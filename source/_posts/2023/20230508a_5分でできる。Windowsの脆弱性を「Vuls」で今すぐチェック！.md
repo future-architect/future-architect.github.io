@@ -8,7 +8,7 @@ tag:
   - Vuls
 category:
   - Security
-thumbnail: /images/20230508a/vuls.png
+thumbnail: /images/2023/20230508a/vuls.png
 author: 島ノ江励
 lede: "弊チームがOSSとして公開しメンテナンスしている「Vuls」の新機能についてご紹介させていただきたいと思います。皆さんは、自社が保有するサーバやソフトウェアに脆弱性がないかどうか、どのようにチェックしていますか？"
 ---
@@ -35,7 +35,7 @@ lede: "弊チームがOSSとして公開しメンテナンスしている「Vuls
 
 1万 GitHub Star目前！
 
-<img src="/images/20230508a/vuls.png" alt="" loading="lazy">
+<img src="/images/2023/20230508a/vuls.png" alt="" loading="lazy">
 
 そんな便利ツールのVulsですが、これまではWindowsはサポートしていませんでした。
 
@@ -108,7 +108,7 @@ vuls.exe scan
 vuls.exe report
 ```
 
-<img src="/images/20230508a/vuls_report.png" alt="" loading="lazy">
+<img src="/images/2023/20230508a/vuls_report.png" alt="" loading="lazy">
 
 自分のサーバで見つかった脆弱性と、それらのCVSSスコアなどが表形式で表示されました。
 

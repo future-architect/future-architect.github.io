@@ -10,7 +10,7 @@ tag:
   - Security
 category:
   - Infrastructure
-thumbnail: /images/20240606a/thumbnail.png
+thumbnail: /images/2024/20240606a/thumbnail.png
 author: 平井隆太
 lede: "AWS Cloud Questの魅力や使い方、そして実際にプレイしてみた感想をAWS初学者の目線でお伝えします。"
 ---
@@ -38,7 +38,7 @@ EC2・RDSなどAWS主要サービスの機能・役割に対する知識はあ�
 **しかも無料！（ここ大事）**
 
 その他のロールは以下のようになっております。
-<img src="/images/20240606a/cq_jp_2-1024x313.png" alt="" width="1024" height="313" loading="lazy">
+<img src="/images/2024/20240606a/cq_jp_2-1024x313.png" alt="" width="1024" height="313" loading="lazy">
 
 # 学習できるサービス内容
 
@@ -68,43 +68,43 @@ AWS Cloud Questでは以下の基礎的なサービスや概念について学�
 まずAWS Cloud Questで検索し、[AWS Cloud Questのページ](https://aws.amazon.com/jp/training/digital/aws-cloud-quest/)へ飛びます。
 「クラウドプラクティショナーを無料で試す」を押下します。
 
-<img src="/images/20240606a/image_(3).png" alt="" width="1200" height="557" loading="lazy">
+<img src="/images/2024/20240606a/image_(3).png" alt="" width="1200" height="557" loading="lazy">
 
 [AWS training and certificationのAWS Cloud Quest: Cloud Practitioner](https://explore.skillbuilder.aws/learn/course/external/view/elearning/11458/aws-cloud-quest-cloud-practitioner)のページへ飛ぶので、「ENROLL」を押します。
 
-<img src="/images/20240606a/image_(4).png" alt="" width="1200" height="562" loading="lazy">
+<img src="/images/2024/20240606a/image_(4).png" alt="" width="1200" height="562" loading="lazy">
 
 「ENROLL」を押すとアカウントの作成が求められるので、作成します（すでにAWSアカウントがある人はサインインでOK）
 
-<img src="/images/20240606a/image_(5).png" alt="" width="1140" height="582" loading="lazy">
+<img src="/images/2024/20240606a/image_(5).png" alt="" width="1140" height="582" loading="lazy">
 
 アカウントの作成はこれで終わりです。
 
 以下の画面で「START LEARNING NOW」を押し、遷移先で「START NOW」を押すとプレイ画面に移ります。
 
-<img src="/images/20240606a/32e49e84-1d04-3796-4082-4b1cb3acd90c.png" alt="" width="1200" height="600" loading="lazy">
+<img src="/images/2024/20240606a/32e49e84-1d04-3796-4082-4b1cb3acd90c.png" alt="" width="1200" height="600" loading="lazy">
 
 ## 日本語の設定
 
 次に言語の設定に進んでいきます。
 スタート画面に移ったら、右上の歯車マークから設定に移動します。
-<img src="/images/20240606a/77dad39e-61f3-8a26-fb0d-75cf46acd714.png" alt="" width="1200" height="596" loading="lazy">
+<img src="/images/2024/20240606a/77dad39e-61f3-8a26-fb0d-75cf46acd714.png" alt="" width="1200" height="596" loading="lazy">
 
 設定画面に移ったら、「Language」を選択。
-<img src="/images/20240606a/ca1909bb-6f73-a9e9-fe72-7cc49e8278dc.png" alt="" width="1200" height="611" loading="lazy">
+<img src="/images/2024/20240606a/ca1909bb-6f73-a9e9-fe72-7cc49e8278dc.png" alt="" width="1200" height="611" loading="lazy">
 
 そのまま「日本語」を選択します。
-<img src="/images/20240606a/4ce1c615-1403-affc-1b94-a7bfcff1c364.png" alt="" width="1200" height="611" loading="lazy">
+<img src="/images/2024/20240606a/4ce1c615-1403-affc-1b94-a7bfcff1c364.png" alt="" width="1200" height="611" loading="lazy">
 
 「日本語」を選択すると、確認をされますので「I Understand」を選択します。
-<img src="/images/20240606a/49f6de95-4fc4-f09d-53f5-fb4a644b1ae4.png" alt="" width="1200" height="612" loading="lazy">
+<img src="/images/2024/20240606a/49f6de95-4fc4-f09d-53f5-fb4a644b1ae4.png" alt="" width="1200" height="612" loading="lazy">
 
 するとゲームが再起動され、スタート画面に戻ります。
 
 この段階で「ゲーム開始」が日本語になっていれば成功です。
 （英語表記のまま変わらない場合は、一度設定画面に移動し、スタート画面に戻るを行うと反映されることがあります）。
 
-<img src="/images/20240606a/image_(10).png" alt="image_(10).png" width="1200" height="612" loading="lazy">
+<img src="/images/2024/20240606a/image_(10).png" alt="image_(10).png" width="1200" height="612" loading="lazy">
 
 ここまできたら準備完了です！
 
@@ -120,21 +120,21 @@ AWS Cloud Questでは、街の中で困っている人達の課題をAWSのク�
 
 街中で困っている人に話しかけます。
 
-<img src="/images/20240606a/image_(11).png" alt="" width="1200" height="559" loading="lazy">
+<img src="/images/2024/20240606a/image_(11).png" alt="" width="1200" height="559" loading="lazy">
 
 困っている人の課題を聞き出します。
 今回の依頼ではどうやら**物理サーバーのハードディスクに障害が発生した**ようです。
-<img src="/images/20240606a/image_(12).png" alt="" width="1200" height="613" loading="lazy">
+<img src="/images/2024/20240606a/image_(12).png" alt="" width="1200" height="613" loading="lazy">
 
 新たなハードドライブで代替すれば解決かと思いきや
 **ハードドライブが届くのに48時間もかかってしまい、システムがすぐに復旧できない**。
-<img src="/images/20240606a/image_(18).png" alt="" width="1200" height="616" loading="lazy">
+<img src="/images/2024/20240606a/image_(18).png" alt="" width="1200" height="616" loading="lazy">
 
 そこでソリューションとしてEC2を提案します。
-<img src="/images/20240606a/image_(20).png" alt="" width="1200" height="607" loading="lazy">
+<img src="/images/2024/20240606a/image_(20).png" alt="" width="1200" height="607" loading="lazy">
 
 **EC2を使えば数分で仮想サーバーを立てることが可能である**と伝えます。
-<img src="/images/20240606a/image_(21).png" alt="" width="1200" height="612" loading="lazy">
+<img src="/images/2024/20240606a/image_(21).png" alt="" width="1200" height="612" loading="lazy">
 ここでクエストの受注が完了します。
 
 一旦ここまでの事象・課題・ソリューションを整理します。
@@ -162,12 +162,12 @@ AWS Cloud Questでは、街の中で困っている人達の課題をAWSのク�
 
 </div>
 
-<img src="/images/20240606a/image.png" alt="" width="1200" height="596" loading="lazy">
+<img src="/images/2024/20240606a/image.png" alt="" width="1200" height="596" loading="lazy">
 
 ### 計画
 
 ソリューションの全体像を元に、実践フェーズとDIYフェーズの目標について事前に学びます。
-<img src="/images/20240606a/image_2.png" alt="" width="1200" height="586" loading="lazy">
+<img src="/images/2024/20240606a/image_2.png" alt="" width="1200" height="586" loading="lazy">
 
 ### 実践
 
@@ -175,7 +175,7 @@ AWS Cloud Questでは、街の中で困っている人達の課題をAWSのク�
 
 「ラボを開始」を押すと環境がプロビジョニングされます。
 その後「AWSコンソールを開く」を押すと、学習用のAWSアカウントからAWSコンソールに入ることができ、実際にサービスを構築できます。
-<img src="/images/20240606a/image_3.png" alt="" width="1116" height="565" loading="lazy">
+<img src="/images/2024/20240606a/image_3.png" alt="" width="1116" height="565" loading="lazy">
 その後はステップの指示に従い、サービスを構築していきます。
 （ここでは詳細な構築の流れはスキップします。気になった方はぜひプレイしてみてください）。
 
@@ -183,7 +183,7 @@ AWS Cloud Questでは、街の中で困っている人達の課題をAWSのク�
 
 実践で得た知識をもとに、与えられた課題をクリアします。
 EC2の場合は、「実践フェーズで起動したEC2インスタンスとは異なるアベイラビリティゾーンに、EC2インスタンスを起動しなさい」というものです。
-<img src="/images/20240606a/image_(15).png" alt="" width="1200" height="582" loading="lazy">
+<img src="/images/2024/20240606a/image_(15).png" alt="" width="1200" height="582" loading="lazy">
 
 実践での操作の意味が分かっていれば難なくクリアできます。
 ここまでがクエストをプレイする大まかな流れになります！
@@ -206,7 +206,7 @@ EC2の場合は、「実践フェーズで起動したEC2インスタンスと�
   <span class="fa fa-fw fa-check-circle"></span>
 
 こんな感じで作業の順番が明記されています
-<img src="/images/20240606a/image_(17).png" alt="image_(17).png" width="1200" height="593" loading="lazy">
+<img src="/images/2024/20240606a/image_(17).png" alt="image_(17).png" width="1200" height="593" loading="lazy">
 
 </div>
 

@@ -11,7 +11,7 @@ tag:
   - フォーマッター
 category:
   - Programming
-thumbnail: /images/20221125a/thumbnail.png
+thumbnail: /images/2022/20221125a/thumbnail.png
 author: 川渕皓太
 lede: "こんにちは、Futureでアルバイトをしている川渕です。[前編]ではLSPを用いたVSCode拡張機能開発チュートリアルとサンプルコードの解説を行いました。後編では前編で解説した[lsp-sample]に機能を追加する方法について説明します。"
 ---
@@ -129,11 +129,11 @@ connection.onCodeAction((params) => {
 
 診断に「利用できるクイックフィックス」が追加されます。
 
-<img src="/images/20221125a/codeAction.drawio.png" alt="codeAction.drawio.png" width="1200" height="230" loading="lazy">
+<img src="/images/2022/20221125a/codeAction.drawio.png" alt="codeAction.drawio.png" width="1200" height="230" loading="lazy">
 
 クイックフィックスを実行するとその単語が小文字に自動で修正されます。
 
-<img src="/images/20221125a/toLower.gif" alt="toLower.gif" width="1200" height="675" loading="lazy">
+<img src="/images/2022/20221125a/toLower.gif" alt="toLower.gif" width="1200" height="675" loading="lazy">
 
 # フォーマット時に実行する機能を追加
 
@@ -189,7 +189,7 @@ connection.onDocumentFormatting((params) => {
 ## 動作確認
 
 フォーマットを実行するとFormatting has been executed. (linecount: ${行数})という文字列がファイルの先頭に挿入されるようになります。
-<img src="/images/20221125a/format.gif" alt="format.gif" width="1200" height="675" loading="lazy">
+<img src="/images/2022/20221125a/format.gif" alt="format.gif" width="1200" height="675" loading="lazy">
 
 # コマンドで実行できる機能を追加
 
@@ -201,7 +201,7 @@ connection.onDocumentFormatting((params) => {
 そのため、クライアント側でコマンドを受け、必要な追加情報をサーバに送ることで実装します。
 (「コマンドを実行した」という情報のみが必要な場合は追加情報を送る必要はありません。)
 
-<img src="/images/20221125a/shori_(1).png" alt="" width="1200" height="223" loading="lazy">
+<img src="/images/2022/20221125a/shori_(1).png" alt="" width="1200" height="223" loading="lazy">
 
 GitHubに上がっているコードを参考にしたところ、2通りの実装方法を見つけたので両方紹介しようと思います。
 
@@ -533,7 +533,7 @@ connection.onExecuteCommand((params) => {
 ## 動作確認
 
 任意の範囲を選択肢、コマンドパレットでreverse textを実行すると、選択範囲が反転されます。また、範囲を選択していない場合はドキュメント全体が反転されます。
-<img src="/images/20221125a/reverse.gif" alt="" width="1200" height="675" loading="lazy">
+<img src="/images/2022/20221125a/reverse.gif" alt="" width="1200" height="675" loading="lazy">
 
 # まとめ
 

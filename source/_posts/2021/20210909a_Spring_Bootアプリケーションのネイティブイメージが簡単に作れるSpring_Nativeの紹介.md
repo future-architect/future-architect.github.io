@@ -8,7 +8,7 @@ tag:
   - SpringBoot
 category:
   - Programming
-thumbnail: /images/20210909a/thumbnail.png
+thumbnail: /images/2021/20210909a/thumbnail.png
 author: 本田紘規
 lede: "こんにちは、2021年新卒入社の本田です。Spring Bootアプリケーションのネイティブイメージが簡単に作れる[Spring Native]について調べてみたので、それを紹介します。Spring NativeとはSpring Bootアプリケーションをほとんど変更することなく、ネイティブイメージを生成することを目指したプロジェクトです。ネイティブイメージの実行はJVMによる実行と比べて..."
 ---
@@ -39,7 +39,7 @@ Spring Nativeでは、Spring Bootアプリケーションのネイティブイ�
 
 ### AOTコンパイル方式(上)とインタプリタ+JITコンパイル方式(下)の比較
 
-<img src="/images/20210909a/コンパイルとインタプリタ.png" alt="コンパイルとインタプリタ.png" width="1200" height="354" loading="lazy">
+<img src="/images/2021/20210909a/コンパイルとインタプリタ.png" alt="コンパイルとインタプリタ.png" width="1200" height="354" loading="lazy">
 
 ## GraalVMとは?
 
@@ -51,7 +51,7 @@ Spring Nativeでは、Spring Bootアプリケーションのネイティブイ�
 
 ### GraalVMのアーキテクチャ
 
-<img src="/images/20210909a/graalVMのアーキテクチャ.png" alt="graalVMのアーキテクチャ.png" width="682" height="604" loading="lazy">
+<img src="/images/2021/20210909a/graalVMのアーキテクチャ.png" alt="graalVMのアーキテクチャ.png" width="682" height="604" loading="lazy">
 
 Spring Nativeの話だったのに一体何の話をしているんだ。。と思われたかもしれませんが、GraalVMは多言語を実行できる仮想マシンという側面の他に、ネイティブイメージ生成機能をもっています。Spring Nativeで用いられているのはGraalVMのネイティブイメージ生成機能です。
 
@@ -73,7 +73,7 @@ Spring Nativeは動的機能を使うためのヒント文をアノテーショ�
 
 Spring InitializrでSpring WebとSpring Nativeを依存関係に追加してプロジェクトのひな型を生成します。
 
-<img src="/images/20210909a/spring_initializr.png" alt="spring_initializr.png" width="1200" height="675" loading="lazy" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;">
+<img src="/images/2021/20210909a/spring_initializr.png" alt="spring_initializr.png" width="1200" height="675" loading="lazy" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;">
 
 非常にシンプルなアプリケーションを記述します。
 
@@ -100,15 +100,15 @@ public class HelloController {
 
 Spring Initializrを使ってSpring Nativeを依存関係に追加してプロジェクトを生成した場合、Mavenなら、`mvn spring-boot:build-image`というコマンドを使ってネイティブイメージのコンテナを生成できます。この機能を使う場合、コンテナ上でビルドが行われるため、GraalVMを端末にインストールしている必要がありません。単にネイティブイメージを生成する場合はGraalVM native build toolを使うみたいです。私はGraalVMをダウンロードしていないので、pom.xmlからnative buildツール関係の依存を削除した後、このコマンドを走らせました。私の環境(Windows 10、Core i5 10210U、 メモリ16GB、Dockerに割り当てたメモリ8GB)だと7分12秒かかりました。
 
-<img src="/images/20210909a/image.png" alt="image.png" width="1200" height="552" loading="lazy">
+<img src="/images/2021/20210909a/image.png" alt="image.png" width="1200" height="552" loading="lazy">
 
 ### コンテナを走らせる。
 
-<img src="/images/20210909a/image_2.png" alt="image.png" width="1200" height="765" loading="lazy">
+<img src="/images/2021/20210909a/image_2.png" alt="image.png" width="1200" height="765" loading="lazy">
 
 0.076秒で起動しました。
 
-<img src="/images/20210909a/image_3.png" alt="image.png" width="1200" height="642" loading="lazy" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;">
+<img src="/images/2021/20210909a/image_3.png" alt="image.png" width="1200" height="642" loading="lazy" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;">
 
 動いているようです。
 

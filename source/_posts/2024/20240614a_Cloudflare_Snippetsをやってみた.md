@@ -8,7 +8,7 @@ tag:
   - 外部寄稿
 category:
   - Programming
-thumbnail: /images/20240614a/thumbnail.png
+thumbnail: /images/2024/20240614a/thumbnail.png
 author: 亀田治伸
 lede: "Cloudflare Snippetsは新しいCloudflareのサービスであり2023年6月にクローズドアルファ版がリリースされ、2024 Develoer Weekでは無作為に抽出された5%のユーザーが利用可能になっていました。6月頭より全ユーザーが利用可能となったサービスです。"
 ---
@@ -29,7 +29,7 @@ Cloudflare の CDN/WAF はルールという機能を提供しています。変
 
 SnippetsはCloudflare Workersのプラットフォームを流用することで、ルールとして新しくJavaScriptの断片（これをSnippetsと呼びます）を実行させることができるようになりました。
 
-<img src="/images/20240614a/abstract.png" alt="" width="1200" height="325" loading="lazy">
+<img src="/images/2024/20240614a/abstract.png" alt="" width="1200" height="325" loading="lazy">
 
 ## Cloudflare Workers との違い
 
@@ -39,7 +39,7 @@ Cloudflare Workers はWeb Workershttps://developer.mozilla.org/en-US/docs/Web/AP
 
 また常に起動するWorkersと異なり、ルールエンジンと連携することで特定の条件に合致したときのみ起動、といった制御が可能です。
 
-<img src="/images/20240614a/2.png" alt="" width="1200" height="766" loading="lazy">
+<img src="/images/2024/20240614a/2.png" alt="" width="1200" height="766" loading="lazy">
 
 この性質により、1つ処理を1つのSnippetsとして分割しておくことで、1つの通信に複数のSnippetsを起動させる、ということも可能です。
 
@@ -54,23 +54,23 @@ Cloudflare Workers はWeb Workershttps://developer.mozilla.org/en-US/docs/Web/AP
 
 等を参考にCDN経由のサイトを立てます。
 
-<img src="/images/20240614a/3.png" alt="" width="370" height="165" loading="lazy">
+<img src="/images/2024/20240614a/3.png" alt="" width="370" height="165" loading="lazy">
 
 マネジメントコンソールから`Rules`→`Snippets`をクリックします。
 `Create a Snippet`をクリックします。
 
-<img src="/images/20240614a/4.png" alt="" width="1200" height="487" loading="lazy">
+<img src="/images/2024/20240614a/4.png" alt="" width="1200" height="487" loading="lazy">
 
 デフォルトで提供されるサンプルSnippetをそのままデプロイするため`Configure to add Snippet rule`をクリックします。
 次にSnippet機能を制御するルールを作成します。
 
-<img src="/images/20240614a/5.png" alt="" width="1127" height="588" loading="lazy">
+<img src="/images/2024/20240614a/5.png" alt="" width="1127" height="588" loading="lazy">
 
 こうすることでクライアントが日本からの通信のみSnippetを起動させるということができます。
 `Configure to create snippet`→`Save and deploy snippet`とボタンを押せば完了です。
 サイトにアクセスすると以下のようにHeaderが付与されていれることがわかります。
 
-<img src="/images/20240614a/6.png" alt="" width="874" height="264" loading="lazy">
+<img src="/images/2024/20240614a/6.png" alt="" width="874" height="264" loading="lazy">
 デフォルトコードは以下です。
 
 ```js snippet.js

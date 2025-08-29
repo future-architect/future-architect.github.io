@@ -8,7 +8,7 @@ tag:
   - 登壇レポート
 category:
   - Infrastructure
-thumbnail: /images/20210910a/thumbnail.png
+thumbnail: /images/2021/20210910a/thumbnail.png
 author: 伊藤太斉
 lede: "Future Tech Night #15への登壇レポートと、内容についての解説です。"
 ---
@@ -46,7 +46,7 @@ lede: "Future Tech Night #15への登壇レポートと、内容についての�
 これで、無事使うサービスがCloud Runに決定しましたので、インフラの概形が出来上がりました。
 次からはいよいよ内部の設定などを行っていきます。
 
-<img src="/images/20210910a/Untitled_Diagram.png" alt="Untitled_Diagram.png" width="1011" height="541" loading="lazy">
+<img src="/images/2021/20210910a/Untitled_Diagram.png" alt="Untitled_Diagram.png" width="1011" height="541" loading="lazy">
 
 ## Serverless NEGの利用
 
@@ -72,7 +72,7 @@ Cloud Runは独自でエンドポイントが生成され、それをCNAMEとし
 
 さて、ここまでで、以下の構成が出来上がりました。これで完成に見えましたが、ハマりどころもあったので次で説明します。
 
-<img src="/images/20210910a/projects_(1).png" alt="projects_(1).png" width="1200" height="605" loading="lazy">
+<img src="/images/2021/20210910a/projects_(1).png" alt="projects_(1).png" width="1200" height="605" loading="lazy">
 
 ## ハマりどころ
 

@@ -9,7 +9,7 @@ tag:
   - 初心者向け
 category:
   - Programming
-thumbnail: /images/20200429/thumbnail.png
+thumbnail: /images/2020/20200429/thumbnail.png
 author: 丸野大輔
 lede: "はじめまして、2019年4月入社_FRX_DigitalLibraryチームの丸野です。研修修了後PJにアサインされて約4ヶ月ほどReact.jsを使って開発を行ってきましたが、Reduxの理解にとても苦しみました。そこで今回はReduxの概要を噛み砕いて説明していきます。同じ悩みを持つ人の理解の助けになればと思います。"
 ---
@@ -31,7 +31,7 @@ lede: "はじめまして、2019年4月入社_FRX_DigitalLibraryチームの丸�
 Reduxとは、React.jsで使用するstateつまりアプリケーションの状態を管理するフレームワークです
 簡単にReduxの概念の下記に図式化してみました
 
-<img src="/images/20200429/1.png" alt="Redux概念図" loading="lazy">
+<img src="/images/2020/20200429/1.png" alt="Redux概念図" loading="lazy">
 
 **State**：アプリケーションの状態
 **Action**：ユーザーが何押したいかという情報を持つオブジェクト
@@ -46,7 +46,7 @@ Reduxとは、React.jsで使用するstateつまりアプリケーションの�
 
 * ユーザーのインプットによってComponent上からAction作成依頼が飛びActionCreatorでActionが作成されます
 
-<img src="/images/20200429/2.png" alt="Action作成" class="img-small-size" loading="lazy">
+<img src="/images/2020/20200429/2.png" alt="Action作成" class="img-small-size" loading="lazy">
 
 * 今回はStateの更新を目的としたActionを想定いたします
 * 作成されるActionは下記のようなもので、type項目で他のActionと区別しています
@@ -81,7 +81,7 @@ import { testFunctionA } from "testActionCreator";
 
 ## （2）Actionをdispatchする
 
-<img src="/images/20200429/3.png" alt="Actionのディスパッチ" class="img-small-size" loading="lazy">
+<img src="/images/2020/20200429/3.png" alt="Actionのディスパッチ" class="img-small-size" loading="lazy">
 
 * Actionを生成するだけではStore内のStateを更新することは出来ません
 * dispatchすることによってActionをStoreに送ることが出来ます

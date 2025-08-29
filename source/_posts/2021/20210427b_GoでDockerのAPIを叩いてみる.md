@@ -11,7 +11,7 @@ tag:
   - ログ
 category:
   - Programming
-thumbnail: /images/20210427b/thumbnail.png
+thumbnail: /images/2021/20210427b/thumbnail.png
 author: 澁川喜規
 lede: "Future Tech Night #7で「GoでDockerのAPIを叩いてみる」という発表をしてきました。近年、コンテナの利用はますます増えています。実行環境としても、クラウドサービスでコンテナをホストするサービスは増えています。コンテナを動かすサービスもあれば、K8Sの利用も増えています。Kubernetesも最小のビルディングブロックはコンテナです。K8SのKnativeベースのGCP Cloud Runが僕の最近のお気に入りです。AWS Lambdaもコンテナを実行できるようになりました"
 ---
@@ -24,7 +24,7 @@ lede: "Future Tech Night #7で「GoでDockerのAPIを叩いてみる」という
 
 近年、コンテナの利用はますます増えています。実行環境としても、クラウドサービスでコンテナをホストするサービスは増えています。コンテナを動かすサービスもあれば、K8Sの利用も増えています。Kubernetesも最小のビルディングブロックはコンテナです。K8SのKnativeベースのGCP Cloud Runが僕の最近のお気に入りです。
 
-<img src="/images/20210427b/スクリーンショット_2021-03-18_23.43.23.png" alt="Clloud Runロゴ" loading="lazy">
+<img src="/images/2021/20210427b/スクリーンショット_2021-03-18_23.43.23.png" alt="Clloud Runロゴ" loading="lazy">
 
 AWS Lambdaもコンテナを実行できるようになりました
 
@@ -44,7 +44,7 @@ AWS Lambdaもコンテナを実行できるようになりました
 
 Dockerをインストールして実際にサーバーなりを起動する場合、操作はdockerコマンドで行います。このdockerコマンドは単に命令を送るだけで、実態はWindowsなりLinuxなりmacOSで常駐プログラムとして実装されているサーバー(dockerd)が行います。
 
-<img src="/images/20210427b/スクリーンショット_2021-04-23_0.32.50.png" alt="dockerdがdockerコマンドを受け取る図" loading="lazy">
+<img src="/images/2021/20210427b/スクリーンショット_2021-04-23_0.32.50.png" alt="dockerdがdockerコマンドを受け取る図" loading="lazy">
 
 Linuxはプロセスやファイルシステムを隔離してそのプロセスだけが動いているように見える状態で動きます。Linuxカーネルが持つ機能を使います。WindowsとmacはHyperVやHypervisor.FrameworkといったOSが持つ仮想PC機能を使い、Linuxを動かし、その中でLinuxカーネルの機能を使って動かします。コンテナごとに独立したOSが起動しているわけではなく、1つのLinuxの中で隔離機能を使って作った環境の中でそれぞれのプロセスが起動します。
 
@@ -70,7 +70,7 @@ dockerコマンドなどはこの命令を自分で組み立てているわけ�
 
 https://docs.docker.com/engine/api/sdk/
 
-<img src="/images/20210427b/スクリーンショット_2021-03-18_23.20.12.png" alt="Docker Engine SDKsページのキャプチャ" loading="lazy">
+<img src="/images/2021/20210427b/スクリーンショット_2021-03-18_23.20.12.png" alt="Docker Engine SDKsページのキャプチャ" loading="lazy">
 
 # Dockerのログビューアを作ってみる
 
@@ -84,7 +84,7 @@ https://docs.docker.com/engine/api/sdk/
 
 このブログの[フューチャーOSS推進タスクフォース始めます](/articles/20201107/)の記事の中で、ログビューアというものがこっそり書かれていましたが、それがこれにあたります。
 
-<img src="/images/20210427b/スクリーンショット_2021-04-23_1.24.57.png" alt="構造ログビューアをやると書いているブログ記事" loading="lazy">
+<img src="/images/2021/20210427b/スクリーンショット_2021-04-23_1.24.57.png" alt="構造ログビューアをやると書いているブログ記事" loading="lazy">
 
 最終的に出来上がったコードがこれです。
 
@@ -92,7 +92,7 @@ https://gitlab.com/osaki-lab/secondsight
 
 アーキテクチャはこんな感じです。
 
-<img src="/images/20210427b/スクリーンショット_2021-04-23_1.25.24.png" alt="DockerログをオンメモリDBに保存、GoでWebAPIをたててgo:embedでHTML/JSを配信してするReactアプリ" loading="lazy">
+<img src="/images/2021/20210427b/スクリーンショット_2021-04-23_1.25.24.png" alt="DockerログをオンメモリDBに保存、GoでWebAPIをたててgo:embedでHTML/JSを配信してするReactアプリ" loading="lazy">
 
 ## Docker APIの利用
 
@@ -115,7 +115,7 @@ https://github.com/docker/cli
 
 完成したのが次のプログラムです。半年ぐらい前に作って放置していたものを、発表の一週間前ぐらいからいじり初めてGoのコードをゼロから作り直して、動くようにしてみました（ので実践投入はまだ）。壮大な構想のために複雑化していたところをバサッと切り捨ててシンプルにしました。
 
-<img src="/images/20210427b/secondsight.gif" alt="ログビューアの動作イメージ動画" loading="lazy">
+<img src="/images/2021/20210427b/secondsight.gif" alt="ログビューアの動作イメージ動画" loading="lazy">
 
 なお、これの実装中に調べて書いたのが次のエントリーです。
 

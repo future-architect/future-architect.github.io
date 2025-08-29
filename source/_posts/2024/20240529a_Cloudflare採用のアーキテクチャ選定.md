@@ -9,12 +9,12 @@ tag:
   - WAF
 category:
   - Infrastructure
-thumbnail: /images/20240529a/thumbnail.png
+thumbnail: /images/2024/20240529a/thumbnail.png
 author: 宮崎将太
 lede: "どんなアーキテクチャでCloudflareを採用したのか？結論ですが、ハイブリッドクラウド構成でのCDN/WAFとして"
 ---
 
-<img src="/images/20240529a/image.png" alt="" width="1200" height="404" loading="lazy">
+<img src="/images/2024/20240529a/image.png" alt="" width="1200" height="404" loading="lazy">
 
 [Cloudflare連載](/articles/20240527a/)3日目の記事です。
 
@@ -34,7 +34,7 @@ lede: "どんなアーキテクチャでCloudflareを採用したのか？結論
 
 Cloudflareに期待する役割はCDN、WAF（ついでにDNS）であり、各サービスへのゲートウェイとして機能しています。  
 
-<img src="/images/20240529a/c0453d5e-005e-585d-29ef-99f8ced603fd.png" alt="" width="1200" height="499" loading="lazy">
+<img src="/images/2024/20240529a/c0453d5e-005e-585d-29ef-99f8ced603fd.png" alt="" width="1200" height="499" loading="lazy">
 
 ## 取りうるアーキテクチャの比較
 
@@ -71,7 +71,7 @@ CDN、WAF、DNSはAWS/Azure単体でカバーすることもできるので、�
 
 ### （1）AWSとAzureをそれぞれ独立させて管理する  
 
-<img src="/images/20240529a/709b68d9-ec9a-4772-3e99-028227cfc9d1.png" alt="" width="922" height="538" loading="lazy">
+<img src="/images/2024/20240529a/709b68d9-ec9a-4772-3e99-028227cfc9d1.png" alt="" width="922" height="538" loading="lazy">
 
 AWSではCloudFront/AWS WAF、AzureではAzureFrontDoorを採用し、それぞれ独立したシステムとするパターンです。  
 まずはこのパターンを考えたくなると思います。  
@@ -84,7 +84,7 @@ AWSではCloudFront/AWS WAF、AzureではAzureFrontDoorを採用し、それぞ�
 
 ### （2）AWSかAzureをゲートウェイとし、もう片方のクラウドにルーティングさせる  
 
-<img src="/images/20240529a/eaa742af-4d9b-05f2-7afe-26d3cea905f0.png" alt="" width="1200" height="489" loading="lazy">
+<img src="/images/2024/20240529a/eaa742af-4d9b-05f2-7afe-26d3cea905f0.png" alt="" width="1200" height="489" loading="lazy">
 
 （1）を考えた時に、CDN/WAFのコスト/運用を圧縮しようと思うと片方のクラウドをゲートウェイ化する案も考えられます。
 
@@ -96,7 +96,7 @@ AWSではCloudFront/AWS WAF、AzureではAzureFrontDoorを採用し、それぞ�
 
 ### （3）Cloudflareをゲートウェイとし、それぞれのクラウドにルーティングさせる
 
-<img src="/images/20240529a/03bf4522-e2c8-0868-f056-1e8d077d298c.png" alt="" width="1200" height="478" loading="lazy">
+<img src="/images/2024/20240529a/03bf4522-e2c8-0868-f056-1e8d077d298c.png" alt="" width="1200" height="478" loading="lazy">
 
 最後に件のCloudflareをゲートウェイとするパターンです。  
 

@@ -10,12 +10,12 @@ tag:
   - 構文解析
 category:
   - Programming
-thumbnail: /images/20220301a/thumbnail.png
+thumbnail: /images/2022/20220301a/thumbnail.png
 author: 空閑康太
 lede: "Mypy や Pyright は Python の静的解析ツールとして有名ですが、これら二つに解析情報でどのような違いがあるのかわからなかったので、実験することにしました。Pyright は Mypy に比べて後発のプロジェクトですが、性能面で優れているなどとして徐々に注目を集めています。"
 ---
 
-<img src="/images/20220301a/mypy.png" alt="" width="600" weihgt="376">
+<img src="/images/2022/20220301a/mypy.png" alt="" width="600" weihgt="376">
 
 # はじめに
 

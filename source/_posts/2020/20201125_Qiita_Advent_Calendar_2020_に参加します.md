@@ -8,7 +8,7 @@ tag:
   - Qiita
 category:
   - Culture
-thumbnail: /images/20201125/thumbnail.png
+thumbnail: /images/2020/20201125/thumbnail.png
 author: 伊藤太斉
 lede: "師走と呼ばれる12月、忙しくなる季節が今年もやってまいりました。そんな12月にフューチャーは今年もQiita主催のアドベントカレンダーに参加します"
 ---
@@ -18,7 +18,7 @@ lede: "師走と呼ばれる12月、忙しくなる季節が今年もやって�
 
 師走と呼ばれる12月、忙しくなる季節が今年もやってまいりました。そんな12月にフューチャーは今年もQiita主催のアドベントカレンダーに参加します。
 
-<img src="/images/20201125/advent-calendar-1865325_1280.png" alt="" title="PixalineによるPixabayからの画像">
+<img src="/images/2020/20201125/advent-calendar-1865325_1280.png" alt="" title="PixalineによるPixabayからの画像">
 
 ## アドベントカレンダーとは
 
@@ -42,7 +42,7 @@ IT技術ブログ界隈ではこれにならって25日までの間、リレー�
 
 今年のアドベントカレンダーはこちらになります。例年通りQiitaに作成しています。
 
-<img src="/images/20201125/image.png" loading="lazy">
+<img src="/images/2020/20201125/image.png" loading="lazy">
 
 * [フューチャー Advent Calendar 2020](https://qiita.com/advent-calendar/2020/future)
 

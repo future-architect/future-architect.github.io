@@ -9,7 +9,7 @@ tag:
   - 登壇レポート
 category:
   - Programming
-thumbnail: /images/20220525a/thumbnail.png
+thumbnail: /images/2022/20220525a/thumbnail.png
 author: 藤田春佳
 lede: "Flutterアプリのperformance測定と基本的な実装ポイントについてご紹介します。1.Performanceについて、2.DevToolsについて..."
 ---
@@ -33,18 +33,18 @@ lede: "Flutterアプリのperformance測定と基本的な実装ポイントに�
 ## DevToolsについて
 
 [公式ページ](https://docs.flutter.dev/development/tools/devtools/overview)でも紹介されるように、`Widget inspector`, CPU profiler, Memory view, Performance view, Network view, Logging view, Debug機能を持っています。勉強会では、Performance viewと、Memory viewを紹介しました。
-<img src="/images/20220525a/image.png" alt="DevToolsについて" width="1200" height="674" loading="lazy">
+<img src="/images/2022/20220525a/image.png" alt="DevToolsについて" width="1200" height="674" loading="lazy">
 
 以前に技術ブログで紹介した[Performance viewの使い方](https://future-architect.github.io/articles/20220317a/)の振り返りにもなりましたが、勉強会では、さらに実装上の注意点をデモを交えてお話しました。
-<img src="/images/20220525a/image_2.png" alt="DevToolsによる性能測定(Performance View)" width="1200" height="676" loading="lazy">
+<img src="/images/2022/20220525a/image_2.png" alt="DevToolsによる性能測定(Performance View)" width="1200" height="676" loading="lazy">
 
-<img src="/images/20220525a/image_3.png" alt="Frameと処理時間" width="1200" height="675" loading="lazy">
+<img src="/images/2022/20220525a/image_3.png" alt="Frameと処理時間" width="1200" height="675" loading="lazy">
 
 レンダリングPerformanceについての実装上の注意の基本的な3点を紹介しました。3番目については、デモとコードを用いてお話しています。
-<img src="/images/20220525a/image_4.png" alt="レンダリングPerformance tips" width="1200" height="676" loading="lazy">
+<img src="/images/2022/20220525a/image_4.png" alt="レンダリングPerformance tips" width="1200" height="676" loading="lazy">
 
 Memory viewの紹介もしています。機能は大きく分けると以下の2つで、１）Memory 使用量とイベントの時系列グラフ表示、２）Memory上のインスタンス分析（SnapShot時の分析と、trace分析の2種類）になります。
-<img src="/images/20220525a/image_5.png" alt="DevToolsによる性能測定 Memory View" width="1200" height="676" loading="lazy">
+<img src="/images/2022/20220525a/image_5.png" alt="DevToolsによる性能測定 Memory View" width="1200" height="676" loading="lazy">
 
 ## レンダリングのプロファイリングデモ
 
@@ -128,7 +128,7 @@ class _ItemState extends State<Item> with SingleTickerProviderStateMixin {
 ```
 
 DevToolsのPerformance viewで確認すると、Frame毎に、画面に表示されないウィジェットもすべてBuildされてしまっています。
-<img src="/images/20220525a/build_100loop.gif" alt="DevToolsのPerformance viewで確認" width="1200" height="442" loading="lazy">
+<img src="/images/2022/20220525a/build_100loop.gif" alt="DevToolsのPerformance viewで確認" width="1200" height="442" loading="lazy">
 
 ２）ListView.builderを使用
 上の１）と同じItem ウィジェットを、ListView.builderを使用して表示すると、Frame毎に、画面に表示される数個のウィジェットのみがBuildされることが分かります。
@@ -171,7 +171,7 @@ class _LVBuilderPageState extends State<LVBuilderPage> {
 }
 ```
 
-<img src="/images/20220525a/build_listviewbuilder.gif" alt="DevToolsのPerformance viewで確認" width="1200" height="442" loading="lazy">
+<img src="/images/2022/20220525a/build_listviewbuilder.gif" alt="DevToolsのPerformance viewで確認" width="1200" height="442" loading="lazy">
 
 ## メモリのプロファイリングデモ
 
@@ -181,7 +181,7 @@ class _LVBuilderPageState extends State<LVBuilderPage> {
 - メモリ使用のスパイク(40％以上)を検知してDevToolsが自動でSnapShotを取得（手動でも可能）して、その時のメモリ使用状況を分析できるようになっています。
 - 以下ではImageCache PackageのObject数が急増していることを確認しています。
 
-<img src="/images/20220525a/memory_demo.gif" alt="メモリのプロファイリングデモ" width="1200" height="661" loading="lazy">
+<img src="/images/2022/20220525a/memory_demo.gif" alt="メモリのプロファイリングデモ" width="1200" height="661" loading="lazy">
 
 補足：正確なPerformance測定は実機を用いた「Profile mode」での測定を前提としていますが、勉強会デモでは画面表示のためシミュレータのdebug modeでの確認としています。
 

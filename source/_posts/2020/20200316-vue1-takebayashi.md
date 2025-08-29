@@ -135,11 +135,11 @@ export default {
 画面での出力:
 
 下図のように、テーブルとデバッグ用にテーブルの中身がそれぞれ出力されます。
-<img src="/images/20200316/photo_20200316_01.png" loading="lazy">
+<img src="/images/2020/20200316/photo_20200316_01.png" loading="lazy">
 
 チェックカラムをクリックすると、チェックが付きます。
 デバッグ用に出力したテーブルの中身データにも反映されています。
-<img src="/images/20200316/photo_20200316_02.png" loading="lazy">
+<img src="/images/2020/20200316/photo_20200316_02.png" loading="lazy">
 
 ### うまくいかない例
 
@@ -165,7 +165,7 @@ onLoad () {
 画面での出力:
 
 チェックカラムをクリックしても、デバッグ用に出したデータは書き換わっていません。
-<img src="/images/20200316/photo_20200316_03.png" loading="lazy">
+<img src="/images/2020/20200316/photo_20200316_03.png" loading="lazy">
 
 ## 解決方法
 

@@ -7,7 +7,7 @@ tag:
   - Terraform
 category:
   - Infrastructure
-thumbnail: /images/20210326/thumbnail.png
+thumbnail: /images/2021/20210326/thumbnail.png
 author: 小林澪司
 lede: "アルバイトの小林です。案件で認証プラットフォームである[Auth0]を利用しています。Auth0がHashiCorpとのパートナーシップを結び、TerraformでAuth0リソースの管理が可能となりました。"
 ---
@@ -23,13 +23,13 @@ https://auth0.com/blog/partners-with-hashicorp-terraform/
 
 ## Auth0とは
 
-<img src="/images/20210326/image.png" loading="lazy">
+<img src="/images/2021/20210326/image.png" loading="lazy">
 
 Auth0の概要については[Auth0導入編](/articles/20200122/)をご参照ください。他にも技術ブログには[Auth0関連の記事](/tags/Auth0/)が沢山あります。
 
 ## Terraformとは
 
-<img src="/images/20210326/image_2.png" loading="lazy">
+<img src="/images/2021/20210326/image_2.png" loading="lazy">
 
 TerraformとはHashiCorpによって開発されたオープンソースのクラウド管理ツールです。
 
@@ -370,7 +370,7 @@ resource "auth0_rule" "set_env" {
 
 2年間本当にお世話になりました。ありがとうございました！
 
-<img src="/images/20210326/kobayashi.jpg" loading="lazy">
+<img src="/images/2021/20210326/kobayashi.jpg" loading="lazy">
 
  [^1]: TIG: Technology Innovation Groupの略で、フューチャーの中でも特にIT技術に特化した部隊です。DXユニット: TIGの中にありデジタルトランスフォーメーションに関わる仕事を推進していくチームです。
  [^2]: 執筆中に[terraformer](https://github.com/GoogleCloudPlatform/terraformer)と呼ばれる既存のインフラリソースをリソース定義(.tf)や状態(.tfstate)に落とし込むCLIツールは見つけたのですが、執筆当時はまだ対応リストに記載されていません。

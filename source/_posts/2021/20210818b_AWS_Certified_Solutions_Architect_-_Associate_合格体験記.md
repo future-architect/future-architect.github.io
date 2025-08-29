@@ -7,7 +7,7 @@ tag:
   - 合格記
 category:
   - Programming
-thumbnail: /images/20210818b/thumbnail.png
+thumbnail: /images/2021/20210818b/thumbnail.png
 author: 市川浩暉
 lede: "TIGの市川浩暉です。先日、業務の合間を縫って少しづつ勉強を進めていた、AWS Certified Solutions Architect - Associate（AWS SAA）を受験し、合格することができました。今回は合格までの学習方法と試験を受けた感想を共有したいと思います。この記事がこれから受験する人の一助となれば幸いです。"
 ---
@@ -19,7 +19,7 @@ lede: "TIGの市川浩暉です。先日、業務の合間を縫って少しづ�
 
 この記事がこれから受験する人の一助となれば幸いです。
 
-<img src="/images/20210818b/AWS-SolArchitect-Associate-2020.png" alt="合格バッチ" width="340" height="340" loading="lazy">
+<img src="/images/2021/20210818b/AWS-SolArchitect-Associate-2020.png" alt="合格バッチ" width="340" height="340" loading="lazy">
 
 # AWS Certified Solutions Architect - Associate とは
 
@@ -120,7 +120,7 @@ AWSの認定試験ではよく変な日本語の問題があるとよく言わ�
 
 AWS認定試験に合格すると、いくつかの特典を受けることができます。
 
-<img src="/images/20210818b/image.png" alt="合格後の特典" width="425" height="136" loading="lazy">
+<img src="/images/2021/20210818b/image.png" alt="合格後の特典" width="425" height="136" loading="lazy">
 
 * 50％ Discount on your next Exam
   * 次回受ける認定試験の受験料が半額となる。
@@ -135,7 +135,7 @@ AWS認定試験に合格すると、いくつかの特典を受けることが�
 
 また、試験に合格した証として認定バッチも受け取ることができます。
 
-<img src="/images/20210818b/image_2.png" alt="認定バッチ" width="760" height="744" loading="lazy">
+<img src="/images/2021/20210818b/image_2.png" alt="認定バッチ" width="760" height="744" loading="lazy">
 
 # 感想
 

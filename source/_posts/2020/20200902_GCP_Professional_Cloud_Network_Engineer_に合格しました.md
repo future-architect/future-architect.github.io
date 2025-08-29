@@ -8,7 +8,7 @@ tag:
   - Network
 category:
   - Infrastructure
-thumbnail: /images/20200902/thumbnail.png
+thumbnail: /images/2020/20200902/thumbnail.png
 author: 西田好孝
 lede: "今回、GCP の `Professional Cloud Network Engineer` という資格に合格したので、その際の体験を記載しておきます。"
 ---
@@ -17,7 +17,7 @@ lede: "今回、GCP の `Professional Cloud Network Engineer` という資格に
 
 今回、GCP の `Professional Cloud Network Engineer` という資格に合格したので、その際の体験を記載しておきます。
 
-<img src="/images/20200902/1_zRKo4d8TLjscKiHqgk6u5w.png" class="img-small-size" loading="lazy">
+<img src="/images/2020/20200902/1_zRKo4d8TLjscKiHqgk6u5w.png" class="img-small-size" loading="lazy">
 
 Cloud Architect の資格の体験記は[こちら](/articles/20190530/)
 
@@ -152,4 +152,4 @@ Cloud Architect の資格の体験記は[こちら](/articles/20190530/)
 # 合格後の特典
 
 やはりありました。`Cloud Architect` とは別なんですね。
-<img src="/images/20200902/2020-08-22_220718.png" loading="lazy">
+<img src="/images/2020/20200902/2020-08-22_220718.png" loading="lazy">

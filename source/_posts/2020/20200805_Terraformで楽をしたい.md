@@ -10,12 +10,12 @@ tag:
   - IaC
 category:
   - Infrastructure
-thumbnail: /images/20200805/thumbnail.JPG
+thumbnail: /images/2020/20200805/thumbnail.JPG
 author: 伊藤太斉
 lede: "TIG/DX所属のインフラエンジニア兼カメラマンの[伊藤太斉]です。今回のアイキャッチは私が昨年撮ったひまわり畑にしました。Infrastructure as Codeでキャッチアップやインフラのリリースができることに越したことはありません。この記事では、Terraformの数多くの機能を使って他のIaCツールと可能な限り代用したり、Terraformの世界でリソース作成を完結させるために使い方を改めて突き詰めた内容になります"
 ---
 
-<img src="/images/20200805/ひまわり.jpg" alt="">
+<img src="/images/2020/20200805/ひまわり.jpg" alt="">
 
 本記事は[夏休み自由研究記事](/tags/%E5%A4%8F%E4%BC%91%E3%81%BF%E8%87%AA%E7%94%B1%E7%A0%94%E7%A9%B6/)の第3弾です。
 

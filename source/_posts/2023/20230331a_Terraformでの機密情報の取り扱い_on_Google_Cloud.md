@@ -9,12 +9,12 @@ tag:
   - Terraform1.4
 category:
   - Security
-thumbnail: /images/20230331a/thumbnail.png
+thumbnail: /images/2023/20230331a/thumbnail.png
 author: 岸下優介
 lede: "最近、Terraform内での機密情報の取り扱いについて触れることがあり、Terraformのv1.4のInteractive input for sensitive variables is now masked in the UI (#29520) についてのENHANCEMENTを取り上げつつ、Terraform環境上での機密情報の取り扱いについて.."
 ---
 
-<img src="/images/20230331a/mozillasops.png" alt="" width="711" height="411">
+<img src="/images/2023/20230331a/mozillasops.png" alt="" width="711" height="411">
 
 ## はじめに
 
@@ -243,7 +243,7 @@ Terraform will perform the following actions:
 
 また、コンソールから復号化されたAPIKEYがちゃんと入っているかどうかも確認してみると、ちゃんと入ってますね🎊
 
-<img src="/images/20230331a/d02d879d-a94b-e788-ccc0-cffad344e32c.png" alt="" width="628" height="218" loading="lazy">
+<img src="/images/2023/20230331a/d02d879d-a94b-e788-ccc0-cffad344e32c.png" alt="" width="628" height="218" loading="lazy">
 
 このようにCloud KMSを利用することで、機密情報を一々入力する必要がなくなり、更に機密情報の内容は追加した本人のみしか知らない状態でTerraform上の運用が可能になります。
 

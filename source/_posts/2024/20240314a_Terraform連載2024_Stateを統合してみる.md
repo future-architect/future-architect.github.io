@@ -7,7 +7,7 @@ tag:
   - tfstate-merge
 category:
   - Infrastructure
-thumbnail: /images/20240314a/thumbnail.png
+thumbnail: /images/2024/20240314a/thumbnail.png
 author: 原田達也
 lede: "tfstateを統合する機会があったので、その経験をもとにまとめます。"
 ---
@@ -94,7 +94,7 @@ Stateを直接操作することはあまり推奨されないですが、今回
 
 操作イメージとしては以下のような手順です
 
-<img src="/images/20240314a/terraform_merge.drawio.png" alt="terraform_merge.drawio.png" width="427" height="429" loading="lazy">
+<img src="/images/2024/20240314a/terraform_merge.drawio.png" alt="terraform_merge.drawio.png" width="427" height="429" loading="lazy">
 
 手順:
 

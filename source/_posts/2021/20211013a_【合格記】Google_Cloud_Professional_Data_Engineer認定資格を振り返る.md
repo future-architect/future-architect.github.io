@@ -8,12 +8,12 @@ tag:
   - データエンジニアリング
 category:
   - Infrastructure
-thumbnail: /images/20211013a/thumbnail.png
+thumbnail: /images/2021/20211013a/thumbnail.png
 author: 玉木竜二
 lede: "TIGの玉木です。先日Professional Data Engineer認定資格を取得しました。この記事ではその振り返りをします。新卒から3年半ほど機械学習モデリングを行っており、ここ半年はAWSでサーバーサイドの実装を主に担当しています。業務でGCPを扱ったことはありませんが、社内で「みんなで資格とっていきましょう！」のような機運があり、以前から機械学習とも関係があるデータエンジニアリングに興味があったため、今回Professional Data Engineer認定資格を受けることにしました。"
 ---
 
-<img src="/images/20211013a/follow-learning-path_2x.png" alt="" width="476" height="274" title="学習イメージ" loading="lazy">
+<img src="/images/2021/20211013a/follow-learning-path_2x.png" alt="" width="476" height="274" title="学習イメージ" loading="lazy">
 
 こんにちは、TIGの玉木です。先日[Professional Data Engineer認定資格](https://cloud.google.com/certification/data-engineer?hl=ja)を取得しました。この記事ではその振り返りをします。
 

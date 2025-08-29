@@ -10,11 +10,11 @@ tag:
   - Rust
 category:
   - DB
-thumbnail: /images/20231120a/thumbnail.png
+thumbnail: /images/2023/20231120a/thumbnail.png
 author: 山田修路
 lede: "新しいSQLフォーマッターであるuroboroSQL-fmtをリリースしました"
 ---
-<img src="/images/20231120a/top.png" alt="" width="630" height="229">
+<img src="/images/2023/20231120a/top.png" alt="" width="630" height="229">
 
 コアテクノロジーグループの山田です。
 
@@ -208,7 +208,7 @@ wasm版は[こちらのデモ](https://future-architect.github.io/uroborosql-fmt
 
 ##### wasm版の実行イメージ
 
-<img src="/images/20231120a/wasm版フォーマットデモ.gif" alt="wasm版フォーマットデモ.gif" width="1200" height="618" loading="lazy">
+<img src="/images/2023/20231120a/wasm版フォーマットデモ.gif" alt="wasm版フォーマットデモ.gif" width="1200" height="618" loading="lazy">
 
 #### 方法2：vscode拡張として使用する
 
@@ -257,7 +257,7 @@ wasm版は[こちらのデモ](https://future-architect.github.io/uroborosql-fmt
 
 ##### vscode拡張版の実行イメージ
 
-<img src="/images/20231120a/vscode版フォーマットデモ.gif" alt="vscode版フォーマットデモ.gif" width="817" height="585" loading="lazy">
+<img src="/images/2023/20231120a/vscode版フォーマットデモ.gif" alt="vscode版フォーマットデモ.gif" width="817" height="585" loading="lazy">
 
 #### 方法3：cliで使用する
 

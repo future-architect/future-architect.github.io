@@ -10,12 +10,12 @@ tag:
   - コアテク
 category:
   - Programming
-thumbnail: /images/20221228a/thumbnail.png
+thumbnail: /images/2022/20221228a/thumbnail.png
 author: 川渕皓太
 lede: "本記事ではRust製SQLフォーマッタであるuroborosql-fmtのVSCode拡張機能化した方法について説明します。"
 ---
 
-<img src="/images/20221228a/top.png" alt="" width="579" height="216">
+<img src="/images/2022/20221228a/top.png" alt="" width="579" height="216">
 
 # はじめに
 
@@ -67,13 +67,13 @@ lede: "本記事ではRust製SQLフォーマッタであるuroborosql-fmtのVSCo
 * 範囲選択されている場合、その範囲のSQLをフォーマットする
 * 範囲選択されていない場合、全体をフォーマットする
 
-<img src="/images/20221228a/format_extension.gif" alt="format_extension.gif" width="1200" height="675" loading="lazy">
+<img src="/images/2022/20221228a/format_extension.gif" alt="format_extension.gif" width="1200" height="675" loading="lazy">
 
 # 処理の流れ
 
 作成する拡張機能の処理の流れを説明します。
 
-<img src="/images/20221228a/df88766a-9fef-6408-5603-1c17bed7619c.png" alt="" width="1200" height="1190" loading="lazy">
+<img src="/images/2022/20221228a/df88766a-9fef-6408-5603-1c17bed7619c.png" alt="" width="1200" height="1190" loading="lazy">
 
 処理の流れは以下のとおりです。
 
@@ -410,7 +410,7 @@ strip -x *.node
 
 GitHub Actionsでビルドした各環境のNode.jsアドオンをダウンロードします。
 GitHubのリポジトリ > Actions > 最新のワークフローに移動し、ページ最下部のArtifactsのファイルをすべてダウンロードします。
-<img src="/images/20221228a/image.png" alt="image.png" width="1200" height="392" loading="lazy">
+<img src="/images/2022/20221228a/image.png" alt="image.png" width="1200" height="392" loading="lazy">
 各ファイルを解凍すると、各環境に合ったNode.jsアドオンが取得できます。
 
 ## nodeファイルをまとめて圧縮
@@ -447,7 +447,7 @@ GitHubのリポジトリ > Actions > 最新のワークフローに移動し、�
 # 拡張機能の作成
 
 ※再掲
-<img src="/images/20221228a/df88766a-9fef-6408-5603-1c17bed7619c_2.png" alt="" width="1200" height="1190" loading="lazy">
+<img src="/images/2022/20221228a/df88766a-9fef-6408-5603-1c17bed7619c_2.png" alt="" width="1200" height="1190" loading="lazy">
 
 TypeScriptからSQLフォーマッタを呼び出すことができるようになったので、次に拡張機能部分を作成します。
 本記事では[microsoft/vscode-extension-samples/lsp-sample](https://github.com/microsoft/vscode-extension-samples/tree/main/lsp-sample)をベースにして拡張機能を作成します。
@@ -604,7 +604,7 @@ connection.onExecuteCommand((params) => {
 
 クライアントとサーバをコンパイルして実行してみます。
 
-<img src="/images/20221228a/formattest.gif" alt="formattest.gif" width="1200" height="675" loading="lazy">
+<img src="/images/2022/20221228a/formattest.gif" alt="formattest.gif" width="1200" height="675" loading="lazy">
 
 ちゃんとフォーマットされることが確認できました🎉
 
@@ -627,7 +627,7 @@ Python3が必要なためインストールします。既にPython3が入って
 
 まず[こちら](https://www.python.org/downloads/)からインストーラをダウンロードします。
 
-<img src="/images/20221228a/image_2.png" alt="image.png" width="1200" height="522" loading="lazy">
+<img src="/images/2022/20221228a/image_2.png" alt="image.png" width="1200" height="522" loading="lazy">
 
 ダウンロードしたファイルを開き、**一番下の「Add Python 3.x to PATH」にチェックを入れてください。**
 「Install Now」をクリックしてインストールし、「Setup was Succesful」と表示されればインストール完了です。
@@ -649,7 +649,7 @@ npm install -g node-gyp
 次に[こちら](https://visualstudio.microsoft.com/ja/thank-you-downloading-visual-studio/?sku=BuildTools)からVisualStudioのビルドツールのインストーラをダウンロードします。
 インストーラを起動して「C++によるデスクトップ開発」を選択して、**右側の「インストールの詳細」の中の「Windows 10 SDK」にチェックを入れて**右下のインストールをクリックします。(Windows11の方は「Windows 11 SDK」にチェックを入れてください。)
 
-<img src="/images/20221228a/image_3.png" alt="image.png" width="1200" height="635" loading="lazy">
+<img src="/images/2022/20221228a/image_3.png" alt="image.png" width="1200" height="635" loading="lazy">
 
 ### 4. npmの設定
 
@@ -687,7 +687,7 @@ code --install-extension .\uroborosql-fmt-1.0.0.vsix
 
 無事インストールされ、フォーマッタが動くようになったので成功です 🎉
 
-<img src="/images/20221228a/image_4.png" alt="" width="1200" height="629" loading="lazy">
+<img src="/images/2022/20221228a/image_4.png" alt="" width="1200" height="629" loading="lazy">
 
 # まとめ
 

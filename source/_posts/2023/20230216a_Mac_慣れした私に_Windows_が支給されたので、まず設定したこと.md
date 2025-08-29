@@ -12,11 +12,11 @@ tag:
   - Change Key
 category:
   - Infrastructure
-thumbnail: /images/20230216a/thumbnail.png
+thumbnail: /images/2023/20230216a/thumbnail.png
 author: 棚井龍之介
 lede: "これまでは Mac ユーザでしたが、Windows が支給されその利用を開始しました。Windows の環境整備として実施した内容を備忘録としての意味も込めてブログ化しました"
 ---
-<img src="/images/20230216a/top.png" alt="top.png" width="1200" height="676" loading="lazy">
+<img src="/images/2023/20230216a/top.png" alt="top.png" width="1200" height="676" loading="lazy">
 
 # 目次
 
@@ -89,13 +89,13 @@ Mac → Windows への移行時に最も頻発したのが「タイプミス」�
 
 普段の Mac では、PC 標準搭載のキーボードか「Magic Keyboard - 日本語（JIS）」を利用しています。US 配列の方が好みという人もいますが、私はそこにこだわりはなく JIS 配列を使い続けています。
 
-<img src="/images/20230216a/MK2A3J.jpeg" alt="MK2A3J.jpeg" width="1144" height="1144" loading="lazy">
+<img src="/images/2023/20230216a/MK2A3J.jpeg" alt="MK2A3J.jpeg" width="1144" height="1144" loading="lazy">
 
 （画像引用元: [Magic Keyboard - 日本語（JIS）](https://www.apple.com/jp/shop/product/MK2A3J/A/magic-keyboard-%E6%97%A5%E6%9C%AC%E8%AA%9Ejis)）
 
 このキーボードは Windows でも利用できますが、私の環境下ではスペースキーの左右にある「英数」と「かな」が検知されず、テキスト入力時にこのボタンを多用する身としては致命的でした。色々探したところ、ガジェット系 Youtuber やブログが絶賛しており見た目的にも Magic Keyboard に近い、logicool の「[MX KEYS mini KX700GR（グラファイト）](https://www.logicool.co.jp/ja-jp/products/keyboards/mx-keys-mini.920-010516.html)」を購入しました。
 
-<img src="/images/20230216a/71e2SZ0PfyL._AC_SL1500_.jpg" alt="71e2SZ0PfyL._AC_SL1500_.jpg" width="1200" height="539" loading="lazy">
+<img src="/images/2023/20230216a/71e2SZ0PfyL._AC_SL1500_.jpg" alt="71e2SZ0PfyL._AC_SL1500_.jpg" width="1200" height="539" loading="lazy">
 
 （画像引用元: [ロジクール MX KEYS mini KX700GR](https://www.amazon.co.jp/dp/B09HQCW3P8/)）
 
@@ -125,11 +125,11 @@ Mac と同じ入力方法での英数/かな変換のため、キーボード的
 
 まずは検索バーに「IME」入力し、候補の中から「日本語 IME 設定（システム設定）」を開きます。
 
-<img src="/images/20230216a/ime_1.png" alt="ime_1.png" width="974" height="786" loading="lazy">
+<img src="/images/2023/20230216a/ime_1.png" alt="ime_1.png" width="974" height="786" loading="lazy">
 
 続いて、「キーとタッチのカスタマイズ」を選択。
 
-<img src="/images/20230216a/ime_2.png" alt="ime_2.png" width="593" height="583" loading="lazy">
+<img src="/images/2023/20230216a/ime_2.png" alt="ime_2.png" width="593" height="583" loading="lazy">
 
 キーの割り当てにある各キーに好みの機能を割り当てるをオンにして、
 
@@ -138,7 +138,7 @@ Mac と同じ入力方法での英数/かな変換のため、キーボード的
 
 に設定します。
 
-<img src="/images/20230216a/ime_3.png" alt="ime_3.png" width="491" height="865" loading="lazy">
+<img src="/images/2023/20230216a/ime_3.png" alt="ime_3.png" width="491" height="865" loading="lazy">
 
 この設定により、Windows の無変換/変換が、Mac での英数/かな変換と同じ機能を果たすようになります。
 
@@ -156,7 +156,7 @@ Mac と同じ入力方法での英数/かな変換のため、キーボード的
 
 と 3 ステップぐらいのプロセスがかかりますが、Mac の全角状態で「zl」を入力すると、即時「→」に変換されて非常に便利です。この入力方法に慣れてしまうと、むしろ「→」が一発で出力されない環境ではストレスフルになるので、Windows にもこれを適用します。このキーバインドの設定のために、[AutoHotkey](https://www.autohotkey.com/) を利用します。
 
-<img src="/images/20230216a/auk_1.png" alt="auk_1.png" width="1200" height="637" loading="lazy">
+<img src="/images/2023/20230216a/auk_1.png" alt="auk_1.png" width="1200" height="637" loading="lazy">
 
 ダンロードするバージョンとして「v1.1」と「v2.0」の 2 つ候補があります。GitHub のリポジトリを確認したところ、メジャーアップデートとなる v2.0 は [2022 年 12 月 20 日にリリース](https://github.com/AutoHotkey/AutoHotkey/releases)されています。文法改善に伴い後方互換性を捨てたことで v1 系で動作していたスクリプトは一部修正が必要になるようです。ネットの情報としては v1 系のサンプルが多い（最近のリリースというのもあり、v2 系の日本語情報はほとんど見つからない）のですが、それほど複雑な文法を入れる見込みはない点と、AutoHotkey のトップページのメッセージには
 
@@ -166,7 +166,7 @@ Mac と同じ入力方法での英数/かな変換のため、キーボード的
 
 ダウンロードが一通り完了すると、画面右クリックで `AutoHotkey Script` が選択肢に追加され、AutoHotkey 用のスクリプトが GUI から作れるようになります。
 
-<img src="/images/20230216a/auk_2.png" alt="auk_2.png" width="689" height="440" loading="lazy">
+<img src="/images/2023/20230216a/auk_2.png" alt="auk_2.png" width="689" height="440" loading="lazy">
 
 `New Script` にてファイル情報の入力・選択が求められるので、今回は
 
@@ -176,16 +176,16 @@ Mac と同じ入力方法での英数/かな変換のため、キーボード的
 
 の設定でファイルを作成しました。
 
-<img src="/images/20230216a/auk_3.png" alt="auk_3.png" width="413" height="281" loading="lazy">
+<img src="/images/2023/20230216a/auk_3.png" alt="auk_3.png" width="413" height="281" loading="lazy">
 
 （作成後のアイコン）
 
-<img src="/images/20230216a/auk_4.png" alt="auk_4.png" width="123" height="113" loading="lazy">
+<img src="/images/2023/20230216a/auk_4.png" alt="auk_4.png" width="123" height="113" loading="lazy">
 
 ファイルを開くと、デフォルトで 1 行目（#Requires AutoHotkey.0）だけが記入されたファイルの生成を確認できます。
 VSCode では AutoHotkey 専用の拡張機能 [AutoHotkey Plus Plus](https://marketplace.visualstudio.com/items?itemName=mark-wiemer.vscode-autohotkey-plus-plus) があり、code highlighting や code formatting によるサポートが便利です。
 
-<img src="/images/20230216a/auk_5.png" alt="auk_5.png" width="410" height="89" loading="lazy">
+<img src="/images/2023/20230216a/auk_5.png" alt="auk_5.png" width="410" height="89" loading="lazy">
 
 `.ahk` ファイルの編集環境は準備できたので、キーバインドの設定を登録します。
 以下のキーバインドを設定したいので、そのまま .ahk ファイルに追記していきます。
@@ -235,15 +235,15 @@ AutoHotkey の定義により「caps lock を別のボタンに置き換える�
 まずは、caps lock を F13 に変更する設定から。
 Change Key のダウンロードが完了したら「管理者として実行(A)」により起動します。
 
-<img src="/images/20230216a/ck_0.png" alt="ck_0.png" width="665" height="173" loading="lazy">
+<img src="/images/2023/20230216a/ck_0.png" alt="ck_0.png" width="665" height="173" loading="lazy">
 
 変更対象のキーである `CapsLock 英数` を選択します。
 
-<img src="/images/20230216a/ck_1.png" alt="ck_1.png" width="877" height="295" loading="lazy">
+<img src="/images/2023/20230216a/ck_1.png" alt="ck_1.png" width="877" height="295" loading="lazy">
 
 続いて、変更先の F13 を指定したいのですが、デフォルトでは F12 以降の F13 から F24 までは表示されていません。この場合は、右上の `Scan code` を利用して、対応するスキャンコードを直接入力していきます。
 
-<img src="/images/20230216a/ck_2.png" alt="ck_2.png" width="879" height="297" loading="lazy">
+<img src="/images/2023/20230216a/ck_2.png" alt="ck_2.png" width="879" height="297" loading="lazy">
 
 F13 から F24 と スキャンコードの対応表
 
@@ -264,11 +264,11 @@ F13 から F24 と スキャンコードの対応表
 
 F13 の `0x` に続く `0064` のスキャンコードを登録します。
 
-<img src="/images/20230216a/ck_3.png" alt="ck_3.png" width="435" height="259" loading="lazy">
+<img src="/images/2023/20230216a/ck_3.png" alt="ck_3.png" width="435" height="259" loading="lazy">
 
 登録が完了すると、作業前は `CapsLock 英数` だった場所が、`Scan code` に変わっていることが分かります。
 
-<img src="/images/20230216a/ck_4.png" alt="ck_4.png" width="880" height="295" loading="lazy">
+<img src="/images/2023/20230216a/ck_4.png" alt="ck_4.png" width="880" height="295" loading="lazy">
 
 この状態で「登録(R)」→「現在の設定内容で登録します(R)」を選択すると、PC が再起動してキーの入れ替えが完了します。再起動後、[こちらのサイト](https://anysweb.co.jp/advancedkeycheck/) などで入力チェックを行うと、caps lock が F13 と認識されているか確認できます。切り替えがうまくいかない場合、一度 Change Key での「リセット(C)」を利用した上で、caps lock から F13 に 1 ステップで切り替えるのではなく、caps lock → home → F13 のように、別のボタンへの変更を 1 度挟むとうまくいくケースもあるようです。
 
@@ -323,23 +323,23 @@ PC操作の基本である「テキスト入力」が私の使い慣れた Mac �
 
 ueli の [Windows 版をダウンロード](https://ueli.app/#/download)して、設定作業を進めます。
 
-<img src="/images/20230216a/ueli_1.png" alt="ueli_1.png" width="1200" height="695" loading="lazy">
+<img src="/images/2023/20230216a/ueli_1.png" alt="ueli_1.png" width="1200" height="695" loading="lazy">
 
 設定が完了すると、`alt + space` によりランチャーの起動が確認できます。
 
 この起動感、Alfred と同じで快適です。ueli の検索範囲はディレクトリ単位で指定可能なので、使いたいアプリケーションやファイルがヒットしない場合は、設定項目を追加すると検索範囲が拡張できます。
 
-<img src="/images/20230216a/ueli_2.png" alt="ueli_2.png" width="765" height="90" loading="lazy">
+<img src="/images/2023/20230216a/ueli_2.png" alt="ueli_2.png" width="765" height="90" loading="lazy">
 
 ファイル検索としては ueli から `es?<検索ワード>` による Everything の呼び出しが可能なので、その設定作業も進めていきます。
 
 こちらの [ダウンロードサイト](https://www.voidtools.com/downloads/) から、`Everything本体` と `Download Everything Command-line Interface` の 2 つをダウンロードします。Everything 本体は [窓の杜](https://forest.watch.impress.co.jp/library/software/everything/) からもダウンロード可能です。Command-line Interface 側はダウンロード後の解凍 & `es.exe` の配置が完了したら、ueli コンソールの "es.exe" のパスに登録します。
 
-<img src="/images/20230216a/ueli_3.png" alt="ueli_3.png" width="1200" height="907" loading="lazy">
+<img src="/images/2023/20230216a/ueli_3.png" alt="ueli_3.png" width="1200" height="907" loading="lazy">
 
 アプリケーションの起動は ueli 単体、ファイル検索は ueli+Everything の使い方が便利です。ueli の起動コマンドはデフォルトで `alt + space` ですが、このコマンドの組み合わせも任意の形に変更可能なため、この点も含めてポイントの高いランチャーアプリだと思います。私は後述の「右 alt キーを右 Ctrl キーに変更」していることもあり、ueli の起動は `ctrl + space` をホットキーに登録しています。
 
-<img src="/images/20230216a/ueli_4.png" alt="ueli_4.png" width="1200" height="491" loading="lazy">
+<img src="/images/2023/20230216a/ueli_4.png" alt="ueli_4.png" width="1200" height="491" loading="lazy">
 
 # その他の設定
 
@@ -359,12 +359,12 @@ ueli の [Windows 版をダウンロード](https://ueli.app/#/download)して�
 
 このように Change Key を利用して「自分の入力癖に Windows を矯正する」ことを繰り返します。Change Key の設定はコンソールの「参照(F)」→「スキャンコードを含む変更されたキーを一覧表示します(R)」から確認可能なので見てみると、色々な設定が反映されていることが分かります。
 
-<img src="/images/20230216a/other_2.png" alt="other_2.png" width="548" height="427" loading="lazy">
+<img src="/images/2023/20230216a/other_2.png" alt="other_2.png" width="548" height="427" loading="lazy">
 
 変更した場所は赤枠で囲まれて表示されるようです。
 このキー配置が、現時点の私にとっては最適のようです。
 
-<img src="/images/20230216a/other_3.png" alt="other_3.png" width="881" height="298" loading="lazy">
+<img src="/images/2023/20230216a/other_3.png" alt="other_3.png" width="881" height="298" loading="lazy">
 
 ここまで設定して、Mac でのテキスト操作コマンドや「使い慣れた指の操作」をそのまま Windows でも実現でき、Mac にて無意識レベルで習得したコマンドを Windows 下においてもストレスなく正しく利用できるようになってきました。まだ Windows を使い始めて 2 週間も経っていないので、このコマンド設定を利用しつつ何かしらの不便があれば「Mac でどうやって操作してたっけ？」→「Windows で再現しよう」を繰り返しながら、Windwos を使いやすい形にセルフアップデートし続ける予定です。
 

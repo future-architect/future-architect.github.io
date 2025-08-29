@@ -9,7 +9,7 @@ tag:
   - バリデーション
 category:
   - DataScience
-thumbnail: /images/20230531a/thumbnail.png
+thumbnail: /images/2023/20230531a/thumbnail.png
 author: 板野竜也
 lede: "Great Expectationsというツールを使って、表形式データの品質をバリデーションする流れをご紹介します。MLOpsを推進するにあたりMLモデルの監視が必要となってきています。その中でも..."
 ---
@@ -26,7 +26,7 @@ ML監視についての概要や意義については、[こちらの記事](/ar
 
 ## 2. Great Expectationsの概要
 
-<img src="/images/20230531a/2023-05-10-16-41-00.png" alt="" width="500" height="133" loading="lazy">
+<img src="/images/2023/20230531a/2023-05-10-16-41-00.png" alt="" width="500" height="133" loading="lazy">
 
 ※[公式サイト](https://docs.greatexpectations.io/docs/)ロゴ
 
@@ -51,7 +51,7 @@ GXでは「監視対象データ、Expectation Suite、バリデーションを�
 
 以下のような内容になっています。
 
-<img src="/images/20230531a/2023-05-08-16-05-51.png" alt="" width="1200" height="212" loading="lazy">
+<img src="/images/2023/20230531a/2023-05-08-16-05-51.png" alt="" width="1200" height="212" loading="lazy">
 
 例えば、`hr`（時間）の列は0から23までの値しか入らないはずです。もしも、`hr`が27のような不正値をとる行が入ってきた場合、検知するというのがGXの使いどころです。
 
@@ -173,7 +173,7 @@ GXはこのNotebookを実行して、CLIでは設定しずらい詳細な設定�
 
 以下の画像はNotebookの冒頭です。
 
-<img src="/images/20230531a/2023-05-08-14-25-51.png" alt="" width="1200" height="707" loading="lazy">
+<img src="/images/2023/20230531a/2023-05-08-14-25-51.png" alt="" width="1200" height="707" loading="lazy">
 
 Notebook上の以下の変数を自身のプロジェクトに合うように変更する必要があります。
 
@@ -265,7 +265,7 @@ To continue editing this suite, run jupyter notebook <現在のディレクト�
 
 以下の画像はNotebookの冒頭です。
 
-<img src="/images/20230531a/2023-05-08-15-59-41.png" alt="" width="1200" height="1107" loading="lazy">
+<img src="/images/2023/20230531a/2023-05-08-15-59-41.png" alt="" width="1200" height="1107" loading="lazy">
 
 Notebookにて、必要に応じて変更すべき変数は以下の2つです。
 
@@ -282,7 +282,7 @@ Notebookのセルを全て実行すると、自動でExpectation Suiteが作成�
 
 以下はそのJSONファイルを一部展開して表示した画像です。
 
-<img src="/images/20230531a/2023-05-08-16-22-06.png" alt="" width="715" height="853" loading="lazy">
+<img src="/images/2023/20230531a/2023-05-08-16-22-06.png" alt="" width="715" height="853" loading="lazy">
 
 expectationは計13個自動生成されたようです。
 
@@ -292,12 +292,12 @@ expectationは計13個自動生成されたようです。
 
 `great_expectations/uncommitted/data_docs/local_site/index.html`を開くと以下のような画面があり、1度バリデーションが行われていることが分かります。
 
-<img src="/images/20230531a/2023-05-10-10-18-29.png" alt="" width="1200" height="303" loading="lazy">
+<img src="/images/2023/20230531a/2023-05-10-10-18-29.png" alt="" width="1200" height="303" loading="lazy">
 
 クリックして詳細を見てみると、2つのExpectationに不合格となっているようです。\
 自動生成のExpectationが何個も定義されているので、多少は変なExpectationが生成されることもあるのでしょう。
 
-<img src="/images/20230531a/2023-05-10-10-20-31.png" alt="" width="1200" height="990" loading="lazy">
+<img src="/images/2023/20230531a/2023-05-10-10-20-31.png" alt="" width="1200" height="990" loading="lazy">
 
 ### 3.6. Checkpointの作成・実行
 
@@ -352,7 +352,7 @@ Notebookの全てのセルを実行し、末尾のセルのコメントアウト
 
 このようにしてデータの不正・品質劣化を監視できます。
 
-<img src="/images/20230531a/2023-05-10-10-45-19.png" alt="" width="1200" height="923" loading="lazy">
+<img src="/images/2023/20230531a/2023-05-10-10-45-19.png" alt="" width="1200" height="923" loading="lazy">
 
 以上でCheckpointを実行するまでの流れは終了です。
 
@@ -411,7 +411,7 @@ JSONファイルを直接編集することもできますが、複雑なため�
 
 バリデーション結果のドキュメントはHTML形式なのでGCSのエンドポイントにアクセスして閲覧できる設定をすれば便利そうです。
 
-<img src="/images/20230531a/2023-05-10-15-59-58.png" alt="" width="1200" height="903" loading="lazy">
+<img src="/images/2023/20230531a/2023-05-10-15-59-58.png" alt="" width="1200" height="903" loading="lazy">
 
 ※[Great Expectations 公式Docs](https://docs.greatexpectations.io/docs/deployment_patterns/how_to_use_great_expectations_with_google_cloud_platform_and_bigquery)より画像引用
 

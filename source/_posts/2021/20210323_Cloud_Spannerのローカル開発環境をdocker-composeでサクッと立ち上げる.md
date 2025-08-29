@@ -9,7 +9,7 @@ tag:
   - エミュレータ
 category:
   - Infrastructure
-thumbnail: /images/20210323/thumbnail.png
+thumbnail: /images/2021/20210323/thumbnail.png
 author: 齋場俊太朗
 lede: "Cloud Spannerのローカル開発環境をdocker-composeでサクッと立ち上げる手順を紹介します。Cloud Spannerを用いた開発を行う方、また興味あるから少し触ってみたいという方にもおすすめです。簡単にCloud Spanner について紹介させていただきます。"
 ---
@@ -137,7 +137,7 @@ spanner> select * from Singers;
 
 ### ファイル構成
 
-<img src="/images/20210323/image.png" loading="lazy">
+<img src="/images/2021/20210323/image.png" loading="lazy">
 
 * **docker-compose.yaml** : docker-composeファイルです。これを立ち上げます
 * **migrations** : DB初期化時に適用するDDL&DMLを配置します
@@ -156,7 +156,7 @@ spanner> select * from Singers;
 
 ### コンテナ構成のイメージとdocker-compose.yamlの内容
 
-<img src="/images/20210323/image_2.png" loading="lazy">
+<img src="/images/2021/20210323/image_2.png" loading="lazy">
 
 Spannerエミュレータ本体`spanner`とCLIアクセス用の`spanner-cli`は常駐プロセスとして起動し続け、それ以外のコンテナはコマンド実行後に正常終了します
 

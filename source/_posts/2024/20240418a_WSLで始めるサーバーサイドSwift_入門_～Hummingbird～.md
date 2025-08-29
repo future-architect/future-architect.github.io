@@ -10,11 +10,11 @@ tag:
   - Hummingbird
 category:
   - Infrastructure
-thumbnail: /images/20240418a/thumbnail.png
+thumbnail: /images/2024/20240418a/thumbnail.png
 author: 清水雄一郎
 lede: "SwiftにおけるWebフレームワークを取り上げます。SwiftはiOSアプリ開発のイメージが強いと思いますが、iOSアプリ開発以外でも利用できることを紹介します。"
 ---
-<img src="/images/20240418a/image.png" alt="image.png" width="851" height="200" loading="lazy">
+<img src="/images/2024/20240418a/image.png" alt="image.png" width="851" height="200" loading="lazy">
 
 # はじめに
 
@@ -37,7 +37,7 @@ GitHub Star 数を比較した図を以下に示します。
 
 先発のフレームワークであるVaporの方が人気で、検索すると日本語記事もいくつかヒットします。Swift.org内のWebフレームワークチュートリアル[^2]として取り上げられていることからも、Vaporが主流となっていることが伺えます。Vaporについては記事になっているものも多いため、後発のHummingbirdを試します。
 
-<img src="/images/20240418a/star-history-2024416.png" alt="" width="1200" height="866" loading="lazy">
+<img src="/images/2024/20240418a/star-history-2024416.png" alt="" width="1200" height="866" loading="lazy">
 （参考：https://star-history.com/#hummingbird-project/hummingbird&vapor/vapor&Date）
 
 ## Hummingbird とは

@@ -9,12 +9,12 @@ tag:
   - 環境構築
 category:
   - Infrastructure
-thumbnail: /images/20220112a/thumbnail.png
+thumbnail: /images/2022/20220112a/thumbnail.png
 author: 鈴木崇史
 lede: "チームの輪読会でKuberntes完全ガイドを読みました。 k8s本は、GKEを例にしながら、k8sのCLIツールだったりマニフェストのyamlファイルを丁寧に紹介しており、実践的に勉強するの適しています。手を動かしつつ勉強したいところですが、クラウドプロバイダーが提供するマネージドk8sはコストが高めで気分的にほいほい使えないところがあります。となるとローカル環境でk8sを用意したくなります。 "
 ---
 
-<img src="/images/20220112a/minikube.png" alt="" width="1000" height="519">
+<img src="/images/2022/20220112a/minikube.png" alt="" width="1000" height="519">
 
 # k8s学習環境が欲しい
 

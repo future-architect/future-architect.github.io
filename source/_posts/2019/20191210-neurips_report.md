@@ -25,7 +25,7 @@ NeurIPS(Conference on Neural Information Processing Systems)は、機械学習�
 
 それでも参加者が多く、入場の際には長蛇の列ができており、近年の機械学習分野への熱の凄さを体感しました。
 
-<img src="/images/20191210/registration.jpg" loading="lazy">
+<img src="/images/2019/20191210/registration.jpg" loading="lazy">
 
 この会場に入るまでにも長い列があり、ここからこのフロアを一周して、やっと受付です(^^;
 
@@ -35,11 +35,11 @@ NeurIPS(Conference on Neural Information Processing Systems)は、機械学習�
 最近、急に冬らしくなってきましたが、バンクーバーはもっと寒いです。
 会場が海沿いのこともあり、しっかりと防寒対策をして臨んでいます。
 
-<img src="/images/20191210/outside.jpg" loading="lazy">
+<img src="/images/2019/20191210/outside.jpg" loading="lazy">
 
 一方で、会場内は熱気にあふれ、皆さん発表に熱い視線を送っています。
 
-<img src="/images/20191210/inside.jpg" loading="lazy">
+<img src="/images/2019/20191210/inside.jpg" loading="lazy">
 
 ## チュートリアル講演
 
@@ -61,7 +61,7 @@ NeurIPS１日目は、主にチュートリアル講演が行われました。
 
 **Bayesian**, **Health** や、**Reinforcement Learning**, **Representation Learning** といった、聞いてワクワクするようなキーワードが並んでいました。
 
-<img src="/images/20191210/tutorial.jpg" loading="lazy">
+<img src="/images/2019/20191210/tutorial.jpg" loading="lazy">
 
 ## インターン生のポスター発表
 
@@ -80,11 +80,11 @@ Belonaさんは、AIMSでヘルスケア分野における機械学習を専門�
 「AdaBoost-Models Ensemble Learning to forecast Time series with high variance and nonlinear Trend,
 Belona Mary SONNA MOMO (AIMS)」
 
-<img src="/images/20191210/WiML.jpg" class="img-middle-size" loading="lazy">
+<img src="/images/2019/20191210/WiML.jpg" class="img-middle-size" loading="lazy">
 
 ## 最後に
 
 明日からは論文の発表が本格的に始まります。
 バンクーバーを満喫しながら、最新の研究を肌で感じてきたいと思います！
 
-<img src="/images/20191210/mug.jpg" class="img-small-size" loading="lazy">
+<img src="/images/2019/20191210/mug.jpg" class="img-small-size" loading="lazy">

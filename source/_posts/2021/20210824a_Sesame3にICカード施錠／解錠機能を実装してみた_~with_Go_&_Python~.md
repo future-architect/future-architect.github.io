@@ -9,12 +9,12 @@ tag:
   - RaspberryPi
 category:
   - IoT
-thumbnail: /images/20210824a/thumbnail.png
+thumbnail: /images/2021/20210824a/thumbnail.png
 author: 宮永崇史
 lede: "夏の自由研究ブログ連載2021の第2本目の投稿として、Sesame3にFelicaによる施錠解錠を実装しました。Sesame3はCANDY HOUSE JAPANが開発、販売しているスマートロックです。Sesame3本体に加えてwifiモジュールを購入すると、外出先から鍵の施錠/解錠を行うことができます。"
 ---
 
-<img src="/images/20210824a/サムネ.png" alt="" width="" height="" loading="lazy">
+<img src="/images/2021/20210824a/サムネ.png" alt="" width="" height="" loading="lazy">
 
 Photo by <a href="https://unsplash.com/@davidclode?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">David Clode</a> on <a href="https://unsplash.com/s/photos/python-programming?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>. The Gopher character is based on the Go mascot designed by [Renee French](http://reneefrench.blogspot.com/).
 
@@ -36,7 +36,7 @@ Photo by <a href="https://unsplash.com/@davidclode?utm_source=unsplash&utm_mediu
 
 ## 2. Sesame3とは
 
-<img src="/images/20210824a/DSC_0478.JPG" alt="Sesame3の箱" width="1200" height="676" loading="lazy">
+<img src="/images/2021/20210824a/DSC_0478.JPG" alt="Sesame3の箱" width="1200" height="676" loading="lazy">
 
 Sesame3は[CANDY HOUSE JAPAN](https://jp.candyhouse.co/)が開発、販売しているスマートロックです。Sesame3本体に加えてwifiモジュールを購入すると、外出先から鍵の施錠/解錠を行うことができます。
 
@@ -95,7 +95,7 @@ PythonでカードリーダーによるIDmの読み取りと`SECRET_KEY`の暗�
 
 Raspberry Piにカードリーダー、スピーカーを接続しています。PythonでカードーリーダーからFelicaのIDmを取得し、暗号化したSECRET_KEYとAPI_TOKENをGo側に渡します。また、IDmの検知をユーザーに通知音で知らせています。GOではCANDY HOUSEが公開しているWeb APIに向けてHTTPリクエストを行います。リクエストに応じて、SESAME3を開閉できるという構成になっています。
 
-<img src="/images/20210824a/image.png" alt="システム構成図" width="1200" height="933" loading="lazy">
+<img src="/images/2021/20210824a/image.png" alt="システム構成図" width="1200" height="933" loading="lazy">
 
 ### 4.2. ディレクトリの構成
 
@@ -433,21 +433,21 @@ if __name__ == '__main__':
 
 スピーカーを取り付けたらとりあえず、新聞受けに投げ入れます。玄関まで電源コードを延長するのが大変でしたが、[こちら](https://www.amazon.co.jp/gp/product/B019O0JS7C)の延長コードでどうにか電源供給できました。
 
-<img src="/images/20210824a/DSC_0482.JPG" alt="玄関に設置の様子" width="1200" height="676" loading="lazy">
+<img src="/images/2021/20210824a/DSC_0482.JPG" alt="玄関に設置の様子" width="1200" height="676" loading="lazy">
 
 カードリーダーはコクヨの[マグネットプレート](https://www.amazon.co.jp/dp/B0012R6M52)を使って取り付けました。
 
-<img src="/images/20210824a/DSC_0000_BURST20210822170307504.JPG" alt="カードリーダー設置の様子" width="1200" height="676" loading="lazy">
+<img src="/images/2021/20210824a/DSC_0000_BURST20210822170307504.JPG" alt="カードリーダー設置の様子" width="1200" height="676" loading="lazy">
 
 ## 8. 動作確認
 
 動作確認の結果です。待機`Waiting Felica...`から検知`Detected!!`→`Lock command was executed.`と正しく動作していることがわかります。
 
-<img src="/images/20210824a/demo.png" alt="デモ" width="1200" height="234" loading="lazy">
+<img src="/images/2021/20210824a/demo.png" alt="デモ" width="1200" height="234" loading="lazy">
 
 こちらは施錠時のスマホの通知画面です。`export.go`に定義した文字列`by Felica`が正しく表示されています。
 
-<img src="/images/20210824a/screenshot.png" alt="スマホ通知画面" width="1200" height="663" loading="lazy">
+<img src="/images/2021/20210824a/screenshot.png" alt="スマホ通知画面" width="1200" height="663" loading="lazy">
 
 ## 9. まとめ
 

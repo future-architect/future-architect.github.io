@@ -8,7 +8,7 @@ tag:
   - Network
 category:
   - Security
-thumbnail: /images/20230119a/thumbnail.png
+thumbnail: /images/2023/20230119a/thumbnail.png
 author: 岸下優介
 lede: "Google CloudのVPC Service Controlsを利用して、リソースへのアクセス制御を行う方法についてTerraformコード付きで紹介していきます。昨今では、個人情報漏洩のニュースが尽きません。少し古いデータではありますが..."
 ---
@@ -33,7 +33,7 @@ VPC Service Controlsを利用することによって、Google Cloudのリソー
 
 また境界の内外におけるデータ移動を制御することが可能なため、データが境界の外へ持ち出されることも防ぎます（境界を超える通信はデフォルトでブロックされます）。
 
-<img src="/images/20230119a/a864e1b2-7cd3-c69c-bf63-fe2b21622b6d.png" alt="" width="1200" height="640" loading="lazy">
+<img src="/images/2023/20230119a/a864e1b2-7cd3-c69c-bf63-fe2b21622b6d.png" alt="" width="1200" height="640" loading="lazy">
 
 こちらの画像のように、境界（Service Perimeter）内に存在するBigQueryは認証されたVPC、VM（GCE）からのみアクセス可能となり、認証されていないリソースからは境界内へのアクセス・境界外へのアクセス共に制限されることになります。
 
@@ -76,18 +76,18 @@ resource "google_access_context_manager_access_policy" "access_policy" {
 
 作成すると、Organization→セキュリティ→VPC Service Controls上にアクセスポリシーが作成されていることが確認できます。
 
-<img src="/images/20230119a/d0b0a574-e85f-3509-49bc-263a2ec8b6f5.jpeg" alt="" width="1120" height="334" loading="lazy">
+<img src="/images/2023/20230119a/d0b0a574-e85f-3509-49bc-263a2ec8b6f5.jpeg" alt="" width="1120" height="334" loading="lazy">
 
 ### ID制御をやってみる
 
 ID制御を行ってみます。
 通常は画像のようにBigQueryのDataset, tableを見ることができます。
 
-<img src="/images/20230119a/da83249a-b466-c2eb-8ea7-9e5fe5e9abfc.jpeg" alt="" width="894" height="396" loading="lazy">
+<img src="/images/2023/20230119a/da83249a-b466-c2eb-8ea7-9e5fe5e9abfc.jpeg" alt="" width="894" height="396" loading="lazy">
 
 これに対して、以下のようなBigQueryへの内向きのみを許可したサービス境界を設定してみます。
 
-<img src="/images/20230119a/755d759c-cde1-42d1-c0c4-e62dc1425a89.png" alt="" width="930" height="348" loading="lazy">
+<img src="/images/2023/20230119a/755d759c-cde1-42d1-c0c4-e62dc1425a89.png" alt="" width="930" height="348" loading="lazy">
 
 #### アクセスレベルを作成する
 
@@ -180,16 +180,16 @@ resource "google_access_context_manager_service_perimeter" "service_perimeter_qi
 
 アクセスレベルで許可されたアカウントでBigQueryを見てみると先ほどと同じようにテーブルが表示されます。
 
-<img src="/images/20230119a/da83249a-b466-c2eb-8ea7-9e5fe5e9abfc_2.jpeg" alt="" width="894" height="396" loading="lazy">
+<img src="/images/2023/20230119a/da83249a-b466-c2eb-8ea7-9e5fe5e9abfc_2.jpeg" alt="" width="894" height="396" loading="lazy">
 
 次に認証されていないプロジェクトからクエリを実行してみます。
 
-<img src="/images/20230119a/7f3f9c23-2e49-3aea-acaa-2e29d774582b.jpeg" alt="" width="1200" height="223" loading="lazy">
+<img src="/images/2023/20230119a/7f3f9c23-2e49-3aea-acaa-2e29d774582b.jpeg" alt="" width="1200" height="223" loading="lazy">
 
 右上に赤字で`VPC Service Controls: Request is prohibited by organization's policy. vpcServiceControlsUniqueIdentifier: -ZWUwU96cNc6_jcWbyKhbCfz9canAZcNkQjPcb4uEhOY00WbG64xVw.`と表示され、クエリが実行できなくなっています。
 こちらの原因としては今回内向き（Ingress）のみしか許可していなかったため、サービス境界外へのデータ持ち出しが拒否されたことによるものです。
 
-<img src="/images/20230119a/fbf4eb92-8842-ec33-9104-afeec96066bd.png" alt="" width="816" height="280" loading="lazy">
+<img src="/images/2023/20230119a/fbf4eb92-8842-ec33-9104-afeec96066bd.png" alt="" width="816" height="280" loading="lazy">
 
 ##### 少し寄り道：ポリシー違反のトラブルシューティング
 
@@ -198,11 +198,11 @@ resource "google_access_context_manager_service_perimeter" "service_perimeter_qi
 
 上記のようにポリシー違反が発生した際、`vpcServiceControlsUniqueIdentifier:`以降の文字列をVPC Service Controls のトラブルシューティングに入力すると違反理由が確認できます。
 
-<img src="/images/20230119a/b666ebc4-5fc7-cfee-b484-e523c7d96640.png" alt="" width="823" height="663" loading="lazy">
+<img src="/images/2023/20230119a/b666ebc4-5fc7-cfee-b484-e523c7d96640.png" alt="" width="823" height="663" loading="lazy">
 
 トラブルシューティングをすると、以下のように行われた動作と違反理由が表示されます。
 
-<img src="/images/20230119a/0e0f69b8-fb59-c4a1-12b4-bb8e739f200f.png" alt="" width="949" height="463" loading="lazy">
+<img src="/images/2023/20230119a/0e0f69b8-fb59-c4a1-12b4-bb8e739f200f.png" alt="" width="949" height="463" loading="lazy">
 上記のポリシー違反理由は、サービス境界外で`tables.getData`が行われたことが原因のようです。
 また、このことからクエリ実行の際、コンソールの裏側ではAPI（`tables.getData`）がコールされていることもわかります。
 
@@ -210,11 +210,11 @@ resource "google_access_context_manager_service_perimeter" "service_perimeter_qi
 
 また、認証されていないアカウントで確認してみると以下のように表示されます。
 
-<img src="/images/20230119a/898b2891-6500-d523-2d73-a9ea1c6c24e4.png" alt="" width="1200" height="287" loading="lazy">
+<img src="/images/2023/20230119a/898b2891-6500-d523-2d73-a9ea1c6c24e4.png" alt="" width="1200" height="287" loading="lazy">
 
 データセットすら見えず、クエリを打とうとすると右上に赤字で`VPC Service Controls: Request is prohibited by organization's policy.`と表示されています。
 
-<img src="/images/20230119a/263efca8-74e1-8ad3-3501-b668c6e69473.png" alt="" width="777" height="331" loading="lazy">
+<img src="/images/2023/20230119a/263efca8-74e1-8ad3-3501-b668c6e69473.png" alt="" width="777" height="331" loading="lazy">
 
 認証されていないアカウントで`bq`コマンドでも同様に確認してみます。
 
@@ -257,11 +257,11 @@ resource "google_access_context_manager_access_level" "id_and_ip" {
 ```
 
 先ほどアクセス可能だったアカウントからGoogle CloudコンソールのBigQueryへアクセスして、クエリを実行してみます。
-<img src="/images/20230119a/77f9a4f8-2a73-f0d1-400a-e306ffb1b765.png" alt="" width="1200" height="123" loading="lazy">
+<img src="/images/2023/20230119a/77f9a4f8-2a73-f0d1-400a-e306ffb1b765.png" alt="" width="1200" height="123" loading="lazy">
 
 アクセスできなくなったことが確認できます。
 
-<img src="/images/20230119a/9de770bd-ea00-9238-2464-906a4bc2561a.png" alt="" width="795" height="320" loading="lazy">
+<img src="/images/2023/20230119a/9de770bd-ea00-9238-2464-906a4bc2561a.png" alt="" width="795" height="320" loading="lazy">
 
 次に指定されたIPアドレスのVMに認証済みのアカウントで`gcloud auth login`してから`bq`コマンドを打ってみます。
 
@@ -280,7 +280,7 @@ bq query --use_legacy_sql=false --project_id <YOUR_PROJECT_ID>  'select worker_i
 
 無事にクエリを実行できました。
 
-<img src="/images/20230119a/27b0c988-2a46-cf62-d7c1-910a171c2e00.png" alt="" width="925" height="338" loading="lazy">
+<img src="/images/2023/20230119a/27b0c988-2a46-cf62-d7c1-910a171c2e00.png" alt="" width="925" height="338" loading="lazy">
 
 このようにアクセスレベルでは個々のIPやアカウントを利用した細かい制御を行うことができます。
 他にもOSの指定（有料）、スクリーンロックを要求するなどを設定することも可能です。
@@ -317,12 +317,12 @@ bq query --use_legacy_sql=false --project_id <YOUR_PROJECT_ID>  'select worker_i
 
 そして、それぞれのBigQueryを以下のように別のサービス境界で守ります。
 
-<img src="/images/20230119a/34000be3-c373-0fe1-47b6-fdae7b41ec73.png" alt="" width="1078" height="374" loading="lazy">
+<img src="/images/2023/20230119a/34000be3-c373-0fe1-47b6-fdae7b41ec73.png" alt="" width="1078" height="374" loading="lazy">
 
 ではこの時、どのようにIngree/Egressを設定すればよいのでしょうか？
 正解は以下のようになります。
 
-<img src="/images/20230119a/e43ce7a0-2d0e-6e65-a572-88d487eacd7b.png" alt="" width="928" height="489" loading="lazy">
+<img src="/images/2023/20230119a/e43ce7a0-2d0e-6e65-a572-88d487eacd7b.png" alt="" width="928" height="489" loading="lazy">
 
 アクセスレベルには先ほどと同様のIDとIPで指定したアクセスレベルを利用し、サービス境界のTerraformコードは以下になります。
 

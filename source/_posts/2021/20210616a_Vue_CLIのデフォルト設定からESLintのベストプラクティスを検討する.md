@@ -8,7 +8,7 @@ tag:
   - ESLint
 category:
   - Infrastructure
-thumbnail: /images/20210616a/thumbnail.png
+thumbnail: /images/2021/20210616a/thumbnail.png
 author: 伊藤真彦
 lede: "TIGの伊藤真彦です。この記事はフロントエンド連載の3記事目です。今回は愛用しているVue CLIを利用して、フロントエンドアプリケーションの詳細な設定について調査してみました。"
 ---
@@ -18,7 +18,7 @@ TIGの伊藤真彦です。
 
 今回は愛用しているVue CLIを利用して、フロントエンドアプリケーションの詳細な設定について調査してみました。
 
-<img src="/images/20210616a/image.png" alt="Vue.jsアイコン" width="400" height="400" loading="lazy">
+<img src="/images/2021/20210616a/image.png" alt="Vue.jsアイコン" width="400" height="400" loading="lazy">
 
 # はじめに
 
@@ -81,17 +81,17 @@ npm run serve
 
 下記画像は`vue create {app-name}`コマンドを実行した際に表示される選択肢です。
 
-<img src="/images/20210616a/image_2.png" alt="vue create {app-name}コマンドを実行した際に表示される選択肢" width="588" height="523" loading="lazy">
+<img src="/images/2021/20210616a/image_2.png" alt="vue create {app-name}コマンドを実行した際に表示される選択肢" width="588" height="523" loading="lazy">
 
 その際、Vue.jsのバージョンの他、Linter/Formatterの有無等の詳細な設定を選択する事が可能です。
 
 今回は、TypeScriptを利用した状態で、Linter/Formatterを利用しない設定と、利用した状態の差分を比較する事で、Linterを有効にするにあたって必要な、また推奨される設定、準備を確認します。
 
-<img src="/images/20210616a/image_3.png" alt="Linter設定" width="642" height="529" loading="lazy">
+<img src="/images/2021/20210616a/image_3.png" alt="Linter設定" width="642" height="529" loading="lazy">
 
 ## ESLint with errpr prevention only
 
-<img src="/images/20210616a/image_4.png" alt="VueCLIではESLint設定" width="1200" height="506" loading="lazy">
+<img src="/images/2021/20210616a/image_4.png" alt="VueCLIではESLint設定" width="1200" height="506" loading="lazy">
 
 VueCLIではESLintを最低限有効に設定した状態を設定できます。
 
@@ -99,7 +99,7 @@ VueCLIではESLintを最低限有効に設定した状態を設定できます�
 
 Linter/Formatter無しの状態とpackage.jsonを比較してみます。
 
-<img src="/images/20210616a/image_5.png" alt="package.jsonの比較" width="709" height="844" loading="lazy">
+<img src="/images/2021/20210616a/image_5.png" alt="package.jsonの比較" width="709" height="844" loading="lazy">
 
 `scripts`の設定にに`lint`コマンドが追加されています。
 
@@ -135,7 +135,7 @@ module.exports = {
 
 ## ESLint + Prettier
 
-<img src="/images/20210616a/image_6.png" alt="" width="" height="" loading="lazy">
+<img src="/images/2021/20210616a/image_6.png" alt="" width="" height="" loading="lazy">
 
 ESLintに加え、[Prettier](https://prettier.io/)も有効にした状態を確認してみます。
 
@@ -145,7 +145,7 @@ ESLintは、Prettierと比較するとJavaScriptの言語としてのコーデ�
 
 このオプションを有効にすると、package.jsonにPrettierも追加されている事が確認できます。
 
-<img src="/images/20210616a/image_7.png" alt="" width="" height="" loading="lazy">
+<img src="/images/2021/20210616a/image_7.png" alt="" width="" height="" loading="lazy">
 
 `.eslintrc.js`にもPrettier向けの設定が追記されています。
 
@@ -174,13 +174,13 @@ module.exports = {
 
 このオプションを有効にすると、Vue.jsのHTMLテンプレート部分も成形されている事が確認できます。
 
-<img src="/images/20210616a/image_8.png" alt="Vue.jsのHTMLテンプレート生成" width="1200" height="399" loading="lazy">
+<img src="/images/2021/20210616a/image_8.png" alt="Vue.jsのHTMLテンプレート生成" width="1200" height="399" loading="lazy">
 
 デフォルトの設定では1行に収めることができる文字数が80文字であるため、個人的には若干過剰に改行される傾向があるなと感じます。
 
 ## ESLint + Airbnb config
 
-<img src="/images/20210616a/image_9.png" alt="Airbnb Config" width="1200" height="399" loading="lazy">
+<img src="/images/2021/20210616a/image_9.png" alt="Airbnb Config" width="1200" height="399" loading="lazy">
 
 Airbnb Configも見てみます、バケーションレンタルで有名なあの[Airbnb](https://www.airbnb.jp/)ですね。
 
@@ -192,7 +192,7 @@ Airbnbのテック企業としての立ち位置について私は詳しくな�
 
 そんなAirbnbスタイルがVue CLIの公式オプションとして選択できるようになっているわけですが、ひとまず`package.json`の差分を見てみましょう。
 
-<img src="/images/20210616a/image_10.png" alt="" width="" height="" loading="lazy">
+<img src="/images/2021/20210616a/image_10.png" alt="" width="" height="" loading="lazy">
 
 `eslint-config-airbnb`がインポートされています。
 

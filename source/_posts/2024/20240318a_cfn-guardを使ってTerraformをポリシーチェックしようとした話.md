@@ -9,7 +9,7 @@ tag:
   - CloudFormation
 category:
   - Infrastructure
-thumbnail: /images/20240318a/thumbnail.png
+thumbnail: /images/2024/20240318a/thumbnail.png
 author: 原木翔
 lede: "cfn-guardを使用してTerraformをポリシーチェックしようとした話をします。"
 ---
@@ -52,7 +52,7 @@ Terraformのポリシーチェックとしては、過去にFuture技術ブロ�
 
 [CloudFormation Guard で Policy as Code！ 実際どうよ？ / Policy as Code with CloudFormation Guard](https://speakerdeck.com/ohmura/policy-as-code-with-cloudformation-guard?slide=7)のスライドをお借りすると次のようなイメージです。
 
-<img src="/images/20240318a/image.png" alt="image.png" width="1200" height="682" loading="lazy">
+<img src="/images/2024/20240318a/image.png" alt="image.png" width="1200" height="682" loading="lazy">
 
 このような **青写真** を描きました。
 
@@ -284,7 +284,7 @@ Terraformユーザーには、cfn-guardの扱いは少々難しいところが�
 ポリシールール等の設定について最近はChatGPT先生に下書きをお願いすることが多いのですが、彼女に自由に書かせたら、明らかにAWS CloudFormationテンプレート向けのguardファイルをTerraformと言い張ったのは悲しかったです。
 
 WHY?と聞いたら次の通り開き直った回答が返ってきました。
-<img src="/images/20240318a/image_2.png" alt="" width="1200" height="1142" loading="lazy">
+<img src="/images/2024/20240318a/image_2.png" alt="" width="1200" height="1142" loading="lazy">
 
 しかし、AWS CDKを使ってCloufFormationのテンプレートファイルを生成し、AWSリソースのデプロイを行っているユーザーにとって強力なポリシーチェックツールなのは間違いありません。
 

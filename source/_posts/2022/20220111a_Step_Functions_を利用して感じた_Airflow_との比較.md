@@ -9,7 +9,7 @@ tag:
   - Airflow
 category:
   - Programming
-thumbnail: /images/20220111a/thumbnail.png
+thumbnail: /images/2022/20220111a/thumbnail.png
 author: 多賀聡一朗
 lede: "TIG 所属の多賀です。AWS 上でのワークフロー構築のため、Step Functions を直近で導入しました。 "
 ---
@@ -32,7 +32,7 @@ AWS 上でのワークフロー構築のため、Step Functions を直近で導�
 
 |  | [MWAA](https://docs.aws.amazon.com/mwaa/latest/userguide/what-is-mwaa.html) | [Step Functions](https://aws.amazon.com/jp/step-functions/?step-functions.sort-by=item.additionalFields.postDateTime&step-functions.sort-order=desc)|
 | :-- | :-- | :-- |
-|   | <img src="/images/20220111a/image.png" alt="MWAAフロー" width="1200" height="764" loading="lazy"> | <img src="/images/20220111a/stepfunction.png" alt="stepfunctionフロー" width="922" height="908" loading="lazy">  <br> [新機能 – AWS Step Functions ワークフロースタジオ – ステートマシンを構築するためのローコードのビジュアルツール - Amazon Web Services ブログ](https://aws.amazon.com/jp/blogs/news/new-aws-step-functions-workflow-studio-a-low-code-visual-tool-for-building-state-machines/) 参照|
+|   | <img src="/images/2022/20220111a/image.png" alt="MWAAフロー" width="1200" height="764" loading="lazy"> | <img src="/images/2022/20220111a/stepfunction.png" alt="stepfunctionフロー" width="922" height="908" loading="lazy">  <br> [新機能 – AWS Step Functions ワークフロースタジオ – ステートマシンを構築するためのローコードのビジュアルツール - Amazon Web Services ブログ](https://aws.amazon.com/jp/blogs/news/new-aws-step-functions-workflow-studio-a-low-code-visual-tool-for-building-state-machines/) 参照|
 | サービス概要 | OSS である [Airflow](https://airflow.apache.org/) をマネージドサービスとして提供| AWS 独自実装のビジュアルワークフローサービス |
 | 一言で | ワークフローにソースコードベース管理の概念を取入れアプリケーション化したサービス (※ Airflow について) | 各種 AWS サービスをパイプラインとして実行するサービス  |
 | 特徴 | ・Pure Python ベースでワークフローを実装可能 <br> ・独自のブラウザベース UI を提供 <br> ・DAG(有向非巡回グラフ)ベースのワークフロー定義 |・Amazon States Language(JSON/YAML) ベースでワークフロー(=State Macine)を実装 <br> ・AWSコンソール上でドラッグ&ドロップでワークフローを作成可能 ([Workflow Studio](https://docs.aws.amazon.com/step-functions/latest/dg/workflow-studio.html)) <br> ・200を超える AWS サービスのサポート([参考](https://aws.amazon.com/jp/about-aws/whats-new/2021/09/aws-step-functions-200-aws-sdk-integration/) )|

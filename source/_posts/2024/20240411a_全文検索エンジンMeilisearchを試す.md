@@ -7,11 +7,11 @@ tag:
   - Meilisearch
 category:
   - Programming
-thumbnail: /images/20240411a/thumbnail.png
+thumbnail: /images/2024/20240411a/thumbnail.png
 author: 岸本卓也
 lede: "ある静的サイトジェネレーターで生成された膨大なドキュメントの検索において、全文検索機能はあるものの以下の課題を感じることがありました。"
 ---
-<img src="/images/20240411a/meilisearch-logo-light.png" alt="" width="495" height="74" loading="lazy">
+<img src="/images/2024/20240411a/meilisearch-logo-light.png" alt="" width="495" height="74" loading="lazy">
 
 # はじめに
 
@@ -76,7 +76,7 @@ docker run -it --rm \
 
 これでMeilisearchが起動しsearch previewも使えるようになっているため、ブラウザで `http://<Dockerのホスト>:7700` にアクセスしてsearch previewを表示してみます。APIキーの入力を求められるので、コンテナ起動時に指定した `aSampleMasterKey` を入力して [Go] します。
 
-<img src="/images/20240411a/Meilisearch-search-preview-enter-api-key.png" alt="Meilisearch-search-preview-enter-api-key.png" width="766" height="480" loading="lazy">
+<img src="/images/2024/20240411a/Meilisearch-search-preview-enter-api-key.png" alt="Meilisearch-search-preview-enter-api-key.png" width="766" height="480" loading="lazy">
 
 まだインデックスを作成していないので何も検索できませんが、これでMeilisearchを使う準備は整いました。
 
@@ -176,7 +176,7 @@ docker run -t --rm \
 
 スクレイピングが完了したらsearch previewで確認してみます。Meilisearchセットアップ時に表示したsearch preview画面をリロードすると、スクレイピングで作成したインデックスを選択して検索できるようになりました。
 
-<img src="/images/20240411a/Meilisearch-search-preview-search-demo.gif" alt="Meilisearch-search-preview-search-demo.gif" width="960" height="480" loading="lazy">
+<img src="/images/2024/20240411a/Meilisearch-search-preview-search-demo.gif" alt="Meilisearch-search-preview-search-demo.gif" width="960" height="480" loading="lazy">
 
 docs-scraperによってこのインデックスには97,668個のドキュメントが作られました (フューチャー技術ブログの記事数は現在1,062件です)。search previewでは文字入力の度に検索が走るのですが、今回の環境では各検索は数ミリ秒～数十ミリ秒で応答されるようで、lightning fastという謳い文句に偽りのない軽快さを体感できました。
 

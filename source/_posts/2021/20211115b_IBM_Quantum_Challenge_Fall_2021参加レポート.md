@@ -9,12 +9,12 @@ tag:
   - コンテスト
 category:
   - Programming
-thumbnail: /images/20211115b/thumbnail.png
+thumbnail: /images/2021/20211115b/thumbnail.png
 author: 宮永崇史
 lede: "こんにちは。TIG/DXユニット所属の宮永です。本記事は2021年10月27日~11月5日に開催された[IBM Quantum Challenge Fall 2021]の参加レポートです。イベントで出題された問題は[GitHubリポジトリ]に格納されているため、参考にしてください。"
 mathjax: true
 ---
-<img src="/images/20211115b/ibm-quantum-challenge-fall-2021-advanced.png" alt="ibm-quantum-challenge-fall-2021-advanced.png" width="600" height="600">
+<img src="/images/2021/20211115b/ibm-quantum-challenge-fall-2021-advanced.png" alt="ibm-quantum-challenge-fall-2021-advanced.png" width="600" height="600">
 
 # はじめに
 
@@ -98,11 +98,11 @@ Microsoft社が提供している[Quantum Katas](https://github.com/microsoft/Qu
 
 イベント期間中は[Slack](qiskit.slack.com)でのコミュニケーションが頻繁に行われており、質問やお互いを褒めあう文化が溢れていて気持ちの良いものでした。
 
-<img src="/images/20211115b/quantum_challenge_slack.png" alt="quantum_challenge_slack.png" width="1200" height="211" loading="lazy">
+<img src="/images/2021/20211115b/quantum_challenge_slack.png" alt="quantum_challenge_slack.png" width="1200" height="211" loading="lazy">
 
 私自身の実績としては全4問の課題を解き終え、サムネイルのAdvancedバッジを取得できました。
 
-<img src="/images/20211115b/image.png" alt="image.png" width="1068" height="312" loading="lazy">
+<img src="/images/2021/20211115b/image.png" alt="image.png" width="1068" height="312" loading="lazy">
 
 最終問題は自分には難しく、まだまだ勉強が足らないなと痛感しました。次回大会では本当の意味でCompleteを成し遂げたいです。
 

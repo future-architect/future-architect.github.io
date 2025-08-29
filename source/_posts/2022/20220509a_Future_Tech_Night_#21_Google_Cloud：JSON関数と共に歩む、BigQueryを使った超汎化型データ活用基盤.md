@@ -9,7 +9,7 @@ tag:
   - 登壇レポート
 category:
   - Infrastructure
-thumbnail: /images/20220509a/thumbnail.png
+thumbnail: /images/2022/20220509a/thumbnail.png
 author: 村田靖拓
 lede: "3月17日に開催された「Future Tech Night #21 Google Cloud: データエンジニア＋MLOps」のセッションサマリと補足事項について触れていきます。当日のセッションは2つありましたが、私の記事では「JSON関数と共に歩む、BigQueryを使った超汎化型データ活用基盤」のセッションについて記載します。"
 ---
@@ -36,7 +36,7 @@ Google CloudでのIoTデータ蓄積基盤を構築する際、「データは�
 
 データ格納までの道中でメッセージングサービスを利用することも多く、アーキデザイン時の考慮事項として"QoSとの付き合い方"は欠かせません。
 
-<img src="/images/20220509a/スクリーンショット_2022-05-06_19.47.04.png" alt="At least onceについて" width="1200" height="669" loading="lazy">
+<img src="/images/2022/20220509a/スクリーンショット_2022-05-06_19.47.04.png" alt="At least onceについて" width="1200" height="669" loading="lazy">
 
 今回のアーキテクチャではPub/Subを採用したのですが、Pub/SubはAt least onceのQoSで動作するため、BigQuery到達までの道中で電文が重複してしまう可能性がありました。
 
@@ -48,7 +48,7 @@ Google CloudでのIoTデータ蓄積基盤を構築する際、「データは�
 
 今回のユースケースでは、データ取得元のデータ構造含めて発展途上かつ今後も頻繁なレイアウト変更が予想されました。そのため、テーブルのカラム構造は極力柔軟な形を目指し設計しました。
 
-<img src="/images/20220509a/スクリーンショット_2022-05-06_19.55.51.png" alt="BigQueryカラム構造" width="1200" height="668" loading="lazy">
+<img src="/images/2022/20220509a/スクリーンショット_2022-05-06_19.55.51.png" alt="BigQueryカラム構造" width="1200" height="668" loading="lazy">
 
 添付資料記載の"JSON一括"方式を最終的には採用しました。カラムをキーごとに分割して格納する形はとらず、受け取ったJSONを丸ごと1カラムに格納しました。
 

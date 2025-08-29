@@ -7,10 +7,10 @@ tag:
   - TensorFlow
 category:
   - Infrastructure
-thumbnail: /images/20220720a/thumbnail.png
+thumbnail: /images/2022/20220720a/thumbnail.png
 author: 金子剛士
 lede: "先日Kaggleで開催された「Foursquare - Location Matching」コンペ(以下4sqコンペ)に社外の知人共にチームで参加し、1083チーム中7位をとりました。（初の金メダルでKaggle Competitions Masterになりました！)本記事では参加記として以下の内容を紹介します。"
-eyecatch: /images/20220720a/4sq_overview.png
+eyecatch: /images/2022/20220720a/4sq_overview.png
 ---
 本記事は[「地図・GIS・位置特定に関する連載」](/articles/20220719a/)二日目の記事です。昨日の[「郵便番号・住所・緯度経度の体系について」](/articles/20220719b/)の記事も、今回の記事とは直接つながってはいませんが、参考になる部分もあるのでぜひご覧ください。
 
@@ -46,7 +46,7 @@ Foursquareは位置を共有するSNS等を提供する企業です。現在は�
 * URLや電話番号、郵便番号
 
 下記の表は私がつくったデータの見本です。「フューチャー株式会社」・「Future Corporation」・「フューチャー」はすべて同じPOIですが、欠損や表記ゆれを含んだ状態でデータセットの中に散在しています。訓練データは約110万件、テストデータは約60万件あり、テストデータではPOIが隠された状態で渡されていました。提出は各行のIDに対して同じPOIであるIDを連結したmatchesの出力を求められました。
-<img src="/images/20220720a/データの例.png" alt="データの例" width="1200" height="117" loading="lazy">
+<img src="/images/2022/20220720a/データの例.png" alt="データの例" width="1200" height="117" loading="lazy">
 
 評価はmatchesに対し (正解のラベルと予測ラベルの積集合の数) / (正解のラベルと予測ラベルの和集合の数) で求められるIoUの平均で計算されました。
 
@@ -63,7 +63,7 @@ Foursquareは位置を共有するSNS等を提供する企業です。現在は�
 * 二点間のペアに対して正確な予測を行うpredict part
 * ペアをグラフとして扱い後処理で精度を上げるpostprocess part
 
-<img src="/images/20220720a/4sq_overview.png" alt="4sq_overview" width="851" height="432" loading="lazy">
+<img src="/images/2022/20220720a/4sq_overview.png" alt="4sq_overview" width="851" height="432" loading="lazy">
 
 # 解法の詳細
 

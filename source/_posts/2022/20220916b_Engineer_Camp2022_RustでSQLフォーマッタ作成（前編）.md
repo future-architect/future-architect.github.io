@@ -10,7 +10,7 @@ tag:
   - Rust
 category:
   - Programming
-thumbnail: /images/20220916b/thumbnail.gif
+thumbnail: /images/2022/20220916b/thumbnail.gif
 author: 川渕皓太
 lede: "みなさん、こんにちは！Future Engineer Camp 2022に参加した川渕と齋藤です。今回のインターンではSQLフォーマッタをRustで作成しました。私達が取り組んだ内容を紹介します。SQLフォーマッタとはSQLを統一された体裁にフォーマットしてくれるツールです。体裁を統一することで他人が見ても読みやすいコードになり、生産性が向上します。"
 ---
@@ -23,11 +23,11 @@ Future Engineer Camp 2022に参加した川渕と齋藤です。
 # SQLフォーマッタとは
 
 SQLフォーマッタとはSQLを統一された体裁にフォーマットしてくれるツールです。体裁を統一することで他人が見ても読みやすいコードになり、生産性が向上します。
-<img src="/images/20220916b/demo1.gif" alt="" width="1200" height="675" loading="lazy">
+<img src="/images/2022/20220916b/demo1.gif" alt="" width="1200" height="675" loading="lazy">
 
 以下の図のように、インデントなどが揃って読みやすくなっていることがわかります。
 
-<img src="/images/20220916b/demo_indent.png" alt="" width="635" height="420" loading="lazy">
+<img src="/images/2022/20220916b/demo_indent.png" alt="" width="635" height="420" loading="lazy">
 
 # 背景
 
@@ -48,7 +48,7 @@ SQLフォーマッタとはSQLを統一された体裁にフォーマットし�
 
 今回作成したフォーマッタの処理の流れを以下に示します。フォーマッタは、構文解析部分とフォーマット処理部分の2つに分かれています。まず、対象となるソースファイルに構文解析を行い、構文木(CST)を構築します。そして、構文木に基づいてフォーマット処理を行い、SQLを整形しています。
 
-<img src="/images/20220916b/stream.png" alt="stream.png" width="960" height="228" loading="lazy">
+<img src="/images/2022/20220916b/stream.png" alt="stream.png" width="960" height="228" loading="lazy">
 
 構文解析を行う部分は上述した[tree-sitter-sql](https://github.com/m-novikov/tree-sitter-sql)を使用し、フォーマット処理を行う部分は0から実装を行いました。
 実装の詳細は後編で述べます。

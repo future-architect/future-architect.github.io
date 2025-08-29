@@ -6,7 +6,7 @@ tag:
   - Playwright
 category:
   - Programming
-thumbnail: /images/20230829a/thumbnail.png
+thumbnail: /images/2023/20230829a/thumbnail.png
 author: 武田大輝
 lede: "Playwrightはさまざまな言語でテストを記述することが可能です。このような他言語展開を可能にしているPlaywrightのアーキテクチャについて調べてみました。"
 ---
@@ -36,7 +36,7 @@ Playwrightはさまざまな言語でテストを記述することが可能で�
 
 クライアント／サーバ構成のイメージは下記の通りです。
 
-<img src="/images/20230829a/Playwright_Architecture.drawio.png" alt="Playwright_Architecture" width="800" height="320" loading="lazy">
+<img src="/images/2023/20230829a/Playwright_Architecture.drawio.png" alt="Playwright_Architecture" width="800" height="320" loading="lazy">
 
 サーバ側はWebSocketまたは標準入出力の口をもち、クライアントからのリクエストに応じて各ブラウザに対しての操作を実行します。クライアント側はテストスクリプトに応じてサーバに対してリクエストを送信します。
 

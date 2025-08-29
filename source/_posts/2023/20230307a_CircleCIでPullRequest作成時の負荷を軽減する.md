@@ -8,11 +8,11 @@ tag:
   - リリース
 category:
   - DevOps
-thumbnail: /images/20230307a/thumbnail.png
+thumbnail: /images/2023/20230307a/thumbnail.png
 author: 宮永崇史
 lede: "CircleCIでGitHubのPR作成時の負荷を軽減するために、PR作成者の自動アサインおよびラベルの付与を自動化した話をご紹介します。"
 ---
-<img src="/images/20230307a/theme.png" alt="" width="1200" height="673" loading="lazy">
+<img src="/images/2023/20230307a/theme.png" alt="" width="1200" height="673" loading="lazy">
 
 # はじめに
 
@@ -71,7 +71,7 @@ release.ymlについて少し説明します。`-title`と`-label`タグが必�
 
 release.ymlを作成したらリリース時にGenerate release noteを押下するだけでリリースノートが自動生成されます。
 
-<img src="/images/20230307a/image.png" alt="image.png" width="1200" height="934" loading="lazy">
+<img src="/images/2023/20230307a/image.png" alt="image.png" width="1200" height="934" loading="lazy">
 
 >GitHub標準機能を用いずにtagのPUSHをトリガーにCircleCIで自動化する場合は[当技術ブログの過去記事](https://future-architect.github.io/articles/20210708a/)が参考になると思います。
 
@@ -329,7 +329,7 @@ CircleCIのOnly build pull requests
 
 ▼成功すると以下のようにPR作成時にブランチ名にしたがってラベルの付与とPR作成者の自動アサインができます
 
-<img src="/images/20230307a/image_2.png" alt="image.png" width="1200" height="569" loading="lazy">
+<img src="/images/2023/20230307a/image_2.png" alt="image.png" width="1200" height="569" loading="lazy">
 
 <div class="note warn" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;">
   <span class="fa fa-fw fa-exclamation-circle"></span>

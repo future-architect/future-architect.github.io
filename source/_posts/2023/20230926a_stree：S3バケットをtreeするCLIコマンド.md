@@ -10,11 +10,11 @@ tag:
   - Go
 category:
   - Programming
-thumbnail: /images/20230926a/thumbnail.png
+thumbnail: /images/2023/20230926a/thumbnail.png
 author: 宮永崇史
 lede: "S3バケットをtreeするCLIコマンドを紹介します。"
 ---
-<img src="/images/20230926a/stree-display.png" alt="" width="1200" height="600" loading="lazy">
+<img src="/images/2023/20230926a/stree-display.png" alt="" width="1200" height="600" loading="lazy">
 
 # はじめに
 
@@ -34,7 +34,7 @@ lede: "S3バケットをtreeするCLIコマンドを紹介します。"
 
 まずは利用画面を見ていただいたほうがイメージ付きやすいかと思いますのでgif画像を添付します。
 
-<img src="/images/20230926a/demo.gif" alt="demo" width="1200" height="686" loading="lazy">
+<img src="/images/2023/20230926a/demo.gif" alt="demo" width="1200" height="686" loading="lazy">
 
 streeは以下の機能をサポートしています。
 
@@ -183,10 +183,10 @@ stree my-bucket/test/dir2 -r us-east-1 -e http://localhost:4537
 `--no-color(-n)`でカラー出力を無効化できます。
 
 ▼カラーつき
-<img src="/images/20230926a/color.png" alt="color.png" width="479" height="391" loading="lazy">
+<img src="/images/2023/20230926a/color.png" alt="color.png" width="479" height="391" loading="lazy">
 
 ▼カラーなし
-<img src="/images/20230926a/no-color.png" alt="no-color.png" width="504" height="391" loading="lazy">
+<img src="/images/2023/20230926a/no-color.png" alt="no-color.png" width="504" height="391" loading="lazy">
 
 # さいごに
 

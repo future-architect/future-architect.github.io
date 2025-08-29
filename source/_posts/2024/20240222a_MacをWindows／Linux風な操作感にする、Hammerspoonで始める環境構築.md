@@ -9,7 +9,7 @@ tag:
   - 環境構築
 category:
   - Infrastructure
-thumbnail: /images/20240222a/thumbnail.jpg
+thumbnail: /images/2024/20240222a/thumbnail.jpg
 author: 山本竜玄
 lede: "私用PCはLinux、会社PCはプロジェクトによってWindowsとMacのどちらかを使っている生活をしており、かつ自宅のモニターやキーボードは外付けで1つのものを使用しています。その日々を過ごす中で、キーバインディングが異なるPCで混乱することがあり、ツール・操作感をできるだけ統一したいという願望がありました。"
 ---
@@ -74,7 +74,7 @@ Macを初めて使うユーザーのお悩みとして、以下のようなも�
 
 ※上記キーの名称はキーボードの刻印見たまま。
 
-<img src="/images/20240222a/IMG_20240219_174617.jpg" alt="IMG_20240219_174617.jpg" width="1200" height="675" loading="lazy">
+<img src="/images/2024/20240222a/IMG_20240219_174617.jpg" alt="IMG_20240219_174617.jpg" width="1200" height="675" loading="lazy">
 
 **2.ウィンドウ操作の変更:**
 
@@ -84,7 +84,7 @@ Macを初めて使うユーザーのお悩みとして、以下のようなも�
 
 - WindowsパスとMacパスの相互変換をメニューバーに常駐させることで簡単に実行
 
-<img src="/images/20240222a/image_(12).png" alt="image_(12).png" width="284" height="146" loading="lazy">
+<img src="/images/2024/20240222a/image_(12).png" alt="image_(12).png" width="284" height="146" loading="lazy">
 
 特に、Windowsユーザーから共有されるパスの相互変換機能は、メニューバーにアイコンを常駐させることで、操作によりクリップボード上のパスを変換する方法としました。これにより、`\\ホスト名\フォルダ名` (Windows) と `smb://ホスト名/フォルダ名`(Mac) の間での変換を簡単に行うことができます。
 
@@ -92,7 +92,7 @@ Macを初めて使うユーザーのお悩みとして、以下のようなも�
 
 すべての変更をHammerspoonで管理しています！ と言いたいところですが、試行錯誤の結果、自然な操作感とするためModifier Keysについては以下のようにスワップしています。
 
-<img src="/images/20240222a/image.png" alt="image.png" width="672" height="403" loading="lazy">
+<img src="/images/2024/20240222a/image.png" alt="image.png" width="672" height="403" loading="lazy">
 
 上記設定とHammerspoon側の設定を合わせることで、キー操作を定義する形です。
 
@@ -212,13 +212,13 @@ end
 ウィンドウ操作としては、Windowsのキーバインディングに寄せたいと思ってました。
 
 画面の半分に移動したり、
-<img src="/images/20240222a/image_2.png" alt="" width="841" height="247" loading="lazy">
+<img src="/images/2024/20240222a/image_2.png" alt="" width="841" height="247" loading="lazy">
 
 最大化したり、
-<img src="/images/20240222a/image_3.png" alt="" width="839" height="242" loading="lazy">
+<img src="/images/2024/20240222a/image_3.png" alt="" width="839" height="242" loading="lazy">
 
 ディスプレイ間を移動したり、
-<img src="/images/20240222a/image_4.png" alt="" width="830" height="243" loading="lazy">
+<img src="/images/2024/20240222a/image_4.png" alt="" width="830" height="243" loading="lazy">
 
 などの操作ですね。Windowsではこれらはデフォルトのショートカットキーとなっていますが、Macでも再現をしたいといったことがモチベーションです。
 
@@ -309,7 +309,7 @@ WindowsとMacのパス表記の間には、小さくそして大きな差異が�
 
 パス変換の実施方法はいろいろあると思いますが、今回はメニューバーに変換を常駐させておき、操作によりクリップボード上のパスを変換する方法としました。
 
-<img src="/images/20240222a/image_(12)_2.png" alt="" width="284" height="146" loading="lazy">
+<img src="/images/2024/20240222a/image_(12)_2.png" alt="" width="284" height="146" loading="lazy">
 
 https://www.hammerspoon.org/docs/hs.menubar.html
 
@@ -392,7 +392,7 @@ local path_converter = require "modules.path_converter"
 
 クリップボードにパスをコピーした上で、Macのメニューバー上に作成したプルダウンから、作成した関数をトリガーすることで画像のようなアラートを表示する＆クリップボードに変換後パスを保存できます。
 
-<img src="/images/20240222a/image_5.png" alt="image.png" width="720" height="355" loading="lazy">
+<img src="/images/2024/20240222a/image_5.png" alt="image.png" width="720" height="355" loading="lazy">
 
 Luaスクリプトをより煮詰めることで、さらにいろんなパスケースや文字列変換にも対応させることが可能です。
 

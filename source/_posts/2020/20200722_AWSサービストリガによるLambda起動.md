@@ -11,7 +11,7 @@ tag:
   - Go
 category:
   - Infrastructure
-thumbnail: /images/20200722/thumbnail.png
+thumbnail: /images/2020/20200722/thumbnail.png
 author: 加部達郎
 lede: "昨今様々なシステムで利用さているAWSのLambdaですが、サーバレスということもあり何かのイベントをトリガに関数を起動させる方法が一般的かと思います。LambdaはAWSの様々なサービスをトリガとして起動することが可能で、自分たちの利用しているAWSサービスと組み合わせて実装するることでその真価を発揮します。AWSに少し詳しい人であればLambdaをAWSのサービストリガで起動させる事ができることは知っていると思いますが、いざ実装するとなると具体的にどういった手順で、なんの設定が必要かというところがわからないという人もいるのではないでしょうか。"
 ---
@@ -82,7 +82,7 @@ LocalStackの詳細については[こちらのブログ](/articles/20191115/)�
 
 ではまず同期型の呼び出しから設定/実装方法を見ていきましょう。今回はよくあるAPI Gateway --> Lambdaという構成を参考に進めていきます。
 
-<img src="/images/20200722/2020-07-17T17.05.46.png" loading="lazy">
+<img src="/images/2020/20200722/2020-07-17T17.05.46.png" loading="lazy">
 
 それでは早速構築してきましょう。まずは、APIのレスポンスを返すLambdaを作成します。
 
@@ -211,7 +211,7 @@ hello lambda
 
 続いてS3とLambdaの連携です。API Gatewayに比べるとだいぶ設定が簡単です。S3にローカルPCからオブジェクトをコピーし、Lambdaが起動できることを確認していきます。
 
-<img src="/images/20200722/2020-07-17T17.05.34.png" loading="lazy">
+<img src="/images/2020/20200722/2020-07-17T17.05.34.png" loading="lazy">
 
 先程と同じようにまずはLambda関数のデプロイから実施していきます。
 トリガの起動が確認できればよいので、Lambdaが起動したらメッセージが出力されるようなソースを用意します。
@@ -373,7 +373,7 @@ aws logs get-log-events \
 
 最後はストリームベーズのLambda起動の設定です。ローカルPCからKinesisへメッセージをPUTしてLambdaを起動させましょう。
 
-<img src="/images/20200722/2020-07-17T17.05.23.png" loading="lazy">
+<img src="/images/2020/20200722/2020-07-17T17.05.23.png" loading="lazy">
 
 例によってテスト用のLambdaを作成します。
 今回はPUTしたメッセージの内容がログに出力されるようなソースを用意します。

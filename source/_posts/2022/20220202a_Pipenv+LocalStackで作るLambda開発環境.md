@@ -10,11 +10,11 @@ tag:
   - Pipenv
 category:
   - Programming
-thumbnail: /images/20220202a/thumbnail.png
+thumbnail: /images/2022/20220202a/thumbnail.png
 author: 宮永崇史
 lede: "PipenvとLocalStackを使用したLambda開発環境の構築を紹介します。本記事で作成するデモアプリは以下のGitHubリポジトリに格納しています。"
 ---
-<img src="/images/20220202a/eyecatch.png" alt="" width="969" height="484" loading="lazy">
+<img src="/images/2022/20220202a/eyecatch.png" alt="" width="969" height="484" loading="lazy">
 
 # はじめに
 
@@ -263,7 +263,7 @@ aws_secret_access_key = test
 S3バケットに格納したExcelファイルはAWS CLIコマンドでファイルをダウンロードして想定通りの挙動をしているか検証します。
 以下、構成図です。
 
-<img src="/images/20220202a/構成.png" alt="構成" width="1200" height="810" loading="lazy">
+<img src="/images/2022/20220202a/構成.png" alt="構成" width="1200" height="810" loading="lazy">
 
 ## アプリ機能詳細
 
@@ -703,7 +703,7 @@ zipコマンドを実行します。
 make zip
 ```
 
-<img src="/images/20220202a/zip.gif" alt="zip" width="890" height="786" loading="lazy">
+<img src="/images/2022/20220202a/zip.gif" alt="zip" width="890" height="786" loading="lazy">
 
 正常に動作していればルートディレクトリのbinフォルダに`lambda.zip`が生成されます。
 
@@ -858,7 +858,7 @@ make download
 以下の画像はETL処理元のJSONファイルとETL処理後のExcelファイルを比較したものです。
 想定通りの結果が得られました！！🎉
 
-<img src="/images/20220202a/image.png" alt="実行結果" width="1200" height="676" loading="lazy">
+<img src="/images/2022/20220202a/image.png" alt="実行結果" width="1200" height="676" loading="lazy">
 
 本記事で使用したソースコードは以下のGitHubリポジトリにまとめています。
 

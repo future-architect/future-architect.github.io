@@ -9,11 +9,11 @@ tag:
   - 式
 category:
   - Programming
-thumbnail: /images/20211025a/thumbnail.png
+thumbnail: /images/2021/20211025a/thumbnail.png
 author: 真野隼記
 lede: "DynamoDBをGoで操作することにかけては、[DynamoDB×Go連載] に参加するくらい関心があるのですが、AWS SDK for Goの公式ライブラリに含まれる、ヘルパーパッケージについて存在を今までスルーしていました。使ってみると業務的には利用一択だと思ったので今後使っていくぞという覚書としてまとめます。"
 ---
-<img src="/images/20211025a/top.png" alt="" width="1200" height="676">
+<img src="/images/2021/20211025a/top.png" alt="" width="1200" height="676">
 
 by [Renée French](http://reneefrench.blogspot.com/)
 

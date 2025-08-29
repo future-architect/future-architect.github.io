@@ -8,7 +8,7 @@ tag:
   - 失敗談
 category:
   - Programming
-thumbnail: /images/20220601b/thumbnail.png
+thumbnail: /images/2022/20220601b/thumbnail.png
 author: 真野隼記
 lede: "失敗談をテーマにした連載ということで、ちょうどプロダクト開発的に良い区切りのタイミングでもあるため、振り返りがてら、DynamoDB,Go,AWS Lambdaの技術要素について自分自身の理解・見込みの甘さについて反省します。"
 ---
@@ -46,7 +46,7 @@ DynamoDBは日付型を直接サポートしておらず、文字列型で保存
 
 例えば次のように、DynamoDB Streamsトリガーでデータレイク側に参照したい形式で転送するといったことを早期に行っていれば..という反省があります。
 
-<img src="/images/20220601b/失敗談技術ブログ.drawio.png" alt="分析用データストアにDDB Streamsで転送" width="1200" height="698" loading="lazy">
+<img src="/images/2022/20220601b/失敗談技術ブログ.drawio.png" alt="分析用データストアにDDB Streamsで転送" width="1200" height="698" loading="lazy">
 
 上図はS3に転送していますが、どういったデータストアで投げても良いとは思います。この例では月額コストをなるべく抑えたく、そこまで集計に用いるクエリにレイテンシを求められなかったため、S3+Athenaで済ましています。
 
@@ -58,13 +58,13 @@ DynamoDBは日付型を直接サポートしておらず、文字列型で保存
 
 ### 元の構成
 
-<img src="/images/20220601b/失敗談技術ブログ-ページ2.drawio.png" alt="失敗談技術ブログ-ページ2.drawio.png" width="1200" height="771" loading="lazy">
+<img src="/images/2022/20220601b/失敗談技術ブログ-ページ2.drawio.png" alt="失敗談技術ブログ-ページ2.drawio.png" width="1200" height="771" loading="lazy">
 
 ### こうすればよかった
 
 元も思想的には悪くない（DynamoDB Streams部分だけの改修で済むケースもあり影響範囲が限定的だった）ですが、終わってみればやや重厚だった気がします（ローカルの環境で再現するのが面倒で、単体テスト品質が上がりにくいにもあり）。
 
-<img src="/images/20220601b/失敗談技術ブログ-ページ3.drawio.png" alt="失敗談技術ブログ-ページ3.drawio.png" width="1200" height="771" loading="lazy">
+<img src="/images/2022/20220601b/失敗談技術ブログ-ページ3.drawio.png" alt="失敗談技術ブログ-ページ3.drawio.png" width="1200" height="771" loading="lazy">
 
 上図のように、同期的に書き込む方式も、既存部分へ手を入れることを過度に恐れず、客観的に判断していこうと思います。
 
@@ -89,13 +89,13 @@ AWS SDK for Goですが、記載がやや冗長になりがちでした。条件
 
 初期移行、リラン、連携先の不具合などで予期せぬデータ量に達した場合は、タイムアウトになりがち。
 
-<img src="/images/20220601b/失敗談技術ブログ-ページ4.drawio.png" alt="失敗談技術ブログ-ページ4.drawio.png" width="962" height="470" loading="lazy">
+<img src="/images/2022/20220601b/失敗談技術ブログ-ページ4.drawio.png" alt="失敗談技術ブログ-ページ4.drawio.png" width="962" height="470" loading="lazy">
 
 ### 横展開するのであれば最初から固く作っておいても良かったと思っている構成
 
 連携先の品質その他の制御が取りにくい場合は、自衛的に固く作り込んでおくことが吉。
 
-<img src="/images/20220601b/失敗談技術ブログ-ページ5.drawio.png" alt="失敗談技術ブログ-ページ5.drawio.png" width="962" height="682" loading="lazy">
+<img src="/images/2022/20220601b/失敗談技術ブログ-ページ5.drawio.png" alt="失敗談技術ブログ-ページ5.drawio.png" width="962" height="682" loading="lazy">
 
 ## その他
 

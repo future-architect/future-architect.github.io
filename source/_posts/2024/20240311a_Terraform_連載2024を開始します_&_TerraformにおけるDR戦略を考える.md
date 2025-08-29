@@ -9,11 +9,11 @@ tag:
   - マルチリージョン
 category:
   - Infrastructure
-thumbnail: /images/20240311a/thumbnail.png
+thumbnail: /images/2024/20240311a/thumbnail.png
 author: 伊藤太斉
 lede: "Terraform連載を開始します。"
 ---
-<img src="/images/20240311a/terraform.png" alt="" width="800" height="418" loading="lazy">
+<img src="/images/2024/20240311a/terraform.png" alt="" width="800" height="418" loading="lazy">
 
 こんにちは。技術ブログ運営の伊藤です。
 本日、3/11よりTerraform連載を開始します。
@@ -30,7 +30,7 @@ lede: "Terraform連載を開始します。"
 
 さて、目を世の中に向けてみて、どれくらいTerraformに対しての興味関心があるのかと思い、Google Trendsで調べたところ、以下のグラフとなりました。
 
-<img src="/images/20240311a/スクリーンショット_2024-03-11_0.02.27.png" alt="" width="1000" height="244" loading="lazy">
+<img src="/images/2024/20240311a/スクリーンショット_2024-03-11_0.02.27.png" alt="" width="1000" height="244" loading="lazy">
 注) 青: Terraform, 赤: CloudFormation
 
 Terraformとパブリッククラウドの中では利用比率が最も高い、AWSのCloudFormationとの比較ですが、大きく差が開いており、その興味関心度を伺うことができます。ちなみに、v1.0のリリースが2021年の夏頃でしたが、その半年後の2022年に入って以降が伸びているようです。

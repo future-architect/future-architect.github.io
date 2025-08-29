@@ -9,12 +9,12 @@ tag:
   - リフレクション
 category:
   - Programming
-thumbnail: /images/20220615a/thumbnail.png
+thumbnail: /images/2022/20220615a/thumbnail.png
 author: 多賀聡一朗
 lede: "!表題の通り、Go で map 型の YAML 出力の際、key を指定した順序にする方法を調査・実装してみました。指定した順序で出力したいので、map を struct へ変換して出力しました"
 ---
 
-<img src="/images/20220615a/yml.png" alt="" width="512" height="512" loading="lazy">
+<img src="/images/2022/20220615a/yml.png" alt="" width="512" height="512" loading="lazy">
 
 <a href="https://www.flaticon.com/free-icons/yml" title="yml icons">Yml icons created by Darius Dan - Flaticon</a>
 

@@ -11,11 +11,11 @@ tag:
   - Udemy
 category:
   - Infrastructure
-thumbnail: /images/20230915a/thumbnail.png
+thumbnail: /images/2023/20230915a/thumbnail.png
 author: 岸下優介
 lede: "最近Data Engineeringを扱うプロジェクトへ異動したこともあり、Google CloudにおけるData Engineeringを網羅的に学びたく、Professional Data Engineer認定資格を受けてきました。"
 ---
-<img src="/images/20230915a/image.png" alt="" width="599" height="586" loading="lazy">
+<img src="/images/2023/20230915a/image.png" alt="" width="599" height="586" loading="lazy">
 
 ## はじめに
 

@@ -9,7 +9,7 @@ tag:
   - やってみた
 category:
   - DevOps
-thumbnail: /images/20240419a/thumbnail.png
+thumbnail: /images/2024/20240419a/thumbnail.png
 author: 中邨英里佳
 lede: "業務の中で初めてJenkinsに触れたので、以下の内容についてまとめたいと思います。"
 ---
@@ -110,13 +110,13 @@ docker run -p 8080:8080 jenkins/jenkins:2.440.3-lts-jdk17
 シェルスクリプトを実行してコンソールに出力してみます。
 
 1. 新規ジョブ作成をクリックします。
-  <img src="/images/20240419a/image.png" alt="" width="1200" height="591" loading="lazy">
+  <img src="/images/2024/20240419a/image.png" alt="" width="1200" height="591" loading="lazy">
 2. 適当なジョブ名を入力し、「フリースタイル・プロジェクトのビルド」を選択して「OK」
-  <img src="/images/20240419a/image_2.png" alt="" width="1200" height="609" loading="lazy">
+  <img src="/images/2024/20240419a/image_2.png" alt="" width="1200" height="609" loading="lazy">
 3. 適当な説明を入力して下にスクロールします。
-  <img src="/images/20240419a/image_3.png" alt="" width="1200" height="612" loading="lazy">
+  <img src="/images/2024/20240419a/image_3.png" alt="" width="1200" height="612" loading="lazy">
 4. 「Build Steps」＞「ビルド手順の追加」から「シェルの実行」を選択します。
-  <img src="/images/20240419a/image_4.png" alt="" width="1200" height="608" loading="lazy">
+  <img src="/images/2024/20240419a/image_4.png" alt="" width="1200" height="608" loading="lazy">
 5. シェルスクリプトに以下を記述して保存します。
 
    ```sh
@@ -124,13 +124,13 @@ docker run -p 8080:8080 jenkins/jenkins:2.440.3-lts-jdk17
    echo "Hello"
    ```
 
-  <img src="/images/20240419a/image_5.png" alt="" width="1200" height="615" loading="lazy">
+  <img src="/images/2024/20240419a/image_5.png" alt="" width="1200" height="615" loading="lazy">
 6. ビルド実行をクリックします。
-  <img src="/images/20240419a/image_6.png" alt="" width="1200" height="585" loading="lazy">
+  <img src="/images/2024/20240419a/image_6.png" alt="" width="1200" height="585" loading="lazy">
 7. 左下にビルド履歴が表示されているので、コンソール出力を見てみます。
-  <img src="/images/20240419a/image_7.png" alt="" width="1101" height="672" loading="lazy">
+  <img src="/images/2024/20240419a/image_7.png" alt="" width="1101" height="672" loading="lazy">
 8. 「Hello」と出力されていて、シェルスクリプトが実行されていることがわかります。
-  <img src="/images/20240419a/image_8.png" alt="" width="1200" height="520" loading="lazy">
+  <img src="/images/2024/20240419a/image_8.png" alt="" width="1200" height="520" loading="lazy">
 
 ## ジョブをつなげて実行する
 
@@ -138,23 +138,23 @@ test-job-A、test-job-B を作成し、A、Bの順番に実行してみます。
 
 1. 最初の例と同様に、フリースタイル・プロジェクトで空のジョブ test-job-A、test-job-B を作成します。
 2. 「test-job-A」の「Build Steps」＞「ビルド後の処理の追加」から「他のプロジェクトのビルド」を選択します。
-  <img src="/images/20240419a/image_9.png" alt="" width="1200" height="524" loading="lazy">
+  <img src="/images/2024/20240419a/image_9.png" alt="" width="1200" height="524" loading="lazy">
 3. 対象プロジェクトに「test-job-B」を入力して保存します。
-  <img src="/images/20240419a/image_10.png" alt="" width="1200" height="527" loading="lazy">
+  <img src="/images/2024/20240419a/image_10.png" alt="" width="1200" height="527" loading="lazy">
 4. 「test-job-A」を実行すると、下流プロジェクトの「test-job-B」も実行されていることがわかります。
-  <img src="/images/20240419a/image_11.png" alt="" width="1200" height="387" loading="lazy">
+  <img src="/images/2024/20240419a/image_11.png" alt="" width="1200" height="387" loading="lazy">
 
 ## Gitリポジトリをチェックアウトする
 
 1. GitHubにとりあえず空のpublicリポジトリを作成します。
-  <img src="/images/20240419a/image_12.png" alt="" width="1200" height="598" loading="lazy">
+  <img src="/images/2024/20240419a/image_12.png" alt="" width="1200" height="598" loading="lazy">
 2. 「test-job-git」ジョブの「ソースコード管理」で「Git」を選択し、リポジトリURLとブランチ名を入力します。
   ※チェックアウトするだけなので認証情報は特に入力していません。
-  <img src="/images/20240419a/image_13.png" alt="" width="1081" height="838" loading="lazy">
+  <img src="/images/2024/20240419a/image_13.png" alt="" width="1081" height="838" loading="lazy">
 3. ジョブを実行してコンソール出力を見ると、（ビルドするものは何もありませんが）正常終了しています。
-  <img src="/images/20240419a/image_14.png" alt="" width="1102" height="675" loading="lazy">
+  <img src="/images/2024/20240419a/image_14.png" alt="" width="1102" height="675" loading="lazy">
 4. ワークスペースの中を見ると、リポジトリの内容（READMEファイル）が取得されています。
-  <img src="/images/20240419a/image_15.png" alt="" width="1200" height="513" loading="lazy">
+  <img src="/images/2024/20240419a/image_15.png" alt="" width="1200" height="513" loading="lazy">
 
 # さいごに
 

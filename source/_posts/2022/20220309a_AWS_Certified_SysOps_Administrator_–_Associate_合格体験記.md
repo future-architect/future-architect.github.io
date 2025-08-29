@@ -8,12 +8,12 @@ tag:
   - 合格記
 category:
   - Infrastructure
-thumbnail: /images/20220309a/thumbnail.png
+thumbnail: /images/2022/20220309a/thumbnail.png
 author: 渡邉光
 lede: "2019年新卒入社筋肉エンジニアの渡邉光です。AWS Certified SysOps Administrator – Associate (AWS SOA-C02) を受験してきました。無事合格できたので、Associate試験は3冠を達成することができました！"
 ---
 
-<img src="/images/20220309a/AWS-Certified_Sysops-Administrator_Associate_512x512.png" alt="" width="512" height="512">
+<img src="/images/2022/20220309a/AWS-Certified_Sysops-Administrator_Associate_512x512.png" alt="" width="512" height="512">
 
 お久しぶりです。2019年新卒入社筋肉エンジニアの渡邉光です。
 

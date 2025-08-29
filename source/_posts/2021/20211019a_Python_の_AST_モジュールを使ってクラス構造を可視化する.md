@@ -11,7 +11,7 @@ tag:
   - インターン2021
 category:
   - Programming
-thumbnail: /images/20211019a/thumbnail.PNG
+thumbnail: /images/2021/20211019a/thumbnail.PNG
 author: 空閑康太
 lede: "こんにちは、Future のインターン Engineer Camp に参加した空閑です。今回のインターンではソースコード静的解析システムの開発に取り組みました。そこで本記事では、開発内容の一部である、Python の AST モジュールを使ったクラス構造の可視化について紹介します。Python の環境構築については以下を参考にしました。[サーバーアプリ開発環境"
 ---
@@ -139,7 +139,7 @@ https://docs.python.org/ja/3/library/ast.html#ast.NodeVisitor.generic_visit
 
 今回の目標は、パッケージ・モジュール・クラスをノードとする図のようなツリーの作成です。パッケージとモジュールはディレクトリ構造にしたがってつなぎ、モジュールの下にはその中で定義されているクラスをつなぎます。作成にあたり、モジュール違いの同名クラスなどが出現することに注意します。
 
-<img src="/images/20211019a/graph_sample.PNG" alt="graph_sample.PNG" width="1036" height="661" loading="lazy">
+<img src="/images/2021/20211019a/graph_sample.PNG" alt="graph_sample.PNG" width="1036" height="661" loading="lazy">
 
 AST はディレクトリ構造までは表現しないため、今回は以下の手順で解析を行います。
 
@@ -222,7 +222,7 @@ class NodeClass(Node):
 
 探索対象のパス以下を再帰的に解析し、パッケージおよびモジュールのみのツリーを作成します。この時点では図のようなツリーが構築されています。
 
-<img src="/images/20211019a/graph_sample_pre.PNG" alt="graph_sample_pre.PNG" width="665" height="421" loading="lazy">
+<img src="/images/2021/20211019a/graph_sample_pre.PNG" alt="graph_sample_pre.PNG" width="665" height="421" loading="lazy">
 
 ```py tree.py
 def create_module_tree(search_path: str, root: Optional[NodeRoot] = None) -> NodeRoot:
@@ -314,10 +314,10 @@ class ClassDefNodeVisitor(ast.NodeVisitor):
 
 標準ライブラリの可視化結果を載せます。全体を載せるには大きすぎる（PDF で約 2 MB）ため、拡大しています。青がパッケージ、オレンジがモジュール、緑がクラスに対応しています。
 
-<img src="/images/20211019a/graph_2.PNG" alt="graph_2.PNG" width="1200" height="187" loading="lazy">
+<img src="/images/2021/20211019a/graph_2.PNG" alt="graph_2.PNG" width="1200" height="187" loading="lazy">
 
 図では `http` パッケージの下に、`server` モジュールがあり、その下にいくつかのクラスがあることが確認できます。実際、該当ディレクトリを見に行くと下図のようになっており、可視化できていることがわかります。
-<img src="/images/20211019a/image.png" alt="image.png" width="1200" height="643" loading="lazy">
+<img src="/images/2021/20211019a/image.png" alt="image.png" width="1200" height="643" loading="lazy">
 
 # さいごに
 

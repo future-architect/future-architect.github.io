@@ -9,7 +9,7 @@ tag:
   - Vue.js
 category:
   - Programming
-thumbnail: /images/20240426b/thumbnail.png
+thumbnail: /images/2024/20240426b/thumbnail.png
 author: 後藤喜斗
 lede: "フロントエンドの開発をする際にはVueを使用しています。Vueでの開発に慣れていくにつれて、「Vue使いやすいな、よくできているなぁ。」と思うとともに、普段何気なく使っているスプレッドシートに対して、今まで感じたことのなかった不便さを感じるようになりました。"
 ---
@@ -96,7 +96,7 @@ Googleが公表している[GoogleTasksのREST Resourceの形式](https://develo
 
 構成図にするとこんなイメージです。
 
-<img src="/images/20240426b/構成図.png" alt="" width="842" height="552" loading="lazy">
+<img src="/images/2024/20240426b/構成図.png" alt="" width="842" height="552" loading="lazy">
 
 ### View
 
@@ -272,11 +272,11 @@ function createTaskTable(taskList) {
 
 スプレッドシートからの変更は編集をトリガーに実行されます。
 
-<img src="/images/20240426b/スプレッドシートから変更.gif" alt="スプレッドシートから変更.gif" width="1200" height="662" loading="lazy">
+<img src="/images/2024/20240426b/スプレッドシートから変更.gif" alt="スプレッドシートから変更.gif" width="1200" height="662" loading="lazy">
 
 GoogleTasksからの変更は定時実行で最短1分ごとに取得できます。
 
-<img src="/images/20240426b/GoogleTasksから変更.gif" alt="GoogleTasksから変更.gif" width="1200" height="662" loading="lazy">
+<img src="/images/2024/20240426b/GoogleTasksから変更.gif" alt="GoogleTasksから変更.gif" width="1200" height="662" loading="lazy">
 
 # まとめ
 

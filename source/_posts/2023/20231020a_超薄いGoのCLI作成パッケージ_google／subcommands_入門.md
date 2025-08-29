@@ -8,12 +8,12 @@ tag:
   - subcommands
 category:
   - Programming
-thumbnail: /images/20231020a/thumbnail.png
+thumbnail: /images/2023/20231020a/thumbnail.png
 author: 真野隼記
 lede: "Google Go Coding Guideで紹介されていたgoogle/subcommandsについて理解を深めて行こうと思います。"
 ---
 
-<img src="/images/20231020a/subcommands.png" alt="" width="491" height="213">
+<img src="/images/2023/20231020a/subcommands.png" alt="" width="491" height="213">
 
 ## はじめに
 

@@ -9,11 +9,11 @@ tag:
   - 登壇レポート
 category:
   - 認証認可
-thumbnail: /images/20210811b/thumbnail.jpg
+thumbnail: /images/2021/20210811b/thumbnail.jpg
 author: 市川浩暉
 lede: "2021年7月21日にFuture Tech Night #14～認証認可（IDaaS）勉強会～を開催し、「生体認証・デバイス認証を活用するパスワードレスな認証規格「WebAuthn」を体験！」というテーマで登壇させていただきました。"
 ---
-<img src="/images/20210811b/key-3348307_640.jpg" alt="" title="MasterTuxによるPixabayからの画像" width="640" height="360" loading="">
+<img src="/images/2021/20210811b/key-3348307_640.jpg" alt="" title="MasterTuxによるPixabayからの画像" width="640" height="360" loading="">
 
 # はじめに
 

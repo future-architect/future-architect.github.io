@@ -9,11 +9,11 @@ tag:
   - Copilot
 category:
   - Programming
-thumbnail: /images/20240326a/thumbnail.png
+thumbnail: /images/2024/20240326a/thumbnail.png
 author: 棚井龍之介
 lede: "Terraform 連載ということで、そういえば、実装コードは Go で書かれていたな、コマンドの使い方はインフラエンジニアの皆様が書いてくれるはずなので、コードリーディングしようかな"
 ---
-<img src="/images/20240326a/top.png" alt="" width="800" height="539">
+<img src="/images/2024/20240326a/top.png" alt="" width="800" height="539">
 
 [Terraform連載2024](/articles/20240311a/) の10本目記事です。
 
@@ -334,7 +334,7 @@ Number of parallel builds: 11
 
 このまましばらく放置していれば、11環境分すべての `terraform` 実行バイナリが作成されるのですが、私のPC環境では以下の問題が発生しました。
 
-<img src="/images/20240326a/disc.png" alt="disc.png" width="544" height="170" loading="lazy">
+<img src="/images/2024/20240326a/disc.png" alt="disc.png" width="544" height="170" loading="lazy">
 
 リポジトリからクローンしたソースコード全体と、ビルドで生成した実行バイナリのダブルパンチにより、ローカル PC が悲鳴を上げていました。
 

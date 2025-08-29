@@ -9,7 +9,7 @@ tag:
   - 環境構築
 category:
   - Infrastructure
-thumbnail: /images/20220107a/thumbnail.gif
+thumbnail: /images/2022/20220107a/thumbnail.gif
 author: 青柳雄登
 lede: "こんにちは。2020年4月入社の青柳です。タイトルにある通り便利ツールをまとめてみました。今回は、新入社員や入社前の大学生をターゲットに、誰でもすぐに使えるツールを紹介しているので、まだ使っていないツールがあればぜひ使ってみて下さい。※前提としてwindowsの方向けなので、Macの方はごめんなさい:bow_tone2:"
 ---
@@ -22,7 +22,7 @@ lede: "こんにちは。2020年4月入社の青柳です。タイトルにあ�
 
 # everything
 
-<img src="/images/20220107a/everything2.gif" alt="everything" width="1160" height="428" loading="lazy">
+<img src="/images/2022/20220107a/everything2.gif" alt="everything" width="1160" height="428" loading="lazy">
 
 https://forest.watch.impress.co.jp/library/software/everything/
 
@@ -36,7 +36,7 @@ https://forest.watch.impress.co.jp/library/software/everything/
 
 # cribor
 
-<img src="/images/20220107a/cribor1.gif" alt="cribor1" width="1200" height="372" loading="lazy">
+<img src="/images/2022/20220107a/cribor1.gif" alt="cribor1" width="1200" height="372" loading="lazy">
 
 https://forest.watch.impress.co.jp/library/software/clibor/
 
@@ -48,7 +48,7 @@ https://forest.watch.impress.co.jp/library/software/clibor/
 
 # Tablacus Explorer
 
-<img src="/images/20220107a/TablacusExplorer.gif" alt="TablacusExplorer.gif" width="862" height="451" loading="lazy">
+<img src="/images/2022/20220107a/TablacusExplorer.gif" alt="TablacusExplorer.gif" width="862" height="451" loading="lazy">
 
 https://tablacus.github.io/explorer.html
 
@@ -58,7 +58,7 @@ https://tablacus.github.io/explorer.html
 
 # orchis launcher
 
-<img src="/images/20220107a/orchislauncher.gif" alt="orchislauncher.gif" width="768" height="348" loading="lazy">
+<img src="/images/2022/20220107a/orchislauncher.gif" alt="orchislauncher.gif" width="768" height="348" loading="lazy">
 
 https://forest.watch.impress.co.jp/library/software/orchis/
 
@@ -70,7 +70,7 @@ https://forest.watch.impress.co.jp/library/software/orchis/
 
 # OneNote
 
-<img src="/images/20220107a/ScreenToGif_2.gif" alt="ScreenToGif.gif" width="1200" height="604" loading="lazy">
+<img src="/images/2022/20220107a/ScreenToGif_2.gif" alt="ScreenToGif.gif" width="1200" height="604" loading="lazy">
 
 https://www.microsoft.com/ja-jp/microsoft-365/onenote/digital-note-taking-app
 
@@ -82,7 +82,7 @@ https://www.microsoft.com/ja-jp/microsoft-365/onenote/digital-note-taking-app
 
 # ScreenToGif
 
-<img src="/images/20220107a/ScreenToGif.gif" alt="ScreenToGif.gif" width="469" height="72" loading="lazy">
+<img src="/images/2022/20220107a/ScreenToGif.gif" alt="ScreenToGif.gif" width="469" height="72" loading="lazy">
 
 https://www.screentogif.com/
 

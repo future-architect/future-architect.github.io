@@ -8,12 +8,12 @@ tag:
   - 入門
 category:
   - Programming
-thumbnail: /images/20230406a/thumbnail.png
+thumbnail: /images/2023/20230406a/thumbnail.png
 author: 大岩潤矢
 lede: "初心者がTerraformを扱う際に気をつけるべきポイントについて、自分が1ヶ月間みっちりTerraformを触った経験をもとに紹介したいと思います。"
 ---
 
-<img src="/images/20230406a/top.png" alt="" width="500" height="286">
+<img src="/images/2023/20230406a/top.png" alt="" width="500" height="286">
 
 ## はじめに
 
@@ -105,11 +105,11 @@ Plan: 0 to add, 1 to change, 0 to destroy.
 
 このまま `terraform apply` を実行すると、たしかにAWSマネージドポリシーである `AWSLambdaVPCAccessExecutionRole` のみがアタッチされている状態となってしまいます。
 
-<img src="/images/20230406a/image.png" alt="" width="1200" height="583" loading="lazy">
+<img src="/images/2023/20230406a/image.png" alt="" width="1200" height="583" loading="lazy">
 
 ここで公式ドキュメントの記述を見てみましょう。[aws_iam_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role)のページ冒頭に、黄色で「NOTE」が書かれているようです。
 
-<img src="/images/20230406a/image_2.png" alt="" width="750" height="259" loading="lazy">
+<img src="/images/2023/20230406a/image_2.png" alt="" width="750" height="259" loading="lazy">
 
 > NOTE:
 > If you use this resource's managed_policy_arns argument or inline_policy configuration blocks, this resource will take over exclusive management of the role's respective policy types (e.g., both policy types if both arguments are used).
@@ -253,17 +253,17 @@ Error: deleting Pinpoint Application (xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx): %!s(<ni
 
 terraform-provider-aws のGitHubにアクセスし、Issueの検索から[「pinpoint nil」で検索します](https://github.com/hashicorp/terraform-provider-aws/issues?q=pinpoint+nil)。すると……ヒットしました！ すでにCloseされていましたが、[「[Bug]: Unable to delete Application PinPoint, destroy command error」](https://github.com/hashicorp/terraform-provider-aws/issues/29341) というタイトルのIssueを発見しました。
 
-<img src="/images/20230406a/image_3.png" alt="image.png" width="1200" height="664" loading="lazy">
+<img src="/images/2023/20230406a/image_3.png" alt="image.png" width="1200" height="664" loading="lazy">
 
 一番下を見ると、[MergedとなっているPR](https://github.com/hashicorp/terraform-provider-aws/pull/30101)があることが分かります。
 
-<img src="/images/20230406a/image_4.png" alt="image.png" width="1077" height="160" loading="lazy">
+<img src="/images/2023/20230406a/image_4.png" alt="image.png" width="1077" height="160" loading="lazy">
 
 さらにその先には、`v4.60.0` で修正がリリースされるとの文言がありました。記事執筆時点で2週間前となっていますが、このバグを踏んで調べた時点ではまだ数日しか経っていない、修正したての出来事でした。
 
 > This functionality has been released in v4.60.0 of the Terraform AWS Provider.
 
-<img src="/images/20230406a/image_5.png" alt="" width="1155" height="298" loading="lazy">
+<img src="/images/2023/20230406a/image_5.png" alt="" width="1155" height="298" loading="lazy">
 
 すぐにterraform-provider-awsのバージョンをv4.60.0に上げ、`terraform init -upgrade` を実施し、apply・destroyを実施すると、今度はエラーを出さずに正常終了しました。
 

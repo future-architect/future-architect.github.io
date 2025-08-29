@@ -7,7 +7,7 @@ tag:
   - SvelteKit
 category:
   - Programming
-thumbnail: /images/20220415a/thumbnail.png
+thumbnail: /images/2022/20220415a/thumbnail.png
 author: 澁川喜規
 lede: "ウェブアプリケーションフレームワークとして最近注目度が少しずつ上がっているのがSvelteです。以前、Svelteをちょびっとサンプルを触ってみた感じ、コードの雰囲気はscript setup版のVue 3っぽいなー、という感じです。あとはプロパティ入力のあるコンポーネントでHTMLを生成するという基本構成はReactもAngularもみんなそうなので、今時のウェブフロントエンドのフレームワークを触ったことがあれば難しくはない気がします。1コンポーネントでおさまる範囲では[ちょっと前に]かんたんなアプリの試作をしてみましたが、じゃあ、一本分のアプリを作るときはどうなんだ、ということでSvelteKitでプロジェクトを新規で作ってみたけど、いろいろな未知の要素がでてきて、これはどうなんだ？というのをドキュメントから探す、という学び方もまあ悪くないな、ということでブログにしてみました。"
 ---
@@ -45,9 +45,9 @@ $ npm run dev -- --open
 
 サンプルプロジェクトは3つのページがあります。静的なAbout以外に、よくあるカウンターと、ToDoがあります。カウンターはSvelte単体でも実現できるような内容で、ToDoはウェブサービスアクセスを伴うサンプルです。
 
-<img src="/images/20220415a/スクリーンショット_2022-04-08_9.57.03.png" alt="カウンターのサンプル" width="1200" height="856" loading="lazy">
+<img src="/images/2022/20220415a/スクリーンショット_2022-04-08_9.57.03.png" alt="カウンターのサンプル" width="1200" height="856" loading="lazy">
 
-<img src="/images/20220415a/スクリーンショット_2022-04-08_9.58.41.png" alt="TODOのサンプル" width="1200" height="856" loading="lazy">
+<img src="/images/2022/20220415a/スクリーンショット_2022-04-08_9.58.41.png" alt="TODOのサンプル" width="1200" height="856" loading="lazy">
 
 ページ周りのコードを抜き出してきたのがこれです。
 
@@ -129,7 +129,7 @@ export const get: RequestHandler = async () => {
 
 ただ、これだとWebページのコンテンツとAPIの区別がつかないので、明治的に`accept: application/json`をリクエストにつけるか、`__data.json`というのをリクエスト側で付与することでJSONのAPIの方を明示的に要求するらしい。確かに、サンプルコードの動きを見ると、`__data.json`がついていますね。
 
-<img src="/images/20220415a/スクリーンショット_2022-04-10_9.40.11.png" alt="API" width="1200" height="412" loading="lazy">
+<img src="/images/2022/20220415a/スクリーンショット_2022-04-10_9.40.11.png" alt="API" width="1200" height="412" loading="lazy">
 
 アンダースコアで除外できることは[プライベートモジュール](https://kit.svelte.dev/docs/routing#private-modules)で説明されていました。ピリオドもプライベート扱い（`.well-known`を除く)とのこと。
 
@@ -137,7 +137,7 @@ export const get: RequestHandler = async () => {
 
 動かしてみて、おっと思ったのが、`_method=DELETE`というところですね。HTTP的にはメソッドはたくさんありますが、JavaScriptを使わずにHTTPのフォームを使って送れるのはGETとPOSTのみです。そこで、POSTにいろいろなメソッドも振る舞わせるというメソッドオーバーライドというのがあります。
 
-<img src="/images/20220415a/スクリーンショット_2022-04-10_9.50.19.png" alt="メソッドオーバーライド" width="1200" height="250" loading="lazy">
+<img src="/images/2022/20220415a/スクリーンショット_2022-04-10_9.50.19.png" alt="メソッドオーバーライド" width="1200" height="250" loading="lazy">
 
 設定を見たときに、メソッドオーバーライドという項目があるのに気づきました。
 

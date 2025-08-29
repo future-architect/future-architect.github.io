@@ -9,7 +9,7 @@ tag:
   - ビジネス
 category:
   - Business
-thumbnail: /images/20220727a/thumbnail.PNG
+thumbnail: /images/2022/20220727a/thumbnail.PNG
 author: ヴーホアン・ミン
 lede: "DXアプローチ連載2本目として本記事では、デザインワークを用いたサービス設計・プロダクト設計をする際に考慮すべき3つの観点についてご紹介し、その文脈の中でフューチャーのデザインワークはどういう立ち位置にいるのかについて考えてみたいと思います。"
 ---
@@ -21,7 +21,7 @@ DXアプローチ連載2本目として本記事では、デザインワーク�
 
 ## Desirability, Viability, Feasibility
 
-<img src="/images/20220727a/スライド1.PNG" alt="" width="1200" height="675" loading="lazy">
+<img src="/images/2022/20220727a/スライド1.PNG" alt="" width="1200" height="675" loading="lazy">
 
 デザイン思考は、Desirability（有用性）・Viability（持続可能性）・Feasibility（実現可能性）の3要素を全て満たすソリューションを生み出すことがゴールだと言われています[^1]。
 
@@ -31,26 +31,26 @@ DXアプローチ連載2本目として本記事では、デザインワーク�
 
 ### 1. Desirability（有用性）
 
-<img src="/images/20220727a/スライド2.PNG" alt="" width="1200" height="675" loading="lazy">
+<img src="/images/2022/20220727a/スライド2.PNG" alt="" width="1200" height="675" loading="lazy">
 
 「ユーザに必要とされているサービス・商品なのか？」「誰かの課題を解決しているのか？」「他に良い既存商品やアイデアないのか？」等の質問に答えるのが最初の観点である「Desirability」（有用性）の役割です。
 
 有用性のないサービス・商品は市場価値もなく、人々から求められないので、もちろん売れません。サービスデザイン・プロダクトデザインは「こんなものがあったらいいな」等のニーズや需要から始まることが多く、有用性の検証がデザインワークの起点になると言っても過言ではないでしょう。そのため、必然的にデザインプロセスの多くは、市場調査やユーザインタビュー等、UXデザインプロセスでいう「Understand」（理解）や「Empathize」（共感）のフェーズから行われます。
 
-<img src="/images/20220727a/image.png" alt="" width="555" height="365" loading="lazy">
+<img src="/images/2022/20220727a/image.png" alt="" width="555" height="365" loading="lazy">
 
 >アボカドトーストをどこでもいつでも… どれぐらいニーズがあるのでしょうか？（個人的には欲しい）
 >出展：@UNNECESSARYINVENTIONS/INSTAGRAM
 
 ### 2. Viability（持続可能性）
 
-<img src="/images/20220727a/スライド3.PNG" alt="" width="1200" height="675" loading="lazy">
+<img src="/images/2022/20220727a/スライド3.PNG" alt="" width="1200" height="675" loading="lazy">
 
 直訳すると「実行可能性」、少し捉え方を変えると「持続可能性」とも言える「Viability」は商品・サービスが問題なく展開でき、継続的に価値を提供できるかどうかを考察する観点です。
 
 利益を確保できるビジネスモデルの設計や各ステークホルダーの理解を得る等、ビジネス観点からの短期的な考察はもちろん、「ターゲットユーザにとって現実的なプライシングになっているのか」「社会・自然環境への負担はどれぐらいあるのか？」等、顧客や社会的評価の視点からも考えたうえで、長期的な持続可能性の確保が必要です。
 
-<img src="/images/20220727a/image_2.png" alt="" width="1200" height="358" loading="lazy">
+<img src="/images/2022/20220727a/image_2.png" alt="" width="1200" height="358" loading="lazy">
 
 >若い利用者のメンタルヘルスに悪影響を及ぼすと指摘されたInstagram… 持続可能なビジネスモデルか？
 >出展：ROYAL SOCIETY FOR PUBLIC HEALTH
@@ -63,13 +63,13 @@ DXアプローチ連載2本目として本記事では、デザインワーク�
 
 ### 3. Feasibility（実現可能性）
 
-<img src="/images/20220727a/スライド4.PNG" alt="" width="1200" height="675" loading="lazy">
+<img src="/images/2022/20220727a/スライド4.PNG" alt="" width="1200" height="675" loading="lazy">
 
 最後の観点である、「Feasibility」はアイデアを実現するためのリソース・技術が十分であるかを確認するための「実現可能性」です。
 
 「ビジネスアイデアを形にするための技術は存在するか」「開発するための人材が揃っているか」「開発技術にかかるコストはどの程度か」等、アイデア具現化の段階で明らかにしないといけない技術的な課題は多くあります。デザインプロセス開始直後は、技術的な制約に囚われすぎずに、アイデアを発散させることは重要です。その一方で、後続のステップで発生するリスクとコストをミニマムに抑えるには、早い段階からアイデアの実現可能性を把握することは不可欠だと言えます。
 
-<img src="/images/20220727a/image_3.png" alt="" width="1200" height="600" loading="lazy">
+<img src="/images/2022/20220727a/image_3.png" alt="" width="1200" height="600" loading="lazy">
 
 >瞬間移動、実現したいですね
 >出展：COKADA/GETTY IMAGES
@@ -82,7 +82,7 @@ DXアプローチ連載2本目として本記事では、デザインワーク�
 
 ## ViabilityとFeasibilityの壁
 
-<img src="/images/20220727a/スライド5.PNG" alt="" width="1200" height="675" loading="lazy">
+<img src="/images/2022/20220727a/スライド5.PNG" alt="" width="1200" height="675" loading="lazy">
 
 前段で申し上げた通り、サービス設計の前半はUXデザインプロセス等を通して「[Desirability](#1-desirability有用性)」（有用性）を担保できることが多いと思います。ただ、プロジェクトが後半に進むにあたり、「[Viability](#2-viability持続可能性)」（持続可能性）と「[Feasibility](#3-feasibility実現可能性)」（実現可能性）の確保に苦しまれるチーム・企業は少なくないのでは。
 

@@ -9,7 +9,7 @@ tag:
   - チーム開発
 category:
   - Programming
-thumbnail: /images/20240702a/thumbnail.png
+thumbnail: /images/2024/20240702a/thumbnail.png
 author:  武田大輝
 lede: "フューチャーの有志メンバでOpenAPI Specification（OAS） v3.0.3に対応したコーディング規約を作成しました。"
 ---
@@ -18,7 +18,7 @@ lede: "フューチャーの有志メンバでOpenAPI Specification（OAS） v3.
 フューチャーの有志メンバーでOpenAPI Specification（OAS） v3.0.3に対応したコーディング規約を作成しました。
 
 <a href="https://future-architect.github.io/coding-standards/documents/forOpenAPISpecification/OpenAPI_Specification_3.0.3.html">
-<img src="/images/20240702a/image.png" alt="" width="1200" height="719" loading="lazy">
+<img src="/images/2024/20240702a/image.png" alt="" width="1200" height="719" loading="lazy">
 </a>
 
 https://future-architect.github.io/coding-standards/documents/forOpenAPISpecification/OpenAPI_Specification_3.0.3.html

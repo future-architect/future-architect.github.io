@@ -8,12 +8,12 @@ tag:
   - インデックス
 category:
   - Culture
-thumbnail: /images/20221130b/thumbnail.png
+thumbnail: /images/2022/20221130b/thumbnail.png
 author: 伊藤太斉
 lede: "技術ブログ運営の伊藤です。今年も後わずかとなっており、年の瀬の忙しさや肌寒さを感じているところです。年末の風物詩となっているQiita Advent Calendarですが、フューチャーは今年8年目の参加となります。本記事では、昨年の振り返りと今年の記事の内容などに触れていこうと思います。"
 ---
 
-<img src="/images/20221130b/top.png" alt="" width="800" height="450">
+<img src="/images/2022/20221130b/top.png" alt="" width="800" height="450">
 
 Photo taken by [@kaedemalu](https://twitter.com/kaedemalu)
 
@@ -37,7 +37,7 @@ Photo taken by [@kaedemalu](https://twitter.com/kaedemalu)
 
 ## 2021年の振り返り
 
-<img src="/images/20221130b/スクリーンショット_2022-11-29_19.08.22.png" alt="スクリーンショット_2022-11-29_19.08.22.png" width="1059" height="692" loading="lazy">
+<img src="/images/2022/20221130b/スクリーンショット_2022-11-29_19.08.22.png" alt="スクリーンショット_2022-11-29_19.08.22.png" width="1059" height="692" loading="lazy">
 
 [2021年の一覧](https://qiita.com/advent-calendar/2021/future)を見ると、言語に留まらず、クラウドサービスの記事や量子コンピュータなどといったさまざまな記事が投稿されています。
 私は入社して以来ずっと使っているTerraformをどのようにしてできるようになったかをまとめてみました。
@@ -45,7 +45,7 @@ Photo taken by [@kaedemalu](https://twitter.com/kaedemalu)
 ## 2022年の記事一覧
 
 [2022年の一覧](https://qiita.com/advent-calendar/2022/future)は以下です。
-<img src="/images/20221130b/スクリーンショット_2022-11-29_19.14.45.png" alt="スクリーンショット_2022-11-29_19.14.45.png" width="1055" height="790" loading="lazy">
+<img src="/images/2022/20221130b/スクリーンショット_2022-11-29_19.14.45.png" alt="スクリーンショット_2022-11-29_19.14.45.png" width="1055" height="790" loading="lazy">
 
 まだ何を書くか決まっていない人もいますが、フロントエンドからインフラ、モバイル、AIなど例年と同様に幅広い記事が公開される予定となっています。
 また、今年も毎年参加のベテラン社員や、今年度入社のルーキーなど、分野だけでなく、社会人歴も厚めとなっております。

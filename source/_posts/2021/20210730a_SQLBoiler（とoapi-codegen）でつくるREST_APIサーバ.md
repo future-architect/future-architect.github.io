@@ -9,7 +9,7 @@ tag:
   - コード生成
 category:
   - Programming
-thumbnail: /images/20210730a/thumbnail.png
+thumbnail: /images/2021/20210730a/thumbnail.png
 author: 筒井悠平
 lede: "GoのORマッパー連載、折り返して5日目です。SQLBoilerを使用したDBスキーマ駆動なREST APIサーバの開発ワークフローを紹介します。"
 ---
@@ -66,7 +66,7 @@ SQLBoilerにはSchema Migration機能は含まれておらず、既存のデー�
 今回使用するテーブル定義です。
 ユーザ、イベント、イベント参加ユーザの3テーブルで、イベント・ユーザ間は `1 : 0...N` の関係です。
 
-<img src="/images/20210730a/image.png" alt="テーブル定義" width="403" height="283" loading="lazy">
+<img src="/images/2021/20210730a/image.png" alt="テーブル定義" width="403" height="283" loading="lazy">
 
 ```sql
 create table "user" (
@@ -398,7 +398,7 @@ c.f. [Go の Open API 3.0 のジェネレータ oapi-codegen を試してみた]
 
 我々が開発するのは、上記2パッケージのグルーコード、ビジネスロジックを担う `app.go` です。
 
-<img src="/images/20210730a/sqlboiler.png" alt="ddlとopenapi.ymlを駆動としたコード生成とアプリ開発のフロー図" width="800" height="320" loading="lazy">
+<img src="/images/2021/20210730a/sqlboiler.png" alt="ddlとopenapi.ymlを駆動としたコード生成とアプリ開発のフロー図" width="800" height="320" loading="lazy">
 
 ### 開発例
 

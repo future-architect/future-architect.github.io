@@ -9,7 +9,7 @@ tag:
   - 設計
 category:
   - DB
-thumbnail: /images/20220906a/thumbnail.png
+thumbnail: /images/2022/20220906a/thumbnail.png
 author: 武田大輝
 lede: "一般的に複数のトランザクションが並行して同じオブジェクトに対してアクセスを行う場合には、トランザクションの分離レベル（SERIALIZABLE/REPEATABLE READ/READ COMMITTED/READ UNCOMMITTED）によって様々な問題が発生します。DynamoDBは2018年にトランザクションがサポートされましたが、本記事ではファントムリードによる書き込みスキューの問題とその対応について取り上げたいと思います。"
 ---
@@ -33,7 +33,7 @@ DynamoDBは2018年に[トランザクションがサポート](https://aws.amazo
 1-1 及び 2-1 の処理にて現在の申し込み人数を取得する場合、両方の結果は2人となり、ユーザAもユーザBも登録が正常に完了してしまいます。
 しかしながら結果として申し込み人数は4人となってしまうため、これは要件を満たしていません。
 
-<img src="/images/20220906a/DynamoDB_Write_Skew_Example_1.drawio.png" alt="DynamoDB_Write_Skew_Example_1.drawio" width="1101" height="341" loading="lazy">
+<img src="/images/2022/20220906a/DynamoDB_Write_Skew_Example_1.drawio.png" alt="DynamoDB_Write_Skew_Example_1.drawio" width="1101" height="341" loading="lazy">
 
 このように、あるトランザクションにおける書き込みの結果が別のトランザクションの読み込み結果を変化させる（今回の場合はユーザAの書き込みによって、ユーザBの検索結果が過去のものになってしまっている）効果は**ファントムリード**と呼ばれ、このように読み込んだ結果を元に書き込みを行なう場合に生じる問題を**書き込みスキュー**と呼びます。
 
@@ -70,7 +70,7 @@ DynamoDBが提供するトランザクションに依存しない方法で対応
 対応案のひとつとして、集計・集約処理（今回の例の場合、申し込み人数が3人を超過しているかどうかのチェック）を直列化する方法が挙げられます。
 例えばDynamoDB Streamsを利用することで、パーティション単位に、データの変更の発生順に処理を直列化して、非同期実行できます。
 
-<img src="/images/20220906a/DynamoDB_Write_Skew_Example_2.drawio.png" alt="DynamoDB_Write_Skew_Example_2.drawio.png" width="1101" height="341" loading="lazy">
+<img src="/images/2022/20220906a/DynamoDB_Write_Skew_Example_2.drawio.png" alt="DynamoDB_Write_Skew_Example_2.drawio.png" width="1101" height="341" loading="lazy">
 
 1. ユーザからの申し込み要求に対して、まず一時登録用のテーブルにデータの書き込みを行います[^1]。
 ユーザから見るとこれは仮登録状態となります。
@@ -94,12 +94,12 @@ DynamoDBは[Conditional Update（条件付きの書き込み）](https://docs.aw
 ロック対象を実体化させるために下記のようにテーブルの構造を変更し、Event IDをハッシュキーとしてユーザを配列で保持し、楽観ロック用にバージョンを保持します。
 また、ここでの話の本質ではありませんが、合わせて現在の申込者数（Count）も保持しておきます。
 
-<img src="/images/20220906a/DynamoDB_Write_Skew_Example_3.drawio.png" alt="DynamoDB_Write_Skew_Example_3.drawio.png" width="1081" height="211" loading="lazy">
+<img src="/images/2022/20220906a/DynamoDB_Write_Skew_Example_3.drawio.png" alt="DynamoDB_Write_Skew_Example_3.drawio.png" width="1081" height="211" loading="lazy">
 
 これによりConditional Updateを利用して書き込みスキューを回避できます。
 具体的な処理の流れは下記のとおりとなります。
 
-<img src="/images/20220906a/DynamoDB_Write_Skew_Example_4.drawio.png" alt="DynamoDB_Write_Skew_Example_4.drawio.png" width="1101" height="341" loading="lazy">
+<img src="/images/2022/20220906a/DynamoDB_Write_Skew_Example_4.drawio.png" alt="DynamoDB_Write_Skew_Example_4.drawio.png" width="1101" height="341" loading="lazy">
 
 1. ユーザからの申し込み要求が行われた場合に、テーブルから対象イベント（EVENT01）のレコードを取得します。
 このときDynamoDBの[Consistent Read](https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/HowItWorks.ReadConsistency.html)を利用して、 一貫性のあるデータの読み取りを行う必要があります。これを行わないと最新の書き込みデータを読み込むことが保証できず、楽観的排他制御を正しく実現できません。
@@ -119,7 +119,7 @@ DynamoDBは[Conditional Update（条件付きの書き込み）](https://docs.aw
 
 テーブル構造を変更できない場合は、テーブルを追加することでロック対象を実体化させます。
 
-<img src="/images/20220906a/DynamoDB_Write_Skew_Example_5.drawio.png" alt="DynamoDB_Write_Skew_Example_5.drawio.png" width="1081" height="211" loading="lazy">
+<img src="/images/2022/20220906a/DynamoDB_Write_Skew_Example_5.drawio.png" alt="DynamoDB_Write_Skew_Example_5.drawio.png" width="1081" height="211" loading="lazy">
 
 処理の流れは先述の「テーブル構造を変更してロック対象を実体化させる」場合と基本的に同様ですが、書き込み時は `TransactWriteItems` を利用して、2テーブルをAtomicに更新する必要があります。
 冒頭でトランザクションを「副次的に利用するケースがある」と述べたのはこの件になります。
@@ -129,7 +129,7 @@ DynamoDBは[Conditional Update（条件付きの書き込み）](https://docs.aw
 別の方法として事前にロック対象となるレコードを全て作成しておくという方法も考えられます。
 例えば新規イベントの作成時など、ユーザの申し込みに先行する形で上限数となる3レコードを作成しておき、ユーザの要求に対してはConditional Updateで楽観的排他制御を実現する方法になります。
 
-<img src="/images/20220906a/DynamoDB_Write_Skew_Example_6.drawio.png" alt="DynamoDB_Write_Skew_Example_6.drawio.png" width="1081" height="241" loading="lazy">
+<img src="/images/2022/20220906a/DynamoDB_Write_Skew_Example_6.drawio.png" alt="DynamoDB_Write_Skew_Example_6.drawio.png" width="1081" height="241" loading="lazy">
 
 今回のケースではレンジキーにシーケンスなどを利用せざるを得ないため、アプリケーションからの取り扱いが少し煩雑になりそうですが、例えば時間単位の会議室の予約システムなどレコードの総量とキーが事前に確定しているようなケースではマッチする可能性があります。
 

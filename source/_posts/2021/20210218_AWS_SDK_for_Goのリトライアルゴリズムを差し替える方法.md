@@ -9,7 +9,7 @@ tag:
   - アルゴリズム
 category:
   - Programming
-thumbnail: /images/20210218/thumbnail.png
+thumbnail: /images/2021/20210218/thumbnail.png
 author: 辻大志郎
 lede: "本記事では[AWS SDK for Go]を使ってAWSのAPIをコールする場合のリトライアルゴリズムを差し替える方法を紹介します。"
 ---
@@ -19,7 +19,7 @@ lede: "本記事では[AWS SDK for Go]を使ってAWSのAPIをコールする場
 
 # `AWS SDK for Go` のリトライ
 
-<img src="/images/20210218/awsgo.png" class="img-middle-size" loading="lazy">
+<img src="/images/2021/20210218/awsgo.png" class="img-middle-size" loading="lazy">
 
 `AWS SDK for Go` のバージョンは [`v1.37.6`](https://github.com/aws/aws-sdk-go/releases/tag/v1.37.6) です。
 

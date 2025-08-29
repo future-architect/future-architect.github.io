@@ -8,17 +8,17 @@ tag:
   - Python Distilled
 category:
   - Programming
-thumbnail: /images/20231116a/thumbnail.png
+thumbnail: /images/2023/20231116a/thumbnail.png
 author: 澁川喜規
 lede: "Python Distilledという本がオライリーから出版されました。作者のDave Beazleyはかなり昔からPythonを使い込んでいる人ですので、この本には信頼しかない、と思い読んでみました"
 ---
-<img src="/images/20231116a/image.png" alt="" width="516" height="660" loading="lazy">
+<img src="/images/2023/20231116a/image.png" alt="" width="516" height="660" loading="lazy">
 
 [秋のブログ週間2023](/articles/20231030a/)、3週目・13本目です。
 
 Python Distilledという本がオライリーから出版されました。作者のDave Beazleyはかなり昔からPythonを使い込んでいる人ですので、この本には信頼しかない、と思い読んでみました。Daveは大学の教授をしていて、コンピュータサイエンスで表彰もされている筋金入りです。本家PyConでも何度も発表されているようです。Python歴は27年でOSSとしてはC/C++をラップして他の言語で使えるようにコードを生成するSWIGはすでに20年以上の歴史がありますし、パーサージェネレータのPLYとSLY。curioというコルーチンのライブラリなどを作っています。僕は以前、SWIGのドキュメント翻訳をしてCマガジンに特集記事を書かせていただいたこともあり、僕の大学時代の顔写真がSWIGのウェブサイトに公開されていたりします。
 
-<img src="/images/20231116a/スクリーンショット_2023-11-04_19.52.36.png" alt="" width="1173" height="1252" loading="lazy">
+<img src="/images/2023/20231116a/スクリーンショット_2023-11-04_19.52.36.png" alt="" width="1173" height="1252" loading="lazy">
 
 そういう世の中のほぼすべてのPython本の著者よりも長いPython歴を持つ著者で、大学やそれ以外の場でPythonを20年以上教え続けているということを考えると、この本の重みがつたわってくるかと思います。
 

@@ -11,11 +11,11 @@ tag:
   - Gemini
 category:
   - Infrastructure
-thumbnail: /images/20240802a/thumbnail.jpg
+thumbnail: /images/2024/20240802a/thumbnail.jpg
 author: 岸下優介
 lede: "8/1-8/2にパシフィコ横浜で開催されているGoogle Cloud Next Tokyo '24に同じプロジェクトのメンバー数名で参加してきました。"
 ---
-<img src="/images/20240802a/PXL_20240801_042608193.jpg" alt="" width="1200" height="683" loading="lazy">
+<img src="/images/2024/20240802a/PXL_20240801_042608193.jpg" alt="" width="1200" height="683" loading="lazy">
 
 ## はじめに
 
@@ -59,7 +59,7 @@ lede: "8/1-8/2にパシフィコ横浜で開催されているGoogle Cloud Next 
 
 ## ブース
 
-<img src="/images/20240802a/image.png" alt="" width="995" height="835" loading="lazy">
+<img src="/images/2024/20240802a/image.png" alt="" width="995" height="835" loading="lazy">
 
 ブース展示にはGoogle側が用意している展示からパートナー企業、SaaS企業の展示があります。写真で載せているブースでは目の前のレールコースターをミニカーが走り、IR LEDセンサーを通じてRaspberry Piが走行データを取得、Google CloudのNoSQLサービスであるBigtableへ連携され、BigQueryやVertexAI Workbenchで解析するというデモでした。ちなみにこのデモは今年4月にラスベガスで開かれたGoogle Cloud Next '24で展示していたものをそのまま持ってきたそうです。
 
@@ -75,6 +75,6 @@ lede: "8/1-8/2にパシフィコ横浜で開催されているGoogle Cloud Next 
 
 特にこういった大規模イベントで貰えるSwagが醍醐味でもあります！
 
-<img src="/images/20240802a/PXL_20240801_151358344.jpg" alt="" width="1200" height="675" loading="lazy">
+<img src="/images/2024/20240802a/PXL_20240801_151358344.jpg" alt="" width="1200" height="675" loading="lazy">
 
 （2024.8.5追記）[Google Cloud Next Tokyo '24 2日目参加レポート ](/articles/20240805a/) 公開しました！

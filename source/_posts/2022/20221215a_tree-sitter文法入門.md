@@ -9,12 +9,12 @@ tag:
   - フォーマッター
 category:
   - Infrastructure
-thumbnail: /images/20221215a/thumbnail.png
+thumbnail: /images/2022/20221215a/thumbnail.png
 author: 齋藤俊哉
 lede: "フューチャーでアルバイトをしている齋藤ですインターン中に作成していたSQLフォーマッタをPostgreSQLの構文に対応させる作業に取り組んでいます。"
 ---
 
-<img src="/images/20221215a/tree-sitter-small.png" alt="" width="400" height="400">
+<img src="/images/2022/20221215a/tree-sitter-small.png" alt="" width="400" height="400">
 
 こちらは[PostgreSQL Advent Calendar 2022](https://qiita.com/advent-calendar/2022/postgresql) カレンダー2枚目・15日目の投稿となります。
 前回は、[@hmatsu47](https://qiita.com/hmatsu47)さんの[Supabase で TCE（透過的列暗号化）を軽く試してみた](https://qiita.com/hmatsu47/items/8de48e81a660eabe4bf0)でした。

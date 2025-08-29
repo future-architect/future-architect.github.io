@@ -9,7 +9,7 @@ tag:
   - フロントエンド
 category:
   - Programming
-thumbnail: /images/20221024a/thumbnail.png
+thumbnail: /images/2022/20221024a/thumbnail.png
 author: 澁川喜規
 lede: "ちょっとしたツールをGoで作ってみたのですが、わざわざインストールしなくてもいいようにWebのUIをつけてブラウザで使えるようにしてみました。ウェブフロントエンド部分はNext.jsの静的サイトで、GoはWASMにしてロードして実行しています。WASMを使うのは初めてなのであえて選んでみました。"
 ---
@@ -17,7 +17,7 @@ lede: "ちょっとしたツールをGoで作ってみたのですが、わざ�
 
 https://shibukawa.github.io/md2sql/
 
-<img src="/images/20221024a/スクリーンショット_2022-10-18_8.38.26.png" alt="" width="1200" height="714" loading="lazy">
+<img src="/images/2022/20221024a/スクリーンショット_2022-10-18_8.38.26.png" alt="" width="1200" height="714" loading="lazy">
 
 ウェブフロントエンド部分はNext.jsの静的サイトで、GoはWASMにしてロードして実行しています。WASMを使うのは初めてなのであえて選んでみました。
 

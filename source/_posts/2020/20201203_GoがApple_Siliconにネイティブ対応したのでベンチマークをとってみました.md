@@ -6,7 +6,7 @@ tag:
   - Go
 category:
   - Programming
-thumbnail: /images/20201203/thumbnail.png
+thumbnail: /images/2020/20201203/thumbnail.png
 author: 澁川喜規
 lede: "ARMなMacが出るとWWDCで発表されてから首を長くしてまっていて、発表と同時にMacBook Proを買って、アプリケーションのARMネイティブ対応されました。業務利用が多い言語のうちの一つということで、手元のPCで軽くベンチマークをとってみました。使った機種は3つです。* 2020モデルのM1のMacBook Pro"
 ---
@@ -25,7 +25,7 @@ ARMなMacが出るとWWDCで発表されてから首を長くしてまってい�
 
 ベンチマークの数値の結果は[こちら](https://docs.google.com/spreadsheets/d/1hzwyeWSNknyV3AhAnOJOifoR1f8UxQP_N9jMJv26Deg/edit?usp=sharing)です。Goのベンチマークはタスクごとの経過時間で出てくるので、MacBook Airの結果を100として相対値をとってグラフにしたのが以下の図です（項目が多くてラベルが半分非表示になっていますが）。グラフは短いほど高速です。
 
-<img src="/images/20201203/スクリーンショット_2020-12-03_13.06.21.png" loading="lazy">
+<img src="/images/2020/20201203/スクリーンショット_2020-12-03_13.06.21.png" loading="lazy">
 
 たまにハッシュ計算とかでかなり遅いものがありますが、おそらくCPUの命令を駆使して高速化、みたいなのがまだきちんと行われていない領域だと思うので、そこはコミットチャンスかと思います。あと、Boolのパースがなぜか遅い。といっても1.5nsと0.3nsとかなので割合でみるとすごい遅く見えますが、実際には影響は少ないかと。
 

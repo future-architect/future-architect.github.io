@@ -9,7 +9,7 @@ tag:
   - TOTP
 category:
   - Infrastructure
-thumbnail: /images/20230120a/thumbnail.png
+thumbnail: /images/2023/20230120a/thumbnail.png
 author: 澁川喜規
 lede: "以前、認証ミドルウェアのhankoの紹介の中で、hankoがテストで使っているMailSlurperというメールサーバーが面白いという紹介をしました。テストにおいては、モックは使うものの、モックを差し込むレイヤーはソースコードレベルではなくて、インフラレベルで仕掛ける方がいいよ、というのはほぼコンセンサスとなっていると思います。"
 ---
@@ -89,7 +89,7 @@ services:
 docker compose up
 ```
 
-<img src="/images/20230120a/スクリーンショット_2023-01-16_1.41.30.png" alt="スクリーンショット_2023-01-16_1.41.30.png" width="1200" height="684" loading="lazy">
+<img src="/images/2023/20230120a/スクリーンショット_2023-01-16_1.41.30.png" alt="スクリーンショット_2023-01-16_1.41.30.png" width="1200" height="684" loading="lazy">
 
 # テストコード作成
 

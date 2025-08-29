@@ -8,12 +8,12 @@ tag:
   - コーディング規約
 category:
   - Programming
-thumbnail: /images/20220328a/thumbnail.png
+thumbnail: /images/2022/20220328a/thumbnail.png
 author: 真野隼記
 lede: "Dartはコンストラクタがたくさんパターンがありますが、公式ドキュメントはもとより、国内外の様々なブログ記事で使い分けが紹介されており、先人による高速道路が整理されていると実感できます。一方で、慣れてくると自然だと感じてきますが、Flutterサンプルコードにある fromJson がfactoryコンストラクタであることが、最初はピンと来ませんでした"
 ---
 
-<img src="/images/20220328a/Dart_programming_language_logo.svg.png" alt="" width="1024" height="320">
+<img src="/images/2022/20220328a/Dart_programming_language_logo.svg.png" alt="" width="1024" height="320">
 
 # はじめに
 

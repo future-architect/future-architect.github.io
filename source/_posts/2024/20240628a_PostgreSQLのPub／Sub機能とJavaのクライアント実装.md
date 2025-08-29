@@ -9,7 +9,7 @@ tag:
   - Java
 category:
   - Programming
-thumbnail: /images/20240628a/thumbnail.png
+thumbnail: /images/2024/20240628a/thumbnail.png
 author:  柳原光佑
 lede: "Pub/Sub型のメッセージングアーキテクチャを採用するにあたっては、kafkaなどのブローカーミドルウェアや、Amazon SNS、Google Cloud Pub/Subなどのマネージドサービスを利用するケースが多いかと思います。ところでPostgreSQLでも実はPub/Subができます。すでに業務でPostgreSQLを使っていれば、新たにPub/Subブローカーを構築しなくても、疎結合なシステム間通信を簡易的に実現できます。"
 ---
@@ -86,7 +86,7 @@ UNLISTEN foo;
 * Pub/Subを行うDBセッションは、同一データベースに接続し、かつ同じチャネルを通知対象としなければいけません。
 * データベースが同じであれば、スキーマが異なっていても通知できます。!
 
-<img src="/images/20240628a/68747470733a2f2.png" alt="68747470733a2f2.png" width="1200" height="579" loading="lazy">
+<img src="/images/2024/20240628a/68747470733a2f2.png" alt="68747470733a2f2.png" width="1200" height="579" loading="lazy">
 
 ## ペイロードのデータ型・サイズ
 

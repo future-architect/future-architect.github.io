@@ -9,7 +9,7 @@ tag:
   - クラウドマイグレーション
 category:
   - Infrastructure
-thumbnail: /images/20221108a/thumbnail.JPG
+thumbnail: /images/2022/20221108a/thumbnail.JPG
 author: 一ノ瀬秀都
 lede: "オンプレからクラウドへのデータ移行に関して、AzureのData Boxというサービスを利用する機会があったので、詳細なワークフローや失敗談について共有します。昨今のDX推進の流れにのり、システムのクラウドシフト/リフトに取り組む方も多いかと思います。「クラウドへの移行を考えているがデータ量が膨大で移行ができない」といった悩みがあったり..."
 ---
@@ -45,7 +45,7 @@ lede: "オンプレからクラウドへのデータ移行に関して、Azure�
 1. Data Box初期設定用PC
 1. データコピー用サーバ
 
-<img src="/images/20221108a/WS000297.JPG" alt="WS000297.JPG" width="1037" height="736" loading="lazy">
+<img src="/images/2022/20221108a/WS000297.JPG" alt="WS000297.JPG" width="1037" height="736" loading="lazy">
 
 Data Box初期設定用PCとデータコピー用サーバは今回の案件のために用意したので、以下に環境情報を記します。
 転送先はAzure Data Boxの領域であり、また転送元はユーザにより異なるため環境情報の説明は省きます。
@@ -75,7 +75,7 @@ Data Boxの結線についても紹介します。
 |  Data#3ポート |  1GbE対応のL2スイッチ  |  RJ45  |  アクセスは発生させない<br>前提条件を満たすために結線  |
 
 以下は結線のイメージです。
-<img src="/images/20221108a/image.png" alt="" width="820" height="449" loading="lazy">
+<img src="/images/2022/20221108a/image.png" alt="" width="820" height="449" loading="lazy">
 出典：[Azure Data Boxの配線方法](https://learn.microsoft.com/ja-jp/azure/databox/data-box-cable-options#transfer-via-data-port-with-static-ips-using-a-switch)
 
 今回MGMTポート + Data#1~3ポート全てで結線をしている理由は、サービス利用の前提として調達・結線が求められているためです。
@@ -109,7 +109,7 @@ RJ45は一般的なLANケーブルで問題ないですが、SFP+のアダプタ
 
 Data Boxを使ったデータ移行の大まかな流れは以下です。
 
-<img src="/images/20221108a/WS000294.JPG" alt="WS000294.JPG" width="1200" height="176" loading="lazy">
+<img src="/images/2022/20221108a/WS000294.JPG" alt="WS000294.JPG" width="1200" height="176" loading="lazy">
 
 1. 発注
 1. 受け取り
@@ -123,7 +123,7 @@ Data Boxを使ったデータ移行の大まかな流れは以下です。
 
 # 発注
 
-<img src="/images/20221108a/ワークフロー_(1).JPG" alt="ワークフロー_(1).JPG" width="1200" height="179" loading="lazy">
+<img src="/images/2022/20221108a/ワークフロー_(1).JPG" alt="ワークフロー_(1).JPG" width="1200" height="179" loading="lazy">
 
 ### 注文の作成
 
@@ -131,13 +131,13 @@ Data Boxを使ったデータ移行の大まかな流れは以下です。
 
 Azure Portalのホーム画面で[Azure Data Box]を選択し、画面左上の[作成]を押下します。
 
-<img src="/images/20221108a/DataBox発注1.jpg" alt="DataBox発注1.jpg" width="1200" height="399" loading="lazy">
+<img src="/images/2022/20221108a/DataBox発注1.jpg" alt="DataBox発注1.jpg" width="1200" height="399" loading="lazy">
 
 次の画面では対象のサブスクリプション、リソースグループ、ソースの国、宛先のAzureリージョンを選択し、[適用]を押下します。
 
-<img src="/images/20221108a/DataBox発注2.jpg" alt="DataBox発注2.jpg" width="1200" height="442" loading="lazy">
+<img src="/images/2022/20221108a/DataBox発注2.jpg" alt="DataBox発注2.jpg" width="1200" height="442" loading="lazy">
 
-<img src="/images/20221108a/DataBox発注3.jpg" alt="DataBox発注3.jpg" width="1200" height="605" loading="lazy">
+<img src="/images/2022/20221108a/DataBox発注3.jpg" alt="DataBox発注3.jpg" width="1200" height="605" loading="lazy">
 
 サービスを選択すると、注文に関する記入する画面に移ります。
 
@@ -145,11 +145,11 @@ Azure Portalのホーム画面で[Azure Data Box]を選択し、画面左上の[
 
 ここで設定する注文名は、Azure Portalに残るものですので、複数台発注する場合は特に一意な名称にしておくとよいでしょう。
 
-<img src="/images/20221108a/DataBox発注4.jpg" alt="DataBox発注4.jpg" width="1200" height="300" loading="lazy">
+<img src="/images/2022/20221108a/DataBox発注4.jpg" alt="DataBox発注4.jpg" width="1200" height="300" loading="lazy">
 
 注文名を指定したら[データ格納先]に移動します。データの格納先と宛先のAzureリージョン、データをインポート/エクスポートしたいストレージアカウントを選択します。
 
-<img src="/images/20221108a/DataBox発注5.jpg" alt="DataBox発注5.jpg" width="1200" height="531" loading="lazy">
+<img src="/images/2022/20221108a/DataBox発注5.jpg" alt="DataBox発注5.jpg" width="1200" height="531" loading="lazy">
 
 Data Boxサービスは一部のストレージアカウントのタイプをサポートしていないため、発注に先立って確認しておくと良いでしょう。
 
@@ -164,23 +164,23 @@ Data Boxサービスは一部のストレージアカウントのタイプをサ
 
 今回は全項目でMicrosoftマネージドキーを選択していますが、カスタマーマネージドキーを選択すると、より長く複雑なパスワードを設定できるようです。パスワードセキュリティをより強固にしたい場合は選択するとよいでしょう。
 
-<img src="/images/20221108a/DataBox発注6.jpg" alt="DataBox発注6.jpg" width="1200" height="547" loading="lazy">
+<img src="/images/2022/20221108a/DataBox発注6.jpg" alt="DataBox発注6.jpg" width="1200" height="547" loading="lazy">
 
 [連絡先の詳細]では出荷方法と通知を受け取るメールアドレス、（Microsoftの管理による出荷を選択した場合は）配達先住所の設定をします。
 
 今回は自己管理の出荷を選択しています。メールはメーリングリストも使用可能です。
 
-<img src="/images/20221108a/住所の追加.jpg" alt="住所の追加.jpg" width="1200" height="567" loading="lazy">
+<img src="/images/2022/20221108a/住所の追加.jpg" alt="住所の追加.jpg" width="1200" height="567" loading="lazy">
 
 [タグ]では対象の注文にタグを設定できます。請求情報等の管理のために便利な機能のようですが、今回は空欄としています。
 
-<img src="/images/20221108a/DataBox発注9.jpg" alt="DataBox発注9.jpg" width="1200" height="324" loading="lazy">
+<img src="/images/2022/20221108a/DataBox発注9.jpg" alt="DataBox発注9.jpg" width="1200" height="324" loading="lazy">
 
 必要なすべての項目を記入し終えたら[確認と注文]に移動し発注します。
 
 # 受け取り
 
-<img src="/images/20221108a/ワークフロー_(2).JPG" alt="ワークフロー_(2).JPG" width="1200" height="178" loading="lazy">
+<img src="/images/2022/20221108a/ワークフロー_(2).JPG" alt="ワークフロー_(2).JPG" width="1200" height="178" loading="lazy">
 
 ### 受取日の調整
 
@@ -202,7 +202,7 @@ Car number plate (自動車登録番号):
 
 受取日が決定すると、Azure Portalで認証コードが発行され、azure-noreply@microsoft.comから受取準備が完了した旨のメール（以下、参照）が送付されます。
 
-<img src="/images/20221108a/受け取り準備完了メール.JPG" alt="受け取り準備完了メール.JPG" width="511" height="529" loading="lazy">
+<img src="/images/2022/20221108a/受け取り準備完了メール.JPG" alt="受け取り準備完了メール.JPG" width="511" height="529" loading="lazy">
 
 受取当日は以下3点を用意し、指定された住所でData Boxを受け取ります。
 
@@ -218,7 +218,7 @@ Car number plate (自動車登録番号):
 
 # デバイスの初期設定
 
-<img src="/images/20221108a/ワークフロー_(3).JPG" alt="ワークフロー_(3).JPG" width="1200" height="179" loading="lazy">
+<img src="/images/2022/20221108a/ワークフロー_(3).JPG" alt="ワークフロー_(3).JPG" width="1200" height="179" loading="lazy">
 
 ### 開梱
 
@@ -249,7 +249,7 @@ Microsoft社から引き取った段ボールを開梱し筐体を取り出し�
 ログイン後に表示されるダッシュボード中央の[Connect and copy]にて、その時点の空き容量（Free Space）と使用済み容量（Used Space）が表示されます。
 ※キャプチャはデータコピー最中のものです
 
-<img src="/images/20221108a/【1号機】ダッシュボード.jpg" alt="【1号機】ダッシュボード.jpg" width="1200" height="583" loading="lazy">
+<img src="/images/2022/20221108a/【1号機】ダッシュボード.jpg" alt="【1号機】ダッシュボード.jpg" width="1200" height="583" loading="lazy">
 
 一通りコピーした後に「思ったよりファイル置けなかった」「もっとコピーしておけばよかった」という事態を避けるため、事前に実効容量を確認し、コピー計画の最終確認ができると良いです。
 
@@ -269,7 +269,7 @@ Microsoft社から引き取った段ボールを開梱し筐体を取り出し�
 
 ※この際MGMTポートのIPアドレスは変更できないため注意です。
 
-<img src="/images/20221108a/【1号機】NWインターフェース設定.jpg" alt="【1号機】NWインターフェース設定.jpg" width="1200" height="587" loading="lazy">
+<img src="/images/2022/20221108a/【1号機】NWインターフェース設定.jpg" alt="【1号機】NWインターフェース設定.jpg" width="1200" height="587" loading="lazy">
 
 今回は静的にIPアドレスを割り当てるので、IP setteingsをStaticに設定し、ほかの項目（IP address, Subnet, Gateway）を埋めました。
 
@@ -287,7 +287,7 @@ Microsoft社から引き取った段ボールを開梱し筐体を取り出し�
 
 ここでCIFS接続に必要なユーザネーム、パスワードを取得できます。
 
-<img src="/images/20221108a/【1号機】接続とコピー_SMB.jpg" alt="【1号機】接続とコピー_SMB.jpg" width="1200" height="585" loading="lazy">
+<img src="/images/2022/20221108a/【1号機】接続とコピー_SMB.jpg" alt="【1号機】接続とコピー_SMB.jpg" width="1200" height="585" loading="lazy">
 
 CIFSに限らず、「NFSもしくはREST APIで転送したい！」と考えている方も、[Connect and copy]ページにて同様に接続情報を取得・設定できます。
 
@@ -295,15 +295,15 @@ NFSの場合は接続許可したいIPアドレスをテキストボックスに
 
 IPが追加されれば、エクスポート設定が完了します。
 
-<img src="/images/20221108a/【1号機】接続とコピー_NFS.jpg" alt="【1号機】接続とコピー_NFS.jpg" width="1200" height="582" loading="lazy">
+<img src="/images/2022/20221108a/【1号機】接続とコピー_NFS.jpg" alt="【1号機】接続とコピー_NFS.jpg" width="1200" height="582" loading="lazy">
 
 REST APIの場合は、BLOBエンドポイントのURL、また認証情報であるAPI Keyや Connection Stringが取得できます。
 
-<img src="/images/20221108a/【1号機】接続とコピー_RESTAPI.jpg" alt="【1号機】接続とコピー_RESTAPI.jpg" width="1200" height="582" loading="lazy">
+<img src="/images/2022/20221108a/【1号機】接続とコピー_RESTAPI.jpg" alt="【1号機】接続とコピー_RESTAPI.jpg" width="1200" height="582" loading="lazy">
 
 # 結線とマウント
 
-<img src="/images/20221108a/ワークフロー_(4).JPG" alt="ワークフロー_(4).JPG" width="1200" height="179" loading="lazy">
+<img src="/images/2022/20221108a/ワークフロー_(4).JPG" alt="ワークフロー_(4).JPG" width="1200" height="179" loading="lazy">
 
 ### Data BoxとNWスイッチの結線
 
@@ -408,7 +408,7 @@ ls -l /mnt/databox2/<containername>/databox2
 
 # データコピー
 
-<img src="/images/20221108a/ワークフロー_(5).JPG" alt="ワークフロー_(5).JPG" width="1200" height="178" loading="lazy">
+<img src="/images/2022/20221108a/ワークフロー_(5).JPG" alt="ワークフロー_(5).JPG" width="1200" height="178" loading="lazy">
 
 ### コピーコマンド実行
 
@@ -434,19 +434,19 @@ cp -prf /<転送元ファイルパス> /mnt/databox2/<containername>/databox2/<�
 
 # 発送
 
-<img src="/images/20221108a/ワークフロー_(6).JPG" alt="ワークフロー_(6).JPG" width="1200" height="179" loading="lazy">
+<img src="/images/2022/20221108a/ワークフロー_(6).JPG" alt="ワークフロー_(6).JPG" width="1200" height="179" loading="lazy">
 
 ### デバイスの発送準備処理（チェックサム計算）
 
 データコピーが完了したら、デバイスの発送準備処理を実行していきます。
 ダッシュボードで[Prepare to ship]ページを選択し、[Start preparation]を押下します。
 
-<img src="/images/20221108a/【1号機】発送準備.jpg" alt="【1号機】発送準備.jpg" width="1200" height="574" loading="lazy">
+<img src="/images/2022/20221108a/【1号機】発送準備.jpg" alt="【1号機】発送準備.jpg" width="1200" height="574" loading="lazy">
 
 発送準備処理では、キャプチャにある通り、デバイスのロックや転送済みデータの整合性確認、ファイル一覧の作成などが実行されます。
 
 処理完了後には以下のように全項目にチェックがつき、Completedの文字が表示されます。
-<img src="/images/20221108a/発送準備完了_1号機.JPG" alt="発送準備完了_1号機.JPG" width="1200" height="540" loading="lazy">
+<img src="/images/2022/20221108a/発送準備完了_1号機.JPG" alt="発送準備完了_1号機.JPG" width="1200" height="540" loading="lazy">
 
 余談にはなりますが、発送準備処理のリードタイムについても説明しようと思います。
 [Docs:Azure Data Box の発送準備](https://docs.microsoft.com/ja-jp/azure/databox/data-box-deploy-prepare-to-ship)では最遅で数日間かかるとあるので、ここで少し驚く方もいるかと思います。
@@ -466,7 +466,7 @@ cp -prf /<転送元ファイルパス> /mnt/databox2/<containername>/databox2/<�
 クローズ処理が完了したら、いよいよ発送に向けて準備をします。
 Web UIにアクセスしデバイスをシャットダウンしていきます。[Shut down or restart]ページから[Shut down]を押下します。
 
-<img src="/images/20221108a/【1号機】シャットダウンと再起動.jpg" alt="【1号機】シャットダウンと再起動.jpg" width="1200" height="576" loading="lazy">
+<img src="/images/2022/20221108a/【1号機】シャットダウンと再起動.jpg" alt="【1号機】シャットダウンと再起動.jpg" width="1200" height="576" loading="lazy">
 
 シャットダウンすると、当たり前ですがファイル共有は使えなくなります。
 必要に応じて周知しましょう。
@@ -498,7 +498,7 @@ Car number plate (自動車登録番号):
 
 引き渡し日時が確定しData Boxの発送準備処理が終わるとAzure Portalで認証コードが発行されます。
 また、azure-noreply@microsoft.comから受取準備が完了した旨のメール（以下、参照）が送付されます。
-<img src="/images/20221108a/引き渡し準備完了メール.JPG" alt="引き渡し準備完了メール.JPG" width="512" height="561" loading="lazy">
+<img src="/images/2022/20221108a/引き渡し準備完了メール.JPG" alt="引き渡し準備完了メール.JPG" width="512" height="561" loading="lazy">
 
 あとは引き渡し当日に以下3点を準備してData BoxをAzureデータセンターに引き渡します。
 
@@ -508,7 +508,7 @@ Car number plate (自動車登録番号):
 
 # Azureへのインポート
 
-<img src="/images/20221108a/ワークフロー_(7).JPG" alt="ワークフロー_(7).JPG" width="1200" height="180" loading="lazy">
+<img src="/images/2022/20221108a/ワークフロー_(7).JPG" alt="ワークフロー_(7).JPG" width="1200" height="180" loading="lazy">
 
 ### インポートを待つ
 

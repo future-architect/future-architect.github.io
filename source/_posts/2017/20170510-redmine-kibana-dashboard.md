@@ -10,12 +10,12 @@ tag:
   - 可視化
 category:
   - Management
-thumbnail: /images/20170510/thumbnail_20170510.jpg
+thumbnail: /images/2017/20170510/thumbnail_20170510.jpg
 author: 近藤雅章
 lede: "Redmineにはデータの可視化機能が標準で搭載されていないという課題があります。そこで、Kibanaを使ってRedmineデータを可視化するダッシュボードを構築する方法を紹介します"
 ---
 
-<img src="/images/20170510/photo_20170510_00.jpg" alt="">
+<img src="/images/2017/20170510/photo_20170510_00.jpg" alt="">
 
 ## はじめに
 
@@ -30,7 +30,7 @@ lede: "Redmineにはデータの可視化機能が標準で搭載されていな
 
 ◆ダッシュボード例
 
-<img src="/images/20170510/photo_20170510_39.png" loading="lazy">
+<img src="/images/2017/20170510/photo_20170510_39.png" loading="lazy">
 
 では早速、Kibanaを使ってみましょう。
 
@@ -51,7 +51,7 @@ lede: "Redmineにはデータの可視化機能が標準で搭載されていな
 
 今回もELK+Timelionを利用して、Redmineデータの可視化環境を構築します。
 
-<img src="/images/20170510/photo_20170510_99.png" loading="lazy">
+<img src="/images/2017/20170510/photo_20170510_99.png" loading="lazy">
 
 ### モジュールのダウンロード
 
@@ -174,7 +174,7 @@ C:\elastic
 
 `logstash.bat -f redmine.txt`
 
-<img src="/images/20170510/photo_20170510_40.png" loading="lazy">
+<img src="/images/2017/20170510/photo_20170510_40.png" loading="lazy">
 
 取り込みが完了しました。
 
@@ -185,7 +185,7 @@ C:\elastic
 
 `kibana.bat`
 
-<img src="/images/20170510/photo_20170510_02.png" loading="lazy">
+<img src="/images/2017/20170510/photo_20170510_02.png" loading="lazy">
 
 Kibanaが起動しました。
 
@@ -193,29 +193,29 @@ Kibanaが起動しました。
 
 では、Kibanaを表示します。ブラウザで `http://localhost:5601`を開く。
 
-<img src="/images/20170510/photo_20170510_03.png" loading="lazy">
+<img src="/images/2017/20170510/photo_20170510_03.png" loading="lazy">
 
 [Configure an index pattern]という画面が開くので、[Time-field name]に"due_date"を指定します。
 
 そして、[Create]をクリック。
 
-<img src="/images/20170510/photo_20170510_10.png" loading="lazy">
+<img src="/images/2017/20170510/photo_20170510_10.png" loading="lazy">
 
 そして、左側の[Visualize]をクリックすると、Visualizeの画面が開きます。
 
-<img src="/images/20170510/photo_20170510_06.png" loading="lazy">
+<img src="/images/2017/20170510/photo_20170510_06.png" loading="lazy">
 
 ここで、「Create a visualizetion」をクリック。
 
-<img src="/images/20170510/photo_20170510_11.png" loading="lazy">
+<img src="/images/2017/20170510/photo_20170510_11.png" loading="lazy">
 
 [Select visualization type]画面が表示されるので、「Vertical bar」をクリックします。
 
-<img src="/images/20170510/photo_20170510_08.png" loading="lazy">
+<img src="/images/2017/20170510/photo_20170510_08.png" loading="lazy">
 
 そして、「logstash-*」をクリックすると、
 
-<img src="/images/20170510/photo_20170510_12.png" loading="lazy">
+<img src="/images/2017/20170510/photo_20170510_12.png" loading="lazy">
 
 グラフ画面が出ましたね！
 
@@ -231,7 +231,7 @@ Kibanaが起動しました。
 
 そして、画面左上の「再生ボタン」をクリックすると、
 
-<img src="/images/20170510/photo_20170510_13.png" loading="lazy">
+<img src="/images/2017/20170510/photo_20170510_13.png" loading="lazy">
 
 担当者別のPVが表示されました！
 
@@ -240,7 +240,7 @@ Kibanaが起動しました。
 画面右上の「Save」をクリック。
 テキストボックスが表示されるので”PvUser”と入力します。
 
-<img src="/images/20170510/photo_20170510_15.png" loading="lazy">
+<img src="/images/2017/20170510/photo_20170510_15.png" loading="lazy">
 
 そして、青色の「Save」をクリックすると、グラフが保存されました。
 
@@ -248,43 +248,43 @@ Kibanaが起動しました。
 
 続いて、画面左側の「Dashboard」をクリックします。
 
-<img src="/images/20170510/photo_20170510_16.png" loading="lazy">
+<img src="/images/2017/20170510/photo_20170510_16.png" loading="lazy">
 
 画面中央の「Create a dashboard」をクリック。
 
-<img src="/images/20170510/photo_20170510_17.png" loading="lazy">
+<img src="/images/2017/20170510/photo_20170510_17.png" loading="lazy">
 
 そして、画面中央の「Add」をクリックします。
 
-<img src="/images/20170510/photo_20170510_18.png" loading="lazy">
+<img src="/images/2017/20170510/photo_20170510_18.png" loading="lazy">
 
 続いて、「PvUser」をクリックすると、
 
-<img src="/images/20170510/photo_20170510_19.png" loading="lazy">
+<img src="/images/2017/20170510/photo_20170510_19.png" loading="lazy">
 
 グラフが追加されました！
 
-<img src="/images/20170510/photo_20170510_19.png" loading="lazy">
+<img src="/images/2017/20170510/photo_20170510_19.png" loading="lazy">
 
 次にダッシュボードを保存します。
 
 右上の「Save」をクリックし、表示されたテキストボックスに”main”と入力。
 
-<img src="/images/20170510/photo_20170510_20.png" loading="lazy">
+<img src="/images/2017/20170510/photo_20170510_20.png" loading="lazy">
 
 「Save」をクリックします。これで作成したダッシュボードが保存されました。
 
-<img src="/images/20170510/photo_20170510_21.png" loading="lazy">
+<img src="/images/2017/20170510/photo_20170510_21.png" loading="lazy">
 
 では、もう1つグラフを作成します。
 
 作成したグラフの上にカーソルを当てると、右上にボタンが出てくるので、
 
-<img src="/images/20170510/photo_20170510_22.png" loading="lazy">
+<img src="/images/2017/20170510/photo_20170510_22.png" loading="lazy">
 
 その中の「鉛筆マーク」をクリックします。
 
-<img src="/images/20170510/photo_20170510_23.png" loading="lazy">
+<img src="/images/2017/20170510/photo_20170510_23.png" loading="lazy">
 
 グラフの編集画面が開きました。
 
@@ -296,23 +296,23 @@ Kibanaが起動しました。
 
 表示されたテキストボックスに”PvTracker”と入力し、「Save as a new visualization」にチェックを入れます。
 
-<img src="/images/20170510/photo_20170510_27.png" loading="lazy">
+<img src="/images/2017/20170510/photo_20170510_27.png" loading="lazy">
 
 そして、「Save」をクリック。グラフが保存されます。
 
 画面左の「Dashboard」をクリック。そして、画面右上の、「Add」をクリックします。
 
-<img src="/images/20170510/photo_20170510_25.png" loading="lazy">
+<img src="/images/2017/20170510/photo_20170510_25.png" loading="lazy">
 
 「PvTracker」をクリックすると、
 
-<img src="/images/20170510/photo_20170510_28.png" loading="lazy">
+<img src="/images/2017/20170510/photo_20170510_28.png" loading="lazy">
 
 トラッカー別PVグラフが追加されました。
 
 次に右上の「Add new Visualization」ボタンをクリック。
 
-<img src="/images/20170510/photo_20170510_30.png" loading="lazy">
+<img src="/images/2017/20170510/photo_20170510_30.png" loading="lazy">
 
 「Select visualization type」画面で「Timelion」をクリックします。
 
@@ -326,7 +326,7 @@ Kibanaが起動しました。
 
 `.es(metric='sum:pv', timefield='due_date').cusum().label('[累積]pv'),.es(metric='sum:ev', timefield='updated_on').cusum().label('[累積]ev'),.es(metric='sum:ac', timefield='updated_on').cusum().label('[累積]ac')`
 
-<img src="/images/20170510/photo_20170510_31.png" loading="lazy">
+<img src="/images/2017/20170510/photo_20170510_31.png" loading="lazy">
 
 EVMグラフが表示されました。
 
@@ -338,15 +338,15 @@ EVMグラフが表示されました。
 
 そして、画面右上の「Add」をクリックし、「EvmAll」をクリックします。
 
-<img src="/images/20170510/photo_20170510_33.png" loading="lazy">
+<img src="/images/2017/20170510/photo_20170510_33.png" loading="lazy">
 
 さらに、画面右上の”＾”をクリックすると、
 
-<img src="/images/20170510/photo_20170510_34.png" loading="lazy">
+<img src="/images/2017/20170510/photo_20170510_34.png" loading="lazy">
 
 EVMグラフの大きさを調整すると、
 
-<img src="/images/20170510/photo_20170510_35.png" loading="lazy">
+<img src="/images/2017/20170510/photo_20170510_35.png" loading="lazy">
 
 ダッシュボードの完成です。
 
@@ -356,15 +356,15 @@ EVMグラフの大きさを調整すると、
 
 例えば、特定の担当者名をクリックすると。
 
-<img src="/images/20170510/photo_20170510_36.png" loading="lazy">
+<img src="/images/2017/20170510/photo_20170510_36.png" loading="lazy">
 
 その担当者が、アサインされているチケットのトラッカー、及び担当者のEVMが表示されます。
 
-<img src="/images/20170510/photo_20170510_37.png" loading="lazy">
+<img src="/images/2017/20170510/photo_20170510_37.png" loading="lazy">
 
 また、表示期間を絞り込む事もできます。Timelion上で期間を選択することで、
 
-<img src="/images/20170510/photo_20170510_38.png" loading="lazy">
+<img src="/images/2017/20170510/photo_20170510_38.png" loading="lazy">
 
 この通り。選択された期間で絞り込むことができました。
 

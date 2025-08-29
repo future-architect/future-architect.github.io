@@ -8,11 +8,11 @@ tag:
   - ETL
 category:
   - Infrastructure
-thumbnail: /images/20230420a/thumbnail.png
+thumbnail: /images/2023/20230420a/thumbnail.png
 author: 市川浩暉
 lede: "本日の入門記事は「Cloud Data Fusionで始めるETL入門」ということで、Google CloudでETL/ELTを構築できる「Cloud Data Fusion」を利用して、ETLを作成します。"
 ---
-<img src="/images/20230420a/image.png" alt="" width="220" height="220" loading="lazy">
+<img src="/images/2023/20230420a/image.png" alt="" width="220" height="220" loading="lazy">
 
 ## はじめに
 
@@ -72,28 +72,28 @@ CLoud Data Fusionは少しデプロイに時間がかかり、大体立ち上が
 
 以下のようにインスタンスが立ち上がったら準備完了です。
 
-<img src="/images/20230420a/image_2.png" alt="" width="1057" height="212" loading="lazy">
+<img src="/images/2023/20230420a/image_2.png" alt="" width="1057" height="212" loading="lazy">
 
 ### パイプラインを作ってみる
 
 今回は入門編ということで、すでに用意されているパイプラインを利用したいと思います。
 コンソール画面から「インスタンスを表示」をクリックし、Cloud Data Fusionの画面にアクセスし、ヘッダーの「HUB」をクリックします
 
-<img src="/images/20230420a/image_3.png" alt="" width="1200" height="945" loading="lazy">
+<img src="/images/2023/20230420a/image_3.png" alt="" width="1200" height="945" loading="lazy">
 
 その後、「Pipelines」の「Cloud Data Fusion Quickstart」をクリックし、
 
-<img src="/images/20230420a/image_4.png" alt="" width="1200" height="691" loading="lazy">
+<img src="/images/2023/20230420a/image_4.png" alt="" width="1200" height="691" loading="lazy">
 
 Finishを押下して、パイプラインを作成します。
 
-<img src="/images/20230420a/image_5.png" alt="" width="1200" height="773" loading="lazy">
+<img src="/images/2023/20230420a/image_5.png" alt="" width="1200" height="773" loading="lazy">
 
 すると、以下のような画面にアクセスできるようになります。
 
 この画面はPipelineのStudioの画面で、GUI形式でパイプラインを作成/編集できます。
 
-<img src="/images/20230420a/image_6.png" alt="" width="1200" height="874" loading="lazy">
+<img src="/images/2023/20230420a/image_6.png" alt="" width="1200" height="874" loading="lazy">
 
 Studio画面の構成を大きく3つに分けて説明します。
 
@@ -129,7 +129,7 @@ Studio画面の構成を大きく3つに分けて説明します。
 
 ### GCSからファイルを読み込み
 
-<img src="/images/20230420a/image_7.png" alt="" width="1200" height="573" loading="lazy">
+<img src="/images/2023/20230420a/image_7.png" alt="" width="1200" height="573" loading="lazy">
 
 各ノードの設定内容を確認する際は、マウスオーバーした際に表示される「Properties」をクリックして内容を確認します。
 
@@ -138,7 +138,7 @@ GCS Propertiesをクリックすると以下のような画面が表示されま
 以下のパス」部分でGCSのオブジェクトを指定しています。
 （デフォルトで設定されているファイルはサンプルファイルとして公開されているため、動かす上で変更の必要はありません）
 
-<img src="/images/20230420a/image_8.png" alt="" width="1200" height="930" loading="lazy">
+<img src="/images/2023/20230420a/image_8.png" alt="" width="1200" height="930" loading="lazy">
 
 ### データ加工
 
@@ -147,21 +147,21 @@ GCS Propertiesをクリックすると以下のような画面が表示されま
 Wranglerでは、記載されたDirectivesを元にデータ加工を行います。
 （個人的にこれがCloud Data Fusionの一番便利な機能だと思っています）。
 
-<img src="/images/20230420a/image_9.png" alt="" width="1200" height="559" loading="lazy">
+<img src="/images/2023/20230420a/image_9.png" alt="" width="1200" height="559" loading="lazy">
 
 Directivesを作成する際は、以下のような形でクリックをするだけでファイルの加工（Parse処理やデータ型の変換等）を行うことができます。
 
 以下のようなファイルをWranglerで読み込んだ際に、
 
-<img src="/images/20230420a/image_10.png" alt="" width="1200" height="850" loading="lazy">
+<img src="/images/2023/20230420a/image_10.png" alt="" width="1200" height="850" loading="lazy">
 
 次の画像のように操作することで、
 
-<img src="/images/20230420a/image_11.png" alt="" width="1200" height="655" loading="lazy">
+<img src="/images/2023/20230420a/image_11.png" alt="" width="1200" height="655" loading="lazy">
 
 データ加工した際のイメージと、先ほど定義されたDirectivesが画面上に作成されます。
 
-<img src="/images/20230420a/image_12.png" alt="" width="1200" height="503" loading="lazy">
+<img src="/images/2023/20230420a/image_12.png" alt="" width="1200" height="503" loading="lazy">
 
 このように、Wranglerを利用することで、実際にどのようなデータ加工が行われるかをイメージしながら、簡単にETLの処理を作成できます。
 
@@ -173,21 +173,21 @@ Directivesを作成する際は、以下のような形でクリックをする�
 
 今回はデータセット/テーブルが既存の環境に存在しない場合に新規作成されるような形になっているので、別途作成する対応は不要です。
 
-<img src="/images/20230420a/image_13.png" alt="" width="1200" height="952" loading="lazy">
+<img src="/images/2023/20230420a/image_13.png" alt="" width="1200" height="952" loading="lazy">
 
 ## デプロイ
 
 今回は入門編ということもあるので設定値はデフォルトのままで、
 以下画像の「Deploy」をを押下し、パイプラインをデプロイします。
 
-<img src="/images/20230420a/image_14.png" alt="" width="1200" height="542" loading="lazy">
+<img src="/images/2023/20230420a/image_14.png" alt="" width="1200" height="542" loading="lazy">
 
 ## 実行してみる
 
 デプロイしたパイプラインを実行してみましょう。
 以下画像で差している「Run」を押下する事で、パイプラインが実行できます。
 
-<img src="/images/20230420a/image_15.png" alt="" width="1200" height="596" loading="lazy">
+<img src="/images/2023/20230420a/image_15.png" alt="" width="1200" height="596" loading="lazy">
 
 ## BigQueryにInsertされた結果を確認する
 
@@ -196,7 +196,7 @@ Cloud Data Fusionを作成したプロジェクトのBigQueryの画面にアク�
 
 すると、BigQuery側でデータがInsertされていることが確認できました。
 
-<img src="/images/20230420a/image_16.png" alt="" width="1200" height="651" loading="lazy">
+<img src="/images/2023/20230420a/image_16.png" alt="" width="1200" height="651" loading="lazy">
 
 ### 開発する際のちょっとしたTips
 
@@ -204,7 +204,7 @@ Cloud Data Fusionの画面から実行した際のログを確認したい時が
 その際に、「Logs」という部分をクリックしても一部のログのみしか確認できないため、
 少し見にくいのですが、以下画像の「View Raw Logs」をクリックすると、ログの全量を確認できます。
 
-<img src="/images/20230420a/image_17.png" alt="" width="1200" height="471" loading="lazy">
+<img src="/images/2023/20230420a/image_17.png" alt="" width="1200" height="471" loading="lazy">
 
 ## 最後に
 

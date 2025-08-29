@@ -7,7 +7,7 @@ tag:
   - 競技プログラミング
 category:
   - Security
-thumbnail: /images/20230425a/thumbnail.png
+thumbnail: /images/2023/20230425a/thumbnail.png
 author: 藤戸四恩
 lede: "Hack The BoxのStarting PointのTIER2のOopsieを解いてみました。"
 ---
@@ -55,11 +55,11 @@ What is the path to the directory on the webserver that returns a login page?
 
 内容は下図のようになります。
 
-<img src="/images/20230425a/image.png" alt="" width="1200" height="526" loading="lazy">
+<img src="/images/2023/20230425a/image.png" alt="" width="1200" height="526" loading="lazy">
 
 `cdn-cgi/login` ディレクトリが存在しているのがわかるので、`http://{IPアドレス}/cdn-cgi/login` にアクセスしてみます。
 
-<img src="/images/20230425a/image_2.png" alt="" width="1200" height="889" loading="lazy">
+<img src="/images/2023/20230425a/image_2.png" alt="" width="1200" height="889" loading="lazy">
 
 Loginページを見つけることができました。
 
@@ -81,14 +81,14 @@ What is the access ID of the admin user?`
 
 TASK3は、アップロードページにアクセスするには、Firefoxで何を変更できますか?と問われており、TASK４は、admin ユーザーのアクセスIDを問われています。TASK2のログインページでLogin as Guestのリンクがあるのでクリックしてみます。
 
-<img src="/images/20230425a/image_3.png" alt="" width="1200" height="690" loading="lazy">
+<img src="/images/2023/20230425a/image_3.png" alt="" width="1200" height="690" loading="lazy">
 
 ヘッダーのAccountをクリックしてみます。
-<img src="/images/20230425a/image_4.png" alt="" width="1200" height="690" loading="lazy">
+<img src="/images/2023/20230425a/image_4.png" alt="" width="1200" height="690" loading="lazy">
 
 URLが`http://{IPアドレス}/cdn-cgi/login/admin.php?content=accounts&id=2`とguestの時idが2となっています。そこでid=1にしてURLを叩いてみます。
 
-<img src="/images/20230425a/image_5.png" alt="" width="1200" height="686" loading="lazy">
+<img src="/images/2023/20230425a/image_5.png" alt="" width="1200" height="686" loading="lazy">
 
 adminユーザのIDがわかりました。
 
@@ -104,13 +104,13 @@ On uploading a file, what directory does that file appear in on the server?
 
 TASK3,4でadminユーザはID34322と分かったので、Cookieのuserを34322、roleをadminに変更し、uploadsをクリックします。
 
-<img src="/images/20230425a/image_6.png" alt="" width="1200" height="743" loading="lazy">
+<img src="/images/2023/20230425a/image_6.png" alt="" width="1200" height="743" loading="lazy">
 
 ファイルをアップロードすると`The file {ファイル名} has been uploaded.`と表示されます。
 
 gobusterをつかって、探索してみます。
 
-<img src="/images/20230425a/image_7.png" alt="" width="751" height="410" loading="lazy">
+<img src="/images/2023/20230425a/image_7.png" alt="" width="751" height="410" loading="lazy">
 
 `uploads`がありました。よって、回答は`uploads`です。また、ファイルをアップロードすると`uploads`配下にファイルが格納されそうと推測できます。
 
@@ -124,13 +124,13 @@ robert ユーザーと共有されているパスワードを含むファイル�
 
 実際にアクセスしてみます。
 
-<img src="/images/20230425a/image_8.png" alt="image.png" width="751" height="410" loading="lazy">
+<img src="/images/2023/20230425a/image_8.png" alt="image.png" width="751" height="410" loading="lazy">
 
 権限がないと怒られます。
 
 [php-reverse-shell](https://github.com/BlackArch/webshells)をファイルアップロードして、reverse-shellを試みます。
 
-<img src="/images/20230425a/image_9.png" alt="" width="908" height="138" loading="lazy">
+<img src="/images/2023/20230425a/image_9.png" alt="" width="908" height="138" loading="lazy">
 
 lsコマンドで色々探してると、`/var/www/html/cdn-cgi/login`配下にdb.phpファイルが存在します。
 db.phpファイルをcatしてみます。
@@ -163,7 +163,7 @@ robertに切り替えたいと考えたのですが、ここで詰まってし�
 
 * Hack The Box は Starting Pointの問題は、walkthroughという回答が用意されています。
 
-<img src="/images/20230425a/image_10.png" alt="" width="725" height="105" loading="lazy">
+<img src="/images/2023/20230425a/image_10.png" alt="" width="725" height="105" loading="lazy">
 
 walkthroughを確認すると、どうやらPythonの実行環境があるらしいので、上図のように実行します。
 
@@ -259,7 +259,7 @@ export PATH="/tmp:$PATH"
 
 これにより、`/usr/bin/bugtracker`を実行し、 `whoami` を実行すると `root` ユーザでシェルが立ち上がっているのが確認できます。
 
-<img src="/images/20230425a/image_11.png" alt="" width="338" height="197" loading="lazy">
+<img src="/images/2023/20230425a/image_11.png" alt="" width="338" height="197" loading="lazy">
 
 あとは `/root` 配下のフラグを提出すれば完了です。
 

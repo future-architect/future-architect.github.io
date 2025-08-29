@@ -18,7 +18,7 @@ lede: "2019年頭より少しずつ書いていたTypeScriptの教育コンテ�
 * [仕事ですぐに使えるTypeScript](https://future-architect.github.io/typescript-guide/)
 
 Web版に加えてPDF版もダウンロード可能です。
-<img alt="" src="/images/20190612/image.png" style="border:solid 1px #000000">
+<img alt="" src="/images/2019/20190612/image.png" style="border:solid 1px #000000">
 
 そもそもこの資料を書き始めたきっかけですが、フューチャーのようなB2Bな会社であっても、最近はフロントエンドの比重が高まっているところから出発しています。僕もフューチャーに転職後からReactでがっつり1年以上の案件をやったり、半年ぐらいのAngular案件をやったりしています。会社としてはVue.jsを推しています。グループ会社の東京カレンダーはReactを使っていたりもします。要件に合わせていろいろですね。B2B2Cな案件も多いですし、お客様の求めるUX体験の良さを実現するにはフロントエンド側での頑張りが必要です。
 

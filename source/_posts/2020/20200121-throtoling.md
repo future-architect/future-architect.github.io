@@ -28,7 +28,7 @@ Googleで「スロットリング」で検索するとパチスロのリング�
 
 SaaSであれば有限のコンピューティングをみんなでシェアするのでより多くの人が快適に利用できるよう、一部のユーザからの大量リクエストを制限するのに利用されます。もし無制限にリクエストを受け入れたとするとシステムに負荷がかかり、クライアントへのレスポンスに時間を要したり待たされた挙句にタイムアウトしてしまいます。
 
-<img src="/images/20200121/1.png" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2020/20200121/1.png" style="border:solid 1px #000000" loading="lazy">
 
 これは大人気の遊園地が入場制限することで、入場済みの来場者に快適に過ごしてもらうことに似ています。入場前の来場者にとっては好ましくありませんが。。。
 
@@ -64,7 +64,7 @@ SaaSであれば有限のコンピューティングをみんなでシェアす�
 
 リトライの間隔を倍々に増加させた上でばらつかせる
 
-<img src="/images/20200121/photo_20200121_01.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2020/20200121/photo_20200121_01.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
 上図は[AWS Solutions Architect ブログ](https://aws.typepad.com/sajp/2015/03/backoff.html)より引用
 
 これらのリトライ手法により単位時間あたりのアクセス数が低減でき、スロットリングの受信拒否が起きにくくなります。
@@ -88,7 +88,7 @@ SaaSであれば有限のコンピューティングをみんなでシェアす�
 
 APIキーを用いてスロットリングされるものとして説明します。
 
-<img src="/images/20200121/2.png" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2020/20200121/2.png" style="border:solid 1px #000000" loading="lazy">
 
 **サービスプロセス**
 1.クライアントからサービスへAPIキーを付与してアクセスする

@@ -9,12 +9,12 @@ tag:
   - go-swagger
 category:
   - Programming
-thumbnail: /images/20200701/thumbnail.png
+thumbnail: /images/2020/20200701/thumbnail.png
 author: 多賀聡一朗
 lede: "go-swagger は Swagger 2.0 にのみ対応しており、OpenAPI 3.0 系が使えない問題がありました。最新に追従していく上でも Open API 3.0 系に寄せていきたいと考えていたので、なにか使えるツールはないか探したところ、以下を見つけました。 https://github.com/deepmap/oapi-codegen 使えるかどうか実際に動かして試してみます。"
 ---
 
-<img src="/images/20200701/top.png" class="img-middle-size" loading="lazy">
+<img src="/images/2020/20200701/top.png" class="img-middle-size" loading="lazy">
 
 The Gopher character is based on the Go mascot designed by [Renée French](http://reneefrench.blogspot.com/).
 

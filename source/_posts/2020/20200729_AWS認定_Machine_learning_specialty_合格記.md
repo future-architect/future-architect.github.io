@@ -8,7 +8,7 @@ tag:
   - 合格記
 category:
   - DataScience
-thumbnail: /images/20200729/thumbnail.png
+thumbnail: /images/2020/20200729/thumbnail.png
 author: 伊藤真彦
 lede: "TIGの伊藤真彦です。先日もう一人の伊藤さんが[Terraform Associate合格記]を書いてくれました。こちらの記事に続いて、資格系の記事を書いてみようと思います。私はAWSの資格を4つほど持っているのですが、今回は[AWS認定 機械学習- 専門知識]について紹介します。ちなみに機械学習の資格は実務経験0から2カ月ほど学習して合格しました。前提知識0の人も対象になるような記事を目指して記載します。"
 ---
@@ -21,7 +21,7 @@ TIGの伊藤真彦です。
 
 前提知識0の人も対象になるような記事を目指して記載します。
 
-<img src="/images/20200729/badge.png" class="img-small-size" loading="lazy">
+<img src="/images/2020/20200729/badge.png" class="img-small-size" loading="lazy">
 
 # この記事の目的
 

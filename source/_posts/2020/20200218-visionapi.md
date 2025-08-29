@@ -52,24 +52,24 @@ https://cloud.google.com/vision/pricing?hl=ja
 
 ## プロジェクト作成
 
-<img src="/images/20200218/photo_20200218_01.png" class="img-middle-size" loading="lazy">
+<img src="/images/2020/20200218/photo_20200218_01.png" class="img-middle-size" loading="lazy">
 
 プロジェクト名を入力し作成ボタンをクリック
 
 ## Cloud Vision APIの有効化
 
-<img src="/images/20200218/photo_20200218_02.png" class="img-middle-size" loading="lazy">
+<img src="/images/2020/20200218/photo_20200218_02.png" class="img-middle-size" loading="lazy">
 
 Cloud Vision APIの画面に移動して有効にするボタンをクリック
 https://cloud.google.com/vision/docs/before-you-begin
 
 ## APIキーを作成
 
-<img src="/images/20200218/photo_20200218_03.png" class="img-middle-size" loading="lazy">
+<img src="/images/2020/20200218/photo_20200218_03.png" class="img-middle-size" loading="lazy">
 
 APIとサービスの画面に移動して認証情報を作成からAPIキーを選択してクリック
 
-<img src="/images/20200218/photo_20200218_04.png" class="img-middle-size" loading="lazy">
+<img src="/images/2020/20200218/photo_20200218_04.png" class="img-middle-size" loading="lazy">
 
 これでAPIキーが作成されました。
 後ほどこのAPIキーを利用します。
@@ -84,7 +84,7 @@ APIとサービスの画面に移動して認証情報を作成からAPIキー�
 
 まずは、Label detection。Futureの[キャリア採用ページ](https://www.future.co.jp/recruit/career/job/engineer/)にある、つよつよエンジニア渋川の[画像](https://www.future.co.jp/recruit/common/img/member/er_popup_14_pc.jpg)を利用してどのようなラベルが検出がされるか見てみましょう。今回の検証では改めて説明する必要はないと思いますがお手軽万能HTTPアクセスツールcURLを利用します。
 
-<img src="/images/20200218/photo_20200218_05.jpeg" class="img-middle-size" loading="lazy">
+<img src="/images/2020/20200218/photo_20200218_05.jpeg" class="img-middle-size" loading="lazy">
 
 keyの項目に先ほど取得したAPIキーを設定します。
 
@@ -213,7 +213,7 @@ descriptionだけ抜き出して整理すると
 
 続いてText detection。渋川の[スペックのレーダーチャート](https://www.future.co.jp/recruit/common/img/member/chart_14_pc.png)を解析してみましょう。
 
-<img src="/images/20200218/photo_20200218_06.png" class="img-middle-size" loading="lazy">
+<img src="/images/2020/20200218/photo_20200218_06.png" class="img-middle-size" loading="lazy">
 
 ```sh Request
 curl -H 'Content-Type:application/json' -d '{"requests":[{"image":{"source":{"imageUri":"https://www.future.co.jp/recruit/common/img/member/chart_14_pc.png"}},"features":[{"type":"TEXT_DETECTION"}]}]}' https://vision.googleapis.com/v1/images:annotate?key=xxxxxxxxxxx

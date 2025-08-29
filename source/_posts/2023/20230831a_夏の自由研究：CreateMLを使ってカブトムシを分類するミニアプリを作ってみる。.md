@@ -9,7 +9,7 @@ tag:
   - 画像処理
 category:
   - DataScience
-thumbnail: /images/20230831a/thumbnail.png
+thumbnail: /images/2023/20230831a/thumbnail.png
 author: 橋本竜我
 lede: "こんにちは！HealthCare Innovation Group[^1]所属の橋本です。本記事は、[夏の自由研究ブログ連載2023]の1本目です。夏の風物詩であるカブトムシやクワガタを識別するミニアプリを作りました。"
 ---
@@ -27,10 +27,10 @@ lede: "こんにちは！HealthCare Innovation Group[^1]所属の橋本です。
 「Swiftと機械学習あたりを絡めて何かできないかな？」と考えたところ、CreateMLという様々な機械学習モデルをGUIで作ることができると知ったため、カブトムシやクワガタの画像を学習させたモデルを使ったミニアプリを作ることにしました。
 
 今回は、作成したミニアプリをもとに、CreateMLの使い方について紹介したいと思います。
-<img src="/images/20230831a/image.png" alt="" width="718" height="247" loading="lazy">
+<img src="/images/2023/20230831a/image.png" alt="" width="718" height="247" loading="lazy">
 
 **作成したカブトムシ・クワガタを分類するミニアプリ**
-<img src="/images/20230831a/beatle_app.gif" alt="" width="177" height="384" loading="lazy">
+<img src="/images/2023/20230831a/beatle_app.gif" alt="" width="177" height="384" loading="lazy">
 
 ## 目次
 
@@ -104,23 +104,23 @@ CreateMLを`Xcode` > `Open Developer Tool` > `CreatML`をクリックし、ウ�
 
 先程用意したtrainingDataフォルダを以下の”＋”部分に、ドラック＆ドロップで追加します。
 
-<img src="/images/20230831a/image_2.png" alt="" width="1103" height="333" loading="lazy">
+<img src="/images/2023/20230831a/image_2.png" alt="" width="1103" height="333" loading="lazy">
 
 追加されると、次のようになります。
 
-<img src="/images/20230831a/image_3.png" alt="" width="1108" height="345" loading="lazy">
+<img src="/images/2023/20230831a/image_3.png" alt="" width="1108" height="345" loading="lazy">
 
 左上の`Train`を押下すると、渡したデータをもとに学習が始まります。
 
 数秒で学習が完了し、以下のように学習時の様子が`Trainingタブ`で確認できます。
 
-<img src="/images/20230831a/image_4.png" alt="" width="868" height="362" loading="lazy">
+<img src="/images/2023/20230831a/image_4.png" alt="" width="868" height="362" loading="lazy">
 
 これで機械学習モデルの作成自体は完了です。
 
 作成したモデルが未知のデータをどれほどの精度で分類できるか評価する方法として、学習時に使用していないテストデータを渡すことができます。CreateML上での実施方法は、Evaluationタブでtraining時と同様に、Testing dataにテスト用のデータをドラック＆ドロップで追加します。
 
-<img src="/images/20230831a/image_5.png" alt="" width="1114" height="398" loading="lazy">
+<img src="/images/2023/20230831a/image_5.png" alt="" width="1114" height="398" loading="lazy">
 
 今回の四種類のカブトムシ・クワガタの分類精度は、ノコギリクワガタが50％をわずかに下回っているが、4分類であることを考えると何もパラメータチューニングをしていない割に、オオクワガタ(giantStagBeatle)は65％とまずまずの精度となっていました。
 
@@ -133,13 +133,13 @@ CreateMLを`Xcode` > `Open Developer Tool` > `CreatML`をクリックし、ウ�
 | Giant<br>StagBeatle | 20 | 15 | 8 |5 | 65% | 75% | 0.7 |
 | beatle | 20 |9 | 7 | 7 | 59% | 65% | 0.62 |
 
-<img src="/images/20230831a/image_6.png" alt="" width="1153" height="480" loading="lazy">
+<img src="/images/2023/20230831a/image_6.png" alt="" width="1153" height="480" loading="lazy">
 
 CreateMLで今回作ったモデルをCoreML　Model形式（`.mlmodel`）として取得します。
 
 Outputタグに移動し、右上のGetから、`beatleAndStagBeatlesClassifier.mlmodel`を任意の場所に保存できます。
 
-<img src="/images/20230831a/image_7.png" alt="" width="1153" height="553" loading="lazy">
+<img src="/images/2023/20230831a/image_7.png" alt="" width="1153" height="553" loading="lazy">
 
 ### アプリへ実装する
 
@@ -172,7 +172,7 @@ class ImagePredictor {
 
 （これを使えば、道端で遭遇したカブトムシ・クワガタの種類がわかるようになる？）
 
-<img src="/images/20230831a/beatle_app_2.gif" alt="" width="177" height="384" loading="lazy">
+<img src="/images/2023/20230831a/beatle_app_2.gif" alt="" width="177" height="384" loading="lazy">
 
 ## 最後に
 

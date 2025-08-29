@@ -9,12 +9,12 @@ tag:
   - Makefile
 category:
   - Programming
-thumbnail: /images/20201022/thumbnail.webp
+thumbnail: /images/2020/20201022/thumbnail.webp
 author: 筒井悠平
 lede: "筒井です。GoとAWS LambdaのためのMakefileを整理しました。Lambda Functionの増加と同時に増えていくターゲットにはオサラバです。"
 ---
 
-<img src="/images/20201022/GNU-make.webp" class="img-middle-size" loading="lazy">
+<img src="/images/2020/20201022/GNU-make.webp" class="img-middle-size" loading="lazy">
 
 筒井です。
 

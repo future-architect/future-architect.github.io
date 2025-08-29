@@ -11,11 +11,11 @@ tag:
   - SQL
 category:
   - DB
-thumbnail: /images/20210403/thumbnail.png
+thumbnail: /images/2021/20210403/thumbnail.png
 author: 棚井龍之介
 lede: "DynamoDBを頻繁に利用しており、連日DynamoDBコンソール画面と睨めっこをしています。DynamoDBのコンソール画面は特定のデータをピンポイントで探すには優秀ですが、データ集計には全く向いていません。"
 ---
-<img src="/images/20210403/Screen_Shot_2021-03-14_at_1.09.08.png" alt="チャットのやり取り" loading="lazy">
+<img src="/images/2021/20210403/Screen_Shot_2021-03-14_at_1.09.08.png" alt="チャットのやり取り" loading="lazy">
 
 # はじめに
 
@@ -51,13 +51,13 @@ DynamoDBのデータにSQLを実行するため、本記事では以下の流れ
 ## 1.DynamoDBを準備
 
 Export S3の機能は新しいコンソール画面上でのみ可能なので、古いUIを利用している場合は「新しいコンソールを試す」を選択してください。
-<img src="/images/20210403/1.png" alt="AWS管理コンソール" loading="lazy">
+<img src="/images/2021/20210403/1.png" alt="AWS管理コンソール" loading="lazy">
 
 今回の動作検証用に、以下の設定でDynamoDBテーブルを作成します。
 
 - テーブル名: test-s3export-and-query
 - パーティションキー: id(String)
-<img src="/images/20210403/3.png" alt="DynamoDBテーブル作成" loading="lazy">
+<img src="/images/2021/20210403/3.png" alt="DynamoDBテーブル作成" loading="lazy">
 
 動作検証用に、サンプルデータを15件投入します。
 
@@ -82,13 +82,13 @@ Export S3の機能は新しいコンソール画面上でのみ可能なので�
 投入結果をコンソール画面で確認します。
 15件とも正しく格納されています。
 
-<img src="/images/20210403/4.png" alt="15件のプレビュー" loading="lazy">
+<img src="/images/2021/20210403/4.png" alt="15件のプレビュー" loading="lazy">
 
 ## 2.Export先のS3を準備
 
 データ出力先のS3を作成します。
 今回は test-dynamodb-export-20210315 のバケット名で作成しました。
-<img src="/images/20210403/5.png" alt="データ出力先の設定" loading="lazy">
+<img src="/images/2021/20210403/5.png" alt="データ出力先の設定" loading="lazy">
 
 ## 3.Exportを実行
 
@@ -96,15 +96,15 @@ Export S3の機能は新しいコンソール画面上でのみ可能なので�
 
 DynamoDBのコンソール画面上から、Export S3を実行します。
 「ストリームとエクスポート」から「S3へのエクスポート」を選択
-<img src="/images/20210403/6.png" alt="S3へのエクスポート" loading="lazy">
+<img src="/images/2021/20210403/6.png" alt="S3へのエクスポート" loading="lazy">
 
 Export S3の実行には Point-in-Time Recovery の設定が必要なため、画面の指示に従い有効化します。
 出力先のS3を選択したら、「エクスポート」を実行します。
-<img src="/images/20210403/6-2.png" alt="エクスポートの実行" loading="lazy">
+<img src="/images/2021/20210403/6-2.png" alt="エクスポートの実行" loading="lazy">
 
 コンソール画面上でExportの進行状況が見れます。
 データ数にもよりますが、出力は5分程度で完了します。
-<img src="/images/20210403/7.png" alt="出力先" loading="lazy">
+<img src="/images/2021/20210403/7.png" alt="出力先" loading="lazy">
 
 Export完了後に出力先S3を確認すると、DyanmoDBデータ本体以外にも複数ファイルが確認できます。
 各ファイルの意味はこちらです
@@ -118,11 +118,11 @@ Export完了後に出力先S3を確認すると、DyanmoDBデータ本体以外�
 | manifest-summary.json 	| Exportジョブの概要情報が記載される                             	|
 | manifest-summary.md5  	| manifest-summary.jsonのチェックサムファイル                    	|
 
-<img src="/images/20210403/8.png" alt="実行結果" loading="lazy">
+<img src="/images/2021/20210403/8.png" alt="実行結果" loading="lazy">
 
 dataパス配下に、ExportしたDynamoDBテーブルデータがgz形式で格納されています。
 
-<img src="/images/20210403/9.png" alt="dataパス配下" loading="lazy">
+<img src="/images/2021/20210403/9.png" alt="dataパス配下" loading="lazy">
 
 以上で、DynamoDBのExport S3は完了しました。
 
@@ -137,11 +137,11 @@ Athenaでのクエリ実行には、事前のテーブル定義が必要です�
 
 今回は test_dynamodb_export の名前でデータベースを追加しました。
 
-<img src="/images/20210403/10.png" alt="AWS Glueカタログのデータベース追加" loading="lazy">
+<img src="/images/2021/20210403/10.png" alt="AWS Glueカタログのデータベース追加" loading="lazy">
 
 続いて、「テーブル」→「テーブルの追加」→「クローラを使用してテーブルを追加」を選択します。
 
-<img src="/images/20210403/11.png" alt="クローラを使用してテーブルを追加" loading="lazy">
+<img src="/images/2021/20210403/11.png" alt="クローラを使用してテーブルを追加" loading="lazy">
 
 今回のクローラでは、以下の設定とします。
 
@@ -151,11 +151,11 @@ Athenaでのクエリ実行には、事前のテーブル定義が必要です�
 - データベース: test_dynamodb_export
 - テーブルに追加されたプレフィックス: users_ ("プレフィックスでの指定文字列+data"が、テーブル名となる)
 
-<img src="/images/20210403/12.png" alt="クローラ設定" loading="lazy">
+<img src="/images/2021/20210403/12.png" alt="クローラ設定" loading="lazy">
 
 クローラの実行をオンデマンドに設定したため、「クローラ」→「test-dynamodb-export(今回追加したクローラ名)」→「クローラの実行」により、テーブル定義を追加します。
 
-<img src="/images/20210403/13.png" alt="クローラの実行" loading="lazy">
+<img src="/images/2021/20210403/13.png" alt="クローラの実行" loading="lazy">
 
 1,2分程度でクローラ実行が完了します。
 以上により、DynamoDBのデータをS3に格納して「クエリが実行できる状態」になりました。
@@ -166,7 +166,7 @@ Athenコンソール画面での「データベース」で「test_dynamodb_expo
 
 Glue Crawlerにより項目定義は完了しているため、あとはSQLを実行するのみです。
 
-<img src="/images/20210403/15.png" alt="Athenaのクエリエディタ" loading="lazy">
+<img src="/images/2021/20210403/15.png" alt="Athenaのクエリエディタ" loading="lazy">
 
 まずは SELECT してみましょう。
 DynamoDBの出力項目をGlue Crawlerでテーブル定義した場合、各項目は「**Item.(項目名).(データ型)**」で指定できます。
@@ -180,7 +180,7 @@ FROM test_dynamodb_export.users_data
 ORDER BY  Item.id.S
 ```
 
-<img src="/images/20210403/17.png" alt="SQL結果" loading="lazy">
+<img src="/images/2021/20210403/17.png" alt="SQL結果" loading="lazy">
 
 DynamoDBをSELECTできましたね。
 SQLっぽく、いくつか条件を追加してみます。
@@ -194,7 +194,7 @@ WHERE Item.age.N <= '30'
 ORDER BY  Item.age.N, Item.id.S
 ```
 
-<img src="/images/20210403/18.png" loading="lazy">
+<img src="/images/2021/20210403/18.png" loading="lazy">
 
 テーブルのJOINも、もちろんできます。
 
@@ -203,7 +203,7 @@ SELECT count(1) AS "15×15=225"
 FROM test_dynamodb_export.users_data, test_dynamodb_export.users_data
 ```
 
-<img src="/images/20210403/19.png" loading="lazy">
+<img src="/images/2021/20210403/19.png" loading="lazy">
 
 今回の記事では1テーブルしか作成していませんが、各テーブルごとに **Export S3 + Glue Crawler** を実施すれば、DynamoDBテーブル同士のJOINが可能となります。
 

@@ -7,11 +7,11 @@ tag:
   - TerraCurl
 category:
   - Infrastructure
-thumbnail: /images/20230328a/thumbnail.png
+thumbnail: /images/2023/20230328a/thumbnail.png
 author: 真野隼記
 lede: "TerraCurlというツールが面白そうだったので触ってみました。TerraCurlは以下の2023.2.22 のHashiCorpさんのブログで紹介されています。* [Writing Terraform for unsupported resources - HashiCorp Blog]"
 ---
-<img src="/images/20230328a/top.png" alt="" width="600" height="356" loading="lazy">
+<img src="/images/2023/20230328a/top.png" alt="" width="600" height="356" loading="lazy">
 
 # はじめに
 
@@ -27,7 +27,7 @@ v1.4リリースとは関係ないですが、[TerraCurl](https://registry.terra
 
 AWS、Google Cloud、Azureなど、日進月歩で新しいサービス、新機能が追加されています。例えば以下は [ITmediaさんのページ](https://www.itmedia.co.jp/enterprise/articles/2103/08/news067.html) から引用した、AWSの機能追加の推移ですがその勢いは加速しています。
 
-<img src="/images/20230328a/kz_wk220322_02_MASK.jpg" alt="kz_wk220322_02_MASK.jpg" width="590" height="333" loading="lazy">
+<img src="/images/2023/20230328a/kz_wk220322_02_MASK.jpg" alt="kz_wk220322_02_MASK.jpg" width="590" height="333" loading="lazy">
 
 クラウドベンダー、SaaSサービス側の機能追加に合わせて、Terraform Provider側の開発が進むので、新しい機能を利用しようとしても、まだ対応していない、といった場面がまれに発生します。Provider側へPull Requestを出しOSSコントリビュートして推進に関与するというのがあるべきアプローチの1つだと思いますが、業務スケジュール上、できるだけ急ぎで対応したいということが多いでしょう。
 
@@ -185,7 +185,7 @@ qiita_article_response = "6410f22e585d0907005e"
 
 限定公開で記事を作成したのでブラウザで確認します。URLのIDが出力された値と一致していることがわかります。
 
-<img src="/images/20230328a/response.png" alt="" width="1200" height="924" loading="lazy">
+<img src="/images/2023/20230328a/response.png" alt="" width="1200" height="924" loading="lazy">
 
 ※URLまでキャプチャに載せていますが、テスト投稿した記事は削除済みです
 

@@ -11,7 +11,7 @@ tag:
   - モック
 category:
   - Programming
-thumbnail: /images/20240710a/thumbnail.png
+thumbnail: /images/2024/20240710a/thumbnail.png
 author: 真野隼記
 lede: "バックエンドのアプリケーションの上で、メール送信するコードがある場合の単体テストをどう実現するか悩みました。"
 ---
@@ -33,7 +33,7 @@ TIG真野です。
 
 ## go-smtp-mock
 
-<img src="/images/20240710a/848bc1dd-fc35-4d78-8bd9-0ac3430270d8.png" alt="848bc1dd-fc35-4d78-8bd9-0ac3430270d8.png" width="1200" height="600" loading="lazy">
+<img src="/images/2024/20240710a/848bc1dd-fc35-4d78-8bd9-0ac3430270d8.png" alt="848bc1dd-fc35-4d78-8bd9-0ac3430270d8.png" width="1200" height="600" loading="lazy">
 
 ※（ロゴがPlaywrightに見えますね）
 

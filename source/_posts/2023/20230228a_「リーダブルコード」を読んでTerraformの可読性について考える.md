@@ -10,12 +10,12 @@ tag:
   - リーダブルコード
 category:
   - Infrastructure
-thumbnail: /images/20230228a/thumbnail.jpg
+thumbnail: /images/2023/20230228a/thumbnail.jpg
 author: 伊藤太斉
 lede: "今回取り上げる書籍は、多くのエンジニアが通過するであろう、リーダブルコード についてです。Terraformと絡めて書いていければと思います。私は、俗にいうプログラミング言語に対しては明るくない方なので、自分が理解できうるTerraformにおいて考えたらどうなるか、について地震の頭の整理、理解のためにも本記事を書いてみました。"
 ---
 
-<img src="/images/20230228a/top.jpg" alt="" width="400" height="565">
+<img src="/images/2023/20230228a/top.jpg" alt="" width="400" height="565">
 
 こんにちは。TIGの伊藤太斉です。
 

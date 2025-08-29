@@ -8,12 +8,12 @@ tag:
   - MaaS
 category:
   - Infrastructure
-thumbnail: /images/20200921/thumbnail.png
+thumbnail: /images/2020/20200921/thumbnail.png
 author: 岡部公亮
 lede: "はじめまして。フューチャーのインターンEngineer Campに参加させていただいた岡部です。今回はタイトルにもある通り、2020年エンジニアキャンプのインターンの内容、学びについてお話しさせていただきます。"
 ---
 
-<img src="/images/20200921/図2.png" loading="lazy">
+<img src="/images/2020/20200921/図2.png" loading="lazy">
 
 # 初めに
 
@@ -80,7 +80,7 @@ Slackに今日やる予定のタスクを書きだし、メールや社内チャ
 その日の内容を日報に書き、社員の方に報告して1日の作業終了です。
 日によってはこの後にオンライン飲みや競技プログラミングのバーチャルコンテストが開催され、他の参加者の方や社員の方と交流します。
 
-<img src="/images/20200921/vc.jpg" loading="lazy">
+<img src="/images/2020/20200921/vc.jpg" loading="lazy">
 
 ## インターンでの学び
 
@@ -97,7 +97,7 @@ Slackに今日やる予定のタスクを書きだし、メールや社内チャ
 
 ### 成果発表とフィードバック
 
-<img src="/images/20200921/成果発表.png" loading="lazy">
+<img src="/images/2020/20200921/成果発表.png" loading="lazy">
 
 また、インターン終了直前に行った最終発表では発表をするだけでなく4週間を通じてのフィードバックもいただくことが出来ます。リモートで大変な状況の中でしたが、自分のアイデアや実装内容についてポジティブな声をいただけた時は非常に嬉しかったです。
 

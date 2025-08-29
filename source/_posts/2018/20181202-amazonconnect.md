@@ -79,7 +79,7 @@ AWSの広告っぽくなってしまうので、サラッと記載します。
 ### 3rd-Party システムとの連携
 
 引用ですが、下記のスライドで説明がありました。
-<img src="/images/20181202/photo_20181202_01.png" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_01.png" loading="lazy">
 
 ### CCP（ソフトフォン）の拡張
 
@@ -101,7 +101,7 @@ AWSの広告っぽくなってしまうので、サラッと記載します。
 
 ### Connectインスタンスの作成
 
-<img src="/images/20181202/photo_20181202_02.png" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_02.png" style="border:solid 1px #000000" loading="lazy">
 
 - 通常2つのインスタンスを作ることが多い（本番・検証）
 - 既存のAWS Directory Serviceにリンクしたり、SAML 2.0認証も可能
@@ -113,7 +113,7 @@ AWSの広告っぽくなってしまうので、サラッと記載します。
 
 ### インスタンスの設定
 
-<img src="/images/20181202/photo_20181202_03.png" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_03.png" style="border:solid 1px #000000" loading="lazy">
 
 - テレフォニー：発信・着信をAmazonConnectで処理するか否かを設定
 - データストレージ：S3/KMSの設定が可能。クレジット情報などを扱う場合は暗号化必須です
@@ -127,7 +127,7 @@ AWSの広告っぽくなってしまうので、サラッと記載します。
 ### 1. 電話番号の取得
 
 ここからはAmazonConnectの管理画面にログインして操作をします。
-<img src="/images/20181202/photo_20181202_04.png" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_04.png" loading="lazy">
 
 - Direct Call（通常回線）とFree Dial（フリーダイヤル）が選択可能
   - 気になったのが、通常回線の050はいいとして、フリーダイヤルの0800は馴染みが無いですね
@@ -136,7 +136,7 @@ AWSの広告っぽくなってしまうので、サラッと記載します。
 
 ### 2. 電話応対時間の設定
 
-<img src="/images/20181202/photo_20181202_05.png" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_05.png" loading="lazy">
 
 - オペレーション時間（Hours of operation）から実際に電話が通じる時間を決められる
   - TimezoneをAsia/Tokyoにすること！
@@ -144,7 +144,7 @@ AWSの広告っぽくなってしまうので、サラッと記載します。
 
 ### 3. キューの作成
 
-<img src="/images/20181202/photo_20181202_06.png" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_06.png" loading="lazy">
 
 - 先程作成したオペレーション時間（Hours of operation）との紐付けを行う
 - Outbound caller ID nameで通知される際の表示文字を決められる
@@ -155,7 +155,7 @@ AWSの広告っぽくなってしまうので、サラッと記載します。
 
 ### 4. プロンプトの作成
 
-<img src="/images/20181202/photo_20181202_07.png" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_07.png" loading="lazy">
 
 - Create new promptにて相手に聞かせる音声の録音やファイルのアップロード（.wav）が可能
 - 問い合わせフロー内でPollyに喋らせることも可能なので、フロー作成の際はそちらで手軽に代用も可能です
@@ -163,7 +163,7 @@ AWSの広告っぽくなってしまうので、サラッと記載します。
 
 ### 5. 問い合わせフローの作成
 
-<img src="/images/20181202/photo_20181202_08.png" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_08.png" style="border:solid 1px #000000" loading="lazy">
 
 - サンプルのフローが20近くあり、それらを修正しても良いかも
 - 基本はブロックをつないでいけばIVRが簡単に構築できます
@@ -183,7 +183,7 @@ AWSの広告っぽくなってしまうので、サラッと記載します。
 
 ### Contact flow designer
 
-<img src="/images/20181202/photo_20181202_09.png" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_09.png" loading="lazy">
 
 - GUIのドラッグ&ドロップでフローを構築可能
 - 複雑になりがちなので、拡大縮小機能あり
@@ -229,7 +229,7 @@ AWSの広告っぽくなってしまうので、サラッと記載します。
 
 #### 6. ルーティングプロファイルの作成
 
-<img src="/images/20181202/photo_20181202_10.png" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_10.png" loading="lazy">
 
 - Routing profilesはキューのグループになる -> 呼をどのようにエージェントに振り分けるかのグループ
 - キューごとにプライオリティを決めることが可能
@@ -276,7 +276,7 @@ ECサイトで注文情報の変更・キャンセルを行う自動応答シス
 
 #### 全体図
 
-<img src="/images/20181202/photo_20181202_11.png" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_11.png" style="border:solid 1px #000000" loading="lazy">
 
 ### 手順
 
@@ -503,7 +503,7 @@ aws lambda add-permission --function-name function:<Lambda Function名> \
 ```
 
 > ※ ARNはAWSコンソール > AmazonConnect > インスタンスエイリアス名　から確認できます。
-<img src="/images/20181202/photo_20181202_12.png" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_12.png" style="border:solid 1px #000000" loading="lazy">
 
 #### Lexとの連携を作成します。
 
@@ -515,17 +515,17 @@ aws lambda add-permission --function-name function:<Lambda Function名> \
 - Sample utterances：ここでの言葉に反応してLexがSlotを呼びます。
 - Slots："Sure, when?"とLexが聞いて来るので、その後の言葉をAMAZON.DATE型として認識します。
 
-<img src="/images/20181202/photo_20181202_13.png" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_13.png" style="border:solid 1px #000000" loading="lazy">
 
 ##### Amazon LexとConnectを接続します。
 
 下図の通り、Lexボットを作成したリージョンとボット名を選択して追加します。
 
-<img src="/images/20181202/photo_20181202_14.png" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_14.png" style="border:solid 1px #000000" loading="lazy">
 
 #### 最後にフローを作成します。
 
-<img src="/images/20181202/photo_20181202_15.png" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_15.png" style="border:solid 1px #000000" loading="lazy">
 
 かいつまんで説明すると、吹き出し部分が重要なところで、データの受け渡しで若干躓くところです。
 個別に見ていきましょう。
@@ -534,43 +534,43 @@ aws lambda add-permission --function-name function:<Lambda Function名> \
 
 電話をかけてきた相手の電話番号はシステムの値で取得可能です。
 宛先キーは使いやすい名称を設定すれば良いと思います（今回はCallerIDでいきます）。
-<img src="/images/20181202/photo_20181202_16.png"  class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_16.png"  class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
 
 ##### Lambdaの呼び出し
 
 先程取得したCallerID（発信者電話番号）を引数としてセットします。
 呼び出すLambdaのARNは関数画面から取得してきましょう。
-<img src="/images/20181202/photo_20181202_17.png"  class="img-middle-size"  style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_17.png"  class="img-middle-size"  style="border:solid 1px #000000" loading="lazy">
 
 ##### 値のチェック
 
 Lambda関数の戻り値をチェックできます。
 ここでは発信者電話番号をキーとした注文情報レコードの有無を確認することを想定しています。
-<img src="/images/20181202/photo_20181202_18.png" class="img-middle-size"  style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_18.png" class="img-middle-size"  style="border:solid 1px #000000" loading="lazy">
 
 ##### ダイヤルプッシュを取得（IVR）
 
 IVRの機能を枠ひとつでできてしまいます！
 ここは特につまずくことなく設定可能かなと思います。
-<img src="/images/20181202/photo_20181202_19.png"  style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_19.png"  style="border:solid 1px #000000" loading="lazy">
 
 ##### キャンセル関数
 
 複数の引数を持つLambda関数にもちゃんとデータを渡すことができます。
-<img src="/images/20181202/photo_20181202_20.png" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_20.png" style="border:solid 1px #000000" loading="lazy">
 
 ##### Lexで顧客の入力を取得
 
 前項の「ダイヤルプッシュを取得（IVR）」と同様のことをLexを用いて実装可能です。
 ボットを選択するだけなので、とても簡単に追加できます。
-<img src="/images/20181202/photo_20181202_21.png" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_21.png" style="border:solid 1px #000000" loading="lazy">
 
 ##### 配送日変更関数の呼び出し
 
 以前までと違うのが、Lexで取得してきた値を引数としたい点です。
 素晴らしいことにこれもGUIで簡単に取れてしまいます。
 （Lexの部分だけ抜き取っています）。。
-<img src="/images/20181202/photo_20181202_22.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_22.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
 
 ##### 完成！
 
@@ -587,7 +587,7 @@ IVRの機能を枠ひとつでできてしまいます！
 AmazonConnectならではの強みを活かしてEC2インスタンスの再起動や、運用監視向けのシステムを作られている方もいて、非常に夢が広がるツールだと思いました。
 
 この実習での作品が発想勝ちだったのか、AmazonConnectサンプルコールセンター対決で優勝をいただきましてechospotをもらえました！（ありがとうございます！）。
-<img src="/images/20181202/photo_20181202_23.jpeg" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_23.jpeg" loading="lazy">
 
 ## 参考資料
 

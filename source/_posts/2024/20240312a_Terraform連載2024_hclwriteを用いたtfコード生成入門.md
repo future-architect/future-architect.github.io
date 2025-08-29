@@ -8,7 +8,7 @@ tag:
   - Go
 category:
   - Infrastructure
-thumbnail: /images/20240312a/thumbnail.png
+thumbnail: /images/2024/20240312a/thumbnail.png
 author: 真野隼記
 lede: "Terraformファイルをコード生成するため、hclwriteというGoパッケージの使い方を調べました。"
 ---
@@ -68,7 +68,7 @@ resource "aws_cloudwatch_metric_alarm" "myproduct_read_dynamodb_throttledrequest
 
 こうした場面で、あるTerraformで定義したリソース（ここではDynamoDB）をインプットに別のコード（Cloudwatch Metrics）を生成し、モジュール化しなくとも不整合が生じにくい開発フローを整備したいと思います。これでモジュール化の判断を先送りにできますね。
 
-<img src="/images/20240312a/dynamodb_hclwrite.drawio.png" alt="" width="1200" height="631" loading="lazy">
+<img src="/images/2024/20240312a/dynamodb_hclwrite.drawio.png" alt="" width="1200" height="631" loading="lazy">
 
 ちなみに、通常、DynamoDBはそこまで数が増えない（ほいほい増えるようであればおそらくDynamoDBを使うべきではない）し、監視項目もそう変更しないだろうから、コード生成もモジュール化しなくても良いんじゃないか？ という意見もあるかと思いますが、それはそれとします。
 

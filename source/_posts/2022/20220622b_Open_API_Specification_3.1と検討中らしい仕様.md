@@ -8,7 +8,7 @@ tag:
   - Swagger
 category:
   - Infrastructure
-thumbnail: /images/20220622b/thumbnail.png
+thumbnail: /images/2022/20220622b/thumbnail.png
 author: 真野隼記
 lede: "Open APIは2022.6.21時点では3.1.0が最新です。これまでリリースノートすらウォッチしていなかったので気になったことを調べてまとめました。"
 ---
@@ -34,7 +34,7 @@ Open APIは[go-swaggerを用いたWebアプリケーション開発Tips19選](/a
 
 Version2と3はメジャーバージョンが変わったということで、記述の構成が変わっています。
 
-<img src="/images/20220622b/v2とv3の違い.png" alt="v2とv3の違い" width="1131" height="792" loading="lazy">
+<img src="/images/2022/20220622b/v2とv3の違い.png" alt="v2とv3の違い" width="1131" height="792" loading="lazy">
 
 ※ 図は https://blog.stoplight.io/difference-between-open-v2-v3-v31 より
 

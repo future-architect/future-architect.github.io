@@ -10,7 +10,7 @@ tag:
   - 失敗談
 category:
   - Infrastructure
-thumbnail: /images/20221020a/thumbnail.png
+thumbnail: /images/2022/20221020a/thumbnail.png
 author: 真野隼記
 lede: "TIG DXユニットの真野です。タイトルに書いたままの内容の記事です。おそらくDynamoDB Streams について調べたことがある方の多くの人には自明な内容だと思います。サマリです。* DynamoDB Streamsの起動順序が保たれるのは 項目単位"
 ---
@@ -41,7 +41,7 @@ DynamoDB Streamsについては1.5年前に似たような小ネタを投稿し�
 
 例を上げて説明します。
 
-<img src="/images/20221020a/dynamodbstreams_構成.png" alt="dynamodbstreams_構成.png" width="1200" height="277" loading="lazy">
+<img src="/images/2022/20221020a/dynamodbstreams_構成.png" alt="dynamodbstreams_構成.png" width="1200" height="277" loading="lazy">
 
 構成例のイメージです。何かしらスタッフの動作をセンシングするデバイスがあり、それをリアルタイムでDynamoDBに登録。そのデータをニアリアルタイムで別システムに連携する必要があるため、DynamoDB StreamsでS3に N 分間隔でタイムスタンプ付きのファイル名で出力。連携先の別システムはファイル名をもとに順次取り込む、といった連携方式です。
 
@@ -52,7 +52,7 @@ DynamoDB Streamsについては1.5年前に似たような小ネタを投稿し�
 * 生成されたファイルを順次取り込んだが、あるデバイスIDに絞ると時系列で順序が狂っていた
 * センシングされた最新の情報が誤って取り込まれ、実体とシステムの値が異なった
 
-<img src="/images/20221020a/dynamodbstreams_構成-ページ2.drawio.png" alt="dynamodbstreams_構成-ページ2.drawio.png" width="1200" height="486" loading="lazy">
+<img src="/images/2022/20221020a/dynamodbstreams_構成-ページ2.drawio.png" alt="dynamodbstreams_構成-ページ2.drawio.png" width="1200" height="486" loading="lazy">
 
 最初は、センシングするデバイス側から送られる順番が狂ったとか、図では省略していますが途中で経由するKinesis Data StreamsのシャードIDにデバイスIDが入っていないなど、DynamoDBに書き込まれるまでで順序が狂ったのかと思っていましたが、書き込みデータにデバイスから送信日時とサーバ受付時間、DBへの永続日時を比較すると原因がDynamoDB Streamsでの出力で狂っていることが分かりました。
 
@@ -62,15 +62,15 @@ DynamoDB Streamsについては1.5年前に似たような小ネタを投稿し�
 
 DynamoDB Streamsは内部的にシャードと呼ばれる単位で分割されています。シャードがどのような単位で分割されるかは利用者側の制御ができず、操作数に応じて柔軟に拡大・縮小する仕組みです（下図だと3シャードに分かれており、その単位でLambdaが起動します）。
 
-<img src="/images/20221020a/DDB-Stream.jpg" alt="DDB-Stream.jpg" width="880" height="459" loading="lazy">
+<img src="/images/2022/20221020a/DDB-Stream.jpg" alt="DDB-Stream.jpg" width="880" height="459" loading="lazy">
 
 Lambdaの起動数ですが、同時実行数を1にすれば、次のように1シャード、1Lambdaしか起動しないです。シャード内は更新順に並んでいるためその中ではLambdaで順番に処理すれば良いです。
 
-<img src="/images/20221020a/DDB-Table1.jpg" alt="DDB-Table1.jpg" width="760" height="293" loading="lazy">
+<img src="/images/2022/20221020a/DDB-Table1.jpg" alt="DDB-Table1.jpg" width="760" height="293" loading="lazy">
 
 今回の間違いは、下図のように、同一Partitionにあるけれど、異なるDynamoDB Streamsシャードに割り当てられたため、ほぼ同時タイミングで複数のLambdaが起動し、同一ハッシュキーのデータ順序が狂ったことが原因で発生しました。
 
-<img src="/images/20221020a/dynamodb順序-ページ3.drawio.png" alt="dynamodb順序-ページ3.drawio.png" width="1200" height="397" loading="lazy">
+<img src="/images/2022/20221020a/dynamodb順序-ページ3.drawio.png" alt="dynamodb順序-ページ3.drawio.png" width="1200" height="397" loading="lazy">
 
 連携先システムとしてはどのファイルにどのキーが含まれているかわかりようがないので回避しようがない（ファイルをマージして取り込むにしても、まだ出力されていないファイルに順序が狂ったデータが無いと言い切れない）ため、出力側が調整すべきことです。
 
@@ -82,7 +82,7 @@ Lambdaの起動数ですが、同時実行数を1にすれば、次のように1
 
 複数の回避手段があるかなと思います。てっとり早いのはDynamoDB Streamsではなく定時起動のジョブを作ることでしょう。
 
-<img src="/images/20221020a/改善案.png" alt="改善案.png" width="1200" height="642" loading="lazy">
+<img src="/images/2022/20221020a/改善案.png" alt="改善案.png" width="1200" height="642" loading="lazy">
 
 もし、取り込み側のシステムのコントロールが効く、かつ過去分に対する補正処理が複雑でなければ、前回取り込んだデバイスのセンサー読み取り時刻より古ければ弾くといった処理を入れても良いかなと思います（状況によりますが）。
 

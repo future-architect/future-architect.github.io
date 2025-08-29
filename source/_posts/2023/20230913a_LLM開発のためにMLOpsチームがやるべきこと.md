@@ -9,7 +9,7 @@ tag:
   - インターン2023
 category:
   - DataScience
-thumbnail: /images/20230913a/thumbnail.png
+thumbnail: /images/2023/20230913a/thumbnail.png
 author: 平野甫
 lede: "「LLM開発のためにMLOpsチームがやるべきこと」というテーマで、従来のMLOpsとの違い・ツール・構成例等について調査・整理しました。LLMとはLarge Launguage Model（大規模言語モデル）の略であり.."
 ---
@@ -44,7 +44,7 @@ LLM自体やLLMを活用したシステムを開発していく場合、MLOpsチ
 
 ## LLM開発の全体像
 
-<img src="/images/20230913a/LLM_system_dev_flow.png" alt="LLM_system_dev_flow" width="960" height="344" loading="lazy">
+<img src="/images/2023/20230913a/LLM_system_dev_flow.png" alt="LLM_system_dev_flow" width="960" height="344" loading="lazy">
 
 参考: [https://note.com/wandb_jp/n/n1aa6d77f33cf](https://note.com/wandb_jp/n/n1aa6d77f33cf)
 
@@ -177,7 +177,7 @@ AWSやAzure、GCPなどのクラウドサービスでは、「大量なデータ
 <details>
 <summary>詳細</summary>
 
-<img src="/images/20230913a/image.png" alt="image" width="1200" height="672" loading="lazy">
+<img src="/images/2023/20230913a/image.png" alt="image" width="1200" height="672" loading="lazy">
 
 </details>
 
@@ -202,7 +202,7 @@ HuggingfaceのトランスフォーマーやLangChainのロギング機能が追
 <details>
 <summary>参考</summary>
 
-<img src="/images/20230913a/mlflow_3.png" alt="mlflow_3" width="1200" height="621" loading="lazy">
+<img src="/images/2023/20230913a/mlflow_3.png" alt="mlflow_3" width="1200" height="621" loading="lazy">
 
 </details>
 
@@ -223,7 +223,7 @@ LangChainの公式Docsに、[Aimを用いたLangChainのトラッキングの例
 <details>
 <summary>参考</summary>
 
-<img src="/images/20230913a/aim.gif" alt="aim" width="1200" height="675" loading="lazy">
+<img src="/images/2023/20230913a/aim.gif" alt="aim" width="1200" height="675" loading="lazy">
 
 引用元: [AimStack on Twitter](https://twitter.com/aimstackio/status/1653836833586024449)
 
@@ -241,7 +241,7 @@ LangChainの公式Docsに、[Aimを用いたLangChainのトラッキングの例
 <details>
 <summary>詳細</summary>
 
-<img src="/images/20230913a/image_2.png" alt="image" width="1200" height="675" loading="lazy">
+<img src="/images/2023/20230913a/image_2.png" alt="image" width="1200" height="675" loading="lazy">
 
 </details>
 
@@ -270,7 +270,7 @@ Moderationでは、ポリシーに反しているかのフラグ(True/False)に�
 <details>
 <summary>詳細</summary>
 
-<img src="/images/20230913a/image_3.png" alt="image" width="1200" height="607" loading="lazy">
+<img src="/images/2023/20230913a/image_3.png" alt="image" width="1200" height="607" loading="lazy">
 
 引用元: [プロンプト フローの概要 (プレビュー)](https://learn.microsoft.com/ja-jp/azure/machine-learning/prompt-flow/get-started-prompt-flow)
 
@@ -285,7 +285,7 @@ Datadogでは、OpenAI API利用時のトークンの総消費量、リクエス
 <details>
 <summary>詳細</summary>
 
-<img src="/images/20230913a/datadog_dashboard.png" alt="datadog_dashboard" width="1200" height="675" loading="lazy">
+<img src="/images/2023/20230913a/datadog_dashboard.png" alt="datadog_dashboard" width="1200" height="675" loading="lazy">
 
 引用元: [Datadog](https://www.datadoghq.com/ja/solutions/openai/)
 
@@ -302,11 +302,11 @@ Datadogでは、OpenAI API利用時のトークンの総消費量、リクエス
 <details>
 <summary>参考</summary>
 
-<img src="/images/20230913a/Dify_table.png" alt="Dify_table" width="946" height="548" loading="lazy">
+<img src="/images/2023/20230913a/Dify_table.png" alt="Dify_table" width="946" height="548" loading="lazy">
 
 引用元: [Dify Docs -Creating An Application](https://docs.dify.ai/application/creating-an-application)
 
-<img src="/images/20230913a/dify.gif" alt="dify.gif" width="800" height="495" loading="lazy">
+<img src="/images/2023/20230913a/dify.gif" alt="dify.gif" width="800" height="495" loading="lazy">
 
 引用元: [Dify.AI on Twitter](https://twitter.com/dify_ai/status/1691296036420243456)
 
@@ -329,7 +329,7 @@ Fixieでは、agent registryに登録されているLLMを使用でき、使用�
 <details>
 <summary>参考</summary>
 
-<img src="/images/20230913a/Chat_playground.png" alt="Chat_playground" width="1200" height="644" loading="lazy">
+<img src="/images/2023/20230913a/Chat_playground.png" alt="Chat_playground" width="1200" height="644" loading="lazy">
 
 引用元: [クイックスタート: Azure OpenAI Service で GPT-35-Turbo と GPT-4 を使い始める](https://learn.microsoft.com/ja-jp/azure/ai-services/openai/chatgpt-quickstart?tabs=command-line&pivots=programming-language-studio#playground)
 
@@ -447,7 +447,7 @@ Guardrails AIには以下のような出力検証機能があります。
 
 特定のクラウドサービスに依存せず、可能な限りOSSで構成する際の構成案を考えてみました。
 
-<img src="/images/20230913a/LLM構成例5.png" alt="LLM構成例5" width="921" height="416" loading="lazy">
+<img src="/images/2023/20230913a/LLM構成例5.png" alt="LLM構成例5" width="921" height="416" loading="lazy">
 
 * （1）UI
   * ユーザーからの入力をチャット形式で受け付ける
@@ -492,7 +492,7 @@ AzureにおけるLLMを活用したシステム開発の特徴は以下の通り
 <details>
 <summary>構成図</summary>
 
-<img src="/images/20230913a/azure_arch.png" alt="azure_arch" width="999" height="475" loading="lazy">
+<img src="/images/2023/20230913a/azure_arch.png" alt="azure_arch" width="999" height="475" loading="lazy">
 
 </details>
 
@@ -508,7 +508,7 @@ AWSにおけるLLMを活用したシステム開発の特徴は以下の通り�
 <details>
 <summary>構成図</summary>
 
-<img src="/images/20230913a/AWS_arch.png" alt="AWS_arch" width="1200" height="835" loading="lazy">
+<img src="/images/2023/20230913a/AWS_arch.png" alt="AWS_arch" width="1200" height="835" loading="lazy">
 
 </details>
 
@@ -526,7 +526,7 @@ GCPにおけるLLMを活用したシステム開発の特徴は以下の通り�
 記事執筆現在（2023年6月14日）GCPにおける、LLMを含む構成例は見当たりませんでしたが、\
 以下にグラウンディング（=LLMモデルがLLM外部のデータに接続すること）の構成の概略を示します。
 
-<img src="/images/20230913a/GCP_arch.png" alt="GCP_arch" width="1200" height="676" loading="lazy">
+<img src="/images/2023/20230913a/GCP_arch.png" alt="GCP_arch" width="1200" height="676" loading="lazy">
 
 引用元: [Google Cloud Japan ブログ](https://cloud.google.com/blog/ja/products/ai-machine-learning/how-to-use-grounding-for-your-llms-with-text-embeddings)
 

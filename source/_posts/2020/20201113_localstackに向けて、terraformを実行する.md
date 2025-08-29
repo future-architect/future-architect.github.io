@@ -11,7 +11,7 @@ tag:
   - DockerCompose
 category:
   - Infrastructure
-thumbnail: /images/20201113/thumbnail.png
+thumbnail: /images/2020/20201113/thumbnail.png
 author: 棚井龍之介
 lede: "- ローカル環境に立ち上げた localstack に向けて、terraform plan/apply/destroy を実行するFutureの棚井龍之介ですTIGグループのDXユニットに所属しています"
 ---
@@ -205,7 +205,7 @@ localstackは [2020-09-15リリース](https://github.com/localstack/localstack#
 
 backendとproviderの定義は完了したので、次は各種リソースを追加しましょう。本記事では、サーバレス構成でよくある「Kinesisでデータを受けて、Lambdaで取得し、S3に永続化」のインフラ環境を、Terraformを使ってLocalstack内に構築します。
 
-<img src="/images/20201113/Screen_Shot_2020-10-29_at_15.12.54.png" loading="lazy">
+<img src="/images/2020/20201113/Screen_Shot_2020-10-29_at_15.12.54.png" loading="lazy">
 
 上記構成をterraform定義するのに必要なresourceはこちらです
 

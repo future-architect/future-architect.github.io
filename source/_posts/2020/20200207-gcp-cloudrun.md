@@ -229,9 +229,9 @@ export default class AboutPage extends Vue {
 
 サーバーアクセスしない部分はこれで動作可能になりました。
 
-<img src="/images/20200207/photo_20200207_01.png" loading="lazy">
+<img src="/images/2020/20200207/photo_20200207_01.png" loading="lazy">
 
-<img src="/images/20200207/photo_20200207_02.png" loading="lazy">
+<img src="/images/2020/20200207/photo_20200207_02.png" loading="lazy">
 
 ## Goのサーバーを作る
 
@@ -353,7 +353,7 @@ Open Server at 127.0.0.1:8888
 
 ここまでで、開発環境で一通り動作確認ができます。
 
-<img src="/images/20200207/photo_20200207_03.png" loading="lazy">
+<img src="/images/2020/20200207/photo_20200207_03.png" loading="lazy">
 
 ## フロントエンドのアセットをGoサーバーにバンドル
 

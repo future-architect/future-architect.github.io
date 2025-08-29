@@ -11,11 +11,11 @@ tag:
   - 登壇レポート
 category:
   - Programming
-thumbnail: /images/20231206a/thumbnail.jpg
+thumbnail: /images/2023/20231206a/thumbnail.jpg
 author: 澁川喜規
 lede: "PyCon APAC 2023でDev Containersで発表してきました。"
 ---
-<img src="/images/20231206a/53296952672_95495d5f01_k.jpg" alt="53296952672_95495d5f01_k.jpg" width="1200" height="800" loading="lazy">
+<img src="/images/2023/20231206a/53296952672_95495d5f01_k.jpg" alt="53296952672_95495d5f01_k.jpg" width="1200" height="800" loading="lazy">
 
 PyCon APAC 2023でDev Containersで発表してきました。写真はスタッフに撮っていただいた写真のアルバムから引用させていただきました。本エントリーではその発表の元ネタとして半年ぐらい前にいろいろ調べていた内容をお伝えします。
 
@@ -27,7 +27,7 @@ PyCon APAC 2023でDev Containersで発表してきました。写真はスタッ
 
 devcontainerは[VSCodeの持つ仕組み](https://code.visualstudio.com/docs/devcontainers/containers)です。この図がよく引用されていますね。ユーザーが操作しているOS上には、ソースコードと、VSCodeのみがいます。git cloneしてきてVSCodeでそのプロジェクトを開くと、`.devcontainer`というフォルダがあり、その設定を元に、VSCodeがコンテナ内部に開発環境を作ってくれます。
 
-<img src="/images/20231206a/image.png" alt="image.png" width="968" height="402" loading="lazy">
+<img src="/images/2023/20231206a/image.png" alt="image.png" width="968" height="402" loading="lazy">
 
 リモートで開発というと、VDI (Virtual Desktop Infrastructure)というものもあります。Amazon Workspacesとか、Azure Virtual Desktopとか、Google Virtual Desktopsとかですね。Webサービスを開発するとして、これらの代表的なVDI環境と比較するとこんな感じかと思います。
 
@@ -50,7 +50,7 @@ Dockerのイメージのアーキテクチャとしては1つの親を持って�
 
 Dev Containersは1つベースを選ぶというのは変わらないのですが「Feature」を選んでトッピングしていきます。そうすると、それらのツール群をインストールするDockerfileが内部的に作られ、ビルドされて使えるようになります。
 
-<img src="/images/20231206a/devcontainer2.png" alt="devcontainer2.png" width="571" height="311" loading="lazy">
+<img src="/images/2023/20231206a/devcontainer2.png" alt="devcontainer2.png" width="571" height="311" loading="lazy">
 
 VSCodeのサーバー側の実装やら、拡張機能はvscodeという名前のボリュームの中に置かれて実行時にマウントしています。Dockerをいじくるソケットも内部にマウントされていて、中から結構やりたい放題できるようになっており、「完璧なイメージファイルを起動するだけ」ではなく、「必要に応じてイメージを改変して再ビルドもするし、Dockerをこき使う」感じの実装になっています。いつも引用される図からは隠されていますが、おとなしく見えて結構獰猛な作りです。もちろん、自分でイメージを作り切ってそれを利用することもできますが、この「イメージ作成機能をも内包しているツール」と考えるべきです。
 
@@ -60,7 +60,7 @@ VSCodeのサーバー側の実装やら、拡張機能はvscodeという名前�
 
 まずは、Dev Containerの拡張を入れてから、 **Add Dev Container Configuration Files...** メニューを選びます。これを選ぶと、次にベースイメージとFeatureを選びます。バージョン選択などのオプションもあります。
 
-<img src="/images/20231206a/スクリーンショット_2023-04-16_22.45.58.png" alt="スクリーンショット_2023-04-16_22.45.58.png" width="1089" height="516" loading="lazy">
+<img src="/images/2023/20231206a/スクリーンショット_2023-04-16_22.45.58.png" alt="スクリーンショット_2023-04-16_22.45.58.png" width="1089" height="516" loading="lazy">
 
 なお、1番目立つ **New Dev Container...** はイメージを作成して即座に起動するのですが、そのイメージの設定などは残りません。VSCodeの履歴にはあるのでそこから再度立ち上げ直したりもできますし、おそらくDockerの操作でイメージとしてコンテナレジストリに送ることはできて、それを起動しつつVSCodeからアタッチ、という運用は可能だと思われますが、あとでパラメータを足したり、Featureを追加したり削除したりといったことがやりにくいので、レシピが手元に残る方を選ぶ方が良いです。
 
@@ -78,11 +78,11 @@ Dev Container関連のブログ記事とか見ると、アプリケーション�
 
 2回目以降は、一度起動したことがあるならWelcomeページで`[Dev Container]`と書いてあるプロジェクトを選択すると、Dockerコンテナが起動し、そこからの編集が開始できます。
 
-<img src="/images/20231206a/スクリーンショット_2023-04-17_0.15.56.png" alt="スクリーンショット_2023-04-17_0.15.56.png" width="926" height="380" loading="lazy">
+<img src="/images/2023/20231206a/スクリーンショット_2023-04-17_0.15.56.png" alt="スクリーンショット_2023-04-17_0.15.56.png" width="926" height="380" loading="lazy">
 
 `.devcontainer`があるプロジェクトを開くと、「コンテナの中で開き直しますか？」とダイアログが出ますし、左下の緑のDev Containerアイコン**Reopen in Container**メニューを選んでも開けます。
 
-<img src="/images/20231206a/スクリーンショット_2023-04-17_0.18.00.png" alt="スクリーンショット_2023-04-17_0.18.00.png" width="564" height="149" loading="lazy">
+<img src="/images/2023/20231206a/スクリーンショット_2023-04-17_0.18.00.png" alt="スクリーンショット_2023-04-17_0.18.00.png" width="564" height="149" loading="lazy">
 
 # Dev Containersがやってくれること・やってくれないこと
 

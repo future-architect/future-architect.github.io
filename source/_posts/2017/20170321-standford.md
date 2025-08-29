@@ -35,12 +35,12 @@ lede: "Elastic{ON}への参加のためにサンフランシスコにやって�
 ベーグル美味しかったので、サンフランシスコに行かれたら立ち寄ってみてください。
 ちなみに、いろいろトッピングしても$8ぐらいで収まります。
 
-<img src="/images/20170321/photo_20170321_01.jpeg" loading="lazy">
+<img src="/images/2017/20170321/photo_20170321_01.jpeg" loading="lazy">
 
 サンフランシスコ駅の途中にGCPのカンファレンス会場があり、こちらも準備中で忙しそうでした。
 あーーー、こっちにも参加したい！ 色々話を聞きたい！ (ノ_-。)
 
-<img src="/images/20170321/photo_20170321_02.jpeg" loading="lazy">
+<img src="/images/2017/20170321/photo_20170321_02.jpeg" loading="lazy">
 
 ## スタンフォード大学到着
 
@@ -51,25 +51,25 @@ lede: "Elastic{ON}への参加のためにサンフランシスコにやって�
 ちなみに、先日大粒のヒョウが降ったらしく、昨今は異常気象らしいです...
 やはり、技術も天気も変遷が早いですね（関係ない）
 
-<img src="/images/20170321/photo_20170321_03.jpeg" loading="lazy">
+<img src="/images/2017/20170321/photo_20170321_03.jpeg" loading="lazy">
 
 スタンフォード大学が125周年とのこと。
 うーん...。歴史を感じますね。
 
-<img src="/images/20170321/photo_20170321_04.jpeg" loading="lazy">
+<img src="/images/2017/20170321/photo_20170321_04.jpeg" loading="lazy">
 
 あ！ 洋平さんだ！
 後ろ姿もイケメン♥
 
-<img src="/images/20170321/photo_20170321_05.jpeg" loading="lazy">
+<img src="/images/2017/20170321/photo_20170321_05.jpeg" loading="lazy">
 
 ## お祈りタイム
 
 まずは、スタンフォード大学内にある教会でお祈りタイム。
 
-<img src="/images/20170321/photo_20170321_06.jpeg" loading="lazy">
+<img src="/images/2017/20170321/photo_20170321_06.jpeg" loading="lazy">
 
-<img src="/images/20170321/photo_20170321_07.jpg" loading="lazy">
+<img src="/images/2017/20170321/photo_20170321_07.jpg" loading="lazy">
 
 # Jen-Hsun Huang Engineering Center
 
@@ -78,25 +78,25 @@ lede: "Elastic{ON}への参加のためにサンフランシスコにやって�
 まずは、NVIDIAのJen-Hsun Huanの寄付によって建てられた「Jen-Hsun Huang Engineering Center」です。
 スタンフォードの色合いを保ちつつ綺麗な建物ですね。
 
-<img src="/images/20170321/photo_20170321_08.jpeg" loading="lazy">
+<img src="/images/2017/20170321/photo_20170321_08.jpeg" loading="lazy">
 
 中に入ると...
 おぉ！！Googleアルゴリズムの開発研究に使用していたサーバがお出迎え！
 そして、ケースがレゴだーーー！
 これは、Google創立者のラリー・ペイジとサーゲイ・ブリンが、ケースをレゴで組み立てたとのこと。
 
-<img src="/images/20170321/photo_20170321_09.jpeg" loading="lazy">
+<img src="/images/2017/20170321/photo_20170321_09.jpeg" loading="lazy">
 
 正面はこんな感じでレゴ感MAXですね。
 
-<img src="/images/20170321/photo_20170321_10.jpeg" loading="lazy">
+<img src="/images/2017/20170321/photo_20170321_10.jpeg" loading="lazy">
 
 奥に入るとスタンフォード大学のラボを発見！
 ここでチームを組んでプロトタイプ開発をしているみたいです。
 うーん...、	すごく楽しそう！
 PCだけでなく工作できる環境があるのは素敵ですね。
 
-<img src="/images/20170321/photo_20170321_11.jpeg" loading="lazy">
+<img src="/images/2017/20170321/photo_20170321_11.jpeg" loading="lazy">
 
 ## Hewlett-Packard
 
@@ -106,13 +106,13 @@ Jen-Hsun Huang Engineering Centerから離れ、次の目的地に洋平さん�
 スタンフォード大学には、卒業生などが寄贈したビルが立ち並んでいます。
 
 * Packard Electrical Engineering Building
-<img src="/images/20170321/photo_20170321_12.jpeg" loading="lazy">
+<img src="/images/2017/20170321/photo_20170321_12.jpeg" loading="lazy">
 
 * William R. Hewlett Teaching Center
-<img src="/images/20170321/photo_20170321_13.jpeg" loading="lazy">
+<img src="/images/2017/20170321/photo_20170321_13.jpeg" loading="lazy">
 
 * The William Gates Computer Science Building
-<img src="/images/20170321/photo_20170321_14.jpeg" loading="lazy">
+<img src="/images/2017/20170321/photo_20170321_14.jpeg" loading="lazy">
 
 # Lunch
 
@@ -123,13 +123,13 @@ Jen-Hsun Huang Engineering Centerから離れ、次の目的地に洋平さん�
 全部$7という優しさ！
 ちなみに、学食もあるのですが、あまり美味しくないそうです..。
 
-<img src="/images/20170321/photo_20170321_15.jpeg" loading="lazy">
+<img src="/images/2017/20170321/photo_20170321_15.jpeg" loading="lazy">
 
 洋平さんおすすめは、ピーナッツ風味のピリ辛味のコチラ！（名前は忘れちゃいました）。
 クセになる程の美味しさです。
 洋平さんが、週に1回のペースで食べている気持ちがわかります。
 
-<img src="/images/20170321/photo_20170321_16.jpeg" loading="lazy">
+<img src="/images/2017/20170321/photo_20170321_16.jpeg" loading="lazy">
 
 ## d.school
 
@@ -138,11 +138,11 @@ Jen-Hsun Huang Engineering Centerから離れ、次の目的地に洋平さん�
 ということで、デザイン思考を学ぶ場所を紹介します。
 Hasso Plattner Institute of Designという名で、通称「d.school」と呼ばれています。
 
-<img src="/images/20170321/photo_20170321_17.jpeg" loading="lazy">
+<img src="/images/2017/20170321/photo_20170321_17.jpeg" loading="lazy">
 
 ちなみに、Hasso Plattner Institute of Designは、SAPの共同設立者、Hasso Plattnerが寄付（35,000,000 USドル）し、2005年にIDEO創設者兼CEO(当時)であり、スタンフォード大学教授のDavid Kelleyがディレクターとなって設立されました。
 
-<img src="/images/20170321/photo_20170321_18.jpeg" loading="lazy">
+<img src="/images/2017/20170321/photo_20170321_18.jpeg" loading="lazy">
 
 d.schoolの授業目的は、モノを作るのでなく、問題解決のプロセスをデザインすることを学びます。
 
@@ -154,9 +154,9 @@ d.schoolでは人間を中心にしたデザインから、いままでの経験
 
 学生たちが日々感じている課題を共有するボードや、作業をするための道具が揃っています。
 
-<img src="/images/20170321/photo_20170321_19.jpeg" loading="lazy">
+<img src="/images/2017/20170321/photo_20170321_19.jpeg" loading="lazy">
 
-<img src="/images/20170321/photo_20170321_20.jpeg" loading="lazy">
+<img src="/images/2017/20170321/photo_20170321_20.jpeg" loading="lazy">
 
 中は吹き抜けになっており、フラッグが掲げられています。
 
@@ -166,7 +166,7 @@ d.schoolでは人間を中心にしたデザインから、いままでの経験
 
 ...シビれますね！
 
-<img src="/images/20170321/photo_20170321_21.jpeg" loading="lazy">
+<img src="/images/2017/20170321/photo_20170321_21.jpeg" loading="lazy">
 
 # 散歩
 
@@ -175,14 +175,14 @@ d.schoolでは人間を中心にしたデザインから、いままでの経験
 スタンフォード大学の学生は、「アヒルの水かき」とのこと。
 （写真は、スタンフォード学生ではないですが）
 
-<img src="/images/20170321/photo_20170321_22.jpeg" loading="lazy">
+<img src="/images/2017/20170321/photo_20170321_22.jpeg" loading="lazy">
 
 # おわりに
 
 スタンフォード大学。ここでたくさんの優秀な学生が誕生するだけでなく、イノベーションも数々生まれる環境。
 こういった環境に私達の会社からも当たり前に留学できる環境を整えていきたいですね。
 
-<img src="/images/20170321/photo_20170321_23.jpeg" loading="lazy">
+<img src="/images/2017/20170321/photo_20170321_23.jpeg" loading="lazy">
 
 ということで、スタンフォード大学編は、これにて終了です。
 ありがとうございました。

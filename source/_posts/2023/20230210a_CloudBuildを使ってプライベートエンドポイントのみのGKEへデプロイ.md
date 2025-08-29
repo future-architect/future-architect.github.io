@@ -9,7 +9,7 @@ tag:
   - GoogleCloud
 category:
   - Infrastructure
-thumbnail: /images/20230210a/thumbnail.png
+thumbnail: /images/2023/20230210a/thumbnail.png
 author: 渡邉光
 lede: "こんにちは！筋肉エンジニアの渡邉です。最近はGCP/GKEについて勉強しています。今回はGitHubへのPushをトリガーにCloudBuildを起動し、プライベートエンドポイントのみのGKEへデプロイする基盤を作りましたので、共有したいと思います。GCPリソースはTerraformで作成しています。"
 ---
@@ -23,7 +23,7 @@ GCPリソースはTerraformで作成しています。CloudBuildとGitHubの連�
 
 # デプロイフロー
 
-<img src="/images/20230210a/Deploy_Architecture.drawio.png" alt="Deploy_Architecture.drawio.png" width="901" height="264" loading="lazy">
+<img src="/images/2023/20230210a/Deploy_Architecture.drawio.png" alt="Deploy_Architecture.drawio.png" width="901" height="264" loading="lazy">
 
 デプロイフローは以下の流れになります。
 
@@ -102,7 +102,7 @@ EXPOSE 8080
 
 # GKEのアーキテクチャ
 
-<img src="/images/20230210a/architecture.drawio.png" alt="architecture.drawio.png" width="1151" height="429" loading="lazy">
+<img src="/images/2023/20230210a/architecture.drawio.png" alt="architecture.drawio.png" width="1151" height="429" loading="lazy">
 
 ## クラスタ構成
 
@@ -218,7 +218,7 @@ manifestファイルの適用自体は踏み台サーバから実行していま
 
 がブラウザ上に返却されます。
 
-<img src="/images/20230210a/2-Application-Access①.png" alt="2-Application-Access①.png" width="344" height="119" loading="lazy">
+<img src="/images/2023/20230210a/2-Application-Access①.png" alt="2-Application-Access①.png" width="344" height="119" loading="lazy">
 
 # CloudBuildの作成
 
@@ -242,7 +242,7 @@ CloudBuildとGitHub（プライベートリポジトリ）を連携するため�
 
 Google Cloudコンソール画面から「Cloud Build」をクリック→「トリガー」をクリック→「トリガーを作成」をクリックします。
 
-<img src="/images/20230210a/1-CloudBuild①.png" alt="1-CloudBuild①.png" width="975" height="882" loading="lazy">
+<img src="/images/2023/20230210a/1-CloudBuild①.png" alt="1-CloudBuild①.png" width="975" height="882" loading="lazy">
 トリガーの作成画面で
 
 - 名前：sample-build
@@ -251,14 +251,14 @@ Google Cloudコンソール画面から「Cloud Build」をクリック→「ト
 
 を入力し、ソース：「新しいリポジトリに接続」をクリックします。
 
-<img src="/images/20230210a/1-CloudBuild②.png" alt="1-CloudBuild②.png" width="979" height="884" loading="lazy">
+<img src="/images/2023/20230210a/1-CloudBuild②.png" alt="1-CloudBuild②.png" width="979" height="884" loading="lazy">
 
 リポジトリに接続画面で
 
 - ソースを選択：GitHub (Cloud Build GitHubアプリ)
 を選択し、「続行」をクリックする。
 
-<img src="/images/20230210a/1-CloudBuild③.png" alt="1-CloudBuild③.png" width="579" height="938" loading="lazy">
+<img src="/images/2023/20230210a/1-CloudBuild③.png" alt="1-CloudBuild③.png" width="579" height="938" loading="lazy">
 
 Sign in to GitHub to continue to Google Cloud Buildの画面で
 
@@ -267,37 +267,37 @@ Sign in to GitHub to continue to Google Cloud Buildの画面で
 
 を入力し、「Sign in」をクリックします。
 
-<img src="/images/20230210a/1-CloudBuild④.png" alt="1-CloudBuild④.png" width="322" height="581" loading="lazy">
+<img src="/images/2023/20230210a/1-CloudBuild④.png" alt="1-CloudBuild④.png" width="322" height="581" loading="lazy">
 
 Google Cloud Build by Google Cloud Build would like permission toの画面の「Authorize Google Cloud Build」をクリックします。
 
-<img src="/images/20230210a/1-CloudBuild⑤.png" alt="1-CloudBuild⑤.png" width="1000" height="718" loading="lazy">
+<img src="/images/2023/20230210a/1-CloudBuild⑤.png" alt="1-CloudBuild⑤.png" width="1000" height="718" loading="lazy">
 
 リポジトリを選択画面の「GOOGLE CLOUD BUILDのインストール」をクリックします。
 
-<img src="/images/20230210a/1-CloudBuild⑥.png" alt="1-CloudBuild⑥.png" width="572" height="903" loading="lazy">
+<img src="/images/2023/20230210a/1-CloudBuild⑥.png" alt="1-CloudBuild⑥.png" width="572" height="903" loading="lazy">
 
 Install Google Cloud Buildの画面から
 
 - Only Select repositories：Cloud Buildと連携したいリポジトリ
 を入力し、「Install」をクリックします。
 
-<img src="/images/20230210a/1-CloudBuild⑦.png" alt="1-CloudBuild⑦.png" width="569" height="807" loading="lazy">
+<img src="/images/2023/20230210a/1-CloudBuild⑦.png" alt="1-CloudBuild⑦.png" width="569" height="807" loading="lazy">
 
 - GitHubアカウント：自身のGitHubアカウント
 - リポジトリ：Cloud Buildと連携したいリポジトリ
 を入力し、チェックボックスにチェックを入れて「接続」をクリックします。
 
-<img src="/images/20230210a/1-CloudBuild⑧.png" alt="1-CloudBuild⑧.png" width="575" height="901" loading="lazy">
+<img src="/images/2023/20230210a/1-CloudBuild⑧.png" alt="1-CloudBuild⑧.png" width="575" height="901" loading="lazy">
 
 ここまでの設定で、Cloud Buildと自身のGitHubリポジトリを連携させることができます。
 
-<img src="/images/20230210a/1-CloudBuild⑨.png" alt="1-CloudBuild⑨.png" width="975" height="882" loading="lazy">
+<img src="/images/2023/20230210a/1-CloudBuild⑨.png" alt="1-CloudBuild⑨.png" width="975" height="882" loading="lazy">
 
 ### terraform importの実行
 
 作成したトリガーの「実行」の隣をクリックし、リソースパスをコピーをクリックします（terraform importで利用します）。。
-<img src="/images/20230210a/1-CloudBuild⑩.png" alt="1-CloudBuild⑩.png" width="1011" height="883" loading="lazy">
+<img src="/images/2023/20230210a/1-CloudBuild⑩.png" alt="1-CloudBuild⑩.png" width="1011" height="883" loading="lazy">
 
 terraform実行環境にて、terraform importを実行し、手動で作成したCloud Buildトリガーをコード管理できるように設定します。
 
@@ -332,13 +332,13 @@ Cloud Build プライベート プールを使用した限定公開 Google Kuber
 ## ネットワークアーキテクチャ
 
 CloudBuildからGKEへデプロイするためのネットワークアーキテクチャの完成図になります。
-<img src="/images/20230210a/New_architecture.drawio.png" alt="New_architecture.drawio.png" width="1200" height="355" loading="lazy">
+<img src="/images/2023/20230210a/New_architecture.drawio.png" alt="New_architecture.drawio.png" width="1200" height="355" loading="lazy">
 
 それぞれ詳細を見ていきましょう。
 
 ### CloudBuild Private Poolとsample-build-vpc間
 
-<img src="/images/20230210a/between_sample_vpc_private_pool.drawio.png" alt="between_sample_vpc_private_pool.drawio.png" width="1200" height="355" loading="lazy">
+<img src="/images/2023/20230210a/between_sample_vpc_private_pool.drawio.png" alt="between_sample_vpc_private_pool.drawio.png" width="1200" height="355" loading="lazy">
 
 Private Poolは、サービスプロデューサーネットワークと呼ばれる Google 所有の Virtual Private Cloud ネットワークでホストされます。サービスプロデューサーネットワークだけでは、GKE Control Planeへアクセスするルートがないので、Private Poolとプライベート接続する用のVPC(sample-build-vpc)を別途作成します。
 
@@ -348,23 +348,23 @@ Private Poolとプライベート接続する用のVPCには、**名前付きIP�
 
 > ※**Cloud Build は、Docker ブリッジ ネットワークの IP 範囲 192.168.10.0/24 を予約します。プロジェクト内のリソースに IP 範囲を割り当てる際、Cloud Build ビルダーがこれらのリソースにアクセスする場合は、192.168.10.0/24 以外の範囲を選択することをおすすめします。**
 
-<img src="/images/20230210a/4-network-architecuture③.png" alt="4-network-architecuture③.png" width="1200" height="844" loading="lazy">
+<img src="/images/2023/20230210a/4-network-architecuture③.png" alt="4-network-architecuture③.png" width="1200" height="844" loading="lazy">
 
 この時サービスのプライベート接続でカスタムルートのエクスポートは「有効」に設定してください。
 この設定により、のちにPrivate PoolにGKE Control PlaneのCIDR(192.168.64.0/28)が広報されます。
-<img src="/images/20230210a/4-network-architecuture④.png" alt="4-network-architecuture④.png" width="1200" height="847" loading="lazy">
+<img src="/images/2023/20230210a/4-network-architecuture④.png" alt="4-network-architecuture④.png" width="1200" height="847" loading="lazy">
 
 ### GKE Control Planeとmy-stg-environment-vpc間
 
-<img src="/images/20230210a/between_gke_control_plane_my_stg_environment.drawio.png" alt="between_gke_control_plane_my_stg_environment.drawio.png" width="1200" height="355" loading="lazy">
+<img src="/images/2023/20230210a/between_gke_control_plane_my_stg_environment.drawio.png" alt="between_gke_control_plane_my_stg_environment.drawio.png" width="1200" height="355" loading="lazy">
 
 GKE Control Planeとmy-stg-environment-vpcを接続しているVPC Peeringのカスタムルートのエクスポートを有効化します。
 これにより、のちにHA VPN Gatewayを通じて広報されてきたPrivate PoolのCIDR(192.168.3.0/24)をGKE Control Plane側に広報できます。
-<img src="/images/20230210a/4-network-architecuture①.png" alt="4-network-architecuture①.png" width="1200" height="849" loading="lazy">
+<img src="/images/2023/20230210a/4-network-architecuture①.png" alt="4-network-architecuture①.png" width="1200" height="849" loading="lazy">
 
 ### HA VPNの作成
 
-<img src="/images/20230210a/between_sample_build_vpc_my_stg_environment.drawio.png" alt="between_sample_build_vpc_my_stg_environment.drawio.png" width="1200" height="355" loading="lazy">
+<img src="/images/2023/20230210a/between_sample_build_vpc_my_stg_environment.drawio.png" alt="between_sample_build_vpc_my_stg_environment.drawio.png" width="1200" height="355" loading="lazy">
 
 CloudBuildのprivate poolのCIDR(192.168.3.0/24)をmy-stg-environment-vpcに、GKE Control PlaneのCIDR(192.168.64.0/28)をsample-build-vpcにそれぞれ広報したいので、my-stg-environment-vpcとsample-build-vpcをHA VPNで接続します。
 
@@ -373,7 +373,7 @@ VPC PeeringでそれぞれのVPCを接続することもできますが、VPC Pe
 まず、HA VPN Gatewayを作成します。
 my-stg-environment-vpcに「ha-vpn-my-stg-environment-tky-gw」、sample-build-vpcに「ha-vpn-sample-build-vpc-tky-gw」を作成します。
 
-<img src="/images/20230210a/4-network-architecuture⑦.png" alt="4-network-architecuture⑦.png" width="1200" height="504" loading="lazy">
+<img src="/images/2023/20230210a/4-network-architecuture⑦.png" alt="4-network-architecuture⑦.png" width="1200" height="504" loading="lazy">
 
 次に、それぞれのHA VPN Gatewayに対応するVPN Tunnelを作成します。
 
@@ -390,7 +390,7 @@ ha-vpn-sample-build-vpc-tky-gwに
 - 「ha-vpn-sample-build-vpc-tky-tunnel-1」
 を作成します。
 
-<img src="/images/20230210a/4-network-architecuture⑧.png" alt="4-network-architecuture⑧.png" width="1200" height="511" loading="lazy">
+<img src="/images/2023/20230210a/4-network-architecuture⑧.png" alt="4-network-architecuture⑧.png" width="1200" height="511" loading="lazy">
 
 次に、それぞれのHA VPN Tunnelに対応するCloud Routerを作成します。
 
@@ -402,9 +402,9 @@ sample-build-vpcにGKE Control PlaneのCIDR(192.168.64.0/28)を広報したい�
 
 my-stg-environmentにCloudBuild Private PoolのCIDR(192.168.3.0/24)を広報したいので、アドバタイズされたIP範囲に192.168.3.0/24を設定します。
 
-<img src="/images/20230210a/4-network-architecuture⑨.png" alt="4-network-architecuture⑨.png" width="1200" height="840" loading="lazy">
+<img src="/images/2023/20230210a/4-network-architecuture⑨.png" alt="4-network-architecuture⑨.png" width="1200" height="840" loading="lazy">
 
-<img src="/images/20230210a/4-network-architecuture⑩.png" alt="4-network-architecuture⑩.png" width="1200" height="847" loading="lazy">
+<img src="/images/2023/20230210a/4-network-architecuture⑩.png" alt="4-network-architecuture⑩.png" width="1200" height="847" loading="lazy">
 
 ここまでの設定で、CloudBuildからGKEへデプロイするためのネットワークアーキテクチャの完成になります。
 
@@ -552,19 +552,19 @@ To https://GitHub.com/xxxxxxxx/xxxxxxxx.git
 
 GitHubにPushされたことをトリガーにCloudBuildのビルドが実行されます（過去にビルドに苦戦したビルド履歴が残っていますね（笑））
 
-<img src="/images/20230210a/3-Deploy①.png" alt="3-Deploy①.png" width="1200" height="847" loading="lazy">
+<img src="/images/2023/20230210a/3-Deploy①.png" alt="3-Deploy①.png" width="1200" height="847" loading="lazy">
 
 最新のビルド履歴（9ee5d0a6）をクリックすると、詳細が確認できます。cloudbuild.yamlに記述したビルドステップごとにビルドが進行していきます。各ビルドステップごとのログも「ビルドログ」から確認できます。
 
 正常終了するとすべてのステップでグリーンになります。
 
-<img src="/images/20230210a/3-Deploy②.png" alt="3-Deploy②.png" width="1200" height="854" loading="lazy">
+<img src="/images/2023/20230210a/3-Deploy②.png" alt="3-Deploy②.png" width="1200" height="854" loading="lazy">
 
 CloudBuildのビルドが正常終了したので、再度ドメインに対してアクセスをします。
 
 すると、変更を加えたVersion：2.0.0の状態でレスポンスが返却され、デプロイが正常に完了したことを確認できました。
 
-<img src="/images/20230210a/3-Deploy③.png" alt="3-Deploy③.png" width="352" height="93" loading="lazy">
+<img src="/images/2023/20230210a/3-Deploy③.png" alt="3-Deploy③.png" width="352" height="93" loading="lazy">
 
 ## Podのライフサイクル
 

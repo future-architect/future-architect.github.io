@@ -9,12 +9,12 @@ tag:
   - Tips
 category:
   - Programming
-thumbnail: /images/20200518/thumbnail.png
+thumbnail: /images/2020/20200518/thumbnail.png
 author: 宮崎将太
 lede: "ホワイトリストProxy申請するときのGo依存ライブラリURLドメインの調べ方を記載します。"
 ---
 
-<img src="/images/20200518/Go-Logo_LightBlue.png" class="img-small-size" loading="lazy">
+<img src="/images/2020/20200518/Go-Logo_LightBlue.png" class="img-small-size" loading="lazy">
 
 # はじめに
 

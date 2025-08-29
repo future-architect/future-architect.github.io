@@ -10,7 +10,7 @@ tag:
   - モバイルアプリ
 category:
   - Programming
-thumbnail: /images/20200330/thumbnail.png
+thumbnail: /images/2020/20200330/thumbnail.png
 author: 佐藤尚至
 lede: "こんにちは、Android Developerの佐藤です。モバイルアプリ品質強化の強い味方となってくれるFirebase Crashlyticsを紹介したいと思います！Firebaseとは、AndroidやiOSなどのモバイルアプリのバックエンド機能を提供してくれるサービスです。提供されているサービスは..."
 ---
@@ -61,7 +61,7 @@ Firebase Crashlyticsを導入することで、以下の情報を簡単に知る
 Android Studioで`Empty Activity`テンプレートをベースにした新規プロジェクトを作成します。
 ボタンを画像のように2つ追加します。
 
-<img src="/images/20200330/1.png" class="img-small-size" loading="lazy">
+<img src="/images/2020/20200330/1.png" class="img-small-size" loading="lazy">
 
 それぞれのボタンに`OnClickListener`を実装します。実装例は後述しますが、それぞれのボタンをクリックしたときの振る舞いを簡単に説明すると、以下のようになります。
 
@@ -78,7 +78,7 @@ https://firebase.google.com/docs/android/setup
 
 Firebaseコンソール画面も親切にナビゲートしてくれるので安心です。
 
-<img src="/images/20200330/2.png" loading="lazy">
+<img src="/images/2020/20200330/2.png" loading="lazy">
 
 ## Firebase Crashlyticsをセットアップする
 
@@ -176,13 +176,13 @@ public class MainActivity extends AppCompatActivity {
 `NON FATAL`ボタンをクリックしたときのレポートは「MainActivity.java - line 30」として通知されています。
 「評価」項目をみると「クラッシュレポート」なのか「非致命的な例外のレポート」なのかがひと目でわかりますね。
 
-<img src="/images/20200330/3.png" loading="lazy">
+<img src="/images/2020/20200330/3.png" loading="lazy">
 
 ### クラッシュレポート
 
 `Fatal`ボタンをクリックすることによって発生したクラッシュレポート(MainActivity.java - line 23)を見てみましょう。
 
-<img src="/images/20200330/4.png" loading="lazy">
+<img src="/images/2020/20200330/4.png" loading="lazy">
 
 以下がひと目でわかりますね。
 
@@ -195,13 +195,13 @@ public class MainActivity extends AppCompatActivity {
 また「スタックトレース」タブからクラッシュしたときのスタックトレースを見ることができます。
 なぜクラッシュしたのかが詳細にわかります。
 
-<img src="/images/20200330/5.png" loading="lazy">
+<img src="/images/2020/20200330/5.png" loading="lazy">
 
 ### ユーザーIDでの検索
 
 「ユーザーIDでの検索」も行うことができます。
 ユーザーから不具合の問い合わせがあった際に、ソースコードのどの箇所で異常があったがゆえにそのユーザーの端末で不具合が発生したのかを素早く知ることができます。
-<img src="/images/20200330/6.png" loading="lazy">
+<img src="/images/2020/20200330/6.png" loading="lazy">
 
 以下のようにSDKにユーザーIDを教えてあげることで、ユーザーIDでの検索が可能になります。
 

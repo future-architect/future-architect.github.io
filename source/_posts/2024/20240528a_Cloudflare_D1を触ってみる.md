@@ -8,12 +8,12 @@ tag:
   - SQLLite
 category:
   - DB
-thumbnail: /images/20240528a/thumbnail.png
+thumbnail: /images/2024/20240528a/thumbnail.png
 author: 真野隼記
 lede: "Cloudflare D1を触ってみました。"
 ---
 
-<img src="/images/20240528a/image.png" alt="" width="1200" height="404" loading="lazy">
+<img src="/images/2024/20240528a/image.png" alt="" width="1200" height="404" loading="lazy">
 
 [Cloudflare連載](/articles/20240527a/)の2日目です。
 
@@ -250,7 +250,7 @@ npx wrangler dev
 
 値が取得できています。
 
-<img src="/images/20240528a/image.png" alt="image.png" width="1200" height="643" loading="lazy">
+<img src="/images/2024/20240528a/image.png" alt="image.png" width="1200" height="643" loading="lazy">
 
 ## デプロイ
 
@@ -302,7 +302,7 @@ DB検索ですが、コンソール上からもSQLを実行できて地味に便
 
 補完が効かないのと、ワンラインな入力ボックスですが、簡単なデータ調査程度であれば十分使えそうです。
 
-<img src="/images/20240528a/image_2.png" alt="image.png" width="1200" height="740" loading="lazy">
+<img src="/images/2024/20240528a/image_2.png" alt="image.png" width="1200" height="740" loading="lazy">
 
 ## さいごに
 

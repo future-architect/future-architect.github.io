@@ -9,7 +9,7 @@ tag:
   - Bluetooth
 category:
   - IoT
-thumbnail: /images/20220404b/thumbnail.png
+thumbnail: /images/2022/20220404b/thumbnail.png
 author: 真野隼記
 lede: "PhilipsののLEDをLチカ（LEDをチカチカさせる）する記事です。普通のLEDだと面白くないので、[Philips HueのLED]を購入しました。接続ですが、Bluetooth（BLE: Bluetooth Low Energy）で直接LEDの操作をします。"
 ---
@@ -38,7 +38,7 @@ Hue LEDのBluetoothの仕様ですが公式は存在しないようです。そ�
 
 1つ目のgistを見てもBLEをよくしらない人からするとサッパリだと思うので補足します。BLE論理的な構造は以下のように、あるDeviceには複数のServiceが紐づいており、その配下にCharacteristicと呼ばれる構造で管理されています。この構成によってデータのやり取りを行います。ServiceもCharacteristicも特定のためにUUIDを用いています。
 
-<img src="/images/20220404b/ble_strucutre.png" alt="ble_strucutre.png" width="791" height="441" loading="lazy">
+<img src="/images/2022/20220404b/ble_strucutre.png" alt="ble_strucutre.png" width="791" height="441" loading="lazy">
 
 さきほどのgistを確認すると、Service `932c32bd-0000-47a2-835a-a8d455b859dd` に、電源ON/OFFをする `932c32bd-0002-47a2-835a-a8d455b859dd` というCharacteristicがあり、そちらに 1/0 のバイナリを送信すると、LEDがついたり消えたりするわけです。何に使うかわからないCharacteristicもいくつかありますが、ライトの操作は大まかこのシートから推測して行うことができます。Python側のライブラリは補足情報としてあつかうと良いかなと思います。
 
@@ -116,13 +116,13 @@ https://github.com/ma91n/flutter-hue-led-sample
 
 Lチカです。照明のON/OFFでカメラのフォーカスが変わってしまっていますが、ついたり消えたりしているのがわかります。手ブレですが、撮影中に飼い猫がじゃれついてきているためにいつもより多めに発生しています。
 
-<video src="/images/20220404b/Lチカ.mp4" controls width="50%"></video>
+<video src="/images/2022/20220404b/Lチカ.mp4" controls width="50%"></video>
 
 ### 色変更
 
 適当にRGBで指定した色に変更するようにしてています。
 
-<video src="/images/20220404b/色変更.mp4" controls width="50%"></video>
+<video src="/images/2022/20220404b/色変更.mp4" controls width="50%"></video>
 
 ## まとめ
 

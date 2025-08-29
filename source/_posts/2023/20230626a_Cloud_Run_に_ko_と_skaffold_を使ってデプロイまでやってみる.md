@@ -12,7 +12,7 @@ tag:
   - CNCF
 category:
   - Infrastructure
-thumbnail: /images/20230626a/thumbnail.png
+thumbnail: /images/2023/20230626a/thumbnail.png
 author: 川口翔大
 lede: "CNCF の Knative を基盤として利用している Cloud Run と CNCF の各種ビルドツール ko, skaffold、Cloud Deploy を用いたうえで、アプリケーションのビルドからデプロイまでを行います。"
 ---
@@ -29,7 +29,7 @@ TIG コアテクチームの川口です。本記事は、[CNCF連載](/articles
 
 全体感を掴むため、それぞれの技術とそれらの関連について図示します。
 
-<img src="/images/20230626a/image.png" alt="image.png" width="1166" height="788" loading="lazy">
+<img src="/images/2023/20230626a/image.png" alt="image.png" width="1166" height="788" loading="lazy">
 
 ### Cloud Run （Knative）
 
@@ -201,7 +201,7 @@ $ skaffold build \
 
 プッシュされた内容を見ると、タグやディレクトリ構成が先ほど設定した内容に沿っていることがわかると思います。
 
-<img src="/images/20230626a/Screenshot_2023-05-03_at_19.59.11.png" alt="" width="1200" height="179" loading="lazy">
+<img src="/images/2023/20230626a/Screenshot_2023-05-03_at_19.59.11.png" alt="" width="1200" height="179" loading="lazy">
 
 # Cloud Deploy でデプロイ
 
@@ -315,7 +315,7 @@ $ gcloud deploy apply \
 
 コンソールからも反映されていることが確認できると思います。
 
-<img src="/images/20230626a/image_2.png" alt="image.png" width="1200" height="642" loading="lazy">
+<img src="/images/2023/20230626a/image_2.png" alt="image.png" width="1200" height="642" loading="lazy">
 
 ## Cloud Deploy によるデプロイ
 
@@ -338,7 +338,7 @@ $ gcloud deploy releases create v1 \
 
 上記のコマンドが成功すれば、Cloud Run 上でもサービスが展開されていることが確認できるはずです。
 
-<img src="/images/20230626a/image_3.png" alt="image.png" width="1200" height="153" loading="lazy">
+<img src="/images/2023/20230626a/image_3.png" alt="image.png" width="1200" height="153" loading="lazy">
 
 ## Cloud Deploy によるカナリアデプロイ
 
@@ -392,7 +392,7 @@ $ gcloud deploy apply \
 
 コンソールからも変更が反映されていることを確認できるはずです。
 
-<img src="/images/20230626a/image_4.png" alt="" width="1200" height="643" loading="lazy">
+<img src="/images/2023/20230626a/image_4.png" alt="" width="1200" height="643" loading="lazy">
 
 次に v2 アプリケーションをデプロイしてみましょう。
 先ほどと同じ（v1 が v2 になっているだけ）コマンドで以下のとおりです。
@@ -408,13 +408,13 @@ $ gcloud deploy releases create v2 \
 
 デプロイが完了すると、カナリアデプロイしてくれていそうな雰囲気がコンソールから見てとれます。
 
-<img src="/images/20230626a/image_5.png" alt="" width="1200" height="274" loading="lazy">
+<img src="/images/2023/20230626a/image_5.png" alt="" width="1200" height="274" loading="lazy">
 
 この時点で、Cloud Run にて生成される URL に何度かアクセスしてみるとレスポンスがたまに v2 用のものに変わっていることが確認できるはずです。
 
 ここで、「ロールアウトを進める」ボタンを押下するとデプロイが進み完了します。
 
-<img src="/images/20230626a/image_6.png" alt="" width="1200" height="272" loading="lazy">
+<img src="/images/2023/20230626a/image_6.png" alt="" width="1200" height="272" loading="lazy">
 
 # おわりに
 

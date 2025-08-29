@@ -10,7 +10,7 @@ tag:
   - go-fuse
 category:
   - Programming
-thumbnail: /images/20220829a/thumbnail.png
+thumbnail: /images/2022/20220829a/thumbnail.png
 author: 真野隼記
 lede: "夏休み自由研究連載の5本目です。go-fuse でLocalStackでローカル環境にエミュレートされるS3バケットをマウントするツールを開発しました。"
 ---
@@ -50,7 +50,7 @@ FUSEとはFilesystem in Userspaceの略で、ユーザーランドで手軽に�
 
 下図は[Wikipedia](https://ja.wikipedia.org/wiki/Filesystem_in_Userspace)より引用した動作イメージです。左上の `ls -l` をされると、カーネルにシステム要求が飛び、それをFUSEの仕組みを経由してユーザーランドのアプリケーションが応答するような流れです。
 
-<img src="/images/20220829a/800px-FUSE_structure.svg.png" alt="800px-FUSE_structure.svg.png" width="800" height="606" loading="lazy">
+<img src="/images/2022/20220829a/800px-FUSE_structure.svg.png" alt="800px-FUSE_structure.svg.png" width="800" height="606" loading="lazy">
 
 今回は右上のユーザーランド側のプロセスで、AWS SDK for Goを用いてS3 on LocalStackをバックエンドにadaptorするようなコードを書きました。
 
@@ -90,11 +90,11 @@ awscliでファイルを予め登録したファイル(hello.txt)を確認→マ
 1. 右のウィンドウで、LocalStackをマウントしたディレクトリにアクセスし、先程ダウンロードしたファイルを編集・保存
 1. 真ん中のウィンドウに戻って、マウント経由で編集したファイルをaws cli経由で再度ダウンロードし、編集結果が反映されていることを確認
 
-<img src="/images/20220829a/demo1.gif" alt="" width="1200" height="502" loading="lazy">
+<img src="/images/2022/20220829a/demo1.gif" alt="" width="1200" height="502" loading="lazy">
 
 もちろん、エクスプローラからも確認できます。
 
-<img src="/images/20220829a/demo2.gif" alt="" width="1200" height="565" loading="lazy">
+<img src="/images/2022/20220829a/demo2.gif" alt="" width="1200" height="565" loading="lazy">
 
 GIF動画では実演してないですが、もちろんVS Codeで好きに編集・保存をしても、LocalStack上のS3に反映されます。そこそこ便利かと思います。
 
@@ -245,7 +245,7 @@ type File interface {
   * 最終的にはキャッシュレスは諦め、[go-cache](https://github.com/patrickmn/go-cache)を導入しました
 * キャッシュの扱い。難しい・うまくハマると速度向上が体感できて楽しい
   * キャッシュの扱いですが、例えばファイルを書き込んだ後には破棄しないと、エディタによってはアプリで持っている情報と不整合が生じて警告を出してくることがあります。別にFUSEを用いた実装に閉じた話でもないですが、適切なハンドリングが必要でした
-<img src="/images/20220829a/FbGZVhJUIAA3Im7.jpg" alt="FbGZVhJUIAA3Im7.jpg" width="1143" height="699" loading="lazy">
+<img src="/images/2022/20220829a/FbGZVhJUIAA3Im7.jpg" alt="FbGZVhJUIAA3Im7.jpg" width="1143" height="699" loading="lazy">
   * オブジェクトストレージと、ファイルシステムとのギャップも感じました
     * 例えば、 `/bucket/dir1/aaa.txt` を削除すると、`GetAttr` のキャッシュとしては `/bucket/dir1/aaa.txt`、`/bucket/dir1`、`/bucket` の3つを無効化しないと不整合になる場合があります
       * ※実際に `dir1/` のオブジェクトが存在するとは限らないため、`aaa.txt` が消えたら `bucket` だけが残る方が自然なケースがある

@@ -8,7 +8,7 @@ tag:
   - 登壇レポート
 category:
   - Infrastructure
-thumbnail: /images/20220331a/thumbnail.png
+thumbnail: /images/2022/20220331a/thumbnail.png
 author: 伊藤太斉
 lede: "2022/2/17に開催したFuture Tech Night #20で登壇した内容のサマリと、当日はお伝えしきれなかったことについて触れていきます。TerraformのStateは、これを扱う上で非常に重要な役割を果たします。実際のリソースと、Terraformソースコードとの差異を確認するためにも、リソースをTerraformの管理下とするためにも必要不可欠なコンポーネントになってきます。"
 ---
@@ -72,7 +72,7 @@ Stateの管理分掌は
 当日いただいた質問の中で改めて回答ができるものについて、こちらで触れます
 > modulesの例だとLBを2回書かないといけない（service_a, service_b両方分）のが少し手間だなあと思ったのですが、AWSリソース単位ではmoduleを作成しない理由をもう少し詳しくお伺いしたいです
 
-<img src="/images/20220331a/2022_0217_Future_Tech_Night_20.png" alt="2022_0217_Future_Tech_Night_#20" width="960" height="540" loading="lazy">
+<img src="/images/2022/20220331a/2022_0217_Future_Tech_Night_20.png" alt="2022_0217_Future_Tech_Night_#20" width="960" height="540" loading="lazy">
 
 (登壇スライドより引用)
 

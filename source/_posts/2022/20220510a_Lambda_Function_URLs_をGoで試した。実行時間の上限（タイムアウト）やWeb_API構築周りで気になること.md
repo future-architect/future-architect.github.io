@@ -10,7 +10,7 @@ tag:
   - タイムアウト
 category:
   - Programming
-thumbnail: /images/20220510a/thumbnail.png
+thumbnail: /images/2022/20220510a/thumbnail.png
 author: 真野隼記
 lede: "2022/04/06にGAになったと発表された、Lambda Function URLsは、AWS Lambdaに直接HTTPSエンドポイントを追加できるというもので、API Gateway（やALB）無しでWeb APIやサイトを構築できると話題になりました。"
 ---
@@ -32,7 +32,7 @@ TIG DXユニット真野です。2022/04/06にGAになったと発表された�
 
 Lambdaについては「関数URLを有効化」し、cURLやブラウザなどで簡易的に疎通したかったので認証タイプは「NONE」を選択します。関数名は「my-function-url-lambda」とします。
 
-<img src="/images/20220510a/lambda_create_resource.png" alt="lambda_create_resource" width="1200" height="987" loading="lazy">
+<img src="/images/2022/20220510a/lambda_create_resource.png" alt="lambda_create_resource" width="1200" height="987" loading="lazy">
 
 Lambda設定は、ランタイムを「Go 1.x」、ハンドラは適当に「lambda」にしています。Lambdaリソースのタイムアウトは「15分0秒」（最長）にします。
 
@@ -81,7 +81,7 @@ deploy:
 
 アクセスするURLは、関数URLという部分に表示されるので、ブラウザでクリックしてLambdaを実行します。
 
-<img src="/images/20220510a/Lambda定義.png" alt="Lambda定義" width="1200" height="381" loading="lazy">
+<img src="/images/2022/20220510a/Lambda定義.png" alt="Lambda定義" width="1200" height="381" loading="lazy">
 
 15分待つと `Internal Server Error` がブラウザで表示されます。CloudWatch Logsで確認すると、以下のように約900秒（15分）起動したことが分かります。おお..!!  29秒の呪縛から開放されている!!
 
@@ -113,7 +113,7 @@ deploy:
 
 API Gatewayのようなリッチな制御は行えなくても、セキュリティ要件でWAF設置が必須な場合があります。Lambda Function URLsは2022.5.5時点ではAWS WAFの設定は不可のようです。AWS WAFの設定画面をみても、現状はAPI Gateway, ALB, AppSyncの3つに限られています。
 
-<img src="/images/20220510a/WAF設定画面.png" alt="WAF設定画面" width="840" height="256" loading="lazy">
+<img src="/images/2022/20220510a/WAF設定画面.png" alt="WAF設定画面" width="840" height="256" loading="lazy">
 
 そのためブラウザアクセスを許容したいけど、検証用のエンドポイントは送信元IPを絞りたいとかも現状はできないです。スロットリング、カスタムドメイン名などとともに、これらの要件が必要な場合はAPI Gatewayを利用しましょうということです（InboundのSecurity Groupが設定できれば最高なんですが..）
 

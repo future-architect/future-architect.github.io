@@ -8,11 +8,11 @@ tag:
   - ハッカソン
 category:
   - VR
-thumbnail: /images/20160511/thumbnail_20160511.jpg
+thumbnail: /images/2016/20160511/thumbnail_20160511.jpg
 author: 川久保由紀
 lede: "IT歴約1年、社会人2年目新人女子のわたしがハッカソンに挑んだ全てをお伝えします！"
 ---
-<img src="/images/20160511/photo_20160511_01.png" class="img-middle-size" loading="lazy">
+<img src="/images/2016/20160511/photo_20160511_01.png" class="img-middle-size" loading="lazy">
 
 投票はこちら（※2016/05/16迄です！）。
 https://2016.spaceappschallenge.org/challenges/mars/space-recreation/projects/the-zen
@@ -38,25 +38,25 @@ IT歴約1年、社会人2年目新人女子のわたしがハッカソンに挑�
 会場は東京会場ではなく、JAXA筑波宇宙センターで開催される筑波会場です！
 ロケットが印象的な、のどかなこの地が今回の舞台となります。
 
-<img src="/images/20160511/photo_20160511_02.jpg" loading="lazy">
-<img src="/images/20160511/photo_20160511_03.jpg" loading="lazy">
+<img src="/images/2016/20160511/photo_20160511_02.jpg" loading="lazy">
+<img src="/images/2016/20160511/photo_20160511_03.jpg" loading="lazy">
 
 # 会場に着いて
 
 ワイワイしている雰囲気を想像していましたが、筑波会場の参加者は少ないため、思ったよりも静かでした。
 
 そんな中、NASAのステッカーを貰った私は、最近買ったばかりのMacに貼って静かに喜んでいました♡
-<img src="/images/20160511/photo_20160511_04.jpg" loading="lazy">
+<img src="/images/2016/20160511/photo_20160511_04.jpg" loading="lazy">
 
 NASAのステッカーが格好いい！ SPACE APPSは黒を選択しました（●＾o＾●）。
-<img src="/images/20160511/photo_20160511_05.jpg" loading="lazy">
+<img src="/images/2016/20160511/photo_20160511_05.jpg" loading="lazy">
 
 # ハッカソンスタート
 
 そんなこんなで、ついにハッカソンがスタートしました！
 まずはチームで記念写真。
 
-<img src="/images/20160511/photo_20160511_06.png" loading="lazy">
+<img src="/images/2016/20160511/photo_20160511_06.png" loading="lazy">
 
 ロケットのつもりです(・ω<)
 
@@ -64,8 +64,8 @@ NASAのステッカーが格好いい！ SPACE APPSは黒を選択しました�
 
 まずはアイデアソンからです。
 
-<img src="/images/20160511/photo_20160511_07.jpg" loading="lazy">
-<img src="/images/20160511/photo_20160511_08.png" loading="lazy">
+<img src="/images/2016/20160511/photo_20160511_07.jpg" loading="lazy">
+<img src="/images/2016/20160511/photo_20160511_08.png" loading="lazy">
 
 せっかくだからFrom JAPAN感を出したいよねーとなり、
 考えたものが、
@@ -99,7 +99,7 @@ VR（バーチャル・リアリティ）のアプリケーションです！
 
 VRと聞くと日常に『無いもの』を生み出すイメージがありますが、The ZENはあえて現実の地球上に『あるもの』を再現し、宇宙飛行士のストレスを取り除くことを目的にしています！
 
-<img src="/images/20160511/photo_20160511_09.png"  class="img-middle-size" loading="lazy">
+<img src="/images/2016/20160511/photo_20160511_09.png"  class="img-middle-size" loading="lazy">
 
 <iframe src="//www.slideshare.net/slideshow/embed_code/key/eMJQn48KTD1NMX" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/OsakiXXDoukoukai/peoples-choice20160424spaceappschallenge-tsukuba" title="【People&#x27;s Choice賞】20160424_SpaceAppsChallenge Tsukuba発表資料（おおさき天文同好会）" target="_blank">【People&#x27;s Choice賞】20160424_SpaceAppsChallenge Tsukuba発表資料（おおさき天文同好会）</a> </strong> from <strong><a href="//www.slideshare.net/OsakiXXDoukoukai" target="_blank">おおさき未来同好会</a></strong> </div>
 
@@ -113,19 +113,19 @@ VRと聞くと日常に『無いもの』を生み出すイメージがありま
 わたしはUnity未経験だったので必死にキャッチアップし、Unityちゃんの操作周りをメインに担当しました！
 
 このUnityちゃん、最初こんな感じなんですよ。
-<img src="/images/20160511/photo_20160511_10.png" loading="lazy">
+<img src="/images/2016/20160511/photo_20160511_10.png" loading="lazy">
 
 この状態から…
 
 (っ*´∀｀* )っじゃーん！！！
 
-<img src="/images/20160511/photo_20160511_11.png" loading="lazy">
+<img src="/images/2016/20160511/photo_20160511_11.png" loading="lazy">
 
 座禅をさせました！
 私が！！！（※Unity初心者）
 
 ※がんばっている様子です
-<img src="/images/20160511/photo_20160511_12.jpg" loading="lazy">
+<img src="/images/2016/20160511/photo_20160511_12.jpg" loading="lazy">
 
 [blender](https://blender.jp/)という3Dのモデリングアプリケーションも併用して利用しましたが、中々操作に癖があり苦労しました。
 
@@ -193,7 +193,7 @@ PV投稿から2週間後、1通のメールが。
 
 <br>
 ※選考フローについて
-<img src="/images/20160511/photo_20160511_13.png" loading="lazy">
+<img src="/images/2016/20160511/photo_20160511_13.png" loading="lazy">
 
 # ファイナリスト選出
 
@@ -213,10 +213,10 @@ PV投稿から2週間後、1通のメールが。
 <br>
 
 現在は11位（2016/05/11時点）、中々厳しいですが宣伝をさらにがんばります！
-<img src="/images/20160511/photo_20160511_14.png" loading="lazy">
+<img src="/images/2016/20160511/photo_20160511_14.png" loading="lazy">
 
 <br>
 TOP5に残って絶対NASAに行くぞー！！！
 みなさん、応援おねがいします٩(๑•̀ω•́๑)۶！
-<img src="/images/20160511/photo_20160511_15.png" loading="lazy">
-<img src="/images/20160511/photo_20160511_16.png" loading="lazy">
+<img src="/images/2016/20160511/photo_20160511_15.png" loading="lazy">
+<img src="/images/2016/20160511/photo_20160511_16.png" loading="lazy">

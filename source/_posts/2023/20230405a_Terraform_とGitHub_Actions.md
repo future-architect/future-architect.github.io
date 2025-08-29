@@ -9,7 +9,7 @@ tag:
   - CI/CD
 category:
   - DevOps
-thumbnail: /images/20230405a/thumbnail.png
+thumbnail: /images/2023/20230405a/thumbnail.png
 author: 前原応光
 lede: "こんにちは。TIG DX チームのゆるふわエンジニアの前原です。今までは、GitLab でTerraform を利用する機会が多かったのですが、今回は、GitHub Actions を利用することになりました。そこで実施した内容をこの記事に書いていきたいと思います。"
 ---
@@ -58,7 +58,7 @@ resource "aws_iam_openid_connect_provider" "github_actions" {
 Terraform 実行後、IAM コンソールにアクセスします。
 ID プロバイダ設定をクリックし、追加されていることを確認します。
 
-<img src="/images/20230405a/image.png" alt="image.png" width="1200" height="659" loading="lazy">
+<img src="/images/2023/20230405a/image.png" alt="image.png" width="1200" height="659" loading="lazy">
 
 ## IAM Role 追加
 
@@ -145,7 +145,7 @@ GitHub の[Settings] > [Secrets and variables]からシークレット変数を�
 * Name: AWS_IAM_ROLE_ARN
 * Secret: {IAM_ROLE_ARN}
 
-<img src="/images/20230405a/image_2.png" alt="image.png" width="1200" height="658" loading="lazy">
+<img src="/images/2023/20230405a/image_2.png" alt="image.png" width="1200" height="658" loading="lazy">
 
 これで設定が完了です。
 
@@ -339,7 +339,7 @@ Input タイプは、string、choice、boolean、environment　などが存在�
 ワークフローを手動実行する際に`env`を指定したい場合は、`environment`を利用します。
 利用する際は、事前に[Settings] > [Environments]で設定を行います。
 
-<img src="/images/20230405a/image_3.png" alt="image.png" width="1200" height="658" loading="lazy">
+<img src="/images/2023/20230405a/image_3.png" alt="image.png" width="1200" height="658" loading="lazy">
 
 注意点として手動実行は、デフォルトブランチでのみ実行可能です。
 ただし、CLI を利用することでデフォルトブランチ以外でも実行が可能です。

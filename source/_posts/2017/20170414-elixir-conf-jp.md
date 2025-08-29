@@ -7,12 +7,12 @@ tag:
   - 参加レポート
 category:
   - Programming
-thumbnail: /images/20170412/thumbnail_20170412.png
+thumbnail: /images/2017/20170412/thumbnail_20170412.png
 author: 前川喜洋
 lede: "Elixir Conf Japan 2017 参加レポート"
 ---
 
-<img src="/images/20170412/photo_20170412_01.png" class="img-small-size" loading="lazy">
+<img src="/images/2017/20170412/photo_20170412_01.png" class="img-small-size" loading="lazy">
 
 # Elixir Conf Japan 2017 に参加しました
 
@@ -237,7 +237,7 @@ nine nines(99.9999999％)のSLAを実現できると知って以来Erlang/OTPに
 
 ## 懇親会
 
-<img src="/images/20170412/photo_20170412_02.jpeg" loading="lazy">
+<img src="/images/2017/20170412/photo_20170412_02.jpeg" loading="lazy">
 
 スリーモンキーズカフェにて。会場は「最大300人」を謳ってますが相当すし詰め状態でした。そしてビュッフェの料理がデプロイされるテーブルがシングルスレッドでキュー溢れしてました。
 私は初手でディープな方々のテーブルに突撃するのはハードルが高かったので比較的親しみ易い話題のテーブルをうろうろしていましたが、感想として多かったのは「やっぱりErlang/OTPか」と「どこに使えば良いんだ…？」でした。自己紹介すると「エンプラでElixirって使うんですか？」と訊かれ「それを探りに来ました」と返す会話が多かったです。そこは予想していた通りでしたが、使える場面を考える上で開発者の確保（教育/採用/調達全て込みで）はどうしたもんだろうねという話は、ほとんどど通じなかったのは意外でした。

@@ -10,7 +10,7 @@ tag:
   - Tips
 category:
   - Programming
-thumbnail: /images/20210902b/thumbnail.gif
+thumbnail: /images/2021/20210902b/thumbnail.gif
 author: 山本雄樹
 lede: "こんにちは、Futureの[Engineer Camp]にてインターン中の山本です。インターンではGo言語を使用したIoTプラットフォームのバックエンド開発に参加させていただいております。GoLandはGoでの開発に特化した統合開発環境で、最初からGoの開発に必要な機能はほとんど揃っています。そのため、インストール後すぐに使い始めることができるという利点があります。とはいえGoLandの全ての機能を使いこなすのは簡単ではなく、なんとなく、受動的に使っている方は多いのではないでしょうか。本記事ではそんな方に向けて、普遍的なGoLandの機能を紹介する内容となっています。読後に少しでもコードを書くのが楽になれば幸いです。"
 ---
@@ -39,7 +39,7 @@ https://www.jetbrains.com/ja-jp/go/
 
 `⌘ + B`もしくは`⌘ + Click`で関数や構造体などが宣言されているところへジャンプできます。
 
-<img src="/images/20210902b/gif2.gif" alt="gif2.gif" width="600" height="258" loading="lazy">
+<img src="/images/2021/20210902b/gif2.gif" alt="gif2.gif" width="600" height="258" loading="lazy">
 
 #### 元の場所に戻る
 
@@ -51,7 +51,7 @@ https://www.jetbrains.com/ja-jp/go/
 
 プロジェクト内のファイルやコード、GoLandのほとんどの機能はここから検索することで出てきます。ちなみに検索したい内容をあらかじめ選択しておくと検索窓に選択内容がコピーされます。
 
-<img src="/images/20210902b/gif1.gif" alt="gif1.gif" width="600" height="267" loading="lazy">
+<img src="/images/2021/20210902b/gif1.gif" alt="gif1.gif" width="600" height="267" loading="lazy">
 
 Goではファイル名と構造体名などが似通うことはそれなりにあると思いますので、ALLの検索窓からではなく、TypesやFilesなどそれぞれの検索窓を開くためのショートカットを覚えておくのもよいかと思います。
 
@@ -75,7 +75,7 @@ Go言語ではエラー処理など何度も書く処理がありますが、こ
 
 わざわざその通りにコーディングしなくとも、`err.nn`として`Enter`キーを押すとコードが生成されます。
 
-<img src="/images/20210902b/gif8.gif" alt="gif8.gif" width="600" height="226" loading="lazy">
+<img src="/images/2021/20210902b/gif8.gif" alt="gif8.gif" width="600" height="226" loading="lazy">
 
 上で説明した`nn`以外にも`!=nil{return}`を生成する`.rr`や変数を作って受け取る`.var`などがあります。
 
@@ -85,25 +85,25 @@ Go言語ではエラー処理など何度も書く処理がありますが、こ
 
 `{}`の間で`option + Enter`を押して、出てきたものの中から`Fill all fields`を選んでください。
 
-<img src="/images/20210902b/gif7.gif" alt="gif7.gif" width="600" height="305" loading="lazy">
+<img src="/images/2021/20210902b/gif7.gif" alt="gif7.gif" width="600" height="305" loading="lazy">
 
 ## 6. ドキュメントを見る (Quick documentation)
 
 関数名の上にカーソルを持ってきてホバーすると関数のドキュメントやドキュメントのURLが表示されます。マウスとか使いたくない時は`Shift+ F1`でドキュメントのページを開きます。
-<img src="/images/20210902b/gif9.gif" alt="gif9.gif" width="600" height="272" loading="lazy">
+<img src="/images/2021/20210902b/gif9.gif" alt="gif9.gif" width="600" height="272" loading="lazy">
 
 ## 7. タブの移動
 
 `⌘ + Shift + [` , `⌘ + Shift + ]`でタブ間を移動できます。
 
-<img src="/images/20210902b/gif10.gif" alt="gif10.gif" width="600" height="360" loading="lazy">
+<img src="/images/2021/20210902b/gif10.gif" alt="gif10.gif" width="600" height="360" loading="lazy">
 
 ## さらに使いこなすために
 
 ### Key Promoter X
 
 [Key Promoter X](https://plugins.jetbrains.com/plugin/9792-key-promoter-x/versions)とは、ショートカットが用意されている処理をショートカットを使用せずに実行するとポップアップでお知らせしてくれるプラグインです。使っていて邪魔になったことはほとんどないので入れておいて損はないと思います。
-<img src="/images/20210902b/ファイル名" alt="ファイル名" width="801" height="283" loading="lazy">
+<img src="/images/2021/20210902b/ファイル名" alt="ファイル名" width="801" height="283" loading="lazy">
 
 ### Learnで学ぼう
 
@@ -111,7 +111,7 @@ Go言語ではエラー処理など何度も書く処理がありますが、こ
 
 Search everywhereウィンドウを立ち上げ（`Shift`2回）、”Learn”を検索すると出てきます。
 
-<img src="/images/20210902b/ファイル名_2" alt="ファイル名" width="1200" height="707" loading="lazy">
+<img src="/images/2021/20210902b/ファイル名_2" alt="ファイル名" width="1200" height="707" loading="lazy">
 
 ### GoLand公式のショートカット一覧PDF
 

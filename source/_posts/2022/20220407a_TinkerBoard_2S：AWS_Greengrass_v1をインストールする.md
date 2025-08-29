@@ -7,12 +7,12 @@ tag:
   - AWSGreengrass
 category:
   - IoT
-thumbnail: /images/20220407a/thumbnail.png
+thumbnail: /images/2022/20220407a/thumbnail.png
 author: 宮永崇史
 lede: "ASUSが販売しているシングルボードコンピュータTinekr Board2SにAWS Greengrassの環境を構築したので記事にまとめました。
 "
 ---
-<img src="/images/20220407a/tinker.png" alt="tinker.png" width="945" height="287" loading="lazy">
+<img src="/images/2022/20220407a/tinker.png" alt="tinker.png" width="945" height="287" loading="lazy">
 
 [電子工作/IoT連載](/articles/20220404a/) の4本目です
 
@@ -41,22 +41,22 @@ ASUSが販売するArmベースのシングルボードコンピュータです�
 一際目を惹くのはでっかいヒートシンクですね。😳
 このヒートシンクは付属品です。
 
-<img src="/images/20220407a/tinker.JPG" alt="外観" width="1200" height="676" loading="lazy">
+<img src="/images/2022/20220407a/tinker.JPG" alt="外観" width="1200" height="676" loading="lazy">
 
 手前にピンヘッダーが40個確認できます。着色してあるため非常に便利です。
 RaspberryPiだと上から1つずつ数えていかなければ行けないのでこの仕様はとてもありがたいですね。
 
 外部インタフェースを見ていきます。
-<img src="/images/20220407a/usb.JPG" alt="外部インターフェース" width="1200" height="676" loading="lazy">
+<img src="/images/2022/20220407a/usb.JPG" alt="外部インターフェース" width="1200" height="676" loading="lazy">
 
 3.2USB Gen1 Type-Aが3つ、3.2USB Gen1 Type-Cが１つ付属しています。有線LANも接続できるようになっています。
 
-<img src="/images/20220407a/DSC_0559.JPG" alt="USB周り" width="1200" height="676" loading="lazy">
+<img src="/images/2022/20220407a/DSC_0559.JPG" alt="USB周り" width="1200" height="676" loading="lazy">
 側面です。一番左にあるのは電源端子その隣がHDMI端子です。
 HDMIの横にMIDI DSI(Mobile Industry Processor Interface Display Serial Interface)も確認できます。
 こちらの端子はディスプレイモジュールを扱う際に使用します。
 
-<img src="/images/20220407a/DSC_0560.JPG" alt="HDMI" width="1200" height="676" loading="lazy">
+<img src="/images/2022/20220407a/DSC_0560.JPG" alt="HDMI" width="1200" height="676" loading="lazy">
 
 最後に前面(背面？ )です。
 手前に見えている端子はMIPI CSI(Mobile Industry Processor Interfa Camera Serial Interface)です。こちらの端子はカメラモジュールを取り付ける際に使用します。
@@ -116,15 +116,15 @@ Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
 デバイスを認識した状態でOSイメージをTinkerOSで選択します
 私の場合はこのタイミングで書き込み先も自動的にTinkerBoardが登録されました。
 
-<img src="/images/20220407a/image.png" alt="Ethcer" width="890" height="579" loading="lazy">
+<img src="/images/2022/20220407a/image.png" alt="Ethcer" width="890" height="579" loading="lazy">
 
 書き込まれるのを待つだけです。
 
-<img src="/images/20220407a/image_2.png" alt="Ethcer書き込み中" width="801" height="503" loading="lazy">
+<img src="/images/2022/20220407a/image_2.png" alt="Ethcer書き込み中" width="801" height="503" loading="lazy">
 
 イメージの書き込みが完了したら再度電源を入れます。
 起動するとリブートが始まり、以下の画面が立ち上がります。
-<img src="/images/20220407a/Screenshot_from_2022-02-04_22-29-32.png" alt="起動画面" width="1200" height="676" loading="lazy">
+<img src="/images/2022/20220407a/Screenshot_from_2022-02-04_22-29-32.png" alt="起動画面" width="1200" height="676" loading="lazy">
 
 有線LANを接続した状態で引き続きセットアップを行います。
 
@@ -156,25 +156,25 @@ https://docs.aws.amazon.com/ja_jp/greengrass/v1/developerguide/what-is-gg.html
 AWS IoTコンソール画面左のタブから「クラシック＞グループ」を選択します.
 画面遷移後「グループを作成」を選択すると下図のようになるので「デフォルト作成を使用」を選択します。
 
-<img src="/images/20220407a/image_3.png" alt="Greengrassのグループ作成" width="241" height="107" loading="lazy">
+<img src="/images/2022/20220407a/image_3.png" alt="Greengrassのグループ作成" width="241" height="107" loading="lazy">
 
-<img src="/images/20220407a/image_4.png" alt="Greengrassのグループ作成のグループ名" width="879" height="620" loading="lazy">
+<img src="/images/2022/20220407a/image_4.png" alt="Greengrassのグループ作成のグループ名" width="879" height="620" loading="lazy">
 適当にグループ名をつけて「次へ」を選択します。
 
-<img src="/images/20220407a/image_5.png" alt="Greengrassのグループ作成のグループ名" width="878" height="481" loading="lazy">
+<img src="/images/2022/20220407a/image_5.png" alt="Greengrassのグループ作成のグループ名" width="878" height="481" loading="lazy">
 こちらも同様にして「次へ」を選択します。
-<img src="/images/20220407a/image_6.png" alt="次へ" width="867" height="477" loading="lazy">
+<img src="/images/2022/20220407a/image_6.png" alt="次へ" width="867" height="477" loading="lazy">
 
 グループの作成が完了すると証明書が発行されます。
 この証明書は後ほど使用するためデスクトップPCにダウンロードしておきます。
 
-<img src="/images/20220407a/image_7.png" alt="証明書の発行" width="910" height="859" loading="lazy">
+<img src="/images/2022/20220407a/image_7.png" alt="証明書の発行" width="910" height="859" loading="lazy">
 
 次に先程発行した証明書を使用してGreengrassコンテナを起動します。
 必要なDockerfileなどは[こちら](https://docs.aws.amazon.com/ja_jp/greengrass/v1/developerguide/what-is-gg.html?icmpid=docs_gg_mktg#gg-docker-download)からダウンロードできます。
 
 私はバージョン1.10を使用しました。
-<img src="/images/20220407a/image_8.png" alt="バージョン1.10" width="1197" height="181" loading="lazy">
+<img src="/images/2022/20220407a/image_8.png" alt="バージョン1.10" width="1197" height="181" loading="lazy">
 
 ダウンロードした圧縮ファイルはデスクトップPCからTinker Boardに転送します。
 以下のコマンドTinker Boardのhomeに転送できます。
@@ -285,7 +285,7 @@ sudo docker-compose -f docker-compose.alpine-aarch64.yml up
 
 起動しました🎉
 
-<img src="/images/20220407a/image_9.png" alt="起動画面" width="1167" height="167" loading="lazy">
+<img src="/images/2022/20220407a/image_9.png" alt="起動画面" width="1167" height="167" loading="lazy">
 
 ### Lambda関数の準備
 
@@ -331,34 +331,34 @@ zip -r hello_world_python_lambda.zip greengrasssdk greengrassHelloWorld.py
 それでは、AWSクラウド上にLambdda関数をデプロイします。
 マネジメントコンソールで適当な名前をつけてLambda関数を作成します。
 
-<img src="/images/20220407a/image_10.png" alt="Lambdaデプロイ" width="1200" height="450" loading="lazy">
+<img src="/images/2022/20220407a/image_10.png" alt="Lambdaデプロイ" width="1200" height="450" loading="lazy">
 
 先程のzipファイルを直接アップロードしてハンドラの名前を編集します。
 
-<img src="/images/20220407a/image_11.png" alt="Lambdaのハンドラ設定" width="774" height="639" loading="lazy">
+<img src="/images/2022/20220407a/image_11.png" alt="Lambdaのハンドラ設定" width="774" height="639" loading="lazy">
 
 開発者ガイドに沿ってバージョンとエイリアスも設定します。
 
-<img src="/images/20220407a/image_12.png" alt="Lambdaのエイリアス" width="813" height="369" loading="lazy">
+<img src="/images/2022/20220407a/image_12.png" alt="Lambdaのエイリアス" width="813" height="369" loading="lazy">
 
 クラウド上へのLambda関数のデプロイが完了したらコンテナに向けてコードの更新を行います。
 Greengrassのグループから「Lambdaの追加」を選択します。
 
-<img src="/images/20220407a/image_13.png" alt="Lambda追加" width="930" height="806" loading="lazy">
+<img src="/images/2022/20220407a/image_13.png" alt="Lambda追加" width="930" height="806" loading="lazy">
 
 すでにLambda関数はデプロイしていますので「既存のLambdaの使用」を選択します。
 
-<img src="/images/20220407a/image_14.png" alt="既存のLambdaの使用ボタン" width="906" height="456" loading="lazy">
+<img src="/images/2022/20220407a/image_14.png" alt="既存のLambdaの使用ボタン" width="906" height="456" loading="lazy">
 
 関数を追加したらLambdaの設定画面に移動して
 「タイムアウト」とLambdaの「ライフサイクル」を下記のように設定します。
 他の設定はデフォルトのままで「更新」を選択します。
 
-<img src="/images/20220407a/image_15.png" alt="Lambdaの実行時の設定画面" width="923" height="741" loading="lazy">
+<img src="/images/2022/20220407a/image_15.png" alt="Lambdaの実行時の設定画面" width="923" height="741" loading="lazy">
 
 グループの設定画面に戻り「最初のサブスクリプションの追加」を選択します。
 
-<img src="/images/20220407a/image_16.png" alt="Greengrassの最初のサブスクリプションの追加" width="920" height="605" loading="lazy">
+<img src="/images/2022/20220407a/image_16.png" alt="Greengrassの最初のサブスクリプションの追加" width="920" height="605" loading="lazy">
 
 「サブスクリプションの作成」画面ではメッセージの送信元(ソース)と受信先（ターゲット）を選択します。
 AWS IoTではMQTTをPub/Subできます。
@@ -369,37 +369,37 @@ AWS IoTではMQTTをPub/Subできます。
 
 トピックのフィルターに「hello/world」と入力して「次へ」を選択します。
 
-<img src="/images/20220407a/image_17.png" alt="image.png" width="936" height="567" loading="lazy">
+<img src="/images/2022/20220407a/image_17.png" alt="image.png" width="936" height="567" loading="lazy">
 
 それではコアデバイスにLambda関数をデプロイします。
 作成したHelloWorldグループ画面で「アクション＞デプロイ」を選択します。
 デプロイする前にコアデバイスでGreengrassが起動していることを再度確認しましょう。
 
-<img src="/images/20220407a/image_18.png" alt="トピックのフィルタリング" width="931" height="476" loading="lazy">
+<img src="/images/2022/20220407a/image_18.png" alt="トピックのフィルタリング" width="931" height="476" loading="lazy">
 
 「自動検出」を選択するとデプロイが開始します。
 
-<img src="/images/20220407a/image_19.png" alt="自動検出" width="924" height="476" loading="lazy">
+<img src="/images/2022/20220407a/image_19.png" alt="自動検出" width="924" height="476" loading="lazy">
 
 デプロイが正常に終了するとステータスが緑色になります。
 
-<img src="/images/20220407a/image_20.png" alt="ステータス" width="904" height="480" loading="lazy">
+<img src="/images/2022/20220407a/image_20.png" alt="ステータス" width="904" height="480" loading="lazy">
 
 ## 動作確認
 
 AWS IoTのマネジメントコンソールの「テスト＞MQTTテストクライアント」からトピックをサブスクライブします。
 
-<img src="/images/20220407a/image_21.png" alt="動作確認" width="244" height="103" loading="lazy">
+<img src="/images/2022/20220407a/image_21.png" alt="動作確認" width="244" height="103" loading="lazy">
 
 トピックのフィルターはhello/worldとして、各種設定を以下のようにします。
 
-<img src="/images/20220407a/image_22.png" alt="トピックの設定" width="899" height="548" loading="lazy">
+<img src="/images/2022/20220407a/image_22.png" alt="トピックの設定" width="899" height="548" loading="lazy">
 
 サブスクライブを選択すると、MQTTの受信が始まります。
 
 コアデバイスが正常に動作していると下図のようにコアデバイスから設定したメッセージが届きます🎉
 
-<img src="/images/20220407a/image_23.png" alt="MQTT受信" width="1200" height="556" loading="lazy">
+<img src="/images/2022/20220407a/image_23.png" alt="MQTT受信" width="1200" height="556" loading="lazy">
 
 コアデバイスのLambda関数はクラウド上から関数を更新、グループの設定から再デプロイを行うことでいつでも更新できます。とても便利ですね。
 

@@ -9,12 +9,12 @@ tag:
   - 静的解析
 category:
   - Programming
-thumbnail: /images/20210603a/thumbnail.jpg
+thumbnail: /images/2021/20210603a/thumbnail.jpg
 author: 辻大志郎
 lede: です。本記事では[AWS Lambda]の関数シグネチャを静的解析することで、より安全にAWS Lambdaを実装する方法を紹介します。"
 ---
 
-<img src="/images/20210603a/business-4576778_640.jpg" alt="640" width="412" height="">
+<img src="/images/2021/20210603a/business-4576778_640.jpg" alt="640" width="412" height="">
 
 TIGの辻 ([@d_tutuz](https://twitter.com/d_tutuz))です。
 
@@ -92,7 +92,7 @@ func HandleInvalid(ctx context.Context) int {
 
 答えは "実行時エラー" になります。AWSのコンソールから実行すると以下のようなエラーメッセージが出力されます。
 
-<img src="/images/20210603a/image.png" alt="実行時エラー表示" loading="lazy">
+<img src="/images/2021/20210603a/image.png" alt="実行時エラー表示" loading="lazy">
 
 ## 静的解析による関数シグネチャチェック
 

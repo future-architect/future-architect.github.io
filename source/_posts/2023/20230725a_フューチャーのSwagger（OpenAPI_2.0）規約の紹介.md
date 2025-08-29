@@ -10,18 +10,18 @@ tag:
   - コーディング規約
 category:
   - Programming
-thumbnail: /images/20230725a/thumbnail.png
+thumbnail: /images/2023/20230725a/thumbnail.png
 author: 真野隼記
 lede: "フューチャーの有志メンバーでSwagger（OpenAPI Specification Version 2.0）のコーディング規約を作りました。"
 ---
 
-<img src="/images/20230725a/top.png" alt="" width="409" height="11" loading="lazy">
+<img src="/images/2023/20230725a/top.png" alt="" width="409" height="11" loading="lazy">
 
 ## はじめに
 
 フューチャーの有志メンバーでSwagger（OpenAPI Specification Version 2.0）のコーディング規約を作りました。多少の仕掛り部分はあるものの、ある程度見れるものになってきたので紹介させてください。
 
-<img src="/images/20230725a/example.png" alt="" width="800" height="632" loading="lazy">
+<img src="/images/2023/20230725a/example.png" alt="" width="800" height="632" loading="lazy">
 
 [OpenAPI Specification 2.0規約 | Future Enterprise Coding Standards](https://future-architect.github.io/coding-standards/documents/forOpenAPISpecification/OpenAPI_Specification_2.0.html)
 

@@ -8,12 +8,12 @@ tag:
   - TechBlog
 category:
   - Culture
-thumbnail: /images/20220121a/thumbnail.png
+thumbnail: /images/2022/20220121a/thumbnail.png
 author: 伊藤太斉
 lede: "こんにちは。技術ブログ運営の伊藤です。今回は、社内の取り組みであるBest Blogger of the Yearの紹介と、2021年の受賞者を発表します。Best Blogger of the Year（べすぶろ）は、社外に影響を与えた記事を執筆した人を表彰する仕組みとして.."
 ---
 
-<img src="/images/20220121a/badge-gf28962ed1_640.png" alt="" width="640" height="320">
+<img src="/images/2022/20220121a/badge-gf28962ed1_640.png" alt="" width="640" height="320">
 
 こんにちは。技術ブログ運営の伊藤です。
 

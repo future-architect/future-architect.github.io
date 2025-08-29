@@ -11,7 +11,7 @@ tag:
   - GCP
 category:
   - Culture
-thumbnail: /images/20211004a/thumbnail.png
+thumbnail: /images/2021/20211004a/thumbnail.png
 author: 棚井龍之介
 lede: "こんにちは。TIGの棚井龍之介です。2021年9月10日 のエンジニアで集まり、合同での勉強会を開催しました。フューチャーからはインフラ担当1名と+アプリ担当2名が登壇して、クラウドサービスの紹介やクラウドでのしくじり話などを発表しました。ナイルさん側の発表内容もクラウド寄りのものが多く、期せずして「クラウド勉強会」のような雰囲気になりました。"
 ---
@@ -78,7 +78,7 @@ Nyle 工藤さん
 レガシーメディアシステムのJamstackリプレイス計画素案
 
 <a href="https://www.ta9to.com/talks/nextjs-mysql/" title="スライドへ">
-  <img src="/images/20211004a/jamstack.jpg" alt="スライドトップページ" width="" height="" loading="lazy">
+  <img src="/images/2021/20211004a/jamstack.jpg" alt="スライドトップページ" width="" height="" loading="lazy">
 </a>
 
 # 登壇した感想
@@ -89,4 +89,4 @@ Nyle 工藤さん
 
 以上、「Nyle × FUTURE」での勉強会レポートでした。
 
-<img src="/images/20211004a/Screen_Shot_2021-09-16_at_20.12.25.png" alt="Screen_Shot_2021-09-16_at_20.12.25.png" width="1200" height="693" loading="lazy">
+<img src="/images/2021/20211004a/Screen_Shot_2021-09-16_at_20.12.25.png" alt="Screen_Shot_2021-09-16_at_20.12.25.png" width="1200" height="693" loading="lazy">

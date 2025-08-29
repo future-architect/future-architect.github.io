@@ -8,7 +8,7 @@ tag:
   - Word2Vec
 category:
   - DataScience
-thumbnail: /images/20210325/thumbnail.png
+thumbnail: /images/2021/20210325/thumbnail.png
 author: 金子剛士
 lede: "自然言語処理でよく使われるWord2VecやTransformerをログデータやテーブルデータの予測・分析に活用するためのオレオレベースラインの紹介を行います。対象読者は既にWord2VecやTransformerについて知識があり、その上自身で改造を行いたい人や..."
 mathjax: true
@@ -108,11 +108,11 @@ self-attentionを行うクラスです。
 データをユーザーのIDによって訓練:テスト=9:1に分けて学習した際のcategorical crossentropyが以下の通りです。
 Tesla T4インスタンスで128epochの学習に1hかかりました。
 
-<img src="/images/20210325/results___22_1.png" loading="lazy">
+<img src="/images/2021/20210325/results___22_1.png" loading="lazy">
 
 次に解く問題について予測しその問題が何番目に出現したかについて計測したところ、64epoch目では訓練中に存在しないユーザーに対し13000問の問題からおおよそ700番目くらいの精度で推薦できました。
 
-<img src="/images/20210325/results___23_1.png" loading="lazy">
+<img src="/images/2021/20210325/results___23_1.png" loading="lazy">
 
 得られたembeddingの可視化です。まずは問題のベクトルの可視化ですが、umapで次元圧縮し可視化したところTOEICのpartごとに綺麗に分離していることが分かります。
 

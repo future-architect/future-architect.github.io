@@ -8,7 +8,7 @@ tag:
   - Dart
 category:
   - Infrastructure
-thumbnail: /images/20211228a/thumbnail.png
+thumbnail: /images/2021/20211228a/thumbnail.png
 author: 伊藤真彦
 lede: "ElectronはHTML、Javascriptをアセットとして利用してデスクトップアプリケーションとして動かすことができます、結論としてはFlutterアプリケーションをWEB向けにビルドして、その成果物をElectronアプリケーションとしてビルドすることができました。"
 ---
@@ -35,11 +35,11 @@ Flutter on Desktopはまだまだリリースから間もないため、安心�
 
 例えば[先日の記事](/articles/20211224a/)で技術検証した[google_maps_flutter](https://pub.dev/packages/google_maps_flutter)を利用したアプリケーションをデスクトップ向けにビルドすると、執筆時点ではアラートが表示され正常に動作しません。
 
-<img src="/images/20211228a/image.png" alt="ビルドエラー" width="1200" height="937" loading="lazy">
+<img src="/images/2021/20211228a/image.png" alt="ビルドエラー" width="1200" height="937" loading="lazy">
 
 同じソースコードをWeb向けにビルドし、Electronに組み込むと問題なく動作します。
 
-<img src="/images/20211228a/image_2.png" alt="ElectronでMap表示" width="1200" height="949" loading="lazy">
+<img src="/images/2021/20211228a/image_2.png" alt="ElectronでMap表示" width="1200" height="949" loading="lazy">
 
 Flutter on Desktopのエコシステムが充実するまでの繋ぎとしてこのような手法をとることができます。
 
@@ -61,7 +61,7 @@ cd myapp
 flutter run -d macos
 ```
 
-<img src="/images/20211228a/image_3.png" alt="Flutter on Desktopおさらい" width="1200" height="933" loading="lazy">
+<img src="/images/2021/20211228a/image_3.png" alt="Flutter on Desktopおさらい" width="1200" height="933" loading="lazy">
 
 設定でデスクトップ向けのビルドが有効化されていない場合は`config`コマンドで有効化します。
 
@@ -249,11 +249,11 @@ cd nodejs
 yarn electron:start
 ```
 
-<img src="/images/20211228a/image_4.png" alt="Flutter on Electron" width="1200" height="769" loading="lazy">
+<img src="/images/2021/20211228a/image_4.png" alt="Flutter on Electron" width="1200" height="769" loading="lazy">
 
 Flutter on Desktopとして起動したものと比較すると、微妙にフォントが変わるなどの違いが発生しますが、どちらも快適に動作します(右がFlutter on Desktopです)。ウィンドウのリサイズ時の挙動などはFlutter on Desktopの方がスムーズです、この辺りは仕組み上仕方がないかな、といった印象です。
 
-<img src="/images/20211228a/image_5.png" alt="Flutter on Desktopとの表示の違い" width="1200" height="465" loading="lazy">
+<img src="/images/2021/20211228a/image_5.png" alt="Flutter on Desktopとの表示の違い" width="1200" height="465" loading="lazy">
 
 今回の仕組みではFlutterアプリケーション自体は素直にFlutterアプリケーションとして開発できているので、Flutter on Desktopでも問題なければフットワーク軽めに移行できます。
 

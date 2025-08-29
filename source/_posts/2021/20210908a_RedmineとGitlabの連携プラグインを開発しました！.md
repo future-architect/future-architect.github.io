@@ -9,7 +9,7 @@ tag:
   - コアテク
 category:
   - Programming
-thumbnail: /images/20210908a/thumbnail.png
+thumbnail: /images/2021/20210908a/thumbnail.png
 author: 高橋健
 lede: "RedmineとGitLabリポジトリを連携するRedmine GitLab Adapter Pluginを開発しましたので紹介させていただきます。"
 ---
@@ -32,26 +32,26 @@ Gitリポジトリ登録機能ですが、Redmineサーバ上で直接Gitリポ�
 
 （1）bareリポジトリをRedmineサーバ上にコピーし、定期的にリポジトリの更新を反映させる
 
-<img src="/images/20210908a/1.png" alt="1.png" width="507" height="320" loading="lazy">
+<img src="/images/2021/20210908a/1.png" alt="1.png" width="507" height="320" loading="lazy">
 
 （2）リポジトリサーバをNFSマウントしRedmineサーバ上から直接参照できるようにする
 
-<img src="/images/20210908a/2.png" alt="2.png" width="514" height="326" loading="lazy">
+<img src="/images/2021/20210908a/2.png" alt="2.png" width="514" height="326" loading="lazy">
 
 当社では主にNFS方式で直接参照させるような構成を取っていました。
 
 NFSマウントがあるというだけでサーバの起動順番を意識しないといけないですし障害ポイントにもなりやすいです。また[最近のGitLabのバージョンアップでストレージパスがハッシュ値に変更](https://gitlab-docs.creationline.com/ce/administration/repository_storage_types.html#hashed-storage)され、GitLabサーバ管理者でないと登録困難な状況になってしまいました。
 
-<img src="/images/20210908a/ハッシュ値.png" alt="ハッシュ値.png" width="753" height="138" loading="lazy">
+<img src="/images/2021/20210908a/ハッシュ値.png" alt="ハッシュ値.png" width="753" height="138" loading="lazy">
 
 ## プラグインの特徴
 
 今回開発したプラグインはGitLabのAPI経由でリポジトリ情報を取得するためNFSマウントやリポジトリコピーを行う必要がありません。
-<img src="/images/20210908a/3.png" alt="3.png" width="483" height="322" loading="lazy">
+<img src="/images/2021/20210908a/3.png" alt="3.png" width="483" height="322" loading="lazy">
 
 通常アクセスするGitLabのURLを登録することで連携できるようになっており、リポジトリのハッシュ値を取得して登録する必要もありません。
 
-<img src="/images/20210908a/4.png" alt="4.png" width="1040" height="400" loading="lazy">
+<img src="/images/2021/20210908a/4.png" alt="4.png" width="1040" height="400" loading="lazy">
 
 httpプロキシを経由する場合やコンテキストルートを独自に設定してある構成でも対応できるようにしています。
 
@@ -143,7 +143,7 @@ GitLabのURLにコンテキストパスが含まれている場合は
 
 Redmineのリポジトリタブを選択して以下のような画面が表示されれば正常に登録されています。画面上の見た目は従来と同様になっています。
 
-<img src="/images/20210908a/5.png" alt="5.png" width="1040" height="561" loading="lazy">
+<img src="/images/2021/20210908a/5.png" alt="5.png" width="1040" height="561" loading="lazy">
 
 ## おわりに
 

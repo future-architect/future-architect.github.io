@@ -7,7 +7,7 @@ tag:
   - Go
 category:
   - Programming
-thumbnail: /images/20210629a/thumbnail.png
+thumbnail: /images/2021/20210629a/thumbnail.png
 author: 辻大志郎
 lede: "今回は身近なところに潜むグラフの例を紹介します。データ構造の一つに「グラフ」があります。グラフは対象物の関係性を数理的に表すものです。世の中の事象をグラフとして定式化することで、問題の見通しがよくなるなど、グラフの応用範囲はとても広く、かつ有用です。グラフそのものの説明については本記事で書ききれる内容ではないので割愛しますが、「グラフ理論」などで検索すればたくさん記事が見つかるでしょう。"
 ---
@@ -34,7 +34,7 @@ Goの `context` パッケージは `Context` インタフェース(コンテキ�
 
 以下のようなコンテキストを考えてみます。
 
-<img src="/images/20210629a/d3199f99-d617-d616-6cb4-9f95910f44f3.png" alt="Contextのチェーン" width="361" height="441" loading="lazy">
+<img src="/images/2021/20210629a/d3199f99-d617-d616-6cb4-9f95910f44f3.png" alt="Contextのチェーン" width="361" height="441" loading="lazy">
 
 コンテキストは `context.Context` でルートとなるコンテキストを作成できます。キャンセル処理は `context.WithCancel` タイムアウトは `context.WithTimeout` デッドラインは `context.WithDeadline` の関数を用いて、子コンテキストを生成できます。また値の伝播は `context.WithValue` で値を伝播できる子コンテキストを生成できます。
 
@@ -56,7 +56,7 @@ Goの `context` パッケージは `Context` インタフェース(コンテキ�
 
 値の伝播と子から親方向への値の探索を実現するために `context` パッケージで扱っている実装はシンプルです。子のコンテキストから親方向のコンテキストを再帰的に探索しています。
 
-<img src="/images/20210629a/38e34076-d4dd-4aa8-8dd9-610c49933417.png" alt="親方向へのキーの探索をしている図" width="361" height="518" loading="lazy">
+<img src="/images/2021/20210629a/38e34076-d4dd-4aa8-8dd9-610c49933417.png" alt="親方向へのキーの探索をしている図" width="361" height="518" loading="lazy">
 
 値を伝播するために `context.WithValue` を用いることができました。また、コンテキストから値を取得するときは `Value` メソッドを用います。
 
@@ -107,7 +107,7 @@ func (*emptyCtx) Value(key interface{}) interface{} {
 
 親のコンテキストがキャンセルされると、子のコンテキストもキャンセルされます。`context` パッケージの実装としては、`map` を用いて、キャンセル可能なコンテキストのグラフを実装します。キャンセル可能な親のコンテキストから子のキャンセル可能なコンテキストにキャンセルを伝播します。
 
-<img src="/images/20210629a/9289157e-5141-0104-b3a1-008e25e60232.png" alt="枝分かれしたContext" width="401" height="411" loading="lazy">
+<img src="/images/2021/20210629a/9289157e-5141-0104-b3a1-008e25e60232.png" alt="枝分かれしたContext" width="401" height="411" loading="lazy">
 
 `context.WithCancel` ではキャンセルできるコンテキスト `cancelCtx` と、キャンセルする関数を返却します。
 
@@ -210,7 +210,7 @@ func (c *cancelCtx) cancel(removeFromParent bool, err error) {
 
 子のキャンセル可能なコンテキストから、親のキャンセル可能なコンテキストは参照できないため、子から親をキャンセルすることはできません。
 
-<img src="/images/20210629a/cd0c070e-4683-749d-675e-b646d8251d7b.png" alt="キャンセルは親に伝播しない図" width="161" height="291" loading="lazy">
+<img src="/images/2021/20210629a/cd0c070e-4683-749d-675e-b646d8251d7b.png" alt="キャンセルは親に伝播しない図" width="161" height="291" loading="lazy">
 
 ### まとめ
 

@@ -11,7 +11,7 @@ tag:
   - Vuetify
 category:
   - Programming
-thumbnail: /images/20210826a/thumbnail.gif
+thumbnail: /images/2021/20210826a/thumbnail.gif
 author: kazuma-takeuchi
 lede: "MONET Technologies Inc. の竹内です。このたび、フューチャー技術ブログに寄稿させていただいています。今回は、弊社のMONETマーケットプレイス上のプロダクトを使って、MaaSアプリをイメージしたデモアプリを作ってみました。今回イメージしたデモアプリは「イベント会場へのマルチモーダル移動経路検索&予約&搭乗Webアプリ」です。"
 ---
@@ -24,9 +24,9 @@ MONET Technologies Inc. の竹内です。このたび、フューチャー技�
 
 今回イメージしたデモアプリは「イベント会場へのマルチモーダル移動経路検索&予約&搭乗Webアプリ」です。
 
-<img src="/images/20210826a/demo_short2.gif" alt="アプリデモ動画" width="640" height="400" loading="lazy">
+<img src="/images/2021/20210826a/demo_short2.gif" alt="アプリデモ動画" width="640" height="400" loading="lazy">
 
-<img src="/images/20210826a/image.png" alt="アプリ紹介" width="1200" height="367" loading="lazy">
+<img src="/images/2021/20210826a/image.png" alt="アプリ紹介" width="1200" height="367" loading="lazy">
 
 MONETマーケットプレイスのプロダクトを利用することにより、このようなデモアプリを省エネで作成できます。画面動作の実装単体であれば、2週間弱であらかた完成しました。
 
@@ -56,11 +56,11 @@ MONETマーケットプレイスのプロダクトを利用することにより
 
 今回作成するデモアプリの簡単な背景を決めておきます。私はデマンド交通サービスの提供者であり、複数のイベント提供会社と提携しながら、エリア内のエンドユーザをイベント会場付近まで送迎するサービスを開始したいサービサーだとします。
 
-<img src="/images/20210826a/image_2.png" alt="デモアプリコンセプトとエンドユーザのイメージ" width="1198" height="526" loading="lazy">
+<img src="/images/2021/20210826a/image_2.png" alt="デモアプリコンセプトとエンドユーザのイメージ" width="1198" height="526" loading="lazy">
 
 この時、エンドユーザ向けのアプリとして「**イベント会場への移動をシームレスに検索できるマルチモーダルMaaSアプリ**」を考えました。今回は、移動手段として、電車とデマンド交通サービス、徒歩を組み合わせた移動を想定します。
 
-<img src="/images/20210826a/image_3.png" alt="イベント会場への移動をシームレスに検索できるマルチモーダルMaaSアプリイメージ" width="1022" height="210" loading="lazy">
+<img src="/images/2021/20210826a/image_3.png" alt="イベント会場への移動をシームレスに検索できるマルチモーダルMaaSアプリイメージ" width="1022" height="210" loading="lazy">
 
 このような流れで移動するエンドユーザに対して、イベントの開始時刻に合わせたデマンド交通サービスを検索/予約を提供できるシステムを提供したいと思います。
 
@@ -68,7 +68,7 @@ MONETマーケットプレイスのプロダクトを利用することにより
 
 作成するデモアプリのイメージがついたので、実際のサービスに関わるシステムを図に起こしてみます。
 
-<img src="/images/20210826a/image_4.png" alt="システム構成図" width="1200" height="462" loading="lazy">
+<img src="/images/2021/20210826a/image_4.png" alt="システム構成図" width="1200" height="462" loading="lazy">
 
 実際のオンデマンドモビリティサービス運用を考えると、
 
@@ -81,7 +81,7 @@ MONETマーケットプレイスのプロダクトを利用することにより
 
 これは **「サービサーはMaaSアプリ開発において付加価値を提供したい部分(エンドユーザ向けアプリ)の開発に注力できる」**ことを意味します。
 
-<img src="/images/20210826a/image_5.png" alt="サービサーはMaaSアプリ開発において付加価値を提供したい部分(エンドユーザ向けアプリ)の開発に注力できる図" width="1200" height="454" loading="lazy">
+<img src="/images/2021/20210826a/image_5.png" alt="サービサーはMaaSアプリ開発において付加価値を提供したい部分(エンドユーザ向けアプリ)の開発に注力できる図" width="1200" height="454" loading="lazy">
 
 エンドユーザ向けアプリに必要な機能のインタフェースとしてAPIを提供しているため、こちらを利用してデモアプリを開発します。
 
@@ -104,7 +104,7 @@ MONETマーケットプレイスのプロダクトを利用することにより
 
 MONETマーケットプレイスが提供する[「デマンド交通サービス開発キット」](https://developer.monet-technologies.co.jp/products/2c92a0fd76f5b2b00176f99cea7463a3)では、運行するデマンド交通サービス用に「ポイント(利用者の乗降地点)」を管理者が設定する必要があります。登録自体はマスタ管理用の画面が用意されているので簡単な操作で追加登録可能です。
 
-<img src="/images/20210826a/image_6.png" alt="デマンド交通サービス開発キット" width="1200" height="449" loading="lazy">
+<img src="/images/2021/20210826a/image_6.png" alt="デマンド交通サービス開発キット" width="1200" height="449" loading="lazy">
 
 ただ、登録するポイントの緯度経度は管理者があらかじめ自身で用意する必要があります。
 
@@ -131,7 +131,7 @@ MONETマーケットプレイスが提供する[「デマンド交通サービ�
 
 といった流れで、いい感じのエリア内の乗降車ポイント登録をすることが出来ます。
 
-<img src="/images/20210826a/image_7.png" alt="乗降車ポイントの登録フロー" width="1026" height="394" loading="lazy">
+<img src="/images/2021/20210826a/image_7.png" alt="乗降車ポイントの登録フロー" width="1026" height="394" loading="lazy">
 
 実際のスクリプトとしては2段階に分けて、
 
@@ -238,7 +238,7 @@ print("done!!!")
 
 例えば、成形したデータをVuetifyのカレンダーに渡すことによって、1時間もかからずにイベントスケジュールを表示できました。
 
-<img src="/images/20210826a/image_8.png" alt="イベントスケジュール" width="1200" height="638" loading="lazy">
+<img src="/images/2021/20210826a/image_8.png" alt="イベントスケジュール" width="1200" height="638" loading="lazy">
 
 また、今回はイベントという情報に注目したデモアプリを作ってみましたが、MONETマーケットプレイスには、
 
@@ -260,7 +260,7 @@ MaaSサービスではさまざまな情報を地図上に表示する必要が�
 
 また、ゼンリンAPIを使って取得した徒歩経路を地図上に乗せることができます。今回はGeoJSON形式に整形することにより、汎用性を持たせた形で地図上に乗せることができました。
 
-<img src="/images/20210826a/image_9.png" alt="地図表示" width="698" height="435" loading="lazy">
+<img src="/images/2021/20210826a/image_9.png" alt="地図表示" width="698" height="435" loading="lazy">
 
 さらに、デマンド交通サービス開発キットの予約検索APIや「いつもNAVI API」の徒歩ルート検索APIを組み合わせることで、経路検索結果をポップアップとして表示できました。
 
@@ -271,7 +271,7 @@ MaaSサービスではさまざまな情報を地図上に表示する必要が�
 
 などを見ながら予約可能かどうかを判断し結果を返すため、オーバーブッキングや物理的に不可能な予約は予め弾けるようにレスポンスを返します。
 
-<img src="/images/20210826a/image_10.png" alt="イベント会場まで移動するまでの経路" width="1200" height="747" loading="lazy">
+<img src="/images/2021/20210826a/image_10.png" alt="イベント会場まで移動するまでの経路" width="1200" height="747" loading="lazy">
 
 上記画像のように、エンドユーザが自身の最寄り駅からイベント会場まで移動するまでの経路をマルチモーダル的に表示できました。
 

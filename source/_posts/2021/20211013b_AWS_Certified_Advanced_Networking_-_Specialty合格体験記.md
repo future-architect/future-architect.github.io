@@ -8,7 +8,7 @@ tag:
   - Network
 category:
   - Infrastructure
-thumbnail: /images/20211013b/thumbnail.png
+thumbnail: /images/2021/20211013b/thumbnail.png
 author: 伊藤真彦
 lede: "TIGの伊藤真彦です。来たる11月13日に[Go Conference 2021 Autumn]に、技術ブログでもお馴染みの澁川さん、辻さんと共に登壇させていただくことになりました。楽しい発表になるように頑張ります。宣伝を挟みましたが、AWS Certified Advanced Networking - Specialtyに合格しましたので、今回も合格体験記を書きます。"
 ---
@@ -22,7 +22,7 @@ TIGの伊藤真彦です。
 
 # AWS Certified Advanced Networking - Specialtyとは
 
-<img src="/images/20211013b/image.png" alt="合格バッチ" width="600" height="600" loading="lazy">
+<img src="/images/2021/20211013b/image.png" alt="合格バッチ" width="600" height="600" loading="lazy">
 
 その名の通り高度なネットワーク知識に特化した試験です。
 オンプレミスとのハイブリッドクラウド、Direct Connect接続、複数社のVPCの合体技といった様々な前提条件ありきのセキュアな通信、ベストプラクティスの知識が求められます。

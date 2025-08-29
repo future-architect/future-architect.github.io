@@ -9,11 +9,11 @@ tag:
   - Network
 category:
   - Security
-thumbnail: /images/20221121a/thumbnail.png
+thumbnail: /images/2022/20221121a/thumbnail.png
 author: 村瀬善則
 lede: "情報処理推進機構(IPA)のネットワークスペシャリスト試験の過去問からC&C(Command & Control)サーバの手法と対応策が興味深かったので自分の知識を整理するためブログにしてみました"
 ---
-<img src="/images/20221121a/candc.png" alt="" width="1200" height="700" loading="lazy">
+<img src="/images/2022/20221121a/candc.png" alt="" width="1200" height="700" loading="lazy">
 
 # はじめに
 
@@ -33,7 +33,7 @@ lede: "情報処理推進機構(IPA)のネットワークスペシャリスト�
 
 適切にファイアウォールの設定がされていればインターネットから内部LAN上のPCにはアクセスできないはずです。しかしながら内部LANのPC(のマルウェア)からインターネット上のC&Cサーバにアクセスすることでファイアウォールを突破しCommandを取得します。プロトコルはHTTPS,HTTPなどが利用されるので一般のWebページと見分けがつきません。Webページの閲覧は許容されている企業が多いため、一度マルウェアの侵入を許してしまうと継続的にCommandを受け付けてしまうことになります。
 
-<img src="/images/20221121a/candc1.png" alt="candc1.png" width="1186" height="669" loading="lazy">
+<img src="/images/2022/20221121a/candc1.png" alt="candc1.png" width="1186" height="669" loading="lazy">
 
 # 試験問題に基づく対応方法 IPアドレスを指定した遮断
 
@@ -43,7 +43,7 @@ lede: "情報処理推進機構(IPA)のネットワークスペシャリスト�
 
 問題文にあるとおり、C&Cサーバとの通信はIPアドレスが特定できればFP(フォワードプロキシ)サーバで遮断できます。
 
-<img src="/images/20221121a/candc2.png" alt="candc2.png" width="1017" height="464" loading="lazy">
+<img src="/images/2022/20221121a/candc2.png" alt="candc2.png" width="1017" height="464" loading="lazy">
 
 # 攻撃者による攪乱 Fast Flux
 
@@ -61,7 +61,7 @@ lede: "情報処理推進機構(IPA)のネットワークスペシャリスト�
 前回説明したDNSキャッシュポイズニングでは攻撃者から攻撃を受けにくくするための施策として大量の送信元ポート番号を利用しましたが、反対にそれを悪用された感じがしますね。
 これをやられるとIPアドレスの特定が困難になってしまいます。
 
-<img src="/images/20221121a/candc3.png" alt="candc3" width="915" height="577" loading="lazy">
+<img src="/images/2022/20221121a/candc3.png" alt="candc3" width="915" height="577" loading="lazy">
 
 # 試験問題に基づく対応方法 FQDNを指定した遮断
 
@@ -78,12 +78,12 @@ IPアドレスの特定が困難なので、IPアドレスではなくマルウ�
 > Domain Fluxは、ドメインワイルドカードを用いて、あらゆるホスト名に対して、同一のIPアドレスを応答する手法である。Fast FluxとDomain Fluxを組み合わせることによって、C&CサーバのFQDNとIPアドレスの両方を隠蔽できる。
 
 なんということでしょう。FQDNが特定できません。マルウェアはきっとホスト名の部分(fast-flux)を定期的に変更してC&Cと通信することでしょう。
-<img src="/images/20221121a/candc4.png" alt="candc4" width="1127" height="652" loading="lazy">
+<img src="/images/2022/20221121a/candc4.png" alt="candc4" width="1127" height="652" loading="lazy">
 
 これに関しては確かにFQDNは特定できませんがワイルドカードを用いて*.example.comへのアクセスを遮断すればよさそうです。
 すごい手法だと思いましたが、ドメイン名を指定して遮断できるので怖くないですね。
 
-<img src="/images/20221121a/candc5.png" alt="candc5" width="1159" height="654" loading="lazy">
+<img src="/images/2022/20221121a/candc5.png" alt="candc5" width="1159" height="654" loading="lazy">
 
 # 試験問題に基づく対応方法 プロキシ認証の導入
 
@@ -95,7 +95,7 @@ IPアドレスの特定が困難なので、IPアドレスではなくマルウ�
 マルウェアがもし動作していたらFPサーバのログに認証失敗のログが短時間に大量に出力されることでしょう。
 この対応により通信の遮断と感染の検知ができるようになりました。
 
-<img src="/images/20221121a/candc6.png" alt="candc6" width="1151" height="645" loading="lazy">
+<img src="/images/2022/20221121a/candc6.png" alt="candc6" width="1151" height="645" loading="lazy">
 
 # 対応に関して
 

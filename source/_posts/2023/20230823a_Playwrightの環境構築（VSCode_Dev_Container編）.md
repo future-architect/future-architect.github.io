@@ -9,7 +9,7 @@ tag:
   - 環境構築
 category:
   - Programming
-thumbnail: /images/20230823a/thumbnail.png
+thumbnail: /images/2023/20230823a/thumbnail.png
 author: 武田大輝
 lede: "VSCode Dev Containersを利用してPlaywrightの実行環境をコンテナ上に構築する手順を説明します。"
 ---
@@ -137,7 +137,7 @@ Playwright公式の[Docker Image](https://playwright.dev/docs/docker)を利用�
 npx playwright test --ui
 ```
 
-<img src="/images/20230823a/Playwright.png" alt="Playwright.png" width="1200" height="738" loading="lazy">
+<img src="/images/2023/20230823a/Playwright.png" alt="Playwright.png" width="1200" height="738" loading="lazy">
 
 ---
 

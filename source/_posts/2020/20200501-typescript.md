@@ -9,7 +9,7 @@ tag:
   - TypeScript
 category:
   - Programming
-thumbnail: /images/20200501/thumbnail.png
+thumbnail: /images/2020/20200501/thumbnail.png
 author: 澁川喜規
 lede: "プロダクションコードでたくさんRedux周りにもreducerなどを実装しなくてはいけなくなったときの次のステップとして、Redux Toolkitの紹介をします。"
 ---
@@ -54,25 +54,25 @@ Reduxを使ったアプリケーションの心臓部のReducerとstoreです。
 
 依存関係を図示するとこんな感じでしょう。
 
-<img src="/images/20200501/1.png" loading="lazy">
+<img src="/images/2020/20200501/1.png" loading="lazy">
 
 これは処理の呼び出しの依存ですが、やっかいなのはaction creatorを実装するときのデータはreducerに流れる（Reduxがやってくれる）ので、実装するときの脳みそとしてはこちらの依存も解決する必要がありますが、あくまでもコードの依存だけ取り上げています。
 
 非同期の処理のためにRedux Thunkを使う場合は依存が追加で発生します。
 
-<img src="/images/20200501/2.png" loading="lazy">
+<img src="/images/2020/20200501/2.png" loading="lazy">
 
 ## TypeScriptを使おうとした場合
 
 TypeScriptだとactionやstateの型定義を行い、コードの中で矛盾がないか確認したいですよね？ いくつか型定義を追加する必要がでてきます。入りきらないので折り返しました。blockdiagのfolded初めて使って見ました。
 
-<img src="/images/20200501/3.png" loading="lazy">
+<img src="/images/2020/20200501/3.png" loading="lazy">
 
 JavaScriptは呼び出しで必要な依存しかなかったものの、Reduxが隠蔽してくれていたデータのやり取りも型情報の依存という形で間接的に繋がってしまうのですよね（action型定義）。
 
 Redux thunkで非同期を扱うとこんな感じに。
 
-<img src="/images/20200501/4.png" loading="lazy">
+<img src="/images/2020/20200501/4.png" loading="lazy">
 
 ここまでくれば、型が揃うので、reducerの中でも型チェックがききますし、action cratorの中の属性名の間違いもわかりますが・・・得られるメリットに対してコストがかかりすぎているなぁ、と思っていました。
 
@@ -84,7 +84,7 @@ Redux Toolkitは、この分散したものを集めます。APIがいろいろ�
 
 sliceというのは、状態とそれを変更するアクションをまとめたものです。どこかで見たことがあるやつですね？ そうです。オブジェクト指向です。状態とメソッドの塊をつくってくれるのです。しかも、State以外、型定義らしい型定義もありません。きちんと推論でぜんぶまるっとやってくれるのです。
 
-<img src="/images/20200501/5.png" loading="lazy">
+<img src="/images/2020/20200501/5.png" loading="lazy">
 
 action種別の文字列定数、actionの型定義みたいな、本質的じゃない中間生成物を一切作らなくてもいいので、まとめてもトータルの行数はかなり短くなります。actionの引数のPayloadの型定義なんかも、createSliceの呼び出しの中でインラインで書いちゃうことができます。
 

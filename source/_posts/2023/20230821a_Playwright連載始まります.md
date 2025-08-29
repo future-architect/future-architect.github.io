@@ -9,12 +9,12 @@ tag:
   - Cypress
 category:
   - Programming
-thumbnail: /images/20230821a/thumbnail.png
+thumbnail: /images/2023/20230821a/thumbnail.png
 author: 澁川喜規
 lede: "現在人気が高まりつつあって、Cypressを追い抜こうとしているのがPlaywrightです。かなりCypressを意識して機能追加を行なってきている印象があります。現時点では..."
 ---
 
-<img src="/images/20230821a/playwright.png" alt="" width="800" height="379">
+<img src="/images/2023/20230821a/playwright.png" alt="" width="800" height="379">
 
 E2Eフレームワークとして高い人気を誇ってきたのがCypressです。使いやすいテストランナー、わかりやすいテスト結果、TypeScriptの組み込みサポート、プラグインによる拡張、(Seleniumと比較して)高速な実行などを提供しています。フューチャー社内でも使っているプロジェクトがいくつもあり、過去にCypress連載をブログ上で行い、それがきっかけとなってSoftware Designに連載も行いました。
 
@@ -38,10 +38,10 @@ E2Eフレームワークとして高い人気を誇ってきたのがCypressで�
 
 どれだけ人気が高まっているかGoogleトレンドを見てみましょう。世界的傾向をみると、３年前はほとんどトレンドに表れていなかったPlaywrightですが、1.5年ほど前から徐々に伸び始めていることがわかります。直近ではCypressの半分程度まで上がってきています。
 
-<img src="/images/20230821a/スクリーンショット_2023-07-25_9.55.13.png" alt="" width="1173" height="699" loading="lazy">
+<img src="/images/2023/20230821a/スクリーンショット_2023-07-25_9.55.13.png" alt="" width="1173" height="699" loading="lazy">
 
 日本だけに限定すると、ここ1ヶ月はCypressよりもPlaywrightの方が上となっています。
 
-<img src="/images/20230821a/スクリーンショット_2023-07-25_9.54.32.png" alt="" width="1174" height="443" loading="lazy">
+<img src="/images/2023/20230821a/スクリーンショット_2023-07-25_9.54.32.png" alt="" width="1174" height="443" loading="lazy">
 
 本連載ではなぜPlaywrightがこれほど人気になっているのかが明らかになると思います。逆にもしかしたらライバルの良いところも見つかるかもしれません。

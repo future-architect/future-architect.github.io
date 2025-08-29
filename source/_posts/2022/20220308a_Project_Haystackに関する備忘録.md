@@ -9,7 +9,7 @@ tag:
   - Haystack
 category:
   - IoT
-thumbnail: /images/20220308a/thumbnail.png
+thumbnail: /images/2022/20220308a/thumbnail.png
 author: 大西翔太
 lede: "IoTに関するデータモデル標準化に用いられるProject Haystackについて調べる機会があり、日本語でまとめられている文献が少なくて理解するのに若干苦労したため、備忘録も兼ねて調査した内容を簡単にまとめておきます。Project Haystack は、ファシリティ・機器などの IoT に関するデータモデルを標準化する取り組みです。ビルシステムとそれに関連するデバイスのモデルを様々なツールで解釈できるようにするため..."
 ---
@@ -47,7 +47,7 @@ Haystackの技術概要をざっくり箇条書でまとめてみました。
 全てのエンティティは一意な id と dis(表示名) のタグを持っており、エンティティごとに固有のタグも存在するようです。
 また、カスタムタグとして Haystack が標準で用意していないタグを作成することも可能なようです。
 
-<img src="/images/20220308a/タグ.png" alt="タグ" width="1200" height="565" loading="lazy">
+<img src="/images/2022/20220308a/タグ.png" alt="タグ" width="1200" height="565" loading="lazy">
 
 ## エンティティ間の関係性の表現
 
@@ -55,7 +55,7 @@ Haystackの技術概要をざっくり箇条書でまとめてみました。
 Haystack ではエンティティ内に作成したタグによって、自身のエンティティの特性と他のエンティティとの関係性を示します。
 例）Sample Electricity Meter は、equip, elec, meter タグにより 自身が equip の派生である elec-meterであることを示し、 site タグの中に Sample Site の id を記載することで、 Sample Site の中に設置されていることを示す。
 
-<img src="/images/20220308a/要素間の関連.png" alt="要素間の関連" width="1200" height="506" loading="lazy">
+<img src="/images/2022/20220308a/要素間の関連.png" alt="要素間の関連" width="1200" height="506" loading="lazy">
 
 ## Point へのデータの格納
 

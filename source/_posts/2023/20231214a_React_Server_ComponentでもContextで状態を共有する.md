@@ -9,7 +9,7 @@ tag:
   - フロントエンド
 category:
   - Programming
-thumbnail: /images/20231214a/thumbnail.png
+thumbnail: /images/2023/20231214a/thumbnail.png
 author: 澁川喜規
 lede: "Next.jsの最近の大きな目玉機能はReact Server Componentです。パフォーマンスアップに有効だったり、gRPCだRESTだGraphQLだ論争を終わりにするServer Actionsなど盛りだくさんです。一方で、サーバーコンポーネントはコーディング上の制約がいろいろあります。"
 ---
@@ -102,7 +102,7 @@ export function Child() {
 
 どこがダメでしょうか？ 実行してみると、`createContext()`の呼出はダメよ、とエラーになっています。このファイルに"use client"を足してもダメです。
 
-<img src="/images/20231214a/image.png" alt="image.png" width="1159" height="688" loading="lazy">
+<img src="/images/2023/20231214a/image.png" alt="image.png" width="1159" height="688" loading="lazy">
 
 この`createContext()`を含むコードを全部クライアントコンポーネントに追い出せばOKです。次のステップでこれを直していきます。
 
@@ -148,15 +148,15 @@ export default function Home() {
 
 これでうまく表示されます。
 
-<img src="/images/20231214a/image_2.png" alt="image.png" width="1004" height="469" loading="lazy">
+<img src="/images/2023/20231214a/image_2.png" alt="image.png" width="1004" height="469" loading="lazy">
 
 レンダリングツリーとしては次のような形になります。Homeコンポーネントで、現在は即値ですがサーバーから取得した情報をProviderコンポーネントに渡し、このコンポーネントがコンテキストに格納します。Childコンポーネントはバケツリレーではなく、コンテキスト経由でユーザー情報を取得します。
 
-<img src="/images/20231214a/名称未設定ファイル-ページ1.drawio.png" alt="名称未設定ファイル-ページ1.drawio.png" width="339" height="211" loading="lazy">
+<img src="/images/2023/20231214a/名称未設定ファイル-ページ1.drawio.png" alt="名称未設定ファイル-ページ1.drawio.png" width="339" height="211" loading="lazy">
 
 ソースコードのインポートの依存関係は次の通りで、サーバー→クライアントの参照はあるが、クライアント→サーバーの参照はないため、React Server Componentの規約には反していません。
 
-<img src="/images/20231214a/名称未設定ファイル-ページ2.drawio.png" alt="名称未設定ファイル-ページ2.drawio.png" width="401" height="131" loading="lazy">
+<img src="/images/2023/20231214a/名称未設定ファイル-ページ2.drawio.png" alt="名称未設定ファイル-ページ2.drawio.png" width="401" height="131" loading="lazy">
 
 これでサーバーから取得した値もコンテキスト経由で子供のコンポーネントに参照させてあげられますね。もちろん、間に挟まるサーバーコンポーネントでは`useContext`は使えないため、サーバーコンポーネントが利用したい値はフェッチで取るか、親からPropsで渡す必要があります。
 

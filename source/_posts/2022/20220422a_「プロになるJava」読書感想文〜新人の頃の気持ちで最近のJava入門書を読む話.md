@@ -8,7 +8,7 @@ tag:
   - 書評
 category:
   - Programming
-thumbnail: /images/20220422a/thumbnail.png
+thumbnail: /images/2022/20220422a/thumbnail.png
 author: 永井優斗
 lede: "久しぶりにJavaを利用するプロジェクトにアサインされたことや、初めてOJTトレーナーをやることになったことがきっかけで、「最近のJava入門書ってどんな感じなんだろう？」とふと興味が湧きました。というわけで、「プロになるJava―仕事で必要なプログラミングの知識がゼロから身につく最高の指南書」（以下「プロになるJava」）というJava入門書を早速購入し、読んでみた中での感想文となります。"
 ---
@@ -26,7 +26,7 @@ HealthCare Innovation Group(HIG)の永井優斗です。
 
 なんと明日(2022/4/23)付で第2刷が出るそうです([著者の1人である、きしださんのtweet](https://twitter.com/kis/status/1515520867467337732)より)。すごいですね。
 
-<img src="/images/20220422a/image.png" alt="" width="400" height="507" loading="lazy">
+<img src="/images/2022/20220422a/image.png" alt="" width="400" height="507" loading="lazy">
 
 - https://gihyo.jp/book/2022/978-4-297-12685-8
 

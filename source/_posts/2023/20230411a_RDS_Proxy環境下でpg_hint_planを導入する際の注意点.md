@@ -8,7 +8,7 @@ tag:
   - AWS
 category:
   - Infrastructure
-thumbnail: /images/20230411a/thumbnail.png
+thumbnail: /images/2023/20230411a/thumbnail.png
 author: 辻大志郎
 lede: "PostgreSQL を使用する際、最適な実行計画が選択されず、クエリの速度が遅くなることがあります。オプティマイザが最適な実行計画を選択できない理由はいくつかありますが、たとえばバッチ処理で大量のデータを投入した直後、統計情報と実データの乖離により、少ないデータに適した計画が大量のデータでは不適切になることがあります。このような場合、PostgreSQL の拡張モジュールである pg_hint_plan により実行計画を固定することで、チューニングが可能です。"
 ---
@@ -22,7 +22,7 @@ PostgreSQL を使用する際、最適な実行計画が選択されず、クエ
 
 以下に説明する環境の概要を示します。PostgreSQL のバージョンは 13.7 、`pg_hint_plan` のバージョンは 1.3.7 です。なお、Aurora インスタンス上に構築したデータベースは `sampledb` としています。
 
-<img src="/images/20230411a/image.png" alt="image.png" width="600" height="208" loading="lazy">
+<img src="/images/2023/20230411a/image.png" alt="image.png" width="600" height="208" loading="lazy">
 
 ## `pg_hint_plan` の導入方法
 
@@ -55,7 +55,7 @@ psql -h ${接続先インスタンス名} -U ${マスターユーザー名} -d s
 
 `pg_hint_plan.enable_hint` などのパラメータを `1` にして有効にした直後から、データベースに接続できなくなる事象が発生しました。リソースモニター上からは接続数が突如10000を超えていました。
 
-<img src="/images/20230411a/image_2.png" alt="image.png" width="706" height="280" loading="lazy">
+<img src="/images/2023/20230411a/image_2.png" alt="image.png" width="706" height="280" loading="lazy">
 
 また、PostgreSQL のサーバーログを確認すると、以下のようなログが大量に出力されていました。
 
@@ -73,7 +73,7 @@ psql -h ${接続先インスタンス名} -U ${マスターユーザー名} -d s
 
 社内の有識者から、**RDS Proxy が DB インスタンスの `postgres` データベースにも接続する仕組みになっている**、と教えていただきました。たしかに上記のログからも `rdsproxyadmin` ユーザーで `postgres` データベースで実行しているクエリがエラーになっていることがわかります[^2]。
 
-<img src="/images/20230411a/image_3.png" alt="image.png" width="926" height="318" loading="lazy">
+<img src="/images/2023/20230411a/image_3.png" alt="image.png" width="926" height="318" loading="lazy">
 
 [^2]: 実際、このエラーはデータベースに `pg_hint_plan` の拡張が登録されていないときに発生します。https://pghintplan.osdn.jp/pg_hint_plan-ja.html#install
 

@@ -12,12 +12,12 @@ tag:
   - 登壇レポート
 category:
   - Programming
-thumbnail: /images/20230925a/thumbnail.png
+thumbnail: /images/2023/20230925a/thumbnail.png
 author: 澁川喜規
 lede: "9/7に行われた技育CAMPアカデミアというイベントでPlaywrightについて話をしてきました。テストというと、設計手法であるところのテスト駆動開発は別としてちょっと業務っぽい感じがして学生さんにはちょっと響かないかな、というのも心配でしたが"
 ---
 
-<img src="/images/20230925a/mv_logo.png" alt="" width="510" height="210">
+<img src="/images/2023/20230925a/mv_logo.png" alt="" width="510" height="210">
 
 9/7に行われた技育CAMPアカデミアというイベントでPlaywrightについて話をしてきました。テストというと、設計手法であるところのテスト駆動開発は別としてちょっと業務っぽい感じがして学生さんにはちょっと響かないかな、というのも心配でしたが、アンケートを見る限り、わかりやすかったという声も多くてほっとしました。
 

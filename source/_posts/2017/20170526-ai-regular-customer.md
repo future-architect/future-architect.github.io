@@ -47,7 +47,7 @@ lede: "AI(機械学習・Deep Learning等)を用いて、 **大量にある顔�
 
 「たくさんある画像から同じ人を見るけること」実現に向け、下記1～3で進めていきます。
 
-<img src="/images/20170523/photo_20170523_01.png" loading="lazy">
+<img src="/images/2017/20170523/photo_20170523_01.png" loading="lazy">
 
 1. OpenFace API(Deep Learning)を利用し、顔画像を抽出・表現獲得を行う
     * 結果は128次元ベクトルに変換される
@@ -103,17 +103,17 @@ Dockerは便利です！
 さて、いよいよ画像解析をはじめていきましょう！
 顔画像から表現を獲得する方法はいくつかありますが、今回はGoogleが出している[FaceNet:A Unified Embedding for Recognition and Clustering](http://www.cv-foundation.org/openaccess/content_cvpr_2015/app/1A_089.pdf)に記載されている手法を実装した、[OpenFace](https://cmusatyalab.github.io/openface/)を使います。
 
-<img src="/images/20170523/photo_20170523_02.jpg" loading="lazy">
+<img src="/images/2017/20170523/photo_20170523_02.jpg" loading="lazy">
 
 OpenFaceのAPIを利用すると、人の顔画像を128次元ベクトルへ変換し、画像同士のユークリッド距離が直接類似度となるようにマッピングを行ってくれます。
 
 実際に2つの画像を特徴変換し、ユーグリッド距離（類似度）を出してみましょう。
 利用する画像は次の2枚です。(Dockerコンテナを立てた際にこの2枚のサンプル画像も入っています)
 
-<img src="/images/20170523/photo_20170523_03.jpeg" loading="lazy">
+<img src="/images/2017/20170523/photo_20170523_03.jpeg" loading="lazy">
 lennon-1.jpg
 
-<img src="/images/20170523/photo_20170523_04.jpeg" loading="lazy">
+<img src="/images/2017/20170523/photo_20170523_04.jpeg" loading="lazy">
 carell.jpg
 
 `/root/openface/demo/` フォルダに以下のファイルを作成します。
@@ -203,7 +203,7 @@ koike,liさん,yonetaniさんの顔画像を50枚前後用意し、次元削減�
  [^1]: PCAについては [こちら](http://d.hatena.ne.jp/hgshrs/20130407/1365335916) も参考にしてください
  [^2]: t-sneについては [こちら](http://blog.albert2005.co.jp/2015/12/02/tsne/) も参考にしてください
 
-<img src="/images/20170523/photo_20170523_05.png" loading="lazy">
+<img src="/images/2017/20170523/photo_20170523_05.png" loading="lazy">
 
 各点は、顔画像を無理やりに２次元に落とし込んだものです。
 なんとなくクラスタリングできそうですね！
@@ -228,7 +228,7 @@ DBSCANの簡単な説明をします。
 各点から到達可能である点は同じクラスタと判断します。
 視覚的に表すと以下のようになり、密接な点を同一クラスとみなしてクラスタリングを行っていることがわかります。
 
-<img src="/images/20170523/photo_20170523_06.png" loading="lazy">
+<img src="/images/2017/20170523/photo_20170523_06.png" loading="lazy">
 
 (厳密に言うと、条件があったり等少々異なった箇所がありますが、今回はこのような理解で構いません。)
 

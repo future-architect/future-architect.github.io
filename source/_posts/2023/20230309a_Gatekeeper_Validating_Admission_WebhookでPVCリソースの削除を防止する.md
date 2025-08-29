@@ -10,7 +10,7 @@ tag:
   - Rego
 category:
   - Infrastructure
-thumbnail: /images/20230309a/thumbnail.png
+thumbnail: /images/2023/20230309a/thumbnail.png
 author: 岩崎賢太
 lede: "みなさん、ArgoCDは使っていますか？業務でEKSクラスタにArgoCDをデプロイして、Kubernetesリソースを管理しています。ArgoCDはGitOpsに則ったCDツールで、WebUIが優れていてKubernetesリソースの作成や更新がとても簡単で便利ですね。"
 ---
@@ -195,11 +195,11 @@ spec:
 
 削除前のArgoCDの画面は以下の通りです。
 
-<img src="/images/20230309a/image.png" alt="image.png" width="1200" height="386" loading="lazy">
+<img src="/images/2023/20230309a/image.png" alt="image.png" width="1200" height="386" loading="lazy">
 
 ArgoCDの画面からアプリケーションをForegroundで削除した結果が以下になります。
 
-<img src="/images/20230309a/image_2.png" alt="image.png" width="1200" height="389" loading="lazy">
+<img src="/images/2023/20230309a/image_2.png" alt="image.png" width="1200" height="389" loading="lazy">
 
 エラーが起こり、APP CONDITIONSにて以下のエラーログが表示されます。
 
@@ -224,11 +224,11 @@ kubectl delete pvc -n monitoring storage-kube-prometheus-stack-grafana-0
 
 まず、`storage-kube-prometheus-stack-grafana-0`を削除した状態が以下の通りです。
 
-<img src="/images/20230309a/image_3.png" alt="image.png" width="1200" height="421" loading="lazy">
+<img src="/images/2023/20230309a/image_3.png" alt="image.png" width="1200" height="421" loading="lazy">
 
 kube-prometheus-stackにSyncをかけてPVCをデプロイします。
 
-<img src="/images/20230309a/image_4.png" alt="image.png" width="1200" height="384" loading="lazy">
+<img src="/images/2023/20230309a/image_4.png" alt="image.png" width="1200" height="384" loading="lazy">
 
 無事にPVCが作成されたため、作成リクエストが無事に承認されたことが確認できました。
 

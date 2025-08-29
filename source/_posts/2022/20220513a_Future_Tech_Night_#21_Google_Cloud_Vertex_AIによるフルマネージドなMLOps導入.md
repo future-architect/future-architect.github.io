@@ -10,7 +10,7 @@ tag:
   - 登壇レポート
 category:
   - DataScience
-thumbnail: /images/20220513a/thumbnail.png
+thumbnail: /images/2022/20220513a/thumbnail.png
 author: 真鍋優
 lede: "「Future Tech Night #21 Google Cloud: データエンジニア＋MLOps」に登壇させていただきましたので、その内容について触れていきたいと思います。"
 ---
@@ -32,7 +32,7 @@ lede: "「Future Tech Night #21 Google Cloud: データエンジニア＋MLOps�
 機械学習プロジェクトが広く一般に普及してきた昨今、多くのカンファレンスや企業活動の中でMLOpsが注目を集めています。
 MLOpsとは、下記のライフサイクルを潤滑に回すための概念であり、Machine Learning + DevOps + Operateを合わせたものです。
 
-<img src="/images/20220513a/image.png" alt="MLOps" width="800" height="450" loading="lazy">
+<img src="/images/2022/20220513a/image.png" alt="MLOps" width="800" height="450" loading="lazy">
 
 本発表では、コーディングと学習のフェーズに焦点を当てています。
 如何にデータサイエンティストのためのコーディング環境や、ハイスペックな学習環境を用意するかといった環境面の問題や、実装されたアルゴリズムをどのようにサービスとして素早くデプロイするのか等が課題となってきます。
@@ -41,7 +41,7 @@ MLOpsとは、下記のライフサイクルを潤滑に回すための概念で
 
 Vertex AIとはGoogle Cloud Platformにおける必要なMLツールがすべて揃った一元的なAIプラットフォームであり、GAされたのが2021年5月と比較的新しいサービスです。
 
-<img src="/images/20220513a/image_2.png" alt="Vertex AI" width="800" height="450" loading="lazy">
+<img src="/images/2022/20220513a/image_2.png" alt="Vertex AI" width="800" height="450" loading="lazy">
 
 * Vertex AI WorkBench
 フルマネージド型のコンピューティング環境で、JupyterLabの環境を数クリックで構築できます。
@@ -49,7 +49,7 @@ Vertex AIとはGoogle Cloud Platformにおける必要なMLツールがすべて
 
 また、Pythonだけでなくパッケージが導入済みのイメージや、自身で作成したイメージを用いて構築することも可能です。
 
-<img src="/images/20220513a/image_3.png" alt="Vertex AI WorkBench" width="800" height="450" loading="lazy">
+<img src="/images/2022/20220513a/image_3.png" alt="Vertex AI WorkBench" width="800" height="450" loading="lazy">
 
 * Vertex AI Pipeline
 WorkBenchで構築した学習アルゴリズムや推論のコードは、サービス化・システム導入の際に利用する環境に合わせて準備する必要があります。
@@ -59,15 +59,15 @@ WorkBenchで構築した学習アルゴリズムや推論のコードは、サ�
 　3. 利用したデータやパラメータ、コードのバージョンを後から見直せるようにすること
 これらの管理をVertex AI Pipelineを用いることで容易に行うことができます。
 
-<img src="/images/20220513a/image_4.png" alt="Vertex AI Pipeline概要" width="800" height="450" loading="lazy">
+<img src="/images/2022/20220513a/image_4.png" alt="Vertex AI Pipeline概要" width="800" height="450" loading="lazy">
 
 Pipelineは複数のコンポーネントから構成されており、デフォルトで用意されたAutoMLといった処理や、各自で作成するDockerイメージによる独自の処理を登録できます。
 
-<img src="/images/20220513a/image_5.png" alt="Pipeline" width="800" height="450" loading="lazy">
+<img src="/images/2022/20220513a/image_5.png" alt="Pipeline" width="800" height="450" loading="lazy">
 
 実行されたPipelineは、自動的に利用したデータや設定値、開始日時や実行時間といった各種パラメータを記録でき、後から結果を遡ることを容易にします。
 
-<img src="/images/20220513a/image_6.png" alt="メタデータ管理" width="800" height="450" loading="lazy">
+<img src="/images/2022/20220513a/image_6.png" alt="メタデータ管理" width="800" height="450" loading="lazy">
 
 ## Q&A
 

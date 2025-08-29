@@ -10,7 +10,7 @@ tag:
   - CloudEvents
 category:
   - Programming
-thumbnail: /images/20200331/thumbnail.png
+thumbnail: /images/2020/20200331/thumbnail.png
 author: 村田靖拓
 lede: "サーバレス連載企画の第5回はCloudEvents(https://cloudevents.io/)を取り上げたいと思います。CloudEventsとは様々存在するイベントを統一的に扱いたいとの思いから登場した統一仕様です。2019.10.24にCNCF(https://www.cncf.io/)のIncubatorプロジェクトに昇格したらしく、同時にv1.0のSpecificationがリリースされています。"
 ---
@@ -25,7 +25,7 @@ lede: "サーバレス連載企画の第5回はCloudEvents(https://cloudevents.i
 
 # CloudEventsとは？
 
-<img src="/images/20200331/photo_20200331_01.png" loading="lazy">
+<img src="/images/2020/20200331/photo_20200331_01.png" loading="lazy">
 
 [CloudEvents](https://cloudevents.io/)は様々存在するイベントを統一的に扱いたいとの思いから登場した統一仕様です。
 2019.10.24に[CNCF](https://www.cncf.io/)のIncubatorプロジェクトに昇格したらしく、同時にv1.0のSpecificationがリリースされています。
@@ -51,7 +51,7 @@ GitHubを見る限りではGoのSDKが一番開発進んでいるのかなと思
 
 以下のような形を目指します。
 
-<img src="/images/20200331/d1.png" loading="lazy">
+<img src="/images/2020/20200331/d1.png" loading="lazy">
 
 ### SDKバージョンについての補足
 
@@ -73,7 +73,7 @@ https://github.com/cloudevents/sdk-go/blob/master/README_v1.md
 
 まずはローカル端末内で完結する形で実装します。
 
-<img src="/images/20200331/d2.png" loading="lazy">
+<img src="/images/2020/20200331/d2.png" loading="lazy">
 
 [公式のリポジトリ](https://github.com/cloudevents/sdk-go/tree/v1.1.2/cmd/samples)にしっかりサンプル実装があるので、それを参考にしつつ進めることができました。
 
@@ -172,7 +172,7 @@ Data,
 実際にはイベントデータの受け渡しはキューを経由するなどして非同期なやりとりになるかと思います。
 というわけで、私が普段GCPを利用しているということもありGCPのCloud Pub/Subを経由する形で実装したいと思います。
 
-<img src="/images/20200331/d3.png" loading="lazy">
+<img src="/images/2020/20200331/d3.png" loading="lazy">
 
 まずはReceiverの実装です。
 
@@ -374,7 +374,7 @@ Data: &{Sequence:0 Message:HELLO}
 期待通りにメッセージを受け取ることができました。
 GCPコンソールからもメッセージがしっかりPub/Subに届いていたことが確認できます。
 
-<img src="/images/20200331/photo_20200331_02.png" class="img-small-size" loading="lazy">
+<img src="/images/2020/20200331/photo_20200331_02.png" class="img-small-size" loading="lazy">
 
 成功です。
 
@@ -383,7 +383,7 @@ GCPコンソールからもメッセージがしっかりPub/Subに届いてい�
 さて、Pub/SubキューはCloud Functionsに渡してあげたいと思うのは私だけでしょうか？（求ム、同志）。
 というわけでラストは先程Cloud Pub/Subに到達したメッセージをCloud Functionsで受け取りたいと思います。
 
-<img src="/images/20200331/d4.png" loading="lazy">
+<img src="/images/2020/20200331/d4.png" loading="lazy">
 
 先程までのReceiverをCluod Functions仕様に書き換えてあげます。また、さっきまでは受け取ったメッセージの中に含まれるpayloadをプログラム上で扱える形にまでparseしきってなかったのでそこも一緒にやりたいと思います。
 
@@ -553,7 +553,7 @@ Senderは同じものを利用するだけなので新しい準備は不要で�
 
 というわけで実行してみると...
 
-<img src="/images/20200331/photo_20200331_03.png" loading="lazy">
+<img src="/images/2020/20200331/photo_20200331_03.png" loading="lazy">
 Cloud Functionsのログにてメッセージが届いていることが確認できました！
 
 無事に『CloudEvents仕様のメッセージをローカル端末からCloud Pub/Sub経由でCloud Functionsに渡し、個々の値を取り出しプログラムで扱える形にすること』という目的を達成できました。

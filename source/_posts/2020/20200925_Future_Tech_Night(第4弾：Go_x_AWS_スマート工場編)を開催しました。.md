@@ -11,7 +11,7 @@ tag:
   - StepFunctions
 category:
   - Programming
-thumbnail: /images/20200925/thumbnail.png
+thumbnail: /images/2020/20200925/thumbnail.png
 author: 辻大志郎
 lede: "こんにちは、TIGの栗田、伊藤、辻です。先日2020/9/25にオンラインにてFuture Tech Nightという社外勉強会を開催しました。今回は第4弾としてGoとAWSを使って工場制御する最新プロジェクトの事例を紹介しました。"
 ---
@@ -25,7 +25,7 @@ lede: "こんにちは、TIGの栗田、伊藤、辻です。先日2020/9/25に�
 - [第3弾【On-Line】Future Tech Night ～船舶IoT Platform編～](https://future.connpass.com/event/185051/)
 - [第4弾【On-Line】Future Tech Night #4 〜Go x AWS スマート工場編〜](https://future.connpass.com/event/188742/) <----- 今回はこれ
 
-<img src="/images/20200925/image.png" loading="lazy">
+<img src="/images/2020/20200925/image.png" loading="lazy">
 
 Gopherのアイキャッチのおかげか、Future Tech Night史上過去最高の参加人数となり大盛況で終わりました。
 
@@ -48,15 +48,15 @@ Gopherのアイキャッチのおかげか、Future Tech Night史上過去最高
 [工場をHackするための基本知識　前編](/articles/20191023/)
 [工場をHackするための基本知識　後編](/articles/20200120/)
 
-<img src="/images/20200925/78e26c1c-e68c-0cc3-ea3d-24ec4e113889.png" loading="lazy">
+<img src="/images/2020/20200925/78e26c1c-e68c-0cc3-ea3d-24ec4e113889.png" loading="lazy">
 
 伊藤からはGoを用いて、AWSクラウドから工場のPLCと通信するためのプロトコル実装を解説しました。MCプロトコルで通信するためのGoのライブラリは [future-architect/go-mcprotocol](https://github.com/future-architect/go-mcprotocol) としてGitHubに公開しています。
 
-<img src="/images/20200925/4010f0c0-415f-ae07-b1d7-d825a1e1fe59.png" loading="lazy">
+<img src="/images/2020/20200925/4010f0c0-415f-ae07-b1d7-d825a1e1fe59.png" loading="lazy">
 
 辻からはクラウドから工場のデバイスを制御するためのアーキテクチャや、制御用のサーバを工場(Edge)に配備せずに、フルクラウド・サーバレスとした理由などを解説しました。また準リアルタイムにPLCと通信するためにStep Functionsを活用したポーリングの仕組みの話をしました。
 
-<img src="/images/20200925/d7e95dd3-7467-dfba-be43-681cf2f2fdae.png" loading="lazy">
+<img src="/images/2020/20200925/d7e95dd3-7467-dfba-be43-681cf2f2fdae.png" loading="lazy">
 
 ## 登壇者からのコメント
 
@@ -78,7 +78,7 @@ A. 筆者の個人的な見解としてはNoです。オンプレとクラウド
 
 A. 下図のようにStep Functionsのタスクがループするようにステートマシンを構成しています(1つの緑背景が1つのタスクです)。図には記述していませんがStep FunctionsのWaitのタスクを用いることで秒単位の実行遅延を発生させることができます。
 
-<img src="/images/20200925/f11743b4-35da-66a0-451c-9b54c6dcb6a2.png" loading="lazy">
+<img src="/images/2020/20200925/f11743b4-35da-66a0-451c-9b54c6dcb6a2.png" loading="lazy">
 
 **Q. StepFunctionsを用いてポーリングする場合、料金は大丈夫でしょうか？**
 
@@ -98,4 +98,4 @@ FutureではFuture Tech Nightの他にも様々なイベントを開催してお
 
 connpassのフューチャーグループイベントの[メンバー登録](https://future.connpass.com/)やTwitter(@future_recruit_)のフォローもお忘れなく📝
 
-<img src="/images/20200925/217f3b78-542d-dce3-e9c0-cfb79c91bd49.png" loading="lazy">
+<img src="/images/2020/20200925/217f3b78-542d-dce3-e9c0-cfb79c91bd49.png" loading="lazy">

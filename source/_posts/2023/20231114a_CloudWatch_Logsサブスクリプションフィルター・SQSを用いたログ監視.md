@@ -10,7 +10,7 @@ tag:
   - SQS
 category:
   - DevOps
-thumbnail: /images/20231114a/thumbnail.png
+thumbnail: /images/2023/20231114a/thumbnail.png
 author: 内田敦也
 lede: "当チームでは、出力されたエラーや警告ログを適宜Backlogに起票することにより、いち早くエラーの対応ができるようにしております。CloudWatch LogsサブスクリプションフィルターとSQSを用いることにより、CloudWatchの特定のログをトリガーとして監視ジョブを立ち上げる仕様に改修しました。"
 ---
@@ -28,7 +28,7 @@ lede: "当チームでは、出力されたエラーや警告ログを適宜Back
 
 # 構成
 
-<img src="/images/20231114a/fig.drawio.png" alt="fig.drawio.png" width="941" height="467" loading="lazy">
+<img src="/images/2023/20231114a/fig.drawio.png" alt="fig.drawio.png" width="941" height="467" loading="lazy">
 
 サブスクリプションフィルターで抽出されたログを、Lambda関数経由でSQSに挿入します。
 

@@ -9,7 +9,7 @@ tag:
   - Swagger
 category:
   - Infrastructure
-thumbnail: /images/20210511b/thumbnail.png
+thumbnail: /images/2021/20210511b/thumbnail.png
 author: 宮崎将太
 lede: "Dart/Flutter連載の2記事目です。はじめまして、TIGの宮崎将太です。突然ですがみなさん、Swagger使いたいですよね。"
 ---
@@ -76,7 +76,7 @@ flutter create flutter_swagger
 
 ※Flutter基本的なディレクトリ構造に関しての説明は今回は割愛します。
 
-<img src="/images/20210511b/image.png" alt="ディレクトリ構成" width="580" height="758" loading="lazy">
+<img src="/images/2021/20210511b/image.png" alt="ディレクトリ構成" width="580" height="758" loading="lazy">
 
 ## swagger.yaml配置
 
@@ -139,7 +139,7 @@ openapi-generator generate -i ./swagger.yaml -g dart -o ./client
 
 ※コンパイルエラーが発生している場合は`client`配下で`flutter pub get`を実行して依存ライブラリを解決してください。
 
-<img src="/images/20210511b/image_2.png" alt="openapi-generatorでの生成先ディレクトリ" width="554" height="1102"  loading="lazy">
+<img src="/images/2021/20210511b/image_2.png" alt="openapi-generatorでの生成先ディレクトリ" width="554" height="1102"  loading="lazy">
 
 主たる生成コードの役割は以下の通りです。
 

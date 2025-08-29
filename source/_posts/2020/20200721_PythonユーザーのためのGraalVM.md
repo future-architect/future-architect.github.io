@@ -8,7 +8,7 @@ tag:
   - Java
 category:
   - Programming
-thumbnail: /images/20200721/thumbnail.png
+thumbnail: /images/2020/20200721/thumbnail.png
 author: 澁川喜規
 lede: "ちょうど一年ぐらい前にGraalVMが商用利用可能な安定版に達し、Enterprise版もリリースされたというニュースがあります。 GraalVMにはPython機能もあると宣伝されているものの、詳しい説明が行われることがなく、それが何者で、どのようなステータスで、どこを目指しているのか、きちんと答えられる人は（日本どころか世界でも）ほぼいないでしょう。GraalVMそのものの説明はちょくちょく出てくるようになってきたと思いますが、そのPythonの機能についてはあまり説明されていないため、Python部分にフォーカスして紹介します。"
 ---
@@ -148,7 +148,7 @@ Please note: This Python implementation is in the very early stages, and can run
 >>> win.show()
 ```
 
-<img src="/images/20200721/thumbnail.png" class="img-small-size" loading="lazy">
+<img src="/images/2020/20200721/thumbnail.png" class="img-small-size" loading="lazy">
 
 デフォルトはnativeモードでAoTコンパイルをします。CPythonと変わらない感覚で使えます。JVMモードにするとJITコンパイルになりますが、ちょっとしたコードはこちらの方が時間がかかるようになります。ただ、Jythonのコードを実行するにはJVMモードでないとダメです。
 

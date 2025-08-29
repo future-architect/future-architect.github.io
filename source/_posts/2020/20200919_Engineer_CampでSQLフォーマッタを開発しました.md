@@ -14,7 +14,7 @@ tag:
   - フォーマッター
 category:
   - Programming
-thumbnail: /images/20200919/thumbnail.jpg
+thumbnail: /images/2020/20200919/thumbnail.jpg
 author: 中村祥大
 lede: "はじめまして。フューチャーのインターンEngineer Campに参加した中村と申します。この記事では、今回のインターンで私が取り組んだ内容を紹介します。今回のインターンで私は、SQLフォーマッタの作成に取り組みました。"
 ---
@@ -32,7 +32,7 @@ lede: "はじめまして。フューチャーのインターンEngineer Campに
 今回のインターンで私は、SQLフォーマッタの作成に取り組みました。
 SQLフォーマッタとは以下のようにSQLのインデントなど整形するツールのことです。
 
-<img src="/images/20200919/formatter.jpg" class="img-middle-size" loading="lazy">
+<img src="/images/2020/20200919/formatter.jpg" class="img-middle-size" loading="lazy">
 
 SQLフォーマッタを用いることで、SQLの見た目を整える手間を削減したり、チームで統一感があるコーディングを実現できます。
 
@@ -71,21 +71,21 @@ ANTLRはパーサ（構文解析器）を生成するためのOSSです。パー
 
 今回作成したフォーマッタによる、フォーマット処理の流れを下図に示します。
 
-<img src="/images/20200919/format-flow1.png" loading="lazy">
+<img src="/images/2020/20200919/format-flow1.png" loading="lazy">
 
 フォーマット処理は2つのステップからなり、パーサとプリンタという2つのプログラムを用います。
 
 第1ステップでは、パーサがフォーマット対象のSQLコードを受け取り、コードをASTという表現に変換します。
 
-<img src="/images/20200919/format-flow2.png" loading="lazy">
+<img src="/images/2020/20200919/format-flow2.png" loading="lazy">
 
 第2ステップでは、プリンタがASTを受け取り、ASTの情報をもとにフォーマットされたコードを出力します。
 
-<img src="/images/20200919/format-flow3.png" loading="lazy">
+<img src="/images/2020/20200919/format-flow3.png" loading="lazy">
 
 この2ステップを組み合わせることで、SQLを入力として受け取り、成形したものを出力するという、フォーマッタの動作が実現できます！
 
-<img src="/images/20200919/format-flow4.png" loading="lazy">
+<img src="/images/2020/20200919/format-flow4.png" loading="lazy">
 
 # 行った作業
 
@@ -99,7 +99,7 @@ PrettierプラグインとしてSQLフォーマッタの開発を行ったので
 開発をしていく中で、SQLのパース処理にかかる時間がありえないほど長いという問題が発生しました。
 メンターの方と調査を行った結果、ANTLR内部の実装にミスがあることが判明し、ANTLRのリポジトリにissueが立つという一幕がありました。
 
-<img src="/images/20200919/image_(2).png" loading="lazy">
+<img src="/images/2020/20200919/image_(2).png" loading="lazy">
 
 現在は[修正](https://github.com/antlr/antlr4/pull/2905)されているのですが、この修正で今まで90分かけても終わらなかった処理が20秒で終わるようになり、特定の条件下において、約270倍（！）の高速化を行うことができました。
 
@@ -109,11 +109,11 @@ PrettierプラグインとしてSQLフォーマッタの開発を行ったので
 
 フォーマット前のSQLコードです。とても見にくい…。
 
-<img src="/images/20200919/before.jpg" class="img-middle-size" loading="lazy">
+<img src="/images/2020/20200919/before.jpg" class="img-middle-size" loading="lazy">
 
 フォーマット後のSQLコードです。見やすい！
 
-<img src="/images/20200919/after.jpg" class="img-middle-size" loading="lazy">
+<img src="/images/2020/20200919/after.jpg" class="img-middle-size" loading="lazy">
 
 各カラムや条件式が整えられ、見やすくなっています。また、最後のWHERE句のような、式中にコメントがある場合もうまくフォーマットが行われています。
 

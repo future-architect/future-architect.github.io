@@ -10,11 +10,11 @@ tag:
   - 暗号
 category:
   - Infrastructure
-thumbnail: /images/20210413a/thumbnail.png
+thumbnail: /images/2021/20210413a/thumbnail.png
 author: 棚井龍之介
 lede: "認証情報を Lambda の環境変数に渡す要件が発生したため認証情報を KMS で暗号化して、リポジトリには暗号化した値を登録し、Lambda 内で復号化する構成を取りました。"
 ---
-<img src="/images/20210413a/Screen_Shot_2021-03-24_at_2.18.57.png" alt="">
+<img src="/images/2021/20210413a/Screen_Shot_2021-03-24_at_2.18.57.png" alt="">
 
 # はじめに
 
@@ -206,7 +206,7 @@ resource "aws_lambda_function" "kms_lambda" {
 ```
 
 手動で設定を行う場合は環境変数の設定から暗号化設定を有効化します。
-<img src="/images/20210413a/lambda.png" alt="環境変数の編集画面" loading="lazy">
+<img src="/images/2021/20210413a/lambda.png" alt="環境変数の編集画面" loading="lazy">
 
 ## Lambda で復号化
 

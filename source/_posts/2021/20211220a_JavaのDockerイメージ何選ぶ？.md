@@ -8,13 +8,13 @@ tag:
   - コンテナビルド
 category:
   - Programming
-thumbnail: /images/20211220a/thumbnail.png
+thumbnail: /images/2021/20211220a/thumbnail.png
 author: 澁川喜規
 featured: false
 lede: "Javaアドベントカレンダーにエントリーした記事になります。Javaのイメージを作る上で、どのDockerイメージをベースに選べばいいのか、というのを軽く調べ始めたら、選択肢がたくさんでてきたので、ちょっと突っ込んで調べてみました。"
 ---
 
-<img src="/images/20211220a/top.png" alt="" width="1000" height="514">
+<img src="/images/2021/20211220a/top.png" alt="" width="1000" height="514">
 
 [Javaアドベントカレンダー](https://qiita.com/advent-calendar/2021/java)にエントリーした記事になります。
 

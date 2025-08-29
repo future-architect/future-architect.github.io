@@ -8,7 +8,7 @@ tag:
   - ドローン
 category:
   - Programming
-thumbnail: /images/20240521a/thumbnail.png
+thumbnail: /images/2024/20240521a/thumbnail.png
 author: 大前七奈
 lede: "ドローンを利用して自動操縦（Autopilot）のロジックを組みたいですが、自宅でドローンを飛ばしたら家が壊されてしまう恐れがあるので、シミュレータを使います。"
 ---
@@ -27,7 +27,7 @@ lede: "ドローンを利用して自動操縦（Autopilot）のロジックを�
 - リモートコントローラー(以下、RC)
 - USBケーブル数本
 
-<img src="/images/20240521a/image.png" alt="" width="1200" height="904" loading="lazy">
+<img src="/images/2024/20240521a/image.png" alt="" width="1200" height="904" loading="lazy">
 
 ## バージョン
 
@@ -43,7 +43,7 @@ lede: "ドローンを利用して自動操縦（Autopilot）のロジックを�
 
 ## システム構成
 
-<img src="/images/20240521a/image_2.png" alt="image.png" width="1200" height="426" loading="lazy">
+<img src="/images/2024/20240521a/image_2.png" alt="image.png" width="1200" height="426" loading="lazy">
 
 ## 手順
 
@@ -58,28 +58,28 @@ https://github.com/dji-sdk/Mobile-SDK-Android/tree/master
 
 ※Package Nameはサンプルコード内のパッケージ名（各パッケージが存在するパス：Sample Code/app/src/main/java）。その他の項目は適当に記載
 
-<img src="/images/20240521a/image_3.png" alt="image.png" width="1192" height="1130" loading="lazy">
+<img src="/images/2024/20240521a/image_3.png" alt="image.png" width="1192" height="1130" loading="lazy">
 
 ### ３（開発PC）サンプリコード内にAPIキーを入力
 
 AndroidManifest.xml（パス：Sample Code/app/src/main/main)
 
-<img src="/images/20240521a/image_4.png" alt="image.png" width="1200" height="405" loading="lazy">
+<img src="/images/2024/20240521a/image_4.png" alt="image.png" width="1200" height="405" loading="lazy">
 
 ### ４（開発PC）Sample Codeフォルダーを開いてビルドする
 
 - gradle-wrapper.properties(パス：Sample Code/gradle/wrapper)で一度「Sync」OR「build」
 ※まず最初からSyncするといいと思うが、大抵の場合ビルドエラーが起こる。こんな感じ
 
-<img src="/images/20240521a/image_5.png" alt="image.png" width="1200" height="569" loading="lazy">
+<img src="/images/2024/20240521a/image_5.png" alt="image.png" width="1200" height="569" loading="lazy">
 
 - 「Change Gradle version in Gradle wrapper to 7.5....」を押すと、自動的にgradle-wrapper.propertiesの中身を書き換えてくれて、ビルドする
 
-<img src="/images/20240521a/image_6.png" alt="image.png" width="1200" height="454" loading="lazy">
+<img src="/images/2024/20240521a/image_6.png" alt="image.png" width="1200" height="454" loading="lazy">
 
 ### ５（開発PC）エミュレータを起動
 
-<img src="/images/20240521a/image_7.png" alt="image.png" width="794" height="1594" loading="lazy">
+<img src="/images/2024/20240521a/image_7.png" alt="image.png" width="794" height="1594" loading="lazy">
 
 - 起動後に「Register App」を押すと、DJI SDK利用が可能になる
 
@@ -94,7 +94,7 @@ AndroidManifest.xml（パス：Sample Code/app/src/main/main)
 - RCの電源をON、Phantom 4の電源をONにする
 - Bridge Appを立ち上げて、USBでRCに繋ぐ
 
-<img src="/images/20240521a/image_8.png" alt="image.png" width="880" height="1868" loading="lazy">
+<img src="/images/2024/20240521a/image_8.png" alt="image.png" width="880" height="1868" loading="lazy">
 
 - 画面のIPアドレスをメモる(こちらの端末では192.168.1.35)
 
@@ -104,11 +104,11 @@ AndroidManifest.xml（パス：Sample Code/app/src/main/main)
 
 (開発PC画面)
 
-<img src="/images/20240521a/image_9.png" alt="image.png" width="772" height="1570" loading="lazy">
+<img src="/images/2024/20240521a/image_9.png" alt="image.png" width="772" height="1570" loading="lazy">
 
 (BridgeApp用携帯画面)
 
-<img src="/images/20240521a/image_10.png" alt="image.png" width="888" height="1868" loading="lazy">
+<img src="/images/2024/20240521a/image_10.png" alt="image.png" width="888" height="1868" loading="lazy">
 
 ### ９（シミュレータ用PC）DJI Assistant 2でPhantom 4に接続
 
@@ -119,14 +119,14 @@ AndroidManifest.xml（パス：Sample Code/app/src/main/main)
 
 - 検知できると、こんな画面が出てくる
 
-<img src="/images/20240521a/image_11.png" alt="image.png" width="1200" height="748" loading="lazy">
+<img src="/images/2024/20240521a/image_11.png" alt="image.png" width="1200" height="748" loading="lazy">
 
-<img src="/images/20240521a/image_12.png" alt="image.png" width="1200" height="753" loading="lazy">
+<img src="/images/2024/20240521a/image_12.png" alt="image.png" width="1200" height="753" loading="lazy">
 
 - 「Simulator」＞「Start Simulating」を押すと、Simulatorが立ち上がる
 ※ファイアウォールを無効化にする必要！ そうしないとRCからの信号が到達できない
 
-<img src="/images/20240521a/image_13.png" alt="image.png" width="1200" height="750" loading="lazy">
+<img src="/images/2024/20240521a/image_13.png" alt="image.png" width="1200" height="750" loading="lazy">
 
 ### １０．🍷🍷🍷操作できました🍷🍷🍷
 

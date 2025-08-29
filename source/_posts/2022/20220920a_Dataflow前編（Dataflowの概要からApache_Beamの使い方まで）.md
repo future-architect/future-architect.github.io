@@ -9,12 +9,12 @@ tag:
   - インターン2022
 category:
   - Infrastructure
-thumbnail: "/images/20220920a/thumbnail.png"
+thumbnail: "/images/2022/20220920a/thumbnail.png"
 author: "平野甫"
 lede: "フューチャーのインターンEngineer Campに参加した平野と申します。今回のインターンでは、Google Cloud Platform (GCP)のサービスとして提供されているDataflowについて調査し、その仕組みや使い方についてこの技術ブログにまとめることに取り組みました。"
 ---
 
-<img src="/images/20220920a/dataflow_top1.png" alt="" width="1000" height="655">
+<img src="/images/2022/20220920a/dataflow_top1.png" alt="" width="1000" height="655">
 
 # はじめに
 
@@ -62,7 +62,7 @@ Dataflow上で実行するデータ処理の内容はApache Beamを用いて記�
 
 Apache Beam自体は、データ処理パイプラインを定義・実行するソフトウェア開発キット (SDK) で、OSSなので誰でも利用できます。Dataflow以外にもFlink, Nemo, Spark, AWS KDAなどの環境（Runnerという）で動かすことができ、Go, Java, Pythonといった様々なプログラミング言語で利用できます。
 
-<img src="/images/20220920a/Apache_Beam_flow.png" alt="Apache_Beam_flow.png" width="1200" height="534" loading="lazy">
+<img src="/images/2022/20220920a/Apache_Beam_flow.png" alt="Apache_Beam_flow.png" width="1200" height="534" loading="lazy">
 
 Apache Beamの特徴としては、パイプライン処理を実行するWorkerの確保、各Workerへのデータの割り当てなどはRunnerが自動で行なってくれるという点があります。そのため、コードを書く際にはパイプライン処理の流れだけに注力すればよく、大規模なデータの分散処理を簡単に実行できます。
 
@@ -71,7 +71,7 @@ Apache Beamの特徴としては、パイプライン処理を実行するWorker
 ## Apache Beamの構成要素
 
 Apache Beamでは以下の図のような構成となっています。
-<img src="/images/20220920a/Apache_Beam_flow_2.png" alt="Apache_Beam_flow.png" width="1200" height="241" loading="lazy">
+<img src="/images/2022/20220920a/Apache_Beam_flow_2.png" alt="Apache_Beam_flow.png" width="1200" height="241" loading="lazy">
 
 * Pipeline:
 データ処理タスク全体（入力データの読み取り→データの処理→データの書き出し）をカプセル化したもの。
@@ -94,15 +94,15 @@ Apache Beamでは以下の図のような構成となっています。
 
 いくつのBundleに分割するかはRunnerが決定します。以下の図では9つのelementからなるPCollectionを2つのBundleに分割しています。
 
-<img src="/images/20220920a/Bundleに分割する例.svg" alt="Bundleに分割する例" loading="lazy">
+<img src="/images/2022/20220920a/Bundleに分割する例.svg" alt="Bundleに分割する例" loading="lazy">
 
 ParDo1を実行する際に、各BundleはWorkerに渡され、並列に実行されます。
 
-<img src="/images/20220920a/Bundleの並列処理.svg" alt="Bundleの並列処理" loading="lazy">
+<img src="/images/2022/20220920a/Bundleの並列処理.svg" alt="Bundleの並列処理" loading="lazy">
 
 PCollectionに含まれるelementよりも小さく分割することはできないため、Bundle数の最大はPCollectionのelement数です。
 
-<img src="/images/20220920a/最も細かくBundleに分割した例.svg" alt="最も細かくBundleに分割した例" loading="lazy">
+<img src="/images/2022/20220920a/最も細かくBundleに分割した例.svg" alt="最も細かくBundleに分割した例" loading="lazy">
 
 _※Splittable ParDoを使えば、1つのelementを複数のBundleで処理できるらしい。この機能は開発中とのこと。_
 
@@ -112,11 +112,11 @@ _※Splittable ParDoを使えば、1つのelementを複数のBundleで処理で�
 
 図ではBundle AにParDo1を適用した出力がBundle C、Bundle BにParDo1を適用した出力がBundle Dとなっています。
 
-<img src="/images/20220920a/Transform間に従属関係がある場合.svg" alt="Transform間に従属関係がある場合" loading="lazy">
+<img src="/images/2022/20220920a/Transform間に従属関係がある場合.svg" alt="Transform間に従属関係がある場合" loading="lazy">
 
 RunnerがParDo1を適用前と後でBundleの再構成を行わない場合、各Bundleは同じWorkerでParDo1とParDo2を適用されます。
 
-<img src="/images/20220920a/各Bundleは同じWorkerで処理される.svg" alt="各Bundleは同じWorkerで処理される" loading="lazy">
+<img src="/images/2022/20220920a/各Bundleは同じWorkerで処理される.svg" alt="各Bundleは同じWorkerで処理される" loading="lazy">
 
 こうすることで、Worker間の通信を省くことができ、他のWorkerの処理を待つ必要がなくなります。
 
@@ -126,13 +126,13 @@ Bundle内のあるelementの処理に失敗した場合、そのelementが属す
 
 ただし、処理を実行するWorkerは変わってもよく、以下の例ではWorker2が処理に失敗したBundleをWorker1が引き受けています。
 
-<img src="/images/20220920a/1つのTransformに失敗した時.svg" alt="1つのTransformに失敗した時" loading="lazy">
+<img src="/images/2022/20220920a/1つのTransformに失敗した時.svg" alt="1つのTransformに失敗した時" loading="lazy">
 
 ### 従属関係にあるTransformに失敗した場合の挙動
 
 2つのTransform間に従属関係があり、後続のTransformの処理に失敗した場合、Bundleは再度最初からTransformを適用される必要があります。
 
-<img src="/images/20220920a/従属関係にあるTransformに失敗した場合.svg" alt="従属関係にあるTransformに失敗した場合" loading="lazy">
+<img src="/images/2022/20220920a/従属関係にあるTransformに失敗した場合.svg" alt="従属関係にあるTransformに失敗した場合" loading="lazy">
 
 _このような挙動となっている理由は、Transform間のelementを保持しておくとメモリを圧迫してしまうため？公式DocにはPersistence costを節約するためとあった。ラージスケールなデータを処理することを念頭においた設計となっている？_
 
@@ -254,7 +254,7 @@ if __name__ == "__main__":
 ```
 
 この場合、パイプラインのグラフは次のようになります。
-<img src="/images/20220920a/caf53485-704f-545e-4c3d-119c96a1615e.png" alt="" width="880" height="926" loading="lazy">
+<img src="/images/2022/20220920a/caf53485-704f-545e-4c3d-119c96a1615e.png" alt="" width="880" height="926" loading="lazy">
 
 また、合流させたい場合には、`beam.Flatten()`を使うことで、分岐したパイプラインを合流させることができます。上の分岐のコードではターミナルへの出力を別々にやっていましたが、下の例では`height_average`と`weight_average`を合流させて、ターミナルへの出力を一括化しています。
 
@@ -299,7 +299,7 @@ if __name__ == "__main__":
 ```
 
 この場合、パイプラインのグラフは次のようになります。
-<img src="/images/20220920a/bd3c7575-0cd5-a2a6-6f31-b6914a43bf50.png" alt="" width="870" height="1438" loading="lazy">
+<img src="/images/2022/20220920a/bd3c7575-0cd5-a2a6-6f31-b6914a43bf50.png" alt="" width="870" height="1438" loading="lazy">
 
 # 最後に
 

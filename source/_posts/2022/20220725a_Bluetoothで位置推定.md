@@ -8,7 +8,7 @@ tag:
   - 位置特定
 category:
   - Infrastructure
-thumbnail: /images/20220725a/thumbnail.png
+thumbnail: /images/2022/20220725a/thumbnail.png
 author: 岸下優介
 lede: "マイコンとか電子工作などIoT関連が好きで、Bluetooth信号を使った位置推定手法について調査したことがあったので、紹介します。"
 ---
@@ -49,11 +49,11 @@ Bluetoothを使った位置推定では、主にビーコンを配置するこ�
 ここでは、自由空間では受信信号強度は距離の二乗に反比例するという関係が使われます。
 ただ記事内でも仰られている通り、実空間では床から反射したり、機器間に人間が居たり、完全な自由空間とは程遠いもので正確な距離を出すことはできません。
 また、ビーコン1つだけだと、同心円上では図のように等しく`距離d`なので方向まではわかりません。
-<img src="/images/20220725a/8094da77-f209-e092-608f-42bcd0f26b49.png" alt="" width="483" height="543" loading="lazy">
+<img src="/images/2022/20220725a/8094da77-f209-e092-608f-42bcd0f26b49.png" alt="" width="483" height="543" loading="lazy">
 
 こんなの使えないじゃん！ ってなるところですが、実際は近くにいるかどうかわかれば良いという用途もあります。
 例えば、ある商品棚の近くに来たときにプッシュ通知したり、ある店の前に通りかかったときにプッシュ通知してお得な情報をお知らせできます。
-<img src="/images/20220725a/9038109f-b428-09a6-1af6-36dd63e300fe.png" alt="" width="711" height="644" loading="lazy">
+<img src="/images/2022/20220725a/9038109f-b428-09a6-1af6-36dd63e300fe.png" alt="" width="711" height="644" loading="lazy">
 
 これを利用したものとして、[LINEビーコン](https://developers.line.biz/ja/docs/messaging-api/using-beacons/)があります。
 LINEビーコンで近くの人を検知、LINEでプッシュ通知という組み合わせです。
@@ -64,7 +64,7 @@ LINEビーコンで近くの人を検知、LINEでプッシュ通知という組
 
 次に、ビーコンを複数使った位置推定手法になります。
 ビーコン1つの場合でも距離はざっくりとわかりましたが、方向がわかりませんでした。これを解決するために3つ以上のビーコンを使う事で方向まで推定します。
-<img src="/images/20220725a/b5cf85ae-e7b1-4586-d814-126511066f71.png" alt="" width="640" height="672" loading="lazy">
+<img src="/images/2022/20220725a/b5cf85ae-e7b1-4586-d814-126511066f71.png" alt="" width="640" height="672" loading="lazy">
 
 図のように各ビーコンの位置は固定で、それぞれのビーコンには個別の識別番号を振っておくことで各ビーコンからの距離がわかります。
 この時どこか**基準点**を決めて、その位置から各ビーコンの位置がどれだけ`x`方向と`y`方向に離れているか記録しておく必要があります。
@@ -78,14 +78,14 @@ LINEビーコンで近くの人を検知、LINEでプッシュ通知という組
 
 ### （1）推定したい場所をグリッドで区切る
 
-<img src="/images/20220725a/34ef68e6-ac85-f74f-84e3-f12a3c048475.png" alt="" width="451" height="487" loading="lazy">
+<img src="/images/2022/20220725a/34ef68e6-ac85-f74f-84e3-f12a3c048475.png" alt="" width="451" height="487" loading="lazy">
 
 図のように部屋をグリッドで区切って番号を振ります。グリッド番号が位置を示します。
 また、このグリッド番号をクラスとして分類モデルに学習させていきます。
 
 ### （2）ビーコンを配置する
 
-<img src="/images/20220725a/6e20b812-7b5c-51df-6e1f-e008db678691.png" alt="" width="454" height="484" loading="lazy">
+<img src="/images/2022/20220725a/6e20b812-7b5c-51df-6e1f-e008db678691.png" alt="" width="454" height="484" loading="lazy">
 
 これはどの手法でも同じですが、Bluetooth信号を発するビーコンに固定の番号を振ってそれぞれ配置します。
 配置位置は特に決まっていませんが、部屋に満遍なく配置したほうがいいでしょう。
@@ -93,7 +93,7 @@ LINEビーコンで近くの人を検知、LINEでプッシュ通知という組
 
 ### （3）各グリッドでBluetoothのRSSIを収集し、機械学習モデルを学習させる
 
-<img src="/images/20220725a/d1acd8bc-3ac5-4d85-d865-9c4366dae2b4.png" alt="" width="805" height="564" loading="lazy">
+<img src="/images/2022/20220725a/d1acd8bc-3ac5-4d85-d865-9c4366dae2b4.png" alt="" width="805" height="564" loading="lazy">
 
 **※図の吹き出しに記載している値はRSSIの大きさ**
 各グリッドの位置でそれぞれのビーコンから送られてくるRSSIの値を収集します。
@@ -104,7 +104,7 @@ LINEビーコンで近くの人を検知、LINEでプッシュ通知という組
 
 ### （4）位置推定する
 
-<img src="/images/20220725a/b11df6af-4e01-f552-67d1-1c6e15327790.png" alt="" width="808" height="593" loading="lazy">
+<img src="/images/2022/20220725a/b11df6af-4e01-f552-67d1-1c6e15327790.png" alt="" width="808" height="593" loading="lazy">
 
 学習させたモデルを使って現在のRSSI値からグリッド番号を推定することで位置がわかります。
 推定された位置はDBに格納するなりして、アプリケーションにて可視化することでユーザーの現在位置が把握できます。

@@ -8,12 +8,12 @@ tag:
   - エラーハンドリング
 category:
   - Programming
-thumbnail: /images/20200523/thumbnail.png
+thumbnail: /images/2020/20200523/thumbnail.png
 author: 真野隼記
 lede: "フューチャー社内には「Go相談室」というチャットルームがあり、そこでGoに関連する疑問を投げたら、大体1日くらいで強い人が解決してくれるという神対応が行われています。そこでAWSやGCPの独自エラーをError warppingされた時にどうやってハンドリングすればよいの？と聞いた時にやり取りした内容をまとめました。"
 ---
 
-<img src="/images/20200523/top.png" loading="lazy">
+<img src="/images/2020/20200523/top.png" loading="lazy">
 
 [Go Tips連載](/tags/GoTips%E9%80%A3%E8%BC%89/)の第6弾です。
 

@@ -10,11 +10,11 @@ tag:
   - GCP
 category:
   - Infrastructure
-thumbnail: /images/20240221a/thumbnail.png
+thumbnail: /images/2024/20240221a/thumbnail.png
 author: 山本竜玄
 lede: "2024/2/1、GDG Tokyo主催の「【Firebase】GDG Tokyo Monthly Online Tech Talks」に「Flutter×Firebaseサービス達で高速でモバイルアプリを開発した話」というタイトルで登壇しました"
 ---
-<img src="/images/20240221a/image.png" alt="image.png" width="660" height="270" loading="lazy">
+<img src="/images/2024/20240221a/image.png" alt="image.png" width="660" height="270" loading="lazy">
 
 # はじめに
 
@@ -52,18 +52,18 @@ lede: "2024/2/1、GDG Tokyo主催の「【Firebase】GDG Tokyo Monthly Online Te
 
 今回紹介したユースケースとしてはモバイルアプリ側はFlutter、バックエンドサービス側をFirebaseのサービスを活用したものです。
 
-<img src="/images/20240221a/image_2.png" alt="image.png" width="962" height="540" loading="lazy">
+<img src="/images/2024/20240221a/image_2.png" alt="image.png" width="962" height="540" loading="lazy">
 
 どちらもGoogle製ということもあり、親和性がある&ドキュメントが豊富ということでこのアーキテクチャが選定されています。
 
-<img src="/images/20240221a/image_3.png" alt="image.png" width="961" height="543" loading="lazy">
+<img src="/images/2024/20240221a/image_3.png" alt="image.png" width="961" height="543" loading="lazy">
 
 使用したサービスを一覧で並べてみると、Firebaseを主としたかなりモダンな構成と言えるのではないでしょうか？
 自分は開発チームにあとから参画したのですが、なかなか良い経験となっています。
 
 ## ログ&アラートについて
 
-<img src="/images/20240221a/image_4.png" alt="image.png" width="963" height="536" loading="lazy">
+<img src="/images/2024/20240221a/image_4.png" alt="image.png" width="963" height="536" loading="lazy">
 
 Firebaseでログ・アラート周りに使用できるサービスとしては以下の2つがあります。
 
@@ -78,7 +78,7 @@ Firebaseでログ・アラート周りに使用できるサービスとしては
 
 ## Firebase Remote Configについて
 
-<img src="/images/20240221a/image_5.png" alt="image.png" width="964" height="538" loading="lazy">
+<img src="/images/2024/20240221a/image_5.png" alt="image.png" width="964" height="538" loading="lazy">
 
 その他に活用していてユニークだったサービスとしては、Remote Configがあります。
 

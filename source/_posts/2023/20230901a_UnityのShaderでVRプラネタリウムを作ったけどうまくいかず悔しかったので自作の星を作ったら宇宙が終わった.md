@@ -9,7 +9,7 @@ tag:
   - プラネタリウム
 category:
   - Programming
-thumbnail: /images/20230901a/thumbnail.png
+thumbnail: /images/2023/20230901a/thumbnail.png
 author: 藤井亮佑
 lede: "実は私、星を見るのが好きなので、天体望遠鏡を買ったり、星を撮るためにカメラを買ったりしています。せっかくならいい環境で見たいので、南は沖縄から北は北海道まで星を見に行っています。（海外も行きたい）"
 ---
@@ -104,7 +104,7 @@ fixed4 frag(v2f i) : SV_Target
 
 さて、この Shader を Skybox に適用するとどのように星が見えるかというと、こんな感じです。
 
-<img src="/images/20230901a/image.png" alt="image.png" width="1200" height="602" loading="lazy">
+<img src="/images/2023/20230901a/image.png" alt="image.png" width="1200" height="602" loading="lazy">
 
 結構それっぽい気がしますね。
 
@@ -125,7 +125,7 @@ fixed4 frag(v2f i) : SV_Target
 
 一応ある程度は描けていたので供養のためキャプチャを掲載しておきます。
 
-<img src="/images/20230901a/image_2.png" alt="" width="1200" height="728" loading="lazy">
+<img src="/images/2023/20230901a/image_2.png" alt="" width="1200" height="728" loading="lazy">
 
 なんか、星空って感じではないですね？
 
@@ -165,7 +165,7 @@ cat hip.txt | sed '1,5d' | sed 's/ \+|/|/g' | sed 's/| \+/|/g' | awk -F '|' -v '
 
 スクリプトにより描画したテクスチャがこちらです。
 
-<img src="/images/20230901a/texture3.9_2.5.png" alt="" width="1200" height="600" loading="lazy">
+<img src="/images/2023/20230901a/texture3.9_2.5.png" alt="" width="1200" height="600" loading="lazy">
 
 高解像度画像に、小さな星の点を表示しているので、あまりきらびやかではないです。
 
@@ -175,17 +175,17 @@ cat hip.txt | sed '1,5d' | sed 's/ \+|/|/g' | sed 's/| \+/|/g' | awk -F '|' -v '
 
 まずは Import して、解像度を高めに設定しておきます。
 
-<img src="/images/20230901a/image_3.png" alt="image.png" width="898" height="790" loading="lazy">
+<img src="/images/2023/20230901a/image_3.png" alt="image.png" width="898" height="790" loading="lazy">
 
 そしたら Skybox 用のマテリアルを作成し、Shader を`Skybox/Panoramic`に、Mapping を`Latitude Longitude Layout`に設定し、テクスチャのところにインポートしたテクスチャを適用します。
 
-<img src="/images/20230901a/image_4.png" alt="image.png" width="896" height="666" loading="lazy">
+<img src="/images/2023/20230901a/image_4.png" alt="image.png" width="896" height="666" loading="lazy">
 
 最後にメニューの Window -> Rendering > Lighting から Lighting 設定を開き、Environment タブにある Skybox Material に作成した Material をセットします。
 
 これで準備は完了です。VR 環境で見てみましょう。
 
-<img src="/images/20230901a/output.gif" alt="output.gif" width="1024" height="1024" loading="lazy">
+<img src="/images/2023/20230901a/output.gif" alt="output.gif" width="1024" height="1024" loading="lazy">
 
 うーん…とりあえず、星空っぽくはある…？（なんか、オリオン座の形おかしい気がする）。
 
@@ -210,10 +210,10 @@ cat hip.txt | sed '1,5d' | sed 's/ \+|/|/g' | sed 's/| \+/|/g' | awk -F '|' -v '
 
 ・・・・・・・・
 
-<img src="/images/20230901a/image_5.png" alt="image.png" width="1200" height="193" loading="lazy">
+<img src="/images/2023/20230901a/image_5.png" alt="image.png" width="1200" height="193" loading="lazy">
 
 せっかくなので-75 等星である、「スーパー明るい藤井星」を追加してみました。見てみましょう。
 
-<img src="/images/20230901a/output2.gif" alt="output2.gif" width="1024" height="1024" loading="lazy">
+<img src="/images/2023/20230901a/output2.gif" alt="output2.gif" width="1024" height="1024" loading="lazy">
 
 宇宙は、なんか亀裂入ったし光に包まれて終わりました。

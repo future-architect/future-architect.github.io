@@ -8,12 +8,12 @@ tag:
   - Tips
 category:
   - Infrastructure
-thumbnail: /images/20240620a/thumbnail.jpg
+thumbnail: /images/2024/20240620a/thumbnail.jpg
 author: 市川燿
 lede: "docker composeを利用しているでしょうか？複数のdockerコンテナをまとめて立ち上げたり、環境変数を定義できたり便利ですよね。今回はある程度docker composeを利用している方向けに私が便利、便利そうと感じたdocker composeの機能を挙げてみました。"
 ---
 
-<img src="/images/20240620a/20210117130925.jpg" alt="" height="800" width="384">
+<img src="/images/2024/20240620a/20210117130925.jpg" alt="" height="800" width="384">
 
 本記事は[「珠玉のアドベントカレンダー記事をリバイバル公開します」](/articles/20240617a/)企画のために、[以前Qiitaに投稿した記事](https://qiita.com/hichika/items/9b96634d471246359e66)を一部ブラッシュアップしたものになります。
 

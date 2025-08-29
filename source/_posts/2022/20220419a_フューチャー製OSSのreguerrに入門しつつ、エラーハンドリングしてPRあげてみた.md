@@ -8,7 +8,7 @@ tag:
   - エラーハンドリング
 category:
   - Programming
-thumbnail: /images/20220419a/thumbnail.png
+thumbnail: /images/2022/20220419a/thumbnail.png
 author: 村田靖拓
 lede: "フューチャー製OSSであるreguerrに入門しようと思います。入門の途中でエラーと遭遇したため、途中からエラーハンドリング編に突入しています。入門祭りということで、エラーハンドリングの一例として「こんな風に考えるんだなー」と思いつつ読んでいただければ幸いです。また、最終的にはエラーハンドリングを元に、OSSへPRを投げています。そういったOSSとの向き合い方を感じて頂くきっかけになれば良いなと思っています。"
 ---
@@ -333,7 +333,7 @@ func init() {
 ## OSSにPRを投げてみる
 
 動作確認を元に以下の変更を加え、[プルリクエスト](https://github.com/future-architect/reguerr/pull/1)を作成しました。
-<img src="/images/20220419a/スクリーンショット_2022-04-17_21.19.31.png" alt="Pull Request" width="1138" height="174" loading="lazy">
+<img src="/images/2022/20220419a/スクリーンショット_2022-04-17_21.19.31.png" alt="Pull Request" width="1138" height="174" loading="lazy">
 
 OSSの挙動でおかしいと思われる点があった際に「このOSS使えねえ！」と騒ぐのではなくissueを起票するかPRをあげよとどこかのエラい人から教わったので、私も例に漏れずそのように行動したいと思います。このPRが少しでも世界平和に繋がることを祈っています。
 

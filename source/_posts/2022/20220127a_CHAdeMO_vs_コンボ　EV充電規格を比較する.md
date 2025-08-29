@@ -9,7 +9,7 @@ tag:
   - コンポ
 category:
   - IoT
-thumbnail: /images/20220127a/thumbnail.png
+thumbnail: /images/2022/20220127a/thumbnail.png
 author: 村上知優
 lede: "大手自動車メーカーが続々とEVを発表したり、EUでは2035年にガソリン車の新車販売が禁止になったりと、近年電気自動車業界が盛り上がりを見せています。EVといえば充電しなければならないのが特徴です。充電ステーションにはスマホのLightningやUSBなどのように、充電するための対応規格が存在します。"
 ---
@@ -39,7 +39,7 @@ CCS1とCCS2は通称**コンボ**と呼ばれています。
 
 実際に2020年にCHAdeMO、GB/T、コンボに互換性のあるCHAdeMO3.0が完成しました。
 
-<img src="/images/20220127a/image.png" alt="チャデモ3.0" width="1200" height="620" loading="lazy">
+<img src="/images/2022/20220127a/image.png" alt="チャデモ3.0" width="1200" height="620" loading="lazy">
 
 参考：https://www.chademo.com/ja/chademo3-0/
 

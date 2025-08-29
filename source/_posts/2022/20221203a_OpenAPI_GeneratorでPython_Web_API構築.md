@@ -8,12 +8,12 @@ tag:
   - Python
 category:
   - Programming
-thumbnail: /images/20221203a/thumbnail.png
+thumbnail: /images/2022/20221203a/thumbnail.png
 author: 村上知優
 lede: "PythonでWebAPIを構築しました。その際にOpenAPI Generatorが便利だったのでご共有します。"
 ---
 
-<img src="/images/20221203a/top.png" alt="" width="941" height="481">
+<img src="/images/2022/20221203a/top.png" alt="" width="941" height="481">
 
 この記事は[Python Advent Calendar 2022](https://qiita.com/advent-calendar/2022/python) カレンダー2の3日目です。昨日はtttakehさんの[じゃんけん画像を分類してみた](https://zenn.dev/takeguchi/articles/672ff3b34753a7)でした。
 

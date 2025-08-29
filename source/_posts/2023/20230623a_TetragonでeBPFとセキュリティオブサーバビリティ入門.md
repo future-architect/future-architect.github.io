@@ -11,7 +11,7 @@ tag:
   - Linux
 category:
   - Security
-thumbnail: /images/20230623a/thumbnail.png
+thumbnail: /images/2023/20230623a/thumbnail.png
 author: 鈴木崇史
 lede: "数年前にクラウドネイティブ注目技術として挙げられたeBPFにかねてよりキャッチアップしたいなと思っていたので、この連載のタイミングでeBPFとその関連プロダクトに入門してみることにしました。CNCFプロジェクト傘下のeBPFを活用したプロダクトとしてはCiliumに触ってみます。"
 ---
@@ -174,7 +174,7 @@ BCC + Pythonは初心者にとっつきやすいですが、実際にはeBPFの�
 
 主な機能としては、定義したポリシーに従ってKuberntesクラスター上のコンテナ内で実行されるプロセスのシステムコールやネットワーク関連のイベントをフィルタリングし、ログとして出力するというものです。ポリシーに応じて動的にeBPFプログラムをアタッチし、カーネル空間内で直接フィルタリングしています。
 
-<img src="/images/20230623a/tetragon-2023-06-21-2234.png" alt="tetragon-2023-06-21-2234.png" width="1065" height="637" loading="lazy">
+<img src="/images/2023/20230623a/tetragon-2023-06-21-2234.png" alt="tetragon-2023-06-21-2234.png" width="1065" height="637" loading="lazy">
 
 ### プロセス実行の監視
 

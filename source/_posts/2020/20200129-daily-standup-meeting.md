@@ -24,7 +24,7 @@ lede: "皆さんは普段どのようにプロジェクトのタスク優先順�
 大掛かりな進捗管理システムを入れるほどの規模感ではなく、しかし油断するとプロジェクトの状況が不透明になりかねないということで、私のチームではDaily Stand-up Meeting(以後、SUM)を導入しています。
 ※毎度立っているわけではないので、呼称はDaily Scrumのほうが正しいかもしれません
 
-<img src="/images/20200129/photo_20200129_01.jpg" loading="lazy">
+<img src="/images/2020/20200129/photo_20200129_01.jpg" loading="lazy">
 ↑とある日のSUMの様子↑
 
 # SUMに期待したこと
@@ -46,7 +46,7 @@ lede: "皆さんは普段どのようにプロジェクトのタスク優先順�
 
 ## 状況共有シートの書きっぷり
 
-<img src="/images/20200129/photo_20200129_02.png" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2020/20200129/photo_20200129_02.png" style="border:solid 1px #000000" loading="lazy">
 ↑こんな感じで記載しています↑
 
 ### シートのフォーマット
@@ -70,30 +70,30 @@ lede: "皆さんは普段どのようにプロジェクトのタスク優先順�
 ### シートを書く際は絵文字をフル活用すると良い
 
 状況共有の際にタスクを種別ごとやプロジェクトごとにカテゴライズすると思いますが、付帯情報を書き始めると縦に長くなってしまいがちです。
-<img src="/images/20200129/photo_20200129_04.png" class="img-small-size" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2020/20200129/photo_20200129_04.png" class="img-small-size" style="border:solid 1px #000000" loading="lazy">
 
 この縦に長い共有内容を5人分記載するといよいよ一覧性に欠けてしまうので、絵文字をフル活用する方針を立てています。
-<img src="/images/20200129/photo_20200129_05.png" class="img-small-size" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2020/20200129/photo_20200129_05.png" class="img-small-size" style="border:solid 1px #000000" loading="lazy">
 
 上記は一例ですが、このように絵文字ごとに意味を持たせて記載するようにしています。
 絵文字を利用して先程の共有内容を書き換えると...
-<img src="/images/20200129/photo_20200129_06.png" class="img-small-size" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2020/20200129/photo_20200129_06.png" class="img-small-size" style="border:solid 1px #000000" loading="lazy">
 
 このようにスッキリします。もちろん行数を圧縮するだけであれば絵文字を使わず書き方を変えるだけで実現はできます。
-<img src="/images/20200129/photo_20200129_07.png" class="img-small-size" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2020/20200129/photo_20200129_07.png" class="img-small-size" style="border:solid 1px #000000" loading="lazy">
 
 これでも必要な情報は含まれていますが...なんか味気ないと思いませんか？ 私は思います笑
 絵文字に意味づけを行うことでハイコンテキスト化してしまうという点はありますが、見てて視覚的にも楽しいので絵文字をガンガン利用しています。
 
 新しいプロジェクトやタスクが始める時に誰かが新しい絵文字を追加して、「◯◯っぽいのでこの絵文字を使おうと思います」「お！ いいねーｗ」「面白い！！」みたいな会話が生まれたりするのでなんだかんだ楽しく運用できているのかなと思います。
-<img src="/images/20200129/photo_20200129_08.png" class="img-small-size" loading="lazy">
+<img src="/images/2020/20200129/photo_20200129_08.png" class="img-small-size" loading="lazy">
 
 シートの上の方に、いま存在する絵文字をずらっと並べておくと、毎日記載する時にも困らないので便利です。
 
 ## Slack ReminderでSUMをリマインド
 
 私のチームではSlack Reminderを使って毎日9時にリマインダを飛ばしています。
-<img src="/images/20200129/photo_20200129_09.png" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2020/20200129/photo_20200129_09.png" style="border:solid 1px #000000" loading="lazy">
 
 SpreadsheetのURLを都度探すのは面倒なので、Slack reminderでURLを投稿する形にしています。ブックマーク登録しとけばいいという意見もありますが、Slack駆動にしておくと何かと便利なのでこうしています。
 

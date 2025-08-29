@@ -8,7 +8,7 @@ tag:
   - 初心者向け
 category:
   - Infrastructure
-thumbnail: /images/20230613a/thumbnail.png
+thumbnail: /images/2023/20230613a/thumbnail.png
 author: 添田瑛介
 lede: "PubSubについて噛み砕いて説明していきます。今後PubSubを使用した開発をする方の助けになれればと思います。"
 ---
@@ -68,7 +68,7 @@ subscriberがメッセージを正常に受け取ったらsubscriptionに対し�
 
 ## 3. 実際の処理の流れの解説<a name="処理の流れの解説"></a>
 
-<img src="/images/20230613a/pubsub_1.png" alt="pubsub" width="667" height="435" loading="lazy">
+<img src="/images/2023/20230613a/pubsub_1.png" alt="pubsub" width="667" height="435" loading="lazy">
 
 上図がPubSubの基本的な処理の流れになっています。
 
@@ -92,7 +92,7 @@ subscriberがメッセージを正常に受け取ったらsubscriptionに対し�
 
 上記はあくまでPubSubを用いた一例ですが、このように異なるサービスやシステム間での効率的な処理が可能になるのがPubSubの凄さだと思っています。
 
-<img src="/images/20230613a/pubsub_2.png" alt="pubsub_2.png" width="727" height="418" loading="lazy">
+<img src="/images/2023/20230613a/pubsub_2.png" alt="pubsub_2.png" width="727" height="418" loading="lazy">
 
 ## 4. PubSubを使用したユースケース考えてみた<a name="処理の流れの解説"></a>
 
@@ -107,7 +107,7 @@ subscriberがメッセージを正常に受け取ったらsubscriptionに対し�
 * 課題（2）：システム依存度の高さ
   * 現行のシステムではデータプロパイダと直接的に連携していることにより、他のデータプロパイダの使用やシステムのアップグレードが非常に難しくなっていた。
 
-<img src="/images/20230613a/pubsub_3.jpg" alt="pubsub_3.jpg" width="1170" height="721" loading="lazy">
+<img src="/images/2023/20230613a/pubsub_3.jpg" alt="pubsub_3.jpg" width="1170" height="721" loading="lazy">
 
 下図のようにPubSubを導入することによってこれらの課題を解決することが可能です（あくまで一例です）
 
@@ -116,7 +116,7 @@ subscriberがメッセージを正常に受け取ったらsubscriptionに対し�
 * 課題（2）：システム依存度の高さ
   * PubSubを介することでデータプロパイダと証券会社システム間は疎結合な関係になることで他のデータプロパイダの使用やアップグレードが現行システムより容易になる。
 
-<img src="/images/20230613a/pubsub_4.jpg" alt="pubsub_4.jpg" width="1170" height="918" loading="lazy">
+<img src="/images/2023/20230613a/pubsub_4.jpg" alt="pubsub_4.jpg" width="1170" height="918" loading="lazy">
 
 # 5.まとめ
 

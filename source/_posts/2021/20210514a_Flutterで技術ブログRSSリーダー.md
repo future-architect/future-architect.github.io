@@ -7,7 +7,7 @@ tag:
   - RSS
 category:
   - Programming
-thumbnail: /images/20210514a/thumbnail.png
+thumbnail: /images/2021/20210514a/thumbnail.png
 author: 真野隼記
 lede: "FlutterでRSSを用いてフューチャー技術ブログリーダーを作ろうと思います。"
 ---
@@ -218,7 +218,7 @@ Androidの場合はブラウザの起動に権限設定が必要です。
 
 エミュレータで動かしてみるとこんな感じです。
 
-<img src="/images/20210514a/Animation.gif" alt="モバイルアプリで実行例" wight="469" height="842" loading="lazy">
+<img src="/images/2021/20210514a/Animation.gif" alt="モバイルアプリで実行例" wight="469" height="842" loading="lazy">
 
 ## スワイプでリストを閉じる
 
@@ -255,7 +255,7 @@ Androidの場合はブラウザの起動に権限設定が必要です。
 
 動かしてみると以下のような使い勝手です。
 
-<img src="/images/20210514a/スワイプ.gif" alt="スワイプ動作イメージ" wight="469" height="842" loading="lazy">
+<img src="/images/2021/20210514a/スワイプ.gif" alt="スワイプ動作イメージ" wight="469" height="842" loading="lazy">
 
 気持ち良いですね...！！
 

@@ -9,7 +9,7 @@ tag:
   - AzureOpenAIService
 category:
   - DataScience
-thumbnail: /images/20231011a/thumbnail.png
+thumbnail: /images/2023/20231011a/thumbnail.png
 author: 板野竜也
 lede: "AzureのPrompt Flowをローカル環境で動かし、作成したフローをコードで管理する方法をご紹介します。"
 ---
@@ -61,7 +61,7 @@ Prompt FlowのVSCode拡張機能をインストールします。
 
 VSCodeの拡張機能にて「Prompt Flow」で検索すると出てきます。
 
-<img src="/images/20231011a/image.png" alt="Prompt Flow for VS Code" width="1200" height="560" loading="lazy">
+<img src="/images/2023/20231011a/image.png" alt="Prompt Flow for VS Code" width="1200" height="560" loading="lazy">
 
 VSCode拡張機能が無くてもPrompt Flow自体は動かせますが、フローの可視化機能があるので、VSCodeが使用できる場合は入れておきましょう。
 
@@ -80,7 +80,7 @@ pf flow init --flow my-simple-flow
 
 中身は以下の通りです。
 
-<img src="/images/20231011a/image_2.png" alt="my-simple-flow, \pycache_, promptflow, flow.tools.json, .gitignore, data.jsonl, flow.dag.yaml, hello.jinja, hello.py, requirements.txt" width="432" height="330" loading="lazy">
+<img src="/images/2023/20231011a/image_2.png" alt="my-simple-flow, \pycache_, promptflow, flow.tools.json, .gitignore, data.jsonl, flow.dag.yaml, hello.jinja, hello.py, requirements.txt" width="432" height="330" loading="lazy">
 
 * `__pycache__`: Pythonを実行する際に生成されるキャッシュディレクトリ（削除しても特に問題はない）
 * `.promptflow/flow.tools.json`: flow.dag.yamlから参照されるToolsのメタデータ（修正する必要はない）
@@ -93,13 +93,13 @@ pf flow init --flow my-simple-flow
 
 そこで赤枠の`Visual editor`を押してみます。
 
-<img src="/images/20231011a/コメント_2023-09-25_163948.png" alt="Visual editoor(Ctrl + k, v)" width="1156" height="1140" loading="lazy">
+<img src="/images/2023/20231011a/コメント_2023-09-25_163948.png" alt="Visual editoor(Ctrl + k, v)" width="1156" height="1140" loading="lazy">
 
 すると、Azureコンソールでお馴染みのGUIベースの編集画面が出てきます。
 
 「入力されたテキストをシステムプロンプトに含めて出力する」という、LLMを使わない簡単なフローのようです。
 
-<img src="/images/20231011a/pic.png" alt="" width="1200" height="612" loading="lazy">
+<img src="/images/2023/20231011a/pic.png" alt="" width="1200" height="612" loading="lazy">
 
 このVisual editorで編集した内容は、`flow.dag.yaml`のテキストデータに反映されるので、GUIベース及びテキストベースのどちらからでも編集可能です。
 
@@ -113,7 +113,7 @@ pf flow test --flow my-simple-flow
 
 すると、以下のようなコンソール出力が返ってきます。
 
-<img src="/images/20231011a/pic2.png" alt="output_prompt: Prompt: Write a simple Hello World! program that displays the greeting message when executed." width="1200" height="147" loading="lazy">
+<img src="/images/2023/20231011a/pic2.png" alt="output_prompt: Prompt: Write a simple Hello World! program that displays the greeting message when executed." width="1200" height="147" loading="lazy">
 
 「入力されたテキストをシステムプロンプトに含めて出力する」というシンプルな標準フローが実行できました。
 
@@ -149,25 +149,25 @@ pf connection create -f <YAMLファイルのパス>
 
 以下のように詳細が表示されればConnection（接続）の設定は完了です。
 
-<img src="/images/20231011a/pic3.png" alt="" width="1200" height="257" loading="lazy">
+<img src="/images/2023/20231011a/pic3.png" alt="" width="1200" height="257" loading="lazy">
 
 ### 2. LLMツールの追加
 
 続いて、LLMツールを追加していきます。`flow.dag.yaml`のVisual editorの画面から「+LLM」を押します。
 
-<img src="/images/20231011a/pic4.png" alt="+LLM" width="1200" height="436" loading="lazy">
+<img src="/images/2023/20231011a/pic4.png" alt="+LLM" width="1200" height="436" loading="lazy">
 
 上部に、LLMツールの名前入力が求められるので好きな名前を設定します（ここでは`llm_node`と設定）
 
-<img src="/images/20231011a/image_3.png" alt="llm_node" width="889" height="97" loading="lazy">
+<img src="/images/2023/20231011a/image_3.png" alt="llm_node" width="889" height="97" loading="lazy">
 
 名前入力が完了すると、「new file」を選択します（`<LLMツール名>.jinja2`というファイルが新規生成されます）
 
-<img src="/images/20231011a/image_4.png" alt="new file" width="885" height="131" loading="lazy">
+<img src="/images/2023/20231011a/image_4.png" alt="new file" width="885" height="131" loading="lazy">
 
 LLMツールが追加されました。connectionには先程設定した接続先が選択できるようになっています。
 
-<img src="/images/20231011a/pic5.png" alt="connection:connection-azure-openai api:chat deployment_name:***-gpt35-01 temperature:1 stop: max_tokens:" width="1200" height="266" loading="lazy">
+<img src="/images/2023/20231011a/pic5.png" alt="connection:connection-azure-openai api:chat deployment_name:***-gpt35-01 temperature:1 stop: max_tokens:" width="1200" height="266" loading="lazy">
 
 ### 3. フローの編集
 
@@ -179,7 +179,7 @@ Azureコンソールでは、1つの画面で全てのソースコードやプ�
 
 `Inputs`でユーザーからの質問を受け取り、`system_prompt`でシステムプロンプトにユーザーの質問を埋め込み、`llm_node`でLLMにプロンプトを投げ、`echo_llm_output`でLLMからの回答を加工して`output`に出力します。
 
-<img src="/images/20231011a/image_5.png" alt="inputs -> system_prompt -> llm_node -> echo_llm_output -> outputs" width="1200" height="1266" loading="lazy">
+<img src="/images/2023/20231011a/image_5.png" alt="inputs -> system_prompt -> llm_node -> echo_llm_output -> outputs" width="1200" height="1266" loading="lazy">
 
 <details><summary>flow.dag.yaml</summary>
 
@@ -228,11 +228,11 @@ nodes:
 
 #### Inputs&Outputs
 
-<img src="/images/20231011a/image_6.png" alt="question string 東京はどこの国の都市？" width="1200" height="333" loading="lazy">
+<img src="/images/2023/20231011a/image_6.png" alt="question string 東京はどこの国の都市？" width="1200" height="333" loading="lazy">
 
 #### system_prompt
 
-<img src="/images/20231011a/image_7.png" alt="${inputs.question}" width="1200" height="222" loading="lazy">
+<img src="/images/2023/20231011a/image_7.png" alt="${inputs.question}" width="1200" height="222" loading="lazy">
 
 <details><summary>system_prompt.jinja2</summary>
 
@@ -250,7 +250,7 @@ AI:
 
 #### llm_node
 
-<img src="/images/20231011a/pic6.png" alt="" width="1200" height="309" loading="lazy">
+<img src="/images/2023/20231011a/pic6.png" alt="" width="1200" height="309" loading="lazy">
 
 <details><summary>llm_node.jinja2</summary>
 
@@ -262,7 +262,7 @@ AI:
 
 #### echo_llm_output
 
-<img src="/images/20231011a/image_8.png" alt="" width="1200" height="218" loading="lazy">
+<img src="/images/2023/20231011a/image_8.png" alt="" width="1200" height="218" loading="lazy">
 
 <details><summary>echo_llm_output.py</summary>
 
@@ -286,7 +286,7 @@ pf flow test --flow my-simple-flow
 
 Outputsの欄に出力が表示されます。
 
-<img src="/images/20231011a/image_9.png" alt="" width="914" height="440" loading="lazy">
+<img src="/images/2023/20231011a/image_9.png" alt="" width="914" height="440" loading="lazy">
 
 ### 5. フローの一括実行
 
@@ -355,7 +355,7 @@ pf run create --flow my-simple-flow --data ./my-simple-flow/data.jsonl --name my
 
 以下のような出力が返ってくれば一括実行は成功です。
 
-<img src="/images/20231011a/7.png" alt="" width="1200" height="297" loading="lazy">
+<img src="/images/2023/20231011a/7.png" alt="" width="1200" height="297" loading="lazy">
 
 複数実行の結果はログとして記録されており、以下のコマンドでいつでも可視化できます。
 
@@ -363,13 +363,13 @@ pf run create --flow my-simple-flow --data ./my-simple-flow/data.jsonl --name my
 pf run show-details --name my_run_001
 ```
 
-<img src="/images/20231011a/8.png" alt="" width="1007" height="312" loading="lazy">
+<img src="/images/2023/20231011a/8.png" alt="" width="1007" height="312" loading="lazy">
 
 ## 作成したフローをコードで管理する
 
 今回作成したファイル群は以下の通りです。
 
-<img src="/images/20231011a/image_10.png" alt="" width="472" height="368" loading="lazy">
+<img src="/images/2023/20231011a/image_10.png" alt="" width="472" height="368" loading="lazy">
 
 これらはgitで管理できます。
 

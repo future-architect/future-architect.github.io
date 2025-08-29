@@ -9,7 +9,7 @@ tag:
   - GoogleChat
 category:
   - Programming
-thumbnail: /images/20210913a/thumbnail.png
+thumbnail: /images/2021/20210913a/thumbnail.png
 author: 山本雄樹
 lede: "こんにちは、Engineer Campにてインターン中の山本です。ブログへの投稿は２本目になります。Google Chat APIに関しての記事となります。業務でGoogle Chat上で通知システムを作成する必要があったのですが、実装するにあたりいくつかのハードルがありました。"
 ---
@@ -34,7 +34,7 @@ lede: "こんにちは、Engineer Campにてインターン中の山本です。
 - 投稿を1つのスレッドにまとめる方法
 - カード型メッセージの送信方法
 
-<img src="/images/20210913a/スクリーンショット_2021-09-07_17.18.14.png" alt="カード型メッセージ投稿例" width="476" height="598" loading="lazy">
+<img src="/images/2021/20210913a/スクリーンショット_2021-09-07_17.18.14.png" alt="カード型メッセージ投稿例" width="476" height="598" loading="lazy">
 
 # Google Chat API とは
 
@@ -64,19 +64,19 @@ Google Hangoutsとの関連は以下のようになっています（[Wikipedia�
 手順は以下のとおりです。
 
 Google Chatを開いて、チャットルームを作成します。スレッド返信を使用する場合はチェックを入れます。
-<img src="/images/20210913a/screenshot_setup1.png" alt="チャットルーム作成" width="1200" height="672" loading="lazy" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px;">
+<img src="/images/2021/20210913a/screenshot_setup1.png" alt="チャットルーム作成" width="1200" height="672" loading="lazy" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px;">
 
 左上をクリックして「Webhookを管理」を選びます。
 
-<img src="/images/20210913a/screenshot_setup2.png" alt="Webhook管理画面" width="400" height="648" loading="lazy" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px;">
+<img src="/images/2021/20210913a/screenshot_setup2.png" alt="Webhook管理画面" width="400" height="648" loading="lazy" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px;">
 
 Webhookの名前とアバターURLを入力し、保存を押します。
 
-<img src="/images/20210913a/screenshot_setup3.png" alt="Webhookの名前とアバターURL入力画面" width="1200" height="659" loading="lazy" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px;">
+<img src="/images/2021/20210913a/screenshot_setup3.png" alt="Webhookの名前とアバターURL入力画面" width="1200" height="659" loading="lazy" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px;">
 
 以上でWebhookの設定は終わりです。この時払い出されるURLは後で使用します。
 
-<img src="/images/20210913a/screenshot_setup4.png" alt="設定完了画面" width="1200" height="469" loading="lazy" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px;">
+<img src="/images/2021/20210913a/screenshot_setup4.png" alt="設定完了画面" width="1200" height="469" loading="lazy" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px;">
 
 # 2. Goでメッセージを送る
 
@@ -120,7 +120,7 @@ func main() {
 
 プログラムを実行すると、Google Chatにメッセージが送信されます。
 
-<img src="/images/20210913a/screenshot_simple_message.png" alt="screenshot_simple_message" width="1066" height="224" loading="lazy">
+<img src="/images/2021/20210913a/screenshot_simple_message.png" alt="screenshot_simple_message" width="1066" height="224" loading="lazy">
 
 # （付録１）投稿を一つのスレッドにまとめる
 
@@ -133,7 +133,7 @@ const webhook = "<任意のWebhookURL>&threadKey=<適当な文字列>"
 ```
 
 以下のように、同じスレッドにメッセージが投稿されるようになります。
-<img src="/images/20210913a/screenshot_thread.png" alt="screenshot_thread" width="1056" height="222" loading="lazy">
+<img src="/images/2021/20210913a/screenshot_thread.png" alt="screenshot_thread" width="1056" height="222" loading="lazy">
 
 # （付録２）Card型メッセージ
 
@@ -315,10 +315,10 @@ func main() {
 それぞれの要素の関係をわかりやすく図にすると以下のようになります（厳密には異なります）
 
 Cardの中には1つ以上のSectionが、Sectionの中には1つ以上のウィジェットが必要になります。ウィジェットの中にはTextParagraphやKeyValue、Buttonの配列などの中から1つの要素が入ります。
-<img src="/images/20210913a/screenshot_card_message.png" alt="screenshot_card_message" width="1200" height="654" loading="lazy">
+<img src="/images/2021/20210913a/screenshot_card_message.png" alt="screenshot_card_message" width="1200" height="654" loading="lazy">
 
 出力結果がこちらです。
-<img src="/images/20210913a/screenshot_card_message_2.png" alt="screenshot_card_message" width="425" height="455" loading="lazy" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px;">
+<img src="/images/2021/20210913a/screenshot_card_message_2.png" alt="screenshot_card_message" width="425" height="455" loading="lazy" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px;">
 
 # 実際に使ってみた感想
 

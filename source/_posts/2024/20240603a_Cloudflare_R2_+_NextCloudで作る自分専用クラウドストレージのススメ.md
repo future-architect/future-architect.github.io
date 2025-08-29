@@ -8,7 +8,7 @@ tag:
   - NextCloud
 category:
   - Programming
-thumbnail: /images/20240603a/thumbnail.png
+thumbnail: /images/2024/20240603a/thumbnail.png
 author: 大岩潤矢
 lede: "みなさんこんにちは、TIG所属の大岩潤矢です。今回はCloudflare連載ということで、Cloudflareのサービス、Cloudflare R2と、NextCloudを利用した自分専用クラウドストレージの構築について紹介します。"
 ---
@@ -124,7 +124,7 @@ https://wasabi.com/pricing
 
 今回はプロジェクトの後輩にRaspberry Piを布教する目的も兼ねて、手持ちのRaspberry Pi 3 Model BにNextCloudをインストールします。大学生時代に4台まとめ買いして家に転がっていたものです。
 
-<img src="/images/20240603a/image.png" alt="image.png" width="677" height="353" loading="lazy">
+<img src="/images/2024/20240603a/image.png" alt="image.png" width="677" height="353" loading="lazy">
 
 事前にIPアドレスを固定し、SSH接続できるようにしてあります。この方法は本題からそれてしまうので、割愛します。
 
@@ -262,7 +262,7 @@ sudo systemctl enable nginx
 
 ブラウザからRaspberry piのIPアドレス宛にアクセスし、nginxのデフォルトページが表示されたらOKです。
 
-<img src="/images/20240603a/image_2.png" alt="image.png" width="913" height="574" loading="lazy">
+<img src="/images/2024/20240603a/image_2.png" alt="image.png" width="913" height="574" loading="lazy">
 
 続いてPHPをインストールします。デフォルトではPHP 8.2がインストールされるようだったので、リポジトリを追加してPHP 8.3をインストールします。以下コマンドを実行し、 `php8.3` と `php8.3-fpm` 、それから各種モジュールをインストールします。
 
@@ -315,25 +315,25 @@ wget https://download.nextcloud.com/server/installer/setup-nextcloud.php
 
 ファイルを配置したら、`http://(Raspberry PiのIPアドレス)/setup-nextcloud.php` にアクセスします。PHPが正しくセットアップされていればSetup Wizardが表示されるので、「Next」を押下します。
 
-<img src="/images/20240603a/image_3.png" alt="image.png" width="416" height="489" loading="lazy">
+<img src="/images/2024/20240603a/image_3.png" alt="image.png" width="416" height="489" loading="lazy">
 
 今回は `/var/www/html` 配下にそのままインストールするため `.` を入力して「Next」を押下。
 
-<img src="/images/20240603a/image_4.png" alt="image.png" width="436" height="468" loading="lazy">
+<img src="/images/2024/20240603a/image_4.png" alt="image.png" width="436" height="468" loading="lazy">
 
 インストールが終了したら、「Next」を押下します。
 
-<img src="/images/20240603a/image_5.png" alt="image.png" width="592" height="351" loading="lazy">
+<img src="/images/2024/20240603a/image_5.png" alt="image.png" width="592" height="351" loading="lazy">
 
 続いて、 `http://(Raspberry PiのIPアドレス)/index.php` にアクセスし、管理者情報を入力します。
 
 データベース情報の部分は、先述したSQLを実行した場合は、データベース名・ユーザ名ともに `nextcloud` になります。
 
-<img src="/images/20240603a/image_6.png" alt="image.png" width="1200" height="652" loading="lazy">
+<img src="/images/2024/20240603a/image_6.png" alt="image.png" width="1200" height="652" loading="lazy">
 
 ようやくインストール完了です。
 
-<img src="/images/20240603a/image_7.png" alt="image.png" width="1200" height="644" loading="lazy">
+<img src="/images/2024/20240603a/image_7.png" alt="image.png" width="1200" height="644" loading="lazy">
 
 ### Cloudflare R2バケットの作成
 
@@ -341,23 +341,23 @@ wget https://download.nextcloud.com/server/installer/setup-nextcloud.php
 
 管理画面へログインし、左のメニューよりR2へ進み、「Create bucket」ボタンを押下します。
 
-<img src="/images/20240603a/image_8.png" alt="image.png" width="1082" height="583" loading="lazy">
+<img src="/images/2024/20240603a/image_8.png" alt="image.png" width="1082" height="583" loading="lazy">
 
 任意の名前を入力し「Create bucket」を押下します。
 
-<img src="/images/20240603a/image_9.png" alt="image.png" width="897" height="662" loading="lazy">
+<img src="/images/2024/20240603a/image_9.png" alt="image.png" width="897" height="662" loading="lazy">
 
 続いてAPIトークンを発行します。R2メニューの右上「Manage R2 API Tokens」に進みます（ユーザプロフィールから発行できるユーザトークンとはまた別なので注意）
 
-<img src="/images/20240603a/image_10.png" alt="image.png" width="1200" height="380" loading="lazy">
+<img src="/images/2024/20240603a/image_10.png" alt="image.png" width="1200" height="380" loading="lazy">
 
 「Create API Token」を押下します。
 
-<img src="/images/20240603a/image_11.png" alt="image.png" width="1192" height="328" loading="lazy">
+<img src="/images/2024/20240603a/image_11.png" alt="image.png" width="1192" height="328" loading="lazy">
 
 今回は閲覧だけでなく編集も行うため、最上位権限である「Admin Read & Write」を選択し、新規作成します。
 
-<img src="/images/20240603a/image_12.png" alt="image.png" width="1200" height="628" loading="lazy">
+<img src="/images/2024/20240603a/image_12.png" alt="image.png" width="1200" height="628" loading="lazy">
 
 最後にキーが払い出されます。以下の値をコピーしておきましょう。
 
@@ -366,7 +366,7 @@ wget https://download.nextcloud.com/server/installer/setup-nextcloud.php
 - Secret Access Key
 - Endpoint
 
-<img src="/images/20240603a/image_13.png" alt="image.png" width="1200" height="728" loading="lazy">
+<img src="/images/2024/20240603a/image_13.png" alt="image.png" width="1200" height="728" loading="lazy">
 
 ### 接続設定
 
@@ -376,11 +376,11 @@ wget https://download.nextcloud.com/server/installer/setup-nextcloud.php
 
 右上のユーザアイコン→アプリ→注目のアプリへ進み、「External storage support」を有効化します。
 
-<img src="/images/20240603a/image_14.png" alt="image.png" width="1179" height="415" loading="lazy">
+<img src="/images/2024/20240603a/image_14.png" alt="image.png" width="1179" height="415" loading="lazy">
 
 その後設定画面に進み、「外部ストレージ」メニューからR2の設定を追加します。先ほど控えたR2のアクセスキー等を以下のように入力します。
 
-<img src="/images/20240603a/image_15.png" alt="image.png" width="1200" height="563" loading="lazy">
+<img src="/images/2024/20240603a/image_15.png" alt="image.png" width="1200" height="563" loading="lazy">
 
 最後にチェックマークをクリックし、左側に緑マークが点灯すれば設定完了です！
 
@@ -388,17 +388,17 @@ wget https://download.nextcloud.com/server/installer/setup-nextcloud.php
 
 ホーム画面に戻ってみると、先ほど設定した「R2」フォルダが増えています。
 
-<img src="/images/20240603a/image_16.png" alt="image.png" width="1134" height="504" loading="lazy">
+<img src="/images/2024/20240603a/image_16.png" alt="image.png" width="1134" height="504" loading="lazy">
 
 実際にファイルをアップロードしてみましょう。ファイルをドラッグ&ドロップすると……
 
-<img src="/images/20240603a/image_17.png" alt="image.png" width="1057" height="486" loading="lazy">
+<img src="/images/2024/20240603a/image_17.png" alt="image.png" width="1057" height="486" loading="lazy">
 
 無事アップロードできました！
 
 Cloudflare R2側にも反映されているようです。
 
-<img src="/images/20240603a/image_18.png" alt="image.png" width="1200" height="537" loading="lazy">
+<img src="/images/2024/20240603a/image_18.png" alt="image.png" width="1200" height="537" loading="lazy">
 
 ## おわりに
 

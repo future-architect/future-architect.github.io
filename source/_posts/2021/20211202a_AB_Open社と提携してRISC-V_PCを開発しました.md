@@ -8,7 +8,7 @@ tag:
   - HW
 category:
   - IoT
-thumbnail: /images/20211202a/thumbnail.jpg
+thumbnail: /images/2021/20211202a/thumbnail.jpg
 author: 真野隼記
 lede: "フューチャーはAB Open社と協力し、無料のオープンソースであるRISC-Vアーキテクチャを活用した独自PCを開発しましたのでご報告します。ITコンサルティング企業のフューチャーがなぜRISC-VベースのPC開発に携わっているのか疑問をお持ちの方も多いかと思いますので、経緯にも触れます。"
 ---
@@ -26,11 +26,11 @@ RISC-VはCPU命令セットアーキテクチャ（Instruction Set Architecture:
 
 ## 開発した RISC-V パーソナルコンピュータについて
 
-<img src="/images/20211202a/future_rvpc_promo_1.jpg" alt="future_rvpc_promo_1.jpg" width="1200" height="802" loading="lazy">
+<img src="/images/2021/20211202a/future_rvpc_promo_1.jpg" alt="future_rvpc_promo_1.jpg" width="1200" height="802" loading="lazy">
 
-<img src="/images/20211202a/future_rvpc_promo_4.jpg" alt="future_rvpc_promo_4.jpg" width="1200" height="802" loading="lazy">
+<img src="/images/2021/20211202a/future_rvpc_promo_4.jpg" alt="future_rvpc_promo_4.jpg" width="1200" height="802" loading="lazy">
 
-<img src="/images/20211202a/future_rvpc_promo_3.jpg" alt="future_rvpc_promo_3.jpg" width="1200" height="802" loading="lazy">
+<img src="/images/2021/20211202a/future_rvpc_promo_3.jpg" alt="future_rvpc_promo_3.jpg" width="1200" height="802" loading="lazy">
 
 開発したPCは、RISC-VのパイオニアであるSiFive社のHiFive Unmatchedを使用しています。CPUはSiFive U740 SoC、メモリは16GBという構成です。最初の写真を見てわかるように、フロントパネルを持っていることが大きな特徴で、ど真ん中に「フューチャー」のロゴが印字されていています！
 
@@ -45,7 +45,7 @@ RISC-VはCPU命令セットアーキテクチャ（Instruction Set Architecture:
 
 フロントパネルには、Pythonアプリケーションを介しての表示が可能です。CPUとメモリの使用状況、コンポーネントの温度などを含むシステム統計が一目でわかるので、PCの状態を常に監視できます。
 
-<img src="/images/20211202a/future_rvpc_promo_5.jpg" alt="future_rvpc_promo_5.jpg" width="1200" height="802" loading="lazy">
+<img src="/images/2021/20211202a/future_rvpc_promo_5.jpg" alt="future_rvpc_promo_5.jpg" width="1200" height="802" loading="lazy">
 
 このOLEDディスプレイのハードウェア設計とPythonを含むコードはGitHubでも公開しています。
 

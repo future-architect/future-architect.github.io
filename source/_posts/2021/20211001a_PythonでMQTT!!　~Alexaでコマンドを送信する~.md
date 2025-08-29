@@ -10,12 +10,12 @@ tag:
   - IoT
 category:
   - IoT
-thumbnail: /images/20211001a/thumbnail.jpg
+thumbnail: /images/2021/20211001a/thumbnail.jpg
 author: 宮永崇史
 lede: "この記事は温度と湿度、不快指数を定期投稿するbotの作成を目指してハンズオンを進める構成となっています。"
 ---
 
-<img src="/images/20211001a/volodymyr-hryshchenko-V5vqWC9gyEU-unsplash.jpg" alt="" title="Volodymyr Hryshchenko on Unsplash" width="1200" height="800" loading="lazy">
+<img src="/images/2021/20211001a/volodymyr-hryshchenko-V5vqWC9gyEU-unsplash.jpg" alt="" title="Volodymyr Hryshchenko on Unsplash" width="1200" height="800" loading="lazy">
 
 # はじめに
 
@@ -33,7 +33,7 @@ lede: "この記事は温度と湿度、不快指数を定期投稿するbotの�
 上記の記事ではAWS IoTと温湿度センサーを使用して「温湿度マイスターbot」を作成する内容を紹介しています。
 
 記事では温度と湿度、不快指数を定期投稿するbotの作成を目指してハンズオンを進める構成となっています。
-<img src="/images/20211001a/image.png" alt="BOT投稿画面" width="647" height="457" loading="lazy">
+<img src="/images/2021/20211001a/image.png" alt="BOT投稿画面" width="647" height="457" loading="lazy">
 
 MQTTを使用して、室内温度を定点観測するだけならば以上の記事で十分ですが、ここまで作成してふと思いました。
 
@@ -69,7 +69,7 @@ RaspberrypiでAWS IoTをSubscribeしておきます。(PublishとSubscribeにつ
 
 AWS IoTからMQTTでコマンドを送信し、Subscriberではコマンド受信をトリガーとしてローカルのワーカーを起動するという構成になっています。AWS IoTのPublishのタイミングはAlexa Home Skillをトリガーとしています。
 
-<img src="/images/20211001a/image_2.png" alt="image.png" width="1200" height="528" loading="lazy">
+<img src="/images/2021/20211001a/image_2.png" alt="image.png" width="1200" height="528" loading="lazy">
 
 # 開発環境
 
@@ -149,7 +149,7 @@ if __name__ == '__main__':
 
 上記Pythonスクリプトを実行した状態でAWS IoTコンソールから「トピックをサブスクライブする」で`topic/to/subscribe`をサブスクライブした後に「トピックを公開する」でメッセージペイロードを発行してください。下図の様に「”AWS IoTコンソールからの挨拶”」を受信できていれば成功です。
 
-<img src="/images/20211001a/pymqtt.gif" alt="pymqtt.gif" width="1200" height="432" loading="lazy">
+<img src="/images/2021/20211001a/pymqtt.gif" alt="pymqtt.gif" width="1200" height="432" loading="lazy">
 
 ## 2. AWS LambdaからAWS IoT経由でPublishする
 
@@ -186,7 +186,7 @@ JSON タブを選択して以下を入力してください。
 
 次に上記で作成したポリシーを付与するIAMロールを作成します。ユースケースは「Lambda」を選択してください。「権限の設定」ページで作成したポリシーを検索、付与します。ここでもタグの設定ページがありますが、入力はしなくても問題ありません。
 
-<img src="/images/20211001a/image_3.png" alt="image.png" width="1200" height="455" loading="lazy">
+<img src="/images/2021/20211001a/image_3.png" alt="image.png" width="1200" height="455" loading="lazy">
 
 以上の設定を行うことでAWS Lambda作成時に「既存のロール」から作成したロールを付与することが可能となります。(今回は「my」という名前のロールを作成しています。)
 
@@ -223,7 +223,7 @@ def lambda_handler(event, context):
         return "Failed."
 ```
 
-<img src="/images/20211001a/py-mqtt2.gif" alt="py-mqtt2.gif" width="1200" height="432" loading="lazy">
+<img src="/images/2021/20211001a/py-mqtt2.gif" alt="py-mqtt2.gif" width="1200" height="432" loading="lazy">
 
 上記スクリプトを実行して下図の様に「AWS Lambdaからの挨拶」が表示されていれば成功です。
 
@@ -242,16 +242,16 @@ Alexa Home Skillを作成する前にAmazon　Developerアカウントを作成�
 
 その上で、[Amazon開発者ポータル](https://developer.amazon.com/ja/)から普段amazon.jpで使用しているアカウントでログインしてください。(正確には使用するAmazon Echo Dotに紐づいているアカウントです。)
 
-<img src="/images/20211001a/image_4.png" alt="image.png" width="1200" height="545" loading="lazy">
+<img src="/images/2021/20211001a/image_4.png" alt="image.png" width="1200" height="545" loading="lazy">
 
 それでは、スキルを作成します。Alexa>スキル開発>開発者コンソールよりスキル作成画面に遷移してください。[Amazon Alexa Console \- Amazon Alexa Official Site](https://developer.amazon.com/alexa/console/ask)
 
 本記事では、`alexa-dht22`というスキルを作成しました。
 
-<img src="/images/20211001a/image_5.png" alt="image.png" width="1075" height="439" loading="lazy">
+<img src="/images/2021/20211001a/image_5.png" alt="image.png" width="1075" height="439" loading="lazy">
 
 スキル作成画面では以下の項目を選択してください。「スマートホーム」「ユーザー定義のプロビジョニング」です。
-<img src="/images/20211001a/image_6.png" alt="image.png" width="1010" height="891" loading="lazy">
+<img src="/images/2021/20211001a/image_6.png" alt="image.png" width="1010" height="891" loading="lazy">
 
 スキルの作成は以上で完了です。次にAlexa Home SkillとAWS Lambdaの連携を行います。
 
@@ -265,7 +265,7 @@ Alexa Home Skillを作成する前にAmazon　Developerアカウントを作成�
 
 今回は`alexa-dht22`という名称で作成しています。
 
-<img src="/images/20211001a/image_7.png" alt="image.png" width="742" height="642" loading="lazy">
+<img src="/images/2021/20211001a/image_7.png" alt="image.png" width="742" height="642" loading="lazy">
 
 作成が完了するとクライアントIDとクライアントシークレットの2つが発行されます。
 この2つは後程使用するので、手元にメモしておきましょう。
@@ -284,7 +284,7 @@ Alexa Home Skillを作成する前にAmazon　Developerアカウントを作成�
 
 作成したスキルを選択後「スマートホーム」という画面でLambad関数のArnを設定します。
 
-<img src="/images/20211001a/skill.png" alt="skill.png" width="1200" height="618" loading="lazy">
+<img src="/images/2021/20211001a/skill.png" alt="skill.png" width="1200" height="618" loading="lazy">
 次に以下の項目を設定してください。
 
 |項目 |設定内容  |
@@ -300,18 +300,18 @@ Alexaのリダイレクト先のURLには3つのURLが記載されていると�
 
 こちらは後の工程で使用するため、手元にメモしておきます(保存後に確認することもできます)。
 
-<img src="/images/20211001a/skill2.png" alt="skill2.png" width="1200" height="735" loading="lazy">
+<img src="/images/2021/20211001a/skill2.png" alt="skill2.png" width="1200" height="735" loading="lazy">
 
 次に[Amazon開発者ポータル](https://developer.amazon.com/ja/)にて先ほどの3つのURLを設定します。
 
 「許可された返信URL」に先ほどメモしたURLを1つずつ登録します。
-<img src="/images/20211001a/skill3.png" alt="skill3.png" width="1200" height="402" loading="lazy">
+<img src="/images/2021/20211001a/skill3.png" alt="skill3.png" width="1200" height="402" loading="lazy">
 
 次が最後の設定項目です。Alexa Developerコンソールのスマートホーム画面にてスキルIDをコピーしてください。こちらをAWS Lambdaのトリガーに設定することで連携の完了です。
 
 先ほど作成したLambad関数でトリガーを設定します。
 
-<img src="/images/20211001a/skill4.png" alt="skill4.png" width="1200" height="719" loading="lazy">
+<img src="/images/2021/20211001a/skill4.png" alt="skill4.png" width="1200" height="719" loading="lazy">
 「アプリケーションID」の部分に先ほどメモした「スキルID」を設定すれば完了です。
 
 ## 5. Alexa Home Skillを開発する
@@ -407,7 +407,7 @@ def send_command() :
 
 Alexaアプリを起動し、「デバイス>スマートホームスキル」と進むと先ほど作成したスキルが表示されます。スキルを有効化し、デバイスの探索を行ってください。Lambad関数が正しく記述できている場合はデバイスの探索が無事完了し、「温湿度マイスター」が登録されているはずです。
 
-<img src="/images/20211001a/alexa2.png" alt="alexa2.png" width="1200" height="958" loading="lazy">
+<img src="/images/2021/20211001a/alexa2.png" alt="alexa2.png" width="1200" height="958" loading="lazy">
 
 それでは最後にAlexaアプリ上で「その他>定型アクション」より、「アレクサ、不快指数は？」という呼びかけをトリガーとして「温湿度マイスターを起動する」アクションを作成します。
 

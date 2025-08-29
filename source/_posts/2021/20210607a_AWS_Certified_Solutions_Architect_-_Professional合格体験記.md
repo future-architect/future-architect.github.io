@@ -7,7 +7,7 @@ tag:
   - AWS
 category:
   - Programming
-thumbnail: /images/20210607a/thumbnail.png
+thumbnail: /images/2021/20210607a/thumbnail.png
 author: 伊藤真彦
 lede: "TIGの伊藤真彦です。先日AWS Certified Solutions Architect - Professionalを受験し合格できました。合格までの学習方法を共有します。"
 ---
@@ -18,7 +18,7 @@ TIGの伊藤真彦です。
 
 合格までの学習方法を共有します。
 
-<img src="/images/20210607a/image.png" alt="aws certified solutions architect icon" width="600" height="600">
+<img src="/images/2021/20210607a/image.png" alt="aws certified solutions architect icon" width="600" height="600">
 
 # AWS Certified Solutions Architect - Professionalとは
 

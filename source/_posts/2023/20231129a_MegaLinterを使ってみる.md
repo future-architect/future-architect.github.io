@@ -11,7 +11,7 @@ tag:
   - 外部寄稿
 category:
   - DevOps
-thumbnail: /images/20231129a/thumbnail.png
+thumbnail: /images/2023/20231129a/thumbnail.png
 author: 宮永崇史
 lede: "MegaLinterを最近個人開発のリポジトリに導入してみたので概要や使い方、所感などを記事にまとめました。"
 ---
@@ -45,7 +45,7 @@ Supporting 55 languages, 24 formats, 20 tooling formats and ready to use out of 
 
 <div align="center">
 ▼MegaLinterの基本的なフロー
-<img src="/images/20231129a/属性.png" alt="属性" width="1200" height="621" loading="lazy">
+<img src="/images/2023/20231129a/属性.png" alt="属性" width="1200" height="621" loading="lazy">
 
 </div>
 
@@ -55,7 +55,7 @@ Supporting 55 languages, 24 formats, 20 tooling formats and ready to use out of 
 
 <div align="center">
 ▼Pull Requestにコメントする例
-<img src="/images/20231129a/属性_2.png" alt="属性" width="825" height="499" loading="lazy">
+<img src="/images/2023/20231129a/属性_2.png" alt="属性" width="825" height="499" loading="lazy">
 </div>
 
 フォーマッタによってはオートフォーマットが有効なものもあるため、非常に便利です。
@@ -97,7 +97,7 @@ npx mega-linter-runner --install
 コマンドを実行すると
 
 下図のようなプロンプトが立ち上がるので選択をしていきます。
-<img src="/images/20231129a/image.png" alt="image.png" width="1153" height="356" loading="lazy">
+<img src="/images/2023/20231129a/image.png" alt="image.png" width="1153" height="356" loading="lazy">
 
 今回はGoのプロジェクトを選択しています。自分の環境に合わせて選択してください。
 
@@ -348,7 +348,7 @@ Download it from artifacts then copy-paste it in your local repo to apply linter
 
 以下がPR上でのコメントの様子です。
 
-<img src="/images/20231129a/image_2.png" alt="image.png" width="651" height="725" loading="lazy">
+<img src="/images/2023/20231129a/image_2.png" alt="image.png" width="651" height="725" loading="lazy">
 
 表形式にまとめてくれているため、非常にわかりやすいですね。
 

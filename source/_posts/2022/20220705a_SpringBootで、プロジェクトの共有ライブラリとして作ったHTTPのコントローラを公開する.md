@@ -7,12 +7,12 @@ tag:
   - Java
 category:
   - Programming
-thumbnail: /images/20220705a/thumbnail.png
+thumbnail: /images/2022/20220705a/thumbnail.png
 author: 澁川喜規
 lede: "アプリケーション開発のチームと、共有ライブラリチームに分かれているが、共有ライブラリ側でアプリ側にHTTPのエンドポイントを追加したい場合があると思います。例えば、特別なヘルスチェックのエンドポイントを足したいとか。SpringBootのデモアプリとして作成したもの（Spring Starter ProjectでSpring Webだけ足したもの）をベースにやり方をまとめていきます。"
 ---
 
-<img src="/images/20220705a/springboot.png" alt="" width="800" height="251">
+<img src="/images/2022/20220705a/springboot.png" alt="" width="800" height="251">
 
 アプリケーション開発のチームと、共有ライブラリチームに分かれているが、共有ライブラリ側でアプリ側にHTTPのエンドポイントを追加したい場合があると思います。例えば、特別なヘルスチェックのエンドポイントを足したいとか。
 

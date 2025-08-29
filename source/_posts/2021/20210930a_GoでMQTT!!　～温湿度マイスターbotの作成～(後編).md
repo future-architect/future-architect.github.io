@@ -12,13 +12,13 @@ tag:
   - ハンズオン
 category:
   - IoT
-thumbnail: /images/20210930a/thumbnail.png
+thumbnail: /images/2021/20210930a/thumbnail.png
 author: 宮永崇史
 lede: "AWS IoTを使用したMQTTのチュートリアルはAWS公式からも詳細なハンズオン記事が出ています。本記事はこちらのハンズオンを基にGo言語を使用してMQTTによる通信を行いました。(公式の記事はPythonで実装されています。)"
 mathjax: true
 ---
 
-<img src="/images/20210930a/サムネイル2.png" alt="" title="Louis Reed on Unsplash" width="1200" height="675" loading="lazy">
+<img src="/images/2021/20210930a/サムネイル2.png" alt="" title="Louis Reed on Unsplash" width="1200" height="675" loading="lazy">
 
 # はじめに
 
@@ -75,7 +75,7 @@ AWS IoTで受信したデータをDynamoDBに登録する方法は公式に詳�
 ### テーブルの新規作成
 
 まずはテーブルの作成です。テーブル名は任意ですが、今回は`mydht22`としました。Partition keyに`device_id`をSort keyに`timestamp`を定義しています。
-<img src="/images/20210930a/image.png" alt="image.png" width="797" height="508" loading="lazy">
+<img src="/images/2021/20210930a/image.png" alt="image.png" width="797" height="508" loading="lazy">
 
 ### ルールの作成
 
@@ -95,18 +95,18 @@ FROM 'topic/to/publish'
 ```
 
 アクション追加の際には下図**「DynamoDBテーブル(DynamoDBv2)の複数列にメッセージを分割する」**を追加してください。
-<img src="/images/20210930a/image_2.png" alt="DynamoDBコンソール画面" width="818" height="247" loading="lazy">
+<img src="/images/2021/20210930a/image_2.png" alt="DynamoDBコンソール画面" width="818" height="247" loading="lazy">
 
 リソースにテーブル`mydht22`選択してください。また、今回は`mydht22`という名称でロールを新規作成しました。
 
-<img src="/images/20210930a/image_3.png" alt="ロール作成" width="982" height="616" loading="lazy">
+<img src="/images/2021/20210930a/image_3.png" alt="ロール作成" width="982" height="616" loading="lazy">
 
 ### 疎通確認
 
 最後にDynamoDBにデータが正しく登録されているか確認します。
 DynamoDBコンソールにアクセスして、下図の様にデータが登録されていることを確認してください。
 
-<img src="/images/20210930a/image_4.png" alt="データ登録" width="675" height="511" loading="lazy">
+<img src="/images/2021/20210930a/image_4.png" alt="データ登録" width="675" height="511" loading="lazy">
 
 作成したルールに従ってデータが登録されていますね！
 次の章では、Boto3を使用してDynamoDBからデータを取得したうえで、扱いやすいようにデータを整形します。
@@ -331,7 +331,7 @@ def worker():
 
 ### 出力結果
 
-<img src="/images/20210930a/室内温湿度.jpg" alt="室内温湿度" width="800" height="600" loading="lazy">
+<img src="/images/2021/20210930a/室内温湿度.jpg" alt="室内温湿度" width="800" height="600" loading="lazy">
 
 ## 7. 作成したプロット図をSlack APIで画像投稿
 
@@ -364,7 +364,7 @@ client = WebClient(
 
 ### 出力結果
 
-<img src="/images/20210930a/image_5.png" alt="出力結果グラフ" width="647" height="457" loading="lazy">
+<img src="/images/2021/20210930a/image_5.png" alt="出力結果グラフ" width="647" height="457" loading="lazy">
 
 それでは、最後にSlack投稿を定期実行するようにしましょう。
 定期実行には以下のモジュールを使わせていただきました。

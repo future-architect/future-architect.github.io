@@ -9,11 +9,11 @@ tag:
   - 登壇レポート
 category:
   - DataScience
-thumbnail: /images/20220613a/thumbnail.png
+thumbnail: /images/2022/20220613a/thumbnail.png
 author: 金子剛士
 lede: "Future Tech Night #17「embeddingの活用」と「MLOps」のAI勉強会を開催し、「embeddingを用いた分析・検索・推薦の技術」というタイトルで発表しました。当日の勉強会の様子は[YouTubeで公開しており..."
 ---
-<img src="/images/20220613a/top.png" alt="" width="600" height="263">
+<img src="/images/2022/20220613a/top.png" alt="" width="600" height="263">
 
 # はじめに
 

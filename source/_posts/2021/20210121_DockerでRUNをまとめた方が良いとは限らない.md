@@ -7,7 +7,7 @@ tag:
   - コンテナビルド
 category:
   - Programming
-thumbnail: /images/20210121/thumbnail.png
+thumbnail: /images/2021/20210121/thumbnail.png
 author: 澁川喜規
 lede: "ソフトウェアの世界では、ツールや言語の進歩があって、もはや古い知識になっているにも関わらず、古い知識がベストプラクティスと呼ばれて蔓延し続けている例があります。Dockerだと「RUNをまとめよう」というのがそうです。かつては..."
 ---
@@ -15,7 +15,7 @@ TIG/DXの渋川です。
 
 ソフトウェアの世界では、ツールや言語の進歩があって、もはや古い知識になっているにも関わらず、古い知識がベストプラクティスと呼ばれて蔓延し続けている例があります。Dockerだと「RUNをまとめよう」というのがそうです。かつてはこれは常に行うべきプラクティスでしたが、現代だとそうじゃないケースもあり、デメリットもあります。
 
-<img src="/images/20210121/Moby-logo.png" class="img-middle-size" loading="lazy">
+<img src="/images/2021/20210121/Moby-logo.png" class="img-middle-size" loading="lazy">
 
 > https://www.docker.com/company/newsroom/media-resources
 

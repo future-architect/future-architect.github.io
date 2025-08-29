@@ -9,7 +9,7 @@ tag:
   - Vertex AI Model Monitoring
 category:
   - DataScience
-thumbnail: /images/20230414a/thumbnail.png
+thumbnail: /images/2023/20230414a/thumbnail.png
 author: 板野竜也
 lede: "データ/モデル監視ツールであるVertex AI Model MonitoringとEvidently AIを利用して両者を様々な観点で検証していきます。"
 ---
@@ -86,7 +86,7 @@ Vertex AIでは、以下のような指標を監視できます。
 
 Moder Registryから作成したモデル・バージョンの詳細画面に行き、「評価を作成」をクリックします。
 
-<img src="/images/20230414a/2023-04-03-09-41-52.png" alt="" width="1200" height="464" loading="lazy">
+<img src="/images/2023/20230414a/2023-04-03-09-41-52.png" alt="" width="1200" height="464" loading="lazy">
 
 設定項目がいくつか出てくるので、ターゲット列、ソース（[★1]）、バッチ予測の出力先を指定します。
 
@@ -94,7 +94,7 @@ Moder Registryから作成したモデル・バージョンの詳細画面に行
 
 今回は、以下の画像のように設定します。
 
-<img src="/images/20230414a/2023-04-03-09-53-15.png" alt="" width="764" height="1834" loading="lazy">
+<img src="/images/2023/20230414a/2023-04-03-09-53-15.png" alt="" width="764" height="1834" loading="lazy">
 
 評価を開始すると、内部でバッチ予測ジョブが自動的に開始され、約20分ほどで評価が完了します。
 
@@ -104,7 +104,7 @@ Moder Registryから作成したモデル・バージョンの詳細画面に行
 
 評価の結果は以下のように見ることができます。特徴量の重要度もヒストグラムで確認できます。
 
-<img src="/images/20230414a/2023-04-03-09-47-27.png" alt="" width="1200" height="730" loading="lazy">
+<img src="/images/2023/20230414a/2023-04-03-09-47-27.png" alt="" width="1200" height="730" loading="lazy">
 
 ### 4.2.4. 自動化とアラート
 
@@ -151,7 +151,7 @@ Evidently AIでは、以下のような指標を監視できます。
 
 ※[★2]について「（2）特徴量寄与率」を算出しなくて良い場合は、以下のように、`target`列と`prediction`列があればよい
 
-<img src="/images/20230414a/2023-03-22-14-50-10.png" alt="" width="199" height="197" loading="lazy">
+<img src="/images/2023/20230414a/2023-03-22-14-50-10.png" alt="" width="199" height="197" loading="lazy">
 
 ### 5.2.2. 手順
 
@@ -199,7 +199,7 @@ report.show(mode='inline') # Notebookのセル出力で結果を表示する
 
 「（1）モデル精度」として、以下のようにMAE等の基本的な数値指標を出力できます。
 
-<img src="/images/20230414a/2023-03-22-14-57-34.png" alt="" width="1200" height="556" loading="lazy">
+<img src="/images/2023/20230414a/2023-03-22-14-57-34.png" alt="" width="1200" height="556" loading="lazy">
 
 ※以降、赤色と灰色のグラフが出てきますが、次のような区別です。
 
@@ -209,7 +209,7 @@ report.show(mode='inline') # Notebookのセル出力で結果を表示する
 「（2）特徴量寄与率」として、以下のように各説明変数-目的変数(target列)間の相関係数を出力できます。\
 説明変数-目的変数間の相関係数が大きいほど特徴量寄与率が大きいことを示します。
 
-<img src="/images/20230414a/2023-04-05-09-36-51.png" alt="" width="1200" height="669" loading="lazy">
+<img src="/images/2023/20230414a/2023-04-05-09-36-51.png" alt="" width="1200" height="669" loading="lazy">
 
 「（3）予測結果の偏り」として、以下のように予測結果の分布表示をできます。
 
@@ -217,7 +217,7 @@ report.show(mode='inline') # Notebookのセル出力で結果を表示する
 
 両者の分布を比較することで、予測結果の偏りを監視できます。
 
-<img src="/images/20230414a/2023-04-03-14-15-06.png" alt="" width="1200" height="559" loading="lazy">
+<img src="/images/2023/20230414a/2023-04-03-14-15-06.png" alt="" width="1200" height="559" loading="lazy">
 
 加えて、Evidently AIでは以下のような視覚的出力もできます。
 
@@ -225,11 +225,11 @@ report.show(mode='inline') # Notebookのセル出力で結果を表示する
 
 直線に近い見た目になるほど高精度であることを視覚的に示します。
 
-<img src="/images/20230414a/2023-03-22-14-58-19.png" alt="" width="1200" height="421" loading="lazy">
+<img src="/images/2023/20230414a/2023-03-22-14-58-19.png" alt="" width="1200" height="421" loading="lazy">
 
 また、誤差の時間的推移を視覚的に表示することもできます。
 
-<img src="/images/20230414a/2023-03-22-15-03-00.png" alt="" width="1200" height="426" loading="lazy">
+<img src="/images/2023/20230414a/2023-03-22-15-03-00.png" alt="" width="1200" height="426" loading="lazy">
 
 今回出力したグラフは一例ですが、Evidently AIでは他にも様々なグラフを出力できます。\
 詳しくは[公式ドキュメント](https://docs.evidentlyai.com/reference/all-metrics#regression)を参照してください。

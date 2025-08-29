@@ -7,7 +7,7 @@ tag:
   - コーディング規約
 category:
   - Programming
-thumbnail: /images/20160902/thumbnail_20160902.png
+thumbnail: /images/2016/20160902/thumbnail_20160902.png
 author: 星賢一
 lede: "システム屋さんがうれしいJava8対応のコーディング規約を公開します！！"
 ---
@@ -40,7 +40,7 @@ lede: "システム屋さんがうれしいJava8対応のコーディング規�
 
 ## Future Enterprise Coding Standards
 
-<img src="/images/20160902/photo_20160902_01.png" alt="フューチャーコーディング規約のイメージキャラクター" loading="lazy">
+<img src="/images/2016/20160902/photo_20160902_01.png" alt="フューチャーコーディング規約のイメージキャラクター" loading="lazy">
 
 世の中になければ自分たちで作るというのは弊社の行動理念でもあるので、社内で伝統的に受け継がれ、細かな改善をしてきたコーディング規約をベースに技術チーム有志にてJava 8対応版を作りました。
 (ちなみにモチーフがなぜハチなのかは、わかりますよね？ )
@@ -144,7 +144,7 @@ https://github.com/future-architect/coding-standards
 
 ## 参考：イメージキャラクターについて
 
-<img src="/images/20160902/photo_20160902_01.png" alt="フューチャーコーディング規約のイメージキャラクター" style="width:200px;" loading="lazy">
+<img src="/images/2016/20160902/photo_20160902_01.png" alt="フューチャーコーディング規約のイメージキャラクター" style="width:200px;" loading="lazy">
 
 ### 特徴
 

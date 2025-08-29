@@ -7,7 +7,7 @@ tag:
   - 書評
 category:
   - Programming
-thumbnail: /images/20221110a/thumbnail.png
+thumbnail: /images/2022/20221110a/thumbnail.png
 author: 藤戸四恩
 lede: "今までWeb APIに関してしっかりと勉強をしたことがなかったので、Web APIの設計方法や考え方をしっかりと学びたいと思い、おすすめの本を周りの人に聞いた際にWeb API The Good Partsを薦めていただき、実際に購入して読みました。"
 ---
@@ -74,7 +74,7 @@ APIの普及について書籍内ではAmazonのアフィリエイトリンク�
 
 2014年時点のGoogleトレンドによる「json api」と「xml api」のトレンド比較が書籍内では「json api」が「xml api」を追い抜いた2年後でしたが、下図の2022年11月では、「json api」の圧勝でした。
 
-<img src="/images/20221110a/比較.png" alt="比較.png" width="1200" height="625" loading="lazy">
+<img src="/images/2022/20221110a/比較.png" alt="比較.png" width="1200" height="625" loading="lazy">
 
 また、1つの作業をするために複数回のアクセスを必要とするAPIは `Chatty API`と呼ばれるためできるだけ少ないアクセス回数になるような設計が必要だが、データを詰め込みすぎてはデータサイズも大きくなってしまうのでレスポンスデータの内容はユーザが取捨選択できるようにすることでデータサイズを小さくし、データの階層はなるべくフラットにすることが必要だと感じました。
 

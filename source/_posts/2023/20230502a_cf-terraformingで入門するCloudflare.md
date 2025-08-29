@@ -9,7 +9,7 @@ tag:
   - cf-terraforming
 category:
   - Infrastructure
-thumbnail: /images/20230502a/thumbnail.png
+thumbnail: /images/2023/20230502a/thumbnail.png
 author: 伊藤太斉
 lede: "cf-terraformingは、Cloudflareにて開発されているOSSで、その名前の通り、Cloudflare上のリソースをHCL化し、出力されたソースを利用してTerraformのState管理下にすることができるツールです"
 ---
@@ -84,7 +84,7 @@ export CLOUDFLARE_ACCOUNT_ID=00000000000000000000000000
 
 これで、準備が整ったので、実際のリソースに対して実行しましょう。cf-terraformingには、`generate`と`import`の2つのコマンドがあります。ここからはそれぞれ使って、WorkersのKVを触ってみようと思います。名前は以下のように`SAMPLE_TF`としました。
 
-<img src="/images/20230502a/image.png" alt="image.png" width="825" height="502" loading="lazy">
+<img src="/images/2023/20230502a/image.png" alt="image.png" width="825" height="502" loading="lazy">
 
 ### generate
 

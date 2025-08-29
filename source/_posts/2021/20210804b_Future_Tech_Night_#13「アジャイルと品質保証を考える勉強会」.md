@@ -8,12 +8,12 @@ tag:
   - 登壇レポート
 category:
   - Programming
-thumbnail: /images/20210804b/thumbnail.jpg
+thumbnail: /images/2021/20210804b/thumbnail.jpg
 author: 岡部荘太郎
 lede: " 2021/7/9（金）にFuture Tech Night #13～アジャイルと品質保証を考える勉強会～を開催しました。私は新卒でフューチャーアーキテクトに入社して、現在は品質管理部門で、全社横断で設計開発の品質向上プロセスの策定・実行を担っています。品質管理部門として、アジャイル開発を採用しているプロジェクトに関わることがあり、縁があって今回の勉強会に登壇することになりました。"
 ---
 
-<img src="/images/20210804b/sea-985545_640.jpg" alt="" title="MerioによるPixabayからの画像" width="640" height="573" loading="lazy">
+<img src="/images/2021/20210804b/sea-985545_640.jpg" alt="" title="MerioによるPixabayからの画像" width="640" height="573" loading="lazy">
 
 # はじめに
 
