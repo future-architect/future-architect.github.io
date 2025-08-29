@@ -12,15 +12,15 @@ category:
   - DB
 thumbnail: /images/2017/20170227/thumbnail_20170227.png
 author: 太田洋介
-lede: "弊社謹製のSQLフォーマッターuroboroSQL formatterを公開しましたので、その紹介をさせていただきます。"
+lede: "当社謹製のSQLフォーマッターuroboroSQL formatterを公開しましたので、その紹介をさせていただきます。"
 ---
 
 
 # はじめに
 
 はじめまして、太田です。
-今回、弊社謹製のSQLフォーマッター[**uroboroSQL formatter**](https://github.com/future-architect/uroboroSQL-formatter)を公開しましたので、その紹介をさせていただきます。
-また、[弊社、星が昨年投稿した記事](/articles/20160902/)の中で[Javaのコーディング規約](/coding-standards/documents/forJava/Javaコーディング規約.html)を公開しましたが、今回その第2弾として、[SQLのコーディング規約（Oracle限定）](/coding-standards/documents/forSQL/SQLコーディング規約（Oracle）.html)も公開いたしましたので、こちらについても触れたいと思います。
+今回、当社謹製のSQLフォーマッター[**uroboroSQL formatter**](https://github.com/future-architect/uroboroSQL-formatter)を公開しましたので、その紹介をさせていただきます。
+また、[当社、星が昨年投稿した記事](/articles/20160902/)の中で[Javaのコーディング規約](/coding-standards/documents/forJava/Javaコーディング規約.html)を公開しましたが、今回その第2弾として、[SQLのコーディング規約（Oracle限定）](/coding-standards/documents/forSQL/SQLコーディング規約（Oracle）.html)も公開いたしましたので、こちらについても触れたいと思います。
 
 <a href="https://github.com/future-architect/uroboroSQL-formatter">
 <img src="/images/2017/20170227/photo_20170227_01.png" class="img-middle-size"  loading="lazy">
@@ -30,17 +30,17 @@ lede: "弊社謹製のSQLフォーマッターuroboroSQL formatterを公開し�
 
 みなさんはどのようなSQLフォーマッターを利用されていますか？　色々あって悩みますよね。
 中には、「実はSQLフォーマッターを使っていない」とか、「SQLフォーマッターを使っていても最終的には手で修正する」という開発フローをとっているチームも少なからず存在するのでは無いでしょうか？
-というか弊社の開発チームは主に上記の2つです（でした）。
+というか当社の開発チームは主に上記の2つです（でした）。
 
 理由を簡単に言ってしまえば、「コーディング規約に合わない」からです。
 「カンマ」や「AND・OR」を、「前にする or 後ろにする」「大文字にする or 小文字にする」などいろいろありますが、
 一番困ったのは「コメントの扱い」です。自分調べですが、コメントが含まれると途端にフォーマットが崩れるフォーマッターが多い印象です。
 
 コーディング規約としてコメントを書くことを強制しているというのもありますが、
-弊社では[Doma2](http://doma.readthedocs.io/ja/stable/)のような2WaySQLテンプレートエンジンを利用していることもあり、
+当社では[Doma2](http://doma.readthedocs.io/ja/stable/)のような2WaySQLテンプレートエンジンを利用していることもあり、
 コメントがあることを前提にフォーマットしてほしいという要望がありました。
 
-このため、弊社では~~興味本位で~~SQLフォーマッターを作成することになりました。
+このため、当社では~~興味本位で~~SQLフォーマッターを作成することになりました。
 
 # **uroboroSQL formatter**利用方法
 
@@ -191,9 +191,9 @@ SublimeText3のプラグインをDoma2で利用される場合は下記のよう
 
 ※[SQL Developer](http://www.oracle.com/technetwork/jp/developer-tools/sql-developer/downloads/index.html)も[A5:SQL Mk-2](http://a5m2.mmatsubara.com/)を機能不十分と言っているわけではありません。どちらも最高にクールで便利なツールです。どちらも大変お世話になっております。みなさんにとっても扱いやすく馴染みあるSQLフォーマット機能を持つツールかと思い、例として書かせていただいております。
 
-# 弊社SQLコーディング規約について
+# 当社SQLコーディング規約について
 
-弊社には独自のSQLのコーディング規約が存在し、長年受け継がれメンテナンスを続けています。
+当社には独自のSQLのコーディング規約が存在し、長年受け継がれメンテナンスを続けています。
 今回、このSQLコーディング規約を公開させていただくことになりました。
 
 [SQLコーディング規約（Oracle）](/coding-standards/documents/forSQL/SQLコーディング規約（Oracle）.html)

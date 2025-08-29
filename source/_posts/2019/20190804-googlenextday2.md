@@ -38,7 +38,7 @@ https://cloud.withgoogle.com/next/tokyo/
 
 ちなみに、移動途中には増上寺の敷居を通らせていただくのですが、歴史ある寺院の建造物とバックにある東京タワーを一緒に見ることができて、いかにも東京らしい絶景を味わえます。
 
-会場では弊社の代表取締役社長の神宮さんパネルがお出迎え。知らなかったので一同でビビりました。
+会場では当社の代表取締役社長の神宮さんパネルがお出迎え。知らなかったので一同でビビりました。
 
 <blockquote class="twitter-tweet"><p lang="ja" dir="ltr">フューチャーもGoogle Cloud<br>Next ’19 in Tokyoを応援しています！実は会場内のパネルに代表取締役社長の神宮さんが登場してます✨<a href="https://twitter.com/hashtag/GoogleNext19?src=hash&amp;ref_src=twsrc%5Etfw">#GoogleNext19</a> <a href="https://t.co/maaknVdD0p">pic.twitter.com/maaknVdD0p</a></p>&mdash; フューチャー技術ブログ (@future_techblog) <a href="https://twitter.com/future_techblog/status/1156409806606888961?ref_src=twsrc%5Etfw">July 31, 2019</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 

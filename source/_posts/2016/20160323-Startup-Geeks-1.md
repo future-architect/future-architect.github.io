@@ -11,12 +11,12 @@ author: 小川達
 ---
 Startup Geeks #1開催報告
 こんにちは。FutureArchitectの小川です。
-先月(2月8日月曜日)に弊社で開催した[Startup Geeks #1](http://startupgeeks.connpass.com/event/24126/)の開催報告です。
+先月(2月8日月曜日)に当社で開催した[Startup Geeks #1](http://startupgeeks.connpass.com/event/24126/)の開催報告です。
 <!-- more -->
 
 <img src="/images/2016/20160323/thumbnail_20160323.png" class="img-small-size" loading="lazy">
 
-当日は、合計80名ほどの方に参加頂き、弊社会議室で以下のタイムラインで開催しました。
+当日は、合計80名ほどの方に参加頂き、当社会議室で以下のタイムラインで開催しました。
 
 | 時間 | 発表者(敬称略) |タイトル |詳細 |
 |:------------ |:--------------|:------------|:------------|
