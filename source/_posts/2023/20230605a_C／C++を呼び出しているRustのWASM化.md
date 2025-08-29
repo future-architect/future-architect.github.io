@@ -205,17 +205,19 @@ C/C++を呼んでいる場合はこちらの方法をオススメします。
       # There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
       ```
 
-      ::: note warn
+::: note warn
 Windowsで[公式ページのインストーラ](https://www.python.org/downloads/)を用いてPythonのインストールを行なっており、かつGit Bashなどを使っている場合はemsdkの実行がうまくいかない場合があります。
-      WindowsではデフォルトでPython3コマンドが入っていますが、そのコマンドはPython3ではなくMicrosoftのPython3インストールページが起動します。また、[Python公式ページのインストーラ](https://www.python.org/downloads/)を用いてインストールされるPython3は`python`コマンドで起動します。よって、**無効な`python3`コマンドと有効な`python`コマンドが存在している状態になります。**
-      emsdkではまず`python3`コマンドを探し、存在しなければ`python`コマンドを探します。そのため、先に述べた環境の場合は無効な`python3`コマンドが使用されてしまいます。
-      対応方法は以下の3つです。
-      1. MicrosoftストアからPython3をインストールする
-          * Microsoftストアが使える方はこの方法が正攻法です
-          * 業務用PCなどでMicrosoftストアが使えない方は以下の方法を試してみてください
-      2. emsdkの`python3`コマンドを探す箇所を削除する
-          * 力技です
-          * [`emsdk/emsdk`の33~39行目](https://github.com/emscripten-core/emsdk/blob/da9699832b5df4e123403490e499c87000c22654/emsdk#L33-L39)を削除するとうまくいきます
+
+WindowsではデフォルトでPython3コマンドが入っていますが、そのコマンドはPython3ではなくMicrosoftのPython3インストールページが起動します。また、[Python公式ページのインストーラ](https://www.python.org/downloads/)を用いてインストールされるPython3は`python`コマンドで起動します。よって、**無効な`python3`コマンドと有効な`python`コマンドが存在している状態になります。**emsdkではまず`python3`コマンドを探し、存在しなければ`python`コマンドを探します。そのため、先に述べた環境の場合は無効な`python3`コマンドが使用されてしまいます。
+
+対応方法はです。
+
+1. MicrosoftストアからPython3をインストールする
+    * Microsoftストアが使える方はこの方法が正攻法です
+    * 業務用PCなどでMicrosoftストアが使えない方は以下の方法を試してみてください
+2. emsdkの`python3`コマンドを探す箇所を削除する
+    * 力技です
+    * [`emsdk/emsdk`の33~39行目](https://github.com/emscripten-core/emsdk/blob/da9699832b5df4e123403490e499c87000c22654/emsdk#L33-L39)を削除するとうまくいきます
 :::
 
 3. プロジェクトの新規作成
