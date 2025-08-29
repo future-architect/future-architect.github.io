@@ -37,11 +37,11 @@ Google WorkspaceはGoogleが提供する組織向けオンラインアプリケ�
 
 今回、Google Workspace上でグループ化された情報（グループの人数、グループのメールアドレス、グループメンバーのメールアドレスなど）を取得する必要がありました。
 
-<div class="note info" style="background: #e5f8e2; padding: 16px;">
-  <span class="fa fa-fw fa-check-circle"></span><p>Google Workspaceのグループ化について</p>
+::: note info
+<p>Google Workspaceのグループ化について</p>
   <p>Google Workspaceではアカウントのグルーピングが可能です。
 これには<a href="https://cloud.google.com/?hl=ja">Google Cloud Platform（GCP）</a>上で、グループに対してIAMロールを付与することができるという恩恵があり、グループに所属しているメンバー全員に対してGCPリソースの権限管理ができます。（例えば、グループAにはGoogle Cloud Storageの管理者権限、グループBにはGoogle Cloud Storageの閲覧権限のみなど）</p>
-</div>
+:::
 
 ## 何が起きたのか
 
@@ -220,10 +220,10 @@ func GetGroupMember() ([]GroupMember, error) {
 こういったケースはどのAPIでもあり得るので、 **[指数バックオフ](https://cloud.google.com/memorystore/docs/redis/exponential-backoff?hl=ja)** を導入しましょう。
 「指数バックオフ？？数学＋横文字やめて！」となるかもしれませんが、簡単にまとめると「APIへリクエストしたにも関わらず失敗した際に、時間を少しおいてリクエストをもう一度送る」処理になります。
 
-<div class="note info" style="background: #e5f8e2; padding: 16px;">
-  <span class="fa fa-fw fa-check-circle"></span><p>指数バックオフに関しては本ブログ過去記事でも紹介しております。</p>
+::: note info
+<p>指数バックオフに関しては本ブログ過去記事でも紹介しております。</p>
   <p><a href="/articles/20200121/">スロットリングとの付き合い方</a></p>
-</div>
+:::
 
 先ほどのリクエスト時間に余裕を持たせたうえで以下の変更を施します。
 
@@ -266,11 +266,11 @@ func createGroupMemberList(srv *admin.Service, email string) ([]GroupMember, err
 こうすることで、たまーにコケるエラーに対して頑健なリクエストをすることが可能になります。
 （というか、[APIの仕様書](https://developers.google.com/admin-sdk/directory/v1/limits)にも指数バックオフ導入しといてねって書いてありますね…）
 
-<div class="note info" style="background: #e5f8e2; padding: 16px;">
-  <span class="fa fa-fw fa-check-circle"></span><p>GoogleAPIのエラーコード処理についても本ブログ過去記事で紹介しております。）</p>
+::: note info
+<p>GoogleAPIのエラーコード処理についても本ブログ過去記事で紹介しております。）</p>
   <p>こちらを参考にすれば、AWS向けにも導入可能になります。</p>
   <p><a href="/articles/20200523/">Go Tips連載6: Error wrappingされた各クラウドSDKの独自型エラーを扱う</a></p>
-</div>
+:::
 
 ## まとめ
 

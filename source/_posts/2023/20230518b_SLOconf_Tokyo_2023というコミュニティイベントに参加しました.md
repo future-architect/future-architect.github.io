@@ -52,11 +52,9 @@ DataDogのSLOチームで働いているAshley Chenさんに、閾値からバ�
 
 ...ということについて、6か月にわたって実際のサービスメトリクスに基づいて両方のタイプのアラートをトリガーすることで実験したそうです。
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 バーンレートとは、SREのエラーバジェット(障害に対してどこまで許容していいかという予算)の消化率を表したものです。一般にはバーンレートが高い場合、障害によるユーザーへの影響が大きいことを示します。
-</div>
+:::
 
 その実験結果として、
 
@@ -73,13 +71,11 @@ DataDogのSLOチームで働いているAshley Chenさんに、閾値からバ�
 
 結果として「閾値を使ったシンプルな通知システム」と比較して、「バーンレートを用いた通知システム」ではユーザーのページ数を42ページも減らすことができると実験結果で得られました。
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 ページ(Page)とは、運用監視の文脈ではシステムからエンジニアやオペレーターへの警告または通知を指します。○○ページ減ったというのは、つまり運用者への警告数を減らせたことを意味します。
 
 携帯電話が普及するより前、ポケベルという小型無線通信機が良く使われていました。英語名をPagerといいます。現代でも[業務用として急患などの緊急通知で病院にいない医者の呼び出しをする等の用途で現役らしい](https://dailyportalz.jp/kiji/pokeberu-kongo-katsuyaku)です。IT業界ではSaaSのPagerDuty等にその名残があります。
-</div>
+:::
 
 ### 感想
 
@@ -180,9 +176,7 @@ SLOを満たせない状況の大半は、インシデント、つまり予期�
 - **暫定復旧の基準点を決める**
  	- SLOと同じ指標にしてしまうと往々にして困ることがあるので、長期的復旧とは指標を別にする
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 講演者から、極端な例だけど...と、データセンター火災とSLOの関係について、閑話休題的に説明があったのですが、非常にインパクトがありました。
 
 先月、パリのGoogleCloudデータセンターの1つ、europe-west9 リージョンが豪雨に見舞われました。多大な雨量が地下室のバッテリー室に流れ込んだ結果、火災が発生し、現状でも完全には回復には至っていません。
@@ -193,7 +187,7 @@ https://www.theregister.com/2023/05/10/google_cloud_paris_outage_persists/
 この状況下ではいつまでもSLOを満たせず、暫定対応から中長期的な改善対応(データセンターの再建等)へのシフトチェンジを行えません。
 
 したがって、暫定復旧と長期的復旧の指標は別にした方がよいでしょう、との結論でした。
-</div>
+:::
 
 - **ポストモーテムを行い、失敗を学習、修正し、次に繋げる**
  	- インシデントを解決した後はポストモーテム(振り返り)を実施し、その内容を共有する
@@ -258,11 +252,9 @@ https://www.theregister.com/2023/05/10/google_cloud_paris_outage_persists/
   		- Enabling SRE活動
  	- Luup SREチームの今後について
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 資料をご一読していただければ、講演内容の概要は分かると思うので、個別の概要については説明せず、感想にて自分が重要だと感じたことをピックアップしていく形を取りたいと思います。
-</div>
+:::
 
 ### 感想
 

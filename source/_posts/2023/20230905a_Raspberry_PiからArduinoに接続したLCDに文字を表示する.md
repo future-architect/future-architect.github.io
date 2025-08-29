@@ -81,15 +81,12 @@ void loop() {
 }
 ```
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 以下の理由で少しハマりました。ハードウェアは原因の特定が難しい、、、<br>
 
 - 可変抵抗の初期不良なのかブレッドボードにうまく刺さらない為、LCDのコントラストがうまく調整できず文字が表示できなかった。→可変にする必要もないので固定抵抗で対応<br>
 - LCDもブレッドボードにちゃんと刺さらないので、出力されなかったり文字化けが発生したりした
-
-</div>
+:::
 
 ## Raspberry Pi の準備
 
@@ -99,12 +96,9 @@ Raspberry Piについては、昔購入したModel Bを使用。OSの状態と�
 - python3とpipの更新
 - pyserial（＝シリアル通信で使用するPythonモジュール）のインストール
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 wheezyはサポートが切れているので、新しいバージョン（BusterとかBullseeye）にしたかったのですがRaspberry Pi Imagerを使用して書き込むとOSが全然立ち上がってくれない為、諦めてwheezyでやっています。
-
-</div>
+:::
 
 ### packageの更新
 
@@ -128,13 +122,10 @@ pipでインストールしたらすぐに終わりました。
 Raspberry PiとArduinoの準備が大体整ったので試しにシリアル通信を行ってみます。
 以下のような文字列送信用のPythonを用意します。
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 ser.open()時にPermissionエラーが出た場合は、portに指定しているポートに対して権限を付与すれば大丈夫です。
 例）sudo chmod 666 /dev/ttyACM0
-
-</div>
+:::
 
 ```python Raspberry Pi（送信側）
 import serial

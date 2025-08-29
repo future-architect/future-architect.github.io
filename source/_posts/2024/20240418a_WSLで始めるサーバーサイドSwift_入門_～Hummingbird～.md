@@ -266,13 +266,10 @@ let package = Package(
 PostgreSQL をインストールします。
 チュートリアルでは（おそらくmacOS前提で） `brew` 経由でインストールしていたのですが、今回は `apt` 経由でインストールします。
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 Linux 上でも Homebrew インストールできるみたいなので、Homebrew 経由でインストールでも良いかもしれません。
 https://docs.brew.sh/Homebrew-on-Linux
-
-</div>
+:::
 
 ```bash
 > sudo apt update

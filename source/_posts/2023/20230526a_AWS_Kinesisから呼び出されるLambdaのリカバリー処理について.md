@@ -45,9 +45,7 @@ TIGの原木です。
 
 内部アカウントでは、そのような仕組みは必要ないため、直接KinesisとLambda(メインのビジネスロジック)を接続しています。
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 中継用のLambdaを設けて、データの橋渡しをするやり方はAWSの情報センターにある下記の情報を参考にしています。
 
 「クロスアカウントの Kinesis ストリームを使用して、私の Lambda 関数を呼び出す方法を教えてください？」
@@ -58,8 +56,7 @@ https://repost.aws/ja/knowledge-center/lambda-cross-account-kinesis-stream
 > 本文の警告:
 >
 > この設定により、Kinesis Data Streams を使用する利点の多くがなくなります。この手順の完了後は、シャード内でレコードをブロックしたり、順序付けを作成したりすることはできません。アプリケーションがこれらの特徴を使用する必要がない場合にのみ、この回避策を使用することをお勧めします。
-
-</div>
+:::
 
 ### 3. Lambdaで処理が失敗した時にSQSへ処理データを送る
 
@@ -129,12 +126,9 @@ https://github.com/hashicorp/terraform-provider-aws/blob/0a77465627efb9003f87978
 
 デフォルトの設定が見当たりませんね。明文化されているわけではありませんが、この裏でリトライ回数は「-1」回=無限回が設定されます。したがって、デフォルト設定ではストリーム呼び出しをする側(AWS Kinesis等)のデータ保持期間が切れるまでリトライし続けるため、その間、Destinationsが呼ばれることはありません。
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 この辺を意識せずに、非同期呼び出しのDestinationsとして作りこんでいた箇所をそのままストリーム呼び出し用に持って行った結果、自分はドはまりすることになりました。
-
-</div>
+:::
 
 ### 同じKinesisなのにデータが異なる？
 
@@ -251,13 +245,10 @@ sqs_message_dict = json.loads(sqs_message)
 | 1  | 非同期呼び出し         | 異なるAWSアカウントからのKinesisデータ連携 | 2回                      | requestPayload                           | Lambda(メインロジック)を呼び出して requestPayloadを渡す                                               |
 | 2  | ストリーム呼び出し     | 同じAWSアカウントからのKinesisデータ連携   | 無限                     | KinesisBatchInfo                         | KinesisからKinesisBatchInfoを元にシャードイテレーターを通じてレコードを取得し、 再びKinesisに送信する |
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 運用側では当然両者のデータの違いを意識したくなかったのでリカバリー処理のためにツールを実装しました。二種類の異なるコードを書きつつ、両者とも元はKinesisのデータなんだけどなっていう、もったいない？ 気持ちがありつつも、違いについて勉強になりました。
 
 Kinesisのクロスアカウントサポート来てほしいです...
-
-</div>
+:::
 
 [^3]: 私信なのでコメントで補足します: そもそも、Lambdaを非同期で呼び出して処理に失敗した場合、データの送信先として「DLQ」と「Destinations」を選ぶことができます。どちらを使ってよいかAWSを最近使いだしたユーザーには判断が難しいところだと思います。両者を比較しても「DLQでできることは全部Destinationsでできるよ」という推しの弱い結論しか出てこないのではないでしょうか。そもそも両者が似たような機能なのは必然なのかもしれません。時系列でみてみると、DLQが2016年、Destinationsが2019年と、Destinationsが後発組です。そのためか、DLQの既存ユーザーのためにDLQとDestinationsが両方利用できるように残してるのでは？ (だから、似た機能なのか)と読み取れる記述が[テックブログ](https://aws.amazon.com/jp/blogs/compute/introducing-aws-lambda-destinations/)にあります。「Destinations and DLQs can be used together and at the same time although Destinations should be considered a more preferred solution. 」(DestinationsとDLQは同時に使用できますが、Destinationsの方がより好ましいソリューションです) これを見る限りでは「AWS公式の資料でもういっそ、DLQの後継機能がDestinationsだから、Destinationsを使いましょう」ってはっきり言いきっちゃってほしい、とぼやきたいところです。あえて機能面に踏み込むなら、Destinations経由で渡されるメッセージにはAWS LambdaのARNが入っているのでコールバックが楽だし、失敗時だけでなく成功時でもハンドリングやメトリクスを取得したい機会が来るから機能拡張の容易な「Destinations」を選択しようというのが今できる説明かなと存じます。

@@ -154,14 +154,11 @@ GitHub CLIでなんとかなりそうなことが判明しましたので、あ�
 
 以下、設定ファイルです。
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 Orbsとは
 OrbsはCircleCI 2.1で追加された機能で、CircleCIの設定を再利用可能なパッケージとして提供したものです。
 Slack連携などは利用している方も多いのではないでしょうか。[Slack連携のOrbs](https://circleci.com/docs/ja/slack-orb-tutorial/)
-
-</div>
+:::
 
 ```yaml config.yml
 # .cicleci/config.yml
@@ -197,13 +194,10 @@ workflows:
 
 `-gh/setup`でGitHub CLIの初期設定を行います。この際のCicleCIの環境変数に`GITHUB_TOKEN`の設定が必要です。
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 GITHUB_TOKENの権限
 GITHUB＿TOKENの権限はPullRequestに対して操作を行うためrepoの権限が必要です。[GITHUB_TOKENのアクセス許可](https://docs.github.com/ja/actions/security-guides/automatic-token-authentication#permissions-for-the-github_token)
-
-</div>
+:::
 
 GitHub CLIのセットアップ完了後ブランチにチェックアウトします。
 その後GitHub CLIのコマンドを記載したShellスクリプトを実行しています。
@@ -293,12 +287,9 @@ prinfo=$(gh pr view --json author,headRefName --jq .author.login,.headRefName)
 
 あとは事前に設定してあるラベル名にブランチ名が合致しているかを確認して文字列一致していればPullRequestにラベルを付与していきます。
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 Shellスクリプト初心者のため、[こちらの記事](https://qiita.com/Hayao0819/items/0e04b39b0804a0d16020)を参考にさせていただきました。
-
-</div>
+:::
 
 ```sh
 set "${labels}"
@@ -319,26 +310,22 @@ done
 
 # 動作確認
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 CircleCIのOnly build pull requests
 今回CircleCIの発火はPullRequestが作成されている状態を想定しています。そのためリリースフローに支障がない場合は[こちら](https://circleci.com/docs/oss/#only-build-pull-requests)に記載のOnly build pull requestの設定をONにすることをおすすめします
-
-</div>
+:::
 
 ▼成功すると以下のようにPR作成時にブランチ名にしたがってラベルの付与とPR作成者の自動アサインができます
 
 <img src="/images/2023/20230307a/image_2.png" alt="image.png" width="1200" height="569" loading="lazy">
 
-<div class="note warn" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-exclamation-circle"></span>
+::: note warn
+<span class="fa fa-fw fa-exclamation-circle"></span>
 
 GitHubアカウントのユーザー名
 add_label.shでは、author.nameがスペースで区切られていないことを想定しています。
 アカウント名にスペースが含まれる場合は、author.nameを別にリクエストして変数に格納するなどしてください。
-
-</div>
+:::
 
 # 少しハマったところ
 

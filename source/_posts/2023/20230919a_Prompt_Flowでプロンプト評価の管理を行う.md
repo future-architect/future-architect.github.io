@@ -15,14 +15,11 @@ lede: "AzureのPrompt Flowを使ってLLMに入力するプロンプト評価の
 ---
 # はじめに
 
-<div class="note warn" style="background: #fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
-
+::: note warn
 本記事は、プレビュー版のAzure Prompt Flowを扱っています。
 
 操作画面等の内容は2023年9月13日現在の内容であることにご注意ください。
-
-</div>
+:::
 
 こんにちは、SAIG/MLOpsチームでアルバイトをしている板野です。
 
@@ -52,12 +49,9 @@ LLMには、追加学習による精度の改善だけでなく、入力する�
 
 今回は、通常の機械学習の実験管理とは異なり、LLM, プロンプトの2変数のうち、LLMを固定します。仮に精度が向上した場合、それが「LLMを改善したから」なのか「プロンプトを改善したから」なのかが分からなくなってしまうからです。
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 本記事ではプロンプトという用語を「システムプロンプト」の意味で使っています。すなわち、（ユーザーからの）質問文は最終的にはプロンプトに含まれることにはなりますが、ここでは質問文をプロンプトとは別の要素として扱います。
-
-</div>
+:::
 
 # プロンプトの評価
 

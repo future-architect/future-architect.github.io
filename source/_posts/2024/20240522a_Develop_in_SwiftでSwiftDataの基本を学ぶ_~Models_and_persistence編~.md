@@ -66,13 +66,10 @@ SwiftDataの主な特徴としては、
 - パフォーマンス最適化:
   - Appleのエコシステムに合わせて最適化されており、効率的なクエリ実行が可能
 
-<div class="note warn" style="background: #fdf9e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
-
+::: note warn
 注意
 SwiftDataはiOS17.0+, iPadOS17.0+で使用可能であること。
-
-</div>
+:::
 
 # Save data
 

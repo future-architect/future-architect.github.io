@@ -33,14 +33,11 @@ https://github.com/future-architect/uroborosql
 
 2016/12/24に[クリスマス・イブにCockroachDBに負荷をかけてみる](https://qiita.com/hoshi-k/items/cf0ce018db62de9291dc)という記事を投稿したのですが、このCockroachDBもそんな理想を追い求めるプロダクトで、RDBでNoSQLのメリットを教授したいニーズはもはやエンジニアが切望する夢なんですね✨️
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 *2024年6月追記*
 現在では、TiDB、yugabyteDBなどの選択肢も増えました。
 CockroachDBもしぶとく生き残っていて何よりです。
-
-</div>
+:::
 
 # JavaとRDBの歴史
 
@@ -50,16 +47,13 @@ CockroachDBもしぶとく生き残っていて何よりです。
 
 なお、2017年時点のライブラリ比較については、[2017年度 Java 永続化フレームワークについての考察(1)](https://qiita.com/shiroma_yuki/items/8d434862bba072bff264)の記事が非常に参考になります（残念ながらこれから紹介するuroboroSQLは入ってません😢）。
 
-<div class="note info" style="background: #e5f8e2; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-check-circle"></span>
-
+::: note info
 *2024年6月追記*
 執筆から6年半ほど経ち、改めて調査してみましたが、大きな変化はないように思います。
 
 ここ数年でアプリケーションフレームワークの領域は、Spring Boot以外に、Quarkus、Micronautのようなマイクロサービス、コンテナネイティブ、ネイティブビルド最適化されたものが登場していますが、O/Rマッパは独立して選定されているように感じます。
 （SpringBootの場合、王道的にSpring Data JPAを選定しているケースも多いとは思います）
-
-</div>
+:::
 
 # uroboroSQLとは
 
