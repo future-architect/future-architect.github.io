@@ -3,6 +3,58 @@
 const maxCount = 6;
 const {getSNSCnt} = require('./lib/sns');
 
+// HTMLを生成するロジックを共通関数として外に切り出す
+function generateRelatedPostsHtml(posts) {
+  const count = Math.min(maxCount, posts.length);
+  if (count === 0) {
+    return `<p class="related-posts-none">No related post.</p>`;
+  }
+
+  const currentTime = new Date();
+  const pastDate = currentTime.getDate() - 30;
+  currentTime.setDate(pastDate);
+  const label = p => currentTime.toISOString() <= p.date.toISOString() ? `<span class="newitem">NEW</span>` : "";
+
+  let result = "";
+  for (let i = 0; i < count; i++) {
+    const related = posts[i];
+    if (related) {
+      const scoreText = related.score ? `スコア: ${related.score.toFixed(4)}` : '';
+      const titleAttr = `${related.lede} ${scoreText}`.trim();
+      result += `<li class="related-posts-item"><span>${related.date.format('YYYY.MM.DD')}</span><span class="snscount">&#9825;${getSNSCnt(related.permalink)}</span><a href=/${related.path} title="${titleAttr}">${related.title}${label(related)}</a></li>`;
+    }
+  }
+
+  return `
+    <div class="widget">
+      <ul class="nav related-post-link">${result}</ul>
+    </div>`;
+}
+
+// カテゴリから関連記事を取得する関数（変更なし）
+function getCategoryRelatedPosts(ctx, post) {
+  const currentCategory = post.categories.data[0];
+  if (!currentCategory) {
+    return [];
+  }
+
+  const categoryPosts = currentCategory.posts.data
+    .filter(p => p._id !== post._id);
+
+  categoryPosts.sort((a, b) => {
+    const snsA = getSNSCnt(a.permalink);
+    const snsB = getSNSCnt(b.permalink);
+    if (snsA !== snsB) {
+      return snsB - snsA;
+    } else {
+      return b.date.valueOf() - a.date.valueOf();
+    }
+  });
+
+  return categoryPosts;
+}
+
+
 hexo.extend.helper.register('list_related_posts', function() {
   const post = this.post;
   if (!post.tags || !post.categories) {
@@ -24,8 +76,10 @@ hexo.extend.helper.register('list_related_posts', function() {
     .filter(p => p._id !== post._id);
 
   if (tagRelatedPosts.length === 0) {
-    // タグ関連記事がなければカテゴリから補填するロジックに直接進む
-    return getCategoryRelatedPosts(this, post);
+    // タグ関連記事がなければカテゴリの記事を取得し、HTMLを生成して返す
+    console.log(`[INFO] Related Posts: No tag-related posts found for "${post.title}". Falling back to category.`);
+    const categoryPosts = getCategoryRelatedPosts(this, post);
+    return generateRelatedPostsHtml(categoryPosts);
   }
 
   const tagIDF = {};
@@ -58,15 +112,14 @@ hexo.extend.helper.register('list_related_posts', function() {
   // 3. 関連度スコアでソートし、同スコアの場合は日付でソート
   relatedPosts.sort((a, b) => {
     if (b.score !== a.score) {
-      return b.score - a.score; // スコアが異なる場合はスコアでソート
+      return b.score - a.score;
     } else {
-      return b.date.valueOf() - a.date.valueOf(); // スコアが同じ場合は日付でソート
+      return b.date.valueOf() - a.date.valueOf();
     }
   });
 
   // 4. 記事数がmaxCountに満たない場合はカテゴリから補填
   if (relatedPosts.length < maxCount) {
-    // 補填された記事はスコアを持たないため、既存のリストにそのまま追加
     const postsToFill = getCategoryRelatedPosts(this, post);
     postsToFill.forEach(p => {
       if(relatedPosts.findIndex(rp => rp._id === p._id) === -1) {
@@ -75,59 +128,6 @@ hexo.extend.helper.register('list_related_posts', function() {
     });
   }
 
-  // 最終的な記事リストのHTML生成
-  const count = Math.min(maxCount, relatedPosts.length);
-  if (count === 0) {
-    return `<p class="related-posts-none">No related post.</p>`;
-  }
-
-  const currentTime = new Date();
-  const pastDate = currentTime.getDate() - 30;
-  currentTime.setDate(pastDate);
-  const label = p => currentTime.toISOString() <= p.date.toISOString() ? `<span class="newitem">NEW</span>` : "";
-
-  let result = "";
-  for (let i = 0; i < count; i++) {
-    const related = relatedPosts[i];
-    if (related) {
-      const scoreText = related.score ? `スコア: ${related.score.toFixed(4)}` : '';
-      const titleAttr = `${related.lede} ${scoreText}`.trim();
-      result += `<li class="related-posts-item"><span>${related.date.format('YYYY.MM.DD')}</span><span class="snscount">&#9825;${getSNSCnt(related.permalink)}</span><a href=/${related.path} title="${titleAttr}">${related.title}${label(related)}</a></li>`;
-    }
-  }
-
-  return `
-    <div class="widget">
-      <ul class="nav related-post-link">${result}</ul>
-    </div>`;
+  // 最終的な記事リストをHTMLに変換して返す
+  return generateRelatedPostsHtml(relatedPosts);
 });
-
-// カテゴリからの補填ロジックを別関数に切り出す
-function getCategoryRelatedPosts(ctx, post) {
-  const currentCategory = post.categories.data[0];
-  if (!currentCategory) {
-    return [];
-  }
-
-  const categoryPosts = currentCategory.posts.data
-    .filter(p => p._id !== post._id);
-
-  categoryPosts.sort((a, b) => {
-    const snsA = getSNSCnt(a.permalink);
-    const snsB = getSNSCnt(b.permalink);
-    if (snsA !== snsB) {
-      return snsB - snsA;
-    } else {
-      return b.date.valueOf() - a.date.valueOf();
-    }
-  });
-
-  return categoryPosts;
-}
-
-function objectArrayIndexOf(array, id) {
-  for(let i = 0; i < array.length; i++){
-    if (array[i]._id === id) return i;
-  }
-  return -1;
-}

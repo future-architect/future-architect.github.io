@@ -7,6 +7,7 @@ tag:
   - 通信規格
   - CHAdeMO
   - コンポ
+  - 業界ドメイン
 category:
   - IoT
 thumbnail: /images/2022/20220127a/thumbnail.png
