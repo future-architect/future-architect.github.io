@@ -30,7 +30,7 @@ lede: "Gemma3とUnslothを組み合わせて、完全オンプレミス環境で
 結果として、プロジェクト固有のコードレビューAIを構築し、Merge Request連動での自動レビューするというフローを実装できました。本記事では、GitLab CE環境での具体的な構築手順などを紹介します。
 
 ::: note info
-PR-Agentや外部APIを活用したアプローチについては、当社SATの高橋さんの[GitLabのレビューにPR-Agentを組み込んでみた](/articles/20250417a/) 記事もご参照ください
+PR-Agentや外部APIを活用したアプローチについては、弊社SATの高橋さんの[GitLabのレビューにPR-Agentを組み込んでみた](/articles/20250417a/) 記事もご参照ください
 :::
 
 # 背景
