@@ -7,7 +7,7 @@ tag:
   - Perl
   - Git
 category:
-  - Programming
+  - DevOps
 thumbnail: /images/2022/20220221a/thumbnail.png
 author: 田中雅大
 lede: "こんにちは、TIG コアテクノロジーユニットの田中です。ファイルの最終更新日時を上書きするスクリプトをGroovyで書く機会があったので紹介します。* Groovy 4.0.0* JVM 1.8.0_121* Perl 5.32.1"

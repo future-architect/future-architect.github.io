@@ -8,7 +8,7 @@ tag:
   - VSCode
   - SourceTree
 category:
-  - Infrastructure
+  - DevOps
 thumbnail: /images/2021/20210420b/thumbnail.png
 author: 市川燿
 lede: "Gitを使っての開発で、指定のツールや好みのGitクライアントを使っていると思います。ターミナルの黒画面でGitコマンドを使うのはちょっと不安、GUI画面から画面を確認しながらGitを操作したい方向けの記事です。GitのBranch作成やCheckout, Commit, Pushまで使えた方向けに、次の段階としてRebase, Cherry Pickなどの実行方法を説明します。"
