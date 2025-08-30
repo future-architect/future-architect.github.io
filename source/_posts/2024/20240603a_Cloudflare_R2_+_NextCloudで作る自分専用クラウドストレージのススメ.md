@@ -7,7 +7,7 @@ tag:
   - Cloudflare
   - NextCloud
 category:
-  - Programming
+  - Infrastructure
 thumbnail: /images/2024/20240603a/thumbnail.png
 author: 大岩潤矢
 lede: "みなさんこんにちは、TIG所属の大岩潤矢です。今回はCloudflare連載ということで、Cloudflareのサービス、Cloudflare R2と、NextCloudを利用した自分専用クラウドストレージの構築について紹介します。"
@@ -237,7 +237,7 @@ Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
 
 Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
 
-MariaDB [(none)]> 
+MariaDB [(none)]>
 ```
 
 ログインできたら、以下のSQLを実行してNextCloud用のデータベースとユーザを作成しておきましょう。

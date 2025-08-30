@@ -7,7 +7,7 @@ tag:
   - Cloudflare Snippets
   - 外部寄稿
 category:
-  - Programming
+  - Infrastructure
 thumbnail: /images/2024/20240614a/thumbnail.png
 author: 亀田治伸
 lede: "Cloudflare Snippetsは新しいCloudflareのサービスであり2023年6月にクローズドアルファ版がリリースされ、2024 Develoer Weekでは無作為に抽出された5%のユーザーが利用可能になっていました。6月頭より全ユーザーが利用可能となったサービスです。"

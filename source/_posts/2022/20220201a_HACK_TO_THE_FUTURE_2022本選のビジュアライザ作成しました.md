@@ -7,7 +7,7 @@ tag:
   - 競技プログラミング
   - HTTF
 category:
-  - Programming
+  - Frontend
 thumbnail: /images/2022/20220201a/thumbnail.png
 author: 山田修路
 lede: "HACK TO THE FUTURE 2022本選のビジュアライザ開発担当したのでその体験記を残しておきます。HACK TO THE FUTUREはフューチャーグループが2018年からAtCoderで開催しているオンライン競技プログラミングコンテストで、全国から高度なプログラミングスキルを持つユース世代を発掘し、交流を図り切磋琢磨し合う場を提供することを目的として開催しています[^1]。"
