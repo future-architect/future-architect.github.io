@@ -8,10 +8,10 @@ tag:
   - OSS
   - コアテク
 category:
-  - Infrastructure
+  - DevOps
 thumbnail: /images/2021/20210927a/thumbnail.png
 author: 高橋健
-lede: "こんにちは、TIGコアテクノロジーユニットの高橋・小松です。Gitlabのマークはきつねではなくたぬきだったんですね...。今回はRedmine Slack Integration Pluginにメンション機能を追加したので紹介させていただきます。"
+lede: "Gitlabのマークはきつねではなくたぬきだったんですね...。今回はRedmine Slack Integration Pluginにメンション機能を追加したので紹介させていただきます。"
 ---
 ## はじめに
 

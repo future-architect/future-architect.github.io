@@ -8,7 +8,7 @@ tag:
   - Redmine
   - メール
 category:
-  - Infrastructure
+  - DevOps
 thumbnail: /images/2021/20211203a/thumbnail.png
 author: 高橋健
 lede: "Redmine4系からメール送信仕様が変わっていることが判明しました。そこで3系と同等のメール送信方式となるようなRedmine_single_mailプラグインを開発しましたので紹介させていただきます。"

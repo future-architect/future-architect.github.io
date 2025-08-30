@@ -3,7 +3,6 @@ title: "Meta Quest 3開封の儀＆フルカラーパススルーで家にテル
 date: 2023/10/13 00:00:00
 postid: a
 tag:
-  - VR
   - MetaQuest3
 category:
   - VR
@@ -15,7 +14,7 @@ lede: "2023年10月10日、とうとう発売されましたね。Meta Quest 3�
 
 こんにちは。TIG DX ユニット所属、金欠コンサルタントの藤井です。
 
-2023年10月10日、とうとう発売されましたね。[Meta Quest 3](https://www.meta.com/jp/quest/quest-3/)（以下 Quest3 と略記）が。しっかり予約して発売日に手に入れようとしたんですが、何故か配達日がズレて 1 日遅れで入手しました。  
+2023年10月10日、とうとう発売されましたね。[Meta Quest 3](https://www.meta.com/jp/quest/quest-3/)（以下 Quest3 と略記）が。しっかり予約して発売日に手に入れようとしたんですが、何故か配達日がズレて 1 日遅れで入手しました。
 せっかくなので、開封の儀と、Quest3 の目玉機能の1つである、[フルカラーパススルー](https://www.meta.com/ja-jp/help/quest/articles/getting-started/getting-started-with-quest-pro/full-color-passthrough/)を使って遊んでみようと思います。
 
 ちなみに、この記事は[immersed](https://immersed.com/)を用いて、VR 空間のバーチャルディスプレイを使って書いています。バーチャルデスクトップについては[井上さんの記事をご参照](/articles/20221031b)ください。
