@@ -8,7 +8,7 @@ tag:
   - ゲーム制作
   - 初心者向け
 category:
-  - Infrastructure
+  - Programming
 thumbnail: /images/2023/20231127a/thumbnail.jpg
 author: 関根正大
 lede: "Unreal Engine5を使って簡単な「色塗りゲーム」を作ってみよます。"

@@ -8,7 +8,7 @@ tag:
   - 登壇レポート
   - TechNight
 category:
-  - Programming
+  - DataEngineering
 thumbnail: /images/2020/20201228/thumbnail.png
 author: 多賀聡一朗
 lede: "こんにちは、TIGの山田、町田、多賀です。先日2020/11/25にオンラインにてFuture Tech Nightという社外勉強会を開催しました。今回は第5弾としてAWS＆DataPlatform を活用した、MaaSビジネスの最新事例を紹介しました"

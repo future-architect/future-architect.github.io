@@ -8,7 +8,7 @@ tag:
   - データガバナンス
   - SQL
 category:
-  - Programming
+  - DataEngineering
 thumbnail: /images/2021/20210928a/thumbnail.png
 author: 真野隼記
 lede: "TIG DXユニット真野です。Python連載の2本目です。データリネージという概念に興味をもったのと、それをサポートするためのPytnon製ツールがあったので触ってみます。データリネージとは.."

@@ -8,8 +8,9 @@ tag:
   - ケンオール
   - SPA
   - flutter_web
+  - 管理画面
 category:
-  - Mobile
+  - Frontend
 thumbnail: /images/2021/20210512a/thumbnail.png
 author: 澁川喜規
 lede: "Flutter連載の3本目はFlutter Webを紹介します。Flutter 2になって、Web向けに出力する機能もStableになりました。Flutter for Webは標準のHTMLにするHTMLレンダラーと、CanvasKitレンダラーと2種類あります。後者はSkiaという2DグラフィックスのライブラリをWebAssembly化したものを使います。Skiaは..."

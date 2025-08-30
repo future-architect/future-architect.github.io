@@ -7,7 +7,7 @@ tag:
   - Rust
   - C/C++
 category:
-  - Infrastructure
+  - Programming
 thumbnail: /images/2023/20230602a/thumbnail.png
 author: 川渕皓太
 lede: "C/C++を呼び出しているRustのwasm化について説明します。結論から述べるとemscriptenを使用することでうまくいきました。"

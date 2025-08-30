@@ -8,7 +8,7 @@ tag:
   - GoogleCloud
   - アクセス制御
 category:
-  - Infrastructure
+  - DataEngineering
 thumbnail: /images/2023/20231018a/thumbnail.png
 author: 岸下優介
 lede: "BigQueryは完全マネージドな、ペタバイトスケールかつコスパのよいデータウェアハウスとして知られております。便利なツールである一方、BigQueryで取り扱うデータには個人情報が含まれていることもあり、適切なアクセス制御が望まれます。Resource Managerのタグ機能を利用して…"

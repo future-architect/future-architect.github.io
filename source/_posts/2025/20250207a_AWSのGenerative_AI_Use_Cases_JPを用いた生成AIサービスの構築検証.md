@@ -8,7 +8,7 @@ tag:
   - LLM
   - Bedrock
 category:
-  - Infrastructure
+  - DataScience
 thumbnail: /images/2025/20250207a/thumbnail.png
 author: 小川智也
 lede: "AWSを用いた生成AIアプリケーションの実装として、Generative AI Use Cases JP についての検証を行いました。"
@@ -127,7 +127,7 @@ CloudFormationを使用して構築し、RAGを有効化すると、上図のデ
 ### KendraとS3の連携
 
 Amazon Kendraに移動し、[KendraとS3の連携](https://catalog.workshops.aws/generative-ai-use-cases-jp/ja-JP/add-data/kendra/integrate-with-kendra)の手順に従って作業を進めました。このリンクにわかりやすい手順が紹介されているため、詳細な手順に関しては省略します。Kendraには、generative-ai-use-cases-index という名前の Kendra インデックスが作成されており、先ほどのS3のデータソースと連携されています。現時点では先ほどアップロードしたオブジェクトはKendraインデックスと同期していないため、同期させる必要があります。Sync nowというボタンを押すことで同期が可能です。また、今回のように手動で同期させるのではなく、スケジュールを設定することで同期を自動化することもできます。
-  
+
 # 実装したアプリ画面
 
 ## CloudFormationで、RAGを有効化して実装した際の画面

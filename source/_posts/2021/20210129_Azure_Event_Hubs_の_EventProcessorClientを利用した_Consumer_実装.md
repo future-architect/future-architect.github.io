@@ -5,8 +5,9 @@ postid: ""
 tag:
   - Azure
   - Java
+  - Event Hubs
 category:
-  - Programming
+  - Infrastructure
 thumbnail: /images/2021/20210129/thumbnail.png
 author: 多賀聡一朗
 lede: "Azure が提供されている Event Hubs の Consumer 処理実装の EventProcessorClient について調査する機会があったため、整理した内容を公開いたします。EventHubs_logo.png> Azure アーキテクチャ アイコン"

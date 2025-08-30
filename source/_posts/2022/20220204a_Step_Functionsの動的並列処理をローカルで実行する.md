@@ -9,7 +9,7 @@ tag:
   - Python
   - Pipenv
 category:
-  - Programming
+  - Infrastructure
 thumbnail: /images/2022/20220204a/thumbnail.png
 author: 宮永崇史
 lede: "AWS Step Functionsの動的並列処理をローカルで実行する方法をハンズオン形式でまとめました。"

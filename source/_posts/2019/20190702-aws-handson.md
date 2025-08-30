@@ -7,7 +7,7 @@ tag:
   - データレイク
   - ハンズオン
 category:
-  - Infrastructure
+  - DataEngineering
 author: 柳澤隆太郎
 lede: "あるプロジェクトでデータ分析基盤を開発することになり、データレイクを中心としたソリューションについて学ぶためにAWS Datalake Hands-onに参加してきました"
 ---

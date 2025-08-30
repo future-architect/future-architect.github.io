@@ -5,12 +5,11 @@ postid: a
 tag:
   - PDE
   - GoogleCloud
-  - データエンジニアリング
   - 合格記
   - 資格
   - Udemy
 category:
-  - Infrastructure
+  - DataEngineering
 thumbnail: /images/2023/20230915a/thumbnail.png
 author: 岸下優介
 lede: "最近Data Engineeringを扱うプロジェクトへ異動したこともあり、Google CloudにおけるData Engineeringを網羅的に学びたく、Professional Data Engineer認定資格を受けてきました。"
