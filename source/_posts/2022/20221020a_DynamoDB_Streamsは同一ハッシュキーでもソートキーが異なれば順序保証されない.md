@@ -9,7 +9,7 @@ tag:
   - Lambda
   - 失敗談
 category:
-  - Infrastructure
+  - DB
 thumbnail: /images/2022/20221020a/thumbnail.png
 author: 真野隼記
 lede: "TIG DXユニットの真野です。タイトルに書いたままの内容の記事です。おそらくDynamoDB Streams について調べたことがある方の多くの人には自明な内容だと思います。サマリです。* DynamoDB Streamsの起動順序が保たれるのは 項目単位"
