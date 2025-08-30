@@ -5,7 +5,6 @@ postid: a
 tag:
   - dbt
   - dbt-fusion-engine
-  - ELT
 category:
   - DataEngineering
 thumbnail: /images/2025/20250828a/thumbnail.png
