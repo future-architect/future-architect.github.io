@@ -6,7 +6,7 @@ tag:
   - Terraform
   - Terraform1.2
 category:
-  - Programming
+  - DevOps
 thumbnail: /images/2024/20240313a/thumbnail.png
 author: 森大作
 lede: "Terraformにおける変数を、構築するインフラの要件に合わせてどのように制御していくかについてお話していきたいと思います。Terraformにおける変数制御は、構築するインフラの要件を明確化させる上で重要になってきます。そこで今回はどんな変数制御があるか、ユースケースを踏まえて見ていきたいと思います。"

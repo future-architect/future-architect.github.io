@@ -7,7 +7,7 @@ tag:
   - 入門
   - 初心者向け
 category:
-  - Infrastructure
+  - DevOps
 thumbnail: /images/2025/20250516a/thumbnail.png
 author: 染矢幸子
 lede: "IT未経験での入社だったため、インフラって何？というところから始まり、AWSやTerraformについてこの数か月間学んできました。"

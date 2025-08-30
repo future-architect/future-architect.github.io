@@ -10,7 +10,7 @@ tag:
   - コンテナデプロイ
   - コンテナビルド
 category:
-  - Infrastructure
+  - DevOps
 thumbnail: /images/2020/20201002/thumbnail.png
 author: 澁川喜規
 lede: "TIGの渋川です。[CNCF連載]の第4回は、CNCFのSandboxプロジェクトのBuildpacksについて紹介します。* https://buildpacks.io"

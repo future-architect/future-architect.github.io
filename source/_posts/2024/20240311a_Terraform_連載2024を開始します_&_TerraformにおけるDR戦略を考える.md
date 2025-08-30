@@ -8,7 +8,7 @@ tag:
   - DR
   - マルチリージョン
 category:
-  - Infrastructure
+  - DevOps
 thumbnail: /images/2024/20240311a/thumbnail.png
 author: 伊藤太斉
 lede: "Terraform連載を開始します。"

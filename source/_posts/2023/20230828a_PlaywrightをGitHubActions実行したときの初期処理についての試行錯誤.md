@@ -6,7 +6,7 @@ tag:
   - Playwright
   - GitHubActions
 category:
-  - Programming
+  - DevOps
 thumbnail: /images/2023/20230828a/thumbnail.png
 author: 枇榔晃裕
 lede: "近年PlaywrightやCypressを用いたE2Eテスト（エンドツーエンドテスト）が行われるようになってきました。E2Eテストとはソフトウェアやシステムの全体的な動作や機能をテストする手法で..."

@@ -7,7 +7,7 @@ tag:
   - OSS
   - Kubernetes
 category:
-  - Infrastructure
+  - DevOps
 author: 真野隼記
 lede: "GCPのインスタンス（GCE, SQL, GKE）を自動で停止させるGoで書かれたツールをGitHubに公開しました。"
 ---

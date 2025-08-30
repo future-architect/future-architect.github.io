@@ -7,7 +7,7 @@ tag:
   - Cloudflare
   - IaC
 category:
-  - Infrastructure
+  - DevOps
 thumbnail: /images/2024/20240327a/thumbnail.png
 author: 大岩潤矢
 lede: "Cloudflareで管理しているドメインのDNS設定や、Cloudflare Pages等のサービスの設定を、Terraform管理に移行した際の手順等を、備忘録がてら記載します。"

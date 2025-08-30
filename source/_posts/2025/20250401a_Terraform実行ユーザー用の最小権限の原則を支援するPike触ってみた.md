@@ -8,7 +8,7 @@ tag:
   - AWS
   - アクセス制御
 category:
-  - Infrastructure
+  - DevOps
 thumbnail: /images/2025/20250401a/thumbnail.png
 author: 真野隼記
 lede: "Pikeを触ってみた記事です。"

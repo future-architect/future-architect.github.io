@@ -6,7 +6,7 @@ tag:
   - Terraform
   - Azure
 category:
-  - Infrastructure
+  - DevOps
 thumbnail: /images/2024/20240325a/thumbnail.png
 author: 真鍋優
 lede: "昨今のOpenAI需要によって、Azure環境の利用を本格的に始める方も多いかと思います。今回はAzure環境でTerraformを利用する際、裏で動いているリソースプロバイダーについてご紹介します。"

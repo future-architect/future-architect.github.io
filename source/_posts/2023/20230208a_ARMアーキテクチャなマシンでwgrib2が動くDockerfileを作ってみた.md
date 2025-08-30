@@ -8,7 +8,7 @@ tag:
   - Ubuntu
   - Docker
 category:
-  - Infrastructure
+  - DevOps
 thumbnail: /images/2023/20230208a/thumbnail.jpg
 author: 矢野颯太
 lede: "wgrib2がすぐ使えるDockerfileが欲しかったので、作成しました。M1 Macで動くようにARMアーキテクチャ向けに定義しました。"

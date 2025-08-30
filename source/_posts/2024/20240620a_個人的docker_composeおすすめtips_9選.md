@@ -7,7 +7,7 @@ tag:
   - DockerCompose
   - Tips
 category:
-  - Infrastructure
+  - DevOps
 thumbnail: /images/2024/20240620a/thumbnail.jpg
 author: 市川燿
 lede: "docker composeを利用しているでしょうか？複数のdockerコンテナをまとめて立ち上げたり、環境変数を定義できたり便利ですよね。今回はある程度docker composeを利用している方向けに私が便利、便利そうと感じたdocker composeの機能を挙げてみました。"

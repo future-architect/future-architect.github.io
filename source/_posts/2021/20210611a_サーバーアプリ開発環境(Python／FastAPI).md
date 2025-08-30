@@ -8,7 +8,7 @@ tag:
   - Python
   - FastAPI
 category:
-  - Programming
+  - DevOps
 thumbnail: /images/2021/20210611a/thumbnail.png
 author: 澁川喜規
 lede: "Pythonでお仕事する前提で、現在のところで自分が最適と考えるチーム開発のための環境整備についてまとめてみました。今までももろもろ散発的に記事に書いたりしていたのですが、Poetryで環境を作ってみたのと、過去のもろもろの情報がまとまったものが個人的にも欲しかったのでまとめました。"

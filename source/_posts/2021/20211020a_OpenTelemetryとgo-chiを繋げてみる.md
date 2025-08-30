@@ -9,7 +9,7 @@ tag:
   - Go
   - CNCF
 category:
-  - Programming
+  - DevOps
 thumbnail: /images/2021/20211020a/thumbnail.png
 author: 澁川喜規
 lede: "OpenTelemetryのGoのTraceがstableになり、1.0がリリースされました。最初の1.0宣言からはだいぶ時間がかかりましたが、Go/Javaなどさまざまな言語の開発が同時進行で、共通のプロトコルも決めて、なおかつさまざまな拡張のAPIを提供して、さらにその拡張も現時点で300以上も提供されているあたり..."

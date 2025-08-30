@@ -7,7 +7,7 @@ tag:
   - Azure
   - Microsoft365
 category:
-  - Programming
+  - 認証認可
 thumbnail: /images/2024/20240401a/thumbnail.png
 author: 澁川喜規
 lede: "過去にいくつかEntraIDが、久々にMicrosoft 365 Developer Programにアクセスしたら、どこにEntraIDがあるのか場所が分からなかったのでメモです。"

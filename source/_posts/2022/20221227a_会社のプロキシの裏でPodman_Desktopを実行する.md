@@ -7,7 +7,7 @@ tag:
   - Docker
   - プロキシ
 category:
-  - Infrastructure
+  - DevOps
 thumbnail: /images/2022/20221227a/thumbnail.png
 author: 澁川喜規
 lede: "ちょっとローカルでPostgreSQLの最新バージョンを試したいけどDocker Desktopの稟議が間に合わない！みたいなときのためのメモです。Docker Desktopの有償化と契約すべきライセンスについては以前書きました。その後..."

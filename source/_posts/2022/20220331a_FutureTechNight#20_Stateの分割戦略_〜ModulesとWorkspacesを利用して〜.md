@@ -7,7 +7,7 @@ tag:
   - TechNight
   - 登壇レポート
 category:
-  - Infrastructure
+  - DevOps
 thumbnail: /images/2022/20220331a/thumbnail.png
 author: 伊藤太斉
 lede: "2022/2/17に開催したFuture Tech Night #20で登壇した内容のサマリと、当日はお伝えしきれなかったことについて触れていきます。TerraformのStateは、これを扱う上で非常に重要な役割を果たします。実際のリソースと、Terraformソースコードとの差異を確認するためにも、リソースをTerraformの管理下とするためにも必要不可欠なコンポーネントになってきます。"

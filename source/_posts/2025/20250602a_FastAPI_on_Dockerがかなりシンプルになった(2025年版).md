@@ -7,7 +7,7 @@ tag:
   - Python
   - FastAPI
 category:
-  - Programming
+  - DevOps
 thumbnail: /images/2025/20250602a/thumbnail.png
 author: 澁川喜規
 lede: "5年ほど前にPythonのコンテナ化について2つの記事を書きましたがFastAPI側もDocker側もアップデートがあり、当時よりもかなりシンプルになってきたのを感じたので少し調べてまとめてみました。"

@@ -6,7 +6,7 @@ tag:
   - Docker
   - コンテナビルド
 category:
-  - Programming
+  - DevOps
 thumbnail: /images/2021/20210121/thumbnail.png
 author: 澁川喜規
 lede: "ソフトウェアの世界では、ツールや言語の進歩があって、もはや古い知識になっているにも関わらず、古い知識がベストプラクティスと呼ばれて蔓延し続けている例があります。Dockerだと「RUNをまとめよう」というのがそうです。かつては..."

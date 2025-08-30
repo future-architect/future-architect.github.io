@@ -9,7 +9,7 @@ tag:
   - Terraform
   - 暗号
 category:
-  - Infrastructure
+  - DevOps
 thumbnail: /images/2021/20210413a/thumbnail.png
 author: 棚井龍之介
 lede: "認証情報を Lambda の環境変数に渡す要件が発生したため認証情報を KMS で暗号化して、リポジトリには暗号化した値を登録し、Lambda 内で復号化する構成を取りました。"

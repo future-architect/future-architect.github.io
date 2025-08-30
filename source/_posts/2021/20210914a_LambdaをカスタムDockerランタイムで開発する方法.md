@@ -10,7 +10,7 @@ tag:
   - Oracle
   - Go
 category:
-  - Programming
+  - DevOps
 thumbnail: /images/2021/20210914a/thumbnail.png
 author: 伊藤真彦
 lede: "普段からAWS Lambdaにはお世話になっているのですが、初めてカスタムランタイムを動かす仕事が舞い込んできました。AWS Lambdaでは下記のランタイムがサポートされています。"

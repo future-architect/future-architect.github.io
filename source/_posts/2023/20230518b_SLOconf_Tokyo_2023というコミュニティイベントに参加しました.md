@@ -9,7 +9,7 @@ tag:
   - SLOconf
   - 心理的安全性
 category:
-  - Infrastructure
+  - DevOps
 thumbnail: /images/2023/20230518b/thumbnail.png
 author: 原木翔
 lede: "SLOconfという、Nobl9社が主催する、サービスレベル目標（SLO）に特化したカンファレンスがあります。今までオンラインでやってきたのですが、三回目になる今回、初めてオフラインで開催&世界各地でローカルなコミュニティイベントを同時開催する運びになりました。"
