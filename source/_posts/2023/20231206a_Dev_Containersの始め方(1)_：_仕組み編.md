@@ -10,7 +10,7 @@ tag:
   - PyCon APAC 2023
   - 登壇レポート
 category:
-  - Programming
+  - DevOps
 thumbnail: /images/2023/20231206a/thumbnail.jpg
 author: 澁川喜規
 lede: "PyCon APAC 2023でDev Containersで発表してきました。"

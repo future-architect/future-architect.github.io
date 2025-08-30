@@ -6,7 +6,7 @@ tag:
   - Terraform
   - tfstate-merge
 category:
-  - Infrastructure
+  - DevOps
 thumbnail: /images/2024/20240314a/thumbnail.png
 author: 原田達也
 lede: "tfstateを統合する機会があったので、その経験をもとにまとめます。"

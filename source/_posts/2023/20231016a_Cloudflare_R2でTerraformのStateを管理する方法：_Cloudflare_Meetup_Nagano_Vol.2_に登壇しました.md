@@ -7,7 +7,7 @@ tag:
   - Terraform
   - 登壇レポート
 category:
-  - Infrastructure
+  - DevOps
 thumbnail: /images/2023/20231016a/thumbnail.png
 author: 伊藤太斉
 lede: "10/14に開催されたCloudflare Meetup Naganoに登壇したので発表内容のサマリとイベントのレポートです。"

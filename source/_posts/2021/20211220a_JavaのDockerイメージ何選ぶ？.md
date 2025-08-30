@@ -7,7 +7,7 @@ tag:
   - Java
   - コンテナビルド
 category:
-  - Programming
+  - DevOps
 thumbnail: /images/2021/20211220a/thumbnail.png
 author: 澁川喜規
 featured: false

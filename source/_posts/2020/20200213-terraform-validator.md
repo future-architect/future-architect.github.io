@@ -7,7 +7,7 @@ tag:
   - Terraform
   - Policy-as-Code
 category:
-  - Infrastructure
+  - DevOps
 author: 齋場俊太朗
 lede: "Terraform Validatorを使って、組織のセキュリティポリシーの自動チェックを継続的に行う方法を紹介します。併せて、ポリシーをコードとして管理する方法も紹介します。Policy as code です。もちろんセキュリティポリシーのみだけではなく、命名規則やリージョン制限なども扱えます。"
 ---

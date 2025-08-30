@@ -5,7 +5,7 @@ postid: ""
 tag:
   - Terraform
 category:
-  - Infrastructure
+  - DevOps
 author: 木村拓海
 lede: "入社以降ずっと触ってきたTerraformについての様々な流派を紹介し、各流派がどのようなパターンに向いているのか(はたまた不向きなのか)の個人的見解をまとめてみました。"
 ---

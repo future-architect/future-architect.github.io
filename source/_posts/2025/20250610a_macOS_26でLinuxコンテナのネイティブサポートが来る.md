@@ -9,7 +9,7 @@ tag:
   - Linux
   - コンテナ
 category:
-  - Infrastructure
+  - DevOps
 thumbnail: /images/2025/20250610a/thumbnail.png
 author: 澁川喜規
 lede: "現在開催中のWWDCで、Linuxコンテナネイティブサポートが発表されました。毎年WWDCの時期になると仮想化のアップデートの話が来るのをずっと首を長くしてまっていた日々だったので、待望のアップデートです。macOSは以前から、Linux仮想化の機能がOSのAPIレベルでサポートしており.."

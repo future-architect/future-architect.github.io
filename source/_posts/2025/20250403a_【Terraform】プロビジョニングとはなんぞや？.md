@@ -9,7 +9,7 @@ tag:
   - Ansible
   - 用語解説
 category:
-  - Infrastructure
+  - DevOps
 thumbnail: /images/2025/20250403a/thumbnail.png
 author:  森友雅
 lede: "業務でTerrafomでAWSのリソースを作成する作業を担当することになり、作業に取り掛かる前にTerraformとは何かを調べていました。公式を確認したところ..."

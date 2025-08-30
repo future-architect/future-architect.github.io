@@ -7,7 +7,7 @@ tag:
   - GitHubActions
   - CI/CD
 category:
-  - Infrastructure
+  - DevOps
 thumbnail: /images/2025/20250604a/thumbnail.png
 author: 武田大輝
 lede: "コードレビューを自動で可視化するためのツールといえばreviewdogが有名です。"

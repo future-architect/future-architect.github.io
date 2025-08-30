@@ -9,7 +9,7 @@ tag:
   - EKS
   - Rego
 category:
-  - Infrastructure
+  - DevOps
 thumbnail: /images/2023/20230309a/thumbnail.png
 author: 岩崎賢太
 lede: "みなさん、ArgoCDは使っていますか？業務でEKSクラスタにArgoCDをデプロイして、Kubernetesリソースを管理しています。ArgoCDはGitOpsに則ったCDツールで、WebUIが優れていてKubernetesリソースの作成や更新がとても簡単で便利ですね。"

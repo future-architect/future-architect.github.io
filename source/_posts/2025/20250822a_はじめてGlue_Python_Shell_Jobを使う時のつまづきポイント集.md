@@ -9,7 +9,7 @@ tag:
   - Glue Python Shell
   - 初心者向け
 category:
-  - Programming
+  - Infrastructure
 thumbnail: /images/2025/20250822a/thumbnail.jpg
 author: 八木雅斗
 lede: "業務でGlue Python Shell Job（以降、Python Shell）を利用する機会があったのですが、「Lambdaとかだと簡単にできるのに、Python Shellだとできないんか～」とか、ドキュメント上でPySparkジョブ or Python Shellのどちらについて記載しているのか分かりにくかったりと..."

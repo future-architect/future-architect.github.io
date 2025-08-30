@@ -6,7 +6,7 @@ tag:
   - Docker
   - ライセンス
 category:
-  - Infrastructure
+  - DevOps
 thumbnail: /images/2022/20220124a/thumbnail.png
 author: 澁川喜規
 lede: "大きな組織でのDocker Desktop有料化が発表されて、いよいよFreeからの切り替え期限が今月末に迫っています。「Docker DesktopだからLinux版は無償だからWSL2に入れれば無料」みたいな解説もされていますが、Linux版のDocker Desktopもすでにベータリリースされており、そのうちLinux版も遅かれ早かれ有償化されるかと思います。で、ライセンスもいくつかあるけど、どれを選べばよいのかを検討した記録を公開します。"

@@ -10,7 +10,7 @@ tag:
   - Go
   - DockerCompose
 category:
-  - Infrastructure
+  - DevOps
 thumbnail: /images/2020/20201113/thumbnail.png
 author: 棚井龍之介
 lede: "- ローカル環境に立ち上げた localstack に向けて、terraform plan/apply/destroy を実行するFutureの棚井龍之介ですTIGグループのDXユニットに所属しています"

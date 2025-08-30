@@ -8,7 +8,7 @@ tag:
   - GitHubActions
   - DevSecOps
 category:
-  - Security
+  - DevOps
 thumbnail: /images/2025/20250619a/thumbnail.png
 author: 松本朝香
 lede: １か月前、情報安全確保支援士を受験してきまして、問題の選択肢にあった SonarQube という初耳ワードがどんなOSSなのか気になりました。タイミングよくこの『CI/CD

@@ -7,7 +7,7 @@ tag:
   - GoogleCloud
   - TFLint
 category:
-  - Infrastructure
+  - DevOps
 thumbnail: /images/2021/20211223a/thumbnail.png
 author: 川端一輝
 featured: false

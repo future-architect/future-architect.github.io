@@ -10,7 +10,7 @@ tag:
   - 環境構築
   - rye
 category:
-  - Programming
+  - DevOps
 thumbnail: /images/2023/20231212a/thumbnail.png
 author: 澁川喜規
 lede: "Dev ContainersのPython環境を作っていきます。"

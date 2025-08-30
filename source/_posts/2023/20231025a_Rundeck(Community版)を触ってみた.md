@@ -8,7 +8,7 @@ tag:
   - 保守運用
   - クラウドリフト
 category:
-  - Infrastructure
+  - DevOps
 thumbnail: /images/2023/20231025a/thumbnail.png
 author: 都筑博紀
 lede: "本検証はAWS環境を用いて行っております。AWSサービス名をそのまま記載している部分が多いですがご了承ください。調査・検証が不十分で内容に不備・誤りがあるかもしれません。あらかじめご了承ください。"

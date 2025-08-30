@@ -9,7 +9,7 @@ tag:
   - 札幌
   - Japan Datadog User Group Meetup
 category:
-  - Infrastructure
+  - DevOps
 thumbnail: /images/2025/20250307a/thumbnail.png
 author: 棚井龍之介
 lede: "最近、担当サービスへの Datadog 導入に成功しまして、その「導入成功に至るまでのプロセス」をなんらかの方法でナレッジ化しておきたいと考えていました"

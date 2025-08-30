@@ -6,7 +6,7 @@ tag:
   - Terraform
   - 合格記
 category:
-  - Infrastructure
+  - DevOps
 thumbnail: /images/2020/20200629/thumbnail.png
 author: 伊藤太斉
 lede: "5/24に受験したHashiCorpから出た資格の1つである、Terraform Associateを受験したときの記事になります。結果としては無事に合格したので、受験前、そして受験当日のことを今回取り扱おうと思います。"

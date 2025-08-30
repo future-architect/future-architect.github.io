@@ -7,7 +7,7 @@ tag:
   - AWS
   - Docker
 category:
-  - Programming
+  - DevOps
 thumbnail: /images/2023/20230105a/thumbnail.png
 author: 村上知優
 lede: "この記事はフューチャー Advent Calendar 2022の14日目の記事です。PythonのWeb APIをLambdaにデプロイする方法について解説します。"

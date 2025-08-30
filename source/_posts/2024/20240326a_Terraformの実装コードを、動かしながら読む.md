@@ -8,7 +8,7 @@ tag:
   - Go
   - Copilot
 category:
-  - Programming
+  - DevOps
 thumbnail: /images/2024/20240326a/thumbnail.png
 author: 棚井龍之介
 lede: "Terraform 連載ということで、そういえば、実装コードは Go で書かれていたな、コマンドの使い方はインフラエンジニアの皆様が書いてくれるはずなので、コードリーディングしようかな"
