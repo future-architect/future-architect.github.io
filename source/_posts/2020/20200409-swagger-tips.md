@@ -10,7 +10,7 @@ tag:
   - 設計
   - チーム開発
 category:
-  - Programming
+  - Frontend
 thumbnail: /images/2020/20200409/thumbnail.png
 author: 亀井隆徳
 lede: "みなさん、Swagger使ってますか？本記事では実際にSwaggerのスキーマ定義を設計していく上で取り決めた規約について書いてみたいと思います。"

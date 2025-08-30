@@ -10,7 +10,7 @@ tag:
   - SQL
   - フォーマッター
 category:
-  - Programming
+  - Frontend
 thumbnail: /images/2022/20221124a/thumbnail.png
 author: 川渕皓太
 lede: "SQLフォーマッタをVSCodeの拡張機能にする作業を行っており、そのための方法を学んでいます。本記事ではLanguage Server Protocolを用いたVSCode拡張機能開発について説明します。。"

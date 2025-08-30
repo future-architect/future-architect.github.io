@@ -8,7 +8,7 @@ tag:
   - 初心者向け
   - Vue.js
 category:
-  - Programming
+  - Frontend
 thumbnail: /images/2024/20240426b/thumbnail.png
 author: 後藤喜斗
 lede: "フロントエンドの開発をする際にはVueを使用しています。Vueでの開発に慣れていくにつれて、「Vue使いやすいな、よくできているなぁ。」と思うとともに、普段何気なく使っているスプレッドシートに対して、今まで感じたことのなかった不便さを感じるようになりました。"

@@ -6,7 +6,7 @@ tag:
   - Vue.js
   - Electron
 category:
-  - Programming
+  - Frontend
 thumbnail: /images/2021/20210107/thumbnail.png
 author: 伊藤真彦
 lede: "Electronは、GitHubが開発したオープンソースのソフトウェアフレームワークです。ChromiumとNode.jsをコアとして採用する事で、Web開発と同じようにHTML,CSS,JavaScriptを用いて開発したものを.."

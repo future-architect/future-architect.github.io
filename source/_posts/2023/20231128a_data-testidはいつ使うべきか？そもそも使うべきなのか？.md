@@ -7,7 +7,7 @@ tag:
   - Cypress
   - Playwright
 category:
-  - Programming
+  - Frontend
 thumbnail: /images/2023/20231128a/thumbnail.png
 author: 澁川喜規
 lede: "Playwrightあるいはそのロケーターの元ネタとなっているTesting Libraryでは、DOMを指定する方法として data-testid 属性を扱ったクエリーを提供しています。"

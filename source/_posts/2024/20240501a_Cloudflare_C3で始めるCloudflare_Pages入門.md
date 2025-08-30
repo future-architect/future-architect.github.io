@@ -8,7 +8,7 @@ tag:
   - Cloudflare C3
   - Vue.js
 category:
-  - Programming
+  - Frontend
 thumbnail: /images/2024/20240501a/thumbnail.png
 author: 大岩潤矢
 lede: "Cloudflareが提供するCLIツール「Cloudflare C3」を利用して、Cloudflare Pagesへ簡単に入門する方法について、ハンズオンを中心に紹介します。"

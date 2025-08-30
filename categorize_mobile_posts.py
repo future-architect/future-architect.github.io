@@ -4,7 +4,12 @@ import os
 POSTS_DIRECTORY = 'source/_posts'
 # 上記リストから、実際に移行したいタグをここに列挙します
 TARGET_TAGS = [
-    'フロントエンド'
+    'JavaScript',
+    'TypeScript',
+    'React',
+    'Vue.js',
+    'Angular',
+    'Svelte'
 ]
 # 上書きする新しいカテゴリ
 NEW_CATEGORY = 'Frontend'

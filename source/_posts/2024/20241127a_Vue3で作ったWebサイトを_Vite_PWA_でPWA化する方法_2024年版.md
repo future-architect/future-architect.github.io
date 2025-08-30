@@ -7,7 +7,7 @@ tag:
   - PWA
   - Vite
 category:
-  - Programming
+  - Frontend
 thumbnail: /images/2024/20241127a/thumbnail.png
 author: 大岩潤矢
 lede: "Vue3で作ったWebサイトをPWA(Progressive Web Apps)化する方法を紹介します。"
