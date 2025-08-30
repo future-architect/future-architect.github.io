@@ -7,10 +7,10 @@ tag:
   - インターン2021
   - 工場
 category:
-  - Programming
+  - IoT
 thumbnail: /images/2021/20211018a/thumbnail.png
 author: 森下俊平
-lede: "こんにちは。フューチャーの夏季インターンシップEngineer Camp 2021に参加した森下です。このインターンシップを通じて得た経験や学んだことをお話ししていきます。"
+lede: "フューチャーの夏季インターンシップEngineer Camp 2021に参加した森下です。このインターンシップを通じて得た経験や学んだことをお話ししていきます。"
 ---
 # はじめに
 

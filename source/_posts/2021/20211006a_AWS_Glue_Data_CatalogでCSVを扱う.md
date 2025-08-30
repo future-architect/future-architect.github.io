@@ -8,7 +8,7 @@ tag:
   - AWS
   - データカタログ
 category:
-  - Programming
+  - Infrastructure
 thumbnail: /images/2021/20211006a/thumbnail.png
 author: 山田勇一
 lede: "PySparkで予定しておりましたが、PySpark関連として、Glueを題材にさせていただきます。Glueといっても大きく下記の３種類、処理系をいれると4種類に分かれると思っていますが、それぞれ全く別のプロダクトという理解をしています。"
