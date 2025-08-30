@@ -3,7 +3,7 @@ title: "アイコンセット公開！その裏側を聞いてみた"
 date: 2020/03/09 10:13:26
 postid: ""
 tag:
-  - icon
+  - アイコン
   - インタビュー
 category:
   - Culture

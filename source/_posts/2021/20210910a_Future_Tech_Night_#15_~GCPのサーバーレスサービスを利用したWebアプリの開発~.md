@@ -4,7 +4,7 @@ date: 2021/09/10 00:00:00
 postid: a
 tag:
   - GoogleCloud
-  - サーバレス
+  - サーバーレス
   - TechNight
   - 登壇レポート
 category:
