@@ -8,7 +8,7 @@ tag:
   - インターン2020
   - 工場
 category:
-  - Programming
+  - IoT
 thumbnail: /images/2020/20200920/thumbnail.png
 author: 斎藤賢太
 lede: "皆さん、こんにちは。Future Engineer Camp 2020に参加しました齋藤です。インターンシップやその前のできごとを書いていきます。"
