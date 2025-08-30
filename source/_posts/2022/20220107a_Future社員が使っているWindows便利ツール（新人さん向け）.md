@@ -8,7 +8,7 @@ tag:
   - 初心者向け
   - 環境構築
 category:
-  - Infrastructure
+  - Business
 thumbnail: /images/2022/20220107a/thumbnail.gif
 author: 青柳雄登
 lede: "こんにちは。2020年4月入社の青柳です。タイトルにある通り便利ツールをまとめてみました。今回は、新入社員や入社前の大学生をターゲットに、誰でもすぐに使えるツールを紹介しているので、まだ使っていないツールがあればぜひ使ってみて下さい。※前提としてwindowsの方向けなので、Macの方はごめんなさい:bow_tone2:"
