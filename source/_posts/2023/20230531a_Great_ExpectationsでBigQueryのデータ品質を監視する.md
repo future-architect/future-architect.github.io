@@ -9,7 +9,7 @@ tag:
   - バリデーション
   - データマネジメント
 category:
-  - DataScience
+  - DataEngineering
 thumbnail: /images/2023/20230531a/thumbnail.png
 author: 板野竜也
 lede: "Great Expectationsというツールを使って、表形式データの品質をバリデーションする流れをご紹介します。MLOpsを推進するにあたりMLモデルの監視が必要となってきています。その中でも..."

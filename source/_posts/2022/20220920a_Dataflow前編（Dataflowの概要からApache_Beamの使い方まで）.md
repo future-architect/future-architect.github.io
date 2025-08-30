@@ -8,7 +8,7 @@ tag:
   - インターン
   - インターン2022
 category:
-  - Infrastructure
+  - DataEngineering
 thumbnail: "/images/2022/20220920a/thumbnail.png"
 author: "平野甫"
 lede: "フューチャーのインターンEngineer Campに参加した平野と申します。今回のインターンでは、Google Cloud Platform (GCP)のサービスとして提供されているDataflowについて調査し、その仕組みや使い方についてこの技術ブログにまとめることに取り組みました。"

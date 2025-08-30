@@ -8,7 +8,7 @@ tag:
   - 構文解析
   - フォーマッター
 category:
-  - Infrastructure
+  - Programming
 thumbnail: /images/2022/20221215a/thumbnail.png
 author: 齋藤俊哉
 lede: "フューチャーでアルバイトをしている齋藤ですインターン中に作成していたSQLフォーマッタをPostgreSQLの構文に対応させる作業に取り組んでいます。"

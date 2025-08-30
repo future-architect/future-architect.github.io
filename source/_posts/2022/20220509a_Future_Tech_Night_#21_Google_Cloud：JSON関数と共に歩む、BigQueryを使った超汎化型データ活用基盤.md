@@ -8,7 +8,7 @@ tag:
   - TechNight
   - 登壇レポート
 category:
-  - Infrastructure
+  - DataEngineering
 thumbnail: /images/2022/20220509a/thumbnail.png
 author: 村田靖拓
 lede: "3月17日に開催された「Future Tech Night #21 Google Cloud: データエンジニア＋MLOps」のセッションサマリと補足事項について触れていきます。当日のセッションは2つありましたが、私の記事では「JSON関数と共に歩む、BigQueryを使った超汎化型データ活用基盤」のセッションについて記載します。"

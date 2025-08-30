@@ -2,18 +2,17 @@ import os
 
 # --- 設定 ---
 POSTS_DIRECTORY = 'source/_posts'
-# 上記リストから、実際に移行したいタグをここに列挙します
-TARGET_TAGS = [
-    'Glue'
-    ]
+# このタグが含まれていたら対象となる
+TARGET_TAG = 'データエンジニアリング'
 # 上書きする新しいカテゴリ
 NEW_CATEGORY = 'DataEngineering'
 # --- 設定ここまで ---
 
-def replace_category_for_mobile_tags(file_path):
+def replace_category_for_tag(file_path):
     """
     ファイルのfront matterをチェックし、ターゲットタグが含まれていれば
-    カテゴリを'Mobile'に置換する。他の行のフォーマットは保持する。
+    カテゴリを指定したものに置換し、元のタグを削除する。
+    他の行のフォーマットは保持する。
     """
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
@@ -25,30 +24,27 @@ def replace_category_for_mobile_tags(file_path):
         has_target_tag = False
         for line in lines:
             if line.strip() == '---':
-                if in_front_matter: # front matterの終わり
-                    break
-                else: # front matterの始まり
+                if in_front_matter: break
+                else:
                     in_front_matter = True
                     continue
-
             if in_front_matter:
                 stripped_line = line.strip()
                 if not line.startswith((' ', '\t')):
                     in_tags_list = stripped_line.startswith(('tag:', 'tags:'))
-
                 if in_tags_list and stripped_line.startswith('-'):
                     tag_value = stripped_line[1:].strip().strip('\'"')
-                    if tag_value in TARGET_TAGS:
+                    if tag_value == TARGET_TAG:
                         has_target_tag = True
                         break
 
-        # ターゲットタグがなければ、何もせず終了
         if not has_target_tag:
             return False, "対象外"
 
         # --- ステップ2: 対象ファイルだった場合、内容を書き換える ---
         new_lines = []
         in_front_matter = False
+        in_tags_list = False
         in_category_list = False
         was_modified = False
 
@@ -56,6 +52,7 @@ def replace_category_for_mobile_tags(file_path):
             if line.strip() == '---':
                 if in_front_matter:
                     in_front_matter = False
+                    in_tags_list = False
                     in_category_list = False
                 else:
                     in_front_matter = True
@@ -66,21 +63,31 @@ def replace_category_for_mobile_tags(file_path):
                 stripped_line = line.strip()
 
                 if not line.startswith((' ', '\t')):
-                    # categoryキーを見つけたら、新しい定義に置き換える
-                    if stripped_line.startswith(('category:', 'categories:')):
+                    if stripped_line.startswith(('tag:', 'tags:')):
+                        in_tags_list = True
+                        in_category_list = False
+                    elif stripped_line.startswith(('category:', 'categories:')):
                         new_lines.append(f'category:\n  - {NEW_CATEGORY}\n')
                         in_category_list = True
+                        in_tags_list = False
                         was_modified = True
                         continue
                     else:
+                        in_tags_list = False
                         in_category_list = False
+                    new_lines.append(line)
+                    continue
 
-                # 古いcategoryリスト内のアイテム行ならスキップ（削除）
                 if in_category_list and stripped_line.startswith('-'):
                     was_modified = True
                     continue
 
-                # その他の行はそのまま追加
+                if in_tags_list and stripped_line.startswith('-'):
+                    tag_value = stripped_line[1:].strip().strip('\'"')
+                    if tag_value == TARGET_TAG:
+                        was_modified = True
+                        continue
+
                 new_lines.append(line)
             else:
                 new_lines.append(line)
@@ -88,9 +95,9 @@ def replace_category_for_mobile_tags(file_path):
         if was_modified:
             with open(file_path, 'w', encoding='utf-8') as f:
                 f.writelines(new_lines)
-            return True, "カテゴリを'Mobile'に置換しました"
+            return True, "カテゴリとタグを変換しました"
         else:
-            return False, "カテゴリが元々ないため処理スキップ"
+            return False, "対象タグが見つかりませんでした"
 
     except Exception as e:
         return False, f"エラー: {e}"
@@ -101,14 +108,14 @@ def main():
         print(f"エラー: '{POSTS_DIRECTORY}' が見つかりません。")
         return
 
-    print(f"カテゴリ置換処理を開始します (対象タグ: {', '.join(TARGET_TAGS)})...")
+    print(f"「{TARGET_TAG}」タグを持つ記事のカテゴリを「{NEW_CATEGORY}」に置換します...")
     updated_files_count = 0
 
     for root, _, files in os.walk(POSTS_DIRECTORY):
         for file in files:
             if file.endswith('.md'):
                 file_path = os.path.join(root, file)
-                was_updated, message = replace_category_for_mobile_tags(file_path)
+                was_updated, message = replace_category_for_tag(file_path)
                 if was_updated:
                     updated_files_count += 1
                     print(f"✅ {message}: {file_path}")
@@ -116,7 +123,7 @@ def main():
     if updated_files_count > 0:
         print(f"\n完了しました。合計 {updated_files_count} 個のファイルを修正しました。")
     else:
-        print("\n完了しました。修正対象のファイルは見つかりませんでした。")
+        print(f"\n完了しました。修正対象のファイルは見つかりませんでした。")
 
 if __name__ == '__main__':
     main()

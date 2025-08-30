@@ -7,7 +7,7 @@ tag:
   - Docker
   - Kubernetes
 category:
-  - DevOps
+  - DataEngineering
 thumbnail: /images/2025/20250630a/thumbnail.png
 author: 片岡久人
 lede: "データ変換ツール「dbt（data build tool）」をDockerコンテナ化し、Kubernetes上で実行する手順を紹介します。"

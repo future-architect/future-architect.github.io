@@ -6,9 +6,8 @@ tag:
   - dbt
   - dbt-fusion-engine
   - ELT
-  - データエンジニアリング
 category:
-  - Programming
+  - DataEngineering
 thumbnail: /images/2025/20250828a/thumbnail.png
 author: 大前七奈
 lede: "dbtは、データエンジニアリングの現場に革新をもたらしましたが、プロジェクトが大規模になるにつれて、いくつかの課題も浮き彫りになってきました。その課題を解決するために開発された次世代のエンジン「dbt Fusion Engine」について..."

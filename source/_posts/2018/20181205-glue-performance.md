@@ -7,7 +7,7 @@ tag:
   - Glue
   - 性能検証
 category:
-  - Infrastructure
+  - DataEngineering
 author: 千葉駿
 lede: "大量データをさばくために、Glueの性能についてあれやこれややった検証結果の一部を公開します"
 ---

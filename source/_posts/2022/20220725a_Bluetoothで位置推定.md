@@ -7,7 +7,7 @@ tag:
   - Bluetooth
   - 位置特定
 category:
-  - Infrastructure
+  - IoT
 thumbnail: /images/2022/20220725a/thumbnail.png
 author: 岸下優介
 lede: "マイコンとか電子工作などIoT関連が好きで、Bluetooth信号を使った位置推定手法について調査したことがあったので、紹介します。"
