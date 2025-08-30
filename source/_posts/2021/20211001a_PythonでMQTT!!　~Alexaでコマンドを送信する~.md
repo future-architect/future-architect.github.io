@@ -7,7 +7,6 @@ tag:
   - Alexa
   - RaspberryPi
   - Python
-  - IoT
 category:
   - IoT
 thumbnail: /images/2021/20211001a/thumbnail.jpg

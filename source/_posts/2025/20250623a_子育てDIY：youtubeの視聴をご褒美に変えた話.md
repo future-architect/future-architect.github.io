@@ -5,8 +5,9 @@ postid: a
 tag:
   - Squid
   - Network
-  - DIY
+  - YouTube
   - 育児
+  - 子ども
 category:
   - Infrastructure
 thumbnail: /images/2025/20250623a/thumbnail.png
