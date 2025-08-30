@@ -7,7 +7,6 @@ tag:
   - Go
   - サーバーレス
   - Lambda
-  - IoT
   - Kinesis
 category:
   - Programming

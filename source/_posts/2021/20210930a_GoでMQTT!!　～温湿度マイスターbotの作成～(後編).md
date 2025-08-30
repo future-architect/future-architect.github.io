@@ -5,7 +5,6 @@ postid: a
 tag:
   - AWSIoT
   - RaspberryPi
-  - IoT
   - Python
   - MQTT
   - BOT

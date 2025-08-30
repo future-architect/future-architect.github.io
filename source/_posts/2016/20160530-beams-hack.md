@@ -5,7 +5,6 @@ postid: ""
 tag:
   - ハッカソン
   - デザイン思考
-  - IoT
 category:
   - IoT
 thumbnail: /images/2016/20160530/thumbnail_20160530.jpg
