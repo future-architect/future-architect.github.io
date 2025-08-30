@@ -6,9 +6,8 @@ tag:
   - MONETマーケットプレイス
   - MaaS
   - Flutter
-  - モバイルアプリ
 category:
-  - Programming
+  - Mobile
 thumbnail: /images/2021/20210517a/thumbnail.png
 author: 越島亮介
 lede: "MONETマーケットプレイスで購入したAPIとFlutterを使って簡単なスマホアプリを作ってみます。"
