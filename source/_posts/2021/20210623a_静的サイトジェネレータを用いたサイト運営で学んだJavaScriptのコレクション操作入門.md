@@ -93,7 +93,6 @@ date: 2021/06/14 00:00:00
 postid: a
 tag:
   - インデックス
-  - フロントエンド
 category:
   - Frontend
 thumbnail: /images/2021/20210614a/thumbnail.jpg

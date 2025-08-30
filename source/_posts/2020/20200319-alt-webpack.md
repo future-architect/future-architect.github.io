@@ -5,7 +5,6 @@ postid: ""
 tag:
   - TypeScript
   - JavaScript
-  - フロントエンド
   - webpack
   - Node.js
   - Parcel

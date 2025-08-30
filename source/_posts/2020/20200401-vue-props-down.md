@@ -4,8 +4,6 @@ date: 2020/04/01 10:30:55
 postid: ""
 tag:
   - Vue.js
-  - フロントエンド
-  - フロントエンド
   - 初心者向け
 category:
   - Frontend
