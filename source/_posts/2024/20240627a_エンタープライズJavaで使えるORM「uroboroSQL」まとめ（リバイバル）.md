@@ -7,7 +7,6 @@ tag:
   - SQL
   - 2WaySQL
   - ORM
-  - 永続化
   - uroboroSQL
 category:
   - Programming
@@ -132,7 +131,7 @@ SqlConfig config = UroboroSQL.builder("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", "sa"
 
 ```java
 try (SqlAgent agent = config.agent()) {
-  // 
+  //
   agent.required(() -> {
     // insert/update/delete
   });
@@ -455,7 +454,7 @@ try (SqlAgent agent = config.agent()) {
           d.location = "Chicago";
           return d;
         })
-    );    
+    );
   });
 }
 

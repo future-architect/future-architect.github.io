@@ -5,7 +5,7 @@ postid: a
 tag:
   - Playwright
 category:
-  - Programming
+  - Frontend
 thumbnail: /images/2023/20230829a/thumbnail.png
 author: 武田大輝
 lede: "Playwrightはさまざまな言語でテストを記述することが可能です。このような他言語展開を可能にしているPlaywrightのアーキテクチャについて調べてみました。"
