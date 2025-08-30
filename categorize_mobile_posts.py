@@ -4,14 +4,10 @@ import os
 POSTS_DIRECTORY = 'source/_posts'
 # 上記リストから、実際に移行したいタグをここに列挙します
 TARGET_TAGS = [
-    'OAuth', 'OIDC', 'WebAuthn', 'Passkeys', 'FIDO', 'FIDO2', 'PKCE', 'JWT',
-    'Auth0', 'Okta', 'Keycloak', 'EntraID', 'IDaaS',
-    'Casbin',
-    'SSO', 'パスワードレス', 'TOTP',
-    'AuthN', 'AuthZ'
+    '自作キーボード'
 ]
 # 上書きする新しいカテゴリ
-NEW_CATEGORY = '認証認可'
+NEW_CATEGORY = 'IoT'
 # --- 設定ここまで ---
 
 def replace_category_for_mobile_tags(file_path):
