@@ -9,7 +9,7 @@ tag:
   - Claude
   - Java
 category:
-  - Programming
+  - DataScience
 thumbnail: /images/2024/20240404a/thumbnail.png
 author: 前川喜洋
 lede: "前編のチュートリアル1で作ったSQL生成チャットbotをベースに、セルフレビュー機能を追加し、間違ったSQL文や存在しないテーブルやカラムを使用しようとした時に自動でやり直すように改修します。"
