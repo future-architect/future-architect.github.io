@@ -9,7 +9,7 @@ tag:
   - Prisma
   - kagome
 category:
-  - Programming
+  - DB
 thumbnail: /images/2025/20250829a/thumbnail.png
 author: 澁川喜規
 lede: "全文検索機能がPrismaにも標準で用意されているということを知りました。PostgreSQLで全文検索はというと、PGroongaとか、pg_bigmを使うとかがトップ出てくるし、そもそも検索をしたくなったらElasticsearch使う、みたいに思っていました。標準で全文検索もできるなら運用コストもだいぶ下げられそうです。"

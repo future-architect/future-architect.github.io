@@ -7,6 +7,7 @@ tag:
   - BigQuery
   - AI監視
   - バリデーション
+  - データマネジメント
 category:
   - DataScience
 thumbnail: /images/2023/20230531a/thumbnail.png
