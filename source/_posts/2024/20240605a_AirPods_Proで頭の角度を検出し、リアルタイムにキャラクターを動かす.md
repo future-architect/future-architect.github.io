@@ -10,7 +10,7 @@ tag:
   - AirPodsPro
   - iOS
 category:
-  - Programming
+  - Mobile
 thumbnail: /images/2024/20240605a/thumbnail.png
 author: 橋本竜我
 lede: "AirPods Proの空間オーディオ機能にあるヘッドトラッキングを用いることで、頭の角度の取得をしてみました"

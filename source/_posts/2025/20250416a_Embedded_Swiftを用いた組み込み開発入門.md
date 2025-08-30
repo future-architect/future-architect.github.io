@@ -8,7 +8,7 @@ tag:
   - RaspberryPi
   - 電子工作
 category:
-  - Infrastructure
+  - IoT
 thumbnail: /images/2025/20250416a/thumbnail.png
 author: 橋本竜我
 lede: "Embedded Swiftを用いてRaspberry Pi Pico WをLチカさせてみました！"

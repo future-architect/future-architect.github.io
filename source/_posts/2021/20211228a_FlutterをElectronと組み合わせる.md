@@ -7,7 +7,7 @@ tag:
   - Electron
   - Dart
 category:
-  - Infrastructure
+  - Mobile
 thumbnail: /images/2021/20211228a/thumbnail.png
 author: 伊藤真彦
 lede: "ElectronはHTML、Javascriptをアセットとして利用してデスクトップアプリケーションとして動かすことができます、結論としてはFlutterアプリケーションをWEB向けにビルドして、その成果物をElectronアプリケーションとしてビルドすることができました。"

@@ -8,7 +8,7 @@ tag:
   - Android
   - Androidエミュレータ
 category:
-  - Programming
+  - Mobile
 thumbnail: /images/2023/20231026a/thumbnail.png
 author: 後藤田千里
 lede: "プロキシが存在するネットワーク内で、Androidエミュレータからインターネット接続ができず、頭を悩ませたことはありませんか？"

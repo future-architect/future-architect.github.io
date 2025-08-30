@@ -7,7 +7,7 @@ tag:
   - Swift
   - Swift6
 category:
-  - Programming
+  - Mobile
 thumbnail: /images/2024/20241208a/thumbnail.png
 author: 橋本竜我
 lede: "SwiftZoomin#20の内容から、Swift6移行に向けて理解が必要なSwift Concurrencyの重要な概念について簡単にまとめました。"

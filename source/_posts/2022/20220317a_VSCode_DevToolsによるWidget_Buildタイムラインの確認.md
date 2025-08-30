@@ -6,7 +6,7 @@ tag:
   - Flutter
   - VSCode
 category:
-  - Programming
+  - Mobile
 thumbnail: /images/2022/20220317a/thumbnail.png
 author: 藤田春佳
 lede: "VS CodeのDevToolsをを使用したWidget Buildの可視化についてご紹介します。Flutterアプリの開発では、Widgetのビルド単位を考えてコードを記述/改修すると思います。AndroidStudioのPerformance機能を使ってWidgetのリビルドを確認している例は見かけるのですが、VSCodeでの確認方法を見かけなかったため調べてみました。予想以上に高機能で、今回使わなかった機能も含めて活用どころがありそうです。"

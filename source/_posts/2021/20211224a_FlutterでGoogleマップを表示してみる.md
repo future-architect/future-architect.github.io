@@ -7,7 +7,7 @@ tag:
   - Dart
   - GoogleMap
 category:
-  - Infrastructure
+  - Mobile
 thumbnail: /images/2021/20211224a/thumbnail.png
 author: 伊藤真彦
 lede: "Flutterの実践的なアプリケーションの作り込みも試してみました。FlutterではGoogleマップを表示するためのウィジェットが存在するため、どのくらい簡単に実現できるか検証してみました。"

@@ -8,10 +8,10 @@ tag:
   - 機械学習
   - 画像処理
 category:
-  - DataScience
+  - Mobile
 thumbnail: /images/2023/20230831a/thumbnail.png
 author: 橋本竜我
-lede: "こんにちは！HealthCare Innovation Group[^1]所属の橋本です。本記事は、[夏の自由研究ブログ連載2023]の1本目です。夏の風物詩であるカブトムシやクワガタを識別するミニアプリを作りました。"
+lede: "夏の風物詩であるカブトムシやクワガタを識別するミニアプリを作りました。"
 ---
 
 ## はじめに

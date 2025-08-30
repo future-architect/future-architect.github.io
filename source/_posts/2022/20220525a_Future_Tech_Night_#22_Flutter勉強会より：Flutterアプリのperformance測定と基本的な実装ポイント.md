@@ -8,7 +8,7 @@ tag:
   - 性能検証
   - 登壇レポート
 category:
-  - Programming
+  - Mobile
 thumbnail: /images/2022/20220525a/thumbnail.png
 author: 藤田春佳
 lede: "Flutterアプリのperformance測定と基本的な実装ポイントについてご紹介します。1.Performanceについて、2.DevToolsについて..."

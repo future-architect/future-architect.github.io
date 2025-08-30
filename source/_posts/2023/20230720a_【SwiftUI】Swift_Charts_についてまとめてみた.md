@@ -8,7 +8,7 @@ tag:
   - iOS
   - iOS16
 category:
-  - Programming
+  - Mobile
 thumbnail: /images/2023/20230720a/thumbnail.png
 author: 橋本竜我
 lede: "はじめまして!2022年5月キャリア入社、HealthCare Innovation Group[^1]の橋本です。本記事が技術ブログ初投稿なので、お手柔らかにお願い致します！今回は、iOS16からApple標準で利用できるようになったSwift Chartsというグラフ等を作成できるフレームワークを取り上げたいと思います。"
