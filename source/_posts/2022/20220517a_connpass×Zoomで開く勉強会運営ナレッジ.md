@@ -4,6 +4,7 @@ date: 2022/05/17 00:00:00
 postid: a
 tag:
   - connpass
+  - 勉強会
   - 運営
   - Zoom
   - TechNight
