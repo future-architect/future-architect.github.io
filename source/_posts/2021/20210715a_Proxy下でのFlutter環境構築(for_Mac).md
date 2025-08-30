@@ -7,7 +7,7 @@ tag:
   - プロキシ
   - 環境構築
 category:
-  - Programming
+  - Mobile
 thumbnail: /images/2021/20210715a/thumbnail.png
 author: 斎藤賢太
 lede: "以前、当ブログで連載が行われたFlutterですが、先日業務のためにFlutterの環境構築をしようとしたところ、いくつかの障壁がありました。当記事ではProxyがある環境下でMac上にFlutterの環境構築について、ダウンロードから仮想デバイス上での公式デモアプリ（Android）実行まで紹介いたします。"

@@ -7,7 +7,7 @@ tag:
   - Android
   - ドローン
 category:
-  - Programming
+  - Mobile
 thumbnail: /images/2024/20240521a/thumbnail.png
 author: 大前七奈
 lede: "ドローンを利用して自動操縦（Autopilot）のロジックを組みたいですが、自宅でドローンを飛ばしたら家が壊されてしまう恐れがあるので、シミュレータを使います。"

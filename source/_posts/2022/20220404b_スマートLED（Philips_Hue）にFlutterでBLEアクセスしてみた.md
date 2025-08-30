@@ -8,7 +8,7 @@ tag:
   - Flutter
   - Bluetooth
 category:
-  - IoT
+  - Mobile
 thumbnail: /images/2022/20220404b/thumbnail.png
 author: 真野隼記
 lede: "PhilipsののLEDをLチカ（LEDをチカチカさせる）する記事です。普通のLEDだと面白くないので、[Philips HueのLED]を購入しました。接続ですが、Bluetooth（BLE: Bluetooth Low Energy）で直接LEDの操作をします。"

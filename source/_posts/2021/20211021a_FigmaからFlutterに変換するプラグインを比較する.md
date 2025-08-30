@@ -5,10 +5,9 @@ postid: a
 tag:
   - Figma
   - Flutter
-  - モバイルアプリ
   - 技術選定
 category:
-  - Programming
+  - Mobile
 thumbnail: /images/2021/20211021a/thumbnail.png
 author: 越島亮介
 lede: "フューチャーでは、FigmaやAdobe XDなどのデザインツールの利用が以前よりも少しづつ増えています。今回の題材はFigmaです。先月の「[Adobe XDからFlutterに変換する]プラグインがあるため、変換ツールの選択肢で迷うことはあまり無いのかなと思います。"

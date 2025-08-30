@@ -10,7 +10,7 @@ tag:
   - Xcode
   - 参加レポート
 category:
-  - Culture
+  - Mobile
 thumbnail: /images/2025/20250416b/thumbnail.jpeg
 author: 橋本竜我
 lede: "初めてtry! Swift Tokyo 2025に参加してきました！参加報告として、興味深かったセッションや参加して感じたことなどを共有します。"

@@ -9,7 +9,7 @@ tag:
   - GDG
   - GoogleCloud
 category:
-  - Infrastructure
+  - Mobile
 thumbnail: /images/2024/20240221a/thumbnail.png
 author: 山本竜玄
 lede: "2024/2/1、GDG Tokyo主催の「【Firebase】GDG Tokyo Monthly Online Tech Talks」に「Flutter×Firebaseサービス達で高速でモバイルアプリを開発した話」というタイトルで登壇しました"

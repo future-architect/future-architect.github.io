@@ -8,7 +8,7 @@ tag:
   - iOS
   - Xcode
 category:
-  - Programming
+  - Mobile
 thumbnail: /images/2025/20250425a/thumbnail.png
 author: 清水雄一郎
 lede: "SwiftにおけるiOS開発といえば、やはりXcodeを使っている方が多いと思います。ただ最近は、VS Codeに魅力的な拡張機能（特に生成AIを活用したもの）が多く、活用していきたいと思うようになりました。"

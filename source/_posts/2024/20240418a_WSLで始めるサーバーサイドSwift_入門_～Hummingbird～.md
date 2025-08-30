@@ -9,7 +9,7 @@ tag:
   - Ubuntu
   - Hummingbird
 category:
-  - Infrastructure
+  - Mobile
 thumbnail: /images/2024/20240418a/thumbnail.png
 author: 清水雄一郎
 lede: "SwiftにおけるWebフレームワークを取り上げます。SwiftはiOSアプリ開発のイメージが強いと思いますが、iOSアプリ開発以外でも利用できることを紹介します。"

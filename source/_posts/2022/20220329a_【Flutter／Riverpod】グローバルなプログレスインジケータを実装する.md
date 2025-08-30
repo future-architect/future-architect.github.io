@@ -6,7 +6,7 @@ tag:
   - Flutter
   - Riverpod
 category:
-  - Infrastructure
+  - Mobile
 thumbnail: /images/2022/20220329a/thumbnail.gif
 author: 武田大輝
 lede: "アプリケーションを開発していて、下記のようなプログレスインジケータを表示したいケースがあるかと思います。今回はこのようなインジケータをページ共通的に制御することを目的として、その実装方法を説明していきます。!"

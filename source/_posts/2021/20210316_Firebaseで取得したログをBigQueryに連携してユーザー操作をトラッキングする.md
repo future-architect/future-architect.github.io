@@ -10,7 +10,7 @@ tag:
   - BigQuery
   - Android
 category:
-  - Infrastructure
+  - Mobile
 thumbnail: /images/2021/20210316/thumbnail.png
 author: 松井宇宙
 lede: "[CP連載2021も折り返しの6本目です！陽光麗らかなある春の日、ITコンサルタントのあなたの元に、ユーザーからの問い合わせが入りました。「すみません、モバイルアプリの調子が悪いので確認してもらえませんか。」"

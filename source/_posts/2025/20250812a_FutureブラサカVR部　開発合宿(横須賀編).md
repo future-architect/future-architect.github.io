@@ -8,7 +8,7 @@ tag:
   - ブラインドサッカー
   - スポーツ×IT
 category:
-  - Culture
+  - VR
 thumbnail: /images/2025/20250812a/thumbnail.jpg
 author: 関根正大
 lede: "2025年3月29,30日に社内部活のブラサカVR部で開発合宿を実施しました！ その時の様子をお届けします👍"

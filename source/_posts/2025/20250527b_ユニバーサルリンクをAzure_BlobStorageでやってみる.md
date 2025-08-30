@@ -8,10 +8,9 @@ tag:
   - Azure Storage
   - iOS
   - UniversalLinks
-  - モバイルアプリ
   - FutureOne
 category:
-  - Infrastructure
+  - Mobile
 thumbnail: /images/2025/20250527b/thumbnail.png
 author: 高山博司
 lede: ".NET MAUIでiOS向けアプリを開発中、WebアプリからiOSアプリを呼び出す必要がでてきたため、ユニバーサルリンクを実装しました。WebサーバーはAzure Blob Storageの静的サイトを利用します。"

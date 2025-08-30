@@ -6,9 +6,8 @@ tag:
   - Swift
   - SwiftUI
   - SwiftData
-  - モバイルアプリ
 category:
-  - Programming
+  - Mobile
 thumbnail: /images/2024/20240522a/thumbnail.png
 author: 橋本竜我
 lede: "公式チュートリアルDevelop in SwiftのModels and persistence、Data editing and navigation、Relationships and queriesという3つのセクションでSwiftDataを学べるとことで実際にやってみました。"
