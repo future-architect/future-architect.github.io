@@ -6,9 +6,8 @@ tag:
   - Next.js
   - Go
   - WebAssembly
-  - フロントエンド
 category:
-  - Programming
+  - Frontend
 thumbnail: /images/2022/20221024a/thumbnail.png
 author: 澁川喜規
 lede: "ちょっとしたツールをGoで作ってみたのですが、わざわざインストールしなくてもいいようにWebのUIをつけてブラウザで使えるようにしてみました。ウェブフロントエンド部分はNext.jsの静的サイトで、GoはWASMにしてロードして実行しています。WASMを使うのは初めてなのであえて選んでみました。"

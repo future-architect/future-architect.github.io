@@ -8,7 +8,7 @@ tag:
   - フロントエンド
   - 初心者向け
 category:
-  - Programming
+  - Frontend
 thumbnail: /images/2020/20200401/thumbnail.png
 author: 東郷聡志
 lede: "今回はVue.jsの最初の難関（だと思っている）「props down, event up」について、初心者が読んでもわかるような資料を用意してみようと思います。

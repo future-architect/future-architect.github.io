@@ -6,9 +6,8 @@ tag:
   - React
   - Next.js
   - RSC
-  - フロントエンド
 category:
-  - Programming
+  - Frontend
 thumbnail: /images/2023/20231214a/thumbnail.png
 author: 澁川喜規
 lede: "Next.jsの最近の大きな目玉機能はReact Server Componentです。パフォーマンスアップに有効だったり、gRPCだRESTだGraphQLだ論争を終わりにするServer Actionsなど盛りだくさんです。一方で、サーバーコンポーネントはコーディング上の制約がいろいろあります。"
