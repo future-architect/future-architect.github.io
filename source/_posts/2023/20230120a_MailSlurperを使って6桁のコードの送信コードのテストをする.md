@@ -8,7 +8,7 @@ tag:
   - メール
   - TOTP
 category:
-  - Infrastructure
+  - 認証認可
 thumbnail: /images/2023/20230120a/thumbnail.png
 author: 澁川喜規
 lede: "以前、認証ミドルウェアのhankoの紹介の中で、hankoがテストで使っているMailSlurperというメールサーバーが面白いという紹介をしました。テストにおいては、モックは使うものの、モックを差し込むレイヤーはソースコードレベルではなくて、インフラレベルで仕掛ける方がいいよ、というのはほぼコンセンサスとなっていると思います。"

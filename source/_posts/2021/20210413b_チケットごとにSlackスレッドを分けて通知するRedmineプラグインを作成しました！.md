@@ -8,7 +8,7 @@ tag:
   - OSS
   - コアテク
 category:
-  - Infrastructure
+  - DevOps
 thumbnail: /images/2021/20210413b/thumbnail.png
 author: 小松裕二
 lede: "Futureでは約一年前にコミュニケーションツールとして採用され社内外のコミュニケーションにSlackを使うことも増えました。そしてプロジェクト管理で利用しているRedmineは相変わらず現役です。個人的にはRedmine4.2のリリースを心待ちにしています。さて、そうなるとRedmineからSlackへ通知したくなりますね。"

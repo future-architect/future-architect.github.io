@@ -5,9 +5,8 @@ postid: a
 tag:
   - Playwright
   - E2Eテスト
-  - フロントエンド
 category:
-  - Programming
+  - Frontend
 thumbnail: /images/2023/20230824a/thumbnail.png
 author: 木戸俊輔
 lede: "Playwright連載3日目の今回は、その便利機能たちをCypressと比較しながら紹介します。Cypressで馴染みの便利機能がPlaywrightではどう実現されているのか、E2Eテストに関わる関係者の悩みを解決するどんな便利機能が備わっているのか、詳しく見てみましょう。"

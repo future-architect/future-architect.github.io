@@ -8,7 +8,7 @@ tag:
   - BOT
   - GAS
 category:
-  - Infrastructure
+  - Frontend
 thumbnail: /images/2020/20200817/thumbnail.png
 author: 仁木美来
 lede: "こんにちは。TIGメディアユニットの仁木です。Slackに投稿するための日報をBOT化・自動化したので自由研究企画に混ぜてもらい記事にすることにしました。毎日共通で書かなければいけないタイトルなどの固定項目やスケジュールの記載を自動化することで、作成時間を短縮し、重要な部分に時間を割けるようになりました"

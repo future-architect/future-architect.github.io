@@ -5,6 +5,7 @@ postid: a
 tag:
   - Go
   - 技術選定
+  - net/http
 categories:
   - Programming
 thumbnail: /images/2021/20210714a/thumbnail.png

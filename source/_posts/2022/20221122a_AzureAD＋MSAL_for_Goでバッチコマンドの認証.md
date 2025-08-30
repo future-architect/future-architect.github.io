@@ -9,7 +9,7 @@ tag:
   - Go
   - EntraID
 category:
-  - Programming
+  - 認証認可
 thumbnail: /images/2022/20221122a/thumbnail.png
 author: 澁川喜規
 lede: "前回の記事ではMSAL.jsを使い、シングルページアプリケーションの認証を試してみました。業務システムで扱う認証にはいろいろな種類がありますが、だいたい以下のどれかに該当するケースが多いと思います。"

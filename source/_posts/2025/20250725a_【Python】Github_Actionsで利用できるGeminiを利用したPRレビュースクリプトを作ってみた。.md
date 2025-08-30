@@ -8,7 +8,7 @@ tag:
   - Python
   - コードレビュー
 category:
-  - Programming
+  - DevOps
 thumbnail: /images/2025/20250725a/thumbnail.png
 author:  片岡久人
 lede: "GitHub Actionsを利用して、CI/CDパイプライン上で実行可能なPRのAIレビュー用スクリプトを紹介します。"

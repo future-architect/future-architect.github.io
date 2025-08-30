@@ -10,7 +10,7 @@ tag:
   - TypeScript
   - Vuetify
 category:
-  - Programming
+  - Frontend
 thumbnail: /images/2021/20210826a/thumbnail.gif
 author: kazuma-takeuchi
 lede: "MONET Technologies Inc. の竹内です。このたび、フューチャー技術ブログに寄稿させていただいています。今回は、弊社のMONETマーケットプレイス上のプロダクトを使って、MaaSアプリをイメージしたデモアプリを作ってみました。今回イメージしたデモアプリは「イベント会場へのマルチモーダル移動経路検索&予約&搭乗Webアプリ」です。"

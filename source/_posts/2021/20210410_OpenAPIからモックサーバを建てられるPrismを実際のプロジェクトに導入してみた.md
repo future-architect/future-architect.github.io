@@ -9,7 +9,7 @@ tag:
   - Vue.js
   - モック
 category:
-  - Programming
+  - Frontend
 thumbnail: /images/2021/20210410/thumbnail.png
 author:  大岩潤矢
 lede: "参加しているプロジェクトで、OpenAPI定義ファイルからモックサーバを建てることができるOSSツール「Prism」を導入することになりました。この記事では、Prism導入の手順や、躓いた点などを紹介します。"

@@ -9,7 +9,7 @@ tag:
   - Go
   - トラブルシュート
 category:
-  - Programming
+  - DB
 thumbnail: /images/2021/20210122/thumbnail.png
 author: 真野隼記
 lede: "DynamoDB Streamsは、DynamoDBに対する項目の追加、変更、削除をイベントとして検出できる機能です。テーブルの項目が変更されるとすぐに、新しいレコードがテーブルのストリームに表示されます"

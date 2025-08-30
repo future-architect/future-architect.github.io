@@ -5,9 +5,8 @@ postid: a
 tag:
   - JavaScript
   - TechBlog
-  - フロントエンド
 category:
-  - Programming
+  - Frontend
 thumbnail: /images/2021/20210623a/thumbnail.png
 author: 真野隼記
 lede: "この記事ではこのフューチャー技術ブログを機能拡張する過程で学んだコレクション操作で利用頻度が高い順にまとめます。ブログ運営（？）の保守運用な雰囲気が少しでも伝わればなと思います。"
@@ -96,7 +95,7 @@ tag:
   - インデックス
   - フロントエンド
 category:
-  - Programming
+  - Frontend
 thumbnail: /images/2021/20210614a/thumbnail.jpg
 author: 真野隼記
 ---

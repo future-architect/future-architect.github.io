@@ -10,15 +10,15 @@ tag:
   - 登壇レポート
   - StepFunctions
 category:
-  - Programming
+  - IoT
 thumbnail: /images/2020/20200925/thumbnail.png
 author: 辻大志郎
-lede: "こんにちは、TIGの栗田、伊藤、辻です。先日2020/9/25にオンラインにてFuture Tech Nightという社外勉強会を開催しました。今回は第4弾としてGoとAWSを使って工場制御する最新プロジェクトの事例を紹介しました。"
+lede: "2020/9/25にオンラインにてFuture Tech Nightという社外勉強会を開催しました。今回は第4弾としてGoとAWSを使って工場制御する最新プロジェクトの事例を紹介しました。"
 ---
 
 ## はじめに
 
-こんにちは、TIGの栗田、伊藤、辻です。先日2020/9/25にオンラインにてFuture Tech Nightという社外勉強会を開催しました。今回は第4弾としてGoとAWSを使って工場制御する最新プロジェクトの事例を紹介しました。
+こんにちは、TIGの栗田、伊藤、辻です。2020/9/25にオンラインにてFuture Tech Nightという社外勉強会を開催しました。今回は第4弾としてGoとAWSを使って工場制御する最新プロジェクトの事例を紹介しました。
 
 - [第1弾【On-Line】Future Tech Night ~メディア業界変革編～](https://future.connpass.com/event/177093/)
 - [第2弾【On-Line】Future Tech Night ～MaaS ビジネス編～](https://future.connpass.com/event/179387/)

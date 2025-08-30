@@ -11,7 +11,7 @@ tag:
   - Cypress
   - 登壇レポート
 category:
-  - Programming
+  - Frontend
 thumbnail: /images/2023/20230925a/thumbnail.png
 author: 澁川喜規
 lede: "9/7に行われた技育CAMPアカデミアというイベントでPlaywrightについて話をしてきました。テストというと、設計手法であるところのテスト駆動開発は別としてちょっと業務っぽい感じがして学生さんにはちょっと響かないかな、というのも心配でしたが"

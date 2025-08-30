@@ -10,7 +10,7 @@ tag:
   - インターン2022
   - BigQuery
 category:
-  - Programming
+  - Infrastructure
 thumbnail: /images/2022/20220920b/thumbnail.png
 author: "平野甫"
 lede: "Dataflowを使うための事前準備からパイプライン実行までの一連の流れについて説明します。次の手順で進めていきます。APIの有効化、IAMの設定、Apache Beam SDKのインストール..."

@@ -5,10 +5,9 @@ postid: ""
 tag:
   - React
   - Redux
-  - フロントエンド
   - TypeScript
 category:
-  - Programming
+  - Frontend
 thumbnail: /images/2020/20200501/thumbnail.png
 author: 澁川喜規
 lede: "プロダクションコードでたくさんRedux周りにもreducerなどを実装しなくてはいけなくなったときの次のステップとして、Redux Toolkitの紹介をします。"

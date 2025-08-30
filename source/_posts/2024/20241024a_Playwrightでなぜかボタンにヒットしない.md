@@ -5,10 +5,10 @@ postid: a
 tag:
   - Playwright
   - E2Eテスト
-  - フロントエンド
   - accessibility
+  - トラブルシュート
 category:
-  - Programming
+  - Frontend
 thumbnail: /images/2024/20241024a/thumbnail.jpg
 author: 澁川喜規
 lede: "getByRoleでボタンがヒットしないです、という相談を受けて調べた内容のメモです。次のようなHTMLになっていました。"

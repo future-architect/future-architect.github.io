@@ -5,9 +5,8 @@ postid: a
 tag:
   - TailwindCSS
   - CSS
-  - フロントエンド
 category:
-  - Programming
+  - Frontend
 thumbnail: /images/2025/20250314a/thumbnail.png
 author: 澁川喜規
 lede: "CSSをわかりやすくメンテナンス性高く書くというのは長い間試行錯誤され続けてきました。命名規則でがんばる、SCSSのようなプリプロセッサを使う、CSS in JSなどいろいろな仕組みがかつて作られたりしてきましたが..."

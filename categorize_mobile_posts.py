@@ -4,10 +4,10 @@ import os
 POSTS_DIRECTORY = 'source/_posts'
 # 上記リストから、実際に移行したいタグをここに列挙します
 TARGET_TAGS = [
-    'Git'
+    'Airflow'
 ]
 # 上書きする新しいカテゴリ
-NEW_CATEGORY = 'DevOps'
+NEW_CATEGORY = 'Infrastructure'
 # --- 設定ここまで ---
 
 def replace_category_for_mobile_tags(file_path):

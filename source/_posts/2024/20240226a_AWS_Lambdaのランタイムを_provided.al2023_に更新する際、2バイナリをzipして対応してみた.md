@@ -7,7 +7,7 @@ tag:
   - AWS
   - Makefile
 category:
-  - Programming
+  - DevOps
 thumbnail: /images/2024/20240226a/thumbnail.png
 author: 真野隼記
 lede: "2023年末にAWS Lambda界隈で話題だった「AWS LambdaのGo 1.xランタイムのサポートが2023年12月31日で終了する」への対応を、あまりネットに無い特殊なやり方を採用して行ったので、考え方や実施メモを残します。"

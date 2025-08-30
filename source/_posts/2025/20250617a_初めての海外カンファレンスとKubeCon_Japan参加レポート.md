@@ -7,7 +7,7 @@ tag:
   - CloudNativeCon
   - 参加レポート
 category:
-  - Programming
+  - DevOps
 thumbnail: /images/2025/20250617a/thumbnail.jpg
 author: 伊藤太斉
 lede: "このCNCF連載とタイミングを同じくして開催しているKubeCon + CloudNativeCon Japanに参加してきたので、1日目に私が回ったセッションや会場の雰囲気についてお伝えできればと思います。"

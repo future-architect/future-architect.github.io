@@ -8,7 +8,7 @@ tag:
   - StepFunctions
   - Airflow
 category:
-  - Programming
+  - Infrastructure
 thumbnail: /images/2022/20220111a/thumbnail.png
 author: 多賀聡一朗
 lede: "TIG 所属の多賀です。AWS 上でのワークフロー構築のため、Step Functions を直近で導入しました。 "

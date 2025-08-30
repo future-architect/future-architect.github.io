@@ -4,11 +4,11 @@ date: 2021/02/16 00:00:00
 postid: ""
 tag:
   - JavaScript
-  - フロントエンド
+  - Service Worker
   - Vue.js
   - トラブルシュート
 category:
-  - Programming
+  - Frontend
 thumbnail: /images/2021/20210216/thumbnail.png
 author: 川端一輝
 lede: "Service Worker開発で起きた不具合と対応方法を記載します。Service Workerは、ブラウザがWebページとは別にバックグラウンドで実行するJavaScriptになります。"

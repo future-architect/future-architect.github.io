@@ -6,7 +6,7 @@ tag:
   - Airflow
   - OSS
 category:
-  - Programming
+  - Infrastructure
 thumbnail: /images/2021/20210528a/thumbnail.png
 author: 多賀聡一朗
 lede: "OSS として Airflow へ貢献するにあたり、ローカルでの実行やテストの環境整備が必要になります。また、 Airflow を利用するにあたってもローカルでの動作確認をしたいケースは多いかと思います。Airflow では、 Airflow Breeze と呼ばれる環境が整備され、公式より提供されています。当記事では、 Airflow Breeze について概要を記載し、 Airflow への OSS 貢献の入り口となれば良いと考えています。"

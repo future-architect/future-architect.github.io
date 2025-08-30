@@ -5,10 +5,9 @@ postid: a
 tag:
   - PlantUML
   - React
-  - フロントエンド
   - UML
 category:
-  - Programming
+  - Frontend
 thumbnail: /images/2022/20221028a/thumbnail.png
 author: 澁川喜規
 lede: "前回の記事ではMermaid.jsをレンダリングしましたが、次はPlantUMLをレンダリングしてみます。こちらも、前回のMermaid.js同様、メンテナンスされているPlantUML対応コンポーネントはありません。PlantUMLもMermaid.js同様、多様なダイアグラムをサポートしています。"

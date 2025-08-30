@@ -6,7 +6,7 @@ tag:
   - TypeScript
   - JavaSCript
 category:
-  - Programming
+  - Frontend
 thumbnail: /images/2024/20241205a/thumbnail.png
 author: 澁川喜規
 lede: "イマドキのJavaScriptの書き方2018]というのを以前書いたのだけど、配列周りはかなり変わっているな、というのを思ったので、そこの部分だけアップデートするつもりで書いてみました。"

@@ -6,7 +6,7 @@ tag:
   - Playwright
   - 環境構築
 category:
-  - Programming
+  - Frontend
 thumbnail: /images/2023/20230822a/thumbnail.png
 author: 藤戸四恩
 lede: "Playwrightは、Microsoftが開発したE2Eテストフレームワークです。Cypressと同様に、Chromium、Firefox、Safariなどのブラウザ上でE2Eテストの実行を自動化できます。 "

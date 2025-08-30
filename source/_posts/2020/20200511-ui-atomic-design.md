@@ -4,11 +4,10 @@ date: 2020/05/11 08:43:07
 postid: ""
 tag:
   - UI/UX
-  - フロントエンド
   - Figma
   - 設計
 category:
-  - Programming
+  - Frontend
 thumbnail: /images/2020/20200511/thumbnail.png
 author: 平川裕蔵
 lede: "今回はPJの現場でUXとUIのデザインを通して、Atomic Designの導入はどのような結果を生んだのか、Atomic Design導入に際しての課題や取り組み方のコツなんかをお伝えできればと思います。z"

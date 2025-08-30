@@ -8,7 +8,7 @@ tag:
   - GitLab
   - コアテク
 category:
-  - Programming
+  - DevOps
 thumbnail: /images/2021/20210908a/thumbnail.png
 author: 高橋健
 lede: "RedmineとGitLabリポジトリを連携するRedmine GitLab Adapter Pluginを開発しましたので紹介させていただきます。"
