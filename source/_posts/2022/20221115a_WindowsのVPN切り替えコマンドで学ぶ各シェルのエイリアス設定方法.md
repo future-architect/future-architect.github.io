@@ -5,8 +5,9 @@ postid: a
 tag:
   - Windows
   - VPN
+  - 環境構築
 category:
-  - Infrastructure
+  - DevOps
 thumbnail: /images/2022/20221115a/thumbnail.png
 author: ダワージャルガルオチラル
 lede: "WindowsでのVPN切り替えコマンド及び各シェルにエイリアスを貼る方法を紹介します。エイリアスを貼れば、好きなコマンドで好きなスクリプトを実行できるようになります。"
