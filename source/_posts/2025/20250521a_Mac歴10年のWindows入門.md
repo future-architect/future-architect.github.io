@@ -13,7 +13,7 @@ tag:
   - CubeICE
   - ULE4JIS
 category:
-  - Programming
+  - DevOps
 thumbnail: /images/2025/20250521a/thumbnail.png
 author: 長谷川寛人
 lede: "Windowsを徹底的にMacBookに近づけ、快適な作業環境を構築することにしました。そのプロセスを詳しく紹介します。"

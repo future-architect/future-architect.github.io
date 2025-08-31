@@ -10,7 +10,7 @@ tag:
   - 環境構築
   - Change Key
 category:
-  - Infrastructure
+  - DevOps
 thumbnail: /images/2023/20230216a/thumbnail.png
 author: 棚井龍之介
 lede: "これまでは Mac ユーザでしたが、Windows が支給されその利用を開始しました。Windows の環境整備として実施した内容を備忘録としての意味も込めてブログ化しました"

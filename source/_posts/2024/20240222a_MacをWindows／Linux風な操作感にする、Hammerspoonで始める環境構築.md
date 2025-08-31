@@ -8,7 +8,7 @@ tag:
   - ショートカット
   - 環境構築
 category:
-  - Infrastructure
+  - DevOps
 thumbnail: /images/2024/20240222a/thumbnail.jpg
 author: 山本竜玄
 lede: "私用PCはLinux、会社PCはプロジェクトによってWindowsとMacのどちらかを使っている生活をしており、かつ自宅のモニターやキーボードは外付けで1つのものを使用しています。その日々を過ごす中で、キーバインディングが異なるPCで混乱することがあり、ツール・操作感をできるだけ統一したいという願望がありました。"
