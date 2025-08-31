@@ -10,7 +10,7 @@ tag:
   - checkmake
   - dotenv
 category:
-  - Programming
+  - DevOps
 thumbnail: /images/2023/20231012a/thumbnail.png
 author: 真野隼記
 lede: "makeを用いてWebバックエンドアプリをGoで開発するということをテーマに、役立ちそうな情報をまとめます。"
