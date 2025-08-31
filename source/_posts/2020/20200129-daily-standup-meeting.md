@@ -7,6 +7,7 @@ tag:
   - マネジメント
   - チーム開発
   - リモートワーク
+  - コミュニケーション
 category:
   - Management
 author: 村田靖拓

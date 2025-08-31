@@ -5,8 +5,9 @@ postid: a
 tag:
   - Slack
   - リモートワーク
+  - コミュニケーション
 category:
-  - Programming
+  - Management
 thumbnail: /images/2021/20210712a/thumbnail.png
 author: 山上燦
 lede: "TIGの山上・村田です。いきなりですが、みなさんはコミュニケーションツール（チャットツール）何を使っていますでしょうか。フューチャーでは2020年のはじめに社内公式のチャットツールとしてSlack Enterprise Gridを導入しました"

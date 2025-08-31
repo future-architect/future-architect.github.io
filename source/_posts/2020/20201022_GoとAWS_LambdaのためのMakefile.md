@@ -8,10 +8,10 @@ tag:
   - Lambda
   - Makefile
 category:
-  - Programming
+  - DevOps
 thumbnail: /images/2020/20201022/thumbnail.webp
 author: 筒井悠平
-lede: "筒井です。GoとAWS LambdaのためのMakefileを整理しました。Lambda Functionの増加と同時に増えていくターゲットにはオサラバです。"
+lede: "GoとAWS LambdaのためのMakefileを整理しました。Lambda Functionの増加と同時に増えていくターゲットにはオサラバです。"
 ---
 
 <img src="/images/2020/20201022/GNU-make.webp" class="img-middle-size" loading="lazy">

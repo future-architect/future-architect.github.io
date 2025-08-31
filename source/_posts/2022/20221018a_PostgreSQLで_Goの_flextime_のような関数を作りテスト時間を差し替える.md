@@ -9,7 +9,7 @@ tag:
   - トリガー
   - モック
 category:
-  - Infrastructure
+  - DB
 thumbnail: /images/2022/20221018a/thumbnail.jpg
 author: 真野隼記
 lede: Songmuさんのflextimeにはずっとお世話になっています。素晴らしいライブラリですが、SQLを用いて結果を永続化するようなテストでの利用する時に冗長性を感じました。PostgreSQL関数 を作成して代用できないか考えてみました。

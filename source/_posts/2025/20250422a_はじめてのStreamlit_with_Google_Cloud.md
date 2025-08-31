@@ -7,8 +7,10 @@ tag:
   - Streamlit
   - ArtifactRegistry
   - CloudRun
+  - Python
+  - 可視化
 category:
-  - Infrastructure
+  - DataEngineering
 thumbnail: /images/2025/20250422a/thumbnail.png
 author: 柴田健太
 lede: "Streamlitは、Pythonを使って簡単にインタラクティブなWebアプリケーションとして共有できるライブラリで多くの採用実績があり、Snowflakeが買収したため今後の発展も期待できます。本記事では、Google CloudのVertex AI Workbenchを活用してStreamlitアプリを開発し、Google Cloud Runにデプロイするまでの手順を詳しく解説します。"

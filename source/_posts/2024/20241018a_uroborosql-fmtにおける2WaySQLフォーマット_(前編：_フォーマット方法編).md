@@ -8,6 +8,7 @@ tag:
   - コアテク
   - uroborosql-fmt
   - 2WaySQL
+  - Rust
 category:
   - Programming
 thumbnail: /images/2024/20241018a/thumbnail.png
@@ -15,7 +16,8 @@ author: 川渕皓太
 lede: "uroborosql-fmtにおいて2WaySQLのフォーマットに対応した方法を説明していきます。"
 ---
 # はじめに
-こんにちは、2024年4月入社の川渕皓太です。
+
+2024年4月入社の川渕皓太です。
 
 先日、当社では新しいSQLフォーマッタである[uroborosql-fmt](https://github.com/future-architect/uroborosql-fmt)をリリースしました。このツールは当社が公開している[PostgreSQL向けのSQLコーディング規約](https://future-architect.github.io/coding-standards/documents/forSQL/SQL%E3%82%B3%E3%83%BC%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E8%A6%8F%E7%B4%84%EF%BC%88PostgreSQL%EF%BC%89.html)に基づいてSQLをフォーマットするものです。
 

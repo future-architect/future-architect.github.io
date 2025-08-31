@@ -7,7 +7,7 @@ tag:
   - IDL
   - Swagger
 category:
-  - Infrastructure
+  - Programming
 thumbnail: /images/2022/20220622b/thumbnail.png
 author: 真野隼記
 lede: "Open APIは2022.6.21時点では3.1.0が最新です。これまでリリースノートすらウォッチしていなかったので気になったことを調べてまとめました。"

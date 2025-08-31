@@ -8,7 +8,7 @@ tag:
   - RISC-V
   - Grayskull e150
 category:
-  - Infrastructure
+  - DataScience
 thumbnail: /images/2024/20240417a/thumbnail.jpg
 author: 山本力世
 lede: "先日リリースされたTenstorrent製のAI推論アクセラレーションボード[Grayskull e150]を早速入手しましたので、そちらの開封をしたいと思います。カナダのトロントに本社がある、知る人ぞ知る、[ジム・ケラー]/AIチップベンダーです。日本法人も昨年に設立されています。"
