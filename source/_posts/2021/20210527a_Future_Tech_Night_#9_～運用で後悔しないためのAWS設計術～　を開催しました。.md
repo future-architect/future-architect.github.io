@@ -9,7 +9,7 @@ tag:
   - 登壇レポート
   - 設計
 category:
-  - Infrastructure
+  - DevOps
 thumbnail: /images/2021/20210527a/thumbnail.png
 author: 村瀬善則
 lede: "こんにちは。TIG村瀬です。2021/4/21を開催しました。私は、運用まで考慮したクラウドアーキテクチャ設計できていますか？というタイトルでお話させていただきました。発表資料は..."

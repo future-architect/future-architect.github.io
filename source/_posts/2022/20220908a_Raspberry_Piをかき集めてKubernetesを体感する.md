@@ -6,7 +6,7 @@ tag:
   - Kubernetes
   - RaspberryPi
 category:
-  - DevOps
+  - IoT
 thumbnail: /images/2022/20220908a/thumbnail.png
 author: 岸下優介
 lede: "業務でGKE（Google Kubernetes Engine）を利用することがあるのですが、Kubernetesの挙動や仕組みなど如何せん理解が難しいです。そこで今回は、自分の手でイチからKubernetesを構築することで勉強しようと思ったのが本記事のモチベーションです。ちょうど自宅にRaspberry Piが3台あったのでRaspberry Piでクラスタを構築していこうと思います。基本的には以下の記事を参考に設定を行っていき、自分の理解を深めるために解説を挟みながら書いていこうと思います。"

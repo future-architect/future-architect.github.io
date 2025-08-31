@@ -5,6 +5,7 @@ postid: a
 tag:
   - アルゴリズム
   - Go
+  - context
 category:
   - Programming
 thumbnail: /images/2021/20210629a/thumbnail.png

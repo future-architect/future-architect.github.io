@@ -7,7 +7,7 @@ tag:
   - GKE
   - "Identity-Aware Proxy"
 category:
-  - DevOps
+  - 認証認可
 thumbnail: /images/2023/20230113a/thumbnail.png
 author: 渡邉光
 lede: "GKE を利用したWebアプリケーションのGoogleアカウント認証について記事を書きます。公式ドキュメントを引用します。IAP を使用すると、HTTPS によってアクセスされるアプリケーションの一元的な承認レイヤを確立できるため、ネットワーク レベルのファイアウォールに頼らずに、アプリケーション レベルのアクセス制御モデルを使用できます。"

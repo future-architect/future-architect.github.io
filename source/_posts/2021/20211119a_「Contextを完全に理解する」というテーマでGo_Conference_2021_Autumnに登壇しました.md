@@ -8,6 +8,7 @@ tag:
   - GoConference
   - 登壇レポート
   - カンファレンス
+  - context
 category:
   - Programming
 thumbnail: /images/2021/20211119a/thumbnail.png

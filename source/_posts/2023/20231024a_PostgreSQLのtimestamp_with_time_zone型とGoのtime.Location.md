@@ -8,6 +8,7 @@ tag:
   - Go
   - jackc/pgx
   - psql
+  - time
 category:
   - Programming
 thumbnail: /images/2023/20231024a/thumbnail.png
@@ -86,7 +87,7 @@ docker-compose up -d
 
 ```sh
 $ PGPASSWORD=pass psql -h localhost -p 5432 -U postgres -c "select current_setting('timezone');"
- current_setting 
+ current_setting
 -----------------
  Asia/Tokyo
 (1 row)
@@ -262,7 +263,7 @@ $ go run .
 0002 2023-10-21T12:04:20Z
 
 # もとに戻す（JSTの場合）
-$ tzutil /s "Tokyo Standard Time" 
+$ tzutil /s "Tokyo Standard Time"
 ```
 
 今度はタイムゾーンをJSTに登録すると2レコードともJSTのタイムゾーンになることが確認できます（Windows側の実行例は割愛します）。
@@ -389,13 +390,13 @@ bisqueさんの[PostgreSQLのTimeZoneを理解する](https://zenn.dev/team_zenn
 
 ```sql
 postgres=# select current_setting('timezone');
- current_setting 
+ current_setting
 -----------------
  Asia/Tokyo
 (1 row)
 
 postgres=# select * from event;
- event_id |           event_at            
+ event_id |           event_at
 ----------+-------------------------------
  0001     | 2023-10-21 21:04:20.445974+09
  0002     | 2023-10-21 21:04:20.445974+09
@@ -404,7 +405,7 @@ postgres=# select * from event;
 postgres=# set timezone to 'UTC';
 SET
 postgres=# select * from event;
- event_id |           event_at            
+ event_id |           event_at
 ----------+-------------------------------
  0001     | 2023-10-21 12:04:20.445974+00
  0002     | 2023-10-21 12:04:20.445974+00
@@ -419,7 +420,7 @@ postgres=# select * from event;
 
 ```sh
 $ PGTZ=UTC PGPASSWORD=pass psql -h localhost -p 5432 -U postgres -c 'select * from event;'
- event_id |           event_at            
+ event_id |           event_at
 ----------+-------------------------------
  0001     | 2023-10-21 12:04:20.445974+00
  0002     | 2023-10-21 12:04:20.445974+00
@@ -448,7 +449,7 @@ $ PGTZ=UTC PGPASSWORD=pass psql -h localhost -p 5432 -U postgres -c 'select * fr
 ```sh
 $ PGPASSWORD=pass psql -h localhost -p 5432 -U postgres \
   -c "select event_id, to_char(event_at, 'YYYY-MM-DD HH24:MI:SS') from event;"
- event_id |       to_char       
+ event_id |       to_char
 ----------+---------------------
  0001     | 2023-10-21 21:04:20
  0002     | 2023-10-21 21:04:20

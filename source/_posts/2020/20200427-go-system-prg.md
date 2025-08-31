@@ -6,6 +6,7 @@ tag:
   - Go
   - 出版
   - 書籍
+  - システムコール
 category:
   - Programming
 thumbnail: /images/2020/20200427/thumbnail.jpeg
