@@ -7,7 +7,7 @@ tag:
   - WebAssembly
   - C#
 category:
-  - Programming
+  - Frontend
 thumbnail: /images/2022/20220412a/thumbnail.png
 author: 清水
 lede: "WebおよびモバイルインターフェースのプロトタイプアプリをBlazor WebAssemblyを用いて開発した経験を通して感じたことなどを簡単に紹介したいと思います。Blazor WebAssemblyとは..."
