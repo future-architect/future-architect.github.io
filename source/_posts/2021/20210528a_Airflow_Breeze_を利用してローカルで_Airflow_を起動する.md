@@ -5,6 +5,8 @@ postid: a
 tag:
   - Airflow
   - OSS
+  - 環境構築
+  - Breeze
 category:
   - Infrastructure
 thumbnail: /images/2021/20210528a/thumbnail.png

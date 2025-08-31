@@ -4,9 +4,9 @@ date: 2020/01/29 10:02:04
 postid: ""
 tag:
   - 会議
-  - マネジメント
   - チーム開発
   - リモートワーク
+  - コミュニケーション
 category:
   - Management
 author: 村田靖拓

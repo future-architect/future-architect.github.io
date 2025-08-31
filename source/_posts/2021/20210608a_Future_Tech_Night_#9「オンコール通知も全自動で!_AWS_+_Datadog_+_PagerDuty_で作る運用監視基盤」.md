@@ -7,7 +7,7 @@ tag:
   - TechNight
   - 保守運用
 category:
-  - Infrastructure
+  - DevOps
 thumbnail: /images/2021/20210608a/thumbnail.png
 author: 木村拓海
 lede: "「オンコール通知も全自動で! AWS + Datadog + PagerDuty で作る運用監視基盤」 というテーマでお話しました。監視 に関連するOSSやSaaSが乱立する昨今、Futureではとある案件で DatadogとPagerDutyをフル活用した運用監視基盤を一から構築しました。運用監視基盤に求められた要件とその設計、システムからDatadog/PagerDutyへの具体的な連携アーキテクチャ、運用してみての嬉しみ/辛み等を惜しみなくお話しました。"

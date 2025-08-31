@@ -4,7 +4,7 @@ date: 2019/09/17 11:00:42
 postid: ""
 tag:
   - 組織論
-  - マネジメント
+  - リーダーシップ
 category:
   - Management
 author: 宮原洋祐

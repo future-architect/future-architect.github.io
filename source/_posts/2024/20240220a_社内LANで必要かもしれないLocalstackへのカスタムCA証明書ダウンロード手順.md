@@ -7,7 +7,7 @@ tag:
   - OpenSSL
   - プロキシ
 category:
-  - Infrastructure
+  - DevOps
 thumbnail: /images/2024/20240220a/thumbnail.png
 author: 真野隼記
 lede: "2023年3月31日にリリースされたLocalStack v2.0.0から、LocalStackのイメージ構成に変更が入りました。"

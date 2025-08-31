@@ -7,6 +7,7 @@ tag:
   - Go
   - メール
   - TOTP
+  - テスト
 category:
   - 認証認可
 thumbnail: /images/2023/20230120a/thumbnail.png

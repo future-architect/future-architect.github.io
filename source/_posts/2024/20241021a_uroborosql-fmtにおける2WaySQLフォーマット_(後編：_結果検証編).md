@@ -5,8 +5,9 @@ postid: a
 tag:
   - uroboroSQL
   - フォーマッター
+  - Rust
 category:
-  - Infrastructure
+  - Programming
 thumbnail: /images/2024/20241021a/thumbnail.png
 author: 齋藤俊哉
 lede: "当社が開発したSQLフォーマッタである[uroboroSQL-fmt] において、フォーマット前のSQLを壊していないかを検証するロジックについて紹介します。"
@@ -17,7 +18,7 @@ mathjax: true
 
 ## はじめに
 
-こんにちは。2024年4月入社の齋藤です。
+2024年4月入社の齋藤です。
 
 当社が開発したSQLフォーマッタである[uroboroSQL-fmt](https://github.com/future-architect/uroborosql-fmt) において、フォーマット前のSQLを壊していないかを検証するロジックについて紹介します。
 
@@ -162,7 +163,7 @@ select
 -- pattern1
 ,   column2 as  pattern
     /*ELIF innerCondB*/
-,   column3 as  column3 -- pattern2 
+,   column3 as  column3 -- pattern2
     /*ELSE*/
 ,   column4 as  column4 -- pattern3
 /*END*/

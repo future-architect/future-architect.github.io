@@ -7,7 +7,7 @@ tag:
   - Go
   - Rego
 category:
-  - Programming
+  - DevOps
 thumbnail: /images/2024/20240703a/thumbnail.png
 author: 関靖秀
 lede: "Open Policy Agentを実際にどうやって判定をリクエストするのかやポリシーの管理方法についてはまとまった情報が少なかったため、こちらにまとめようと思いました。"
@@ -177,7 +177,7 @@ allow if {
 Bundleを作るには、`opa build`コマンドを使います。以下のコマンドで、bundle.tar.gzとしてBundleが生成されます。
 
 ```sh
-opa build -o bundle.tar.gz ./policies 
+opa build -o bundle.tar.gz ./policies
 ```
 
 ## 呼び出し方
@@ -332,7 +332,7 @@ curlコマンドで、HTTP APIを使った判定リクエストをしてみま�
 判定リクエストは以下のように投げます。見て分かる通り、レスポンスとして受け取りたい項目は、HTTP APIのパスとして表現されています。今回の場合、`example` packageの`allow`という項目を受け取りたいので、`/v1/data/example/allow`にアクセスしています。
 
 ```sh
-curl -vX POST -H 'Content-Type: application/json' -d @input-api.json  http://localhost:8181/v1/data/example/allow 
+curl -vX POST -H 'Content-Type: application/json' -d @input-api.json  http://localhost:8181/v1/data/example/allow
 ```
 
 レスポンスは以下のようになります。

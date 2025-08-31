@@ -5,6 +5,8 @@ postid: a
 tag:
   - Go
   - Java
+  - ジェネリクス
+  - イテレータ
 category:
   - Programming
 thumbnail: /images/2025/20250317a/thumbnail.png

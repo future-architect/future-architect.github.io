@@ -6,7 +6,6 @@ tag:
   - Redmine
   - Kibana
   - Elasticsearch
-  - マネジメント
   - 可視化
 category:
   - Management

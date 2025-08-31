@@ -5,10 +5,11 @@ postid: a
 tag:
   - LLM
   - コンテナ
+  - Docker
   - containerd
   - CNCF
 category:
-  - Infrastructure
+  - DevOps
 thumbnail: /images/2025/20250626a/thumbnail.png
 author: 鈴木崇史
 lede: "ECSなどでコンテナの起動を高速化することを目標に、イメージを遅延して読み込むLazy-pullingな技術に目を向け、LLMコンテナに対し効果があるのかどうかを検証していきます。"

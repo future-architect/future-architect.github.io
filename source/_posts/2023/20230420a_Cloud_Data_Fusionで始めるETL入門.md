@@ -7,16 +7,16 @@ tag:
   - GoogleCloud
   - ETL
 category:
-  - Infrastructure
+  - DataEngineering
 thumbnail: /images/2023/20230420a/thumbnail.png
 author: 市川浩暉
-lede: "本日の入門記事は「Cloud Data Fusionで始めるETL入門」ということで、Google CloudでETL/ELTを構築できる「Cloud Data Fusion」を利用して、ETLを作成します。"
+lede: "「Cloud Data Fusionで始めるETL入門」ということで、Google CloudでETL/ELTを構築できる「Cloud Data Fusion」を利用して、ETLを作成します。"
 ---
 <img src="/images/2023/20230420a/image.png" alt="" width="220" height="220" loading="lazy">
 
 ## はじめに
 
-こんにちは、TIG (Technology Innovation Group)の市川です。
+TIG (Technology Innovation Group)の市川です。
 [春の入門祭り](/articles/20230417a/)4日目の記事です。
 
 本日の入門記事は「Cloud Data Fusionで始めるETL入門」ということで、Google CloudでETL/ELTを構築できる「[Cloud Data Fusion](https://cloud.google.com/data-fusion?hl=ja)」を利用して、ETLを作成します。

@@ -5,8 +5,9 @@ postid: a
 tag:
   - 全文検索
   - Meilisearch
+  - スクレイピング
 category:
-  - Programming
+  - Infrastructure
 thumbnail: /images/2024/20240411a/thumbnail.png
 author: 岸本卓也
 lede: "ある静的サイトジェネレーターで生成された膨大なドキュメントの検索において、全文検索機能はあるものの以下の課題を感じることがありました。"
@@ -182,7 +183,7 @@ docs-scraperによってこのインデックスには97,668個のドキュメ�
 
 スクレイピング設定の変更やwebサイトの更新に追従するためなど、インデックスを更新したい場合、上記のdocs-scraper実行を再度行えばよいです。docs-scraperは最初にインデックスを削除&新規作成してからドキュメントを登録していきます。ただ、このようにインデックスを更新するとエンドユーザーに影響があります。インデックスが存在しないタイミングがあったりスクレイピング途中のインデックスが使われてしまうためです。これが問題になる場合、swap indexes APIを使って対策できるようです。Swap indexesは [アトミックに処理される](https://www.meilisearch.com/docs/reference/api/indexes#:~:text=Swapping%20indexes%20is%20an%20atomic%20transaction) そうです。
 
-cf. [Swapping indexes](https://www.meilisearch.com/docs/learn/core_concepts/indexes#swapping-indexes)  
+cf. [Swapping indexes](https://www.meilisearch.com/docs/learn/core_concepts/indexes#swapping-indexes)
 cf. [Zero downtime index deployment](https://blog.meilisearch.com/zero-downtime-index-deployment/)
 
 docs-scraperによって作成される [ドキュメント](https://www.meilisearch.com/docs/learn/core_concepts/documents) の詳細を確認するため、APIでドキュメントを参照してみます (cf. [単一ドキュメントを取得するAPIのリファレンス](https://www.meilisearch.com/docs/reference/api/documents#get-one-document))。docs-scraperによって作成されるインデックスではprimary keyとして `objectID` が設定されています (cf. [単一インデックスの情報を取得するAPIのリファレンス](https://www.meilisearch.com/docs/reference/api/indexes#get-one-index))。
