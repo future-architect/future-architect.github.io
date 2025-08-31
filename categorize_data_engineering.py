@@ -3,9 +3,9 @@ import os
 # --- 設定 ---
 POSTS_DIRECTORY = 'source/_posts'
 # このタグが含まれていたら対象となる
-TARGET_TAG = 'データエンジニアリング'
+TARGET_TAG = 'マネジメント'
 # 上書きする新しいカテゴリ
-NEW_CATEGORY = 'DataEngineering'
+NEW_CATEGORY = 'Management'
 # --- 設定ここまで ---
 
 def replace_category_for_tag(file_path):

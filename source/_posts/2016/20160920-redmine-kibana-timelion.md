@@ -5,7 +5,6 @@ postid: ""
 tag:
   - Kibana
   - Redmine
-  - マネジメント
   - 可視化
   - グラフ
 category:

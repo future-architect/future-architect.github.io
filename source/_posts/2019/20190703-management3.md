@@ -6,7 +6,6 @@ tag:
   - Metabase
   - BI
   - Redmine
-  - マネジメント
   - 可視化
   - グラフ
 category:

@@ -5,7 +5,6 @@ postid: a
 tag:
   - Factorio
   - 生成AI
-  - マネジメント
 category:
   - Management
 thumbnail: /images/2025/20250415a/thumbnail.png
