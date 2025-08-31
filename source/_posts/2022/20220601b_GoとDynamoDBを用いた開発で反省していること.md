@@ -7,7 +7,7 @@ tag:
   - 振り返り
   - 失敗談
 category:
-  - Programming
+  - DB
 thumbnail: /images/2022/20220601b/thumbnail.png
 author: 真野隼記
 lede: "失敗談をテーマにした連載ということで、ちょうどプロダクト開発的に良い区切りのタイミングでもあるため、振り返りがてら、DynamoDB,Go,AWS Lambdaの技術要素について自分自身の理解・見込みの甘さについて反省します。"
