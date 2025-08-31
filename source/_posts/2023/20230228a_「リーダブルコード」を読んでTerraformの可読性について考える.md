@@ -5,7 +5,6 @@ postid: a
 tag:
   - Terraform
   - 書評
-  - 読書
   - 可読性
   - リーダブルコード
 category:
