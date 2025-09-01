@@ -9,7 +9,7 @@ tag:
   - 資格
   - Udemy
 category:
-  - Infrastructure
+  - Security
 thumbnail: /images/2023/20230921a/thumbnail.png
 author: 岸下優介
 lede: "これまで組織全体のGoogle Cloudプロジェクトを包括的に見る業務に携わっており、主にIAMやネットワークを含むGoogle Cloud環境上の治安維持のような仕事を担ってきました。今回はその経験値を測るべくProfessional Cloud Security Engineer認定資格を受けてきました。"
