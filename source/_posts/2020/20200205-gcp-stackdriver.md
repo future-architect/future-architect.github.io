@@ -9,7 +9,7 @@ tag:
   - CloudOperations
   - ログ
 category:
-  - Infrastructure
+  - DevOps
 author: 真野隼記
 lede: "Google Cloudをテーマにした連載企画を始めるということで、初回はStackdriver Loggingの活用方法をまとめます。
 
