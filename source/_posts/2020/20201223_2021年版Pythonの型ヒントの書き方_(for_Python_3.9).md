@@ -4,6 +4,10 @@ date: 2020/12/23 00:00:00
 postid: ""
 tag:
   - Python
+  - Python3.9
+  - PyCharm
+  - VSCode
+  - ジェネリクス
 category:
   - Programming
 thumbnail: /images/2020/20201223/thumbnail.png
