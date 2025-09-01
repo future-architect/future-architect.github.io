@@ -5,9 +5,7 @@ postid: a
 tag:
   - Dapr
   - AIエージェント
-  - Dapr Agents
   - Claude
-  - Claude Code
   - OpenAPI
 category:
   - DataScience
