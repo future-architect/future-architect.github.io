@@ -8,7 +8,7 @@ tag:
   - Go
   - 暗号
 category:
-  - Infrastructure
+  - Security
 author: 市川諒
 lede: "突然ですが、普段生活するうえでカギ🔑をなくした、忘れたことはないでしょうか。私はあります。なくしたことはないけど、うっかり置き忘れちゃうんですよね。
 
