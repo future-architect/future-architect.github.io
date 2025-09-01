@@ -8,7 +8,7 @@ tag:
   - GoogleMap
   - PlusCode
 category:
-  - Infrastructure
+  - Business
 thumbnail: /images/2022/20220726a/thumbnail.png
 author: 真野隼記
 lede: "緯度・経度をコード化する技術に興味があったのでOpen Location Code（Plus Code）について調べました。"
