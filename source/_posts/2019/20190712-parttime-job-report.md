@@ -7,7 +7,7 @@ tag:
   - Go
   - Terraform
 category:
-  - DevOps
+  - Culture
 author: 棚井龍之介
 lede: "アルバイトの視点から見た「Future ってこんな会社なんだ」について紹介いたします。"
 ---
