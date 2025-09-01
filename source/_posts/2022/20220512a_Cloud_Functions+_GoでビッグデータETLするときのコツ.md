@@ -8,7 +8,7 @@ tag:
   - CloudFunctions
   - サーバーレス
 category:
-  - Programming
+  - DataEngineering
 thumbnail: /images/2022/20220512a/thumbnail.png
 author: 鈴木崇史
 lede: "Google Cloud上の大規模なシステムのとあるログがCloud Storageに溜まっており、それらをBigQueryにロードし、分析したい、ということがありました。このログは未加工のままBigQueryに読み込めるフォーマットではなく、いわゆるETL処理が必要でした。運用面を考慮し利用サービスを増やしたくない、ということで使い慣れたCloud Functionsを使うことにしました。"
