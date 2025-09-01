@@ -7,7 +7,7 @@ tag:
   - インターン2020
   - MaaS
 category:
-  - Infrastructure
+  - Culture
 thumbnail: /images/2020/20200921/thumbnail.png
 author: 岡部公亮
 lede: "はじめまして。フューチャーのインターンEngineer Campに参加させていただいた岡部です。今回はタイトルにもある通り、2020年エンジニアキャンプのインターンの内容、学びについてお話しさせていただきます。"
