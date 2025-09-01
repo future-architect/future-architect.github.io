@@ -6,8 +6,8 @@ tag:
   - PostgreSQL
   - AWS
   - Aurora
-  - DB設計
   - ガイドライン
+  - データモデル
 category:
   - DB
 thumbnail: /images/2025/20250530a/thumbnail.png
