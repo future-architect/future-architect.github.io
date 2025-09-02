@@ -6,6 +6,7 @@ tag:
   - GitHub
   - GitHubActions
   - CI/CD
+  - コードレビュー
 category:
   - DevOps
 thumbnail: /images/2025/20250604a/thumbnail.png
