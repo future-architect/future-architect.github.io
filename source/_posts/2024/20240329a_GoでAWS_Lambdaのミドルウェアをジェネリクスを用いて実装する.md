@@ -5,7 +5,7 @@ postid: a
 tag:
   - Go
   - Lambda
-  - Decorator
+  - デザインパターン
   - ジェネリクス
 category:
   - Programming
