@@ -3,8 +3,6 @@ title: "スマートLED（Philips Hue）にFlutterでBLEアクセスしてみた
 date: 2022/04/04 00:00:01
 postid: b
 tag:
-  - Lチカ
-  - BLE
   - Flutter
   - Bluetooth
 category:
