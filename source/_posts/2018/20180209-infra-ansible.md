@@ -6,7 +6,6 @@ tag:
   - Ansible
   - 登壇レポート
   - IaC
-  - DevOps
 category:
   - DevOps
 thumbnail: /images/2018/20180209/thumbnail_20180209.png
