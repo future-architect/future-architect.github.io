@@ -6,7 +6,6 @@ tag:
   - 入門
   - Jenkins
   - CI/CD
-  - やってみた
 category:
   - DevOps
 thumbnail: /images/2024/20240419a/thumbnail.png
