@@ -4,9 +4,8 @@ date: 2022/09/30 00:00:00
 postid: a
 tag:
   - GoogleCloud
-  - 資格
   - 合格記
-  - Google Cloud Professional Machine Learning Engineer
+  - PMLE
   - 機械学習
 category:
   - DataScience
