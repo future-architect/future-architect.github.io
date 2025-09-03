@@ -3,10 +3,9 @@ title: "【合格記】Google Cloud Professional Cloud Security Engineer認定�
 date: 2023/09/21 00:00:00
 postid: a
 tag:
-  - PCSE
   - GoogleCloud
+  - PCSE
   - 合格記
-  - 資格
   - Udemy
 category:
   - Security
