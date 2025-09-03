@@ -7,7 +7,6 @@ tag:
   - AWSGameDay
   - コンテスト
   - 参戦記
-  - DevOps
 category:
   - Infrastructure
 thumbnail: /images/2021/20211111a/thumbnail.png
