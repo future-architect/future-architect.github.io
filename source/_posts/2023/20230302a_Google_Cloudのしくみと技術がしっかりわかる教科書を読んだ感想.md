@@ -6,7 +6,7 @@ tag:
   - 書評
   - GoogleCloud
   - 入門
-  - Google Cloudのしくみと技術がしっかりわかる教科書
+  - BigQuery
 category:
   - Infrastructure
 thumbnail: /images/2023/20230302a/thumbnail.png
