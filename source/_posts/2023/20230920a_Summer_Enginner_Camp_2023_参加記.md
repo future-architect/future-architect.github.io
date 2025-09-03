@@ -3,7 +3,6 @@ title: "Summer Enginner Camp 2023 参加記"
 date: 2023/09/20 00:00:00
 postid: a
 tag:
-  - エンジニア
   - インターン
   - コミュニケーション
   - チーム開発
