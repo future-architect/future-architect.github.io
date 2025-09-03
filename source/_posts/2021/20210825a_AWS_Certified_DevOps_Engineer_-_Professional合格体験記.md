@@ -5,7 +5,6 @@ postid: a
 tag:
   - AWS
   - 合格記
-  - DevOps
 category:
   - DevOps
 thumbnail: /images/2021/20210825a/thumbnail.png
