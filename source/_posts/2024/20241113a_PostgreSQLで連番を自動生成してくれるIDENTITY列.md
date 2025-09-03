@@ -4,6 +4,7 @@ date: 2024/11/13 00:00:00
 postid: a
 tag:
   - PostgreSQL
+  - シーケンス
   - IDENTITY
 category:
   - DB
