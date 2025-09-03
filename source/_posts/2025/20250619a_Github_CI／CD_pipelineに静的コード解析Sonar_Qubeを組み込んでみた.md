@@ -6,7 +6,6 @@ tag:
   - CI/CD
   - SonarQube
   - GitHubActions
-  - DevSecOps
 category:
   - DevOps
 thumbnail: /images/2025/20250619a/thumbnail.png
