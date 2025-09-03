@@ -5,7 +5,6 @@ postid: ""
 tag:
   - Vue.js
   - Vue3
-  - 書籍
   - 書評
   - WEB+DBPRESS
 category:
