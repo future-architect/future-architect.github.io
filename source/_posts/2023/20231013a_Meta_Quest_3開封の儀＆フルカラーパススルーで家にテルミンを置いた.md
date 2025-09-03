@@ -3,8 +3,9 @@ title: "Meta Quest 3開封の儀＆フルカラーパススルーで家にテル
 date: 2023/10/13 00:00:00
 postid: a
 tag:
-  - MetaQuest3
+  - MetaQuest
   - 音楽
+  - テルミン
 category:
   - VR
 thumbnail: /images/2023/20231013a/thumbnail.jpg
