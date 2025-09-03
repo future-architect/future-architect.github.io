@@ -6,6 +6,7 @@ tag:
   - PostgreSQL
   - PostgreSQL17
   - 排他制約
+  - パーティション
 category:
   - DB
 thumbnail: /images/2024/20241106a/thumbnail.png
