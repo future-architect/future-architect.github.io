@@ -6,6 +6,7 @@ tag:
   - React
   - Next.js
   - RSC
+  - サーバーコンポーネント
 category:
   - Frontend
 thumbnail: /images/2023/20231214a/thumbnail.png
