@@ -4,7 +4,7 @@ date: 2020/06/08 10:37:41
 postid: ""
 tag:
   - マイコン
-  - clang
+  - コンパイラ
 category:
   - IoT
 thumbnail: /images/2020/20200608/thumbnail.png
