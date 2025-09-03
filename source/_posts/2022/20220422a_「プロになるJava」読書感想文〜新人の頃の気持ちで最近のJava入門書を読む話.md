@@ -4,8 +4,8 @@ date: 2022/04/22 00:00:00
 postid: a
 tag:
   - Java
-  - 書籍
   - 書評
+  - 入門
 category:
   - Programming
 thumbnail: /images/2022/20220422a/thumbnail.png
