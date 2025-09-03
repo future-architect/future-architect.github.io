@@ -6,7 +6,7 @@ tag:
   - Rundeck
   - IaC
   - 保守運用
-  - クラウドリフト
+  - クラウドマイグレーション
 category:
   - DevOps
 thumbnail: /images/2023/20231025a/thumbnail.png
