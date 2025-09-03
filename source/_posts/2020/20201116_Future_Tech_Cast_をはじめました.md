@@ -3,8 +3,7 @@ title: "Future Tech Cast をはじめました"
 date: 2020/11/16 00:00:00
 postid: ""
 tag:
-  - TechBlog
-  - TechCast
+  - 運営
   - ポッドキャスト
 category:
   - Culture
