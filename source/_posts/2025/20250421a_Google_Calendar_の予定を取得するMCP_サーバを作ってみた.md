@@ -4,7 +4,6 @@ date: 2025/04/21 00:00:00
 postid: a
 tag:
   - MCP
-  - ClaudeDesktop
   - Claude
   - OAuth
   - Googleカレンダー
