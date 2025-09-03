@@ -6,6 +6,7 @@ tag:
   - Terraform
   - インデックス
   - DR
+  - 可用性
   - マルチリージョン
 category:
   - DevOps
