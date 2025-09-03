@@ -5,7 +5,6 @@ postid: a
 tag:
   - Cloudflare Pages
   - Cloudflare
-  - Cloudflare C3
   - Vue.js
 category:
   - Frontend
