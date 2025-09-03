@@ -4,7 +4,7 @@ date: 2024/07/31 00:00:00
 postid: a
 tag:
   - GoogleCloud
-  - 合格機
+  - 合格記
   - PCDE
 category:
   - Infrastructure
