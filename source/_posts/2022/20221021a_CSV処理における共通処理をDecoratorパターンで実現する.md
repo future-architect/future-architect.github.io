@@ -4,7 +4,7 @@ date: 2022/10/21 00:00:00
 postid: a
 tag:
   - Go
-  - Decorator
+  - デザインパターン
   - CSV
   - encoding/csv
 category:
