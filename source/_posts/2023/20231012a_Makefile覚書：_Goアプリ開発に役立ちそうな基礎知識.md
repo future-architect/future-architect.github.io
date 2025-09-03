@@ -7,7 +7,6 @@ tag:
   - Go
   - チーム開発
   - EditorConfig
-  - checkmake
   - dotenv
 category:
   - DevOps
