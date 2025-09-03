@@ -4,8 +4,8 @@ date: 2024/07/31 00:00:00
 postid: a
 tag:
   - GoogleCloud
-  - 資格
-  - Cloud Professional Cloud DevOps Engineer
+  - 合格機
+  - PCDE
 category:
   - Infrastructure
 thumbnail: /images/2024/20240731a/thumbnail.png
