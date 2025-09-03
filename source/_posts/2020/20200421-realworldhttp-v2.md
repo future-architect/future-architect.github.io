@@ -6,7 +6,6 @@ tag:
   - 出版
   - Web
   - HTTP
-  - 書籍
   - O'Reilly
   - RealWorldHTTP
 category:
