@@ -4,9 +4,9 @@ date: 2023/03/02 00:00:00
 postid: a
 tag:
   - 書評
-  - 書籍
   - GoogleCloud
   - 入門
+  - Google Cloudのしくみと技術がしっかりわかる教科書
 category:
   - Infrastructure
 thumbnail: /images/2023/20230302a/thumbnail.png
