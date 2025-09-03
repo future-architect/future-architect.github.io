@@ -5,7 +5,8 @@ postid: a
 tag:
   - GoogleCloud
   - 合格記
-  - Professional Google Workspace Administrator
+  - PGWA
+  - 全冠
 category:
   - Infrastructure
 thumbnail: /images/2024/20240801a/thumbnail.png
