@@ -6,7 +6,6 @@ tag:
   - Kibana
   - Redmine
   - 可視化
-  - グラフ
 category:
   - Management
 thumbnail: /images/2016/20160920/thumbnail_20160920.jpg
