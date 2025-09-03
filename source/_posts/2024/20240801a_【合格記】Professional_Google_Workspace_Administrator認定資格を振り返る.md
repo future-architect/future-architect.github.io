@@ -4,7 +4,7 @@ date: 2024/08/01 00:00:00
 postid: a
 tag:
   - GoogleCloud
-  - 資格
+  - 合格記
   - Professional Google Workspace Administrator
 category:
   - Infrastructure
