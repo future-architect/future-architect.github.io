@@ -8,7 +8,7 @@ tag:
   - JavaScript
   - コアテク
   - 技術選定
-  - グラフ
+  - 階層グラフ
 category:
   - Frontend
 thumbnail: /images/2021/20210303/thumbnail.png
