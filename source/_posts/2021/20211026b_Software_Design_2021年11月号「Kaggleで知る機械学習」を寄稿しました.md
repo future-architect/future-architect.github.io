@@ -7,7 +7,6 @@ tag:
   - 機械学習
   - NLP
   - 画像処理
-  - 書籍
   - 出版
   - SoftwareDesign
 category:
