@@ -3,10 +3,8 @@ title: "Real World HTTPの第3版ができあがりました"
 date: 2024/05/13 00:00:00
 postid: a
 tag:
-  - 書籍
   - RealWorldHTTP
   - 出版
-  - 書籍
   - O'Reilly
   - HTTP
   - Web
