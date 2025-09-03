@@ -3,7 +3,7 @@ title: "Terraform Validatorを使って、GCPのセキュリティポリシー�
 date: 2020/02/13 10:26:28
 postid: ""
 tag:
-  - Google Cloud
+  - GoogleCloud
   - Terraform
   - Policy-as-Code
 category:
