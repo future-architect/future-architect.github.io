@@ -7,7 +7,6 @@ tag:
   - タイムゾーン
   - Go
   - jackc/pgx
-  - psql
   - time
 category:
   - Programming
