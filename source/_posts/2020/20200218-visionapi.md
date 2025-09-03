@@ -3,7 +3,7 @@ title: "初めてのGCP 画像AI(Vision API)をさわってみた"
 date: 2020/02/18 10:16:55
 postid: ""
 tag:
-  - Google Cloud
+  - GoogleCloud
   - 画像処理
 category:
   - DataScience
