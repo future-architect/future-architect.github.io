@@ -6,7 +6,7 @@ tag:
   - LocalStack
   - AWS
   - Lambda
-  - 開発環境
+  - 環境構築
   - Pipenv
 category:
   - Programming
