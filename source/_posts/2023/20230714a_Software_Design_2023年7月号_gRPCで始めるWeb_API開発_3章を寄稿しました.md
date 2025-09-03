@@ -6,7 +6,6 @@ tag:
   - gRPC
   - SoftwareDesign
   - 寄稿
-  - 書籍
   - 出版
 category:
   - Programming
