@@ -5,6 +5,7 @@ postid: a
 tag:
   - TensorFlow
   - NLP
+  - embedding
   - 機械学習
   - TechNight
   - 登壇レポート
