@@ -4,6 +4,7 @@ date: 2022/06/13 00:00:00
 postid: a
 tag:
   - TensorFlow
+  - NLP
   - 機械学習
   - TechNight
   - 登壇レポート
