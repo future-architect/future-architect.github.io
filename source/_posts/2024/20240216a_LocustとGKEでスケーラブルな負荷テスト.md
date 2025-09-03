@@ -3,7 +3,7 @@ title: "LocustとGKEでスケーラブルな負荷テスト"
 date: 2024/02/16 00:00:00
 postid: a
 tag:
-  - GoogleCloudArchitectureCenter
+  - GKE
   - GoogleCloud
   - locust
   - 負荷テスト
