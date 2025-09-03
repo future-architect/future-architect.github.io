@@ -5,7 +5,6 @@ postid: ""
 tag:
   - デザイン思考
   - SPAJAM
-  - SPAJAM2016
   - ハッカソン
 category:
   - IoT
