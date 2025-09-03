@@ -4,6 +4,7 @@ date: 2024/09/20 00:00:00
 postid: a
 tag:
   - Go
+  - text/template
   - OpenSearch
   - DynamoDB
 category:
