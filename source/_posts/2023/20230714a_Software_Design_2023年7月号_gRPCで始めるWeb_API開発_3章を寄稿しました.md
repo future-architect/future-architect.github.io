@@ -5,7 +5,6 @@ postid: a
 tag:
   - gRPC
   - SoftwareDesign
-  - 寄稿
   - 出版
 category:
   - Programming
