@@ -6,6 +6,7 @@ tag:
   - PostgreSQL
   - Oracle
   - DB移行
+  - 実行計画
 category:
   - DB
 author: 岸田聡
