@@ -7,7 +7,6 @@ tag:
   - BI
   - Redmine
   - 可視化
-  - グラフ
 category:
   - Management
 thumbnail: /images/2019/20190703/photo_20190703_01.jpeg
