@@ -6,7 +6,6 @@ tag:
   - Go
   - Decorator
   - CSV
-  - ファイル連携
   - 共通処理
   - encoding/csv
 category:
