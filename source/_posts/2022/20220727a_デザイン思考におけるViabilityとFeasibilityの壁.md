@@ -6,7 +6,6 @@ tag:
   - デザイン思考
   - デザインワーク
   - UI/UX
-  - ビジネス
 category:
   - Business
 thumbnail: /images/2022/20220727a/thumbnail.PNG
