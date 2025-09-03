@@ -6,6 +6,7 @@ tag:
   - Go
   - Lambda
   - Decorator
+  - ジェネリクス
 category:
   - Programming
 thumbnail: /images/2024/20240329a/thumbnail.png
