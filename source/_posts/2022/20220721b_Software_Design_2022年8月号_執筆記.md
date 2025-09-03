@@ -5,7 +5,6 @@ postid: b
 tag:
   - SoftwareDesign
   - OpenAPI
-  - 書籍
   - 出版
 category:
   - Programming
