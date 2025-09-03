@@ -6,7 +6,6 @@ tag:
   - GoogleCloud
   - CloudBuild
   - GitOps
-  - DevOps
   - CI/CD
 category:
   - DevOps
