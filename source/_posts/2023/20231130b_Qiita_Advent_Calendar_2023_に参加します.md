@@ -5,7 +5,6 @@ postid: b
 tag:
   - アドベントカレンダー
   - インデックス
-  - アドベントカレンダー2023
 category:
   - Culture
 thumbnail: /images/2023/20231130b/thumbnail.JPG
