@@ -5,7 +5,7 @@ postid: ""
 tag:
   - Terraform
   - HashiTalks
-  - Google Cloud
+  - GoogleCloud
   - 登壇レポート
 category:
   - DevOps
