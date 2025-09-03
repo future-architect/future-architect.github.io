@@ -5,7 +5,7 @@ postid: a
 tag:
   - SoftwareDesign
   - ドキュメント
-  - 寄稿
+  - 出版
   - Markdown
 category:
   - DevOps
