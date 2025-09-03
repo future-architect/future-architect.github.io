@@ -6,7 +6,6 @@ tag:
   - Go
   - Lambda
   - Decorator
-  - 共通処理
 category:
   - Programming
 thumbnail: /images/2024/20240329a/thumbnail.png
