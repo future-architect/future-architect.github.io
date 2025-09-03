@@ -5,7 +5,6 @@ postid: a
 tag:
   - RISC-V
   - ISA
-  - HW
 category:
   - IoT
 thumbnail: /images/2021/20211202a/thumbnail.jpg
