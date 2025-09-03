@@ -5,7 +5,6 @@ postid: ""
 tag:
   - Go
   - 出版
-  - 書籍
   - システムコール
 category:
   - Programming
