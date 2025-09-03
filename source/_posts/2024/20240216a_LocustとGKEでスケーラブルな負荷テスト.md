@@ -6,7 +6,6 @@ tag:
   - GoogleCloudArchitectureCenter
   - GoogleCloud
   - locust
-  - 性能検証
   - 負荷テスト
 category:
   - Infrastructure
