@@ -5,7 +5,7 @@ postid: a
 tag:
   - SoftwareDesign
   - Go
-  - 寄稿
+  - 出版
   - エラーハンドリング
 category:
   - Programming
