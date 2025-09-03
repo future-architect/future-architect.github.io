@@ -3,7 +3,7 @@ title: "GCP連載#8 gcloud compute sshじゃなくてsshコマンドを使いた
 date: 2020/02/17 10:56:29
 postid: ""
 tag:
-  - Google Cloud
+  - GoogleCloud
   - 踏み台
 category:
   - Infrastructure
