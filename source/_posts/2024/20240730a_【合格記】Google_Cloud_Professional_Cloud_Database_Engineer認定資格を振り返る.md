@@ -4,8 +4,8 @@ date: 2024/07/30 00:00:00
 postid: a
 tag:
   - GoogleCloud
-  - 資格
-  - Cloud Professional Cloud Database Engineer
+  - 合格記
+  - PCDB
 category:
   - DB
 thumbnail: /images/2024/20240730a/thumbnail.png
