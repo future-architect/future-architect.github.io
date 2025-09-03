@@ -6,7 +6,6 @@ tag:
   - PDE
   - GoogleCloud
   - 合格記
-  - 資格
   - Udemy
 category:
   - DataEngineering
