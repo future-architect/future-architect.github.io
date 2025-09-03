@@ -15,7 +15,6 @@ hexo.extend.helper.register('count_tags', function() {
 });
 
 hexo.extend.helper.register('ranking_tags', function() {
-
   const tagPosts = this.site.tags.map(tag => ({tag:tag, posts:tag.posts, count:tag.posts.length, shareCount:totalCount(tag.posts)}));
 
   const compareFunc = (a, b) => (b.shareCount + b.count)/b.count - (a.shareCount + a.count)/a.count;
@@ -67,8 +66,6 @@ function customTagCloudHelper(options) {
   let result = '';
 
   tags.forEach(tag => {
-    // ▼▼▼ フォントサイズ計算ロジックの変更箇所 ▼▼▼
-
     // 1. 基本となる線形の比率(0.0 〜 1.0)を算出
     const ratio = spread === 0 ? 0.5 : (tag.length - minSize) / spread;
 
@@ -78,8 +75,6 @@ function customTagCloudHelper(options) {
 
     // 3. 調整後の比率を元にフォントサイズを決定
     const fontSize = minFont + (maxFont - minFont) * adjustedRatio;
-
-    // ▲▲▲ ここまで ▲▲▲
 
     const tagName = tag.name.replace(/ /g, '-');
     const tagLink = hexo.url_for(tag.path);
