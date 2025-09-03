@@ -4,7 +4,7 @@ date: 2024/12/27 00:00:00
 postid: a
 tag:
   - SoftwareDesign
-  - 寄稿
+  - 出版
   - CDN
   - Web
   - テクニカルライティング
