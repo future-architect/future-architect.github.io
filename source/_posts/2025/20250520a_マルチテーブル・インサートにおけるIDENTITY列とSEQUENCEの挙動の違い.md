@@ -5,6 +5,7 @@ postid: a
 tag:
   - Oracle
   - SQL
+  - IDENTITY
   - シーケンス
 category:
   - DB
