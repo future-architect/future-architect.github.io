@@ -6,6 +6,8 @@ tag:
   - SQL
   - データモデル
   - アルゴリズム
+  - 実行計画
+  - データ構造
 category:
   - DB
 author: 杉江伸祐
