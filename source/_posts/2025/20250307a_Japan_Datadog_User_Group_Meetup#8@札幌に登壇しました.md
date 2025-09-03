@@ -6,7 +6,6 @@ tag:
   - 登壇レポート
   - Datadog
   - 北海道
-  - 札幌
   - Japan Datadog User Group Meetup
 category:
   - DevOps
