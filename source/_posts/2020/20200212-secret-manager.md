@@ -3,7 +3,7 @@ title: "【もう鍵なくさない】GCPのSecret ManagerとBerglasで幸せに
 date: 2020/02/12 09:14:36
 postid: ""
 tag:
-  - Google Cloud
+  - GoogleCloud
   - Python
   - Go
   - 暗号
