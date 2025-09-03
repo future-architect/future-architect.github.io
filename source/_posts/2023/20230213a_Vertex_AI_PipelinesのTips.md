@@ -6,7 +6,6 @@ tag:
   - VertexAI
   - GoogleCloud
   - MLOps
-  - ナレッジ
   - Tips
 category:
   - DataScience
