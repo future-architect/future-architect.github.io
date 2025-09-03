@@ -76,7 +76,12 @@ function customTagCloudHelper(options) {
     // 3. 調整後の比率を元にフォントサイズを決定
     const fontSize = minFont + (maxFont - minFont) * adjustedRatio;
 
-    const tagName = tag.name.replace(/ /g, '-');
+    let tagName = tag.name;
+    if (tag.length === 1) {
+      tagName += '*'; // 記事数が1なら「*」を追記
+    }
+
+    tagName = tagName.replace(/ /g, '-');
     const tagLink = hexo.url_for(tag.path);
 
     result += `<a href="${tagLink}" style="font-size: ${fontSize.toFixed(2)}${fontUnit};">${tagName}</a>\n`;
