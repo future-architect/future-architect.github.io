@@ -5,7 +5,6 @@ postid: b
 tag:
   - Swift
   - try!Swift
-  - try!Swift2025
   - iOS
   - Xcode
   - 参加レポート
