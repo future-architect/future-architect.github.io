@@ -3,7 +3,7 @@ title: "Stackdriver Loggingへ良い感じのログ出力方法を考える"
 date: 2020/02/05 09:23:10
 postid: ""
 tag:
-  - Google Cloud
+  - GoogleCloud
   - OpenCensus
   - Go
   - CloudOperations
