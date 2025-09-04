@@ -4,10 +4,7 @@ date: 2025/05/27 00:00:01
 postid: b
 tag:
   - MAUI
-  - .NET
-  - Azure Storage
   - iOS
-  - UniversalLinks
   - FutureOne
 category:
   - Mobile
