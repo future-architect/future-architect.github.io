@@ -6,7 +6,6 @@ tag:
   - PostgreSQL
   - 全文検索
   - Go
-  - Prisma
   - kagome
 category:
   - DB
