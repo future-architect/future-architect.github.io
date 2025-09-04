@@ -6,7 +6,6 @@ tag:
   - Oracle
   - SQL
   - IDENTITY
-  - シーケンス
 category:
   - DB
 thumbnail: /images/2025/20250520a/thumbnail.png
