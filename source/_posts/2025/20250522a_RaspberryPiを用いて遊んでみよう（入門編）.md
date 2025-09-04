@@ -5,7 +5,7 @@ postid: a
 tag:
   - RaspberryPi
   - RaspberryPiPicoW
-  - 障害物検知
+  - センサー
   - MicroPython
 category:
   - IoT
