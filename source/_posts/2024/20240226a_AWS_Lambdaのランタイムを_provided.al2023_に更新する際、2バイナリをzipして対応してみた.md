@@ -7,6 +7,7 @@ tag:
   - AWS
   - Makefile
   - バージョンアップ
+  - リリース
 category:
   - DevOps
 thumbnail: /images/2024/20240226a/thumbnail.png
