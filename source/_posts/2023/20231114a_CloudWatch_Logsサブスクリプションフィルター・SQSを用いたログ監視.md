@@ -4,7 +4,7 @@ date: 2023/11/14 00:00:00
 postid: a
 tag:
   - ログ
-  - 監視
+  - 保守運用
   - AWS
   - CloudWatch
   - SQS
