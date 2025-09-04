@@ -3,7 +3,7 @@ title: "FUTURE INSIGHT SEMINARを開催します"
 date: 2021/02/27 00:00:00
 postid: ""
 tag:
-  - セミナー
+  - 最適化
   - コンサルティング
 category:
   - Culture
