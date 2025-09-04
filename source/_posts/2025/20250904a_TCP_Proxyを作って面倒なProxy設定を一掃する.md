@@ -17,6 +17,8 @@ lede: "セキュリティ上の理由などで、どうしてもProxyを使わ�
 
 <img src="/images/2025/20250904a/top.jpg" alt="" width="1024" height="1024">
 
+[夏の自由研究2025](/articles/20250825a/)ブログ連載の8日目です。
+
 # はじめに
 
 Technology Innovation Groupの神崎です。
