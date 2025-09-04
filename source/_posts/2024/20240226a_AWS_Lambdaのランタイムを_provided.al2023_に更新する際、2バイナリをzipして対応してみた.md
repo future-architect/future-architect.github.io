@@ -6,6 +6,7 @@ tag:
   - lambda
   - AWS
   - Makefile
+  - バージョンアップ
 category:
   - DevOps
 thumbnail: /images/2024/20240226a/thumbnail.png
