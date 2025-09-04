@@ -6,7 +6,6 @@ tag:
   - Linter
   - MegaLinter
   - Markdownlint
-  - Rivive
   - GitHubActions
   - 外部寄稿
 category:
