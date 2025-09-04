@@ -5,10 +5,7 @@ postid: a
 tag:
   - Mac
   - 環境構築
-  - iTerm2
-  - Colors
-  - Raycast
-  - Arc
+  - キーバインド
 category:
   - DevOps
 thumbnail: /images/2025/20250225a/thumbnail.png
