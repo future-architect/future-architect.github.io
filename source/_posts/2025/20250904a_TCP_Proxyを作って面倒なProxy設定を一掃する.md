@@ -1,5 +1,5 @@
 ---
-title: "TCP Proxyを作って面倒なProxy設定を一掃する"
+title: "TCP Proxyを作って面倒なProxy設定を一掃する ～Rust製moproxyとnftablesによる透過プロキシ設定～"
 date: 2025/09/04 00:00:00
 postid: a
 tag:
