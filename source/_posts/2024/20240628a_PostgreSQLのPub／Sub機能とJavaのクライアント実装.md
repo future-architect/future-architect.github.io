@@ -4,7 +4,6 @@ date: 2024/06/28 00:00:00
 postid: a
 tag:
   - PostgreSQL
-  - R2DBC
   - JDBC
   - Java
 category:
