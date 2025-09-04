@@ -6,7 +6,6 @@ tag:
   - テスト
   - SMTP
   - メール
-  - go-smtp-mock
   - Go
   - モック
 category:
