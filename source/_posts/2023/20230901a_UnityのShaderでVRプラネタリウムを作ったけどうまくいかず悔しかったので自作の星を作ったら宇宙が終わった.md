@@ -5,7 +5,7 @@ postid: a
 tag:
   - Unity
   - Shader
-  - プラネタリウム
+  - 宇宙
 category:
   - VR
 thumbnail: /images/2023/20230901a/thumbnail.png
