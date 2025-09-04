@@ -51,7 +51,37 @@ function customTagCloudHelper(options) {
     return '';
   }
 
-  // 全てのタグの完全な情報をMapに保存し、信頼できるデータソースとする
+  // 「***」を付与するタグを事前に計算する
+  // 1. タグを「紐づく記事IDの集合」でグループ化するためのMap
+  const postSetToTagsMap = new Map();
+
+  site.tags.forEach(tag => {
+    // 記事が2未満のタグは今回の条件に関係ないので除外
+    if (tag.length < 2) {
+      return;
+    }
+    // 記事のIDをソートして、一意のキーを作成 (例: "id1,id2,id3")
+    const postIds = tag.posts.map(post => post._id).sort();
+    const key = postIds.join(',');
+
+    if (!postSetToTagsMap.has(key)) {
+      postSetToTagsMap.set(key, []);
+    }
+    postSetToTagsMap.get(key).push(tag.name);
+  });
+
+  // 2. 条件に合う「完全に一致する」タグの集合（Set）を作成
+  const matchedTagSet = new Set();
+  postSetToTagsMap.forEach((tagGroup, postSetKey) => {
+    // 記事リストが完全に一致するタグが2つ以上あるグループのみが対象
+    if (tagGroup.length >= 2) {
+      tagGroup.forEach(tagName => {
+        matchedTagSet.add(tagName);
+      });
+    }
+  });
+
+  // 全てのタグの完全な情報をMapに保存（「**」の判定で使用）
   const tagDataMap = new Map();
   site.tags.forEach(t => {
     tagDataMap.set(t.name, t);
@@ -80,13 +110,15 @@ function customTagCloudHelper(options) {
     let tagName = tag.name;
     let suffix = '';
 
-    // suffix（* または **）を決定するロジック
-    if (tag.length === 1) {
-      // 記事数が1つのタグは「*」を付ける
+    // 3. メインループでsuffixを付与
+    //    「***」の条件を最優先でチェック
+    if (matchedTagSet.has(tag.name)) {
+      suffix = '***';
+    }
+    // それ以外のタグで、記事数が1つの場合は「*」または「**」の判定
+    else if (tag.length === 1) {
       suffix = '*';
       const singlePost = tag.posts.first();
-
-      // その記事に紐づく他のタグが、1つでも他の記事に紐づかないタグの場合、「**」を付与する
       const otherTags = singlePost.tags.filter(t => t.name !== tag.name);
       if (otherTags.length > 0 && otherTags.some(otherTag => {
         const fullTagInfo = tagDataMap.get(otherTag.name);
@@ -97,7 +129,6 @@ function customTagCloudHelper(options) {
     }
 
     tagName += suffix;
-
     tagName = tagName.replace(/ /g, '-');
     const tagLink = hexo.url_for(tag.path);
 
