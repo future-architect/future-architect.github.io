@@ -4,7 +4,6 @@ date: 2023/09/06 00:00:00
 postid: a
 tag:
   - ChatGPT
-  - SemanticSearch
   - embedding
   - SentenceTransformers
   - AI
