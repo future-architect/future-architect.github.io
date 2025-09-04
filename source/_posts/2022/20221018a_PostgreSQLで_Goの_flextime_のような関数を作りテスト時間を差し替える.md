@@ -4,7 +4,6 @@ date: 2022/10/18 00:00:00
 postid: a
 tag:
   - PostgreSQL
-  - flextime
   - テスト
   - トリガー
   - モック
