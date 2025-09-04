@@ -7,8 +7,7 @@ tag:
   - TechNight
   - AWS
   - CodePipeline
-  - ECS
-  - BlueGreenDeployment
+  - リリース
 category:
   - DevOps
 thumbnail: /images/2022/20220314a/thumbnail.png
