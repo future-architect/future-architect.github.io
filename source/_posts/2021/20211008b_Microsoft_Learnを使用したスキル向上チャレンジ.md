@@ -3,8 +3,6 @@ title: "Microsoft Learnを使用したスキル向上チャレンジ"
 date: 2021/10/08 00:00:01
 postid: b
 tag:
-  - Microsoft
-  - MicrosoftLearn
   - Azure
   - スキルアップ
   - クラウドスキルチャレンジ
