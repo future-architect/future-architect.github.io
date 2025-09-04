@@ -6,6 +6,7 @@ tag:
   - Vue.js
   - Node.js
   - ESLint
+  - EditorConfig
 category:
   - Frontend
 thumbnail: /images/2021/20210616a/thumbnail.png
