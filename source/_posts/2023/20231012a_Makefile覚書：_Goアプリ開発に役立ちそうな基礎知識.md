@@ -7,7 +7,6 @@ tag:
   - Go
   - チーム開発
   - EditorConfig
-  - dotenv
 category:
   - DevOps
 thumbnail: /images/2023/20231012a/thumbnail.png
