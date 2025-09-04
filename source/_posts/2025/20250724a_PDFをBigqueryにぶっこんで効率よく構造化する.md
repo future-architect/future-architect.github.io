@@ -7,7 +7,6 @@ tag:
   - BigQuery
   - GoogleCloud
   - PDF
-  - BigQueryML
 category:
   - DataScience
 thumbnail: /images/2025/20250724a/thumbnail.png
