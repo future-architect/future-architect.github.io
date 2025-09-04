@@ -6,6 +6,7 @@ tag:
   - デザイン思考
   - SPAJAM
   - ハッカソン
+  - アイデアソン
 category:
   - IoT
 thumbnail: /images/2016/20160420/thumbnail_20160420.jpg
