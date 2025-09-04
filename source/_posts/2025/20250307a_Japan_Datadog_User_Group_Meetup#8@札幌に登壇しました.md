@@ -5,8 +5,7 @@ postid: a
 tag:
   - 登壇レポート
   - Datadog
-  - 北海道
-  - Japan Datadog User Group Meetup
+  - JDDUG
 category:
   - DevOps
 thumbnail: /images/2025/20250307a/thumbnail.png
