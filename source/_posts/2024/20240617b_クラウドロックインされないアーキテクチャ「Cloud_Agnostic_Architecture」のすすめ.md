@@ -7,7 +7,6 @@ tag:
   - GoogleCloud
   - アーキテクチャ
   - ロックイン
-  - CSP
 category:
   - Infrastructure
 thumbnail: /images/2024/20240617b/thumbnail.png
