@@ -5,7 +5,6 @@ postid: b
 tag:
   - CNCF
   - Notary
-  - notation
   - コンテナ
 category:
   - Security
