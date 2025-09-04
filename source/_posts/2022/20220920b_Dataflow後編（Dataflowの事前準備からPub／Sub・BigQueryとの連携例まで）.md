@@ -5,7 +5,6 @@ postid: b
 tag:
   - Dataflow
   - GoogleCloud
-  - ApacheBeam
   - インターン
   - インターン2022
   - BigQuery
