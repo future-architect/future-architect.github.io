@@ -8,7 +8,6 @@ tag:
   - Mac
   - ショートカット
   - 環境構築
-  - AutoHotKey
 category:
   - DevOps
 thumbnail: /images/2023/20230216a/thumbnail.png
