@@ -6,7 +6,7 @@ tag:
   - AI監視
   - MLOps
   - Evidently AI
-  - Vertex AI Model Monitoring
+  - VertexAI
 category:
   - DataScience
 thumbnail: /images/2023/20230413a/thumbnail.png
