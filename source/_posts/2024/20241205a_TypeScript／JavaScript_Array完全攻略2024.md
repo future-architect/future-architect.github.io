@@ -5,6 +5,7 @@ postid: a
 tag:
   - TypeScript
   - JavaSCript
+  - ECMAScript
 category:
   - Frontend
 thumbnail: /images/2024/20241205a/thumbnail.png
