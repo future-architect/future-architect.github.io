@@ -4,8 +4,7 @@ date: 2025/05/12 00:00:01
 postid: b
 tag:
   - MLOps
-  - AzureDataFactory
-  - Purview
+  - RAG
   - AISearch
   - インターン
   - インターン2024
