@@ -8,7 +8,6 @@ tag:
   - Mac
   - キーバインド
   - VSCode
-  - AutoHotKey
 category:
   - DevOps
 thumbnail: /images/2025/20250521a/thumbnail.png
