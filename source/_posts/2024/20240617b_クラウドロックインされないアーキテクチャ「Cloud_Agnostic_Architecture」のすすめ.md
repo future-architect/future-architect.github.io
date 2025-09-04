@@ -6,7 +6,7 @@ tag:
   - AWS
   - GoogleCloud
   - アーキテクチャ
-  - ロックイン
+  - ベンダーロックイン
 category:
   - Infrastructure
 thumbnail: /images/2024/20240617b/thumbnail.png
