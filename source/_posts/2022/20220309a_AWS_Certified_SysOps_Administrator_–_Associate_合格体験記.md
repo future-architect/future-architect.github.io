@@ -4,7 +4,7 @@ date: 2022/03/09 00:00:00
 postid: a
 tag:
   - AWS
-  - SysOpsアドミニストレーター
+  - SOA
   - 合格記
 category:
   - Infrastructure
