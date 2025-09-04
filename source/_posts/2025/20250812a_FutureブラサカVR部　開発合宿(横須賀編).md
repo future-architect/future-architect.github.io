@@ -6,7 +6,6 @@ tag:
   - Unity
   - 開発合宿
   - ブラインドサッカー
-  - スポーツ×IT
 category:
   - VR
 thumbnail: /images/2025/20250812a/thumbnail.jpg
