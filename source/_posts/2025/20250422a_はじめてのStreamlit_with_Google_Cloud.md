@@ -5,7 +5,6 @@ postid: a
 tag:
   - GoogleCloud
   - Streamlit
-  - ArtifactRegistry
   - CloudRun
   - Python
   - 可視化
