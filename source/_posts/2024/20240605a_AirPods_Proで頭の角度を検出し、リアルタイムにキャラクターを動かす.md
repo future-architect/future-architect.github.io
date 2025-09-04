@@ -5,8 +5,7 @@ postid: a
 tag:
   - Swift
   - SwiftUI
-  - CoreMotion
-  - HeadTracking
+  - Apple
   - AirPodsPro
   - iOS
 category:
