@@ -5,7 +5,6 @@ postid: a
 tag:
   - CUDA
   - GPGPU
-  - cuDNN
   - DeepLearning
 category:
   - DataScience
