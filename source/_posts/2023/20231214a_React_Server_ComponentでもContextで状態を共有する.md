@@ -5,7 +5,6 @@ postid: a
 tag:
   - React
   - Next.js
-  - RSC
   - サーバーコンポーネント
 category:
   - Frontend
