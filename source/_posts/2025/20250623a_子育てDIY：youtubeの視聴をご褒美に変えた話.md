@@ -3,7 +3,7 @@ title: "子育てDIY：YouTubeの視聴をご褒美に変えた話"
 date: 2025/06/23 00:00:00
 postid: a
 tag:
-  - Squid
+  - プロキシ
   - Network
   - YouTube
   - 育児
