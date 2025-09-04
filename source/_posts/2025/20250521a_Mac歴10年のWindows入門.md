@@ -7,11 +7,8 @@ tag:
   - 環境構築
   - Mac
   - キーバインド
-  - Clibor
   - VSCode
-  - Power Toys
-  - CubeICE
-  - ULE4JIS
+  - AutoHotKey
 category:
   - DevOps
 thumbnail: /images/2025/20250521a/thumbnail.png
