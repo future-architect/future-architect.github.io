@@ -3,7 +3,7 @@ title: "Cloudflare R2 + NextCloudで作る自分専用クラウドストレー�
 date: 2024/06/03 00:00:00
 postid: a
 tag:
-  - CloudflareR2
+  - S3
   - Cloudflare
   - NextCloud
 category:
