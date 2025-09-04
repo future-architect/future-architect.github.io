@@ -51,12 +51,18 @@ function customTagCloudHelper(options) {
     return '';
   }
 
+  // 全てのタグの完全な情報をMapに保存し、信頼できるデータソースとする
+  const tagDataMap = new Map();
+  site.tags.forEach(t => {
+    tagDataMap.set(t.name, t);
+  });
+
   // オプションのデフォルト値を設定
   options = options || {};
   const minFont = options.min_font || 12;
   const maxFont = options.max_font || 26;
   const fontUnit = options.font_unit || 'px';
-  const boostRatio = options.boost_ratio || 0.7; // 上昇ペースのオプション
+  const boostRatio = options.boost_ratio || 0.7;
 
   const sizes = tags.map(tag => tag.length);
   const maxSize = Math.max(...sizes) || 1;
@@ -66,20 +72,31 @@ function customTagCloudHelper(options) {
   let result = '';
 
   tags.forEach(tag => {
-    // 1. 基本となる線形の比率(0.0 〜 1.0)を算出
+    // フォントサイズの計算
     const ratio = spread === 0 ? 0.5 : (tag.length - minSize) / spread;
-
-    // 2. 比率を累乗して上昇ペースを調整 (boostRatio乗する)
-    //    boostRatioが 0.5 の場合、平方根と同じ効果になり、序盤の上昇が急になります。
     const adjustedRatio = Math.pow(ratio, boostRatio);
-
-    // 3. 調整後の比率を元にフォントサイズを決定
     const fontSize = minFont + (maxFont - minFont) * adjustedRatio;
 
     let tagName = tag.name;
+    let suffix = '';
+
+    // suffix（* または **）を決定するロジック
     if (tag.length === 1) {
-      tagName += '*'; // 記事数が1なら「*」を追記
+      // 記事数が1つのタグは「*」を付ける
+      suffix = '*';
+      const singlePost = tag.posts.first();
+
+      // その記事に紐づく他のタグが、1つでも他の記事に紐づかないタグの場合、「**」を付与する
+      const otherTags = singlePost.tags.filter(t => t.name !== tag.name);
+      if (otherTags.length > 0 && otherTags.some(otherTag => {
+        const fullTagInfo = tagDataMap.get(otherTag.name);
+        return fullTagInfo && fullTagInfo.length === 1;
+      })) {
+        suffix = '**';
+      }
     }
+
+    tagName += suffix;
 
     tagName = tagName.replace(/ /g, '-');
     const tagLink = hexo.url_for(tag.path);
