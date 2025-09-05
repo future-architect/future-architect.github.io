@@ -5,7 +5,6 @@ postid: a
 tag:
   - MLOps
   - MLflow
-  - Optuna
   - Python
 category:
   - DataScience
