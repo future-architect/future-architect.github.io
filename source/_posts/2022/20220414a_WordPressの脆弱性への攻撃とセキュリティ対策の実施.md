@@ -3,7 +3,6 @@ title: "WordPressの脆弱性への攻撃とセキュリティ対策の実施"
 date: 2022/04/14 00:00:00
 postid: a
 tag:
-  - WordPress
   - 脆弱性
   - Vuls
   - FutureVuls
