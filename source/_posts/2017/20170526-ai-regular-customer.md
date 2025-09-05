@@ -5,8 +5,7 @@ postid: ""
 tag:
   - Python
   - 機械学習
-  - DeepLearning
-  - データ分析
+  - AI
   - 顔認証
   - OpenCV
 category:
