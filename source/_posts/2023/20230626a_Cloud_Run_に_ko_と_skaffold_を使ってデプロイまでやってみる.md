@@ -3,12 +3,11 @@ title: "Cloud Run に ko と skaffold を使ってデプロイまでやってみ
 date: 2023/06/26 00:00:00
 postid: a
 tag:
+  - GoogleCloud
   - CloudRun
-  - CloudDeploy
   - Knative
   - skaffold
   - ko
-  - GoogleCloud
   - CNCF
 category:
   - DevOps
