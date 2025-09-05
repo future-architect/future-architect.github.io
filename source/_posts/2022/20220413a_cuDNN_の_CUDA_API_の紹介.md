@@ -3,7 +3,6 @@ title: "cuDNN の CUDA API の紹介"
 date: 2022/04/13 00:00:00
 postid: a
 tag:
-  - CUDA
   - GPGPU
   - DeepLearning
 category:
