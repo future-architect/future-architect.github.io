@@ -6,7 +6,6 @@ tag:
   - VSCode
   - フォーマッター
   - コアテク
-  - uroborosql-fmt
   - 2WaySQL
   - Rust
 category:
