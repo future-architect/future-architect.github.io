@@ -4,7 +4,7 @@ date: 2025/04/03 00:00:00
 postid: a
 tag:
   - Terraform
-  - プロビジョニング
+  - 初心者向け
   - AWS
   - Ansible
   - 用語解説
