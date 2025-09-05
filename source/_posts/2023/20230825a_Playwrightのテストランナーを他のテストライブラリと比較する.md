@@ -5,13 +5,11 @@ postid: a
 tag:
   - Playwright
   - TDD
-  - BDD
   - テスト
   - Java
   - Ruby
   - TypeScript
   - Jest
-  - Mocha
 category:
   - Frontend
 thumbnail: /images/2023/20230825a/thumbnail.png
