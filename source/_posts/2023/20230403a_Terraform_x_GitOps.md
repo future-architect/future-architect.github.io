@@ -1,14 +1,11 @@
 ---
-title: "Terraform x GitOps"
+title: "Terraform x GitOps についての調査"
 date: 2023/04/03 00:00:00
 postid: a
 tag:
   - Terraform
   - GitOps
   - GitHubActions
-  - PipeCD
-  - TerraformCloud
-  - Atlantis
   - CI/CD
 category:
   - DevOps
