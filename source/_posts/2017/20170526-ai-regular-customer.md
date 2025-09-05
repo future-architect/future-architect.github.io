@@ -8,6 +8,7 @@ tag:
   - DeepLearning
   - データ分析
   - 顔認証
+  - OpenCV
 category:
   - DataScience
 author: 小池優希
