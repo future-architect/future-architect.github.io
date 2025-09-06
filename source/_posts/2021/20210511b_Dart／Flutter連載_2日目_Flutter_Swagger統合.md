@@ -6,6 +6,7 @@ tag:
   - Flutter
   - Dart
   - OpenAPI
+  - OpenAPIGenerator
   - Swagger
 category:
   - Mobile
