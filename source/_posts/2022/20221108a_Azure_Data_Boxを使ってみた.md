@@ -4,7 +4,6 @@ date: 2022/11/08 00:00:00
 postid: a
 tag:
   - Azure
-  - DataBox
   - データ移行
   - クラウドマイグレーション
 category:
