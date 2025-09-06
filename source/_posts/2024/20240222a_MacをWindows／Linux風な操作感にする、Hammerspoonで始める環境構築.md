@@ -3,7 +3,7 @@ title: "MacをWindows/Linux風な操作感にする、Hammerspoonで始める環
 date: 2024/02/22 00:00:00
 postid: a
 tag:
-  - Hammerspoon
+  - キーバインド
   - Mac
   - ショートカット
   - 環境構築
