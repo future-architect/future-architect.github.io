@@ -8,6 +8,7 @@ tag:
   - OIDC
   - Go
   - OpenSSL
+  - OpenAPIGenerator
 category:
   - 認証認可
 thumbnail: /images/2024/20240829a/thumbnail.png
