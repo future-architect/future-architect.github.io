@@ -5,7 +5,6 @@ postid: ""
 tag:
   - Ruby
   - Selenium
-  - SORACOM
 category:
   - IoT
 thumbnail: /images/2019/20191201/thumbnail.png
