@@ -4,7 +4,6 @@ date: 2025/08/28 00:00:00
 postid: a
 tag:
   - dbt
-  - dbt-fusion-engine
 category:
   - DataEngineering
 thumbnail: /images/2025/20250828a/thumbnail.png
