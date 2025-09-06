@@ -4,9 +4,8 @@ date: 2021/04/20 00:00:00
 postid: b
 tag:
   - Git
-  - IntelliJ
   - VSCode
-  - SourceTree
+  - Gitクライアント
 category:
   - DevOps
 thumbnail: /images/2021/20210420b/thumbnail.png
