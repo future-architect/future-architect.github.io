@@ -7,7 +7,6 @@ tag:
   - AI
   - 生成AI
   - Googleカレンダー
-  - タスク管理
 category:
   - DataScience
 thumbnail: /images/2025/20250728a/thumbnail.png
