@@ -6,6 +6,7 @@ tag:
   - Git
   - VSCode
   - Gitクライアント
+  - 便利ツール
 category:
   - DevOps
 thumbnail: /images/2021/20210420b/thumbnail.png
