@@ -4,7 +4,7 @@ date: 2022/03/29 00:00:00
 postid: a
 tag:
   - Flutter
-  - Riverpod
+  - 状態管理
 category:
   - Mobile
 thumbnail: /images/2022/20220329a/thumbnail.gif
