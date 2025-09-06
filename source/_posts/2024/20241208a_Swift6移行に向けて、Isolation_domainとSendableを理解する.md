@@ -5,7 +5,6 @@ postid: a
 tag:
   - iOS
   - Swift
-  - Swift6
 category:
   - Mobile
 thumbnail: /images/2024/20241208a/thumbnail.png
