@@ -5,7 +5,6 @@ postid: a
 tag:
   - Go
   - Python
-  - SESAME3
   - RaspberryPi
 category:
   - IoT
