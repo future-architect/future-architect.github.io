@@ -4,7 +4,6 @@ date: 2022/05/10 00:00:00
 postid: a
 tag:
   - Lambda
-  - LambdaFunctionURLs
   - Go
   - サーバーレス
   - タイムアウト
