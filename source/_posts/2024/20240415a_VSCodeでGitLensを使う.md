@@ -7,6 +7,7 @@ tag:
   - Git
   - Gitクライアント
   - コードリーディング
+  - 便利ツール
 category:
   - DevOps
 thumbnail: /images/2024/20240415a/thumbnail.png
