@@ -8,6 +8,7 @@ tag:
   - HTTP
   - トラブルシュート
   - CORS
+  - WAF
 category:
   - Infrastructure
 thumbnail: /images/2020/20200717/thumbnail.png
