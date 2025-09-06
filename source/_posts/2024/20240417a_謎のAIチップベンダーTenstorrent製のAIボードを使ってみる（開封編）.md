@@ -3,10 +3,8 @@ title: "謎のAIチップベンダーTenstorrent製のAIボードを使ってみ
 date: 2024/04/17 00:00:00
 postid: a
 tag:
-  - Tenstorrent
   - AI
   - RISC-V
-  - Grayskull e150
 category:
   - DataScience
 thumbnail: /images/2024/20240417a/thumbnail.jpg
