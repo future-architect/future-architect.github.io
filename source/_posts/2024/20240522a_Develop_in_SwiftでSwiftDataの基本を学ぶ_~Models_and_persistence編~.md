@@ -5,7 +5,6 @@ postid: a
 tag:
   - Swift
   - SwiftUI
-  - SwiftData
 category:
   - Mobile
 thumbnail: /images/2024/20240522a/thumbnail.png
