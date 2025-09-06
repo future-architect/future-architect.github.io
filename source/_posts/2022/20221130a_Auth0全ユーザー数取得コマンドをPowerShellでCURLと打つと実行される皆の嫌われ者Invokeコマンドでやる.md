@@ -5,8 +5,8 @@ postid: a
 tag:
   - Auth0
   - curl
+  - Windows
   - PowerShell
-  - Invoke-Request
 category:
   - 認証認可
 thumbnail: /images/2022/20221130a/thumbnail.png
