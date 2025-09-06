@@ -3,7 +3,7 @@ title: "フィーチャーフラグを管理するためのOpenFeature"
 date: 2023/06/21 00:00:00
 postid: a
 tag:
-  - OpenFeature
+  - リリース
   - CNCF
   - フィーチャーフラグ
 category:
