@@ -5,7 +5,7 @@ postid: a
 tag:
   - 書評
   - Python
-  - Python Distilled
+  - O'Reilly
 category:
   - Programming
 thumbnail: /images/2023/20231116a/thumbnail.png
