@@ -5,7 +5,7 @@ postid: a
 tag:
   - VSCode
   - Git
-  - GitLens
+  - Gitクライアント
   - コードリーディング
 category:
   - DevOps
