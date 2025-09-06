@@ -6,9 +6,8 @@ tag:
   - AWS
   - Glue
   - PySpark
-  - SparkSQL
+  - SQL
   - Athena
-  - Python
   - Tips
 category:
   - DataEngineering
