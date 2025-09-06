@@ -4,7 +4,7 @@ date: 2022/04/15 00:00:00
 postid: a
 tag:
   - Svelte
-  - SvelteKit
+  - Playwright
 category:
   - Frontend
 thumbnail: /images/2022/20220415a/thumbnail.png
