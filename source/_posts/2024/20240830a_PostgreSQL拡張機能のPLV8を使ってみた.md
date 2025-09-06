@@ -3,11 +3,10 @@ title: "PostgreSQL拡張機能のPLV8を使ってみた"
 date: 2024/08/30 00:00:00
 postid: a
 tag:
-  - PLV8
   - PostgreSQL
   - JavaScript
   - TypeScript
-  - Vitest
+  - Vite
 category:
   - DB
 thumbnail: /images/2024/20240830a/thumbnail.png
