@@ -7,7 +7,7 @@ tag:
   - Network
   - 初心者向け
   - VPC
-  - トラブルシューティング
+  - トラブルシュート
   - ハンズオン
 category:
   - Infrastructure
