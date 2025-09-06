@@ -9,6 +9,7 @@ tag:
   - OpenTelemetry
   - CloudOperations
   - CloudRun
+  - PyCharm
 category:
   - DevOps
 thumbnail: /images/2021/20210311/thumbnail.png
