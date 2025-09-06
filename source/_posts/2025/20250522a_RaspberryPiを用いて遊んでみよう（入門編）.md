@@ -4,7 +4,6 @@ date: 2025/05/22 00:00:00
 postid: a
 tag:
   - RaspberryPi
-  - RaspberryPiPicoW
   - センサー
   - MicroPython
 category:
