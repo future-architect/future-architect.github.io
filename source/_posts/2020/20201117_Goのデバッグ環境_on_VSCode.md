@@ -194,11 +194,11 @@ RUNコンソールの`VARIABLES`部分にて、ブレークポイントで設定
 
 VSCodeのGo周りでは多賀さんの記事もオススメです。
 
-* [Goのデバッグ環境 on VSCode | フューチャー技術ブログ](/articles/20201117/)
+* [VSCode の Go extension でよく利用するコマンド 7選](/articles/20200707/)
 
 市川さんの記事のVSCodeの拡張機能の共有方法すると便利です。
 
-* [チームで推奨するVSCode拡張機能を共有するtips | フューチャー技術ブログ](/articles/20200828/)
+* [チームで推奨するVSCode拡張機能を共有するtips術](/articles/20200828/)
 
 # おわりに
 
