@@ -5,7 +5,7 @@ postid: a
 tag:
   - PostgreSQL
   - AWS
-  - Aurora
+  - RDS
   - ガイドライン
   - データモデル
 category:
