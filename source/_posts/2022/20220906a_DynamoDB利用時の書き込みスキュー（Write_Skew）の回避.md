@@ -4,7 +4,6 @@ date: 2022/09/06 00:00:00
 postid: a
 tag:
   - DynamoDB
-  - トランザクション
   - 排他制御
   - 設計
 category:
