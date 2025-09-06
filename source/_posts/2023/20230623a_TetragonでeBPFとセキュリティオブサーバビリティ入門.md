@@ -5,8 +5,6 @@ postid: a
 tag:
   - kubernetes
   - CNCF
-  - Tetragon
-  - eBPF
   - オブサーバビリティ
   - Linux
 category:
