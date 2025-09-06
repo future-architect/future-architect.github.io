@@ -5,7 +5,6 @@ postid: a
 tag:
   - Java
   - バイトコード
-  - JDK24
 category:
   - Programming
 thumbnail: /images/2025/20250529a/thumbnail.png
