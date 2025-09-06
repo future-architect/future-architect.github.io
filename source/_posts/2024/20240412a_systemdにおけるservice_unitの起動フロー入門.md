@@ -3,9 +3,7 @@ title: "Systemdにおけるservice unitの起動フロー入門"
 date: 2024/04/12 00:00:00
 postid: a
 tag:
-  - RHEL
   - Linux
-  - Systemd
 category:
   - Infrastructure
 thumbnail: /images/2024/20240412a/thumbnail.jpg
