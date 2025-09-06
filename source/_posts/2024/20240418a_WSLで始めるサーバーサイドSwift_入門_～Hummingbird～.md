@@ -7,7 +7,6 @@ tag:
   - サーバーサイドSwift
   - WSL
   - Ubuntu
-  - Hummingbird
 category:
   - Mobile
 thumbnail: /images/2024/20240418a/thumbnail.png
