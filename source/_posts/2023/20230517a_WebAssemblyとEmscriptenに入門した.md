@@ -5,7 +5,7 @@ postid: a
 tag:
   - 入門
   - WebAssembly
-  - Emscripten
+  - C/C++
 category:
   - Frontend
 thumbnail: /images/2023/20230517a/thumbnail.png
