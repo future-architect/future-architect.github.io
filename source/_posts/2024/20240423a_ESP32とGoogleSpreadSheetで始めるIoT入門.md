@@ -6,7 +6,6 @@ tag:
   - ESP32
   - スプレッドシート
   - GAS
-  - DS18B20
 category:
   - IoT
 thumbnail: /images/2024/20240423a/thumbnail.png
