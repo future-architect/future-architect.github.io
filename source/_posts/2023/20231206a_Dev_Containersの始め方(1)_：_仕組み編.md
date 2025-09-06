@@ -7,7 +7,6 @@ tag:
   - Docker
   - VSCode
   - PyCon
-  - PyCon APAC 2023
   - 登壇レポート
 category:
   - DevOps
