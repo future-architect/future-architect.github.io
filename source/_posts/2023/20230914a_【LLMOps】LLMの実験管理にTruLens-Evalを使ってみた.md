@@ -6,7 +6,6 @@ tag:
   - LLM
   - MLOps
   - LLMOps
-  - TruLens-Eval
 category:
   - DataScience
 thumbnail: /images/2023/20230914a/thumbnail.png
