@@ -6,7 +6,6 @@ tag:
   - iOS
   - CI/CD
   - Xcode
-  - XcodeCloud
 category:
   - Mobile
 thumbnail: /images/2025/20250609a/thumbnail.png
