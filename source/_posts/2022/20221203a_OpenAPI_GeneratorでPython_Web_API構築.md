@@ -6,6 +6,7 @@ tag:
   - Swagger
   - WebAPI
   - Python
+  - OpenAPIGenerator
 category:
   - Programming
 thumbnail: /images/2022/20221203a/thumbnail.png
