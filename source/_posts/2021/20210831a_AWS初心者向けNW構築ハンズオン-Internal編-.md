@@ -7,7 +7,7 @@ tag:
   - Network
   - 初心者向け
   - VPC
-  - VPC_Reachability_Analyzer
+  - トラブルシューティング
   - ハンズオン
 category:
   - Infrastructure
