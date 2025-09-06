@@ -3,7 +3,6 @@ title: IPAの過去問で学ぶC & C(Command & Control)サーバの手法と対�
 date: 2022/11/21 00:00:00
 postid: a
 tag:
-  - C&Cサーバ
   - IPA
   - Network
 category:
