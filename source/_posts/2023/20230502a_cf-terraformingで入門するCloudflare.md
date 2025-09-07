@@ -6,7 +6,6 @@ tag:
   - Cloudflare
   - IaC
   - Terraform
-  - cf-terraforming
 category:
   - DevOps
 thumbnail: /images/2023/20230502a/thumbnail.png
