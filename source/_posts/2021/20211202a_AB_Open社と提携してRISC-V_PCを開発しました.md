@@ -4,7 +4,6 @@ date: 2021/12/02 00:00:00
 postid: a
 tag:
   - RISC-V
-  - ISA
 category:
   - IoT
 thumbnail: /images/2021/20211202a/thumbnail.jpg
