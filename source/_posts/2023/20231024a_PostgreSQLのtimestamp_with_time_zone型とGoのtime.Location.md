@@ -4,7 +4,6 @@ date: 2023/10/24 00:00:00
 postid: a
 tag:
   - PostgreSQL
-  - タイムゾーン
   - Go
   - jackc/pgx
   - time
