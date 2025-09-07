@@ -4,7 +4,7 @@ date: 2022/11/07 00:00:00
 postid: a
 tag:
   - SRE
-  - Spotify
+  - 保守運用
 category:
   - DevOps
 thumbnail: /images/2022/20221107a/thumbnail.png
