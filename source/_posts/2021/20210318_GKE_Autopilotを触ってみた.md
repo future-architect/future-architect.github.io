@@ -5,7 +5,7 @@ postid: ""
 tag:
   - Kubernetes
   - GoogleCloud
-  - GKE Autopilot
+  - GKE
 category:
   - DevOps
 thumbnail: /images/2021/20210318/thumbnail.jpg
