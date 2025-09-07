@@ -6,7 +6,7 @@ tag:
   - 登壇レポート
   - TechNight
   - AWS
-  - CodePipeline
+  - ECS
   - リリース
 category:
   - DevOps
