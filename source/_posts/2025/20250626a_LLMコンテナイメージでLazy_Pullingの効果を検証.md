@@ -6,7 +6,8 @@ tag:
   - LLM
   - コンテナ
   - Docker
-  - containerd
+  - KubeCon
+  - CloudNativeCon
   - CNCF
 category:
   - DevOps
