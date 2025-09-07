@@ -3,7 +3,6 @@ title: "KMSで暗号化してLambdaで復号化する"
 date: 2021/04/13 00:00:00
 postid: "a"
 tag:
-  - KMS
   - Lambda
   - AWS
   - Terraform
