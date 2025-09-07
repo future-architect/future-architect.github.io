@@ -4,7 +4,6 @@ date: 2025/06/10 00:00:00
 postid: a
 tag:
   - Mac
-  - macOS
   - Docker
   - Linux
   - コンテナ
