@@ -5,7 +5,6 @@ postid: a
 tag:
   - VisionPro
   - Apple
-  - XR
 category:
   - VR
 thumbnail: /images/2024/20240905a/thumbnail.png
