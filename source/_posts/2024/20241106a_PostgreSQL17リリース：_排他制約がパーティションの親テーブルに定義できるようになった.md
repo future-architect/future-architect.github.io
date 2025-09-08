@@ -5,7 +5,6 @@ postid: a
 tag:
   - PostgreSQL
   - PostgreSQL17
-  - 排他制約
   - パーティション
 category:
   - DB
