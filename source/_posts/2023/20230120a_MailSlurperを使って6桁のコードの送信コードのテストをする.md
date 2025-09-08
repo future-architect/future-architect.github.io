@@ -6,7 +6,6 @@ tag:
   - MailSlurper
   - Go
   - メール
-  - TOTP
   - テスト
 category:
   - 認証認可
