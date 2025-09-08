@@ -6,7 +6,6 @@ tag:
   - PostgreSQL
   - 全文検索
   - Go
-  - kagome
 category:
   - DB
 thumbnail: /images/2025/20250829a/thumbnail.png
