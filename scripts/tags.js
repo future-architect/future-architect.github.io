@@ -11,7 +11,7 @@ hexo.extend.generator.register("tags", function(locals) {
 });
 
 hexo.extend.helper.register('count_tags', function() {
-  return this.site.posts.map(post => post.tags).flat().unique().length;
+  return this.site.tags.length;
 });
 
 hexo.extend.helper.register('ranking_tags', function() {
