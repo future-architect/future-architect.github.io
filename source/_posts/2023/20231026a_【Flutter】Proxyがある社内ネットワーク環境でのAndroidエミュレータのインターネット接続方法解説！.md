@@ -6,7 +6,7 @@ tag:
   - Flutter
   - プロキシ
   - Android
-  - Androidエミュレータ
+  - エミュレータ
 category:
   - Mobile
 thumbnail: /images/2023/20231026a/thumbnail.png
