@@ -4,11 +4,11 @@ date: 2023/03/31 00:00:00
 postid: a
 tag:
   - GoogleCloud
-  - sops
+  - 暗号
   - Terraform
   - Terraform1.4
 category:
-  - DevOps
+  - Security
 thumbnail: /images/2023/20230331a/thumbnail.png
 author: 岸下優介
 lede: "最近、Terraform内での機密情報の取り扱いについて触れることがあり、Terraformのv1.4のInteractive input for sensitive variables is now masked in the UI (#29520) についてのENHANCEMENTを取り上げつつ、Terraform環境上での機密情報の取り扱いについて.."
