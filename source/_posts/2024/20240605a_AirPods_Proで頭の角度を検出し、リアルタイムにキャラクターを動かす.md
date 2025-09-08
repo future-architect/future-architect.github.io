@@ -6,7 +6,6 @@ tag:
   - Swift
   - SwiftUI
   - Apple
-  - AirPodsPro
   - iOS
 category:
   - Mobile
