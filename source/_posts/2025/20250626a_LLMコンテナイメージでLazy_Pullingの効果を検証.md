@@ -7,7 +7,6 @@ tag:
   - コンテナ
   - Docker
   - KubeCon
-  - CloudNativeCon
   - CNCF
 category:
   - DevOps
