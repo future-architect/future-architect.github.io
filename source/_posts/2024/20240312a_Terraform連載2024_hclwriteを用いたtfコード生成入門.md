@@ -4,7 +4,7 @@ date: 2024/03/12 00:00:00
 postid: a
 tag:
   - Terraform
-  - hclwrite
+  - コード生成
   - Go
 category:
   - DevOps
