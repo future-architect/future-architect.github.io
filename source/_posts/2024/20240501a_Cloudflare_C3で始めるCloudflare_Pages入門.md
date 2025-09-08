@@ -3,7 +3,6 @@ title: "Cloudflare C3で始めるCloudflare Pages入門"
 date: 2024/05/01 00:00:00
 postid: a
 tag:
-  - Cloudflare Pages
   - Cloudflare
   - Vue.js
 category:
