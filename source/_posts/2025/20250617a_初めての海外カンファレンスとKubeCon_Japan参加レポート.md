@@ -4,7 +4,7 @@ date: 2025/06/17 00:00:00
 postid: a
 tag:
   - KubeCon
-  - CloudNativeCon
+  - CNCF
   - 参加レポート
 category:
   - DevOps
