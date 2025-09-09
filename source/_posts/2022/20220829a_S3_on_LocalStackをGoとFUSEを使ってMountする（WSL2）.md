@@ -3,7 +3,6 @@ title: "S3 on LocalStackをGoとFUSEを使ってMountする（WSL2）"
 date: 2022/08/29 00:00:00
 postid: a
 tag:
-  - FUSE
   - S3
   - LocalStack
   - Go
