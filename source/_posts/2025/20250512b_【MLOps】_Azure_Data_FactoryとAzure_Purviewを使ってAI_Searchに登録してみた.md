@@ -5,7 +5,6 @@ postid: b
 tag:
   - MLOps
   - RAG
-  - AISearch
   - インターン
   - インターン2024
   - Azure
