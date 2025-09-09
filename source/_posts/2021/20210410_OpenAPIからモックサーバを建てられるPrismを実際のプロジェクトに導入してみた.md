@@ -5,7 +5,6 @@ postid: ""
 tag:
   - Swagger
   - OpenAPI
-  - Prism
   - Vue.js
   - モック
 category:
