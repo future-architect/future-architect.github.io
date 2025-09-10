@@ -6,6 +6,7 @@ tag:
   - AWS
   - Lambda
   - APIGateway
+  - JWT
 category:
   - 認証認可
 thumbnail: /images/2021/20210610a/thumbnail.png
