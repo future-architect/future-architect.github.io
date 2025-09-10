@@ -4,7 +4,7 @@ date: 2022/05/25 00:00:00
 postid: a
 tag:
   - Flutter
-  - DevTools
+  - プロファイリング
   - 性能検証
   - 登壇レポート
 category:
