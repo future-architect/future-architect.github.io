@@ -6,7 +6,6 @@ tag:
   - 地図
   - 位置特定
   - GoogleMap
-  - PlusCode
 category:
   - Business
 thumbnail: /images/2022/20220726a/thumbnail.png
