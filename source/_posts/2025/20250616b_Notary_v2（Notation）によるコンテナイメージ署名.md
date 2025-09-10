@@ -4,7 +4,6 @@ date: 2025/06/16 00:00:01
 postid: b
 tag:
   - CNCF
-  - Notary
   - コンテナ
 category:
   - Security
