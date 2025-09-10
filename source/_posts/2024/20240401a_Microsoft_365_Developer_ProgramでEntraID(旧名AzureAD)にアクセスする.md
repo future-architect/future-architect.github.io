@@ -5,7 +5,7 @@ postid: a
 tag:
   - EntraID
   - Azure
-  - Microsoft365
+  - Microsoft
 category:
   - 認証認可
 thumbnail: /images/2024/20240401a/thumbnail.png
