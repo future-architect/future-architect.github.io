@@ -4,7 +4,6 @@ date: 2021/03/29 00:00:00
 postid: ""
 tag:
   - ShellScript
-  - ShellCheck
   - Linter
   - 静的解析
 category:
