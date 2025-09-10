@@ -5,6 +5,7 @@ postid: a
 tag:
   - Kaggle
   - TensorFlow
+  - K-means
 category:
   - Infrastructure
 thumbnail: /images/2022/20220720a/thumbnail.png
