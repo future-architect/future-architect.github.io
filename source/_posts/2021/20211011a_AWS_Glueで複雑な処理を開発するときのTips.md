@@ -5,7 +5,6 @@ postid: a
 tag:
   - AWS
   - Glue
-  - PySpark
   - SQL
   - Athena
   - Tips
