@@ -4,8 +4,8 @@ date: 2023/05/09 00:00:00
 postid: a
 tag:
   - AWS
-  - ApplicationComposer
   - ノーコード
+  - サーバレス
 category:
   - Infrastructure
 thumbnail: /images/2023/20230509a/thumbnail.png
