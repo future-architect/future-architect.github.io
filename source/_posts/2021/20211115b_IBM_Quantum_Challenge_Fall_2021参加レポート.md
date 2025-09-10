@@ -3,8 +3,6 @@ title: "IBM Quantum Challenge Fall 2021参加レポート"
 date: 2021/11/15 00:00:01
 postid: b
 tag:
-  - 量子コンピューター
-  - QuantumChallenge
   - ハッカソン
   - コンテスト
 category:
