@@ -5,7 +5,6 @@ postid: a
 tag:
   - S3
   - Cloudflare
-  - NextCloud
 category:
   - Infrastructure
 thumbnail: /images/2024/20240603a/thumbnail.png
