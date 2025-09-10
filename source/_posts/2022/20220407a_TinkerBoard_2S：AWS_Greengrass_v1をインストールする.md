@@ -4,8 +4,6 @@ date: 2022/04/07 00:00:00
 postid: a
 tag:
   - AWS
-  - TinkerBoard2S
-  - Greengrass
   - 電子工作
 category:
   - IoT
