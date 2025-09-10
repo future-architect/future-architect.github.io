@@ -5,8 +5,8 @@ postid: a
 tag:
   - PostgreSQL
   - テスト
-  - トリガー
   - モック
+  - time
 category:
   - DB
 thumbnail: /images/2022/20221018a/thumbnail.jpg
