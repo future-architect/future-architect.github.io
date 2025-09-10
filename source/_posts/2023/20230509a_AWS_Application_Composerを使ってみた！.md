@@ -5,7 +5,7 @@ postid: a
 tag:
   - AWS
   - ノーコード
-  - サーバレス
+  - サーバーレス
 category:
   - Infrastructure
 thumbnail: /images/2023/20230509a/thumbnail.png
