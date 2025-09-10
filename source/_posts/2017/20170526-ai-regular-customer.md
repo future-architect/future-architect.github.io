@@ -8,6 +8,7 @@ tag:
   - AI
   - 顔認証
   - OpenCV
+  - クラスタリング
 category:
   - DataScience
 author: 小池優希
