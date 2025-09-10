@@ -3,7 +3,7 @@ title: "iOS ユニバーサルリンクをAzure BlobStorageでやってみる"
 date: 2025/05/27 00:00:01
 postid: b
 tag:
-  - MAUI
+  - .NET
   - iOS
   - FutureOne
 category:
