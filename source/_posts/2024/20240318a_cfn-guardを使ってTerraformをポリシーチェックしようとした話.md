@@ -4,9 +4,7 @@ date: 2024/03/18 00:00:00
 postid: a
 tag:
   - Terraform
-  - cfn-guard
   - Policy-as-Code
-  - CloudFormation
 category:
   - DevOps
 thumbnail: /images/2024/20240318a/thumbnail.png
