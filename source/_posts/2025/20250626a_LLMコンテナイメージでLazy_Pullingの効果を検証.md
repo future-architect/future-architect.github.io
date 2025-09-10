@@ -8,6 +8,7 @@ tag:
   - Docker
   - KubeCon
   - CNCF
+  - ECS
 category:
   - DevOps
 thumbnail: /images/2025/20250626a/thumbnail.png
