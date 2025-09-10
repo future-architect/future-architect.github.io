@@ -6,7 +6,6 @@ tag:
   - Lambda
   - Go
   - サーバーレス
-  - タイムアウト
 category:
   - Programming
 thumbnail: /images/2022/20220510a/thumbnail.png
