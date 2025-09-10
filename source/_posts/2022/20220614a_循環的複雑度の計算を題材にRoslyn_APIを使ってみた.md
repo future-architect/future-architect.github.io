@@ -4,8 +4,6 @@ date: 2022/06/14 00:00:00
 postid: a
 tag:
   - C#
-  - VB.Net
-  - Roslyn
   - 静的解析
 category:
   - Programming
