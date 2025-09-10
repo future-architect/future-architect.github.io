@@ -7,7 +7,7 @@ tag:
   - Go
   - GoogleCloud
   - CloudFunctions
-  - CloudEvents
+  - CNCF
 category:
   - Programming
 thumbnail: /images/2020/20200331/thumbnail.png
