@@ -4,8 +4,8 @@ date: 2025/06/19 00:00:00
 postid: a
 tag:
   - CI/CD
-  - SonarQube
   - GitHubActions
+  - 静的解析
 category:
   - DevOps
 thumbnail: /images/2025/20250619a/thumbnail.png
