@@ -4,7 +4,6 @@ date: 2016-04-20 21:25:28
 postid: ""
 tag:
   - デザイン思考
-  - SPAJAM
   - ハッカソン
   - アイデアソン
 category:
