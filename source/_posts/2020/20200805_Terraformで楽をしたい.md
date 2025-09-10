@@ -6,7 +6,6 @@ tag:
   - Terraform
   - GoogleCloud
   - Ansible
-  - Packer
   - IaC
 category:
   - DevOps
