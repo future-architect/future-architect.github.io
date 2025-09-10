@@ -5,6 +5,7 @@ postid: a
 tag:
   - AWS
   - 電子工作
+  - シングルボード
 category:
   - IoT
 thumbnail: /images/2022/20220407a/thumbnail.png
