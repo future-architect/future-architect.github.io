@@ -3,7 +3,6 @@ title: "CHAdeMO vs コンボ EV充電規格を比較する"
 date: 2022/01/27 00:00:00
 postid: a
 tag:
-  - EV
   - 業界ドメイン
 category:
   - IoT
