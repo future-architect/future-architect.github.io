@@ -3,8 +3,8 @@ title: "Adobe XDからFlutterに変換する"
 date: 2021/09/15 00:00:00
 postid: a
 tag:
-  - AdobeXD
   - Flutter
+  - コード生成
 category:
   - Mobile
 thumbnail: /images/2021/20210915a/thumbnail.png
