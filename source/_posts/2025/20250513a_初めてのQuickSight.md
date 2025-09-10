@@ -4,7 +4,7 @@ date: 2025/05/13 00:00:00
 postid: a
 tag:
   - AWS
-  - QuickSight
+  - 入門
   - BI
   - 可視化
 category:
