@@ -5,7 +5,6 @@ postid: a
 tag:
   - Java
   - MicroProfile
-  - Helidon
 category:
   - Programming
 thumbnail: /images/2023/20230308a/thumbnail.png
