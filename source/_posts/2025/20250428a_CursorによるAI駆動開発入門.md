@@ -7,7 +7,6 @@ tag:
   - 生成AI
   - LLM
   - cursor
-  - VibeCoding
 category:
   - DataScience
 thumbnail: /images/2025/20250428a/thumbnail.gif
