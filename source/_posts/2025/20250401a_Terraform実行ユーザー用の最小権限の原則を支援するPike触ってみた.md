@@ -4,7 +4,6 @@ date: 2025/04/01 00:00:00
 postid: a
 tag:
   - Terraform
-  - Pike
   - AWS
   - アクセス制御
 category:
