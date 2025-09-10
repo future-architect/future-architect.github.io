@@ -3,7 +3,6 @@ title: "Kong API Gatewayを使ってResource Serverを保護する"
 date: 2022/10/06 00:00:00
 postid: a
 tag:
-  - Kong
   - OAuth
   - OIDC
   - APIGateway
