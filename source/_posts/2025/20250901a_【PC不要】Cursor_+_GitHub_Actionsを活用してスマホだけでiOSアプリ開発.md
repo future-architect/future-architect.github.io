@@ -8,7 +8,6 @@ tag:
   - cursor
   - GitHubActions
   - CI/CD
-  - VibeCoding
   - アプリストア審査
 category:
   - Mobile
