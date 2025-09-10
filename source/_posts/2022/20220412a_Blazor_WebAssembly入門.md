@@ -3,7 +3,6 @@ title: "Blazor WebAssembly入門"
 date: 2022/04/12 00:00:00
 postid: a
 tag:
-  - Blazor
   - WebAssembly
   - C#
 category:
