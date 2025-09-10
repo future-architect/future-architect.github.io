@@ -5,7 +5,6 @@ postid: a
 tag:
   - リリース
   - CNCF
-  - フィーチャーフラグ
 category:
   - DevOps
 thumbnail: /images/2023/20230621a/thumbnail.png
