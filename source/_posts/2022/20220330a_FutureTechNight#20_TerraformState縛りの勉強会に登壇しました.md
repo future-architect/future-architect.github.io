@@ -6,6 +6,7 @@ tag:
   - Terraform
   - TechNight
   - 登壇レポート
+  - tfstate
 category:
   - DevOps
 thumbnail: /images/2022/20220330a/thumbnail.png
