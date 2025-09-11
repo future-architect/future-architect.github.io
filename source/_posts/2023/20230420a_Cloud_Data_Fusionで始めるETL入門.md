@@ -3,7 +3,6 @@ title: "Cloud Data Fusionで始めるETL入門"
 date: 2023/04/20 00:00:00
 postid: a
 tag:
-  - CloudDataFusion
   - GoogleCloud
   - ETL
 category:
