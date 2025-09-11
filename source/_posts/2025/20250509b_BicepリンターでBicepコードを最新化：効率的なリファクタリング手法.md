@@ -4,7 +4,8 @@ date: 2025/05/09 00:00:01
 postid: b
 tag:
   - Azure
-  - Bicep
+  - IaC
+  - Linter
   - FutureOne
 category:
   - Infrastructure
