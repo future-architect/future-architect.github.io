@@ -3,7 +3,6 @@ title: "AI Agent用フレームワーク「Dapr Agents」について調べて�
 date: 2025/06/25 00:00:00
 postid: a
 tag:
-  - Dapr
   - AIエージェント
   - Claude
   - OpenAPI
