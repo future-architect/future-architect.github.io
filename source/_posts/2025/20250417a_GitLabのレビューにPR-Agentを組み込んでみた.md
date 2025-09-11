@@ -3,7 +3,6 @@ title: "GitLabのレビューにPR-Agentを組み込んでみた"
 date: 2025/04/17 00:00:00
 postid: a
 tag:
-  - pr-agent
   - GitLab
   - 生成AI
   - GitLab
