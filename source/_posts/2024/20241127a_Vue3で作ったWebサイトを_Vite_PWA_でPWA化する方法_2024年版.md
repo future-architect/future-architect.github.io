@@ -5,6 +5,7 @@ postid: a
 tag:
   - Vue.js
   - PWA
+  - Service Worker
   - Vite
 category:
   - Frontend
