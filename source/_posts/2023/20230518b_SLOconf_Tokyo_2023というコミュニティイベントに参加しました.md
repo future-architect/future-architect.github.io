@@ -6,7 +6,6 @@ tag:
   - SRE
   - SLO
   - 参加レポート
-  - SLOconf
   - 心理的安全性
 category:
   - DevOps
