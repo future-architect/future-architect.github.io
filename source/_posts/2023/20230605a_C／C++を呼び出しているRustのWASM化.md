@@ -6,6 +6,7 @@ tag:
   - WebAssembly
   - Rust
   - C/C++
+  - tree-sitter
 category:
   - Programming
 thumbnail: /images/2023/20230602a/thumbnail.png
