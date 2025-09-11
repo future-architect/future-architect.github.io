@@ -4,7 +4,6 @@ date: 2020/07/10 10:19:54
 postid: ""
 tag:
   - Terraform
-  - HashiTalks
   - GoogleCloud
   - 登壇レポート
 category:
