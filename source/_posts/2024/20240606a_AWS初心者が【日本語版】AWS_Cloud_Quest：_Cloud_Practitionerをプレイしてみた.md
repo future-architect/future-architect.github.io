@@ -4,7 +4,6 @@ date: 2024/06/06 00:00:00
 postid: a
 tag:
   - AWS
-  - AWS Cloud Quest
   - 初心者向け
   - Network
 category:
