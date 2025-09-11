@@ -3,7 +3,6 @@ title: "Factorioに入門して「ボトルネック解消」を体感する"
 date: 2025/04/15 00:00:00
 postid: a
 tag:
-  - Factorio
   - 生成AI
 category:
   - Management
