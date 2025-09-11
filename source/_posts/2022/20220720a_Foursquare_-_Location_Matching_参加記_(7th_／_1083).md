@@ -5,7 +5,7 @@ postid: a
 tag:
   - Kaggle
   - TensorFlow
-  - K-means
+  - クラスタリング
 category:
   - Infrastructure
 thumbnail: /images/2022/20220720a/thumbnail.png
