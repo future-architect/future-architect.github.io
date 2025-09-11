@@ -5,7 +5,6 @@ postid: a
 tag:
   - Go
   - CLI
-  - subcommands
 category:
   - Programming
 thumbnail: /images/2023/20231020a/thumbnail.png
