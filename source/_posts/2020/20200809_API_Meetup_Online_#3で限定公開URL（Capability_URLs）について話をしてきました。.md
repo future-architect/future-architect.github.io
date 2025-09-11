@@ -6,7 +6,7 @@ tag:
   - HTTP
   - Web
   - 署名付きURL
-  - APIMeetup
+  - WebAPI
   - 登壇レポート
 category:
   - Programming
