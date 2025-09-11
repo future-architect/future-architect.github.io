@@ -5,7 +5,6 @@ postid: ""
 tag:
   - GoogleCloud
   - IaC
-  - Cloud Deployment Manager
 category:
   - DevOps
 author: 前原応光
