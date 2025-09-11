@@ -3,8 +3,7 @@ title: "ARMアーキテクチャなマシンでwgrib2が動くDockerfileを作�
 date: 2023/02/08 00:00:00
 postid: a
 tag:
-  - wgrib2
-  - grib2
+  - Mac
   - Ubuntu
   - Docker
 category:
