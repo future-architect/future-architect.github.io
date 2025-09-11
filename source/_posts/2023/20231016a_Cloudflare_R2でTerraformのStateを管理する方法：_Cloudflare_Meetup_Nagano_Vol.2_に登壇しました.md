@@ -6,6 +6,7 @@ tag:
   - Cloudflare
   - Terraform
   - 登壇レポート
+  - tfstate
 category:
   - DevOps
 thumbnail: /images/2023/20231016a/thumbnail.png
