@@ -7,6 +7,7 @@ tag:
   - OIDC
   - APIGateway
   - JWT
+  - Keycloak
 category:
   - 認証認可
 thumbnail: /images/2022/20221006a/thumbnail.png
