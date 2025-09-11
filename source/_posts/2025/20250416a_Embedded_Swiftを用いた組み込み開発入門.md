@@ -4,7 +4,6 @@ date: 2025/04/16 00:00:00
 postid: a
 tag:
   - Swift
-  - EmbeddedSwift
   - RaspberryPi
   - 電子工作
 category:
