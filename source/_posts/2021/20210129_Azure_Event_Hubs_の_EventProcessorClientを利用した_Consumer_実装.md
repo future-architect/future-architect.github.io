@@ -5,7 +5,6 @@ postid: ""
 tag:
   - Azure
   - Java
-  - Event Hubs
 category:
   - Infrastructure
 thumbnail: /images/2021/20210129/thumbnail.png
