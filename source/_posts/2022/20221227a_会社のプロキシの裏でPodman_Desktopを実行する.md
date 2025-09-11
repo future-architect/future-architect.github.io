@@ -3,7 +3,6 @@ title: "会社のプロキシの裏でPodman Desktopを実行する"
 date: 2022/12/27 00:00:00
 postid: a
 tag:
-  - Podman
   - Docker
   - プロキシ
 category:
