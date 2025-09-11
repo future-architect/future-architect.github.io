@@ -9,6 +9,7 @@ tag:
   - Redshift
   - BigQuery
   - Snowflake
+  - DWH
 category:
   - DB
 thumbnail: /images/2020/20200703/thumbnail.png
