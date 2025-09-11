@@ -6,7 +6,6 @@ tag:
   - Gemini
   - BigQuery
   - GoogleCloud
-  - PDF
 category:
   - DataScience
 thumbnail: /images/2025/20250724a/thumbnail.png
