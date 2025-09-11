@@ -5,7 +5,6 @@ postid: a
 tag:
   - PostgreSQL
   - JDBC
-  - Java
 category:
   - DB
 thumbnail: /images/2024/20240628a/thumbnail.png
