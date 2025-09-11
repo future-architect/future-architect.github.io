@@ -5,7 +5,6 @@ postid: a
 tag:
   - Auth0
   - SSO
-  - Shopify
   - Auth0Rules
 category:
   - 認証認可
