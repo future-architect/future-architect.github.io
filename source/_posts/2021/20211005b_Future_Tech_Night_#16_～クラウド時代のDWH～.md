@@ -7,6 +7,7 @@ tag:
   - 登壇レポート
   - Spanner
   - Snowflake
+  - DWH
 category:
   - DB
 thumbnail: /images/2021/20211005b/thumbnail.jpg
