@@ -4,6 +4,7 @@ date: 2020/03/25 14:44:32
 postid: ""
 tag:
   - Go
+  - Goリリースパーティ
   - 登壇レポート
 category:
   - Programming
