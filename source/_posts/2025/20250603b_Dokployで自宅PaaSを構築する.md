@@ -3,9 +3,7 @@ title: "Dokployで自宅PaaSを構築する"
 date: 2025/06/03 00:00:01
 postid: b
 tag:
-  - Dokploy
   - Docker
-  - Traefik
 category:
   - DevOps
 thumbnail: /images/2025/20250603b/thumbnail.png
