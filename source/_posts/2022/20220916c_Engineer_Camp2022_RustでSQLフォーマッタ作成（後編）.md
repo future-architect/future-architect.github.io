@@ -8,6 +8,7 @@ tag:
   - インターン2022
   - フォーマッター
   - Rust
+  - tree-sitter
 category:
   - Programming
 thumbnail: /images/2022/20220916c/thumbnail.png
