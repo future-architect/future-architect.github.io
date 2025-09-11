@@ -7,6 +7,7 @@ tag:
   - PyCharm
   - VSCode
   - ジェネリクス
+  - Mypy
 category:
   - Programming
 thumbnail: /images/2020/20201223/thumbnail.png
