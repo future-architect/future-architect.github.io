@@ -6,7 +6,7 @@ tag:
   - Prompt Flow
   - Azure
   - LLM
-  - AzureOpenAIService
+  - OpenAI
 category:
   - DataScience
 thumbnail: /images/2023/20231011a/thumbnail.png
