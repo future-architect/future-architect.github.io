@@ -5,7 +5,6 @@ postid: b
 tag:
   - AWS
   - 登壇レポート
-  - AWS Partner Summit Japan
 category:
   - IoT
 thumbnail: /images/2022/20220415b/thumbnail.png
