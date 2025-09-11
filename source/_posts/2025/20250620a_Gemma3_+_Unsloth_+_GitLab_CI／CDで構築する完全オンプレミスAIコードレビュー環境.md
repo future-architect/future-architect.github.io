@@ -3,8 +3,6 @@ title: "Gemma3 + Unsloth + GitLab CI/CDで構築する完全オンプレミスAI
 date: 2025/06/20 00:00:00
 postid: a
 tag:
-  - Gemma3
-  - Unsloth
   - GitLab
   - コードレビュー
   - 生成AI
