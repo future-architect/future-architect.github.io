@@ -7,6 +7,7 @@ tag:
   - Lambda
   - サーバーレス
   - 保守運用
+  - CloudWatch
 category:
   - DevOps
 thumbnail: /images/2021/20210531b/thumbnail.png
