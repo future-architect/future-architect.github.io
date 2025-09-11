@@ -5,7 +5,6 @@ postid: a
 tag:
   - GoogleCloud
   - GKE
-  - "Identity-Aware Proxy"
 category:
   - 認証認可
 thumbnail: /images/2023/20230113a/thumbnail.png
