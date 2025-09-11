@@ -6,6 +6,7 @@ tag:
   - Terraform
   - Cloudflare
   - IaC
+  - tfstate
 category:
   - DevOps
 thumbnail: /images/2024/20240327a/thumbnail.png
