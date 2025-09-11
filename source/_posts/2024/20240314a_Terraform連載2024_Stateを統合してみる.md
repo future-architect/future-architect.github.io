@@ -4,7 +4,7 @@ date: 2024/03/14 00:00:00
 postid: a
 tag:
   - Terraform
-  - tfstate-merge
+  - tfstate
 category:
   - DevOps
 thumbnail: /images/2024/20240314a/thumbnail.png
