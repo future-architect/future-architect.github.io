@@ -7,7 +7,6 @@ tag:
   - アルゴリズム
   - 出版
   - SoftwareDesign
-  - 線形代数
 category:
   - DataScience
 author: 上野貴史
