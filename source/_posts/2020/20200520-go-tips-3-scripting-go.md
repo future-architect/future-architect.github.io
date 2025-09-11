@@ -5,6 +5,7 @@ postid: ""
 tag:
   - Go
   - GoTips連載
+  - path/filepath
 category:
   - Programming
 thumbnail: /images/2020/20200520/thumbnail.png
