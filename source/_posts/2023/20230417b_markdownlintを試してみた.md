@@ -208,12 +208,12 @@ baz
 さきほど200件ほど検知されたと記載しましたが、その大部分は以下のコマンドを実行すると自動で修正してくれます（対象のファイルが直接書き換えられるため、事実上フォーマッターのような動きをします）。
 
 ```sh
-markdownlint-cli2-fix "**/*.md"
+markdownlint-cli2 --fix "**/*.md"
 ```
 
 全ての検知結果を修正してくれるわけではなく[ドキュメント](https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md)に `Fixable` とついたもののみ修正してくれるようです。動作もコミット前後で差し込む程度であれば何ら気にならない速度ですので、開発フローに組み込んでしまえば良さそうです。
 
-この`markdownlint-cli2-fix` は Prettierでも修正されないルールがあるため、併せて設定しておくと良さそうです。
+この`markdownlint-cli2 --fix` は Prettierでも修正されないルールがあるため、併せて設定しておくと良さそうです。
 
 ## 所感とまとめ
 
