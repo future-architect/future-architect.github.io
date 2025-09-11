@@ -4,9 +4,9 @@ date: 2022/12/28 00:00:00
 postid: a
 tag:
   - Rust
+  - TypeScript
   - VSCode
   - フォーマッター
-  - napi-rs
   - コアテク
 category:
   - Programming
