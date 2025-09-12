@@ -55,19 +55,61 @@ function author_to_url(author) {
   return ((this.config.author_generator || {}).url_map || {})[author] || author;
 }
 
-hexo.extend.helper.register('list_authors', function(year='all') {
+hexo.extend.helper.register('list_authors', function(year = 'all') {
+  // 年指定、または全期間での投稿数をカウントする関数を定義
   let count_posts = author => this.site.posts.filter(post => post.author === author).length;
   if (year != 'all') {
     count_posts = author => this.site.posts.filter(post => post.date.format("YYYY") === year && post.author === author).length;
   }
 
+  // 投稿数で著者をソート
   const compareFunc = (a, b) => count_posts(b) - count_posts(a);
-  const postRankings = this.site.authors.filter(author => !Array.isArray(author)).sort(compareFunc)
-  const authors = postRankings.filter(author => count_posts(author) > 0).map(author => `
-      <li class="author-list-item">
-          <a class="author-list-link" href="/authors/${author_to_url.call(this, author)}">${author}</a>
+  const postRankings = this.site.authors.filter(author => !Array.isArray(author)).sort(compareFunc);
+
+  // authorMapperを定義。yearの値によって処理を分岐する
+  let authorMapper;
+
+  if (year === 'all') {
+    // 全期間表示の場合のロジック
+    const currentYear = new Date().getFullYear(); // 今年 (2025)
+    const lastYear = currentYear - 1; // 昨年 (2024)
+    const twoYearsAgo = currentYear - 2; // 2年前 (2023)
+
+    // 特定の年に著者の投稿があるかチェックするヘルパー
+    const hasPostsInYear = (author, checkYear) =>
+      this.site.posts.some(post => post.date.year() === checkYear && post.author === author);
+
+    authorMapper = author => {
+      let suffix = '';
+      const hasNoPostsThisYear = !hasPostsInYear(author, currentYear);
+
+      // 今年の投稿実績がない著者のみを対象にサフィックスを判定
+      if (hasNoPostsThisYear) {
+        // 条件(拡張): 昨年実績があるか -> '**'を付与
+        if (hasPostsInYear(author, lastYear)) {
+          suffix = '**';
+        // 条件: 2年前に実績があるか -> '*'を付与
+        } else if (hasPostsInYear(author, twoYearsAgo)) {
+          suffix = '*';
+        }
+      }
+
+      return `
+        <li class="author-list-item">
+          <a class="author-list-link" href="/authors/${author_to_url.call(this, author)}">${author}${suffix}</a>
           <span class="author-list-count">${count_posts(author)} 件</span>
-      </li>`).join('');
+        </li>`;
+    };
+  } else {
+    // 年指定の場合のロジック (従来通り)
+    authorMapper = author => `
+      <li class="author-list-item">
+        <a class="author-list-link" href="/authors/${author_to_url.call(this, author)}">${author}</a>
+        <span class="author-list-count">${count_posts(author)} 件</span>
+      </li>`;
+  }
+
+  const authors = postRankings.filter(author => count_posts(author) > 0).map(authorMapper).join('');
 
   return `<ul class="author-list">${authors}</ul>`;
 });
