@@ -5,7 +5,7 @@ postid: b
 tag:
   - Azure
   - スキルアップ
-  - クラウドスキルチャレンジ
+  - 社内勉強会
 category:
   - Infrastructure
 thumbnail: /images/2021/20211008b/thumbnail.jpg
