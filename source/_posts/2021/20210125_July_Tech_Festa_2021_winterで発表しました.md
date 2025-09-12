@@ -6,7 +6,7 @@ tag:
   - AWS
   - Electron
   - 登壇レポート
-  - JulyTechFesta
+  - 勉強会
   - Vue.js
 category:
   - Frontend
