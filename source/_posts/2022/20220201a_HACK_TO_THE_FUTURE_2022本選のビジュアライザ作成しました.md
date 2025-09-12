@@ -5,7 +5,7 @@ postid: a
 tag:
   - AtCoder
   - 競技プログラミング
-  - HTTF
+  - コンテスト
 category:
   - Frontend
 thumbnail: /images/2022/20220201a/thumbnail.png
