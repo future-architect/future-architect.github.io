@@ -4,7 +4,7 @@ date: 2025/04/16 00:00:01
 postid: b
 tag:
   - Swift
-  - try!Swift
+  - カンファレンス
   - iOS
   - Xcode
   - 参加レポート
