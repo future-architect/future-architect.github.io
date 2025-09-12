@@ -4,7 +4,6 @@ date: 2024/04/18 00:00:00
 postid: a
 tag:
   - Swift
-  - サーバーサイドSwift
   - WSL
   - Ubuntu
 category:
