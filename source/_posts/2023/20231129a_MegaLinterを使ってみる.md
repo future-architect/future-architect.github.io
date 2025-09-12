@@ -4,7 +4,6 @@ date: 2023/11/29 00:00:00
 postid: a
 tag:
   - Linter
-  - MegaLinter
   - Markdownlint
   - GitHubActions
   - 外部寄稿
