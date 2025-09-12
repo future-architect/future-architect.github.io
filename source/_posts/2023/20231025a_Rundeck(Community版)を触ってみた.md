@@ -3,7 +3,7 @@ title: "Rundeck(Community版)を触ってみた"
 date: 2023/10/25 00:00:00
 postid: a
 tag:
-  - Rundeck
+  - ジョブスケジューラ
   - IaC
   - 保守運用
   - クラウドマイグレーション
