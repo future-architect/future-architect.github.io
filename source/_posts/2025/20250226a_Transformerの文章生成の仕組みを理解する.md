@@ -6,7 +6,7 @@ tag:
   - AI
   - LLM
   - Transformer
-  - Attention
+  - 論文紹介
 category:
   - DataScience
 thumbnail: /images/2025/20250226a/thumbnail.jpg
