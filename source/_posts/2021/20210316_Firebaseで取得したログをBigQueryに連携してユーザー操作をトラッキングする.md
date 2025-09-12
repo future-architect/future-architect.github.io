@@ -4,9 +4,7 @@ date: 2021/03/16 00:00:00
 postid: ""
 tag:
   - GoogleCloud
-  - Java
   - Firebase
-  - GoogleAnalytics
   - BigQuery
   - Android
 category:
