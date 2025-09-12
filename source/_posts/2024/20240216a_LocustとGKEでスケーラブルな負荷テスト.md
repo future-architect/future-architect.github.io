@@ -5,7 +5,6 @@ postid: a
 tag:
   - GKE
   - GoogleCloud
-  - locust
   - 負荷テスト
 category:
   - Infrastructure
