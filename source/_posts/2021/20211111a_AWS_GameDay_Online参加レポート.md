@@ -4,7 +4,6 @@ date: 2021/11/11 00:00:00
 postid: a
 tag:
   - AWS
-  - AWSGameDay
   - コンテスト
   - 参戦記
 category:
