@@ -7,7 +7,6 @@ tag:
   - CloudRun
   - Knative
   - skaffold
-  - ko
   - CNCF
 category:
   - DevOps
