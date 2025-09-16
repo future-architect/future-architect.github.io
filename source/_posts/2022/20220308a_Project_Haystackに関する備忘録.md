@@ -3,10 +3,8 @@ title: "Project Haystackに関する備忘録"
 date: 2022/03/08 00:00:00
 postid: a
 tag:
-  - Haystack
   - データモデル
   - 設計
-  - Haystack
 category:
   - IoT
 thumbnail: /images/2022/20220308a/thumbnail.png
