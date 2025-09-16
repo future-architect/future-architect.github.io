@@ -7,6 +7,7 @@ tag:
   - MLflow
   - MLOps
   - GoogleCloud
+  - Minikube
 category:
   - DataScience
 thumbnail: /images/2025/20250701a/thumbnail.png
