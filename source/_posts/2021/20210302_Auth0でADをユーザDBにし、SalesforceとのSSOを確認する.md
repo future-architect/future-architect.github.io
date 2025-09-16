@@ -4,7 +4,6 @@ date: 2021/03/02 00:00:00
 postid: ""
 tag:
   - Auth0
-  - Salesforce
   - SSO
   - AD
   - Auth0Rules
