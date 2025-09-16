@@ -4,7 +4,7 @@ date: 2022/06/24 00:00:00
 postid: a
 tag:
   - gRPC
-  - grpc-gateway
+  - WebAPI
   - IDL
   - ProtocolBuffers
 category:
