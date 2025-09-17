@@ -4,8 +4,7 @@ date: 2025/03/07 00:00:00
 postid: a
 tag:
   - 登壇レポート
-  - Datadog
-  - JDDUG
+  - オブサーバビリティ
 category:
   - DevOps
 thumbnail: /images/2025/20250307a/thumbnail.png
