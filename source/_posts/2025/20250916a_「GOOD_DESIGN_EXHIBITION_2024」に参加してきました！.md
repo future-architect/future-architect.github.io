@@ -5,6 +5,7 @@ postid: a
 tag:
   - 展示会
   - 参加レポート
+  - UI/UX
 category:
   - Business
 thumbnail: /images/2025/20250916a/thumbnail.png
