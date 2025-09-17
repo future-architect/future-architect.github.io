@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * カスタムコンテナを置換するフィルター
  *
@@ -14,10 +12,12 @@
  * :::
  */
 hexo.extend.filter.register('before_post_render', function(data) {
-  // ::: note [class] ... ::: の記法にマッチする正規表現
-  const regex = /^:::\s+note(?:\s+(\w+))?\n([\s\S]+?)\n:::$/gm;
+  // インデントに対応するよう正規表現を修正
+  // ^(\s*): 行頭のインデント（スペース）をキャプチャ(group 1)
+  // \1:::  : 開始タグと同じインデントを持つ終了タグにマッチ
+  const regex = /^(\s*):::\s+note(?:\s+(\w+))?\n([\s\S]+?)\n\1:::$/gm;
 
-  data.content = data.content.replace(regex, (match, specifiedClass, content) => {
+  data.content = data.content.replace(regex, (match, indent, specifiedClass, content) => {
 
     let className = 'info'; // デフォルトのクラス名
     const allowedClasses = ['info', 'warn', 'alert'];
@@ -25,8 +25,17 @@ hexo.extend.filter.register('before_post_render', function(data) {
       className = specifiedClass;
     }
 
-    // コンテナ内のコンテンツをMarkdownとして正しくレンダリング
-    const renderedContent = hexo.render.renderSync({ text: content, engine: 'markdown' });
+    // キャプチャしたコンテナ内のコンテンツから、共通のインデントを削除
+    // これにより、Markdownレンダラが意図せずコードブロックとして解釈するのを防ぐ
+    const unindentedContent = content.split('\n').map(line => {
+      if (line.startsWith(indent)) {
+        return line.substring(indent.length);
+      }
+      return line;
+    }).join('\n');
+
+    // インデントを削除したコンテンツをMarkdownとして正しくレンダリング
+    const renderedContent = hexo.render.renderSync({ text: unindentedContent, engine: 'markdown' });
 
     // コードブロックとして認識されてしまわないよう、インデントされないよう愚直に文字列結合
     let html = `<div class="note-container ${className}">`
