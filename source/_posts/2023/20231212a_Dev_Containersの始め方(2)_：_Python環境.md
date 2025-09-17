@@ -8,7 +8,6 @@ tag:
   - VSCode
   - Docker
   - 環境構築
-  - rye
 category:
   - DevOps
 thumbnail: /images/2023/20231212a/thumbnail.png
