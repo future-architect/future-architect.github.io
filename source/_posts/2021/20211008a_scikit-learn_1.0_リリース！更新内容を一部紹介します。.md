@@ -3,7 +3,6 @@ title: "scikit-learn 1.0 リリース！更新内容を一部紹介します。"
 date: 2021/10/08 00:00:00
 postid: a
 tag:
-  - scikit-learn
   - 機械学習
   - pandas
   - Python
