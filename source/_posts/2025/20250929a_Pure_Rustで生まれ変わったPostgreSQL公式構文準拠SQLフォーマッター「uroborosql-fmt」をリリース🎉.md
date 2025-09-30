@@ -35,7 +35,7 @@ lede: "roborosql-fmtの新バージョンv1.0.0をリリースしました。当
 
 また、今回のアップデートについては、以下のシリーズ記事でも詳しく解説しています。
 
-- 新パーサーの技術詳細: (近日公開予定！)
+- [PostgreSQL 全構文対応の Pure Rust な CST パーサーを作ってみた](/articles/20250930a/)
 - パーサーの置き換え戦略: (近日公開予定！)
 
 # 当社のSQLフォーマッター開発の歩みと課題の変遷
@@ -153,4 +153,7 @@ Linter機能は具体的に、以下のような警告・エラーをVSCode上�
 
 - [future-architect/uroborosql-fmt - GitHub](https://github.com/future-architect/uroborosql-fmt)
 
-後日postgresql-cst-parser開発の話、パーサー移行に伴うフォーマッター移行作業の話の2本の記事を公開予定です。お楽しみに！
+postgresql-cst-parser開発の話、パーサー移行に伴うフォーマッター移行作業の話の2本の記事を公開予定です。お楽しみに！
+
+- [PostgreSQL 全構文対応の Pure Rust な CST パーサーを作ってみた](/articles/20250930a/)
+- パーサーの置き換え戦略: (近日公開予定！)
