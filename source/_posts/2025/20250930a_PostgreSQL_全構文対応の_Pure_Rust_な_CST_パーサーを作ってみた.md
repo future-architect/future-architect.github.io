@@ -31,8 +31,8 @@ PostgreSQL のフォーマッターである uroborosql-fmt[^1] の開発に携�
 
 今回のアップデートについては、以下のシリーズ記事でも詳しく解説しています。
 
-- リリース概要: [Pure Rustで生まれ変わったPostgreSQL公式構文準拠SQLフォーマッター「uroborosql-fmt」をリリース🎉 ](/articles/20250929a/)
-- パーサーの置き換え戦略: (近日公開予定！)
+- リリース概要: [Pure Rustで生まれ変わったPostgreSQL公式構文準拠SQLフォーマッター「uroborosql-fmt」をリリース🎉](/articles/20250929a/)
+- パーサーの置き換え戦略: [半年がかりのパーサー移行を成功に導いた戦略 ～Rust製SQLフォーマッター開発の裏側～](/articles/20251001a/)
 
 ::: note
 本記事のAppendixではflex・bisonの定義ファイルの構造、2WaySQLのエラー回復について説明していますが、発展的な内容であるため、興味のある方以外は読み飛ばしていただいて問題ありません。
@@ -433,4 +433,3 @@ and emp.id = 1 -- 余計なand/orが先頭にある
 [^8]:構文解析器は bison を用いて [gram.y](https://github.com/postgres/postgres/blob/master/src/backend/parser/gram.y) から生成
 [^9]:アクションは無視しているため本来はエラーになるべきSQLがエラーにならなかったりするのですが、それは許容しています
 [^10]:詳しくは [uroboroSQL のドキュメント](https://future-architect.github.io/uroborosql-doc/background/#%E4%B8%8D%E8%A6%81%E3%81%AA%E3%82%AB%E3%83%B3%E3%83%9E%E3%81%AE%E9%99%A4%E5%8E%BB)を参照ください。
-
