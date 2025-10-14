@@ -11,6 +11,8 @@ thumbnail: /images/2025/20251010a/thumbnail.png
 author: 市川裕也
 lede: "私が現場で行った PostgreSQL のパフォーマンスチューニングについて、原因調査から解決までのプロセスを共有します。この記事が、「なぜか適切な実行計画が選ばれない、インデックスが使われない」といった同様の問題に直面している方の助けになれば幸いです。"
 ---
+[PostgreSQL18連載](/articles/20251006a/)の5本目の記事です。
+
 ## はじめに
 
 こんにちは、CSIG (Cyber Security Innovation Group) の市川です。
