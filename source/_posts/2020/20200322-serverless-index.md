@@ -8,19 +8,15 @@ tag:
 category:
   - Programming
 thumbnail: /images/2020/20200322/thumbnail.png
-author: 真野隼記
+author: admin
 lede: "AWSのLambdaに代表されるサーバレスアプリは実行時のみ稼働するため、サーバー稼働によるあらゆるコストから解放され、システム開発の工数を減らすことができます。例えば何らかのAPIを提供する場合でも、API GatewayとLambdaを組み合わせることで提供可能です。"
 ---
 
-## はじめに
-
-こんにちは、TIG/DXチームの真野です。
+<img src="/images/2020/20200322/lightning-bolt-1203953_640.png" alt="" width="640" height="360" loading="lazy">
 
 サーバレスをテーマにしたブログ連載を始めますので、そのご報告です。
 
 ## サーバレスとは
-
-<img src="/images/2020/20200322/lightning-bolt-1203953_640.png" alt="" width="640" height="360" loading="lazy">
 
 サーバレスを説明するためによく使われるのが以下の2つではないでしょうか？
 

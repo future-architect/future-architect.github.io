@@ -8,14 +8,12 @@ tag:
 category:
   - Culture
 thumbnail: /images/2022/20220606b/thumbnail.jpg
-author: 真野隼記
+author: admin
 lede: "フューチャーのサマーインターン2022 Summer Engineer Camp🌞⛺🏃の募集が始まりました。フューチャーでは夏のインターンシップは2つのコースがあります。"
 ---
 <img src="/images/2022/20220606b/23855886_s.jpg" alt="" width="640" height="427" loading="lazy">
 
 ## はじめに
-
-こんにちは、真野です。
 
 フューチャーのサマーインターン2022 Summer Engineer Camp🌞⛺🏃の募集が始まりました。
 
