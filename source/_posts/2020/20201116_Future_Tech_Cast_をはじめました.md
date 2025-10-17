@@ -8,12 +8,10 @@ tag:
 category:
   - Culture
 thumbnail: /images/2020/20201116/thumbnail.png
-author: 真野隼記
+author: admin
 lede: "この度フューチャー技術ブログから派生して、Future Tech Cast という名前でポッドキャストを始めましたのでご報告です。"
 ---
 # はじめに
-
-こんにちは。技術ブログ運営の真野です。
 
 この度、フューチャー技術ブログから派生して、[Future Tech Cast](https://anchor.fm/futuretechcast) という名前でポッドキャストを始めましたのでご報告です。
 
