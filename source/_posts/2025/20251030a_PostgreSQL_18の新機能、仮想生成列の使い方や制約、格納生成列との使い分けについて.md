@@ -4,6 +4,7 @@ date: 2025/10/30 00:00:00
 postid: a
 tag:
   - PostgreSQL
+  - PostgreSQL18
 category:
   - DB
 thumbnail: /images/2025/20251030a/thumbnail.jpg
