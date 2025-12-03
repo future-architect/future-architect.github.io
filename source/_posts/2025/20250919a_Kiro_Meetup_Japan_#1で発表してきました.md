@@ -5,6 +5,7 @@ postid: a
 tag:
   - AIエージェント
   - 登壇レポート
+  - Kiro
 category:
   - Programming
 thumbnail: /images/2025/20250919a/thumbnail.png
