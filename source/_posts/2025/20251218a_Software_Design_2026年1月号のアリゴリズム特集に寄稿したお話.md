@@ -1,5 +1,5 @@
 ---
-title: "Software Design 2026年1月号のアリゴリズム特集に寄稿したお話"
+title: "Software Design 2026年1月号のアルゴリズム特集に寄稿したお話"
 date: 2025/12/18 00:00:00
 postid: a
 tag:
