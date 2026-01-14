@@ -172,7 +172,7 @@ nftables上では以下のルールを設定します。
 ```toml
 # /usr/local/lib/systemd/system/nft-proxy.service
 [Unit]
-description=nftables proxy
+Description=nftables proxy
 Wants=moproxy.service
 
 [Service]
