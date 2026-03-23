@@ -20,7 +20,7 @@ hexo.extend.filter.register('before_post_render', function(data) {
   data.content = data.content.replace(regex, (match, indent, specifiedClass, content) => {
 
     let className = 'info'; // デフォルトのクラス名
-    const allowedClasses = ['info', 'warn', 'alert'];
+    const allowedClasses = ['tip', 'info', 'warn', 'alert'];
     if (specifiedClass && allowedClasses.includes(specifiedClass)) {
       className = specifiedClass;
     }
