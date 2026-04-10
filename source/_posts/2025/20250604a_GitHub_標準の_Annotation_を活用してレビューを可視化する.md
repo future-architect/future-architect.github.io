@@ -176,7 +176,7 @@ Problem Matcher は、GitHub Actions のワークフロー内で `::add-matcher:
 ここで指定する `eslint-stylish` は、Problem Matcher の設定ファイル内で定義した `owner` に対応しています。
 
 ただし、実際のところ ESLint を GitHub Actions 上で実行する場合、通常この登録処理を明示的に記述することはありません。
-なぜなら、ESLint を実行する前には一般的に [actions/setup-node](https://github.com/actions/setup-node/tree/main) を使って Node.js のセットアップを行いますが、このステップの中で [ESLint 用の Problem Matcher](https://github.com/actions/setup-node/blob/main/.github/eslint-stylish.jsons) が自動的に登録されるためです。
+なぜなら、ESLint を実行する前には一般的に [actions/setup-node](https://github.com/actions/setup-node/tree/main) を使って Node.js のセットアップを行いますが、このステップの中で [ESLint 用の Problem Matcher](https://github.com/actions/setup-node/blob/main/.github/eslint-stylish.json) が自動的に登録されるためです。
 
 ほかにも `setup-python` や `setup-go` そして `setup-dotnet` などでも言語に応じて標準的な Problem Matcher が登録されるようになっています。
 
