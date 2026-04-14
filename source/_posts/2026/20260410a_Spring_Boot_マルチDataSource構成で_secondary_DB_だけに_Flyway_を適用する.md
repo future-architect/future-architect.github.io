@@ -5,7 +5,6 @@ postid: a
 tag:
   - SpringBoot
   - Flyway
-  - DB
 category:
   - DB
 thumbnail: /images/2026/20260410a/thumbnail.png
