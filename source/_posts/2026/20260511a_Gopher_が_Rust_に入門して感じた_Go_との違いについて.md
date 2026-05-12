@@ -15,9 +15,9 @@ author: 市川裕也
 lede: "業務では主に Go を書いているのですが、「Rust は面白い」という話は方々から聞いており、自分もどこかで学んでおきたい、という気持ちがありました。そこで、せっかくの入門祭りということで、これを機に Rust に入門してみることにしました。"
 ---
 
-<img src="/images/2026/20260511a/thumbnail.jpg" alt="" width="900" height="502">
+<img src="/images/2026/20260511a/top.jpg" alt="" width="900" height="502">
 
-[春の入門祭り2026](https://future-architect.github.io/articles/20260421a/)の8日目の記事です。
+[春の入門祭り2026](/articles/20260421a/)の8日目の記事です。
 
 ## はじめに
 
