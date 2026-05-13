@@ -10,7 +10,8 @@ category:
   - Culture
 thumbnail: /images/2026/20260513a/thumbnail.png
 author: 棚井龍之介
-lede: "![top.png]こんにちは。FutureVulsの棚井です。2026年4月16日、アリゾナ州スコッツデールで開催された VulnCon 2026 に登壇しました。"
+lede: "2026年4月16日、アリゾナ州スコッツデールで開催された VulnCon 2026 に登壇しました。現地で CVE Program、FIRST、NVD、各種SCAツールのコアメンバーと直接議論できた経験を経て、自分の学習投資の量と質を、もう一段階引き上げる必要があると考えるようになりました。
+"
 ---
 <img src="/images/2026/20260513a/top.png" alt="" width="1200" height="670" loading="lazy">
 
