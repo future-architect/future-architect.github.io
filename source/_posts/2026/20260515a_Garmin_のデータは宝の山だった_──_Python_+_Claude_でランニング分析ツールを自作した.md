@@ -9,7 +9,7 @@ tag:
 category:
   - Programming
 thumbnail: /images/2026/20260515a/thumbnail.png
-author: 山下 量之
+author: 山下量之
 lede: "ランニングにハマって、Garmin デバイスを使って走っている。走り終わったあと、Garmin Connect のアプリを開いてデータを眺めるのが楽しい。"
 ---
 # はじめに
