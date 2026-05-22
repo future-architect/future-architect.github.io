@@ -7,6 +7,7 @@ tag:
   - MLOps
   - LLM
   - Bedrock
+  - AWS CDK
 category:
   - DataScience
 thumbnail: /images/2025/20250207a/thumbnail.png
