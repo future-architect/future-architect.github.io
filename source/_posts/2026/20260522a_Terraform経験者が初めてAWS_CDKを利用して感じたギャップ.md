@@ -173,7 +173,7 @@ https://docs.aws.amazon.com/ja_jp/AWSCloudFormation/latest/UserGuide/using-cfn-s
 
 https://aws.amazon.com/jp/about-aws/whats-new/2025/11/configuration-drift-enhanced-cloudformation-sets/
 
-ただし、CloudFormationの「ドリフトの検知」ではサポートされていないリソースが存在し、サポート外のリソースについては、マネジメントコンソールから手動で設定変更されたり削除されたりしても、検知することができません。
+ただし、CloudFormationの「ドリフトの検知」ではサポートされていないリソースが存在し、サポート外のリソースについては、マネジメントコンソールから手動で設定変更されたり削除されたりしても、検知できません。
 
 ▼ドリフト検知可能なリソースは以下を参照（※記載のないAWSリソースはドリフト検知不可）
 
