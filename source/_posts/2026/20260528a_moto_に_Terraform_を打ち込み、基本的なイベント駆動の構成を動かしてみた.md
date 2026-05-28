@@ -98,7 +98,7 @@ services:
 %
 ```
 
-# 試したいこと① : Terraform を moto に打ち込む
+# 試したいこと（1） : Terraform を moto に打ち込む
 
 ここからが本題のひとつめです。
 Terraform の provider が向く先を moto に切り替えていきます。
