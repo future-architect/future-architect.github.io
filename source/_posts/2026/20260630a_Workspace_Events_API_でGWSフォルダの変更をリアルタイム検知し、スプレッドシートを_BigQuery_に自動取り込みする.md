@@ -26,7 +26,7 @@ lede: "Google Drive の共有フォルダにあるスプレッドシートが更
 |:--|:--|:--|
 | 6/30（火）| 柴田健太さん | Workspace Events API で GWS フォルダの変更をリアルタイム検知し、スプレッドシートを BigQuery に自動取り込みする（この記事です） |
 | 7/1（水）| 真野隼記さん | ガイドライン公開しました |
-| 7/2（木）| 鈴木風真さん | 【S3 Tables(Iceberg)】timestamptz 型の登録に苦戦した話 |
+| 7/2（木）| 鈴木風真さん | [S3 TablesのIceberg形式で、timestamptz型の登録に苦戦した話](http://localhost:4000/articles/20260702a/) |
 | 7/3（金）| 棚井龍之介さん | TBD |
 | 7/6（月）| 片岡久人さん | TBD |
 
