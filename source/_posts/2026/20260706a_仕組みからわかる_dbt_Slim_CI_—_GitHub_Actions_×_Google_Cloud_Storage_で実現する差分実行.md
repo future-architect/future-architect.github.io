@@ -348,7 +348,7 @@ jobs:
 このステップには順序依存があります。基準 manifest は次章の `deploy.yml` が作って GCS に置くものなので、**まだ一度も deploy が走っていない初回は、ここで manifest が見つからず失敗します**。最初に一度 `deploy.yml` を通して基準 manifest を用意してから、PR 側の Slim CI が使えるようになります（`deploy.yml` 側は manifest が無くても全量ビルドにフォールバックするようになっています。詳しくは6章で触れます）。
 :::
 
-## キモ② 何が選ばれるかを可視化する
+## キモ（2） 何が選ばれるかを可視化する
 
 ```yaml
 - name: Show selected models
