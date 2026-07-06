@@ -28,7 +28,7 @@ lede: "Google Drive の共有フォルダにあるスプレッドシートが更
 | 7/1（水）| 真野隼記さん | ガイドライン公開しました |
 | 7/2（木）| 鈴木風真さん | [S3 TablesのIceberg形式で、timestamptz型の登録に苦戦した話](http://localhost:4000/articles/20260702a/) |
 | 7/3（金）| 棚井龍之介さん | [主要AIモデルのデータ保持期間とZDRを、一次情報で確認する](/articles/20260703a/) |
-| 7/6（月）| 片岡久人さん | TBD |
+| 7/6（月）| 片岡久人さん | [仕組みからわかる dbt Slim CI — GitHub Actions × Google Cloud Storage で実現する差分実行](/articles/20260706a/) |
 
 ## はじめに
 
