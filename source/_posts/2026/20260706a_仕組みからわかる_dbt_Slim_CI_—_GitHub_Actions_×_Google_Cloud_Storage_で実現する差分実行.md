@@ -331,7 +331,7 @@ jobs:
 
 </details>
 
-## キモ① 基準 manifest を取ってくる
+## キモ（1） 基準 manifest を取ってくる
 
 ```yaml
 - name: Get prod manifest
