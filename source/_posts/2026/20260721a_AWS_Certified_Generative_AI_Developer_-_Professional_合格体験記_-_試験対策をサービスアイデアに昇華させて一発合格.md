@@ -21,7 +21,7 @@ lede: "2026年7月14日に AWS Certified Generative AI Developer - Professional 
 
 前回の [AWS Certified Advanced Networking - Specialty の合格体験記](https://future-architect.github.io/articles/20260708a/) の最後に、「設計から障害調査までをAIが担うようになっても、その出力の妥当性を自分で見極められるように、知識をアップデートし続けたい」と書きました。書いておいて何ですが、そのAIを、当時の私はノリと雰囲気で使っていただけです。
 
-<img src="/images/2026/20260721a/俺たちは雰囲気で.png" alt="俺たちは雰囲気で.png" width="640" height="384" loading="lazy">
+<img src="/images/2026/20260721a/俺たちは雰囲気で.png" alt="俺たちは雰囲気で.png" width="640" height="384" loading="lazy">
 
 （上の画像は [雰囲気ジェネレータ](https://potato4d.github.io/huniki_generator/) で生成しました）
 
