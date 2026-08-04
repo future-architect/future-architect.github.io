@@ -4,6 +4,7 @@ date: 2022/01/27 00:00:00
 postid: a
 tag:
   - 業界ドメイン
+  - エネルギー業界
 category:
   - IoT
 thumbnail: /images/2022/20220127a/thumbnail.png

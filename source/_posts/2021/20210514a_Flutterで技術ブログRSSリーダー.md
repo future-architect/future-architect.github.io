@@ -4,6 +4,7 @@ date: 2021/05/14 00:00:01
 postid: a
 tag:
   - Flutter
+  - Dart
 category:
   - Mobile
 thumbnail: /images/2021/20210514a/thumbnail.png

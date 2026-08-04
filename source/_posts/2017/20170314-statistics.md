@@ -4,6 +4,7 @@ date: 2017-03-14 14:00:00
 postid: ""
 tag:
   - 統計
+  - データ分析
 category:
   - DataScience
 thumbnail: /images/2017/20170310/thumbnail_20170310.jpg
