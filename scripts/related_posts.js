@@ -1,6 +1,8 @@
 'use strict';
 
-const maxCount = 6;
+// 関連記事の最大表示件数
+// 記事が長文化する傾向にあるため、記事末尾のスクロール量を抑える目的で絞っている
+const maxCount = 3;
 const {getSNSCnt} = require('./lib/sns');
 
 // HTMLを生成するロジックを共通関数として外に切り出す
