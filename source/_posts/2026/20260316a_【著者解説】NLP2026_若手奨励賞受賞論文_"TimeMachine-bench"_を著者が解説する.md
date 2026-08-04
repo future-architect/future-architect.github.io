@@ -3,7 +3,6 @@ title: "【著者解説】NLP2026 若手奨励賞受賞論文 \"TimeMachine-benc
 date: 2026/03/16 00:00:00
 postid: a
 tag:
-  - 自然言語処理
   - NLP
   - 論文解説
 category:

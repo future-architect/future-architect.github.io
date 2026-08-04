@@ -6,6 +6,7 @@ tag:
   - S3
   - LocalStack
   - Go
+  - WSL
 category:
   - Programming
 thumbnail: /images/2022/20220829a/thumbnail.png
