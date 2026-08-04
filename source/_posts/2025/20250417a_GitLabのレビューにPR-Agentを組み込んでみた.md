@@ -5,7 +5,6 @@ postid: a
 tag:
   - GitLab
   - 生成AI
-  - GitLab
   - コードレビュー
 category:
   - AIDD
