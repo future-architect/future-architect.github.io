@@ -4,7 +4,7 @@ date: 2026/03/16 00:00:00
 postid: a
 tag:
   - NLP
-  - 論文解説
+  - 論文紹介
 category:
   - DataScience
 thumbnail: /images/2026/20260316a/thumbnail.png
