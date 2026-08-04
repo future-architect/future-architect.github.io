@@ -5,7 +5,7 @@ postid: a
 tag:
   - Gemini
   - GoogleCloud
-  - Pandas
+  - pandas
   - dbt
   - データモデル
 category:

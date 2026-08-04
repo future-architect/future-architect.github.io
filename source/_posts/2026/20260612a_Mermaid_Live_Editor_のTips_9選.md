@@ -3,7 +3,7 @@ title: "Mermaid Live Editor のTips 9選"
 date: 2026/06/12 00:00:00
 postid: a
 tag:
-  - mermaid.js
+  - Mermaid.js
   - Tips
 category:
   - Programming

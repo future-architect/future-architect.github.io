@@ -5,6 +5,7 @@ postid: a
 tag:
   - インターン
   - インターン2026
+  - インタビュー
 category:
   - Culture
 thumbnail: /images/2026/20260323a/thumbnail.jpg
