@@ -8,7 +8,7 @@ tag:
   - コンテキストエンジニアリング
   - Copilot
 category:
-  - Infrastructure
+  - AIDD
 thumbnail: /images/2026/20260424a/thumbnail.png
 author: 星名藍乃介
 lede: "お問い合わせ対応業務にLLM Agentを導入してみたお話です。"

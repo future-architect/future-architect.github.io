@@ -7,7 +7,7 @@ tag:
   - Claude
   - GitHub
 category:
-  - Business
+  - AIDD
 thumbnail: /images/2026/20260422a/thumbnail.png
 author: 棚井龍之介
 lede: "調査データや発見を GitHub リポジトリにひたすら追加していく。スライド・原稿・ブログへの反映は Claude に任せる"
