@@ -13,16 +13,20 @@ const fs = require('hexo-fs');
  *
  * 読み込み順は従来の head.ejs と同じ（Bootstrap → metronic → テーマ）。
  * CSS は後勝ちなので、この順序を変えると表示が壊れる。
+ *
+ * 元ファイルは themes/future/source/ の外（css-src / metronic-src）に置いている。
+ * source/ 配下だと Hexo が public/ にそのまま複製してしまい、
+ * 参照されない CSS が配信されるため。
  */
 hexo.extend.generator.register('site_css', async function() {
   const themeDir = this.theme_dir;
 
-  const bootstrap = await fs.readFile(path.join(themeDir, 'source/css/bootstrap-subset.css'));
-  const metronic = await fs.readFile(path.join(themeDir, 'source/metronic/assets/style.css'));
+  const bootstrap = await fs.readFile(path.join(themeDir, 'css-src/bootstrap-subset.css'));
+  const metronic = await fs.readFile(path.join(themeDir, 'metronic-src/assets/style.css'));
 
   // theme-styles.styl は Stylus なので、ここで描画してから連結する
   const themeStyles = await this.render.render({
-    path: path.join(themeDir, 'source/css/theme-styles.styl'),
+    path: path.join(themeDir, 'css-src/theme-styles.styl'),
     engine: 'styl'
   });
 
