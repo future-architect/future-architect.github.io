@@ -7,7 +7,7 @@ tag:
   - コードレビュー
   - 生成AI
 category:
-  - DevOps
+  - AIDD
 thumbnail: /images/2025/20250620a/thumbnail.png
 author: 山本竜玄
 lede: "Gemma3とUnslothを組み合わせて、完全オンプレミス環境でのAIコードレビューができる環境を構築してみました。"

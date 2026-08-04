@@ -10,7 +10,7 @@ tag:
   - CI/CD
   - アプリストア審査
 category:
-  - Mobile
+  - AIDD
 thumbnail: /images/2025/20250901a/thumbnail.png
 author: 清水雄一郎
 lede: "スマホだけでスマホアプリ作れたらカッコよくないですか？楽しそうですよね？PCを触らずスマホ縛りというルールで開発したアプリは、こちらです。"

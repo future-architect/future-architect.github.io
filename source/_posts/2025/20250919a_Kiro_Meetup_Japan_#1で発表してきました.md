@@ -7,7 +7,7 @@ tag:
   - 登壇レポート
   - Kiro
 category:
-  - Programming
+  - AIDD
 thumbnail: /images/2025/20250919a/thumbnail.png
 author: 澁川喜規
 lede: "Kiro Meetup Japan #1でKiroを使った開発体験について発表してきました。"

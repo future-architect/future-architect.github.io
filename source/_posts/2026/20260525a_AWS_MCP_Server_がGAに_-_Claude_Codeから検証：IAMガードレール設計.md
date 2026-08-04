@@ -6,7 +6,7 @@ tag:
   - AWS
   - ClaudeCode
 category:
-  - Infrastructure
+  - AIDD
 thumbnail: /images/2026/20260525a/thumbnail.png
 author: 棚井龍之介
 lede: "Claude Code から AWS MCP Server をセットアップし、提供される 11 ツール・IAM ガードレール・CloudTrail 監査までを実際に動かしながらまとめます。"
