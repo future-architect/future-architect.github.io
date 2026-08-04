@@ -4,6 +4,7 @@ date: 2017/03/22 12:00:00
 postid: ""
 tag:
   - Elastic{ON}
+  - 参加レポート
 category:
   - Culture
 author: 前原応光

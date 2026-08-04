@@ -4,6 +4,7 @@ date: 2021/04/01 00:00:00
 postid: ""
 tag:
   - ShellScript
+  - Linux
 category:
   - Infrastructure
 thumbnail: /images/2021/20210401/thumbnail.png

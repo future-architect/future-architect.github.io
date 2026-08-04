@@ -4,6 +4,7 @@ date: 2026/06/12 00:00:00
 postid: a
 tag:
   - mermaid.js
+  - Tips
 category:
   - Programming
 thumbnail: /images/2026/20260612a/thumbnail.png

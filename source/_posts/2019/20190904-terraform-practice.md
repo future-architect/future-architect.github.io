@@ -4,6 +4,7 @@ date: 2019/09/03 15:20:52
 postid: ""
 tag:
   - Terraform
+  - IaC
 category:
   - DevOps
 author: 木村拓海

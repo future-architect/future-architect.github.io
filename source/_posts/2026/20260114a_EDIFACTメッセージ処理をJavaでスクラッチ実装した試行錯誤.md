@@ -4,6 +4,7 @@ date: 2026/01/14 00:00:00
 postid: a
 tag:
   - Java
+  - 業界ドメイン
 category:
   - IoT
 thumbnail: /images/2026/20260114a/thumbnail.jpg

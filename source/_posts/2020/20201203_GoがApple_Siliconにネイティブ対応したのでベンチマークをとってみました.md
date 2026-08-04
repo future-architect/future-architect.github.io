@@ -4,6 +4,7 @@ date: 2020/12/03 00:00:00
 postid: ""
 tag:
   - Go
+  - Mac
 category:
   - Programming
 thumbnail: /images/2020/20201203/thumbnail.png

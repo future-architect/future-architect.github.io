@@ -4,6 +4,7 @@ date: 2023/08/29 00:00:00
 postid: a
 tag:
   - Playwright
+  - テスト
 category:
   - Frontend
 thumbnail: /images/2023/20230829a/thumbnail.png

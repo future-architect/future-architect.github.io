@@ -4,6 +4,7 @@ date: 2024/03/13 00:00:00
 postid: a
 tag:
   - Terraform
+  - IaC
 category:
   - DevOps
 thumbnail: /images/2024/20240313a/thumbnail.png

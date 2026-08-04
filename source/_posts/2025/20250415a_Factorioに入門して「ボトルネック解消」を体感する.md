@@ -4,6 +4,7 @@ date: 2025/04/15 00:00:00
 postid: a
 tag:
   - 生成AI
+  - ゲーム
 category:
   - Management
 thumbnail: /images/2025/20250415a/thumbnail.png

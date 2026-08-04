@@ -4,6 +4,7 @@ date: 2021/12/02 00:00:00
 postid: a
 tag:
   - RISC-V
+  - 電子工作
 category:
   - IoT
 thumbnail: /images/2021/20211202a/thumbnail.jpg
