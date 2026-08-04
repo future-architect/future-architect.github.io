@@ -128,13 +128,21 @@ hexo.extend.helper.register('list_related_posts', function() {
     return acc;
   }, []);
 
-  // 3. 関連度スコアでソートし、同スコアの場合は日付でソート
+  // 3. 関連度スコアでソートし、同スコアの場合は公開日が近い記事を優先する。
+  //    技術記事は前提バージョンなど時代の文脈に依存するため、同じ関連度なら
+  //    同時期の記事の方が読み継ぎやすい。連載の古い回が埋もれる問題も解消する。
+  //    ただし過去方向は未来方向より重く扱い、わずかに新しい記事へ流れるようにする
+  const PAST_PENALTY = 2;
+  const dateDistance = p => {
+    const diff = p.date.valueOf() - post.date.valueOf();
+    return diff >= 0 ? diff : -diff * PAST_PENALTY;
+  };
+
   relatedPosts.sort((a, b) => {
     if (b.score !== a.score) {
       return b.score - a.score;
-    } else {
-      return b.date.valueOf() - a.date.valueOf();
     }
+    return dateDistance(a) - dateDistance(b);
   });
 
   // 4. 記事数がmaxCountに満たない場合はカテゴリから補填
