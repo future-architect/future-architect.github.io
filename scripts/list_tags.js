@@ -3,6 +3,10 @@
 // custom list_tags
 // https://github.com/noraj/hexo/blob/master/lib/plugins/helper/list_tags.js
 
+const {getSNSCnt} = require('./lib/sns');
+
+// タグに紐づく記事のSNSリアクション（Twitter/FaceBook/Hatebu/Pocket/Feedly）の合計
+const snsTotalCount = tag => tag.posts.map(post => getSNSCnt(post.permalink)).reduce((acc, cur) => acc + cur, 0);
 
 function listTopPageTags(tags, options) {
   if (!options && (!tags || !Object.prototype.hasOwnProperty.call(tags, 'length'))) {
@@ -21,23 +25,28 @@ function listTopPageTags(tags, options) {
   const minCount = options.minCount || 1; // 拡張
   let result = '';
 
-  // Sort the tags
-  tags = tags.sort(orderby, order);
-
   // Ignore tags with zero posts
-  tags = tags.filter(tag => tag.length);
+  // 表示対象の絞り込みは amount で件数を切る前に済ませる
+  tags = tags.filter(tag => tag.length && tag.length >= minCount);
+
+  // Sort the tags
+  // snsCount は Warehouse のフィールドではないため、配列に変換して独自に並べ替える
+  if (orderby === 'snsCount') {
+    tags = tags.toArray()
+      .map(tag => ({tag, snsCount: snsTotalCount(tag)})) // 比較のたびに集計し直さないよう先にキーを持たせる
+      .sort((a, b) => b.snsCount - a.snsCount)
+      .map(entry => entry.tag);
+  } else {
+    tags = tags.sort(orderby, order).toArray();
+  }
 
   // Limit the number of tags
-  if (options.amount) tags = tags.limit(options.amount);
+  if (options.amount) tags = tags.slice(0, options.amount);
 
   if (style === 'list') {
     result += `<ul class="${className}-list" itemprop="keywords">`;
 
     tags.forEach(tag => {
-      if (tag.length < minCount) {
-        return;
-      }
-
       result += `<li class="${className}-list-item">`;
 
       result += `<a class="${className}-list-link" href="${this.url_for(tag.path)}${suffix}" rel="tag">`;
@@ -62,9 +71,6 @@ function listTopPageTags(tags, options) {
     result += '</ul>';
   } else {
     tags.forEach((tag, i) => {
-      if (tag.length < minCount) {
-          return;
-      }
       if (i) result += separator;
 
       result += `<a class="${className}-link" href="${this.url_for(tag.path)}${suffix}" rel="tag">`;
