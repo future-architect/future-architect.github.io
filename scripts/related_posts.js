@@ -101,6 +101,13 @@ hexo.extend.helper.register('list_related_posts', function() {
   });
 
   const relatedPosts = tagRelatedPosts.reduce((acc, p) => {
+    // 既に評価済みの記事はスキップする。
+    // tagRelatedPosts には共有タグの数だけ同じ記事が並ぶため、
+    // ここで加算するとタグを多く共有する記事のスコアが二重三重に積み上がる
+    if (acc.some(item => item._id === p._id)) {
+      return acc;
+    }
+
     let score = 0;
 
     p.tags.data.forEach(tag => {
@@ -109,16 +116,15 @@ hexo.extend.helper.register('list_related_posts', function() {
       }
     });
 
+    // タグを多く持つ記事ほど1タグあたりの意味が薄いため、タグ数で正規化する。
+    // これがないと、大きなタグを複数持つ記事が全記事の関連記事を占めてしまう
+    score /= Math.sqrt(p.tags.length || 1);
+
     if (p.author === post.author) {
       score += authorIDF[p.author];
     }
 
-    const existingPostIndex = acc.findIndex(item => item._id === p._id);
-    if (existingPostIndex !== -1) {
-      acc[existingPostIndex].score += score;
-    } else {
-      acc.push({ ...p, score: score });
-    }
+    acc.push({ ...p, score: score });
     return acc;
   }, []);
 
