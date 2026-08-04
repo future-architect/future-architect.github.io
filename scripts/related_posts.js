@@ -33,15 +33,23 @@ function generateRelatedPostsHtml(posts) {
     </div>`;
 }
 
+// 「この記事を参照している記事」（reference_posts.js）に出る記事のID
+// 同じ記事が関連記事にも並ばないよう、除外するために使う
+function getReferencePostIds(ctx, post) {
+  return new Set(ctx.site.posts.data
+    .filter(p => p.path !== post.path && p.content.includes(post.path))
+    .map(p => p._id));
+}
+
 // カテゴリから関連記事を取得する関数（変更なし）
-function getCategoryRelatedPosts(ctx, post) {
+function getCategoryRelatedPosts(ctx, post, excludeIds) {
   const currentCategory = post.categories.data[0];
   if (!currentCategory) {
     return [];
   }
 
   const categoryPosts = currentCategory.posts.data
-    .filter(p => p._id !== post._id);
+    .filter(p => p._id !== post._id && !excludeIds.has(p._id));
 
   categoryPosts.sort((a, b) => {
     const snsA = getSNSCnt(a.permalink);
@@ -63,6 +71,9 @@ hexo.extend.helper.register('list_related_posts', function() {
     return `<p class="related-posts-none">No related post.</p>`;
   }
 
+  // 0. 「この記事を参照している記事」と重複しないよう、除外対象を先に求める
+  const referenceIds = getReferencePostIds(this, post);
+
   // 1. 全著者数を取得し、著者のIDFを計算
   const allPostsCount = this.site.posts.length;
   const authors = [...new Set(this.site.posts.data.map(p => p.author))];
@@ -75,12 +86,12 @@ hexo.extend.helper.register('list_related_posts', function() {
   // 2. 関連度スコアリング (タグと著者のIDFを考慮)
   const tagRelatedPosts = post.tags.data
     .flatMap(tag => tag.posts.data)
-    .filter(p => p._id !== post._id);
+    .filter(p => p._id !== post._id && !referenceIds.has(p._id));
 
   if (tagRelatedPosts.length === 0) {
     // タグ関連記事がなければカテゴリの記事を取得し、HTMLを生成して返す
     console.log(`[INFO] Related Posts: No tag-related posts found for "${post.title}". Falling back to category.`);
-    const categoryPosts = getCategoryRelatedPosts(this, post);
+    const categoryPosts = getCategoryRelatedPosts(this, post, referenceIds);
     return generateRelatedPostsHtml(categoryPosts);
   }
 
@@ -122,7 +133,7 @@ hexo.extend.helper.register('list_related_posts', function() {
 
   // 4. 記事数がmaxCountに満たない場合はカテゴリから補填
   if (relatedPosts.length < maxCount) {
-    const postsToFill = getCategoryRelatedPosts(this, post);
+    const postsToFill = getCategoryRelatedPosts(this, post, referenceIds);
     postsToFill.forEach(p => {
       if(relatedPosts.findIndex(rp => rp._id === p._id) === -1) {
         relatedPosts.push(p);
