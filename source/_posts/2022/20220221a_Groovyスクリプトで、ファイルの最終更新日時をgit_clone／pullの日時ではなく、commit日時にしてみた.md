@@ -3,7 +3,6 @@ title: "Groovyスクリプトで、ファイルの最終更新日時を`git clon
 date: 2022/02/21 00:00:00
 postid: a
 tag:
-  - Groovy
   - Perl
   - Git
 category:

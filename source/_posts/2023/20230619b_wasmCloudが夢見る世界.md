@@ -3,7 +3,6 @@ title: "wasmCloudが夢見る世界"
 date: 2023/06/19 00:00:01
 postid: b
 tag:
-  - wasmCloud
   - WebAssembly
   - CNCF
 category:

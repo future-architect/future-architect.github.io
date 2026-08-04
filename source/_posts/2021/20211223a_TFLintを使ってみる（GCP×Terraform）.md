@@ -5,7 +5,6 @@ postid: a
 tag:
   - Terraform
   - GoogleCloud
-  - TFLint
 category:
   - DevOps
 thumbnail: /images/2021/20211223a/thumbnail.png

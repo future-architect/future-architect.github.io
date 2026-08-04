@@ -4,8 +4,6 @@ date: 2026/07/02 00:00:00
 postid: a
 tag:
   - S3
-  - S3Tables
-  - Iceberg
 category:
   - Programming
 thumbnail: /images/2026/20260702a/thumbnail.png

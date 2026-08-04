@@ -4,7 +4,6 @@ date: 2023/06/22 00:00:00
 postid: a
 tag:
   - CNCF
-  - Tinkerbell
   - オンプレミス
   - Linux
 category:

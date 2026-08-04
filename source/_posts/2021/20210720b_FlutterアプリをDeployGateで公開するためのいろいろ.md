@@ -4,7 +4,6 @@ date: 2021/07/20 00:00:02
 postid: b
 tag:
   - Flutter
-  - DeployGate
 category:
   - Mobile
 thumbnail: /images/2021/20210721b/thumbnail.png

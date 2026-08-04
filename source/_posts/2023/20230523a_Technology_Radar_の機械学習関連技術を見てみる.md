@@ -6,7 +6,6 @@ tag:
   - 機械学習
   - AI
   - MLOps
-  - TechnologyRadar
 category:
   - DataScience
 thumbnail: /images/2023/20230523a/thumbnail.png

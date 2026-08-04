@@ -3,7 +3,6 @@ title: "記録のための日記から、対話で育てる日記へ ーClaude �
 date: 2026/03/17 00:00:00
 postid: a
 tag:
-  - Obsidian
   - Claude
   - MCP
 category:

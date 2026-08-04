@@ -4,7 +4,6 @@ date: 2026/05/12 00:00:00
 postid: a
 tag:
   - PostgreSQL
-  - SQLServer
 category:
   - DB
 thumbnail: /images/2026/20260512a/thumbnail.jpg

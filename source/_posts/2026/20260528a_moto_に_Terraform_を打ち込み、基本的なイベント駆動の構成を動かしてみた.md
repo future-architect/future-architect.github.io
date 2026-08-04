@@ -4,7 +4,6 @@ date: 2026/05/28 00:00:00
 postid: a
 tag:
   - Terraform
-  - moto
   - モック
 category:
   - Infrastructure
