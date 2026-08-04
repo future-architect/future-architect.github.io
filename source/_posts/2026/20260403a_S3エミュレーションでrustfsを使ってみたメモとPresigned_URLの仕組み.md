@@ -4,7 +4,6 @@ date: 2026/04/03 00:00:00
 postid: a
 tag:
   - S3
-  - rustfs
   - Docker
   - Go
 category:

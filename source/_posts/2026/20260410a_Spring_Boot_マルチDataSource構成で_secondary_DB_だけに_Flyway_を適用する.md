@@ -4,7 +4,6 @@ date: 2026/04/10 00:00:00
 postid: a
 tag:
   - SpringBoot
-  - Flyway
 category:
   - DB
 thumbnail: /images/2026/20260410a/thumbnail.png

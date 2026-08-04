@@ -3,7 +3,6 @@ title: "Prometheus/Grafanaを使ってみる"
 date: 2024/04/17 00:00:01
 postid: b
 tag:
-  - Prometheus
   - Grafana
 category:
   - DevOps

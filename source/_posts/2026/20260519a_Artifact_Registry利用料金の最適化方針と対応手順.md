@@ -5,7 +5,6 @@ postid: a
 tag:
   - Terraform
   - GoogleCloud
-  - ArtifactRegistry
 category:
   - Infrastructure
 thumbnail: /images/2026/20260519a/thumbnail.png
