@@ -7,7 +7,7 @@ tag:
   - AI
   - ハッカソン
 category:
-  - Infrastructure
+  - AIDD
 thumbnail: /images/2025/20251203a/thumbnail.png
 author: 澁川喜規
 lede: "生成AI搭載の新しい開発環境が毎月のように登場したりしていて、大盛り上がりの中、Kiroを使ったハッカソンが行われていたので参加してみました。"

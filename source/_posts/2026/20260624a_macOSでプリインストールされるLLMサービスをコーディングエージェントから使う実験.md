@@ -7,7 +7,7 @@ tag:
   - LLM
   - Foundationmodel
 category:
-  - Infrastructure
+  - AIDD
 thumbnail: /images/2026/20260624a/thumbnail.png
 author: 澁川喜規
 lede: "みなさん、WWDC26の情報はみられましたか？昨年発表されたDocker互換のコンテナランタイムがパワーアップし、WSLのようなLinuxコンソール体験を提供するcontainer machineとか楽しそうですよね。"

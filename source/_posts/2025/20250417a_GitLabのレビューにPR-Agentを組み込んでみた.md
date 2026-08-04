@@ -8,7 +8,7 @@ tag:
   - GitLab
   - コードレビュー
 category:
-  - DevOps
+  - AIDD
 thumbnail: /images/2025/20250417a/thumbnail.png
 author: 髙橋遼
 lede: "フューチャーでは、Gitホスティング環境として、SaaSとしてのGitHubだけでなく、社内開発基盤運用チームが構築・運用している、オンプレミス版のGitLabも利用可能となっています。"
