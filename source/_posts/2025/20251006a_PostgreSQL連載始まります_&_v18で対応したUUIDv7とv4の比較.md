@@ -5,6 +5,7 @@ postid: a
 tag:
   - PostgreSQL
   - PostgreSQL18
+  - UUID
 category:
   - DB
 thumbnail: /images/2025/20251006a/thumbnail.png
