@@ -8,6 +8,7 @@ tag:
   - Lambda
   - Python
   - Pipenv
+  - 並列処理
 category:
   - Infrastructure
 thumbnail: /images/2022/20220204a/thumbnail.png

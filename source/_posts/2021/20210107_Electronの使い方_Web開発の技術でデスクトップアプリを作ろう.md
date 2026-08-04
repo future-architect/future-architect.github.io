@@ -5,6 +5,7 @@ postid: ""
 tag:
   - Vue.js
   - Electron
+  - デスクトップアプリ
 category:
   - Frontend
 thumbnail: /images/2021/20210107/thumbnail.png
