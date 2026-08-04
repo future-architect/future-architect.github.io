@@ -4,7 +4,7 @@ date: 2021/09/02 00:00:01
 postid: b
 tag:
   - Go
-  - Goland
+  - GoLand
   - JetBrains
   - ショートカット
   - Tips

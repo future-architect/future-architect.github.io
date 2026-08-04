@@ -4,7 +4,7 @@ date: 2020/05/19 21:52:54
 postid: ""
 tag:
   - Go
-  - Goland
+  - GoLand
   - GoTips連載
 category:
   - Programming

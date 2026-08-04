@@ -4,7 +4,7 @@ date: 2026/03/25 00:00:00
 postid: a
 tag:
   - Kubernetes
-  - minikube
+  - Minikube
   - 初心者向け
 category:
   - Infrastructure

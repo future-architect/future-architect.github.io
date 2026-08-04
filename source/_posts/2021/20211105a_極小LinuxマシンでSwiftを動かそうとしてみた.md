@@ -4,7 +4,7 @@ date: 2021/11/05 00:00:00
 postid: a
 tag:
   - Rust
-  - M5stack
+  - M5Stack
   - Linux
 category:
   - IoT
