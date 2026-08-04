@@ -4,7 +4,6 @@ date: 2025/12/03 00:00:00
 postid: a
 tag:
   - Kiro
-  - AI
   - ハッカソン
 category:
   - AIDD
