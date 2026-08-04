@@ -5,7 +5,6 @@ postid: a
 tag:
   - Mac
   - LLM
-  - Foundationmodel
 category:
   - AIDD
 thumbnail: /images/2026/20260624a/thumbnail.png

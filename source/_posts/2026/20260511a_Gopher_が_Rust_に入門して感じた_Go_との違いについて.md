@@ -4,8 +4,7 @@ date: 2026/05/11 00:00:00
 postid: a
 tag:
   - Rust
-  - Bob
-  - SeaORM
+  - ORM
   - 入門
   - Go
 category:
