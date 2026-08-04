@@ -5,6 +5,10 @@ const {getSNSCnt} = require('./lib/sns');
 const fs = require("fs");
 const gaCache = JSON.parse(fs.readFileSync("ga_cache.json", 'utf-8'));
 
+// ランキング（トレンド・年間人気・SNS人気）の表示件数
+// 記事が長文化する傾向にあるため、トップページのスクロール量を抑える目的で絞っている
+const RANKING_DISPLAY_COUNT = 10;
+
 hexo.extend.helper.register('popular_posts', function(term='weekly') {
   const yearAgo = new Date();
   yearAgo.setDate(yearAgo.getDate() - 365); // 1year
@@ -66,7 +70,7 @@ hexo.extend.helper.register('popular_posts', function(term='weekly') {
     })
     .filter(post => post.pv >= 0)
     .sort(compareFunc)
-    .slice(0, 15);
+    .slice(0, RANKING_DISPLAY_COUNT);
 
   const label = post => {
     if (monthAgo.toISOString() <= post.date.toISOString()) {
@@ -90,7 +94,7 @@ hexo.extend.helper.register('sns_popular_posts', function() {
 
   const allPosts = this.site.posts.data;
   allPosts.sort((a, b) => getSNSCnt(b.permalink) - getSNSCnt(a.permalink))
-  const popularPost = allPosts.slice(0, 15)
+  const popularPost = allPosts.slice(0, RANKING_DISPLAY_COUNT)
 
   const label = post => {
     const currentTime = new Date();
