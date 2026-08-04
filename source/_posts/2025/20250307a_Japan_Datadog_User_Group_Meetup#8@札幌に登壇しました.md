@@ -5,7 +5,7 @@ postid: a
 tag:
   - 登壇レポート
   - オブサーバビリティ
-  - DataDog
+  - Datadog
 category:
   - DevOps
 thumbnail: /images/2025/20250307a/thumbnail.png

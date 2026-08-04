@@ -4,7 +4,7 @@ date: 2024/12/05 00:00:00
 postid: a
 tag:
   - TypeScript
-  - JavaSCript
+  - JavaScript
   - ECMAScript
 category:
   - Frontend

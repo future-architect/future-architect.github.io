@@ -3,7 +3,7 @@ title: "AWS Lambdaのランタイムを provided.al2023 に更新する際、2�
 date: 2024/02/26 00:00:00
 postid: a
 tag:
-  - lambda
+  - Lambda
   - AWS
   - Makefile
   - バージョンアップ

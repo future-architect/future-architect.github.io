@@ -4,7 +4,7 @@ date: 2024/07/12 00:00:00
 postid: a
 tag:
   - Go
-  - goland
+  - GoLand
   - WSL
   - IDE
 category:

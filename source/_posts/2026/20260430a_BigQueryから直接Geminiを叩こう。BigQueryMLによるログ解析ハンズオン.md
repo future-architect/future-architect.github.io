@@ -3,7 +3,7 @@ title: "BigQueryから直接Geminiを叩こう。BigQueryMLによるログ解析
 date: 2026/04/30 00:00:00
 postid: a
 tag:
-  - Bigquery
+  - BigQuery
   - GoogleCloud
   - Gemini
 category:
