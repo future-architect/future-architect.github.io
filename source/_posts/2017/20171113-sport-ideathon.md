@@ -7,6 +7,7 @@ tag:
   - プログラミング教育
   - アイデアソン
   - 子ども
+  - スポーツ
 category:
   - VR
 thumbnail: /images/2017/20171113/thumbnail_20171113.png

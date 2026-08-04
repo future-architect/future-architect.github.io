@@ -7,6 +7,7 @@ tag:
   - SSO
   - AD
   - Auth0Rules
+  - Salesforce
 category:
   - 認証認可
 thumbnail: /images/2021/20210302/thumbnail.png

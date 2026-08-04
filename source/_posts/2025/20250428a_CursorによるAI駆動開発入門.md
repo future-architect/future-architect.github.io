@@ -7,6 +7,7 @@ tag:
   - 生成AI
   - LLM
   - cursor
+  - AI駆動開発
 category:
   - AIDD
 thumbnail: /images/2025/20250428a/thumbnail.gif

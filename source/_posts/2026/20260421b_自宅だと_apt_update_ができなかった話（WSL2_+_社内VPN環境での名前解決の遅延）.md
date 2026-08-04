@@ -3,7 +3,7 @@ title: "自宅だと apt update ができなかった話（WSL2 + 社内VPN環�
 date: 2026/04/21 00:00:01
 postid: b
 tag:
-  - WSL2
+  - WSL
   - VPN
   - Ubuntu
   - 環境構築

@@ -6,6 +6,7 @@ tag:
   - GoogleCloud
   - Terraform
   - Terraform1.4
+  - GCS
 category:
   - DevOps
 thumbnail: /images/2023/20230327b/thumbnail.png

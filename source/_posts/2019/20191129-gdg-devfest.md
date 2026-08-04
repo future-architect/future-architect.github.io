@@ -6,6 +6,7 @@ tag:
   - GoogleCloud
   - GCPUG
   - 登壇レポート
+  - GDG
 category:
   - Infrastructure
 author: 伊藤太斉
