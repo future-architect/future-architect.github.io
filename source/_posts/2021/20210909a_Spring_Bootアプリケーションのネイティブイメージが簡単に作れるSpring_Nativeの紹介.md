@@ -10,7 +10,7 @@ category:
   - Programming
 thumbnail: /images/2021/20210909a/thumbnail.png
 author: 本田紘規
-lede: "こんにちは、2021年新卒入社の本田です。Spring Bootアプリケーションのネイティブイメージが簡単に作れる[Spring Native]について調べてみたので、それを紹介します。Spring NativeとはSpring Bootアプリケーションをほとんど変更することなく、ネイティブイメージを生成することを目指したプロジェクトです。ネイティブイメージの実行はJVMによる実行と比べて..."
+lede: "2021年新卒入社の本田です。Spring Bootアプリケーションのネイティブイメージが簡単に作れる[Spring Native]について調べてみたので、それを紹介します。Spring NativeとはSpring Bootアプリケーションをほとんど変更することなく、ネイティブイメージを生成することを目指したプロジェクトです。ネイティブイメージの実行はJVMによる実行と比べて..."
 ---
 ## はじめに
 

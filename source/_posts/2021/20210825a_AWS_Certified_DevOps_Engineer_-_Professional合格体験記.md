@@ -9,7 +9,7 @@ category:
   - DevOps
 thumbnail: /images/2021/20210825a/thumbnail.png
 author: 伊藤真彦
-lede: "TIGの伊藤真彦です。先日AWS Certified DevOps Engineer – Professionalを受験し合格できました。これにて専門知識以外はコンプリートしました、Machine learning specialtyも合格しているので7冠です。"
+lede: "先日AWS Certified DevOps Engineer – Professionalを受験し合格できました。これにて専門知識以外はコンプリートしました、Machine learning specialtyも合格しているので7冠です。"
 ---
 TIGの伊藤真彦です。
 

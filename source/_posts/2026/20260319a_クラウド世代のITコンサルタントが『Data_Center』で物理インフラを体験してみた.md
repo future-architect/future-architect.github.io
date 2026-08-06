@@ -10,7 +10,7 @@ category:
   - Infrastructure
 thumbnail: /images/2026/20260319a/thumbnail.png
 author: 片岡 久人
-lede: "こんにちは。製造エネルギーグループの片岡久人です。今回は『Data Center』というゲームがリリースされ、一部界隈で話題になっていたので、プレイした感想をお話できればと思います。"
+lede: "今回は『Data Center』というゲームがリリースされ、一部界隈で話題になっていたので、プレイした感想をお話できればと思います。"
 ---
 # 1. はじめに
 

@@ -9,7 +9,7 @@ category:
   - Infrastructure
 thumbnail: /images/2024/20240603a/thumbnail.png
 author: 大岩潤矢
-lede: "みなさんこんにちは、TIG所属の大岩潤矢です。今回はCloudflare連載ということで、Cloudflareのサービス、Cloudflare R2と、NextCloudを利用した自分専用クラウドストレージの構築について紹介します。"
+lede: "今回はCloudflare連載ということで、Cloudflareのサービス、Cloudflare R2と、NextCloudを利用した自分専用クラウドストレージの構築について紹介します。"
 ---
 
 [Cloudflare連載](/articles/20240527a/)の4つ目です。

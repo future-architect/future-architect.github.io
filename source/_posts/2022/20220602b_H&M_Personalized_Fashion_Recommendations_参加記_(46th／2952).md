@@ -10,7 +10,7 @@ category:
   - DataScience
 thumbnail: /images/2022/20220602b/thumbnail.png
 author: 金子剛士
-lede: "Strategic AI Group所属の金子です。普段は推薦に関連する実装やデータ分析を行っています。先日Kaggleで開催された[H&M Personalized Fashion Recommendations]コンペに単独で参加し、2952チーム中46位をとりました。今回の参加記では以下の内容を紹介します。"
+lede: "普段は推薦に関連する実装やデータ分析を行っています。先日Kaggleで開催された[H&M Personalized Fashion Recommendations]コンペに単独で参加し、2952チーム中46位をとりました。今回の参加記では以下の内容を紹介します。"
 ---
 # はじめに
 

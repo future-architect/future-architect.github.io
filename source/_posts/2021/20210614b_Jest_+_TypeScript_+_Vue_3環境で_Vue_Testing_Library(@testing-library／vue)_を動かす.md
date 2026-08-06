@@ -11,7 +11,7 @@ category:
   - Frontend
 thumbnail: /images/2021/20210614b/thumbnail.png
 author: 中川旭
-lede: "フロントエンド記事連載の1記事目です。Vue Testing LibraryはVue.js公式のライブラリであるvue-test-utilをベースとする、DOM Testing LibraryのVue.js用拡張です。Vue Testing Libraryを用いると、Vue.js公式ライブラリであるvue-test-utilと比較して内部構造を意識せずにテストを作成できます。"
+lede: "Vue Testing LibraryはVue.js公式のライブラリであるvue-test-utilをベースとする、DOM Testing LibraryのVue.js用拡張です。Vue Testing Libraryを用いると、Vue.js公式ライブラリであるvue-test-utilと比較して内部構造を意識せずにテストを作成できます。"
 ---
 
 [フロントエンド連載](/articles/20210614a/)の1記事目です。

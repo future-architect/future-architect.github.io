@@ -12,7 +12,7 @@ category:
   - Infrastructure
 thumbnail: /images/2020/20200916/thumbnail.png
 author: 出口豊
-lede: "はじめまして、2017年新卒入社、TIG所属の出口です。今回は、GlyphFeedsの素材受信インターフェース構築を介してAmazon Simple Queue Service  の検証について紹介します。"
+lede: "今回は、GlyphFeedsの素材受信インターフェース構築を介してAmazon Simple Queue Service  の検証について紹介します。"
 ---
 
 [GlyphFeeds連載企画](/articles/20200914/)3つ目の記事です。

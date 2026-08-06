@@ -10,8 +10,7 @@ category:
   - IoT
 thumbnail: /images/2022/20220407a/thumbnail.png
 author: 宮永崇史
-lede: "ASUSが販売しているシングルボードコンピュータTinekr Board2SにAWS Greengrassの環境を構築したので記事にまとめました。
-"
+lede: "ASUSが販売しているシングルボードコンピュータTinekr Board2SにAWS Greengrassの環境を構築したので記事にまとめました。"
 ---
 <img src="/images/2022/20220407a/tinker.png" alt="tinker.png" width="945" height="287" loading="lazy">
 

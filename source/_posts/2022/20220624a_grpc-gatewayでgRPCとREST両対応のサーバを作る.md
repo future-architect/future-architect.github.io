@@ -11,7 +11,7 @@ category:
   - Programming
 thumbnail: /images/2022/20220624a/thumbnail.png
 author:  関靖秀
-lede: "TIGの関です。[サービス間通信とIDL（インタフェース記述言語）連載]の3本目です。昨日に続き、gRPCネタです。この記事では次のネタを扱います。- gRPCの概観- gRPCとWebブラウザの関係性"
+lede: "昨日に続き、gRPCネタです。この記事では次のネタを扱います。- gRPCの概観- gRPCとWebブラウザの関係性"
 ---
 # はじめに
 

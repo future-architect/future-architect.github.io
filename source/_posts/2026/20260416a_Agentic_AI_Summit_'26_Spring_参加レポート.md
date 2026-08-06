@@ -10,7 +10,7 @@ category:
   - Infrastructure
 thumbnail: /images/2026/20260416a/thumbnail.jpg
 author: 古賀晴大
-lede: "2026年3月19日（木）に開催されたGoogle Cloud 主催の[「Agentic AI Summit '26 Spring」]に参加してきました。本イベントでは、単なるタスクの自動化を行うAIから進化した、自律的に思考し行動する「Agentic AI」をメインテーマとしており、自律型AIがいかに業務プロセスを変革し、ビジネス成果をもたらすかを学びました。 "
+lede: "2026年3月19日（木）に開催されたGoogle Cloud 主催の[「Agentic AI Summit '26 Spring」]に参加してきました。本イベントでは、単なるタスクの自動化を行うAIから進化した、自律的に思考し行動する「Agentic AI」をメインテーマとしており、自律型AIがいかに業務プロセスを変革し、ビジネス成果をもたらすかを学びました。"
 ---
 
 <img src="/images/2026/20260416a/top.jpg" alt="" width="372" height="259">

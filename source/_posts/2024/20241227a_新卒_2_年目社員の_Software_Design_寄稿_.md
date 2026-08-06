@@ -12,7 +12,7 @@ category:
   - Infrastructure
 thumbnail: /images/2024/20241227a/thumbnail.jpg
 author: 小澤泰河
-lede: " 技術評論社様（以下敬称略）の『Software Design 2024 年 8 月号』 に記事を寄稿する機会をいただけましたので、その話をご紹介します。"
+lede: "技術評論社様（以下敬称略）の『Software Design 2024 年 8 月号』 に記事を寄稿する機会をいただけましたので、その話をご紹介します。"
 ---
 <a href="https://gihyo.jp/magazine/SD/archive/2024/202408">
 <img src="/images/2024/20241227a/TH320_642408.jpg" alt="" width="320" height="452">

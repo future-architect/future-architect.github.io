@@ -9,7 +9,7 @@ tag:
 category:
   - Programming
 author: 辻大志郎
-lede: "こんにちは。TIG の辻です。先日開催された golang.tokyo #28 に当社から2名、登壇しましたのでそのレポートをします。LT 景品で頂いた CNCF のキャラクターです。かわいいです。"
+lede: "先日開催された golang.tokyo #28 に当社から2名、登壇しましたのでそのレポートをします。LT 景品で頂いた CNCF のキャラクターです。かわいいです。"
 ---
 
 # はじめに
