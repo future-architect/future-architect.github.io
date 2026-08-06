@@ -37,6 +37,14 @@ jobs:
 
       - name: Run textlint with reviewdog
         run: |
+          # Markdown の変更が無い PR では、textlint も reviewdog も実行しない。
+          # textlint は対象0件だと使い方の説明を標準出力に出し、reviewdog は
+          # 空の標準入力を checkstyle として解析できずに落ちるため
+          if [ -z "$(git diff --diff-filter=ACMR --name-only origin/${{github.base_ref}} HEAD -- '*.md')" ]; then
+            echo "Markdown の変更が無いためスキップします"
+            exit 0
+          fi
+
           git diff -z --diff-filter=ACMR --name-only origin/${{github.base_ref}} HEAD -- '*.md' \
             | xargs -0 -r npx --no-install textlint --fix || true
           git diff -z --diff-filter=ACMR --name-only origin/${{github.base_ref}} HEAD -- '*.md' \
