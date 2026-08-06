@@ -13,7 +13,7 @@ category:
   - Frontend
 thumbnail: /images/2022/20221125a/thumbnail.png
 author: 川渕皓太
-lede: "こんにちは、Futureでアルバイトをしている川渕です。[前編]ではLSPを用いたVSCode拡張機能開発チュートリアルとサンプルコードの解説を行いました。後編では前編で解説した[lsp-sample]に機能を追加する方法について説明します。"
+lede: "Futureでアルバイトをしている川渕です。前編ではLSPを用いたVSCode拡張機能開発チュートリアルとサンプルコードの解説を行いました。後編では前編で解説したlsp-sampleに機能を追加する方法について説明します。"
 ---
 # はじめに
 

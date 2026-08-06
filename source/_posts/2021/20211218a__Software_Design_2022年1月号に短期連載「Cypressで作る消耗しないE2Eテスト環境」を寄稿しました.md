@@ -10,7 +10,7 @@ category:
   - Frontend
 thumbnail: /images/2021/20211218a/thumbnail.png
 author: 木戸俊輔
-lede: "[Software Design 2022年1月号]に短期連載「Cypressで作る消耗しないE2Eテスト環境」を寄稿しました！"
+lede: "Software Design 2022年1月号に短期連載「Cypressで作る消耗しないE2Eテスト環境」を寄稿しました！"
 ---
 # はじめに
 

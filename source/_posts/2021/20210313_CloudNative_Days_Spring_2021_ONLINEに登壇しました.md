@@ -12,7 +12,7 @@ category:
   - Infrastructure
 thumbnail: /images/2021/20210313/thumbnail.png
 author: 伊藤太斉
-lede: "こんにちは。TIGの伊藤太斉です。今回は先日開催されました、CloudNative Days Spring 2021 ONLINEに登壇しましたので、その内容について書いていきます。はじめにイベントの概要について簡単に説明します。"
+lede: "今回は先日開催されました、CloudNative Days Spring 2021 ONLINEに登壇しましたので、その内容について書いていきます。はじめにイベントの概要について簡単に説明します。"
 ---
 こんにちは。TIGの伊藤太斉です。
 今回は先日開催されました、[CloudNative Days Spring 2021 ONLINE](https://event.cloudnativedays.jp/cndo2021)に登壇しましたので、その内容について書いていきます。

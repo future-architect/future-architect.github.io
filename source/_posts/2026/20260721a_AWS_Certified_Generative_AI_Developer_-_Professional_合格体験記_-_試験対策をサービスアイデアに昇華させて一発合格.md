@@ -9,7 +9,7 @@ category:
   - DataScience
 thumbnail: /images/2026/20260721a/thumbnail.png
 author: 棚井龍之介
-lede: "2026年7月14日に AWS Certified Generative AI Developer - Professional  を受験し、794点/1000点（合格ライン750点）で一発合格しました。受けた動機はシンプルで、生成AIの知識武装です。"
+lede: "2026年7月14日に AWS Certified Generative AI Developer - Professional を受験し、794点/1000点（合格ライン750点）で一発合格しました。受けた動機はシンプルで、生成AIの知識武装です。"
 ---
 <img src="/images/2026/20260721a/aws-certified-generative-ai-developer-professional.png" alt="aws-certified-generative-ai-developer-professional.png" width="600" height="600" loading="lazy">
 

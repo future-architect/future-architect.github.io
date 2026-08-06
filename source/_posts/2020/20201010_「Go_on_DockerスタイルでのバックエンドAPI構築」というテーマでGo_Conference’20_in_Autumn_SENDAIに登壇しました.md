@@ -12,7 +12,7 @@ category:
   - DevOps
 thumbnail: /images/2020/20201010/thumbnail.png
 author: 伊藤真彦
-lede: "TIGの伊藤真彦です先日[Go Conference’20 in Autumn SENDAI]に登壇させていただきました、リモート登壇の為残念ながら現地には行きませんでした。発表資料はこちらです。"
+lede: "TIGの伊藤真彦です先日Go Conference’20 in Autumn SENDAIに登壇させていただきました、リモート登壇の為残念ながら現地には行きませんでした。発表資料はこちらです。"
 ---
 TIGの伊藤真彦です
 

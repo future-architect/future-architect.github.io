@@ -9,7 +9,7 @@ category:
   - DevOps
 thumbnail: /images/2022/20221107a/thumbnail.png
 author: 岸下優介
-lede: "最近、Netflixで配信中のSpotify創業ドキュメンタリー：[The Playlist]を見ました。そんなわけでSpotify熱が高まっていたこと、自分がプロジェクトの方でSRE活動に関わっていることもあり.."
+lede: "最近、Netflixで配信中のSpotify創業ドキュメンタリー：The Playlistを見ました。そんなわけでSpotify熱が高まっていたこと、自分がプロジェクトの方でSRE活動に関わっていることもあり.."
 ---
 
 <img src="/images/2022/20221107a/teamwork-7423957_640.png" alt="" width="640" height="427">

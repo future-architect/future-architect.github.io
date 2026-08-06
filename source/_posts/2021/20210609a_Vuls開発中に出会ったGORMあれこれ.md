@@ -11,7 +11,7 @@ category:
   - Programming
 thumbnail: /images/2021/20210609a/thumbnail.png
 author: MaineK00n
-lede: "はじめまして、中岡と申します。現在はフューチャー発OSSのVuls開発をメインに、CSIGでアルバイトをしています。- ORMを触るときは発行されるクエリが意図したものか確認する"
+lede: "VulsでDebianをスキャンしたとき、CVE情報のベースをOVALからDebian Security Trackerへ変更しようというものです。実装してみると、変更前はスキャン時間の90％ileが3.37sだったのですが、変更後は11.15sまで増加してしまいました。"
 ---
 # Vuls開発中に出会ったGORMあれこれ
 

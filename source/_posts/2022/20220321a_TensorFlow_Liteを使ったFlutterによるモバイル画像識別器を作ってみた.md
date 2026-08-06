@@ -10,7 +10,7 @@ category:
   - Mobile
 thumbnail: /images/2022/20220321a/thumbnail.png
 author: 岸下優介
-lede: "初めまして、2022年中途入社でTIG所属の岸下です。FlutterとTensorFlow Liteを使ったモバイル画像識別について執筆させて頂きます。TensorFlow Liteとは..."
+lede: "FlutterとTensorFlow Liteを使ったモバイル画像識別について執筆させて頂きます。TensorFlow Liteとは..."
 ---
 # はじめに
 

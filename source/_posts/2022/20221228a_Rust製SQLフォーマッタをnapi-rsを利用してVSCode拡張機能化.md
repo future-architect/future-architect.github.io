@@ -12,7 +12,7 @@ category:
   - Programming
 thumbnail: /images/2022/20221228a/thumbnail.png
 author: 川渕皓太
-lede: "本記事ではRust製SQLフォーマッタであるuroborosql-fmtのVSCode拡張機能化した方法について説明します。"
+lede: "Rust製SQLフォーマッタであるuroborosql-fmtのVSCode拡張機能化した方法について説明します。"
 ---
 
 <img src="/images/2022/20221228a/top.png" alt="" width="579" height="216">

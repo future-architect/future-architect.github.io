@@ -10,7 +10,7 @@ category:
   - Programming
 thumbnail: /images/2024/20241021a/thumbnail.png
 author: 齋藤俊哉
-lede: "当社が開発したSQLフォーマッタである[uroboroSQL-fmt] において、フォーマット前のSQLを壊していないかを検証するロジックについて紹介します。"
+lede: "当社が開発したSQLフォーマッタであるuroboroSQL-fmt において、フォーマット前のSQLを壊していないかを検証するロジックについて紹介します。"
 mathjax: true
 ---
 

@@ -12,7 +12,7 @@ category:
   - Mobile
 thumbnail: /images/2021/20210511b/thumbnail.png
 author: 宮崎将太
-lede: "Dart/Flutter連載の2記事目です。はじめまして、TIGの宮崎将太です。突然ですがみなさん、Swagger使いたいですよね。"
+lede: "突然ですがみなさん、Swagger使いたいですよね。"
 ---
 # はじめに
 

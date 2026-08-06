@@ -11,7 +11,7 @@ category:
   - DevOps
 thumbnail: /images/2021/20210315/thumbnail.png
 author: 前原応光
-lede: "こんにちは、ゆるふわエンジニアの前原です。本記事では、ビルド周りをよしなにやってくれるCloud Build について紹介したいと思います。"
+lede: "ゆるふわエンジニアの前原です。本記事では、ビルド周りをよしなにやってくれるCloud Build について紹介したいと思います。"
 ---
 # はじめに
 

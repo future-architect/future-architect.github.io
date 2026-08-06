@@ -10,7 +10,7 @@ category:
   - DataEngineering
 thumbnail: /images/2021/20211112a/thumbnail.png
 author: 伊藤真彦
-lede: "TIGの伊藤真彦です。先日AWS Certified Data Analytics - Specialtyに合格しました。これで持っているAWS認定資格は10個になりました。"
+lede: "先日AWS Certified Data Analytics - Specialtyに合格しました。これで持っているAWS認定資格は10個になりました。"
 ---
 TIGの伊藤真彦です。
 <img src="/images/2021/20211112a/image.png" alt="image.png" width="600" height="600" loading="lazy">
