@@ -34,7 +34,7 @@ Vulsでは、以下のようにsqlite3などの形式で保存されたVulnerabi
 
 FYI: Vulsのスキャンアーキテクチャは[こちら](https://vuls.io/docs/en/architecture-fast-deep.html)に詳しく書かれています。
 
-<img src="/images/2021/20210609a/vuls-arch.png" alt="Vulsアーキテクチャ図" loading="lazy"
+<img src="/images/2021/20210609a/vuls-arch.png" alt="Vulsアーキテクチャ図" loading="lazy">
 
 Reference: [future-architect/vuls](https://github.com/future-architect/vuls)
 
