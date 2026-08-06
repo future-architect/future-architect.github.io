@@ -23,7 +23,10 @@ function generateRelatedPostsHtml(posts) {
     if (related) {
       const scoreText = related.score ? `スコア: ${related.score.toFixed(4)}` : '';
       const titleAttr = `${related.lede} ${scoreText}`.trim();
-      result += `<li class="related-posts-item"><span>${related.date.format('YYYY.MM.DD')}</span><span class="snscount">&#9825;${getSNSCnt(related.permalink)}</span><a href=/${related.path} title="${titleAttr}">${related.title}${label(related)}</a></li>`;
+        // タイトル -> 日付 -> SNS数の順。読み手は「何の記事か」を見てから
+      // 「古くないか」「評判はどうか」を確認する。「この記事を参照している記事」
+      // （reference_posts.js）とマークアップを揃えている
+      result += `<li class="related-posts-item"><a href=/${related.path} title="${titleAttr}">${related.title}</a>${label(related)}<span class="post-meta"><span class="post-meta-date">${related.date.format('YYYY.MM.DD')}</span><span class="snscount">&#9825;${getSNSCnt(related.permalink)}</span></span></li>`;
     }
   }
 
