@@ -1,5 +1,13 @@
 'use strict';
 
+const {getSNSCnt} = require('./lib/sns');
+
+// 反響が0のときは何も出さない（related_posts.js と揃える）
+const snsLabel = permalink => {
+  const n = getSNSCnt(permalink);
+  return n > 0 ? `<span class="snscount">&#9825;${n}</span>` : '';
+};
+
 hexo.extend.helper.register('list_reference_posts', function() {
 
   const referencePosts = this.site.posts.data.filter(p => p.content.includes(this.post.path))
@@ -24,7 +32,8 @@ hexo.extend.helper.register('list_reference_posts', function() {
   let result = "";
   for (let i = 0; i < Math.min(5, referencePosts.length); i++) {
     const related = referencePosts[i];
-    result += `<li class="reference-posts-item"><a href=/${related.path} title="${related.lede}">${related.title}${label(related)}</a></li>`;
+    // 関連記事（related_posts.js）とマークアップを揃える
+    result += `<li class="reference-posts-item"><a href=/${related.path} title="${related.lede}">${related.title}</a>${label(related)}<span class="post-meta"><span class="post-meta-date">${related.date.format('YYYY.MM.DD')}</span>${snsLabel(related.permalink)}</span></li>`;
   }
 
   return `
