@@ -11,7 +11,7 @@ category:
   - Programming
 thumbnail: /images/2021/20211028b/thumbnail.png
 author: 武田大輝
-lede: "OpenAPI仕様に則ってREST APIの設計をする際に、値が存在しないという状態をどのように表現するかというお話です。まずはじめに、ここで`undefined`と言っているのは、OpenAPIの仕様において、リクエスト/レスポンスのデータ型を定義するSchema Objectのプロパティの1つである`required`が指定されていない状態を指します。"
+lede: "OpenAPI仕様に則ってREST APIの設計をする際に、値が存在しないという状態をどのように表現するかというお話です。まずはじめに、ここでundefinedと言っているのは、OpenAPIの仕様において、リクエスト/レスポンスのデータ型を定義するSchema Objectのプロパティの1つであるrequiredが指定されていない状態を指します。"
 ---
 
 <img src="/images/2021/20211028b/top.png" alt="" width="800" height="414">

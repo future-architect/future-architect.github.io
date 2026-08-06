@@ -11,7 +11,7 @@ category:
   - DataEngineering
 thumbnail: /images/2026/20260630a/thumbnail.jpg
 author: 柴田健太
-lede: "Google Drive の共有フォルダにあるスプレッドシートが更新されたら、自動的にテーブルとしてBigQueryに取り込みたい。このような仕組みを作りたいと思うことは誰にでもあると思います。従来は Google Drive API の `changes.watch` を使った Webhook ベースの方法が一般的でしたが..."
+lede: "Google Drive の共有フォルダにあるスプレッドシートが更新されたら、自動的にテーブルとしてBigQueryに取り込みたい。このような仕組みを作りたいと思うことは誰にでもあると思います。従来は Google Drive API の changes.watch を使った Webhook ベースの方法が一般的でしたが..."
 ---
 
 <img src="/images/2026/20260630a/top.jpg" alt="" width="720" height="393">
