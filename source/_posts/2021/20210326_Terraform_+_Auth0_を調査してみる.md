@@ -10,7 +10,7 @@ category:
   - 認証認可
 thumbnail: /images/2021/20210326/thumbnail.png
 author: 小林澪司
-lede: "アルバイトの小林です。案件で認証プラットフォームである[Auth0]を利用しています。Auth0がHashiCorpとのパートナーシップを結び、TerraformでAuth0リソースの管理が可能となりました。"
+lede: "アルバイトの小林です。案件で認証プラットフォームであるAuth0を利用しています。Auth0がHashiCorpとのパートナーシップを結び、TerraformでAuth0リソースの管理が可能となりました。"
 ---
 TIG DXユニット [^1] アルバイトの小林です。
 

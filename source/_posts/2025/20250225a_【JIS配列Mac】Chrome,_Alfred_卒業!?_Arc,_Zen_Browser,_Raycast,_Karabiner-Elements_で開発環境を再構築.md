@@ -10,7 +10,7 @@ category:
   - DevOps
 thumbnail: /images/2025/20250225a/thumbnail.png
 author: 棚井龍之介
-lede: "JIS 配列 Mac ユーザーの皆さん、今の環境に満足していますか？  Webブラウザやランチャーアプリには何を使っていますか？今日は思い切って、長年連れ添った Chrome と Alfred から、Arc, Zen Browser や Raycast に切り替えた環境構築をご紹介します。"
+lede: "JIS 配列 Mac ユーザーの皆さん、今の環境に満足していますか？ Webブラウザやランチャーアプリには何を使っていますか？今日は思い切って、長年連れ添った Chrome と Alfred から、Arc, Zen Browser や Raycast に切り替えた環境構築をご紹介します。"
 ---
 
 JIS 配列 Mac ユーザーの皆さん、今の環境に満足していますか？

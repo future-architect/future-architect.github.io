@@ -11,7 +11,7 @@ category:
   - Programming
 thumbnail: /images/2021/20210218/thumbnail.png
 author: 辻大志郎
-lede: "[AWS SDK for Go]を使ってAWSのAPIをコールする場合のリトライアルゴリズムを差し替える方法を紹介します。"
+lede: "AWS SDK for Goを使ってAWSのAPIをコールする場合のリトライアルゴリズムを差し替える方法を紹介します。"
 ---
 # はじめに
 

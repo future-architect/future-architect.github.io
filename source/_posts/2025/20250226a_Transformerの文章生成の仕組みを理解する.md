@@ -11,7 +11,7 @@ category:
   - DataScience
 thumbnail: /images/2025/20250226a/thumbnail.jpg
 author: 森友雅
-lede: "Transformerを知っていて、その理解を深めたい人、大規模言語モデル  がどのようにして推論しているのかを知りたい人向けに..."
+lede: "Transformerを知っていて、その理解を深めたい人、大規模言語モデル がどのようにして推論しているのかを知りたい人向けに..."
 mathjax: true
 ---
 # 本記事の前提

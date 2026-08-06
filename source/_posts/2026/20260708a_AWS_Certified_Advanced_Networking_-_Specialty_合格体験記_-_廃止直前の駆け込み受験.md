@@ -10,7 +10,7 @@ category:
   - Infrastructure
 thumbnail: /images/2026/20260708a/thumbnail.png
 author: 棚井龍之介
-lede: "2026年7月1日に AWS Certified Advanced Networking - Specialty  に続く、2つ目のAWS認定です。"
+lede: "2026年7月1日に AWS Certified Advanced Networking - Specialty に続く、2つ目のAWS認定です。"
 ---
 <img src="/images/2026/20260708a/image1.png" alt="" width="600" height="600" loading="lazy">
 

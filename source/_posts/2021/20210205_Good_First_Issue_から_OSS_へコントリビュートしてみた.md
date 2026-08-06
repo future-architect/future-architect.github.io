@@ -10,7 +10,7 @@ category:
   - Programming
 thumbnail: /images/2021/20210205/thumbnail.png
 author: 多賀聡一朗
-lede: "[Good First Issue] にコントリビュートしてみたので、経験談について記載してみます。[Good First Issue]で定義されており、初めてのコントリビュートに向いている Issue につけられるラベルです。"
+lede: "Good First Issue にコントリビュートしてみたので、経験談について記載してみます。Good First Issueで定義されており、初めてのコントリビュートに向いている Issue につけられるラベルです。"
 ---
 ## 概要
 
