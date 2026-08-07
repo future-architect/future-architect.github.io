@@ -106,7 +106,7 @@ bootstrap-subset → metronic → theme-styles.styl の順で `/css/site.css` �
   | `body` | 13px | `theme-styles.styl` |
   | 本文（`p` / `li` / `summary`） | `1.2em` = 15.6px | 〃 |
   | 記事タイトル | `clamp(24px, 1.325rem + 0.9vw, 32px)` | 〃（1箇所のみ） |
-  | 本文見出し h1〜h5 | 26 / 24 / 22 / 20 / 18px | 〃 |
+  | 本文見出し h1〜h5 | `2.0 / 1.85 / 1.7 / 1.55 / 1.4em` = 26 / 24.05 / 22.1 / 20.15 / 18.2px | 〃 |
   | コードブロック | 13px（`line-height` は `font-size × 1.6` で追従） | `highlight.styl` の変数 |
 
 - コードブロックのサイズは本文との相対バランスを見て 15px → 14px → 13px と
