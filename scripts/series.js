@@ -16,9 +16,14 @@
  * 日目 / 第N弾）や、連載を束ねる年間企画との区別を推測に頼るため、
  * 実行時には残していない。判定はフロントマターだけを見る。
  *
- * 番号は出さない。本文が名乗る番号（「6本目です」）と日付順の位置は、
- * 70連載中37件でズレていた。索引記事を1本目に数えるかが連載ごとに違い、
- * 本文と食い違う番号を機械が示す方が、番号が無いより害が大きい。
+ * 出すのは全何本かまでで、今何本目かは出さない。
+ * 本文が名乗る番号（「6本目です」）は、索引記事を1本目に数えるかが
+ * 連載ごとに違う。実測では 43連載が数えず / 23連載が数え / 4連載は連載内でも
+ * 不統一だった。機械が一方の流儀で番号を振ると、他方の114記事で
+ * 本文の「4本目です」と食い違う。番号が無いより害が大きい。
+ *
+ * 全何本かはこの流儀に依存しないので出せる。索引は連載の目次であって
+ * 本編ではないため、本数には数えない。
  */
 
 let cache = null;
@@ -35,10 +40,13 @@ function build(site) {
   const series = new Map(); // 記事のパス -> その記事から見た連載
   for (const [name, posts] of groups) {
     const index = posts.find(p => p.tags && p.tags.some(t => t.name === 'インデックス'));
+    // 索引は本編に数えない。索引記事自身から見た本数も同じ値になる
+    const total = posts.length - (index ? 1 : 0);
 
     posts.forEach((post, i) => {
       series.set(post.path, {
         name,
+        total,
         index: index && index !== post ? index : null,
         prev: i > 0 ? posts[i - 1] : null,
         next: i < posts.length - 1 ? posts[i + 1] : null
