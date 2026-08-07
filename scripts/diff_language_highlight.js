@@ -10,7 +10,11 @@
  *
  * - 追加行（+）・削除行（-）は行全体を差分の色にする。ただし色だけを
  *   上書きし font-weight は触らないので、キーワードの太字は残る
- * - それ以外の行は指定された言語の構文ハイライトがそのまま出る
+ * - 言語側の「強調を足す」色は落とす。差分の赤緑と構文の色が同時に出ると
+ *   色数が多すぎて、どこが変わったのかが読み取りにくくなる
+ * - ただし「優先度を下げる」色は残す。コメントを地の文より暗くするのは
+ *   情報量を減らす方向なので、差分の読み取りを邪魔しない
+ * - キーワードの太字も残す。色を持たせなくても構造は伝わる
  *
  * hexo 標準のハイライタを通さず、terraform 用（register_hljs_terraform.js）と
  * 同じやり方でコードブロックを横取りして自前で組み立てる。
@@ -56,6 +60,27 @@ function highlightLines(code, language) {
   return lines;
 }
 
+/**
+ * 言語側の色を落とす。
+ *
+ * 差分の赤緑と構文の色が同時に出ると色数が多すぎて読み取りにくいため、
+ * 強調を足すだけのクラス（キーワード・型・文字列・数値など）は
+ * クラスを外して地の文の色に戻す。
+ *
+ * 例外は2つ。
+ * - comment は地の文より暗くする「優先度を下げる」色なので残す
+ * - keyword は色を外したうえで太字だけ残したいので、専用クラスに移す
+ *
+ * span の数は変えないので、行またぎの開き直しとも整合する。
+ */
+function neutralize(html) {
+  return html.replace(/<span class="([^"]*)">/g, (tag, cls) => {
+    if (cls === 'comment') return tag;
+    if (cls === 'keyword') return '<span class="keyword-plain">';
+    return '<span>';
+  });
+}
+
 function render(code, language) {
   // 差分マーカーを外した素のコードにしてからハイライトする。
   // マーカーが残っていると言語として解釈できず、全体が崩れる
@@ -71,7 +96,7 @@ function render(code, language) {
 
   return rows.map((r, i) => {
     // テーマの CSS は hljs- 接頭辞の付かないクラス名を前提にしている
-    const body = highlighted[i].replace(/hljs-/g, '');
+    const body = neutralize(highlighted[i].replace(/hljs-/g, ''));
     const cls = r.cls ? `line ${r.cls}` : 'line';
     return `<span class="${cls}">${escapeHtml(r.marker)}${body}</span><br>`;
   }).join('');
