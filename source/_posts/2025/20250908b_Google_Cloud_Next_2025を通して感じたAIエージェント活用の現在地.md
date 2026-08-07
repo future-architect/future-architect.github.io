@@ -9,7 +9,7 @@ tags:
   - GoogleCloudNext2025
   - ロボット
 categories:
-  - Infrastructure
+  - AIDD
 thumbnail: /images/2025/20250908b/thumbnail.png
 author: 柴田健太
 lede: "Google Cloud Next 2025を通して感じたAIエージェント活用の現在地について、私なりの考えを整理してみたいと思います。"
