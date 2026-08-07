@@ -110,7 +110,7 @@ $ curl -sSL https://dokploy.com/install.sh | sudo sh
 
 まずはGoのアプリケーションを作ってみます。ふつうのウェブアプリケーションです。
 
-```text go.mod
+```gomod go.mod
 module goapp
 
 go 1.24
