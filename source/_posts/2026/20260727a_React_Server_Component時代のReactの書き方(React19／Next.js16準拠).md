@@ -7,7 +7,7 @@ tags:
   - React
   - サーバーコンポーネント
 categories:
-  - Infrastructure
+  - Frontend
 thumbnail: /images/2026/20260727a/thumbnail.png
 author: 澁川喜規
 lede: "一番Next.jsとかReactを書いていたのはhookが出たあたりで関数コンポーネントになった近辺でだいぶ前ですが、Reactのドキュメントを一通り見ていたところ、かなり書き方が変わっていそうなので、新規プロジェクトでがっつりイマドキの書き方に寄せてみようと思って学びなおしたり、検証したのでその備忘というか整理です。"
