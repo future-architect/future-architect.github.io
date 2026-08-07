@@ -16,7 +16,7 @@ lede: "「B-treeインデックスのスキップスキャン」機能が気に�
 
 <img src="/images/2025/20251014a/top.jpg" alt="" width="800" height="664">
 
-[PostgreSQL18連載](/articles/20251006a/)の6本目の記事です。
+[PostgreSQL18連載](/articles/20251006a/)の5本目の記事です。
 
 [PostgreSQL 18がリリース](https://www.postgresql.org/about/news/postgresql-18-released-3142/)されました。リリースされた機能のうち私は「B-treeインデックスのスキップスキャン」機能が気になったので、機能の特徴を深堀りしつつ、実際の挙動を確認してみます。
 

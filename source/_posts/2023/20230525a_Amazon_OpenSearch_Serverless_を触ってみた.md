@@ -14,7 +14,7 @@ thumbnail: /images/2023/20230525a/thumbnail.png
 author: 齊藤英比古
 lede: "Amazon OpenSearch Service を触る機会があり、興味があったのでプレビューで公開されていたServerless版でいろいろ試していました"
 ---
-[春の入門連載2023](/articles/20230417a)、17日ぶり2回目の寄稿、23日目を担当します齊藤です。よろしくお願いします。
+[春の入門連載2023](/articles/20230417a)、17日ぶり23回目の寄稿、23日目を担当します齊藤です。よろしくお願いします。
 運良く2個目の記事をアップできることになりました！ (やったね)
 
 業務でAmazon OpenSearch Service (Serviceのほう) を触る機会があり、興味があったのでプレビューで公開されていたServerless版でいろいろ試しました。

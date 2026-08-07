@@ -16,7 +16,7 @@ lede: "Terraform 連載ということで、そういえば、実装コードは
 ---
 <img src="/images/2024/20240326a/top.png" alt="" width="800" height="539">
 
-[Terraform連載2024](/articles/20240311a/) の10本目記事です。
+[Terraform連載2024](/articles/20240311a/) の9本目記事です。
 
 # はじめに
 

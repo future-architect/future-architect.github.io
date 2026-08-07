@@ -16,7 +16,7 @@ lede: "PlantUMLで使えるテーマについてのご紹介です。以前、�
 ---
 <img src="/images/2021/20211108a/example_vibrant.png" alt="example_vibrant.png" width="641" height="424" loading="lazy">
 
-[秋のブログ週間](/articles/20211027a/)連載の7本目です。
+[秋のブログ週間](/articles/20211027a/)連載の8本目です。
 
 ## はじめに
 

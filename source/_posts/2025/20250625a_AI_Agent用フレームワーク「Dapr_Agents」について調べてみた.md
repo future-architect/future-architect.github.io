@@ -20,7 +20,7 @@ lede: "Dapr Agentsの検討記事です。Dapr Agents の技術的背景や意�
 > 本日、Dapr を基盤として構築された新たなフレームワーク「Dapr Agents」のリリースを発表いたします。Dapr Agents は、ステートフルなワークフロー調整機能と先進的な Agentic AI 機能を統合したソリューションです。
 > https://www.cncf.io/blog/2025/03/12/announcing-dapr-ai-agents/
 
-[CNCF 連載](/articles/20250616a/) 6 日目は[Dapr Agents](https://github.com/dapr/dapr-agents)の検討記事です。
+[CNCF 連載](/articles/20250616a/) 4 日目は[Dapr Agents](https://github.com/dapr/dapr-agents)の検討記事です。
 
 Dapr Agents の技術的背景や意義を「Agentic AI」や「ワークフロー」の側面から探ります。
 

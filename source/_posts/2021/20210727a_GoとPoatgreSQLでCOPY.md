@@ -8,7 +8,7 @@ tags:
   - Go
   - jackc/pgx
 categories:
-  - Programming
+  - Programming
 series: "GoのORマッパー連載"
 thumbnail: /images/2021/20210727a/thumbnail.png
 author: 澁川喜規

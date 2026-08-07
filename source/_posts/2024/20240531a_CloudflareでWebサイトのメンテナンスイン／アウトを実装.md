@@ -13,7 +13,7 @@ author: 小林弘樹
 lede: "CloudflareをCDNやDNSに利用しているサービスにおいて、CDNレイヤでメンテナンスイン/アウトを実装する方法を書いてみます。"
 ---
 
-[Cloudflare連載](/articles/20240527a/)5日目の記事です。
+[Cloudflare連載](/articles/20240527a/)4日目の記事です。
 
 # はじめに
 

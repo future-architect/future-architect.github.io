@@ -17,7 +17,7 @@ lede: "Apple 純正のCI/CDサービスである Xcode Cloud を初めて導入�
 
 # はじめに
 
-[CI/CD連載](/articles/20250603a/) 5本目です。
+[CI/CD連載](/articles/20250603a/) 4本目です。
 
 HIGの橋本です。
 

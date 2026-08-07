@@ -8,7 +8,7 @@ tags:
   - ORM
   - jackc/pgx
 categories:
-  - Programming
+  - Programming
 series: "GoのORマッパー連載"
 thumbnail: /images/2021/20210916a/thumbnail.png
 author: 筒井悠平
