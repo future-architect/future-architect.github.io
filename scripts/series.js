@@ -24,7 +24,64 @@
  *
  * 全何本かはこの流儀に依存しないので出せる。索引は連載の目次であって
  * 本編ではないため、本数には数えない。
+ *
+ * ナビに出す題名からは、連載名を名乗り直している部分を落とす。
+ * 連載名は見出しに出ているので、前 / 次 の両方で繰り返すと本題が埋もれる。
+ *
+ *   「Go 1.27 リリース連載：encoding/json/v2」-> 「encoding/json/v2」
  */
+
+// 表記の揺れは題名側にある（「Go1.27リリース連載」「Go 1.27 リリース連載」）。
+// 空白は無視し、全角/半角と大小は NFKC で吸収して突き合わせる
+const WS = /[\s　]/;
+const SEP = /[：:｜|〜～]/;
+
+function sameChar(a, b) {
+  return a.normalize('NFKC').toLowerCase() === b.normalize('NFKC').toLowerCase();
+}
+
+// 接頭辞を空白を無視して照合し、題名側で消費した位置を返す。合わなければ -1
+function consume(title, prefix) {
+  let i = 0;
+  let j = 0;
+  while (j < prefix.length) {
+    if (WS.test(prefix[j])) { j++; continue; }
+    if (i >= title.length) return -1;
+    if (WS.test(title[i])) { i++; continue; }
+    if (!sameChar(title[i], prefix[j])) return -1;
+    i++;
+    j++;
+  }
+  return i;
+}
+
+/**
+ * 題名の頭にある連載名を落とす。落とせなければ題名をそのまま返す。
+ *
+ * 落とす条件を2段に分けているのは、素朴に接頭辞を消すと題名が壊れるため。
+ *
+ * - 「<連載名>連載」で始まるなら、空白区切りでも落とす。
+ *   「Go 1.22リリース連載 net, net/http」-> 「net, net/http」
+ * - 「<連載名>」だけで始まるときは、明示的な区切り（：や｜）を要求する。
+ *   連載名が題名の文頭の語そのものである場合があり、空白まで許すと
+ *   「Cloudflare 採用のアーキテクチャ選定」が「採用のアーキテクチャ選定」になる
+ *
+ * 区切りの後ろが本題にならない題名は落とさない。索引記事に多い
+ * 「CI/CD連載を始めます」は「を始めます」になってしまう。
+ * 実データでは620記事中40件が落ち、43件は接頭辞を持ちながら据え置かれた。
+ */
+function navTitle(title, name) {
+  for (const [prefix, allowSpace] of [[name + '連載', true], [name, false]]) {
+    const k = consume(title, prefix);
+    if (k < 0) continue;
+    const rest = title.slice(k);
+    if (!rest) continue; // 題名が連載名そのもの（索引記事に多い）
+    if (!(SEP.test(rest[0]) || (allowSpace && WS.test(rest[0])))) continue;
+    const stripped = rest.replace(/^[\s　：:｜|〜～]+/, '');
+    if (stripped) return stripped;
+  }
+  return title;
+}
 
 let cache = null;
 
@@ -43,13 +100,16 @@ function build(site) {
     // 索引は本編に数えない。索引記事自身から見た本数も同じ値になる
     const total = posts.length - (index ? 1 : 0);
 
+    // 落とすのはナビの表示だけ。記事の title そのものは触らない
+    const nav = posts.map(p => ({path: p.path, title: navTitle(p.title, name)}));
+
     posts.forEach((post, i) => {
       series.set(post.path, {
         name,
         total,
         index: index && index !== post ? index : null,
-        prev: i > 0 ? posts[i - 1] : null,
-        next: i < posts.length - 1 ? posts[i + 1] : null
+        prev: i > 0 ? nav[i - 1] : null,
+        next: i < posts.length - 1 ? nav[i + 1] : null
       });
     });
   }
