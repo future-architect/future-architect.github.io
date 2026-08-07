@@ -63,6 +63,23 @@ make lint   # npx lint-staged（git add 済みの記事のみ textlint）
 記事を書き換えたら `make fix` か、対象ファイルだけの
 `node_modules/.bin/textlint --fix <path>` を通してから push する。
 
+### mermaid の図をローカルで確認する場合
+
+mermaid はビルド時に SVG へ変換している（`scripts/mermaid_svg.js`）。
+変換には `mmdr`（Rust製の mermaid レンダラ）が必要で、PATH に無い場合は
+従来どおりブラウザ側の CDN 描画にフォールバックする。**入れなくてもビルドは通る**。
+
+```sh
+curl -sSfL https://github.com/1jehuang/mermaid-rs-renderer/releases/download/v0.3.1/mmdr-x86_64-unknown-linux-gnu.tar.gz \
+  | tar xz -C ~/.local/bin
+```
+
+CI（`deploy.yml`）でも同じ方法で入れている。バージョンを上げるときは
+両方を揃えること。
+
+`scripts/` を変えても記事は再描画されない（`db.json` のキャッシュ）ため、
+見た目を確認するときは `make clean` を挟む。
+
 ## Lint ルール
 
 - `.textlintrc`: `preset-ja-technical-writing` + `spellcheck-tech-word`。一文200文字まで、漢字連続10文字まで。感嘆符・疑問符と弱い表現は許容
