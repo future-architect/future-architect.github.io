@@ -18,17 +18,29 @@ hexo.extend.helper.register('list_reference_posts', function() {
 
   // 件数で打ち切らない。参照されていることは記事が積み上げてきた事実で、
   // 隠すと「参照しても表示されないなら書かなくてよい」という方向に働きうる。
-  // 実データでは被参照が6件以上の記事は70本（5.7%）、最大でも29件のため、
-  // 全件出してもページが極端に伸びることはない
-  let result = "";
-  for (const post of referencePosts) {
-    // マークアップは lib/post_list.js に集約している
-    result += postListItem(post, 'reference-posts-item');
-  }
+  //
+  // ただし全件をそのまま並べると、最大32件の記事では記事末尾が長くなりすぎる。
+  // 先頭だけ常に見せ、残りは details で畳んでクリックで開けるようにする。
+  // details ならJSを足さずに済む。
+  const VISIBLE = 5;
+  // 残りが1件だけなら畳む意味がないので、そのまま出す
+  const collapses = referencePosts.length > VISIBLE + 1;
+  const shown = collapses ? referencePosts.slice(0, VISIBLE) : referencePosts;
+  const hidden = collapses ? referencePosts.slice(VISIBLE) : [];
+
+  // マークアップは lib/post_list.js に集約している
+  const items = posts => posts.map(p => postListItem(p, 'reference-posts-item')).join('');
+
+  // ul の直下に details は置けないため、畳む分は別の ul にして details で包む
+  const more = hidden.length === 0 ? '' : `
+    <details class="reference-post-more">
+      <summary>残り ${hidden.length} 件を表示</summary>
+      <ul class="reference-post-link">${items(hidden)}</ul>
+    </details>`;
 
   return `
   <div class="card">
     <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
-    <ul class="reference-post-link">${result}</ul>
+    <ul class="reference-post-link">${items(shown)}</ul>${more}
   </div>`;
 });
