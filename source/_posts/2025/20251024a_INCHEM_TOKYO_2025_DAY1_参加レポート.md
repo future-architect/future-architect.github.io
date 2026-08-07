@@ -6,7 +6,7 @@ tags:
   - 参加レポート
   - 展示会
 categories:
-  - Infrastructure
+  - Business
 thumbnail: /images/2025/20251024a/thumbnail
 author:  三谷昭徳
 lede: "皆さん、初めまして。入社１年目、製造・エネルギー事業部の三谷 昭徳です。2025年9月17日（水）~ 19日（金）に東京ビッグサイトで開催されたINCHEM TOKYO 2025のDAY1に参加してきました！当日の様子や注目されていた技術などをレポートしたいと思います！"
