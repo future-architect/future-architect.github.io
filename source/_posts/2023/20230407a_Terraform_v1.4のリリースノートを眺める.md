@@ -2,10 +2,10 @@
 title: "Terraform v1.4のリリースノートを眺める"
 date: 2023/04/07 00:00:00
 postid: a
-tag:
+tags:
   - Terraform
   - Terraform1.4
-category:
+categories:
   - DevOps
 thumbnail: /images/2023/20230407a/thumbnail.png
 author: 伊藤太斉

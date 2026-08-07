@@ -2,12 +2,12 @@
 title: "Future Tech Night #15 ~GCPのサーバーレスサービスを利用したWebアプリの開発~"
 date: 2021/09/10 00:00:00
 postid: a
-tag:
+tags:
   - GoogleCloud
   - サーバーレス
   - TechNight
   - 登壇レポート
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2021/20210910a/thumbnail.png
 author: 伊藤太斉

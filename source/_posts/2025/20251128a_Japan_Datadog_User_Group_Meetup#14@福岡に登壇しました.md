@@ -2,11 +2,11 @@
 title: "Japan Datadog User Group Meetup#14@福岡に登壇しました"
 date: 2025/11/28 00:00:00
 postid: a
-tag:
+tags:
   - Datadog
   - オブサーバビリティ
   - 登壇レポート
-category:
+categories:
   - DevOps
 thumbnail: /images/2025/20251128a/thumbnail.png
 author: 市川裕也

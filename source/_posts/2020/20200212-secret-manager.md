@@ -2,12 +2,12 @@
 title: "【もう鍵なくさない】GCPのSecret ManagerとBerglasで幸せになる"
 date: 2020/02/12 09:14:36
 postid: ""
-tag:
+tags:
   - GoogleCloud
   - Python
   - Go
   - 暗号
-category:
+categories:
   - Security
 author: 市川諒
 lede: "突然ですが、普段生活するうえでカギ🔑をなくした、忘れたことはないでしょうか。私はあります。なくしたことはないけど、うっかり置き忘れちゃうんですよね。

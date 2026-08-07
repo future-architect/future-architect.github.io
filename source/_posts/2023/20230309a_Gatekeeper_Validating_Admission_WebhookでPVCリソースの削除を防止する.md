@@ -2,13 +2,13 @@
 title: "Gatekeeper Validating Admission WebhookでPVCリソースの削除を防止する"
 date: 2023/03/09 00:00:00
 postid: a
-tag:
+tags:
   - Kubernetes
   - OpenPolicyAgent
   - ArgoCD
   - EKS
   - Rego
-category:
+categories:
   - DevOps
 thumbnail: /images/2023/20230309a/thumbnail.png
 author: 岩崎賢太

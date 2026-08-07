@@ -2,11 +2,11 @@
 title: "Terraformの基本のキ！ファイル構成からコマンドまでやさしく解説"
 date: 2025/05/16 00:00:00
 postid: a
-tag:
+tags:
   - Terraform
   - 入門
   - 初心者向け
-category:
+categories:
   - DevOps
 thumbnail: /images/2025/20250516a/thumbnail.png
 author: 染矢幸子

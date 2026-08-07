@@ -2,11 +2,11 @@
 title: "Future Tech Night(第3弾：船舶IoT Platform編)を開催しました。"
 date: 2021/01/28 00:00:00
 postid: ""
-tag:
+tags:
   - AWS
   - 登壇レポート
   - TechNight
-category:
+categories:
   - Culture
 thumbnail: /images/2021/20210128/thumbnail.png
 author: 矢野颯太

@@ -2,11 +2,11 @@
 title: "FutureTechNight#20 Stateの分割戦略 〜ModulesとWorkspacesを利用して〜"
 date: 2022/03/31 00:00:00
 postid: a
-tag:
+tags:
   - Terraform
   - TechNight
   - 登壇レポート
-category:
+categories:
   - DevOps
 thumbnail: /images/2022/20220331a/thumbnail.png
 author: 伊藤太斉

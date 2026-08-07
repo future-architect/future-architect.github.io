@@ -2,12 +2,12 @@
 title: "Slack×GASの日報テンプレBOTを実務に導入してみた"
 date: 2020/08/17 00:00:00
 postid: ""
-tag:
+tags:
   - Slack
   - JavaScript
   - BOT
   - GAS
-category:
+categories:
   - Frontend
 thumbnail: /images/2020/20200817/thumbnail.png
 author: 仁木美来

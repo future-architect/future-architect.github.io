@@ -2,13 +2,13 @@
 title: "Mac歴10年のWindows入門"
 date: 2025/05/21 00:00:00
 postid: a
-tag:
+tags:
   - Windows
   - 環境構築
   - Mac
   - キーバインド
   - VSCode
-category:
+categories:
   - DevOps
 thumbnail: /images/2025/20250521a/thumbnail.png
 author: 長谷川寛人

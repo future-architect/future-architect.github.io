@@ -2,10 +2,10 @@
 title: "Qiita Advent Calendar 2023 に参加します"
 date: 2023/11/30 00:00:01
 postid: b
-tag:
+tags:
   - アドベントカレンダー
   - インデックス
-category:
+categories:
   - Culture
 thumbnail: /images/2023/20231130b/thumbnail.JPG
 author: 伊藤太斉

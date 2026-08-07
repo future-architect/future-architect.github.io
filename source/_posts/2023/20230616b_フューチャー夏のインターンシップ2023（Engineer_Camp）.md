@@ -2,10 +2,10 @@
 title: "フューチャー夏のインターンシップ2023（Engineer Camp）"
 date: 2023/06/16 00:00:01
 postid: b
-tag:
+tags:
   - インターン
   - インターン2023
-category:
+categories:
   - Culture
 thumbnail: /images/2023/20230616b/thumbnail.jpg
 author: admin

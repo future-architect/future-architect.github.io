@@ -2,10 +2,10 @@
 title: "AWS Certified Solutions Architect - Associate 合格体験記"
 date: 2021/08/18 00:00:01
 postid: b
-tag:
+tags:
   - AWS
   - 合格記
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2021/20210818b/thumbnail.png
 author: 市川浩暉

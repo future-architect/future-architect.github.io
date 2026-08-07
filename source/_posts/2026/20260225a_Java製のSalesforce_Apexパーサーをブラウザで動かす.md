@@ -2,11 +2,11 @@
 title: "Java製のSalesforce Apexパーサーをブラウザで動かす"
 date: 2026/02/25 00:00:00
 postid: a
-tag:
+tags:
   - Java
   - Salesforce
   - WebAssembly
-category:
+categories:
   - Programming
 thumbnail: /images/2026/20260225a/thumbnail.png
 author: 二村暢之

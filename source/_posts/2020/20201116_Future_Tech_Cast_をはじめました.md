@@ -2,10 +2,10 @@
 title: "Future Tech Cast をはじめました"
 date: 2020/11/16 00:00:00
 postid: ""
-tag:
+tags:
   - 運営
   - ポッドキャスト
-category:
+categories:
   - Culture
 thumbnail: /images/2020/20201116/thumbnail.png
 author: admin

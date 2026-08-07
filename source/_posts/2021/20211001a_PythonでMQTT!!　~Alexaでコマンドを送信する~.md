@@ -2,12 +2,12 @@
 title: "PythonでMQTT!! ～Alexaでコマンドを送信する～"
 date: 2021/10/01 00:00:00
 postid: a
-tag:
+tags:
   - MQTT
   - Alexa
   - RaspberryPi
   - Python
-category:
+categories:
   - IoT
 thumbnail: /images/2021/20211001a/thumbnail.jpg
 author: 宮永崇史

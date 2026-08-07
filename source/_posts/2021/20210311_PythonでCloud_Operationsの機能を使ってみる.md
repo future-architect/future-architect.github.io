@@ -2,7 +2,7 @@
 title: "PythonでCloud Operationsの機能を使ってみる"
 date: 2021/03/11 00:00:00
 postid: ""
-tag:
+tags:
   - GoogleCloud
   - Python
   - OpenCensus
@@ -10,7 +10,7 @@ tag:
   - CloudOperations
   - CloudRun
   - PyCharm
-category:
+categories:
   - DevOps
 thumbnail: /images/2021/20210311/thumbnail.png
 author: 澁川喜規

@@ -2,11 +2,11 @@
 title: "DynamoDB利用時の書き込みスキュー（Write Skew）の回避"
 date: 2022/09/06 00:00:00
 postid: a
-tag:
+tags:
   - DynamoDB
   - 排他制御
   - 設計
-category:
+categories:
   - DB
 thumbnail: /images/2022/20220906a/thumbnail.png
 author: 武田大輝

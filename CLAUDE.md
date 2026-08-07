@@ -21,18 +21,18 @@ Hexo 7.3 製の静的サイトで、GitHub Pages にホスティングされて�
 ファイル名は `source/_posts/<年>/YYYYMMDD<postid>_<タイトル>.md`。
 `postid` は同日複数投稿を区別する `a`, `b`, `c`…。公開URLは `/articles/YYYYMMDD<postid>/`。
 
-フロントマターは以下の形式（**キーは `tag` / `category` と単数形**。Hexo 標準の `tags` / `categories` ではない）:
+フロントマターは以下の形式（キーは Hexo 標準の `tags` / `categories` と複数形）:
 
 ```yaml
 ---
 title: "Go 1.27 リリース連載： uuid"
 date: 2026/08/04 00:00:00
 postid: a
-tag:
+tags:
   - Go
   - Go1.27
   - UUID
-category:
+categories:
   - Programming
 thumbnail: /images/2026/20260804a/thumbnail.jpg
 author: 武田大輝
@@ -40,7 +40,8 @@ lede: "Go 1.27 で標準ライブラリに追加されたuuidパッケージを�
 ---
 ```
 
-- `category` は既存の語彙から選ぶ。使用実績: Programming / Infrastructure / DataScience / Culture / DataEngineering / Security / Management / DB / Business / AI / IoT / DevOps / AU
+- `categories` は既存の語彙から選ぶ。使用実績（記事数）: Programming 337 / DevOps 184 / Infrastructure 160 / Frontend 130 / Culture 121 / DataScience 113 / DB 70 / Mobile 57 / IoT 53 / Business 51 / DataEngineering 43 / Security 38 / Management 37 / AIDD 27 / 認証認可 25 / VR 20
+  - `AI` は `AIDD` に、`Design` は `UI/UX` タグに統合済み。`_config.yml` の `alias` で転送している
 - `author` は `_profile.yml` に未登録なら追記する。複数著者は配列可
 - `lede` は一覧・OGP に出る概要文
 - 画像は `<img src="/images/2026/20260804a/xxx.jpg" alt="" width="1024" height="559" loading="lazy">` のように実寸の width/height を明記する

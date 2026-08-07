@@ -2,12 +2,12 @@
 title: "【合格記】Google Cloud Professional Cloud Security Engineer認定資格を振り返る"
 date: 2023/09/21 00:00:00
 postid: a
-tag:
+tags:
   - GoogleCloud
   - PCSE
   - 合格記
   - Udemy
-category:
+categories:
   - Security
 thumbnail: /images/2023/20230921a/thumbnail.png
 author: 岸下優介

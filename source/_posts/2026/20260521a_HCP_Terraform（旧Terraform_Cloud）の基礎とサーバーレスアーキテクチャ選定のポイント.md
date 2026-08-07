@@ -2,10 +2,10 @@
 title: "HCP Terraform（旧Terraform Cloud）の基礎とサーバーレスアーキテクチャ選定のポイント"
 date: 2026/05/21 00:00:00
 postid: a
-tag:
+tags:
   - Terraform
   - TerraformCloud
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2026/20260521a/thumbnail.jpg
 author: 片岡久人

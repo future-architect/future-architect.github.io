@@ -2,13 +2,13 @@
 title: "DynamoDB Streamsは同一ハッシュキーでもソートキーが異なれば順序保証されない"
 date: 2022/10/20 00:00:00
 postid: a
-tag:
+tags:
   - AWS
   - DynamoDB
   - DynamoDBStreams
   - Lambda
   - 失敗談
-category:
+categories:
   - DB
 thumbnail: /images/2022/20221020a/thumbnail.png
 author: 真野隼記

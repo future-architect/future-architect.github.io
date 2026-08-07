@@ -2,11 +2,11 @@
 title: "フューチャーでSlack Enterprise Gridの導入を進めた話"
 date: 2021/07/12 00:00:00
 postid: a
-tag:
+tags:
   - Slack
   - リモートワーク
   - コミュニケーション
-category:
+categories:
   - Management
 thumbnail: /images/2021/20210712a/thumbnail.png
 author: 山上燦

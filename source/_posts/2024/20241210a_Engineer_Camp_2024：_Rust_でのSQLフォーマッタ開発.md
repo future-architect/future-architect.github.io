@@ -2,7 +2,7 @@
 title: "Engineer Camp 2024: Rust でのSQLフォーマッタ開発"
 date: 2024/12/10 00:00:00
 postid: a
-tag:
+tags:
   - SQL
   - VSCode
   - フォーマッター
@@ -10,7 +10,7 @@ tag:
   - インターン2024
   - Rust
   - 2WaySQL
-category:
+categories:
   - DB
 thumbnail: /images/2024/20241210a/thumbnail.gif
 author: 仲泰志

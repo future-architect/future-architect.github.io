@@ -2,10 +2,10 @@
 title: "AWS Partner Summit Japan 2022に登壇してみた"
 date: 2022/04/15 00:00:01
 postid: b
-tag:
+tags:
   - AWS
   - 登壇レポート
-category:
+categories:
   - IoT
 thumbnail: /images/2022/20220415b/thumbnail.png
 author: 真野隼記

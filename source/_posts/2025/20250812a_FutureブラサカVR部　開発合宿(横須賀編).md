@@ -2,11 +2,11 @@
 title: "FutureブラサカVR部　開発合宿(横須賀編)"
 date: 2025/08/12 00:00:00
 postid: a
-tag:
+tags:
   - Unity
   - 開発合宿
   - ブラインドサッカー
-category:
+categories:
   - VR
 thumbnail: /images/2025/20250812a/thumbnail.jpg
 author: 関根正大

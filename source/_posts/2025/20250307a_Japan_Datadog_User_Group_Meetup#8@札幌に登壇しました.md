@@ -2,11 +2,11 @@
 title: "Japan Datadog User Group Meetup#8@札幌に登壇しました"
 date: 2025/03/07 00:00:00
 postid: a
-tag:
+tags:
   - 登壇レポート
   - オブサーバビリティ
   - Datadog
-category:
+categories:
   - DevOps
 thumbnail: /images/2025/20250307a/thumbnail.png
 author: 棚井龍之介

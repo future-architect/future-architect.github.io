@@ -2,14 +2,14 @@
 title: "Google Cloud Next Tokyo'25 Day2 参加レポート"
 date: 2025/08/26 00:00:00
 postid: a
-tag:
+tags:
   - GoogleCloud
   - GoogleCloudNext
   - GoogleCloudNext2025
   - 生成AI
   - AIエージェント
   - 参加レポート
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2025/20250826a/thumbnail.jpg
 author: 村井 俊介

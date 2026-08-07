@@ -2,10 +2,10 @@
 title: "全文検索エンジンMeilisearchを試す"
 date: 2024/04/11 00:00:00
 postid: a
-tag:
+tags:
   - 全文検索
   - スクレイピング
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2024/20240411a/thumbnail.png
 author: 岸本卓也

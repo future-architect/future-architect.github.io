@@ -2,12 +2,12 @@
 title: Terraformで楽をしたい
 date: 2020/08/05 00:00:00
 postid: ""
-tag:
+tags:
   - Terraform
   - GoogleCloud
   - Ansible
   - IaC
-category:
+categories:
   - DevOps
 thumbnail: /images/2020/20200805/thumbnail.JPG
 author: 伊藤太斉

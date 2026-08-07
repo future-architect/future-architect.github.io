@@ -2,13 +2,13 @@
 title: "Flutter Swagger統合"
 date: 2021/05/11 00:00:01
 postid: b
-tag:
+tags:
   - Flutter
   - Dart
   - OpenAPI
   - OpenAPIGenerator
   - Swagger
-category:
+categories:
   - Mobile
 thumbnail: /images/2021/20210511b/thumbnail.png
 author: 宮崎将太

@@ -2,10 +2,10 @@
 title: "PostgreSQLで連番を自動生成するIDENTITY列。SERIALとどちらを使うべきか"
 date: 2024/11/13 00:00:00
 postid: a
-tag:
+tags:
   - PostgreSQL
   - IDENTITY
-category:
+categories:
   - DB
 thumbnail: /images/2024/20241113a/thumbnail.png
 author: 真野隼記

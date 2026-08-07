@@ -2,11 +2,11 @@
 title: "DynamoDBコスト削減のための基本的な施策4点"
 date: 2025/05/12 00:00:00
 postid: a
-tag:
+tags:
   - AWS
   - DynamoDB
   - コスト削減
-category:
+categories:
   - DB
 thumbnail: /images/2025/20250512a/thumbnail.jpg
 author:  八木雅斗

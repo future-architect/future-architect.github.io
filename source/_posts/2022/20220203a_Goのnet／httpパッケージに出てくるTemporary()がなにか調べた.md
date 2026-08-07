@@ -2,12 +2,12 @@
 title: "Goのnet/httpパッケージに出てくるTemporary()がなにか調べた"
 date: 2022/02/03 00:00:00
 postid: a
-tag:
+tags:
   - コードリーディング
   - Go
   - Go1.18
   - net/http
-category:
+categories:
   - Programming
 thumbnail: /images/2022/20220203a/thumbnail.png
 author: 真野隼記

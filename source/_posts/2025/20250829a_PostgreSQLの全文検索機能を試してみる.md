@@ -2,11 +2,11 @@
 title: "PostgreSQLの全文検索機能を試してみる"
 date: 2025/08/29 00:00:00
 postid: a
-tag:
+tags:
   - PostgreSQL
   - 全文検索
   - Go
-category:
+categories:
   - DB
 thumbnail: /images/2025/20250829a/thumbnail.png
 author: 澁川喜規

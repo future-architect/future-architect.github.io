@@ -2,12 +2,12 @@
 title: "仕組みからわかる dbt Slim CI — GitHub Actions × Google Cloud Storage で実現する差分実行"
 date: 2026/07/06 00:00:00
 postid: a
-tag:
+tags:
   - dbt
   - GoogleCloud
   - GCS
   - GitHubActions
-category:
+categories:
   - DataEngineering
 thumbnail: /images/2026/20260706a/thumbnail.jpg
 author: 片岡久人

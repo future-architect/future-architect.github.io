@@ -2,13 +2,13 @@
 title: "【Firebase】GDG Tokyo Monthly Online Tech Talksに登壇しました"
 date: 2024/02/21 00:00:00
 postid: a
-tag:
+tags:
   - 登壇レポート
   - Firebase
   - Flutter
   - GDG
   - GoogleCloud
-category:
+categories:
   - Mobile
 thumbnail: /images/2024/20240221a/thumbnail.png
 author: 山本竜玄

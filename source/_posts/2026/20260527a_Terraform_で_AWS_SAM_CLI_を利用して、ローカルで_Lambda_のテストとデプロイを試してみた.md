@@ -2,13 +2,13 @@
 title: "Terraform で AWS SAM CLI を利用して、ローカルで Lambda のテストとデプロイを試してみた"
 date: 2026/05/27 00:00:00
 postid: a
-tag:
+tags:
   - Terraform
   - AWS
   - Lambda
   - SAM
   - テスト
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2026/20260527a/thumbnail.jpg
 author: 香村真紀

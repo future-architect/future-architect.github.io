@@ -2,10 +2,10 @@
 title: "Groovyスクリプトで、ファイルの最終更新日時を`git clone/pull`の日時ではなく、commit日時にしてみた"
 date: 2022/02/21 00:00:00
 postid: a
-tag:
+tags:
   - Perl
   - Git
-category:
+categories:
   - DevOps
 thumbnail: /images/2022/20220221a/thumbnail.png
 author: 田中雅大

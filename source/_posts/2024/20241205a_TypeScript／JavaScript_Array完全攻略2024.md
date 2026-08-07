@@ -2,11 +2,11 @@
 title: "TypeScript/JavaScript Array完全攻略2024"
 date: 2024/12/05 00:00:00
 postid: a
-tag:
+tags:
   - TypeScript
   - JavaScript
   - ECMAScript
-category:
+categories:
   - Frontend
 thumbnail: /images/2024/20241205a/thumbnail.png
 author: 澁川喜規

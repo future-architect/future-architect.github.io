@@ -2,12 +2,12 @@
 title: "Go Tips 連載5: エラーコードベースの例外ハンドリングの実装＋morikuni/failureサンプル"
 date: 2020/05/22 00:14:52
 postid: ""
-tag:
+tags:
   - Go
   - GoTips連載
   - 設計
   - エラーハンドリング
-category:
+categories:
   - Programming
 thumbnail: /images/2020/20200522/thumbnail.png
 author: 多賀聡一朗

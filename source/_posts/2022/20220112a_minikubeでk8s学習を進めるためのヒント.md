@@ -2,12 +2,12 @@
 title: "Minikubeでk8s学習を進めるためのヒント"
 date: 2022/01/12 00:00:00
 postid: a
-tag:
+tags:
   - Kubernetes
   - Minikube
   - 入門
   - 環境構築
-category:
+categories:
   - DevOps
 thumbnail: /images/2022/20220112a/thumbnail.png
 author: 鈴木崇史

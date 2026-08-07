@@ -2,13 +2,13 @@
 title: "Rust製SQLフォーマッタをnapi-rsを利用してVSCode拡張機能化"
 date: 2022/12/28 00:00:00
 postid: a
-tag:
+tags:
   - Rust
   - TypeScript
   - VSCode
   - フォーマッター
   - コアテク
-category:
+categories:
   - Programming
 thumbnail: /images/2022/20221228a/thumbnail.png
 author: 川渕皓太

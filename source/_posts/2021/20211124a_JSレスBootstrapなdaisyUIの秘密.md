@@ -2,11 +2,11 @@
 title: "JSレスBootstrapなdaisyUIの秘密"
 date: 2021/11/24 00:00:00
 postid: a
-tag:
+tags:
   - CSS
   - TailwindCSS
   - daisyUI
-category:
+categories:
   - Frontend
 thumbnail: /images/2021/20211124a/thumbnail.png
 author: 澁川喜規

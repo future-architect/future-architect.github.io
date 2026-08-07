@@ -2,11 +2,11 @@
 title: "Terraform実行ユーザー用の最小権限の原則を支援するPike触ってみた"
 date: 2025/04/01 00:00:00
 postid: a
-tag:
+tags:
   - Terraform
   - AWS
   - アクセス制御
-category:
+categories:
   - DevOps
 thumbnail: /images/2025/20250401a/thumbnail.png
 author: 真野隼記

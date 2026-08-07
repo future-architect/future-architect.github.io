@@ -2,12 +2,12 @@
 title: "Firebaseで取得したログをBigQueryに連携してユーザー操作をトラッキングする"
 date: 2021/03/16 00:00:00
 postid: ""
-tag:
+tags:
   - GoogleCloud
   - Firebase
   - BigQuery
   - Android
-category:
+categories:
   - Mobile
 thumbnail: /images/2021/20210316/thumbnail.png
 author: 松井宇宙

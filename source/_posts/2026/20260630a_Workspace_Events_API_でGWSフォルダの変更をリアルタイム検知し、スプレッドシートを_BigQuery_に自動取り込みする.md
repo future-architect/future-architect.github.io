@@ -2,12 +2,12 @@
 title: "Workspace Events API でGWSフォルダの変更をリアルタイム検知し、スプレッドシートを BigQuery に自動取り込みする"
 date: 2026/06/30 00:00:00
 postid: a
-tag:
+tags:
   - GoogleCloud
   - GoogleWorkspace
   - PubSub
   - BigQuery
-category:
+categories:
   - DataEngineering
 thumbnail: /images/2026/20260630a/thumbnail.jpg
 author: 柴田健太

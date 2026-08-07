@@ -2,12 +2,12 @@
 title: "Gopher が Rust に入門して感じた Go との違いについて"
 date: 2026/05/11 00:00:00
 postid: a
-tag:
+tags:
   - Rust
   - ORM
   - 入門
   - Go
-category:
+categories:
   - Programming
 thumbnail: /images/2026/20260511a/thumbnail.jpg
 author: 市川裕也

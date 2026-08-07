@@ -2,14 +2,14 @@
 title: "Future Tech Night(第4弾：Go x AWS スマート工場編)を開催しました"
 date: 2020/09/25 00:00:00
 postid: ""
-tag:
+tags:
   - 工場
   - Go
   - AWS
   - TechNight
   - 登壇レポート
   - StepFunctions
-category:
+categories:
   - IoT
 thumbnail: /images/2020/20200925/thumbnail.png
 author: 辻大志郎

@@ -2,11 +2,11 @@
 title: "Electronの使い方 Web開発の技術でデスクトップアプリを作ろう"
 date: 2021/01/07 00:00:00
 postid: ""
-tag:
+tags:
   - Vue.js
   - Electron
   - デスクトップアプリ
-category:
+categories:
   - Frontend
 thumbnail: /images/2021/20210107/thumbnail.png
 author: 伊藤真彦

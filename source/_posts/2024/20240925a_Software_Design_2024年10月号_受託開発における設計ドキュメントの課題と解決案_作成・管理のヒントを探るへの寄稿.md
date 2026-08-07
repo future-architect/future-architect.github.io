@@ -2,12 +2,12 @@
 title: "Software Design 2024年10月号 受託開発における設計ドキュメントの課題と解決案 作成・管理のヒントを探るへの寄稿"
 date: 2024/09/25 00:00:00
 postid: a
-tag:
+tags:
   - SoftwareDesign
   - ドキュメント
   - 出版
   - Markdown
-category:
+categories:
   - DevOps
 thumbnail: /images/2024/20240925a/thumbnail.jpg
 author: 真野隼記

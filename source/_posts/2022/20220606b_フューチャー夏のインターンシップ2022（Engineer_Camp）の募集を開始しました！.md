@@ -2,10 +2,10 @@
 title: "フューチャー夏のインターンシップ2022（Engineer Camp）の募集を開始しました！"
 date: 2022/06/06 00:00:01
 postid: b
-tag:
+tags:
   - インターン
   - インターン2022
-category:
+categories:
   - Culture
 thumbnail: /images/2022/20220606b/thumbnail.jpg
 author: admin

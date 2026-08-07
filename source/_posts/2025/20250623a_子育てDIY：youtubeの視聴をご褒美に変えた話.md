@@ -2,12 +2,12 @@
 title: "子育てDIY：YouTubeの視聴をご褒美に変えた話"
 date: 2025/06/23 00:00:00
 postid: a
-tag:
+tags:
   - プロキシ
   - Network
   - 育児
   - 子ども
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2025/20250623a/thumbnail.png
 author: 西田好孝

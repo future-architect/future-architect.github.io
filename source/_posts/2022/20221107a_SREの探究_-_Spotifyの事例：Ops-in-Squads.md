@@ -2,10 +2,10 @@
 title: "SREの探究 - Spotifyの事例：Ops-in-Squads"
 date: 2022/11/07 00:00:00
 postid: a
-tag:
+tags:
   - SRE
   - 保守運用
-category:
+categories:
   - DevOps
 thumbnail: /images/2022/20221107a/thumbnail.png
 author: 岸下優介

@@ -2,12 +2,12 @@
 title: "LLM開発のためにMLOpsチームがやるべきこと"
 date: 2023/09/13 00:00:00
 postid: a
-tag:
+tags:
   - LLM
   - MLOps
   - インターン
   - インターン2023
-category:
+categories:
   - DataScience
 thumbnail: /images/2023/20230913a/thumbnail.png
 author: 平野甫

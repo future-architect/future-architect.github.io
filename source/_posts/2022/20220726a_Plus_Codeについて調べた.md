@@ -2,11 +2,11 @@
 title: "Plus Codeについて調べた"
 date: 2022/07/26 00:00:00
 postid: a
-tag:
+tags:
   - 地図
   - 位置特定
   - GoogleMap
-category:
+categories:
   - Business
 thumbnail: /images/2022/20220726a/thumbnail.png
 author: 真野隼記

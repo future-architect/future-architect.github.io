@@ -2,14 +2,14 @@
 title: "AIを使って顔画像から「常連さん」を判定しよう！"
 date: 2017/05/26 16:15:31
 postid: ""
-tag:
+tags:
   - Python
   - 機械学習
   - AI
   - 顔認証
   - OpenCV
   - クラスタリング
-category:
+categories:
   - DataScience
 author: 小池優希
 lede: "AI(機械学習・Deep Learning等)を用いて、 **大量にある顔画像の中から同一人物をクラスタリングし、頻出する顔画像の抽出** を行い、常連さんの判定を行いたいと思います。"

@@ -2,12 +2,12 @@
 title: "Google Cloud Next Tokyo'25 Day1参加レポート"
 date: 2025/09/17 00:00:00
 postid: a
-tag:
+tags:
   - GoogleCloud
   - GoogleCloudNext
   - GoogleCloudNext2025
   - 参加レポート
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2025/20250917a/thumbnail.png
 author:  片岡久人

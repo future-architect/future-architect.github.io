@@ -2,11 +2,11 @@
 title: "Xcode Cloudで最初に作りたい基本的なワークフロー"
 date: 2025/06/09 00:00:00
 postid: a
-tag:
+tags:
   - iOS
   - CI/CD
   - Xcode
-category:
+categories:
   - Mobile
 thumbnail: /images/2025/20250609a/thumbnail.png
 author: 橋本竜我

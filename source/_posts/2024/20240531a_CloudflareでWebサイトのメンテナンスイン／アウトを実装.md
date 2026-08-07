@@ -2,10 +2,10 @@
 title: "CloudflareでWebサイトのメンテナンスイン/アウトを実装"
 date: 2024/05/31 00:00:00
 postid: a
-tag:
+tags:
   - Cloudflare
   - CDN
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2024/20240531a/thumbnail.jpg
 author: 小林弘樹

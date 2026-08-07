@@ -2,10 +2,10 @@
 title: "循環的複雑度の計算を題材にRoslyn APIを使ってみた"
 date: 2022/06/14 00:00:00
 postid: a
-tag:
+tags:
   - C#
   - 静的解析
-category:
+categories:
   - Programming
 thumbnail: /images/2022/20220614a/thumbnail.png
 author: 山田修路

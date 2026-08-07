@@ -2,13 +2,13 @@
 title: "Future Tech Night #21 Google Cloud Vertex AIによるフルマネージドなMLOps導入"
 date: 2022/05/13 00:00:00
 postid: a
-tag:
+tags:
   - MLOps
   - VertexAI
   - GoogleCloud
   - TechNight
   - 登壇レポート
-category:
+categories:
   - DataScience
 thumbnail: /images/2022/20220513a/thumbnail.png
 author: 真鍋優

@@ -2,12 +2,12 @@
 title: "Terraformerとしてコードを書いて思うこと"
 date: 2021/10/29 00:00:00
 postid: a
-tag:
+tags:
   - Terraform
   - 設計
   - IaC
   - 可読性
-category:
+categories:
   - DevOps
 thumbnail: /images/2021/20211029a/thumbnail.png
 author: 伊藤太斉

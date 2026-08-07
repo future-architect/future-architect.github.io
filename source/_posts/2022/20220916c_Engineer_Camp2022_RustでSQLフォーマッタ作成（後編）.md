@@ -2,14 +2,14 @@
 title: "Engineer Camp2022 RustでSQLフォーマッタ作成（後編）"
 date: 2022/09/16 00:00:02
 postid: c
-tag:
+tags:
   - SQL
   - インターン
   - インターン2022
   - フォーマッター
   - Rust
   - tree-sitter
-category:
+categories:
   - Programming
 thumbnail: /images/2022/20220916c/thumbnail.png
 author: 川渕皓太

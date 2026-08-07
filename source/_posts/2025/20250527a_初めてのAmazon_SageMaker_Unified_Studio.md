@@ -2,12 +2,12 @@
 title: "初めてのAmazon SageMaker Unified Studio"
 date: 2025/05/27 00:00:00
 postid: a
-tag:
+tags:
   - AWS
   - SageMaker
   - データカタログ
   - データマネジメント
-category:
+categories:
   - DataEngineering
 thumbnail: /images/2025/20250527a/thumbnail.png
 author: 中神孝士

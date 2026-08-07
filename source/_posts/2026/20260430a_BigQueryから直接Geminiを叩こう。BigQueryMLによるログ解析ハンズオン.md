@@ -2,11 +2,11 @@
 title: "BigQueryから直接Geminiを叩こう。BigQueryMLによるログ解析ハンズオン"
 date: 2026/04/30 00:00:00
 postid: a
-tag:
+tags:
   - BigQuery
   - GoogleCloud
   - Gemini
-category:
+categories:
   - DataScience
 thumbnail: /images/2026/20260430a/thumbnail.png
 author: 柴田健太

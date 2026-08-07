@@ -2,14 +2,14 @@
 title: CORSのプリフライトリクエスト（OPTIONメソッド）はAPI Keyの認証なしでOKにしておかないと失敗する話
 date: 2020/07/17 00:00:00
 postid: ""
-tag:
+tags:
   - Go
   - Web
   - HTTP
   - トラブルシュート
   - CORS
   - WAF
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2020/20200717/thumbnail.png
 author: 真野隼記

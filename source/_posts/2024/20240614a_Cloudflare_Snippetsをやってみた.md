@@ -2,10 +2,10 @@
 title: "Cloudflare Snippetsをやってみた"
 date: 2024/06/14 00:00:00
 postid: a
-tag:
+tags:
   - Cloudflare
   - 外部寄稿
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2024/20240614a/thumbnail.png
 author: 亀田治伸

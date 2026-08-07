@@ -2,10 +2,10 @@
 title: "フィーチャーフラグを管理するためのOpenFeature"
 date: 2023/06/21 00:00:00
 postid: a
-tag:
+tags:
   - リリース
   - CNCF
-category:
+categories:
   - DevOps
 thumbnail: /images/2023/20230621a/thumbnail.png
 author: 真野隼記

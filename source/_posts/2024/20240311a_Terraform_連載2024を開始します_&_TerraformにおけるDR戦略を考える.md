@@ -2,12 +2,12 @@
 title: "Terraform連載2024を開始します & TerraformにおけるDR戦略を考える"
 date: 2024/03/11 00:00:00
 postid: a
-tag:
+tags:
   - Terraform
   - インデックス
   - DR
   - マルチリージョン
-category:
+categories:
   - DevOps
 thumbnail: /images/2024/20240311a/thumbnail.png
 author: 伊藤太斉

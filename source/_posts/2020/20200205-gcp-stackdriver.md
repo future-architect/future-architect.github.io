@@ -2,13 +2,13 @@
 title: "Stackdriver Loggingへ良い感じのログ出力方法を考える"
 date: 2020/02/05 09:23:10
 postid: ""
-tag:
+tags:
   - GoogleCloud
   - OpenCensus
   - Go
   - CloudOperations
   - ログ
-category:
+categories:
   - DevOps
 author: 真野隼記
 lede: "Google Cloudをテーマにした連載企画を始めるということで、初回はStackdriver Loggingの活用方法をまとめます。

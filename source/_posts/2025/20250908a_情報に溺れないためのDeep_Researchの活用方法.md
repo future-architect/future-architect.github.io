@@ -2,12 +2,12 @@
 title: "情報に溺れないためのDeep Researchの活用方法"
 date: 2025/09/08 00:00:00
 postid: a
-tag:
+tags:
   - 生成AI
   - Gemini
   - キャッチアップ
   - DeepResearch
-category:
+categories:
   - Business
 thumbnail: /images/2025/20250908a/thumbnail.png
 author: 仲田帆志弥

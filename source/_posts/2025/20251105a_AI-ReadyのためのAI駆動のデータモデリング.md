@@ -2,13 +2,13 @@
 title: "AI-ReadyのためのAI駆動のデータモデリング"
 date: 2025/11/05 00:00:00
 postid: a
-tag:
+tags:
   - Gemini
   - GoogleCloud
   - pandas
   - dbt
   - データモデル
-category:
+categories:
   - DataEngineering
 thumbnail: /images/2025/20251105a/thumbnail.png
 author: 大前七奈

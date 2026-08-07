@@ -2,11 +2,11 @@
 title: "極小LinuxマシンでSwiftを動かそうとしてみた"
 date: 2021/11/05 00:00:00
 postid: a
-tag:
+tags:
   - Rust
   - M5Stack
   - Linux
-category:
+categories:
   - IoT
 thumbnail: /images/2021/20211105a/thumbnail.jpeg
 author: 山本力世

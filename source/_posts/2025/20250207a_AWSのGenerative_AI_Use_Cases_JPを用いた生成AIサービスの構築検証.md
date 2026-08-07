@@ -2,13 +2,13 @@
 title: "AWSのGenerative AI Use Cases JPを用いた生成AIサービスの構築検証"
 date: 2025/02/07 00:00:00
 postid: a
-tag:
+tags:
   - AWS
   - MLOps
   - LLM
   - Bedrock
   - AWS CDK
-category:
+categories:
   - DataScience
 thumbnail: /images/2025/20250207a/thumbnail.png
 author: 小川智也

@@ -2,10 +2,10 @@
 title: "PostgreSQL17リリース記念連載を始めます"
 date: 2024/10/23 00:00:00
 postid: a
-tag:
+tags:
   - PostgreSQL
   - PostgreSQL17
-category:
+categories:
   - DB
 thumbnail: /images/2024/20241023a/thumbnail.png
 author: 真野隼記

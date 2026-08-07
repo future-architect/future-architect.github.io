@@ -2,11 +2,11 @@
 title: "【iOS/Swift】ダークモード・ライトモード・端末の表示モードへアプリ内から自由に切り替える"
 date: 2024/04/30 00:00:00
 postid: a
-tag:
+tags:
   - iOS
   - Swift
   - SwiftUI
-category:
+categories:
   - Mobile
 thumbnail: /images/2024/20240430a/thumbnail.jpeg
 author: 橋本竜我

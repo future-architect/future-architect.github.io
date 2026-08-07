@@ -2,11 +2,11 @@
 title: "AWSのKiroを使うハッカソン「Kiroween」に参加してみた"
 date: 2025/12/03 00:00:00
 postid: a
-tag:
+tags:
   - スペック駆動開発
   - Kiro
   - ハッカソン
-category:
+categories:
   - AIDD
 thumbnail: /images/2025/20251203a/thumbnail.png
 author: 澁川喜規

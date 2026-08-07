@@ -2,13 +2,13 @@
 title: "Dev Containersの始め方(2) : Python環境"
 date: 2023/12/12 00:00:00
 postid: a
-tag:
+tags:
   - Dev Containers
   - Python
   - VSCode
   - Docker
   - 環境構築
-category:
+categories:
   - DevOps
 thumbnail: /images/2023/20231212a/thumbnail.png
 author: 澁川喜規

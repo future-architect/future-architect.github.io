@@ -2,12 +2,12 @@
 title: "AWSマネージドAirflow(MWAA)についてのFAQ"
 date: 2020/12/06 00:00:00
 postid: ""
-tag:
+tags:
   - Airflow
   - AWS
   - Python
   - ジョブ設計
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2020/20201206/thumbnail.png
 author: 多賀聡一朗

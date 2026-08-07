@@ -2,11 +2,11 @@
 title: "Python連載始まります＆Python翻訳プロジェクト"
 date: 2021/09/27 14:25:01
 postid: b
-tag:
+tags:
   - Python
   - インデックス
   - 翻訳
-category:
+categories:
   - Programming
 thumbnail: /images/2021/20210927b/thumbnail.png
 author: 澁川喜規

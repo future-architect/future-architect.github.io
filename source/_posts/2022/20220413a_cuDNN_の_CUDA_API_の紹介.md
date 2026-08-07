@@ -2,10 +2,10 @@
 title: "cuDNN の CUDA API の紹介"
 date: 2022/04/13 00:00:00
 postid: a
-tag:
+tags:
   - GPGPU
   - AI
-category:
+categories:
   - DataScience
 thumbnail: /images/2022/20220413a/thumbnail.png
 author: 松崎功也

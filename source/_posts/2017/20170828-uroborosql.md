@@ -2,12 +2,12 @@
 title: "uroboroSQL x Spring BootによるWebアプリケーション開発"
 date: 2017/08/28 12:00:00
 postid: ""
-tag:
+tags:
   - uroboroSQL
   - Java
   - SQL
   - SpringBoot
-category:
+categories:
   - Programming
 thumbnail: /images/2017/20170828/thumbnail_20170828.jpg
 author: 星賢一

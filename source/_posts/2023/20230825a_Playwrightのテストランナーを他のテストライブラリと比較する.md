@@ -2,7 +2,7 @@
 title: "Playwrightのテストランナーを他のテストライブラリと比較する"
 date: 2023/08/25 00:00:00
 postid: a
-tag:
+tags:
   - Playwright
   - TDD
   - テスト
@@ -10,7 +10,7 @@ tag:
   - Ruby
   - TypeScript
   - Jest
-category:
+categories:
   - Frontend
 thumbnail: /images/2023/20230825a/thumbnail.png
 author: 澁川喜規

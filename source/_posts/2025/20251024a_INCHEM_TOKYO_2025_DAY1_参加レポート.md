@@ -2,10 +2,10 @@
 title: "INCHEM TOKYO 2025 DAY1 参加レポート"
 date: 2025/10/24 00:00:00
 postid: a
-tag:
+tags:
   - 参加レポート
   - 展示会
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2025/20251024a/thumbnail
 author:  三谷昭徳

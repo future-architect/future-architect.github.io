@@ -2,13 +2,13 @@
 title: "今あえてTypeScriptのビルド＆バンドルツールを探してみる"
 date: 2020/03/19 10:12:40
 postid: ""
-tag:
+tags:
   - TypeScript
   - JavaScript
   - webpack
   - Node.js
   - Parcel
-category:
+categories:
   - Frontend
 author: 澁川喜規
 lede: "ちょっとしたフロントエンドの開発で、TypeScriptに最初から対応していて、簡単に使えるものは何かないかな、と調べてみたメモです。React/Vue/Angularの場合はそれぞれの初期化コマンドで何から何まで用意してくれます。Next.js、Nuxt.js、Gatsbyなども、これらのビルドのステップを簡略化するコマンドを提供しています。基本的にこれらのウェブフロントエンドを開発するときには、小規模・中規模ぐらいならあんまり気にしなくておまかせでもいいと思います。"

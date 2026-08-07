@@ -2,7 +2,7 @@
 title: "Engineer Camp2020でSQLフォーマッタを開発しました"
 date: 2020/09/19 00:00:00
 postid: ""
-tag:
+tags:
   - SQL
   - インターン
   - インターン2020
@@ -12,7 +12,7 @@ tag:
   - VSCode拡張
   - コアテク
   - フォーマッター
-category:
+categories:
   - Programming
 thumbnail: /images/2020/20200919/thumbnail.jpg
 author: 中村祥大

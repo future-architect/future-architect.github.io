@@ -2,10 +2,10 @@
 title: "記録のための日記から、対話で育てる日記へ ーClaude × Obsidian × MCPで作る思考のジャーナリングー"
 date: 2026/03/17 00:00:00
 postid: a
-tag:
+tags:
   - Claude
   - MCP
-category:
+categories:
   - AIDD
 thumbnail: /images/2026/20260317a/thumbnail.jpg
 author: 山下量之

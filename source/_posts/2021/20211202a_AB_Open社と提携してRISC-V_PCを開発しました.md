@@ -2,10 +2,10 @@
 title: "AB Open社と提携してRISC-V PCを開発しました"
 date: 2021/12/02 00:00:00
 postid: a
-tag:
+tags:
   - RISC-V
   - 電子工作
-category:
+categories:
   - IoT
 thumbnail: /images/2021/20211202a/thumbnail.jpg
 author: 真野隼記

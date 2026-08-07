@@ -2,14 +2,14 @@
 title: "Nyle × FUTURE で勉強会を開催しました"
 date: 2021/10/04 00:00:00
 postid: a
-tag:
+tags:
   - 登壇レポート
   - 勉強会
   - 合同勉強会
   - LT
   - AWS
   - GoogleCloud
-category:
+categories:
   - Culture
 thumbnail: /images/2021/20211004a/thumbnail.png
 author: 棚井龍之介

@@ -2,11 +2,11 @@
 title: "Go1.14のRelease Partyに登壇しました🎉"
 date: 2020/03/25 14:44:32
 postid: ""
-tag:
+tags:
   - Go
   - Goリリースパーティ
   - 登壇レポート
-category:
+categories:
   - Programming
 thumbnail: /images/2020/20200325/thumbnail.png
 author: 辻大志郎

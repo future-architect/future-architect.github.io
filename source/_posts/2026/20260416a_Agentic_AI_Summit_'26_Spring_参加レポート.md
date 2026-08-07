@@ -2,11 +2,11 @@
 title: "Agentic AI Summit '26 Spring 参加レポート"
 date: 2026/04/16 00:00:00
 postid: a
-tag:
+tags:
   - AI
   - GoogleCloud
   - 参加レポート
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2026/20260416a/thumbnail.jpg
 author: 古賀晴大

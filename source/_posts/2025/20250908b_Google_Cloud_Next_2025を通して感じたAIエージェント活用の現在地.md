@@ -2,13 +2,13 @@
 title: "Google Cloud Next 2025を通して感じたAIエージェント活用の現在地"
 date: 2025/09/08 00:00:01
 postid: b
-tag:
+tags:
   - GoogleCloud
   - AIエージェント
   - GoogleCloudNext
   - GoogleCloudNext2025
   - ロボット
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2025/20250908b/thumbnail.png
 author: 柴田健太

@@ -2,10 +2,10 @@
 title: "スマートLED（Philips Hue）にFlutterでBLEアクセスしてみた"
 date: 2022/04/04 00:00:01
 postid: b
-tag:
+tags:
   - Flutter
   - Bluetooth
-category:
+categories:
   - Mobile
 thumbnail: /images/2022/20220404b/thumbnail.png
 author: 真野隼記

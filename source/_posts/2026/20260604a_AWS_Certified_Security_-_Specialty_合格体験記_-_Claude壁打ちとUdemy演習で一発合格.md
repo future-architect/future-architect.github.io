@@ -2,10 +2,10 @@
 title: "AWS Certified Security - Specialty 合格体験記 - Claude壁打ちとUdemy演習で一発合格"
 date: 2026/06/04 00:00:00
 postid: a
-tag:
+tags:
   - AWS
   - 合格記
-category:
+categories:
   - Security
 thumbnail: /images/2026/20260604a/thumbnail.png
 author: 棚井龍之介

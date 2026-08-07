@@ -2,12 +2,12 @@
 title: "PostgreSQL 全構文対応の Pure Rust な CST パーサーを作ってみた"
 date: 2025/09/30 00:00:00
 postid: a
-tag:
+tags:
   - Rust
   - PostgreSQL
   - 構文解析
   - 2WaySQL
-category:
+categories:
   - DB
 thumbnail: /images/2025/20250930a/thumbnail.png
 author: 山田修路

@@ -2,10 +2,10 @@
 title: "Azure環境Terraform実行におけるリソースプロバイダーについて"
 date: 2024/03/25 00:00:00
 postid: a
-tag:
+tags:
   - Terraform
   - Azure
-category:
+categories:
   - DevOps
 thumbnail: /images/2024/20240325a/thumbnail.png
 author: 真鍋優

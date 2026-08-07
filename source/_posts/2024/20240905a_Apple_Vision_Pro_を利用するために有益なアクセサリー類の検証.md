@@ -2,10 +2,10 @@
 title: "Apple Vision Pro を利用するために有益なアクセサリー類の検証"
 date: 2024/09/05 00:00:00
 postid: a
-tag:
+tags:
   - VisionPro
   - Apple
-category:
+categories:
   - VR
 thumbnail: /images/2024/20240905a/thumbnail.png
 author: 山本力世

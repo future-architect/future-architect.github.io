@@ -2,14 +2,14 @@
 title: "LambdaをカスタムDockerランタイムで開発する方法"
 date: 2021/09/14 00:00:00
 postid: a
-tag:
+tags:
   - AWS
   - Lambda
   - サーバーレス
   - Docker
   - Oracle
   - Go
-category:
+categories:
   - DevOps
 thumbnail: /images/2021/20210914a/thumbnail.png
 author: 伊藤真彦

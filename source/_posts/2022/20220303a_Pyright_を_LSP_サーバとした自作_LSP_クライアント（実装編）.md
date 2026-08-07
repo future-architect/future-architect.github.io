@@ -2,11 +2,11 @@
 title: "Pyright を LSP サーバとした自作 LSP クライアント（実装編）"
 date: 2022/03/03 00:00:00
 postid: a
-tag:
+tags:
   - Python
   - LSP
   - Pyright
-category:
+categories:
   - Programming
 thumbnail: /images/2022/20220303a/thumbnail.png
 author: 空閑康太

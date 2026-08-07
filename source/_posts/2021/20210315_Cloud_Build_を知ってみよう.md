@@ -2,12 +2,12 @@
 title: "Cloud Build を知ってみよう"
 date: 2021/03/15 00:00:00
 postid: ""
-tag:
+tags:
   - GoogleCloud
   - CloudBuild
   - GitOps
   - CI/CD
-category:
+categories:
   - DevOps
 thumbnail: /images/2021/20210315/thumbnail.png
 author: 前原応光

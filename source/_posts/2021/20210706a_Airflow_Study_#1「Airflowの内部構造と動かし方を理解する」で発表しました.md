@@ -2,11 +2,11 @@
 title: "Airflow Study #1「Airflowの内部構造と動かし方を理解する」で発表しました"
 date: 2021/07/06 00:00:00
 postid: a
-tag:
+tags:
   - Airflow
   - Breeze
   - 登壇レポート
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2021/20210706a/thumbnail.png
 author: 多賀聡一朗

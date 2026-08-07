@@ -2,11 +2,11 @@
 title: "H&M Personalized Fashion Recommendations 参加記 (46th/2952)"
 date: 2022/06/02 00:00:01
 postid: b
-tag:
+tags:
   - Kaggle
   - TensorFlow
   - 参戦記
-category:
+categories:
   - DataScience
 thumbnail: /images/2022/20220602b/thumbnail.png
 author: 金子剛士

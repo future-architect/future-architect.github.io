@@ -2,12 +2,12 @@
 title: "AWS SDK for GoでDynamoDBの式を扱うヘルパーパッケージの使い方"
 date: 2021/10/25 00:00:00
 postid: a
-tag:
+tags:
   - AWS
   - DynamoDB
   - Go
   - 式
-category:
+categories:
   - Programming
 thumbnail: /images/2021/20211025a/thumbnail.png
 author: 真野隼記

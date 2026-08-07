@@ -2,12 +2,12 @@
 title: "クラウドロックインされないアーキテクチャ「Cloud Agnostic Architecture」のすすめ"
 date: 2024/06/17 00:00:00
 postid: b
-tag:
+tags:
   - AWS
   - GoogleCloud
   - アーキテクチャ
   - ベンダーロックイン
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2024/20240617b/thumbnail.png
 author: 武田大輝

@@ -2,12 +2,12 @@
 title: "CSV処理における共通処理をDecoratorパターンで実現する"
 date: 2022/10/21 00:00:00
 postid: a
-tag:
+tags:
   - Go
   - デザインパターン
   - CSV
   - encoding/csv
-category:
+categories:
   - Programming
 thumbnail: /images/2022/20221021a/thumbnail.png
 author: 辻大志郎

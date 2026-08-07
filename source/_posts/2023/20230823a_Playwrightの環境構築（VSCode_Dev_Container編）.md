@@ -2,12 +2,12 @@
 title: "Playwrightの環境構築（VSCode Dev Containers編）"
 date: 2023/08/23 00:00:00
 postid: a
-tag:
+tags:
   - Playwright
   - VSCode
   - Docker
   - 環境構築
-category:
+categories:
   - Frontend
 thumbnail: /images/2023/20230823a/thumbnail.png
 author: 武田大輝

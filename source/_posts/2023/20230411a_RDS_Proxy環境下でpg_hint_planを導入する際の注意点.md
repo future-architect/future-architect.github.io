@@ -2,11 +2,11 @@
 title: "RDS Proxy環境下でpg_hint_planを導入する際の注意点"
 date: 2023/04/11 00:00:00
 postid: a
-tag:
+tags:
   - RDS
   - AWS
   - 実行計画
-category:
+categories:
   - DB
 thumbnail: /images/2023/20230411a/thumbnail.png
 author: 辻大志郎

@@ -2,12 +2,12 @@
 title: "AWS Kinesisから呼び出されるLambdaのリカバリー処理について"
 date: 2023/05/26 00:00:00
 postid: a
-tag:
+tags:
   - Kinesis
   - Lambda
   - AWS
   - リトライ
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2023/20230526a/thumbnail.png
 author: 原木翔

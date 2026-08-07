@@ -2,11 +2,11 @@
 title: "マネージャーがうれしいRedmineデータのグラフ表示方法を公開します！！（Metabase編） "
 date: 2019/07/03 09:00:00
 postid: ""
-tag:
+tags:
   - BI
   - Redmine
   - 可視化
-category:
+categories:
   - Management
 thumbnail: /images/2019/20190703/photo_20190703_01.jpeg
 author: 近藤雅章

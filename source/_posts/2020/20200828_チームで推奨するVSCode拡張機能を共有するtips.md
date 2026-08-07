@@ -2,11 +2,11 @@
 title: "チームで推奨するVSCode拡張機能を共有するtips"
 date: 2020/08/28 00:00:00
 postid: ""
-tag:
+tags:
   - VSCode
   - チーム開発
   - Tips
-category:
+categories:
   - DevOps
 thumbnail: /images/2020/20200828/thumbnail.png
 author: 市川浩暉

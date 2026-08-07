@@ -2,11 +2,11 @@
 title: "Best Blogger of the Year 2021 受賞者を発表します"
 date: 2022/01/21 00:00:00
 postid: a
-tag:
+tags:
   - ベスブロ
   - 運営
   - TechBlog
-category:
+categories:
   - Culture
 thumbnail: /images/2022/20220121a/thumbnail.png
 author: 伊藤太斉

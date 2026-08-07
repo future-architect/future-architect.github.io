@@ -2,10 +2,10 @@
 title: "Chromeの拡張機能作ってみた！"
 date: 2020/06/25 10:34:33
 postid: ""
-tag:
+tags:
   - JavaScript
   - ChromeExtension
-category:
+categories:
   - Frontend
 thumbnail: /images/2020/20200625/thumbnail.png
 author: 彩花谷田

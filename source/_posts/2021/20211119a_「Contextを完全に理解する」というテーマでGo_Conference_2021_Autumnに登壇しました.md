@@ -2,14 +2,14 @@
 title: "「Contextを完全に理解する」というテーマでGo Conference 2021 Autumnに登壇しました"
 date: 2021/11/19 00:00:00
 postid: a
-tag:
+tags:
   - Go
   - コードリーディング
   - GoConference
   - 登壇レポート
   - カンファレンス
   - context
-category:
+categories:
   - Programming
 thumbnail: /images/2021/20211119a/thumbnail.png
 author: 伊藤真彦

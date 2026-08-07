@@ -2,13 +2,13 @@
 title: "AzureAD＋MSAL for Goでバッチコマンドの認証"
 date: 2022/11/22 00:00:00
 postid: a
-tag:
+tags:
   - Azure
   - AD
   - MSAL.js
   - Go
   - EntraID
-category:
+categories:
   - 認証認可
 thumbnail: /images/2022/20221122a/thumbnail.png
 author: 澁川喜規

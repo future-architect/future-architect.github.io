@@ -2,10 +2,10 @@
 title: "SORACOM USBドングルの自動接続"
 date: 2019/12/01 12:02:03
 postid: ""
-tag:
+tags:
   - Ruby
   - Selenium
-category:
+categories:
   - IoT
 thumbnail: /images/2019/20191201/thumbnail.png
 author: 棚井龍之介

@@ -2,12 +2,12 @@
 title: "Future Tech Night #21 Google Cloud：JSON関数と共に歩む、BigQueryを使った超汎化型データ活用基盤"
 date: 2022/05/09 00:00:00
 postid: a
-tag:
+tags:
   - GoogleCloud
   - BigQuery
   - TechNight
   - 登壇レポート
-category:
+categories:
   - DataEngineering
 thumbnail: /images/2022/20220509a/thumbnail.png
 author: 村田靖拓

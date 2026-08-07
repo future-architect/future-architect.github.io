@@ -2,13 +2,13 @@
 title: "Go Conference 2021 Autumn にGoの静的解析で登壇しました"
 date: 2021/11/22 00:00:00
 postid: a
-tag:
+tags:
   - Go
   - GoConference
   - 登壇レポート
   - 静的解析
   - カンファレンス
-category:
+categories:
   - Programming
 thumbnail: /images/2021/20211122a/thumbnail.png
 author: 辻大志郎

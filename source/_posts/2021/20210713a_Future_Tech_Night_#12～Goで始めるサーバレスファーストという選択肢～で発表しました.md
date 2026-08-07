@@ -2,12 +2,12 @@
 title: "Future Tech Night #12～Serverless x Goの可能性～で発表しました"
 date: 2021/07/13 00:00:00
 postid: a
-tag:
+tags:
   - 登壇レポート
   - AWS
   - サーバーレス
   - TechNight
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2021/20210713a/thumbnail.png
 author: 伊藤真彦

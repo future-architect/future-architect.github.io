@@ -2,11 +2,11 @@
 title: "Future Tech Night #9「オンコール通知も全自動で! AWS + Datadog + PagerDuty で作る運用監視基盤」"
 date: 2021/06/08 00:00:00
 postid: a
-tag:
+tags:
   - AWS
   - TechNight
   - 保守運用
-category:
+categories:
   - DevOps
 thumbnail: /images/2021/20210608a/thumbnail.png
 author: 木村拓海

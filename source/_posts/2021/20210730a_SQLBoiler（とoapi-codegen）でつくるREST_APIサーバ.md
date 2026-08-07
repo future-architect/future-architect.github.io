@@ -2,12 +2,12 @@
 title: "SQLBoiler（とoapi-codegen）でつくるREST APIサーバ"
 date: 2021/07/30 00:00:00
 postid: a
-tag:
+tags:
   - Go
   - ORM
   - OpenAPI
   - コード生成
-category:
+categories:
   - Programming
 thumbnail: /images/2021/20210730a/thumbnail.png
 author: 筒井悠平

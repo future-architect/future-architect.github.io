@@ -2,10 +2,10 @@
 title: "Mermaid Live Editor のTips 9選"
 date: 2026/06/12 00:00:00
 postid: a
-tag:
+tags:
   - Mermaid.js
   - Tips
-category:
+categories:
   - Programming
 thumbnail: /images/2026/20260612a/thumbnail.png
 author: 真野隼記

@@ -2,11 +2,11 @@
 title: "【合格記】Google Cloud Professional Cloud DevOps Engineer認定資格を振り返る"
 date: 2024/07/31 00:00:00
 postid: a
-tag:
+tags:
   - GoogleCloud
   - 合格記
   - PCDE
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2024/20240731a/thumbnail.png
 author: 岸下優介

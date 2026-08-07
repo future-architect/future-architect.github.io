@@ -2,11 +2,11 @@
 title: "Flutter Windows開発を試す"
 date: 2022/03/18 00:00:00
 postid: a
-tag:
+tags:
   - Flutter
   - Windows
   - デスクトップアプリ
-category:
+categories:
   - Mobile
 thumbnail: /images/2022/20220318a/thumbnail.png
 author: 澁川喜規

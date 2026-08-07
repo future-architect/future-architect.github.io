@@ -2,12 +2,12 @@
 title: "PlantUMLのテーマ（思わぬ展開）"
 date: 2021/11/08 00:00:00
 postid: a
-tag:
+tags:
   - PlantUML
   - OSS
   - 設計
   - UML
-category:
+categories:
   - DevOps
 thumbnail: /images/2021/20211108a/thumbnail.png
 author: ヴーホアン・ミン

@@ -2,11 +2,11 @@
 title: "Embedded Swiftを用いた組み込み開発入門"
 date: 2025/04/16 00:00:00
 postid: a
-tag:
+tags:
   - Swift
   - RaspberryPi
   - 電子工作
-category:
+categories:
   - IoT
 thumbnail: /images/2025/20250416a/thumbnail.png
 author: 橋本竜我

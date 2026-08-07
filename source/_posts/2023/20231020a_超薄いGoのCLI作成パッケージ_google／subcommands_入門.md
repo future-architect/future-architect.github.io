@@ -2,10 +2,10 @@
 title: "超薄いGoのCLI作成パッケージ google/subcommands 入門"
 date: 2023/10/20 00:00:00
 postid: a
-tag:
+tags:
   - Go
   - CLI
-category:
+categories:
   - Programming
 thumbnail: /images/2023/20231020a/thumbnail.png
 author: 真野隼記

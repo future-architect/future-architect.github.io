@@ -2,11 +2,11 @@
 title: "CloudEndure Migration - 実践編"
 date: 2020/11/20 00:00:00
 postid: ""
-tag:
+tags:
   - AWS
   - CloudEndure
   - クラウドマイグレーション
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2020/20201120/thumbnail.png
 author: 八巻達紀

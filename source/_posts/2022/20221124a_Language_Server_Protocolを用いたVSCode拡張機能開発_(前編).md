@@ -2,14 +2,14 @@
 title: "Language Server Protocolを用いたVSCode拡張機能開発 (前編)"
 date: 2022/11/24 00:00:00
 postid: a
-tag:
+tags:
   - LSP
   - VSCode
   - VSCode拡張
   - TypeScript
   - SQL
   - フォーマッター
-category:
+categories:
   - Frontend
 thumbnail: /images/2022/20221124a/thumbnail.png
 author: 川渕皓太

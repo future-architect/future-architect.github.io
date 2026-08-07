@@ -2,11 +2,11 @@
 title: "Auth0アカウントでShopifyにSSOする"
 date: 2021/11/10 00:00:00
 postid: a
-tag:
+tags:
   - Auth0
   - SSO
   - Auth0Rules
-category:
+categories:
   - 認証認可
 thumbnail: /images/2021/20211110a/thumbnail.png
 author: 武田拓己

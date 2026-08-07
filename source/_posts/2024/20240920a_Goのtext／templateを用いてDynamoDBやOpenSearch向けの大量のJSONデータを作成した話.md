@@ -2,12 +2,12 @@
 title: "Goのtext/templateを用いてDynamoDBやOpenSearch向けの大量のJSONデータを作成した話"
 date: 2024/09/20 00:00:00
 postid: a
-tag:
+tags:
   - Go
   - text/template
   - OpenSearch
   - DynamoDB
-category:
+categories:
   - Programming
 thumbnail: /images/2024/20240920a/thumbnail.jpg
 author: 大江聖太郎

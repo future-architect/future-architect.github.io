@@ -2,11 +2,11 @@
 title: "GKE Autopilotを触ってみた"
 date: 2021/03/18 00:00:00
 postid: ""
-tag:
+tags:
   - Kubernetes
   - GoogleCloud
   - GKE
-category:
+categories:
   - DevOps
 thumbnail: /images/2021/20210318/thumbnail.jpg
 author: 関靖秀

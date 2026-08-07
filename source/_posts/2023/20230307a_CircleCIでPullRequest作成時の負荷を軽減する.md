@@ -2,11 +2,11 @@
 title: "CircleCIでPullRequest作成時の負荷を軽減する"
 date: 2023/03/07 00:00:00
 postid: a
-tag:
+tags:
   - CircleCI
   - GitHub
   - リリース
-category:
+categories:
   - DevOps
 thumbnail: /images/2023/20230307a/thumbnail.png
 author: 宮永崇史

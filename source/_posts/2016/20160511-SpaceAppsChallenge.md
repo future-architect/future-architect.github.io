@@ -2,11 +2,11 @@
 title: "ハッカソン道中記#3～社会人2年目のリケジョがハッカソンに出てみました～"
 date: 2016-05-11 15:07:34
 postid: ""
-tag:
+tags:
   - デザイン思考
   - Unity
   - ハッカソン
-category:
+categories:
   - VR
 thumbnail: /images/2016/20160511/thumbnail_20160511.jpg
 author: 川久保由紀

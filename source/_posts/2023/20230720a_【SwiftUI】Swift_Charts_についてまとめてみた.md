@@ -2,11 +2,11 @@
 title: "【SwiftUI】Swift Charts についてまとめてみた"
 date: 2023/07/20 00:00:00
 postid: a
-tag:
+tags:
   - Swift
   - SwiftUI
   - iOS
-category:
+categories:
   - Mobile
 thumbnail: /images/2023/20230720a/thumbnail.png
 author: 橋本竜我

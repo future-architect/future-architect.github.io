@@ -2,12 +2,12 @@
 title: "Service Worker開発で起きた不具合を振り返る"
 date: 2021/02/16 00:00:00
 postid: ""
-tag:
+tags:
   - JavaScript
   - Service Worker
   - Vue.js
   - トラブルシュート
-category:
+categories:
   - Frontend
 thumbnail: /images/2021/20210216/thumbnail.png
 author: 川端一輝

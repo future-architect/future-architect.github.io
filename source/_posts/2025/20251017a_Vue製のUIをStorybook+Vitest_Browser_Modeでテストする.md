@@ -2,11 +2,11 @@
 title: "Vue製のUIをStorybook+Vitest Browser Modeでテストする"
 date: 2025/10/17 00:00:00
 postid: a
-tag:
+tags:
   - Vue.js
   - Vite
   - テスト
-category:
+categories:
   - Frontend
 thumbnail: /images/2025/20251017a/thumbnail.png
 author: 小杉山護

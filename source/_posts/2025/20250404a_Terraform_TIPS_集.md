@@ -2,10 +2,10 @@
 title: "Terraform TIPS 集"
 date: 2025/04/04 00:00:00
 postid: a
-tag:
+tags:
   - Terraform
   - Tips
-category:
+categories:
   - DevOps
 thumbnail: /images/2025/20250404a/thumbnail.png
 author: 前原応光

@@ -2,11 +2,11 @@
 title: "iOS ユニバーサルリンクをAzure BlobStorageでやってみる"
 date: 2025/05/27 00:00:01
 postid: b
-tag:
+tags:
   - .NET
   - iOS
   - FutureOne
-category:
+categories:
   - Mobile
 thumbnail: /images/2025/20250527b/thumbnail.png
 author: 高山博司

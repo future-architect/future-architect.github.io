@@ -2,12 +2,12 @@
 title: "AWS内の通信がインターネットを経由しない今、VPC Endpointを利用する意味はあるのか？"
 date: 2021/06/18 00:00:00
 postid: a
-tag:
+tags:
   - AWS
   - Network
   - VPC
   - 技術選定
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2021/20210618a/thumbnail.png
 author: 村瀬善則

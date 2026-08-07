@@ -2,12 +2,12 @@
 title: "RedmineとGitLabの連携プラグインを開発しました！"
 date: 2021/09/08 00:00:00
 postid: a
-tag:
+tags:
   - Redmine
   - OSS
   - GitLab
   - コアテク
-category:
+categories:
   - DevOps
 thumbnail: /images/2021/20210908a/thumbnail.png
 author: 高橋健

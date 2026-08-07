@@ -2,11 +2,11 @@
 title: "FastAPI on Dockerがかなりシンプルになった(2025年版)"
 date: 2025/06/02 00:00:00
 postid: a
-tag:
+tags:
   - Docker
   - Python
   - FastAPI
-category:
+categories:
   - DevOps
 thumbnail: /images/2025/20250602a/thumbnail.png
 author: 澁川喜規

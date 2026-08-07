@@ -2,11 +2,11 @@
 title: "S3エミュレーションでrustfsを使ってみたメモとPresigned URLの仕組み"
 date: 2026/04/03 00:00:00
 postid: a
-tag:
+tags:
   - S3
   - Docker
   - Go
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2026/20260403a/thumbnail.png
 author: 澁川喜規

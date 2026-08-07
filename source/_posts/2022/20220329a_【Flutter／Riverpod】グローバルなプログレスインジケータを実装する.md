@@ -2,10 +2,10 @@
 title: "【Flutter/Riverpod】グローバルなプログレスインジケータを実装する"
 date: 2022/03/29 00:00:00
 postid: a
-tag:
+tags:
   - Flutter
   - 状態管理
-category:
+categories:
   - Mobile
 thumbnail: /images/2022/20220329a/thumbnail.gif
 author: 武田大輝

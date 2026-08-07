@@ -2,10 +2,10 @@
 title: "イチ押し。Playwrightの快適機能"
 date: 2023/08/24 00:00:00
 postid: a
-tag:
+tags:
   - Playwright
   - E2Eテスト
-category:
+categories:
   - Frontend
 thumbnail: /images/2023/20230824a/thumbnail.png
 author: 木戸俊輔

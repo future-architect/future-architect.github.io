@@ -2,13 +2,13 @@
 title: "Cypress入門～初心者でも簡単にE2Eテストが作れる～"
 date: 2021/04/28 00:00:01
 postid: a
-tag:
+tags:
   - JavaScript
   - Cypress
   - TechNight
   - 登壇レポート
   - E2Eテスト
-category:
+categories:
   - Frontend
 thumbnail: /images/2021/20210428a/thumbnail.png
 author: 木戸俊輔

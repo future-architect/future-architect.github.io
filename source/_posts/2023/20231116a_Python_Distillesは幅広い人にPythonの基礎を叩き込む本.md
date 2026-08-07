@@ -2,11 +2,11 @@
 title: "Python Distilledは幅広い人にPythonの基礎を叩き込む本"
 date: 2023/11/16 00:00:00
 postid: a
-tag:
+tags:
   - 書評
   - Python
   - O'Reilly
-category:
+categories:
   - Programming
 thumbnail: /images/2023/20231116a/thumbnail.png
 author: 澁川喜規

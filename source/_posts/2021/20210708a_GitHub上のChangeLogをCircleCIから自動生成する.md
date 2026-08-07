@@ -2,13 +2,13 @@
 title: "GitHub上のChangeLogをCircleCIから自動生成する"
 date: 2021/07/08 00:00:00
 postid: a
-tag:
+tags:
   - GitHub
   - CircleCI
   - CI/CD
   - リリースノート
   - ドキュメント
-category:
+categories:
   - DevOps
 thumbnail: /images/2021/20210708a/thumbnail.png
 author: 富山龍之介

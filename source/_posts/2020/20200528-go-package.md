@@ -2,10 +2,10 @@
 title: "あなたのGoアプリ/ライブラリのパッケージ構成もっとシンプルでよくない？"
 date: 2020/05/28 09:49:19
 postid: ""
-tag:
+tags:
   - 設計
   - Go
-category:
+categories:
   - Programming
 thumbnail: /images/2020/20200528/thumbnail.png
 author: 澁川喜規

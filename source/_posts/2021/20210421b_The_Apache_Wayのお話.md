@@ -2,11 +2,11 @@
 title: "The Apache Wayのお話"
 date: 2021/04/21 00:00:01
 postid: b
-tag:
+tags:
   - OSS
   - 運営
   - コミュニティ
-category:
+categories:
   - Management
 author: 藤野圭一
 lede: "私が現在参加しているThe Apache Software Foundation（ASF）の基本理念の一つであるThe Apache Wayについて紹介します。The Apache Wayを通して、ASFのことを少しでも知ってもらえたらと思います。"

@@ -2,12 +2,12 @@
 title: "Vue3で作ったWebサイトを Vite PWA でPWA化する方法 2024年版"
 date: 2024/11/27 00:00:00
 postid: a
-tag:
+tags:
   - Vue.js
   - PWA
   - Service Worker
   - Vite
-category:
+categories:
   - Frontend
 thumbnail: /images/2024/20241127a/thumbnail.png
 author: 大岩潤矢

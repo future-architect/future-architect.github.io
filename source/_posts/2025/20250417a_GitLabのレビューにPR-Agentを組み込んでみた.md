@@ -2,11 +2,11 @@
 title: "GitLabのレビューにPR-Agentを組み込んでみた"
 date: 2025/04/17 00:00:00
 postid: a
-tag:
+tags:
   - GitLab
   - 生成AI
   - コードレビュー
-category:
+categories:
   - AIDD
 thumbnail: /images/2025/20250417a/thumbnail.png
 author: 髙橋遼

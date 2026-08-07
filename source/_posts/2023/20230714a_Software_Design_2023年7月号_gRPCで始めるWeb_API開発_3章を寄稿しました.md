@@ -2,11 +2,11 @@
 title: "Software Design 2023年7月号 gRPCで始めるWeb API開発 3章を寄稿しました"
 date: 2023/07/14 00:00:00
 postid: a
-tag:
+tags:
   - gRPC
   - SoftwareDesign
   - 出版
-category:
+categories:
   - Programming
 thumbnail: /images/2023/20230714a/thumbnail.png
 author: 真野隼記

@@ -2,13 +2,13 @@
 title: "Go Conference 2021 Springに登壇しました"
 date: 2021/04/30 00:00:00
 postid: a
-tag:
+tags:
   - Go
   - GoConference
   - 登壇レポート
   - TCP/IP
   - カンファレンス
-category:
+categories:
   - Programming
 thumbnail: /images/2021/20210430a/thumbnail.png
 author: 辻大志郎

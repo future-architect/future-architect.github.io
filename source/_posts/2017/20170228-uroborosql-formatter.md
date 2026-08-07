@@ -2,12 +2,12 @@
 title: "SQL開発者を幸せにする！？ Sublime Text 3でも使える uroboroSQL Formatter を公開しました"
 date: 2017-02-28 12:00:00
 postid: ""
-tag:
+tags:
   - SQL
   - uroboroSQL
   - コーディング規約
   - フォーマッター
-category:
+categories:
   - DB
 thumbnail: /images/2017/20170227/thumbnail_20170227.png
 author: 太田洋介

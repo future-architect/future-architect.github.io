@@ -2,13 +2,13 @@
 title: "Serverless連載5: CloudEventsのGo版SDKをいじってみる"
 date: 2020/03/31 09:39:23
 postid: ""
-tag:
+tags:
   - サーバーレス
   - Go
   - GoogleCloud
   - CloudFunctions
   - CNCF
-category:
+categories:
   - Programming
 thumbnail: /images/2020/20200331/thumbnail.png
 author: 村田靖拓

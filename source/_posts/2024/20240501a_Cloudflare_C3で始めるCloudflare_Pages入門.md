@@ -2,10 +2,10 @@
 title: "Cloudflare C3で始めるCloudflare Pages入門"
 date: 2024/05/01 00:00:00
 postid: a
-tag:
+tags:
   - Cloudflare
   - Vue.js
-category:
+categories:
   - Frontend
 thumbnail: /images/2024/20240501a/thumbnail.png
 author: 大岩潤矢

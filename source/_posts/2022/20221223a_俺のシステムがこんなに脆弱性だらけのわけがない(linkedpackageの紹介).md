@@ -2,12 +2,12 @@
 title: "俺のシステムがこんなに脆弱性だらけのわけがない(linkedpackageの紹介)"
 date: 2022/12/23 00:00:00
 postid: a
-tag:
+tags:
   - JavaScript
   - Node.js
   - npm
   - 脆弱性
-category:
+categories:
   - Security
 thumbnail: /images/2022/20221223a/thumbnail.jpg
 author: 澁川喜規

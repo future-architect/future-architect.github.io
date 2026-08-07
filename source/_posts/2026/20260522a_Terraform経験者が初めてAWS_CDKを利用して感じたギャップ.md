@@ -2,12 +2,12 @@
 title: "Terraform経験者が初めてAWS CDKを利用して感じたギャップ"
 date: 2026/05/22 00:00:00
 postid: a
-tag:
+tags:
   - Terraform
   - AWS CDK
   - 技術選定
   - IaC
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2026/20260522a/thumbnail.png
 author: 八木雅斗

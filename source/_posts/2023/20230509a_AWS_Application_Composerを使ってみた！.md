@@ -2,11 +2,11 @@
 title: "AWS Application Composerを使ってみた！"
 date: 2023/05/09 00:00:00
 postid: a
-tag:
+tags:
   - AWS
   - ノーコード
   - サーバーレス
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2023/20230509a/thumbnail.png
 author: 佐藤更星

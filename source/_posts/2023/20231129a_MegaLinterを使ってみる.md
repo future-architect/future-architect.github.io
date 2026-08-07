@@ -2,12 +2,12 @@
 title: "MegaLinterを使ってみる"
 date: 2023/11/29 00:00:00
 postid: a
-tag:
+tags:
   - Linter
   - Markdownlint
   - GitHubActions
   - 外部寄稿
-category:
+categories:
   - DevOps
 thumbnail: /images/2023/20231129a/thumbnail.png
 author: 宮永崇史

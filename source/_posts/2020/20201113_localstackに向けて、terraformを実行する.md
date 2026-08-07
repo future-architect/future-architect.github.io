@@ -2,14 +2,14 @@
 title: "LocalStackに向けてTerraformを実行する"
 date: 2020/11/13 00:00:00
 postid: ""
-tag:
+tags:
   - LocalStack
   - AWS
   - Terraform
   - Docker
   - Go
   - DockerCompose
-category:
+categories:
   - DevOps
 thumbnail: /images/2020/20201113/thumbnail.png
 author: 棚井龍之介

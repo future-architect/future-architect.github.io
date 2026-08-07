@@ -2,10 +2,10 @@
 title: "今どきJavaのウェブ開発体験(Helidon)"
 date: 2023/03/08 00:00:00
 postid: a
-tag:
+tags:
   - Java
   - コンテナビルド
-category:
+categories:
   - Programming
 thumbnail: /images/2023/20230308a/thumbnail.png
 author: 澁川喜規

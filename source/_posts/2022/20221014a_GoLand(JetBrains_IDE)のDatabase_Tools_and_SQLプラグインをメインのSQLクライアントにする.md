@@ -2,13 +2,13 @@
 title: "GoLand(JetBrains IDE)のDatabase Tools and SQLプラグインをメインのSQLクライアントにする"
 date: 2022/10/14 00:00:00
 postid: a
-tag:
+tags:
   - GoLand
   - JetBrains
   - 便利ツール
   - SQL
   - IDE
-category:
+categories:
   - DB
 thumbnail: /images/2022/20221014a/thumbnail.png
 author: 真野隼記

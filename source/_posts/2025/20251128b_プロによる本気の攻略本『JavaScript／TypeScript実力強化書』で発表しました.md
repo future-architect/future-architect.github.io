@@ -2,10 +2,10 @@
 title: "プロによる本気の攻略本『JavaScript/TypeScript実力強化書』で発表しました"
 date: 2025/11/28 00:00:01
 postid: b
-tag:
+tags:
   - 登壇レポート
   - TypeScript
-category:
+categories:
   - Programming
 thumbnail: /images/2025/20251128b/thumbnail.jpg
 author: 澁川喜規

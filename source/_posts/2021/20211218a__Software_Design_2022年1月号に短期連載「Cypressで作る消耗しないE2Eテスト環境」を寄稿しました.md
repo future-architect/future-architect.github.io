@@ -2,11 +2,11 @@
 title: Software Design 2022年1月号に短期連載「Cypressで作る"消耗しない"E2Eテスト環境」を寄稿しました
 date: 2021/12/18 00:00:00
 postid: a
-tag:
+tags:
   - Cypress
   - SoftwareDesign
   - 出版
-category:
+categories:
   - Frontend
 thumbnail: /images/2021/20211218a/thumbnail.png
 author: 木戸俊輔

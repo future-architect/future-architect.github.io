@@ -2,11 +2,11 @@
 title: "Lambda Function URLs をGoでお試し。実行時間の上限（タイムアウト）やWeb API構築周りで気になること"
 date: 2022/05/10 00:00:00
 postid: a
-tag:
+tags:
   - Lambda
   - Go
   - サーバーレス
-category:
+categories:
   - Programming
 thumbnail: /images/2022/20220510a/thumbnail.png
 author: 真野隼記

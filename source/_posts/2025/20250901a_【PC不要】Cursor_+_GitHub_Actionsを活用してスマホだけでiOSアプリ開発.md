@@ -2,14 +2,14 @@
 title: "【PC不要】Cursor + GitHub Actionsを活用してスマホだけでiOSアプリ開発"
 date: 2025/09/01 00:00:00
 postid: a
-tag:
+tags:
   - iOS
   - 生成AI
   - cursor
   - GitHubActions
   - CI/CD
   - アプリストア審査
-category:
+categories:
   - AIDD
 thumbnail: /images/2025/20250901a/thumbnail.png
 author: 清水雄一郎

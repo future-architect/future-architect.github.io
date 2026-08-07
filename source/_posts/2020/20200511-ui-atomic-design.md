@@ -2,11 +2,11 @@
 title: "PJでUIデザインにAtomic Designを導入したらどうだったのか"
 date: 2020/05/11 08:43:07
 postid: ""
-tag:
+tags:
   - UI/UX
   - Figma
   - 設計
-category:
+categories:
   - Frontend
 thumbnail: /images/2020/20200511/thumbnail.png
 author: 平川裕蔵

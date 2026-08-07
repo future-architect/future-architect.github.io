@@ -2,12 +2,12 @@
 title: "Redmine Slack Integration Pluginにメンション機能を追加しました！"
 date: 2021/09/27 00:00:00
 postid: a
-tag:
+tags:
   - Redmine
   - Slack
   - OSS
   - コアテク
-category:
+categories:
   - DevOps
 thumbnail: /images/2021/20210927a/thumbnail.png
 author: 高橋健

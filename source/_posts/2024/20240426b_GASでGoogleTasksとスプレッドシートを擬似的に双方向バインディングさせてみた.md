@@ -2,12 +2,12 @@
 title: "GASでGoogleTasksとスプレッドシートを擬似的に双方向バインディングさせてみた"
 date: 2024/04/26 00:00:01
 postid: b
-tag:
+tags:
   - GAS
   - スプレッドシート
   - 初心者向け
   - Vue.js
-category:
+categories:
   - Frontend
 thumbnail: /images/2024/20240426b/thumbnail.png
 author: 後藤喜斗

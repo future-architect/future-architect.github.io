@@ -2,12 +2,12 @@
 title: "Prompt Flowでプロンプト評価の管理を行う"
 date: 2023/09/19 00:00:00
 postid: a
-tag:
+tags:
   - LLM
   - LLMOps
   - Azure
   - "Prompt Flow"
-category:
+categories:
   - DataScience
 thumbnail: /images/2023/20230919a/thumbnail.png
 author: 板野竜也

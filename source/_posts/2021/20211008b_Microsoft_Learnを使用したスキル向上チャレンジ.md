@@ -2,11 +2,11 @@
 title: "Microsoft Learnを使用したスキル向上チャレンジ"
 date: 2021/10/08 00:00:01
 postid: b
-tag:
+tags:
   - Azure
   - スキルアップ
   - 社内勉強会
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2021/20211008b/thumbnail.jpg
 author: 川村英之

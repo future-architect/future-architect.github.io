@@ -2,11 +2,11 @@
 title: "Python Web APIをAWS Lambdaにデプロイ"
 date: 2023/01/05 00:00:00
 postid: a
-tag:
+tags:
   - WebAPI
   - AWS
   - Docker
-category:
+categories:
   - DevOps
 thumbnail: /images/2023/20230105a/thumbnail.png
 author: 村上知優

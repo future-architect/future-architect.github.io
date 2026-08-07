@@ -2,12 +2,12 @@
 title: "Terraform × BigQuery データ管理：陥りがちな落とし穴と対策５選（サンプルコード付き）"
 date: 2025/04/07 00:00:00
 postid: a
-tag:
+tags:
   - Terraform
   - GoogleCloud
   - BigQuery
   - データマネジメント
-category:
+categories:
   - DataEngineering
 thumbnail: /images/2025/20250407a/thumbnail.png
 author: 大前七奈

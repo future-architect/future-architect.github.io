@@ -2,12 +2,12 @@
 title: "「TEAM GEEK」を読んでメンバー視点で良いチームについて考える"
 date: 2023/11/14 00:00:01
 postid: b
-tag:
+tags:
   - コミュニケーション
   - チーム開発
   - リーダーシップ
   - 書評
-category:
+categories:
   - Management
 thumbnail: /images/2023/20231114b/thumbnail.jpg
 author: 工藤駿泰

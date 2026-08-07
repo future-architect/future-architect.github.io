@@ -2,12 +2,12 @@
 title: "GoLand の WSL2 対応状況を見てみる"
 date: 2024/07/12 00:00:00
 postid: a
-tag:
+tags:
   - Go
   - GoLand
   - WSL
   - IDE
-category:
+categories:
   - Programming
 thumbnail: /images/2024/20240712a/thumbnail.png
 author: 真野隼記

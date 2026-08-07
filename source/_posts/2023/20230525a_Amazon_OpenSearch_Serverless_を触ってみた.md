@@ -2,12 +2,12 @@
 title: "Amazon OpenSearch Serverless を触ってみた"
 date: 2023/05/25 00:00:00
 postid: a
-tag:
+tags:
   - 入門
   - OpenSearch
   - 全文検索
   - AWS
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2023/20230525a/thumbnail.png
 author: 齊藤英比古

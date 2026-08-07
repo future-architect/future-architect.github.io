@@ -2,11 +2,11 @@
 title: "「プロになるJava」読書感想文〜新人の頃の気持ちで最近のJava入門書を読む話"
 date: 2022/04/22 00:00:00
 postid: a
-tag:
+tags:
   - Java
   - 書評
   - 入門
-category:
+categories:
   - Programming
 thumbnail: /images/2022/20220422a/thumbnail.png
 author: 永井優斗

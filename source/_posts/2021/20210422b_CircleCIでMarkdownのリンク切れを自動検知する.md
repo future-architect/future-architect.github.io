@@ -2,11 +2,11 @@
 title: "CircleCIでMarkdownのリンク切れを自動検知する"
 date: 2021/04/22 00:00:01
 postid: b
-tag:
+tags:
   - CircleCI
   - Markdown
   - ドキュメント
-category:
+categories:
   - DevOps
 thumbnail: /images/2021/20210422b/thumbnail.png
 author: 棚井龍之介

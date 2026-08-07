@@ -2,12 +2,12 @@
 title: "Vertex AI PipelinesのTips"
 date: 2023/02/13 00:00:00
 postid: a
-tag:
+tags:
   - VertexAI
   - GoogleCloud
   - MLOps
   - Tips
-category:
+categories:
   - DataScience
 thumbnail: /images/2023/20230213a/thumbnail.png
 author: 平野甫

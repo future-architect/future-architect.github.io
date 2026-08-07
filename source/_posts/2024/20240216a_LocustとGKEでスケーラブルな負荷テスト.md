@@ -2,11 +2,11 @@
 title: "LocustとGKEでスケーラブルな負荷テスト"
 date: 2024/02/16 00:00:00
 postid: a
-tag:
+tags:
   - GKE
   - GoogleCloud
   - 負荷テスト
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2024/20240216a/thumbnail.png
 author: 岸下優介

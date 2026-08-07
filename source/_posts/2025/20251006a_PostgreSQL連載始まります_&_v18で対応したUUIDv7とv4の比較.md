@@ -2,11 +2,11 @@
 title: "PostgreSQL連載始まります & v18で対応したUUIDv7とv4の比較"
 date: 2025/10/06 00:00:00
 postid: a
-tag:
+tags:
   - PostgreSQL
   - PostgreSQL18
   - UUID
-category:
+categories:
   - DB
 thumbnail: /images/2025/20251006a/thumbnail.png
 author: 澁川喜規

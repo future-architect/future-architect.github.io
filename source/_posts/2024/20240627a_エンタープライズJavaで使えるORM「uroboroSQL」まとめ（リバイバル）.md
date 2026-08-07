@@ -2,13 +2,13 @@
 title: "エンタープライズJavaで使えるORM「uroboroSQL」まとめ（リバイバル）"
 date: 2024/06/27 00:00:00
 postid: a
-tag:
+tags:
   - Java
   - SQL
   - 2WaySQL
   - ORM
   - uroboroSQL
-category:
+categories:
   - Programming
 thumbnail: /images/2024/20240627a/thumbnail
 author: 星賢一

@@ -2,10 +2,10 @@
 title: "Pulumiで始めるIaC入門"
 date: 2023/04/26 00:00:00
 postid: a
-tag:
+tags:
   - IaC
   - 入門
-category:
+categories:
   - DevOps
 thumbnail: /images/2023/20230426a/thumbnail.png
 author: 渡邉光

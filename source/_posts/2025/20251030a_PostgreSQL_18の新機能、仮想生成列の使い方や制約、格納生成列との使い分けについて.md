@@ -2,10 +2,10 @@
 title: "PostgreSQL 18の新機能、仮想生成列の使い方や制約、格納生成列との使い分けについて"
 date: 2025/10/30 00:00:00
 postid: a
-tag:
+tags:
   - PostgreSQL
   - PostgreSQL18
-category:
+categories:
   - DB
 thumbnail: /images/2025/20251030a/thumbnail.jpg
 author: 真野隼記

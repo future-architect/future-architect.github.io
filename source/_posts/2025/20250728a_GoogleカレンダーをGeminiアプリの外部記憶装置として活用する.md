@@ -2,12 +2,12 @@
 title: "GoogleカレンダーをGeminiアプリの外部記憶装置として活用する"
 date: 2025/07/28 00:00:00
 postid: a
-tag:
+tags:
   - Gemini
   - AI
   - 生成AI
   - Googleカレンダー
-category:
+categories:
   - DataScience
 thumbnail: /images/2025/20250728a/thumbnail.png
 author: 清水雄一郎

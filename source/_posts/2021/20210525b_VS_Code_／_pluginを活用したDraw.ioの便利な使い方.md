@@ -2,10 +2,10 @@
 title: "VS Code / プラグインを活用したDraw.ioの便利な使い方"
 date: 2021/05/25 00:00:01
 postid: b
-tag:
+tags:
   - draw.io
   - VSCode
-category:
+categories:
   - DevOps
 thumbnail: /images/2021/20210525b/thumbnail.gif
 author: 山田勇一

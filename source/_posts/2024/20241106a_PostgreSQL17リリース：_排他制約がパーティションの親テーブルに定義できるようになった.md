@@ -2,11 +2,11 @@
 title: "PostgreSQL17リリース: 排他制約がパーティションの親テーブルに定義できるようになった"
 date: 2024/11/06 00:00:00
 postid: a
-tag:
+tags:
   - PostgreSQL
   - PostgreSQL17
   - パーティション
-category:
+categories:
   - DB
 thumbnail: /images/2024/20241106a/thumbnail.png
 author: 真野隼記

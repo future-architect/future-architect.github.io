@@ -2,12 +2,12 @@
 title: "Go で map 型の YAML 出力を指定の順序へ変更したい"
 date: 2022/06/15 00:00:00
 postid: a
-tag:
+tags:
   - Go
   - YAML
   - map
   - リフレクション
-category:
+categories:
   - Programming
 thumbnail: /images/2022/20220615a/thumbnail.png
 author: 多賀聡一朗

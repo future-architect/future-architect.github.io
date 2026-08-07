@@ -2,11 +2,11 @@
 title: "AI Agent用フレームワーク「Dapr Agents」について調べてみた"
 date: 2025/06/25 00:00:00
 postid: a
-tag:
+tags:
   - AIエージェント
   - Claude
   - OpenAPI
-category:
+categories:
   - DataScience
 thumbnail: /images/2025/20250625a/thumbnail.png
 author: 原木翔

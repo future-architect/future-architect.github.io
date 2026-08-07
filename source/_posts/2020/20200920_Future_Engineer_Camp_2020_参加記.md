@@ -2,12 +2,12 @@
 title: "Engineer Camp 2020（スマートファクトリー） 参加記"
 date: 2020/09/20 00:00:00
 postid: ""
-tag:
+tags:
   - Go
   - インターン
   - インターン2020
   - 工場
-category:
+categories:
   - IoT
 thumbnail: /images/2020/20200920/thumbnail.png
 author: 斎藤賢太

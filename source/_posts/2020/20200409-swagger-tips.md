@@ -2,14 +2,14 @@
 title: "スキーマファースト開発のためのOpenAPI（Swagger）設計規約"
 date: 2020/04/09 10:38:04
 postid: ""
-tag:
+tags:
   - OpenAPI
   - Swagger
   - Go
   - TypeScript
   - 設計
   - チーム開発
-category:
+categories:
   - Frontend
 thumbnail: /images/2020/20200409/thumbnail.png
 author: 亀井隆徳

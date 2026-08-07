@@ -2,11 +2,11 @@
 title: "GoでWebアプリ開発時にあるあるだったレビューコメント"
 date: 2020/07/09 11:09:27
 postid: ""
-tag:
+tags:
   - Go
   - コードレビュー
   - チーム開発
-category:
+categories:
   - Programming
 thumbnail: /images/2020/20200709/thumbnail.png
 author: 真野隼記

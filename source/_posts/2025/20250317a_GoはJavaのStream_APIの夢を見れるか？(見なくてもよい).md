@@ -2,12 +2,12 @@
 title: "GoはJavaのStream APIの夢を見れるか？(見なくてもよい)"
 date: 2025/03/17 00:00:00
 postid: a
-tag:
+tags:
   - Go
   - Java
   - ジェネリクス
   - イテレータ
-category:
+categories:
   - Programming
 thumbnail: /images/2025/20250317a/thumbnail.png
 author: 澁川喜規

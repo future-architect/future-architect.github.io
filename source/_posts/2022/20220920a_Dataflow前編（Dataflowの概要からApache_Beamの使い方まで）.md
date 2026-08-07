@@ -2,11 +2,11 @@
 title: "Dataflow前編（Dataflowの概要からApache Beamの使い方まで）"
 date: 2022/09/20 00:00:00
 postid: a
-tag:
+tags:
   - Dataflow
   - インターン
   - インターン2022
-category:
+categories:
   - DataEngineering
 thumbnail: "/images/2022/20220920a/thumbnail.png"
 author: "平野甫"

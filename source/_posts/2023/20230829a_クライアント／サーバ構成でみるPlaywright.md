@@ -2,10 +2,10 @@
 title: "クライアント/サーバ構成でみるPlaywright"
 date: 2023/08/29 00:00:00
 postid: a
-tag:
+tags:
   - Playwright
   - テスト
-category:
+categories:
   - Frontend
 thumbnail: /images/2023/20230829a/thumbnail.png
 author: 武田大輝

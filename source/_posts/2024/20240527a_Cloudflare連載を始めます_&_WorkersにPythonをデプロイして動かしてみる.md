@@ -2,11 +2,11 @@
 title: "Cloudflare連載を始めます & WorkersにPythonをデプロイして動かしてみる"
 date: 2024/05/27 00:00:00
 postid: a
-tag:
+tags:
   - Cloudflare
   - Cloudflare Workers
   - Python
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2024/20240527a/thumbnail.jpg
 author: 伊藤太斉

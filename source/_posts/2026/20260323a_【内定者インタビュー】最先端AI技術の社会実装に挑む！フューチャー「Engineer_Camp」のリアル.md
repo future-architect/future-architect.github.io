@@ -2,11 +2,11 @@
 title: "【内定者インタビュー】最先端AI技術の社会実装に挑む！フューチャー「Engineer Camp」のリアル"
 date: 2026/03/23 00:00:00
 postid: a
-tag:
+tags:
   - インターン
   - インターン2026
   - インタビュー
-category:
+categories:
   - Culture
 thumbnail: /images/2026/20260323a/thumbnail.jpg
 author: 家永直子

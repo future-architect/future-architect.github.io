@@ -2,11 +2,11 @@
 title: "ServiceNow+Terraform(+Go) によるインフラ構築自動化"
 date: 2020/04/16 21:30:49
 postid: ""
-tag:
+tags:
   - Terraform
   - Go
   - ワークフロー
-category:
+categories:
   - DevOps
 thumbnail: /images/2020/20200416/thumbnail.png
 author: 西田好孝

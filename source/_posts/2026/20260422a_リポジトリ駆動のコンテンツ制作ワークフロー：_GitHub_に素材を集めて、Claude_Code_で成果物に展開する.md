@@ -2,11 +2,11 @@
 title: "リポジトリ駆動のコンテンツ制作ワークフロー: GitHub に素材を集めて、Claude Code で成果物に展開する"
 date: 2026/04/22 00:00:00
 postid: a
-tag:
+tags:
   - ClaudeCode
   - Claude
   - GitHub
-category:
+categories:
   - AIDD
 thumbnail: /images/2026/20260422a/thumbnail.png
 author: 棚井龍之介

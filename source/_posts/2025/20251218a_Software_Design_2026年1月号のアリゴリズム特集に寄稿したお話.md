@@ -2,11 +2,11 @@
 title: "Software Design 2026年1月号のアルゴリズム特集に寄稿したお話"
 date: 2025/12/18 00:00:00
 postid: a
-tag:
+tags:
   - 出版
   - アルゴリズム
   - SoftwareDesign
-category:
+categories:
   - Programming
 thumbnail: /images/2025/20251218a/thumbnail.jpg
 author: 澁川喜規

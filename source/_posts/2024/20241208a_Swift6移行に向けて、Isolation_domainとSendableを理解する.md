@@ -2,10 +2,10 @@
 title: "Swift6移行に向けて、Isolation domainとSendableを理解する"
 date: 2024/12/08 00:00:00
 postid: a
-tag:
+tags:
   - iOS
   - Swift
-category:
+categories:
   - Mobile
 thumbnail: /images/2024/20241208a/thumbnail.png
 author: 橋本竜我

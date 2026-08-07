@@ -2,11 +2,11 @@
 title: "RaspberryPiと赤外線反射センサーを用いて遊んでみよう（入門編）"
 date: 2025/05/22 00:00:00
 postid: a
-tag:
+tags:
   - RaspberryPi
   - センサー
   - MicroPython
-category:
+categories:
   - IoT
 thumbnail: /images/2025/20250522a/thumbnail.png
 author: 生駒開

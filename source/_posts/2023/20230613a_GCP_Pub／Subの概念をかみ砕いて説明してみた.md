@@ -2,11 +2,11 @@
 title: "GCP Pub/Subの概念をかみ砕いて説明してみた"
 date: 2023/06/13 00:00:00
 postid: a
-tag:
+tags:
   - PubSub
   - GoogleCloud
   - 初心者向け
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2023/20230613a/thumbnail.png
 author: 添田瑛介

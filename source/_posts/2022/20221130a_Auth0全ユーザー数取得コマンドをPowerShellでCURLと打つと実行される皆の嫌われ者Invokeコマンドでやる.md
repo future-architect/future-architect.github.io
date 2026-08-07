@@ -2,12 +2,12 @@
 title: "Auth0全ユーザー数取得コマンドをPowerShellのInvokeコマンドで行う"
 date: 2022/11/30 00:00:00
 postid: a
-tag:
+tags:
   - Auth0
   - curl
   - Windows
   - PowerShell
-category:
+categories:
   - 認証認可
 thumbnail: /images/2022/20221130a/thumbnail.png
 author: ダワージャルガルオチラル

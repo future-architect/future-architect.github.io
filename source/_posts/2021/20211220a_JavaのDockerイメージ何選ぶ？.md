@@ -2,11 +2,11 @@
 title: "JavaのDockerイメージ何選ぶ？"
 date: 2021/12/20 00:00:00
 postid: a
-tag:
+tags:
   - Docker
   - Java
   - コンテナビルド
-category:
+categories:
   - DevOps
 thumbnail: /images/2021/20211220a/thumbnail.png
 author: 澁川喜規

@@ -2,12 +2,12 @@
 title: "Technical Credibilityを築くということ"
 date: 2021/04/22 00:00:00
 postid: a
-tag:
+tags:
   - 新人向け
   - スキルアップ
   - アウトプット
   - マインドセット
-category:
+categories:
   - Culture
 thumbnail: /images/2021/20210422a/thumbnail.jpg
 author: 須田桂伍

@@ -2,12 +2,12 @@
 title: "PythonistaがGo言語に入門してみた"
 date: 2020/11/19 00:00:00
 postid: ""
-tag:
+tags:
   - Python
   - Go
   - 入門
   - 他言語からGoへ
-category:
+categories:
   - Programming
 thumbnail: /images/2020/20201119/thumbnail.png
 author: 村上知優

@@ -2,14 +2,14 @@
 title: "Grafana Alloyを使って、EKSクラスタ外部のサーバからメトリクス取得を試してみた"
 date: 2025/08/25 00:00:01
 postid: b
-tag:
+tags:
   - Grafana
   - Grafana Alloy
   - EKS
   - 初心者向け
   - Docker
   - オブサーバビリティ
-category:
+categories:
   - DevOps
 thumbnail: /images/2025/20250825b/thumbnail.png
 author:  二宮佑斗

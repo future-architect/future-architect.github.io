@@ -2,12 +2,12 @@
 title: "CursorによるAI駆動開発入門"
 date: 2025/04/28 00:00:00
 postid: a
-tag:
+tags:
   - 入門
   - 生成AI
   - LLM
   - cursor
-category:
+categories:
   - AIDD
 thumbnail: /images/2025/20250428a/thumbnail.gif
 author: 小橋昌明

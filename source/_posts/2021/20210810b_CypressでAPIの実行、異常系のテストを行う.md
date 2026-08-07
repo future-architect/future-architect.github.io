@@ -2,11 +2,11 @@
 title: "CypressでAPIの実行、異常系のテストを行う"
 date: 2021/08/10 00:00:01
 postid: b
-tag:
+tags:
   - Cypress
   - Node.js
   - E2Eテスト
-category:
+categories:
   - Frontend
 thumbnail: /images/2021/20210810b/thumbnail.jpg
 author: 伊藤真彦

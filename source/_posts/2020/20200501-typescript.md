@@ -2,11 +2,11 @@
 title: "TypeScriptでReactをやるときは、小さいアプリでもReduxを最初から使ってもいいかもねというお話"
 date: 2020/05/01 10:19:34
 postid: ""
-tag:
+tags:
   - React
   - Redux
   - TypeScript
-category:
+categories:
   - Frontend
 thumbnail: /images/2020/20200501/thumbnail.png
 author: 澁川喜規

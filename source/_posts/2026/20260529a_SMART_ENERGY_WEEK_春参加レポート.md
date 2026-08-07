@@ -2,10 +2,10 @@
 title: "SMART ENERGY WEEK 春参加レポート"
 date: 2026/05/29 00:00:00
 postid: a
-tag:
+tags:
   - エネルギー業界
   - 展示会
-category:
+categories:
   - Business
 thumbnail: /images/2026/20260529a/thumbnail.jpg
 author: 佐々木皓晨

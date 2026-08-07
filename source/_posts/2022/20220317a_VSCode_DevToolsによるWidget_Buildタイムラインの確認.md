@@ -2,10 +2,10 @@
 title: "VSCode DevToolsによるWidget Buildタイムラインの確認"
 date: 2022/03/17 00:00:00
 postid: a
-tag:
+tags:
   - Flutter
   - VSCode
-category:
+categories:
   - Mobile
 thumbnail: /images/2022/20220317a/thumbnail.png
 author: 藤田春佳

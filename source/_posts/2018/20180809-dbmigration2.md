@@ -2,11 +2,11 @@
 title: データベースマイグレーション ～OracleからPostgreSQLへ～　−第２回ー
 date: 2018/08/09 15:00:36
 postid: ""
-tag:
+tags:
   - PostgreSQL
   - Oracle
   - DB移行
-category:
+categories:
   - DB
 thumbnail: /images/2018/20180809/thumbnail.png
 author: 岸田聡

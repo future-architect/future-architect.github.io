@@ -2,11 +2,11 @@
 title: "TensorFlow Liteを使ったFlutterによるモバイル画像識別器を作ってみた"
 date: 2022/03/21 00:00:00
 postid: a
-tag:
+tags:
   - TensorFlow
   - 画像処理
   - Flutter
-category:
+categories:
   - Mobile
 thumbnail: /images/2022/20220321a/thumbnail.png
 author: 岸下優介

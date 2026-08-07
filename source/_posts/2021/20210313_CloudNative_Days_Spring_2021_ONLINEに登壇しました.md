@@ -2,13 +2,13 @@
 title: "CloudNative Days Spring 2021 ONLINEに登壇しました"
 date: 2021/03/13 00:00:00
 postid: ""
-tag:
+tags:
   - 登壇レポート
   - OpenPolicyAgent
   - CNCF
   - Policy-as-Code
   - カンファレンス
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2021/20210313/thumbnail.png
 author: 伊藤太斉

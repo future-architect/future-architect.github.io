@@ -2,9 +2,9 @@
 title: "PostgreSQLユーザーがSQL Server開発で知っておきたかった実践Tips10選"
 date: 2026/05/12 00:00:00
 postid: a
-tag:
+tags:
   - PostgreSQL
-category:
+categories:
   - DB
 thumbnail: /images/2026/20260512a/thumbnail.jpg
 author: 辻大志郎

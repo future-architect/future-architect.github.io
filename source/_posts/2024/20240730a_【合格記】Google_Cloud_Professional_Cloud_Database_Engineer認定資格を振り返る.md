@@ -2,11 +2,11 @@
 title: "【合格記】Google Cloud Professional Cloud Database Engineer認定資格を振り返る"
 date: 2024/07/30 00:00:00
 postid: a
-tag:
+tags:
   - GoogleCloud
   - 合格記
   - PCDB
-category:
+categories:
   - DB
 thumbnail: /images/2024/20240730a/thumbnail.png
 author: 岸下優介

@@ -2,12 +2,12 @@
 title: "チケットごとにSlackスレッドを分けて通知するRedmineプラグインを作成しました！"
 date: 2021/04/13 00:00:00
 postid: "b"
-tag:
+tags:
   - Redmine
   - Slack
   - OSS
   - コアテク
-category:
+categories:
   - DevOps
 thumbnail: /images/2021/20210413b/thumbnail.png
 author: 小松裕二

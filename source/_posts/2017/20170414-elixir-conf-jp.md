@@ -2,9 +2,9 @@
 title: "Elixir Conf Japan 2017 参加レポート"
 date: 2017/04/14 12:00:00
 postid: ""
-tag:
+tags:
   - 参加レポート
-category:
+categories:
   - Programming
 thumbnail: /images/2017/20170412/thumbnail_20170412.png
 author: 前川喜洋

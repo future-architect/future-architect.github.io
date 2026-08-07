@@ -2,12 +2,12 @@
 title: "Pure Rustで生まれ変わったPostgreSQL公式構文準拠SQLフォーマッター「uroborosql-fmt」をリリース🎉"
 date: 2025/09/29 00:00:00
 postid: a
-tag:
+tags:
   - フォーマッター
   - uroboroSQL
   - Rust
   - WebAssembly
-category:
+categories:
   - DB
 thumbnail: /images/2025/20250929a/thumbnail.png
 author: 川渕皓太

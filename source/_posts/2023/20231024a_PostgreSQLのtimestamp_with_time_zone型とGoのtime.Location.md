@@ -2,12 +2,12 @@
 title: "PostgreSQLのtimestamp with time zone型とGoのtime.Location"
 date: 2023/10/24 00:00:00
 postid: a
-tag:
+tags:
   - PostgreSQL
   - Go
   - jackc/pgx
   - time
-category:
+categories:
   - Programming
 thumbnail: /images/2023/20231024a/thumbnail.png
 author: 真野隼記

@@ -2,13 +2,13 @@
 title: "Pyright を LSP サーバとした自作 LSP クライアント（調査編）"
 date: 2022/03/02 00:00:00
 postid: a
-tag:
+tags:
   - Python
   - コアテク
   - 構文解析
   - LSP
   - Pyright
-category:
+categories:
   - Programming
 thumbnail: /images/2022/20220302a/thumbnail.png
 author: 空閑康太

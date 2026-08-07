@@ -2,10 +2,10 @@
 title: "AWS Certified DevOps Engineer - Professional合格体験記"
 date: 2021/08/25 00:00:00
 postid: a
-tag:
+tags:
   - AWS
   - 合格記
-category:
+categories:
   - DevOps
 thumbnail: /images/2021/20210825a/thumbnail.png
 author: 伊藤真彦

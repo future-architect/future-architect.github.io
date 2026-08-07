@@ -2,12 +2,12 @@
 title: "Go Tips連載1: ホワイトリストProxy申請するときのGo依存ライブラリURLドメインの調べ方"
 date: 2020/05/18 09:55:52
 postid: ""
-tag:
+tags:
   - Go
   - GoTips連載
   - プロキシ
   - Tips
-category:
+categories:
   - Programming
 thumbnail: /images/2020/20200518/thumbnail.png
 author: 宮崎将太

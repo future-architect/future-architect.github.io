@@ -2,12 +2,12 @@
 title: "手動運用しているCloudflareをTerraformでInfrastructure as Codeする"
 date: 2024/03/27 00:00:00
 postid: a
-tag:
+tags:
   - Terraform
   - Cloudflare
   - IaC
   - tfstate
-category:
+categories:
   - DevOps
 thumbnail: /images/2024/20240327a/thumbnail.png
 author: 大岩潤矢

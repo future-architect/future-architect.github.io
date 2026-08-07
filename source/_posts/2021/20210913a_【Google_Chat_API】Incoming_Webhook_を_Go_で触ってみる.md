@@ -2,12 +2,12 @@
 title: "【Google Chat API】Incoming Webhook を Go で触ってみる"
 date: 2021/09/13 00:00:00
 postid: a
-tag:
+tags:
   - Go
   - BOT
   - GoogleWorkspace
   - GoogleChat
-category:
+categories:
   - Programming
 thumbnail: /images/2021/20210913a/thumbnail.png
 author: 山本雄樹

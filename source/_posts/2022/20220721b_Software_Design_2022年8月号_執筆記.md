@@ -2,11 +2,11 @@
 title: "Software Design 2022年8月号 執筆記"
 date: 2022/07/21 00:00:01
 postid: b
-tag:
+tags:
   - SoftwareDesign
   - OpenAPI
   - 出版
-category:
+categories:
   - Programming
 thumbnail: /images/2022/20220721b/thumbnail.jpg
 author: 武田大輝

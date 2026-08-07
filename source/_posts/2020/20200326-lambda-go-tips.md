@@ -2,13 +2,13 @@
 title: "Serverless連載2: AWS Lambda×Goの開発Tips"
 date: 2020/03/26 14:24:00
 postid: ""
-tag:
+tags:
   - Go
   - AWS
   - サーバーレス
   - Lambda
   - Tips
-category:
+categories:
   - Programming
 author: 真野隼記
 lede: "サーバレス連載の第2弾はLambdaアプリをGoで開発する中で調べた内容や、Tipsを紹介します。"

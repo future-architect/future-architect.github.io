@@ -2,12 +2,12 @@
 title: "S3 on LocalStackをGoとFUSEを使ってMountする（WSL2）"
 date: 2022/08/29 00:00:00
 postid: a
-tag:
+tags:
   - S3
   - LocalStack
   - Go
   - WSL
-category:
+categories:
   - Programming
 thumbnail: /images/2022/20220829a/thumbnail.png
 author: 真野隼記

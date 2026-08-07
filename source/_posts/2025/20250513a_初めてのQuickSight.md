@@ -2,12 +2,12 @@
 title: "初めてのQuickSight"
 date: 2025/05/13 00:00:00
 postid: a
-tag:
+tags:
   - AWS
   - 入門
   - BI
   - 可視化
-category:
+categories:
   - DataScience
 thumbnail: /images/2025/20250513a/thumbnail.png
 author: 板垣翼

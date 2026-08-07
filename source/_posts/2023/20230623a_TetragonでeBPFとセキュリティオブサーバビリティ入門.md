@@ -2,12 +2,12 @@
 title: "TetragonでeBPFとセキュリティオブサーバビリティ入門"
 date: 2023/06/23 00:00:00
 postid: a
-tag:
+tags:
   - Kubernetes
   - CNCF
   - オブサーバビリティ
   - Linux
-category:
+categories:
   - Security
 thumbnail: /images/2023/20230623a/thumbnail.png
 author: 鈴木崇史

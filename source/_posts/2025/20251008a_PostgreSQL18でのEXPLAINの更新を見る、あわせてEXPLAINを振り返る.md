@@ -2,11 +2,11 @@
 title: "PostgreSQL18でのEXPLAINの更新を見る、あわせてEXPLAINを振り返る"
 date: 2025/10/08 00:00:00
 postid: a
-tag:
+tags:
   - PostgreSQL
   - 実行計画
   - PostgreSQL18
-category:
+categories:
   - DB
 thumbnail: /images/2025/20251008a/thumbnail.jpg
 author: 山本竜玄

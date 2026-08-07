@@ -2,10 +2,10 @@
 title: "GoがApple Siliconにネイティブ対応したのでベンチマークをとってみました"
 date: 2020/12/03 00:00:00
 postid: ""
-tag:
+tags:
   - Go
   - Mac
-category:
+categories:
   - Programming
 thumbnail: /images/2020/20201203/thumbnail.png
 author: 澁川喜規

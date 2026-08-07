@@ -2,13 +2,13 @@
 title: "Future Tech Night #10 ～進化するJava。標準API／Tomcat編　を開催しました"
 date: 2021/06/30 00:00:00
 postid: a
-tag:
+tags:
   - OSS
   - Java
   - Tomcat
   - TechNight
   - 登壇レポート
-category:
+categories:
   - Programming
 thumbnail: /images/2021/20210630a/thumbnail.jpg
 author: 藤野圭一

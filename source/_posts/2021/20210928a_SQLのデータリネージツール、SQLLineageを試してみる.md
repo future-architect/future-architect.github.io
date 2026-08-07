@@ -2,12 +2,12 @@
 title: "SQLのデータリネージツール、SQLLineageを試してみる"
 date: 2021/09/28 00:00:00
 postid: a
-tag:
+tags:
   - Python
   - データリネージュ
   - データガバナンス
   - SQL
-category:
+categories:
   - DataEngineering
 thumbnail: /images/2021/20210928a/thumbnail.png
 author: 真野隼記

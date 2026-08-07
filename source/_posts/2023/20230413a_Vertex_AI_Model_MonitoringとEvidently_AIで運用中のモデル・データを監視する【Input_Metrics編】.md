@@ -2,12 +2,12 @@
 title: "Vertex AI Model MonitoringとEvidently AIで運用中のモデル・データを監視する【Input Metrics編】"
 date: 2023/04/13 00:00:00
 postid: a
-tag:
+tags:
   - AI監視
   - MLOps
   - Evidently AI
   - VertexAI
-category:
+categories:
   - DataScience
 thumbnail: /images/2023/20230413a/thumbnail.png
 author: 板野竜也

@@ -2,12 +2,12 @@
 title: "Wiresharkで通信プロトコルを見る"
 date: 2021/08/23 00:00:01
 postid: b
-tag:
+tags:
   - Wireshark
   - Network
   - 初心者向け
   - TCP/IP
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2021/20210823b/thumbnail.png
 author: 棚井龍之介

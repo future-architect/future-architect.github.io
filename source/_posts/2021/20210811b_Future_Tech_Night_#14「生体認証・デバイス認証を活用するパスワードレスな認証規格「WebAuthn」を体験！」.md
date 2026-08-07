@@ -2,12 +2,12 @@
 title: "Future Tech Night #14「生体認証・デバイス認証を活用するパスワードレスな認証規格「WebAuthn」を体験！」"
 date: 2021/08/11 00:00:01
 postid: b
-tag:
+tags:
   - Auth0
   - WebAuthn
   - TechNight
   - 登壇レポート
-category:
+categories:
   - 認証認可
 thumbnail: /images/2021/20210811b/thumbnail.jpg
 author: 市川浩暉

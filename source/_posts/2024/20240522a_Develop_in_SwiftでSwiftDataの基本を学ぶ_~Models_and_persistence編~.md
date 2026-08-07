@@ -2,10 +2,10 @@
 title: "Develop in SwiftでSwiftDataの基本を学ぶ ~Models and persistence編~"
 date: 2024/05/22 00:00:00
 postid: a
-tag:
+tags:
   - Swift
   - SwiftUI
-category:
+categories:
   - Mobile
 thumbnail: /images/2024/20240522a/thumbnail.png
 author: 橋本竜我

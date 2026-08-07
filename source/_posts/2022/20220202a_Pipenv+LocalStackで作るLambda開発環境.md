@@ -2,13 +2,13 @@
 title: "Pipenv+LocalStackで作るLambda開発環境"
 date: 2022/02/02 00:00:00
 postid: a
-tag:
+tags:
   - LocalStack
   - AWS
   - Lambda
   - 環境構築
   - Pipenv
-category:
+categories:
   - Programming
 thumbnail: /images/2022/20220202a/thumbnail.png
 author: 宮永崇史

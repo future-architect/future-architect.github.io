@@ -2,13 +2,13 @@
 title: GoからAWS KinesisのAggregationFormatを利用する
 date: 2020/07/27 00:00:00
 postid: ""
-tag:
+tags:
   - AWS
   - Go
   - サーバーレス
   - Lambda
   - Kinesis
-category:
+categories:
   - Programming
 thumbnail: /images/2020/20200727/thumbnail.png
 author: 真野隼記

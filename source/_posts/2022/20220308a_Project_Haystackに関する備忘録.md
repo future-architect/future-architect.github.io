@@ -2,10 +2,10 @@
 title: "Project Haystackに関する備忘録"
 date: 2022/03/08 00:00:00
 postid: a
-tag:
+tags:
   - データモデル
   - 設計
-category:
+categories:
   - IoT
 thumbnail: /images/2022/20220308a/thumbnail.png
 author: 大西翔太

@@ -2,13 +2,13 @@
 title: 'Future Tech Night #16 ～クラウド時代のDWH～'
 date: 2021/10/05 00:00:01
 postid: b
-tag:
+tags:
   - TechNight
   - 登壇レポート
   - Spanner
   - Snowflake
   - DWH
-category:
+categories:
   - DB
 thumbnail: /images/2021/20211005b/thumbnail.jpg
 author: 中山祐一

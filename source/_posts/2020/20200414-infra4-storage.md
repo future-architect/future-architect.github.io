@@ -2,10 +2,10 @@
 title: "インフラ入門vol.4（ストレージ）"
 date: 2020/04/14 11:07:29
 postid: ""
-tag:
+tags:
   - インフラ入門
   - 入門
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2020/20200414/thumbnail.png
 author: 川村英之

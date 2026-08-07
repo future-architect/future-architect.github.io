@@ -2,10 +2,10 @@
 title: "AWS Certified Security - Specialty合格体験記"
 date: 2021/09/21 00:00:00
 postid: a
-tag:
+tags:
   - AWS
   - 合格記
-category:
+categories:
   - Security
 thumbnail: /images/2021/20210921a/thumbnail.png
 author: 伊藤真彦

@@ -2,10 +2,10 @@
 title: "Serverless連載を始めます（2020）"
 date: 2020/03/22 09:56:50
 postid: ""
-tag:
+tags:
   - サーバーレス
   - インデックス
-category:
+categories:
   - Programming
 thumbnail: /images/2020/20200322/thumbnail.png
 author: admin

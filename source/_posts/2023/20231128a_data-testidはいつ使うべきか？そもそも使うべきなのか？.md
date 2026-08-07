@@ -2,11 +2,11 @@
 title: "data-testidはいつ使うべきか？そもそも使うべきなのか？"
 date: 2023/11/28 00:00:00
 postid: a
-tag:
+tags:
   - React
   - Cypress
   - Playwright
-category:
+categories:
   - Frontend
 thumbnail: /images/2023/20231128a/thumbnail.png
 author: 澁川喜規

@@ -2,13 +2,13 @@
 title: "Mac 慣れした私に Windows が支給されたので、まず設定したこと"
 date: 2023/02/16 00:00:00
 postid: a
-tag:
+tags:
   - Windows
   - キーバインド
   - Mac
   - ショートカット
   - 環境構築
-category:
+categories:
   - DevOps
 thumbnail: /images/2023/20230216a/thumbnail.png
 author: 棚井龍之介

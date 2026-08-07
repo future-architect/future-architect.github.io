@@ -2,11 +2,11 @@
 title: "Gemma3 + Unsloth + GitLab CI/CDで構築する完全オンプレミスAIコードレビュー環境"
 date: 2025/06/20 00:00:00
 postid: a
-tag:
+tags:
   - GitLab
   - コードレビュー
   - 生成AI
-category:
+categories:
   - AIDD
 thumbnail: /images/2025/20250620a/thumbnail.png
 author: 山本竜玄

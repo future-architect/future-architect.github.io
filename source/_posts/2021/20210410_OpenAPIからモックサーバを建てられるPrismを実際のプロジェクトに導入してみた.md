@@ -2,12 +2,12 @@
 title: "OpenAPIからモックサーバを建てられるPrismを実際のプロジェクトに導入してみた"
 date: 2021/04/10 00:00:00
 postid: ""
-tag:
+tags:
   - Swagger
   - OpenAPI
   - Vue.js
   - モック
-category:
+categories:
   - Frontend
 thumbnail: /images/2021/20210410/thumbnail.png
 author:  大岩潤矢

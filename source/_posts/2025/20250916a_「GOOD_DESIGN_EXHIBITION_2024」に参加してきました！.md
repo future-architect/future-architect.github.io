@@ -2,11 +2,11 @@
 title: "「GOOD DESIGN EXHIBITION 2024」に参加してきました！"
 date: 2025/09/16 00:00:00
 postid: a
-tag:
+tags:
   - 展示会
   - 参加レポート
   - UI/UX
-category:
+categories:
   - Business
 thumbnail: /images/2025/20250916a/thumbnail.png
 author: 福井彩乃

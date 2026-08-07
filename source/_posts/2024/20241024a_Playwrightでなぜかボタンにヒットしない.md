@@ -2,12 +2,12 @@
 title: "Playwrightでなぜかボタンにヒットしない"
 date: 2024/10/24 00:00:00
 postid: a
-tag:
+tags:
   - Playwright
   - E2Eテスト
   - accessibility
   - トラブルシュート
-category:
+categories:
   - Frontend
 thumbnail: /images/2024/20241024a/thumbnail.jpg
 author: 澁川喜規

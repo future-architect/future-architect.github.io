@@ -2,12 +2,12 @@
 title: "Terraform x GitOps についての調査"
 date: 2023/04/03 00:00:00
 postid: a
-tag:
+tags:
   - Terraform
   - GitOps
   - GitHubActions
   - CI/CD
-category:
+categories:
   - DevOps
 thumbnail: /images/2023/20230403a/thumbnail.png
 author: 川口翔大

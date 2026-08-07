@@ -2,13 +2,13 @@
 title: "OpenTelemetryとgo-chiを繋げてみる"
 date: 2021/10/20 00:00:00
 postid: a
-tag:
+tags:
   - OpenTelemetry
   - Telemetry
   - go-chi
   - Go
   - CNCF
-category:
+categories:
   - DevOps
 thumbnail: /images/2021/20211020a/thumbnail.png
 author: 澁川喜規

@@ -2,13 +2,13 @@
 title: "Auth0でADをユーザDBにし、SalesforceとのSSOを確認する"
 date: 2021/03/02 00:00:00
 postid: ""
-tag:
+tags:
   - Auth0
   - SSO
   - AD
   - Auth0Rules
   - Salesforce
-category:
+categories:
   - 認証認可
 thumbnail: /images/2021/20210302/thumbnail.png
 author: 山田勇一

@@ -2,12 +2,12 @@
 title: "サーバーアプリ開発環境(Python／FastAPI)"
 date: 2021/06/11 00:00:00
 postid: a
-tag:
+tags:
   - Docker
   - VSCode
   - Python
   - FastAPI
-category:
+categories:
   - DevOps
 thumbnail: /images/2021/20210611a/thumbnail.png
 author: 澁川喜規

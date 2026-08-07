@@ -2,11 +2,11 @@
 title: "scikit-learn 1.0 リリース！更新内容を一部紹介します。"
 date: 2021/10/08 00:00:00
 postid: a
-tag:
+tags:
   - 機械学習
   - pandas
   - Python
-category:
+categories:
   - DataScience
 thumbnail: /images/2021/20211008a/thumbnail.png
 author: 玉木竜二

@@ -2,11 +2,11 @@
 title: "GoとDynamoDBを用いた開発で反省していること"
 date: 2022/06/01 00:00:00
 postid: b
-tag:
+tags:
   - DynamoDB
   - 振り返り
   - 失敗談
-category:
+categories:
   - DB
 thumbnail: /images/2022/20220601b/thumbnail.png
 author: 真野隼記

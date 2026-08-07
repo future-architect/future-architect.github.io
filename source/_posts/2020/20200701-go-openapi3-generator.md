@@ -2,12 +2,12 @@
 title: "Go の Open API 3.0 のジェネレータ oapi-codegen を試してみた"
 date: 2020/07/01 09:40:40
 postid: ""
-tag:
+tags:
   - Go
   - OpenAPI
   - Swagger
   - go-swagger
-category:
+categories:
   - Programming
 thumbnail: /images/2020/20200701/thumbnail.png
 author: 多賀聡一朗

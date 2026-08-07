@@ -2,11 +2,11 @@
 title: "AWS Session Managerでセッションを切断されにくくする方法"
 date: 2019/10/09 08:56:31
 postid: ""
-tag:
+tags:
   - AWS
   - Session-Manager
   - 踏み台
-category:
+categories:
   - Infrastructure
 author: 村瀬善則
 lede: "世の中コンテナ化の流れでEC2インスタンスを直接利用する機会が減ってきていますが、まだまだサーバにSSH接続する機会もあるかと思います。今回はSSH相当の処理をよりセキュアに行えるSession Managerについて調査・検証してみました。"

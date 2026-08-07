@@ -2,13 +2,13 @@
 title: "LocalStackでS3署名付きURLを使う時に気を付けるポイント"
 date: 2021/11/15 00:00:00
 postid: a
-tag:
+tags:
   - AWS
   - LocalStack
   - S3
   - 署名付きURL
   - CORS
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2021/20211115a/thumbnail.png
 author: 伊藤真彦

@@ -2,12 +2,12 @@
 title: "Serverless連載4: Firebase CrashlyticsでAndroidアプリのエラーログをさくっと収集する"
 date: 2020/03/30 09:45:42
 postid: ""
-tag:
+tags:
   - サーバーレス
   - GoogleCloud
   - Firebase
   - Android
-category:
+categories:
   - Mobile
 thumbnail: /images/2020/20200330/thumbnail.png
 author: 佐藤尚至

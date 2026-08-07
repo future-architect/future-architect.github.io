@@ -2,11 +2,11 @@
 title: "VSCodeの拡張機能（Notebooks類）を自作して公開するまでの流れ"
 date: 2024/10/11 00:00:00
 postid: a
-tag:
+tags:
   - VSCode
   - VSCode拡張
   - JupyterNotebook
-category:
+categories:
   - Programming
 thumbnail: /images/2024/20241011a/thumbnail.png
 author: 王紹宇

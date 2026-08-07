@@ -2,10 +2,10 @@
 title: "Terraform連載2024 Stateを統合してみる"
 date: 2024/03/14 00:00:00
 postid: a
-tag:
+tags:
   - Terraform
   - tfstate
-category:
+categories:
   - DevOps
 thumbnail: /images/2024/20240314a/thumbnail.png
 author: 原田達也

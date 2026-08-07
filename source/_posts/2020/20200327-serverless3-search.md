@@ -2,14 +2,14 @@
 title: "Serverless連載3: Goでサーバーレス用の検索エンジンwatertowerを作ってみました"
 date: 2020/03/27 09:51:22
 postid: ""
-tag:
+tags:
   - Go
   - サーバーレス
   - AWS
   - GoCDK
   - DynamoDB
   - 全文検索
-category:
+categories:
   - Programming
 thumbnail: /images/2020/20200327/thumbnail.png
 author: 澁川喜規

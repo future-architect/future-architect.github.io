@@ -2,12 +2,12 @@
 title: "Cloud Functions+ GoでビッグデータETLするときのコツ"
 date: 2022/05/12 00:00:00
 postid: a
-tag:
+tags:
   - GoogleCloud
   - ETL
   - CloudFunctions
   - サーバーレス
-category:
+categories:
   - DataEngineering
 thumbnail: /images/2022/20220512a/thumbnail.png
 author: 鈴木崇史

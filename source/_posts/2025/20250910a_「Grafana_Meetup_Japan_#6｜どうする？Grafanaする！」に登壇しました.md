@@ -2,11 +2,11 @@
 title: "「Grafana Meetup Japan #6｜どうする？Grafanaする！」に登壇しました"
 date: 2025/09/10 00:00:00
 postid: a
-tag:
+tags:
   - Grafana
   - Grafana Alloy
   - 登壇レポート
-category:
+categories:
   - DevOps
 thumbnail: /images/2025/20250910a/thumbnail.png
 author: 伊藤太斉

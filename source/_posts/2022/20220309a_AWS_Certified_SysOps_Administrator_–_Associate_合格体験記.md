@@ -2,11 +2,11 @@
 title: "AWS Certified SysOps Administrator – Associate 合格体験記"
 date: 2022/03/09 00:00:00
 postid: a
-tag:
+tags:
   - AWS
   - SOA
   - 合格記
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2022/20220309a/thumbnail.png
 author: 渡邉光

@@ -2,11 +2,11 @@
 title: "VPC Service ControlでGoogle Cloud環境をガッチリ守る"
 date: 2023/01/19 00:00:00
 postid: a
-tag:
+tags:
   - GoogleCloud
   - VPC
   - Network
-category:
+categories:
   - Security
 thumbnail: /images/2023/20230119a/thumbnail.png
 author: 岸下優介

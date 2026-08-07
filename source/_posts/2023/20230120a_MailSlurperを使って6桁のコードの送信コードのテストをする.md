@@ -2,12 +2,12 @@
 title: "MailSlurperを使って6桁のコードの送信コードのテストをする"
 date: 2023/01/20 00:00:00
 postid: a
-tag:
+tags:
   - MailSlurper
   - Go
   - メール
   - テスト
-category:
+categories:
   - 認証認可
 thumbnail: /images/2023/20230120a/thumbnail.png
 author: 澁川喜規

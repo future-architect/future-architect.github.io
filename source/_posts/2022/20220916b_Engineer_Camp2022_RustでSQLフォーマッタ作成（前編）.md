@@ -2,13 +2,13 @@
 title: "Engineer Camp2022 RustでSQLフォーマッタ作成（前編）"
 date: 2022/09/16 00:00:01
 postid: b
-tag:
+tags:
   - SQL
   - インターン
   - インターン2022
   - フォーマッター
   - Rust
-category:
+categories:
   - Programming
 thumbnail: /images/2022/20220916b/thumbnail.gif
 author: 川渕皓太

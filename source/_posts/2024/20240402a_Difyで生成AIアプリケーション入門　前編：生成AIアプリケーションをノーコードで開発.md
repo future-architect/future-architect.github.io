@@ -2,12 +2,12 @@
 title: "Difyで生成AIアプリケーション入門　前編：生成AIアプリケーションをノーコードで開発"
 date: 2024/04/02 00:00:00
 postid: a
-tag:
+tags:
   - 生成AI
   - Dify
   - ノーコード
   - Claude
-category:
+categories:
   - DataScience
 thumbnail: /images/2024/20240402a/thumbnail.png
 author: 前川喜洋

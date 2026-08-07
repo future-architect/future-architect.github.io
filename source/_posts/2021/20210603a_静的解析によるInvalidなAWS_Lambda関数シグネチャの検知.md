@@ -2,12 +2,12 @@
 title: "静的解析によるInvalidなAWS Lambda関数シグネチャの検知"
 date: 2021/06/03 00:00:00
 postid: a
-tag:
+tags:
   - Go
   - Lambda
   - Linter
   - 静的解析
-category:
+categories:
   - Programming
 thumbnail: /images/2021/20210603a/thumbnail.jpg
 author: 辻大志郎

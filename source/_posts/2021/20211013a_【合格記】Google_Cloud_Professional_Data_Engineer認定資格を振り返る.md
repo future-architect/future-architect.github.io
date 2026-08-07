@@ -2,10 +2,10 @@
 title: "【合格記】Google Cloud Professional Data Engineer認定資格を振り返る"
 date: 2021/10/13 00:00:00
 postid: a
-tag:
+tags:
   - GoogleCloud
   - 合格記
-category:
+categories:
   - DataEngineering
 thumbnail: /images/2021/20211013a/thumbnail.png
 author: 玉木竜二

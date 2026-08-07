@@ -2,13 +2,13 @@
 title: "GlyphFeeds連載を始めます！"
 date: 2020/09/14 00:00:00
 postid: ""
-tag:
+tags:
   - GlyphFeeds
   - CMS
   - AWS
   - インデックス
   - メディア業界
-category:
+categories:
   - Business
 thumbnail: /images/2020/20200914/thumbnail.jpg
 author: 山上燦

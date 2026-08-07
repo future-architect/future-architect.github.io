@@ -2,10 +2,10 @@
 title: "SvelteKitのデフォルトプロジェクトから学ぶ"
 date: 2022/04/15 00:00:00
 postid: a
-tag:
+tags:
   - Svelte
   - Playwright
-category:
+categories:
   - Frontend
 thumbnail: /images/2022/20220415a/thumbnail.png
 author: 澁川喜規

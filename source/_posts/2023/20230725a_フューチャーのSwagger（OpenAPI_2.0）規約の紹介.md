@@ -2,13 +2,13 @@
 title: "フューチャーのSwagger（OpenAPI 2.0）規約の紹介"
 date: 2023/07/25 00:00:00
 postid: a
-tag:
+tags:
   - Swagger
   - OpenAPI
   - チーム開発
   - 設計
   - コーディング規約
-category:
+categories:
   - Programming
 thumbnail: /images/2023/20230725a/thumbnail.png
 author: 真野隼記

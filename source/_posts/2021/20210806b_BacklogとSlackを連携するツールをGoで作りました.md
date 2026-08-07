@@ -2,11 +2,11 @@
 title: "BacklogとSlackを連携するツールをGoで作りました"
 date: 2021/08/06 00:00:01
 postid: b
-tag:
+tags:
   - Go
   - OSS
   - Slack
-category:
+categories:
   - Management
 thumbnail: /images/2021/20210806b/thumbnail.png
 author: 伊藤真彦

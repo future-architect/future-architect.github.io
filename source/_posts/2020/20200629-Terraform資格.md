@@ -2,10 +2,10 @@
 title: "Terraform Associate合格記"
 date: 2020/06/29 10:03:42
 postid: ""
-tag:
+tags:
   - Terraform
   - 合格記
-category:
+categories:
   - DevOps
 thumbnail: /images/2020/20200629/thumbnail.png
 author: 伊藤太斉

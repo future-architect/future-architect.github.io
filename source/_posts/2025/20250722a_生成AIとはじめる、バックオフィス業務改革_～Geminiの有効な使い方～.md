@@ -2,11 +2,11 @@
 title: "生成AIとはじめる、バックオフィス業務改革 ～Geminiの有効な使い方～"
 date: 2025/07/22 00:00:00
 postid: a
-tag:
+tags:
   - 生成AI
   - Gemini
   - Gems
-category:
+categories:
   - Business
 thumbnail: /images/2025/20250722a/thumbnail.png
 author: 村田靖拓

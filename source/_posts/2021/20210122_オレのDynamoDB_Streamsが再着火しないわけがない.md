@@ -2,13 +2,13 @@
 title: "オレのDynamoDB Streamsが再着火しないわけがない"
 date: 2021/01/22 00:00:00
 postid: ""
-tag:
+tags:
   - AWS
   - DynamoDB
   - DynamoDBStreams
   - Go
   - トラブルシュート
-category:
+categories:
   - DB
 thumbnail: /images/2021/20210122/thumbnail.png
 author: 真野隼記

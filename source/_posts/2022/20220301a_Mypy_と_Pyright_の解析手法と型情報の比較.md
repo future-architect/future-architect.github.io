@@ -2,13 +2,13 @@
 title: "Mypy と Pyright の解析手法と型情報の比較"
 date: 2022/03/01 00:00:00
 postid: a
-tag:
+tags:
   - Python
   - Mypy
   - Pyright
   - コアテク
   - 構文解析
-category:
+categories:
   - Programming
 thumbnail: /images/2022/20220301a/thumbnail.png
 author: 空閑康太

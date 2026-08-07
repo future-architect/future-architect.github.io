@@ -2,13 +2,13 @@
 title: "新卒 2 年目社員の Software Design 寄稿 "
 date: 2024/12/27 00:00:00
 postid: a
-tag:
+tags:
   - SoftwareDesign
   - 出版
   - CDN
   - Web
   - テクニカルライティング
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2024/20241227a/thumbnail.jpg
 author: 小澤泰河

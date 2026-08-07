@@ -2,12 +2,12 @@
 title: "Prompt Flowをローカルで動かす＆コードで管理する"
 date: 2023/10/11 00:00:00
 postid: a
-tag:
+tags:
   - Prompt Flow
   - Azure
   - LLM
   - OpenAI
-category:
+categories:
   - DataScience
 thumbnail: /images/2023/20231011a/thumbnail.png
 author: 板野竜也

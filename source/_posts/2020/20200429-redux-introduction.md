@@ -2,11 +2,11 @@
 title: "Reduxを分かりやすく解説してみた"
 date: 2020/04/29 17:05:22
 postid: ""
-tag:
+tags:
   - React
   - Redux
   - 初心者向け
-category:
+categories:
   - Frontend
 thumbnail: /images/2020/20200429/thumbnail.png
 author: 丸野大輔

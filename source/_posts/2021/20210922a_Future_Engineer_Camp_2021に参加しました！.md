@@ -2,11 +2,11 @@
 title: "Engineer Camp 2021（IoTプラットフォーム）に参加しました！"
 date: 2021/09/22 00:00:00
 postid: a
-tag:
+tags:
   - インターン
   - インターン2021
   - IoTプラットフォーム
-category:
+categories:
   - Culture
 thumbnail: /images/2021/20210922a/thumbnail.png
 author: 山本雄樹

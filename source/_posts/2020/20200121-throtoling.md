@@ -2,12 +2,12 @@
 title: "スロットリングとの付き合い方"
 date: 2020/01/21 08:52:16
 postid: ""
-tag:
+tags:
   - AWS
   - GoogleCloud
   - リトライ
   - スロットリング
-category:
+categories:
   - Infrastructure
 author: 村瀬善則
 lede: "スロットリングとは

@@ -2,12 +2,12 @@
 title: "JenkinsでのTerraform CI/CD"
 date: 2023/03/30 00:00:00
 postid: a
-tag:
+tags:
   - GoogleCloud
   - Jenkins
   - Terraform
   - CI/CD
-category:
+categories:
   - DevOps
 thumbnail: /images/2023/20230330a/thumbnail.png
 author: 渡邉光

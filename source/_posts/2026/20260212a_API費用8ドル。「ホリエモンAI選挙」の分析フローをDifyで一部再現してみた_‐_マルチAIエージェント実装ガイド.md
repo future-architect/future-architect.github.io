@@ -2,10 +2,10 @@
 title: "API費用8ドル。「ホリエモンAI選挙」の分析フローをDifyで一部再現してみた ‐ マルチAIエージェント実装ガイド"
 date: 2026/02/12 00:00:00
 postid: a
-tag:
+tags:
   - Dify
   - AIエージェント
-category:
+categories:
   - DataScience
 thumbnail: /images/2026/20260212a/thumbnail.png
 author: 棚井龍之介

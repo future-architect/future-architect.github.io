@@ -2,12 +2,12 @@
 title: "DynamoDB×Go連載#2 AWS SDKによるDynamoDBの基本操作"
 date: 2020/02/27 08:25:12
 postid: ""
-tag:
+tags:
   - Go
   - AWS
   - DynamoDB×Go
   - DynamoDB
-category:
+categories:
   - Programming
 author: 武田大輝
 lede: "DynamoDB×Go連載企画の第2弾の記事となります。本記事ではサードパーティ製のライブラリを利用せずaws-sdkを素で利用した場合のDynamoDBの基本操作について見ていきましょう。"

@@ -2,12 +2,12 @@
 title: "PostgreSQLで Goの flextime のような関数を作りテスト時間を差し替える"
 date: 2022/10/18 00:00:00
 postid: a
-tag:
+tags:
   - PostgreSQL
   - テスト
   - モック
   - time
-category:
+categories:
   - DB
 thumbnail: /images/2022/20221018a/thumbnail.jpg
 author: 真野隼記

@@ -2,11 +2,11 @@
 title: "ローカルKubernetesでdbtをコンテナ化して実行してみる"
 date: 2025/06/30 00:00:00
 postid: a
-tag:
+tags:
   - dbt
   - Docker
   - Kubernetes
-category:
+categories:
   - DataEngineering
 thumbnail: /images/2025/20250630a/thumbnail.png
 author: 片岡久人

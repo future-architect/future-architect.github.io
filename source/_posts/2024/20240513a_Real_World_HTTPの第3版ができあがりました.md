@@ -2,13 +2,13 @@
 title: "Real World HTTPの第3版ができあがりました"
 date: 2024/05/13 00:00:00
 postid: a
-tag:
+tags:
   - RealWorldHTTP
   - 出版
   - O'Reilly
   - HTTP
   - Web
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2024/20240513a/thumbnail.jpg
 author: 澁川喜規

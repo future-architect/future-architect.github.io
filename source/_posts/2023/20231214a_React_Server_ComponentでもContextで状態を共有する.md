@@ -2,11 +2,11 @@
 title: "React Server ComponentでもContextで状態を共有する"
 date: 2023/12/14 00:00:00
 postid: a
-tag:
+tags:
   - React
   - Next.js
   - サーバーコンポーネント
-category:
+categories:
   - Frontend
 thumbnail: /images/2023/20231214a/thumbnail.png
 author: 澁川喜規

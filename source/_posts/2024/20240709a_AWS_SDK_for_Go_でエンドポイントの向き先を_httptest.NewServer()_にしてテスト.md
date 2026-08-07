@@ -2,12 +2,12 @@
 title: "AWS SDK for Go でエンドポイントの向き先を httptest.NewServer() にしてテスト"
 date: 2024/07/09 00:00:00
 postid: a
-tag:
+tags:
   - AWS
   - モック
   - テスト
   - LocalStack
-category:
+categories:
   - Programming
 thumbnail: /images/2024/20240709a/thumbnail.png
 author: 真野隼記

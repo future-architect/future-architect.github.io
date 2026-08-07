@@ -2,10 +2,10 @@
 title: "Testcontainersを用いてテスト実行前の docker compose up を無くし、Goで並列テストする"
 date: 2024/04/09 00:00:00
 postid: a
-tag:
+tags:
   - テスト
   - Go
-category:
+categories:
   - Programming
 thumbnail: /images/2024/20240409a/thumbnail.png
 author: 真野隼記

@@ -2,13 +2,13 @@
 title: "go-swaggerを用いたWebアプリケーション開発Tips19選"
 date: 2020/06/30 10:06:15
 postid: ""
-tag:
+tags:
   - OpenAPI
   - Swagger
   - Go
   - Lambda
   - go-swagger
-category:
+categories:
   - Programming
 thumbnail: /images/2020/20200630/thumbnail.png
 author: 真野隼記

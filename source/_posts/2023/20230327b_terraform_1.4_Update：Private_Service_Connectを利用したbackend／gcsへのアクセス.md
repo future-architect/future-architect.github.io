@@ -2,12 +2,12 @@
 title: "Terraform 1.4 Update:Private Service Connectを利用したbackend/gcsへのアクセス"
 date: 2023/03/27 00:00:01
 postid: b
-tag:
+tags:
   - GoogleCloud
   - Terraform
   - Terraform1.4
   - GCS
-category:
+categories:
   - DevOps
 thumbnail: /images/2023/20230327b/thumbnail.png
 author: 渡邉光

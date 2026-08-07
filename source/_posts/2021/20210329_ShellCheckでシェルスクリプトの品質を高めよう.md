@@ -2,11 +2,11 @@
 title: "ShellCheckでシェルスクリプトの品質を高めよう"
 date: 2021/03/29 00:00:00
 postid: ""
-tag:
+tags:
   - ShellScript
   - Linter
   - 静的解析
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2021/20210329/thumbnail.png
 author: 辻大志郎
