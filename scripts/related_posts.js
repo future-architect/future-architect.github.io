@@ -4,12 +4,7 @@
 // 記事が長文化する傾向にあるため、記事末尾のスクロール量を抑える目的で絞っている
 const maxCount = 3;
 const {getSNSCnt} = require('./lib/sns');
-
-// 反響が0のときは何も出さない。0と表示されると寂しく見えるため
-const snsLabel = permalink => {
-  const n = getSNSCnt(permalink);
-  return n > 0 ? `<span class="snscount">&#9825;${n}</span>` : '';
-};
+const {postListItem} = require('./lib/post_list');
 
 // HTMLを生成するロジックを共通関数として外に切り出す
 function generateRelatedPostsHtml(posts) {
@@ -18,21 +13,14 @@ function generateRelatedPostsHtml(posts) {
     return `<p class="related-posts-none">No related post.</p>`;
   }
 
-  const currentTime = new Date();
-  const pastDate = currentTime.getDate() - 30;
-  currentTime.setDate(pastDate);
-  const label = p => currentTime.toISOString() <= p.date.toISOString() ? `<span class="newitem">NEW</span>` : "";
-
   let result = "";
   for (let i = 0; i < count; i++) {
     const related = posts[i];
     if (related) {
       const scoreText = related.score ? `スコア: ${related.score.toFixed(4)}` : '';
       const titleAttr = `${related.lede} ${scoreText}`.trim();
-        // タイトル -> 日付 -> SNS数の順。読み手は「何の記事か」を見てから
-      // 「古くないか」「評判はどうか」を確認する。「この記事を参照している記事」
-      // （reference_posts.js）とマークアップを揃えている
-      result += `<li class="related-posts-item"><a href=/${related.path} title="${titleAttr}">${related.title}</a>${label(related)}<span class="post-meta"><span class="post-meta-date">${related.date.format('YYYY.MM.DD')}</span>${snsLabel(related.permalink)}</span></li>`;
+      // マークアップは lib/post_list.js に集約している
+      result += postListItem(related, 'related-posts-item', titleAttr);
     }
   }
 
