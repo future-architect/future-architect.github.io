@@ -1,26 +1,13 @@
 <div class="row">
   <main class="col-xs-12 col-sm-12 col-md-10 blog-posts">
-  <% if (pagination == 2){ %>
-    <% page.posts.each(function(post){ %>
-      <%- partial('article', {post: post, index: true}) %>
-    <% }) %>
-  <% } else { %>
-    <section class="archives-wrap">
-      <div class="archives">
-        <% page.posts.each(function(post, i){ %>
-        <%- partial('archive-post', {post: post, even: i % 2 == 0, index: true}) %>
-        <% }) %>
-      </div>
-      <% if (page.posts.length){ %>
-      <div id="page-nav" class="pagination">
-        <%- paginator({prev_text:'Prev', next_text:'Next', mid_size:3, end_size:2, show_all:false}) %>
-      </div>
-      <% } %>
-    </section>
-  <% } %>
-
-    <aside>
-      <section class="popular-articles">
+  <%# ホームの1ページ目だけ、ランキングを記事リストより前に出す。
+      ホームに来る読者は「どんな記事があるか」をざっと掴みたいのであって、
+      公開順の先頭から読みたいわけではない %>
+  <% const isHome = is_home(); %>
+  <% const isHomeFirst = isHome && page.current === 1; %>
+  <% if (isHomeFirst) { %>
+    <section class="popular-articles home-ranking">
+        <h2 id="popular" class="bottom-content-header"><a href="#popular" class="headerlink" title="よく読まれている記事"></a>よく読まれている記事</h2>
         <div class="margin-bottom-20 nav tabs">
           <input id="monthly" type="radio" name="tab_item" checked>
           <label tabindex="0" class="tab_item" for="monthly">トレンド</label>
@@ -38,12 +25,67 @@
             <%- sns_popular_posts() %>
           </div>
         </div>
+    </section>
+  <% } %>
+  <% if (pagination == 2){ %>
+    <% page.posts.each(function(post){ %>
+      <%- partial('article', {post: post, index: true}) %>
+    <% }) %>
+  <% } else { %>
+    <section class="archives-wrap">
+      <%# ホームだけ見出しを出す。タグ／カテゴリ／著者ページは
+          パンくずと h1 が既に「何の一覧か」を示しているため不要。
+          1ページ目は新着そのものだが、2ページ目以降は全記事を繰っている
+          途中なので「新着記事」だと実態とずれる %>
+      <% if (isHome) { %>
+      <h2 id="posts" class="bottom-content-header"><a href="#posts" class="headerlink" title="記事一覧"></a><%= page.current === 1 ? '新着記事' : '記事一覧' %></h2>
+      <% } %>
+      <div class="archives">
+        <% page.posts.each(function(post, i){ %>
+        <%- partial('archive-post', {post: post, even: i % 2 == 0, index: true}) %>
+        <% }) %>
+      </div>
+      <% if (page.posts.length){ %>
+      <div id="page-nav" class="pagination">
+        <%- paginator({prev_text:'Prev', next_text:'Next', mid_size:3, end_size:2, show_all:false}) %>
+      </div>
+      <% } %>
+    </section>
+  <% } %>
+
+
+    <%# 末尾の導線。ホームの2ページ目以降では、ページを繰っている読者が
+        探し直す段階に無いため何も出さない（スクロール量だけが増える）。
+        ランキングはホーム1ページ目では上に出したので、ここでは繰り返さない %>
+    <% if (!(isHome && page.current > 1)) { %>
+    <aside>
+      <section class="popular-articles">
+        <% if (!isHomeFirst) { %>
+        <div class="margin-bottom-20 nav tabs">
+          <input id="monthly" type="radio" name="tab_item" checked>
+          <label tabindex="0" class="tab_item" for="monthly">トレンド</label>
+          <input id="yearly" type="radio" name="tab_item">
+          <label tabindex="0" class="tab_item" for="yearly">年間人気</label>
+          <input id="sns" type="radio" name="tab_item">
+          <label tabindex="0" class="tab_item" for="sns">SNS人気</label>
+          <div class="tab_content" id="popular_monthly">
+            <%- popular_posts('monthly') %>
+          </div>
+          <div class="tab_content" id="popular_yearly">
+            <%- popular_posts('yearly') %>
+          </div>
+          <div class="tab_content" id="popular_sns">
+            <%- sns_popular_posts() %>
+          </div>
+        </div>
+        <% } %>
         <div class="blog-tags margin-bottom-20">
           <h2 id="searchbytag" class="bottom-content-header"><a href="#searchbytag" class="headerlink" title="タグから記事を探す"></a>タグから記事を探す</h2>
           <%- partial('../_widget/tag.ejs') %>
         </div>
       </section>
     </aside>
+    <% } %>
   </main>
   <aside class="col-xs-12 col-sm-12 col-md-2 blog-sidebar">
     <%- partial('sidebar') %>
