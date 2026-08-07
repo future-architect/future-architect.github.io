@@ -87,6 +87,32 @@ make lint   # npx lint-staged（git add 済みの記事のみ textlint）
 `normalize.mjs` は日本語ファイル名・本文の Unicode NFC 正規化を行うスクリプトで、
 週次ワークフロー（`normalize.yml`）から実行され PR を作る。手動実行は `node normalize.mjs`。
 
+## CSS / 文字サイズの方針
+
+CSS は `themes/future/css-src/` にあり、`scripts/combine_css.js` が
+bootstrap-subset → metronic → theme-styles.styl の順で `/css/site.css` に連結する。
+**この順序は後勝ちの前提なので変えると表示が壊れる。**
+
+文字サイズは過去に「どこで最終値が決まるか追えない」ことが原因の不具合を
+2回出している（#1927 / #1928）。以下を守る。
+
+- **1つの要素のサイズは1箇所でしか決めない。** 幅によって変える場合は
+  メディアクエリを重ねず `clamp(下限, 可変, 上限)` で1行にまとめる。
+  記述順に依存しなくなり、幅の変化に対しても連続する
+- 実効サイズの基準:
+
+  | 対象 | 値 | 指定箇所 |
+  | --- | --- | --- |
+  | `body` | 13px | `theme-styles.styl` |
+  | 本文（`p` / `li` / `summary`） | `1.2em` = 15.6px | 〃 |
+  | 記事タイトル | `clamp(24px, 1.325rem + 0.9vw, 32px)` | 〃（1箇所のみ） |
+  | 本文見出し h1〜h5 | 26 / 24 / 22 / 20 / 18px | 〃 |
+  | コードブロック | 13px（`line-height` は `font-size × 1.6` で追従） | `highlight.styl` の変数 |
+
+- コードブロックのサイズは本文との相対バランスを見て 15px → 14px → 13px と
+  調整した経緯がある（#1927 / #1929）。安易に変えない
+- 色を変えるときは WCAG AA（コントラスト比 4.5）を満たすか計算してから入れる
+
 ## その他
 
 - URL の付け替え（タグ→カテゴリの統合、タグの名寄せ）は `_config.yml` の `alias` に記述する
