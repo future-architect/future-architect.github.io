@@ -37,8 +37,19 @@ const escapeXml = s => String(s)
   .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
   .replace(/"/g, '&quot;').replace(/'/g, '&apos;');
 
-// config.url の末尾スラッシュ有無に左右されないように正規化する
-const absUrl = (base, path) => `${base.replace(/\/$/, '')}/${String(path).replace(/^\//, '')}`;
+/**
+ * config.url の末尾スラッシュ有無に左右されないよう正規化したうえで、
+ * サイトマップの仕様に沿って URL エスケープする。
+ *
+ * タグ・カテゴリのパスは日本語をそのまま含む（例: tags/認証認可/）。
+ * sitemap.org の仕様では <loc> は URL エスケープされている必要があるため
+ * encodeURI をかける（/ や : は保持される）。
+ * index.html は末尾を落として、ディレクトリ形式の URL に揃える。
+ */
+const absUrl = (base, path) => {
+  const clean = String(path).replace(/^\//, '').replace(/index\.html$/, '');
+  return encodeURI(`${base.replace(/\/$/, '')}/${clean}`);
+};
 
 const iso = d => (d && typeof d.toISOString === 'function') ? d.toISOString() : null;
 
