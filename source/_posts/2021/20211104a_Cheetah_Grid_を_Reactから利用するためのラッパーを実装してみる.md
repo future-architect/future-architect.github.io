@@ -2,12 +2,12 @@
 title: "Cheetah Grid を Reactから利用するためのラッパーを実装してみる"
 date: 2021/11/04 00:00:00
 postid: a
-tag:
+tags:
   - TypeScript
   - React
   - CheetahGrid
   - OSS
-category:
+categories:
   - Frontend
 thumbnail: /images/2021/20211104a/thumbnail.png
 author: 澁川喜規

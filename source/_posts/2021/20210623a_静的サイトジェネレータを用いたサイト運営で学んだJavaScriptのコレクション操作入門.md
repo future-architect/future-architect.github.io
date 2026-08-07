@@ -2,10 +2,10 @@
 title: "JavaScriptのコレクション操作入門"
 date: 2021/06/23 00:00:00
 postid: a
-tag:
+tags:
   - JavaScript
   - TechBlog
-category:
+categories:
   - Frontend
 thumbnail: /images/2021/20210623a/thumbnail.png
 author: 真野隼記

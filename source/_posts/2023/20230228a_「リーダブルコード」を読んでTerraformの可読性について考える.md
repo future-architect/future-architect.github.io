@@ -2,12 +2,12 @@
 title: "「リーダブルコード」を読んでTerraformの可読性について考える"
 date: 2023/02/28 00:00:00
 postid: a
-tag:
+tags:
   - Terraform
   - 書評
   - 可読性
   - リーダブルコード
-category:
+categories:
   - DevOps
 thumbnail: /images/2023/20230228a/thumbnail.jpg
 author: 伊藤太斉

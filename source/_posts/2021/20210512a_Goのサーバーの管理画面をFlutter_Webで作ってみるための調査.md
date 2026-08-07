@@ -2,13 +2,13 @@
 title: "Goのサーバーの管理画面をFlutter Webで作ってみるための調査"
 date: 2021/05/12 00:00:00
 postid: a
-tag:
+tags:
   - Flutter
   - Go
   - SPA
   - flutter_web
   - 管理画面
-category:
+categories:
   - Frontend
 thumbnail: /images/2021/20210512a/thumbnail.png
 author: 澁川喜規

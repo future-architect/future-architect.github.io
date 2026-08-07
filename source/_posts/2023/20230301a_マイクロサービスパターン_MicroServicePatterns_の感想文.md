@@ -2,11 +2,11 @@
 title: "マイクロサービスパターン MicroServicePatterns の感想文"
 date: 2023/03/01 00:00:00
 postid: a
-tag:
+tags:
   - マイクロサービス
   - デザインパターン
   - 書評
-category:
+categories:
   - DevOps
 thumbnail: /images/2023/20230301a/thumbnail.jpg
 author: 川口翔大

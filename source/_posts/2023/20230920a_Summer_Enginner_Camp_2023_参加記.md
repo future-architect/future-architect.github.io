@@ -2,11 +2,11 @@
 title: "Summer Enginner Camp 2023 参加記"
 date: 2023/09/20 00:00:00
 postid: a
-tag:
+tags:
   - インターン
   - コミュニケーション
   - チーム開発
-category:
+categories:
   - Culture
 thumbnail: /images/2023/20230920a/thumbnail.png
 author: 高橋大翔

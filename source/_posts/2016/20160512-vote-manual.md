@@ -2,10 +2,10 @@
 title: "Space Apps Challenge 2016への投票方法"
 date: 2016-05-12 09:05:59
 postid: ""
-tag:
+tags:
   - ハッカソン
   - 宇宙
-category:
+categories:
   - VR
 thumbnail: /images/2016/20160512/thumbnail_20160512.jpg
 author: admin

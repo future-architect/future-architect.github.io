@@ -2,13 +2,13 @@
 title: "Googleカレンダーの予定を取得するMCP サーバを作ってみた"
 date: 2025/04/21 00:00:00
 postid: a
-tag:
+tags:
   - MCP
   - Claude
   - OAuth
   - Googleカレンダー
   - TypeScript
-category:
+categories:
   - DataScience
 thumbnail: /images/2025/20250421a/thumbnail.png
 author: 市川裕也

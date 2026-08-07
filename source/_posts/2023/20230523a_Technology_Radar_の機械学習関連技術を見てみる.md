@@ -2,11 +2,11 @@
 title: "Technology Radar の機械学習関連技術を見てみる"
 date: 2023/05/23 00:00:00
 postid: a
-tag:
+tags:
   - 機械学習
   - AI
   - MLOps
-category:
+categories:
   - DataScience
 thumbnail: /images/2023/20230523a/thumbnail.png
 author: 小橋昌明

@@ -2,10 +2,10 @@
 title: "Future AI EXPO 開催！"
 date: 2018/03/01 12:01:22
 postid: ""
-tag:
+tags:
   - 展示会
   - 機械学習
-category:
+categories:
   - DataScience
 thumbnail: /images/2018/20180301/thumbnail_20180301.jpeg
 author: 貞光九月

@@ -2,13 +2,13 @@
 title: "GoにおけるAPIドキュメントベースのWeb API開発について登壇しました"
 date: 2021/04/27 00:00:05
 postid: c
-tag:
+tags:
   - Go
   - TechNight
   - 登壇レポート
   - OpenAPI
   - Swagger
-category:
+categories:
   - Programming
 thumbnail: /images/2021/20210427c/thumbnail.png
 author: 多賀聡一朗

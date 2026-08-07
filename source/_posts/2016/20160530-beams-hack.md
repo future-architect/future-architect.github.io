@@ -2,11 +2,11 @@
 title: "ハッカソン道中記#4～リケジョ、ITと外遊びしてみた～"
 date: 2016-05-30 08:40:24
 postid: ""
-tag:
+tags:
   - ハッカソン
   - アイデアソン
   - デザイン思考
-category:
+categories:
   - IoT
 thumbnail: /images/2016/20160530/thumbnail_20160530.jpg
 author: 川久保由紀

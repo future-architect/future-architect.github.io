@@ -2,10 +2,10 @@
 title: "ぶらりシリコンバレー巡礼"
 date: 2017/03/22 12:00:00
 postid: ""
-tag:
+tags:
   - Elastic{ON}
   - 参加レポート
-category:
+categories:
   - Culture
 author: 前原応光
 lede: "前回の記事に続いて、シリコンバレーのIT企業についての現地レポートをお届けします！"

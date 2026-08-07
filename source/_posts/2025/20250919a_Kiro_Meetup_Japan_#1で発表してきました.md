@@ -2,11 +2,11 @@
 title: "Kiro Meetup Japan #1で発表してきました"
 date: 2025/09/19 00:00:00
 postid: a
-tag:
+tags:
   - AIエージェント
   - 登壇レポート
   - Kiro
-category:
+categories:
   - AIDD
 thumbnail: /images/2025/20250919a/thumbnail.png
 author: 澁川喜規

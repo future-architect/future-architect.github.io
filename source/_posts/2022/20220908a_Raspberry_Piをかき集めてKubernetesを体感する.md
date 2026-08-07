@@ -2,10 +2,10 @@
 title: "Raspberry Piをかき集めてKubernetesを体感する"
 date: 2022/09/08 00:00:00
 postid: a
-tag:
+tags:
   - Kubernetes
   - RaspberryPi
-category:
+categories:
   - IoT
 thumbnail: /images/2022/20220908a/thumbnail.png
 author: 岸下優介

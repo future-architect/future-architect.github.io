@@ -2,13 +2,13 @@
 title: "JavaプログラマーのためのGo言語入門"
 date: 2020/03/11 09:39:47
 postid: ""
-tag:
+tags:
   - Go
   - Java
   - 翻訳
   - 入門
   - 他言語からGoへ
-category:
+categories:
   - Programming
 author:
   - 柏木祥子

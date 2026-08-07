@@ -2,10 +2,10 @@
 title: "AWS Certified Developer - Associate 合格体験記"
 date: 2021/09/06 00:00:00
 postid: a
-tag:
+tags:
   - AWS
   - 合格記
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2021/20210906a/thumbnail.png
 author: 渡邉光

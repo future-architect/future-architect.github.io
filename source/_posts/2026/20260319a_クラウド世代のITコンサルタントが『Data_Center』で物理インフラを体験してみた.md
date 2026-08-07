@@ -2,11 +2,11 @@
 title: "クラウド世代のITコンサルタントが『Data Center』で物理インフラを体験してみた"
 date: 2026/03/19 00:00:00
 postid: a
-tag:
+tags:
   - ゲーム
   - Network
   - オンプレミス
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2026/20260319a/thumbnail.png
 author: 片岡 久人

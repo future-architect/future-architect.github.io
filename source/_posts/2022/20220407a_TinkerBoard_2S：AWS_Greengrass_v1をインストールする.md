@@ -2,11 +2,11 @@
 title: "TinkerBoard 2S：AWS Greengrass v1をインストールする"
 date: 2022/04/07 00:00:00
 postid: a
-tag:
+tags:
   - AWS
   - 電子工作
   - シングルボード
-category:
+categories:
   - IoT
 thumbnail: /images/2022/20220407a/thumbnail.png
 author: 宮永崇史

@@ -2,12 +2,12 @@
 title: "GoとAWS LambdaのためのMakefile"
 date: 2020/10/22 00:00:00
 postid: ""
-tag:
+tags:
   - Go
   - AWS
   - Lambda
   - Makefile
-category:
+categories:
   - DevOps
 thumbnail: /images/2020/20201022/thumbnail.webp
 author: 筒井悠平

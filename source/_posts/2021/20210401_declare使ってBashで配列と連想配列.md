@@ -2,10 +2,10 @@
 title: "declare使ってBashで配列と連想配列"
 date: 2021/04/01 00:00:00
 postid: ""
-tag:
+tags:
   - ShellScript
   - Linux
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2021/20210401/thumbnail.png
 author: 市川諒

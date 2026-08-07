@@ -2,12 +2,12 @@
 title: "OpenAPI GeneratorでPython Web API構築"
 date: 2022/12/03 00:00:00
 postid: a
-tag:
+tags:
   - Swagger
   - WebAPI
   - Python
   - OpenAPIGenerator
-category:
+categories:
   - Programming
 thumbnail: /images/2022/20221203a/thumbnail.png
 author: 村上知優

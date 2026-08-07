@@ -2,11 +2,11 @@
 title: "社内LANで必要かもしれないLocalstackへのカスタムCA証明書ダウンロード手順"
 date: 2024/02/20 00:00:00
 postid: a
-tag:
+tags:
   - LocalStack
   - OpenSSL
   - プロキシ
-category:
+categories:
   - DevOps
 thumbnail: /images/2024/20240220a/thumbnail.png
 author: 真野隼記

@@ -2,12 +2,12 @@
 title: "Vuls開発中に出会ったGORMあれこれ"
 date: 2021/06/09 00:00:00
 postid: a
-tag:
+tags:
   - ORM
   - Go
   - Vuls
   - GORM
-category:
+categories:
   - Programming
 thumbnail: /images/2021/20210609a/thumbnail.png
 author: MaineK00n

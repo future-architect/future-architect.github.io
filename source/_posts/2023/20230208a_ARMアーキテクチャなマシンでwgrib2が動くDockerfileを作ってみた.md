@@ -2,11 +2,11 @@
 title: "ARMアーキテクチャなマシンでwgrib2が動くDockerfileを作ってみた"
 date: 2023/02/08 00:00:00
 postid: a
-tag:
+tags:
   - Mac
   - Ubuntu
   - Docker
-category:
+categories:
   - DevOps
 thumbnail: /images/2023/20230208a/thumbnail.jpg
 author: 矢野颯太

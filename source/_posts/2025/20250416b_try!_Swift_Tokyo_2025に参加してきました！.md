@@ -2,13 +2,13 @@
 title: "try! Swift Tokyo 2025に参加してきました！"
 date: 2025/04/16 00:00:01
 postid: b
-tag:
+tags:
   - Swift
   - カンファレンス
   - iOS
   - Xcode
   - 参加レポート
-category:
+categories:
   - Mobile
 thumbnail: /images/2025/20250416b/thumbnail.jpeg
 author: 橋本竜我

@@ -2,12 +2,12 @@
 title: "OpenAPIにおけるundefinedとnullの設計"
 date: 2021/10/28 00:00:01
 postid: b
-tag:
+tags:
   - OpenAPI
   - jsonschema
   - Swagger
   - 設計
-category:
+categories:
   - Programming
 thumbnail: /images/2021/20211028b/thumbnail.png
 author: 武田大輝

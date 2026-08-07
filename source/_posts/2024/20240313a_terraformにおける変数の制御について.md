@@ -2,10 +2,10 @@
 title: "Terraform連載2024 Terraformにおける変数の制御について"
 date: 2024/03/13 00:00:00
 postid: a
-tag:
+tags:
   - Terraform
   - IaC
-category:
+categories:
   - DevOps
 thumbnail: /images/2024/20240313a/thumbnail.png
 author: 森大作

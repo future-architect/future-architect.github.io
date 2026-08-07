@@ -2,11 +2,11 @@
 title: "Go Tips連載3: ファイルを扱うちょっとしたスクリプトをGoで書くときのTips5選"
 date: 2020/05/20 09:43:46
 postid: ""
-tag:
+tags:
   - Go
   - GoTips連載
   - path/filepath
-category:
+categories:
   - Programming
 thumbnail: /images/2020/20200520/thumbnail.png
 author: 辻大志郎

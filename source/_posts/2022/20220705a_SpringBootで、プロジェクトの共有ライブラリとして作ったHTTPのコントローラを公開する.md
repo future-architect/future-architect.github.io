@@ -2,10 +2,10 @@
 title: "SpringBootで、プロジェクトの共有ライブラリとして作ったHTTPのコントローラを公開する"
 date: 2022/07/05 00:00:00
 postid: a
-tag:
+tags:
   - SpringBoot
   - Java
-category:
+categories:
   - Programming
 thumbnail: /images/2022/20220705a/thumbnail.png
 author: 澁川喜規

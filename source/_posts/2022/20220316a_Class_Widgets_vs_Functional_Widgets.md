@@ -2,10 +2,10 @@
 title: "Class Widgets vs Functional Widgets"
 date: 2022/03/16 00:00:00
 postid: a
-tag:
+tags:
   - Flutter
   - 設計
-category:
+categories:
   - Mobile
 thumbnail: /images/2022/20220316a/thumbnail.png
 author: 武田大輝

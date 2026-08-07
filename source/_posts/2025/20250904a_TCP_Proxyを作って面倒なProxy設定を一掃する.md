@@ -2,13 +2,13 @@
 title: "TCP Proxyを作って面倒なProxy設定を一掃する ～Rust製moproxyとnftablesによる透過プロキシ設定～"
 date: 2025/09/04 00:00:00
 postid: a
-tag:
+tags:
   - Network
   - プロキシ
   - Linux
   - WSL
   - 環境構築
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2025/20250904a/thumbnail.jpg
 author: 神崎 林太郎

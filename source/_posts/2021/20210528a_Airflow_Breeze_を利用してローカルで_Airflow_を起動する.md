@@ -2,12 +2,12 @@
 title: "Airflow Breeze を利用してローカルで Airflow を起動する"
 date: 2021/05/28 00:00:00
 postid: a
-tag:
+tags:
   - Airflow
   - OSS
   - 環境構築
   - Breeze
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2021/20210528a/thumbnail.png
 author: 多賀聡一朗

@@ -2,12 +2,12 @@
 title: "tree-sitter文法入門"
 date: 2022/12/15 00:00:00
 postid: a
-tag:
+tags:
   - tree-sitter
   - SQL
   - 構文解析
   - フォーマッター
-category:
+categories:
   - Programming
 thumbnail: /images/2022/20221215a/thumbnail.png
 author: 齋藤俊哉

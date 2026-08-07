@@ -2,11 +2,11 @@
 title: "GCPインスタンスを自動で停止させるツールの公開"
 date: 2019/07/16 09:12:58
 postid: ""
-tag:
+tags:
   - GoogleCloud
   - OSS
   - Kubernetes
-category:
+categories:
   - DevOps
 author: 真野隼記
 lede: "GCPのインスタンス（GCE, SQL, GKE）を自動で停止させるGoで書かれたツールをGitHubに公開しました。"

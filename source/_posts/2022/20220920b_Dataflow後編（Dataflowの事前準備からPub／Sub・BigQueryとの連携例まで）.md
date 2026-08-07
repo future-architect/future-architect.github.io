@@ -2,13 +2,13 @@
 title: "Dataflow後編（Dataflowの事前準備からPub/Sub・BigQueryとの連携例まで）"
 date: 2022/09/20 00:00:01
 postid: b
-tag:
+tags:
   - Dataflow
   - GoogleCloud
   - インターン
   - インターン2022
   - BigQuery
-category:
+categories:
   - DataEngineering
 thumbnail: /images/2022/20220920b/thumbnail.png
 author: "平野甫"

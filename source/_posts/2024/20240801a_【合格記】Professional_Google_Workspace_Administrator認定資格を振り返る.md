@@ -2,12 +2,12 @@
 title: "【合格記】Professional Google Workspace Administrator認定資格を振り返る"
 date: 2024/08/01 00:00:00
 postid: a
-tag:
+tags:
   - GoogleCloud
   - 合格記
   - PGWA
   - 全冠
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2024/20240801a/thumbnail.png
 author: 岸下優介

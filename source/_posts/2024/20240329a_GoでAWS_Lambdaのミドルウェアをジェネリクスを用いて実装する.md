@@ -2,12 +2,12 @@
 title: "GoでAWS Lambdaのミドルウェアをジェネリクスを用いて実装する"
 date: 2024/03/29 00:00:00
 postid: a
-tag:
+tags:
   - Go
   - Lambda
   - デザインパターン
   - ジェネリクス
-category:
+categories:
   - Programming
 thumbnail: /images/2024/20240329a/thumbnail.png
 author: 真野隼記

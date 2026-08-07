@@ -2,12 +2,12 @@
 title: "AirPods Proで頭の角度を検出し、リアルタイムにキャラクターを動かす"
 date: 2024/06/05 00:00:00
 postid: a
-tag:
+tags:
   - Swift
   - SwiftUI
   - Apple
   - iOS
-category:
+categories:
   - Mobile
 thumbnail: /images/2024/20240605a/thumbnail.png
 author: 橋本竜我

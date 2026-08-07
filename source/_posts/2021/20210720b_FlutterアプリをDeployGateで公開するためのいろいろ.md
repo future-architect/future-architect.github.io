@@ -2,9 +2,9 @@
 title: "FlutterアプリをDeployGateで公開するためのいろいろ"
 date: 2021/07/20 00:00:02
 postid: b
-tag:
+tags:
   - Flutter
-category:
+categories:
   - Mobile
 thumbnail: /images/2021/20210721b/thumbnail.png
 author: 澁川喜規

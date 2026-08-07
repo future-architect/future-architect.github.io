@@ -2,11 +2,11 @@
 title: "PostgreSQL 18の新機能「B-treeインデックスのスキップスキャン」"
 date: 2025/10/14 00:00:00
 postid: a
-tag:
+tags:
   - PostgreSQL
   - 実行計画
   - PostgreSQL18
-category:
+categories:
   - DB
 thumbnail: /images/2025/20251014a/thumbnail.jpg
 author: 村田靖拓

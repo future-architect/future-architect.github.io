@@ -2,11 +2,11 @@
 title: "AWS Certified Advanced Networking - Specialty合格体験記"
 date: 2021/10/13 00:00:01
 postid: b
-tag:
+tags:
   - AWS
   - 合格記
   - Network
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2021/20211013b/thumbnail.png
 author: 伊藤真彦

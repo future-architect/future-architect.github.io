@@ -2,11 +2,11 @@
 title: "Tinkerbellについて"
 date: 2023/06/22 00:00:00
 postid: a
-tag:
+tags:
   - CNCF
   - オンプレミス
   - Linux
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2023/20230622a/thumbnail.png
 author: 原木翔

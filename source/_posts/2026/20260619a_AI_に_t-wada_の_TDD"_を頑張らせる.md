@@ -2,10 +2,10 @@
 title: "AI に t-wada の TDD を頑張らせる"
 date: 2026/06/19 00:00:00
 postid: a
-tag:
+tags:
   - Claude
   - TDD
-category:
+categories:
   - AIDD
 thumbnail: /images/2026/20260619a/thumbnail.jpg
 author: 佐藤尭彰

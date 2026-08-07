@@ -2,11 +2,11 @@
 title: "MSの生成AIサンプルアプリ（Chat with your data - Solution accelerator）コード確認"
 date: 2024/08/22 00:00:00
 postid: a
-tag:
+tags:
   - LLM
   - Azure
   - Python
-category:
+categories:
   - DataScience
 thumbnail: /images/2024/20240822a/thumbnail.png
 author: 山田勇一

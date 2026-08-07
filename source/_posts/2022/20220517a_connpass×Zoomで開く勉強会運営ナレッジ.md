@@ -2,11 +2,11 @@
 title: "connpass×Zoomで開く勉強会運営ナレッジ"
 date: 2022/05/17 00:00:00
 postid: a
-tag:
+tags:
   - 勉強会
   - 運営
   - TechNight
-category:
+categories:
   - Culture
 thumbnail: /images/2022/20220517a/thumbnail.png
 author: 真野隼記

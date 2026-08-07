@@ -2,12 +2,12 @@
 title: "AWS利用料金をSlackに円グラフ付きで投稿する"
 date: 2021/10/15 00:00:00
 postid: a
-tag:
+tags:
   - AWS
   - Slack
   - Go
   - 可視化
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2021/20211015a/thumbnail.png
 author: 中山楓太

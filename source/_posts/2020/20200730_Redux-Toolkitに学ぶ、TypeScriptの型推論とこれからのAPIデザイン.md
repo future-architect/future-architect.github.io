@@ -2,11 +2,11 @@
 title: Redux-Toolkitに学ぶ、TypeScriptの型推論とこれからのAPIデザイン
 date: 2020/07/30 00:00:00
 postid: ""
-tag:
+tags:
   - TypeScript
   - Redux
   - React
-category:
+categories:
   - Frontend
 thumbnail: /images/2020/20200730/thumbnail.png
 author: 澁川喜規

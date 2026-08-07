@@ -2,11 +2,11 @@
 title: "FlutterでGoogleマップを表示してみる"
 date: 2021/12/24 00:00:00
 postid: a
-tag:
+tags:
   - Flutter
   - Dart
   - GoogleMap
-category:
+categories:
   - Mobile
 thumbnail: /images/2021/20211224a/thumbnail.png
 author: 伊藤真彦

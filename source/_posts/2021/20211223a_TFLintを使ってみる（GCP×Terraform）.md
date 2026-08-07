@@ -2,10 +2,10 @@
 title: "TFLintを使ってみる（GCP×Terraform）"
 date: 2021/12/23 00:00:00
 postid: a
-tag:
+tags:
   - Terraform
   - GoogleCloud
-category:
+categories:
   - DevOps
 thumbnail: /images/2021/20211223a/thumbnail.png
 author: 川端一輝

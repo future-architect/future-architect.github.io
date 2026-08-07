@@ -2,10 +2,10 @@
 title: "Java における \"Hello World!\" の深堀り"
 date: 2025/05/29 00:00:00
 postid: a
-tag:
+tags:
   - Java
   - バイトコード
-category:
+categories:
   - Programming
 thumbnail: /images/2025/20250529a/thumbnail.png
 author: 岸本卓也

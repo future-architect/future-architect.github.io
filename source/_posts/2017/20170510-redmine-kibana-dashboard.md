@@ -2,12 +2,12 @@
 title: "マネージャーがうれしいRedmineデータのダッシュボード表示方法を公開します！！"
 date: 2017/05/10 18:00:00
 postid: ""
-tag:
+tags:
   - Redmine
   - Kibana
   - Elasticsearch
   - 可視化
-category:
+categories:
   - Management
 thumbnail: /images/2017/20170510/thumbnail_20170510.jpg
 author: 近藤雅章

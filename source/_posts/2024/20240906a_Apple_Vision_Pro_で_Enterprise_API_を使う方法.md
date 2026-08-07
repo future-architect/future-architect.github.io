@@ -2,10 +2,10 @@
 title: "Apple Vision Pro で Enterprise API を使う方法"
 date: 2024/09/06 00:00:00
 postid: a
-tag:
+tags:
   - Apple
   - VisionPro
-category:
+categories:
   - VR
 thumbnail: /images/2024/20240906a/thumbnail.png
 author: 山本力世

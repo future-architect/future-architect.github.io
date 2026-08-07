@@ -2,10 +2,10 @@
 title: "Hack The Box Oopsie を解いてみた"
 date: 2023/04/25 00:00:00
 postid: a
-tag:
+tags:
   - HackTheBox
   - 競技プログラミング
-category:
+categories:
   - Security
 thumbnail: /images/2023/20230425a/thumbnail.png
 author: 藤戸四恩

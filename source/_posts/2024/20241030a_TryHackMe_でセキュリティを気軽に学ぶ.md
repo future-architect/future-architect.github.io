@@ -2,9 +2,9 @@
 title: TryHackMe でセキュリティを気軽に学ぶ
 date: 2024/10/30 00:00:00
 postid: a
-tag:
+tags:
   - HackTheBox
-category:
+categories:
   - Security
 thumbnail: /images/2024/20241030a/thumbnail.png
 author: 島ノ江励

@@ -2,11 +2,11 @@
 title: "PlantUMLをReact上でレンダリングする"
 date: 2022/10/28 00:00:00
 postid: a
-tag:
+tags:
   - PlantUML
   - React
   - UML
-category:
+categories:
   - Frontend
 thumbnail: /images/2022/20221028a/thumbnail.png
 author: 澁川喜規

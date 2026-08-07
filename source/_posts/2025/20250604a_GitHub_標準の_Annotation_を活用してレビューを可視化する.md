@@ -2,12 +2,12 @@
 title: "GitHub 標準の Annotation を活用してレビューを可視化する"
 date: 2025/06/04 00:00:00
 postid: a
-tag:
+tags:
   - GitHub
   - GitHubActions
   - CI/CD
   - コードレビュー
-category:
+categories:
   - DevOps
 thumbnail: /images/2025/20250604a/thumbnail.png
 author: 武田大輝

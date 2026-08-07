@@ -2,10 +2,10 @@
 title: "Terraform × Policy as Code:管理策を実装し、追跡可能なガードレールへ"
 date: 2026/05/26 00:00:00
 postid: a
-tag:
+tags:
   - Terraform
   - Policy-as-Code
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2026/20260526a/thumbnail.jpg
 author: 棚井龍之介

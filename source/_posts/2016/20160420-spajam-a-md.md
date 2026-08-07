@@ -2,11 +2,11 @@
 title: "ハッカソン道中記#2～世界はチャンスであふれてる～"
 date: 2016-04-20 21:25:28
 postid: ""
-tag:
+tags:
   - デザイン思考
   - ハッカソン
   - アイデアソン
-category:
+categories:
   - IoT
 thumbnail: /images/2016/20160420/thumbnail_20160420.jpg
 author: 清田侑

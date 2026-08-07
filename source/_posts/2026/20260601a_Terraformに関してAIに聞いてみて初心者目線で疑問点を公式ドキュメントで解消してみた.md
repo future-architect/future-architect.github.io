@@ -2,11 +2,11 @@
 title: "Terraformに関してAIに聞いてみて初心者目線で疑問点を公式ドキュメントで解消してみた"
 date: 2026/06/01 00:00:00
 postid: a
-tag:
+tags:
   - Terraform
   - TerraformCloud
   - IaC
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2026/20260601a/thumbnail.jpg
 author: 永井辰弥

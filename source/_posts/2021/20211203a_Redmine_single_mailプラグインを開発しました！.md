@@ -2,12 +2,12 @@
 title: "Redmine_single_mailプラグインを開発しました！"
 date: 2021/12/03 00:00:00
 postid: a
-tag:
+tags:
   - コアテク
   - OSS
   - Redmine
   - メール
-category:
+categories:
   - DevOps
 thumbnail: /images/2021/20211203a/thumbnail.png
 author: 高橋健

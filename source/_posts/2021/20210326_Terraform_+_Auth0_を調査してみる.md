@@ -2,11 +2,11 @@
 title: "Terraform + Auth0 を調査してみる"
 date: 2021/03/26 00:00:00
 postid: ""
-tag:
+tags:
   - Auth0
   - Terraform
   - tfstate
-category:
+categories:
   - 認証認可
 thumbnail: /images/2021/20210326/thumbnail.png
 author: 小林澪司

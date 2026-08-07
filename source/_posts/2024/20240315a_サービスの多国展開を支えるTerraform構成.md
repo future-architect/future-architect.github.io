@@ -2,11 +2,11 @@
 title: "サービスの多国展開を支えるTerraform構成"
 date: 2024/03/15 00:00:00
 postid: a
-tag:
+tags:
   - Terraform
   - マルチリージョン
   - 海外展開
-category:
+categories:
   - DevOps
 thumbnail: /images/2024/20240315a/thumbnail.png
 author: 岸下優介

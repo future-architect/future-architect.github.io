@@ -2,10 +2,10 @@
 title: IPAの過去問で学ぶC & C(Command & Control)サーバの手法と対応策
 date: 2022/11/21 00:00:00
 postid: a
-tag:
+tags:
   - IPA
   - Network
-category:
+categories:
   - Security
 thumbnail: /images/2022/20221121a/thumbnail.png
 author: 村瀬善則

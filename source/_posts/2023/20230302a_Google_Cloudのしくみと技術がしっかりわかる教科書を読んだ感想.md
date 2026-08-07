@@ -2,12 +2,12 @@
 title: "Google Cloudのしくみと技術がしっかりわかる教科書を読んだ感想"
 date: 2023/03/02 00:00:00
 postid: a
-tag:
+tags:
   - 書評
   - GoogleCloud
   - 入門
   - BigQuery
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2023/20230302a/thumbnail.png
 author: 藤戸四恩

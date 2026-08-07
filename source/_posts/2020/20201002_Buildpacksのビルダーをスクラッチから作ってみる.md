@@ -2,14 +2,14 @@
 title: "Buildpacksのビルダーをスクラッチから作ってみる"
 date: 2020/10/02 00:00:00
 postid: ""
-tag:
+tags:
   - CNCF
   - Buildpacks
   - Docker
   - Python
   - コンテナデプロイ
   - コンテナビルド
-category:
+categories:
   - DevOps
 thumbnail: /images/2020/20201002/thumbnail.png
 author: 澁川喜規

@@ -2,11 +2,11 @@
 title: "Qiita Advent Calendar 2020 に参加します"
 date: 2020/11/25 00:00:00
 postid: ""
-tag:
+tags:
   - アドベントカレンダー
   - TechBlog
   - Qiita
-category:
+categories:
   - Culture
 thumbnail: /images/2020/20201125/thumbnail.png
 author: 伊藤太斉

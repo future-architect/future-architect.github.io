@@ -2,12 +2,12 @@
 title: "OpenAPI Specification v3.0.3のコーディング規約を公開しました"
 date: 2024/07/02 00:00:00
 postid: a
-tag:
+tags:
   - OpenAPI
   - コーディング規約
   - 設計
   - チーム開発
-category:
+categories:
   - Programming
 thumbnail: /images/2024/20240702a/thumbnail.png
 author:  武田大輝

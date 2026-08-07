@@ -2,11 +2,11 @@
 title: "OracleDB マルチテーブル・インサートにおけるIDENTITY列とSEQUENCEの挙動の違い"
 date: 2025/05/20 00:00:00
 postid: a
-tag:
+tags:
   - Oracle
   - SQL
   - IDENTITY
-category:
+categories:
   - DB
 thumbnail: /images/2025/20250520a/thumbnail.png
 author: 姫路康太郎

@@ -2,11 +2,11 @@
 title: "ElasticSearch→OpenSearchへの移行に伴いGoクライアントを切り替えた話"
 date: 2024/05/23 00:00:00
 postid: a
-tag:
+tags:
   - Go
   - OpenSearch
   - Elasticsearch
-category:
+categories:
   - Programming
 thumbnail: /images/2024/20240523a/thumbnail.png
 author: 大江聖太郎

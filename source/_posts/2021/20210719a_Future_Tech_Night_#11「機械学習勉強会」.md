@@ -2,11 +2,11 @@
 title: "Future Tech Night #11「機械学習勉強会」"
 date: 2021/07/19 00:00:00
 postid: a
-tag:
+tags:
   - 機械学習
   - TechNight
   - 登壇レポート
-category:
+categories:
   - DataScience
 thumbnail: /images/2021/20210719a/thumbnail.png
 author: 玉木竜二

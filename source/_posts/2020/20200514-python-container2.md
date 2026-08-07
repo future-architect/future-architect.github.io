@@ -2,11 +2,11 @@
 title: "仕事でPythonコンテナをデプロイする人向けのDockerfile (2): distroless編"
 date: 2020/05/14 08:51:53
 postid: ""
-tag:
+tags:
   - Python
   - Docker
   - コンテナビルド
-category:
+categories:
   - DevOps
 thumbnail: /images/2020/20200514/thumbnail.png
 author: 澁川喜規

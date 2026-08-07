@@ -2,11 +2,11 @@
 title: "AWS GameDay Online参加レポート"
 date: 2021/11/11 00:00:00
 postid: a
-tag:
+tags:
   - AWS
   - コンテスト
   - 参戦記
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2021/20211111a/thumbnail.png
 author: 伊藤真彦

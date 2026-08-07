@@ -2,11 +2,11 @@
 title: "HACK TO THE FUTURE 2022本選のビジュアライザ作成しました"
 date: 2022/02/01 00:00:00
 postid: a
-tag:
+tags:
   - AtCoder
   - 競技プログラミング
   - コンテスト
-category:
+categories:
   - Frontend
 thumbnail: /images/2022/20220201a/thumbnail.png
 author: 山田修路

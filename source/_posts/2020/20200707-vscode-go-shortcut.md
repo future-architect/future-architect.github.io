@@ -2,11 +2,11 @@
 title: "VSCode の Go extension でよく利用するコマンド 7選"
 date: 2020/07/07 10:15:05
 postid: ""
-tag:
+tags:
   - Go
   - VSCode
   - ショートカット
-category:
+categories:
   - Programming
 thumbnail: /images/2020/20200707/thumbnail.png
 author: 多賀聡一朗

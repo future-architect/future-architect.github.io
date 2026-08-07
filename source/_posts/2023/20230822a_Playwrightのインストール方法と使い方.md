@@ -2,10 +2,10 @@
 title: "Playwrightのインストール方法と使い方"
 date: 2023/08/22 00:00:00
 postid: a
-tag:
+tags:
   - Playwright
   - 環境構築
-category:
+categories:
   - Frontend
 thumbnail: /images/2023/20230822a/thumbnail.png
 author: 藤戸四恩

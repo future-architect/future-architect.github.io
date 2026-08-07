@@ -2,14 +2,14 @@
 title: "RDS DBインスタンスのアカウント間複製をGitHub Actionsで自動化"
 date: 2024/05/07 00:00:00
 postid: a
-tag:
+tags:
   - RDS
   - AWS
   - GitHubActions
   - ShellScript
   - IAM
   - CI/CD
-category:
+categories:
   - DevOps
 thumbnail: /images/2024/20240507a/thumbnail.png
 author: 太田寛明

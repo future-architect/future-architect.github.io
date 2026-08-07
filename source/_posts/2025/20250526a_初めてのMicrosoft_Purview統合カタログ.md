@@ -2,11 +2,11 @@
 title: "初めてのMicrosoft Purview統合カタログ"
 date: 2025/05/26 00:00:00
 postid: a
-tag:
+tags:
   - Azure
   - データカタログ
   - データマネジメント
-category:
+categories:
   - DataEngineering
 thumbnail: /images/2025/20250526a/thumbnail.png
 author: 佐々木伸悟

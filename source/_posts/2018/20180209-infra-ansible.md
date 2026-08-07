@@ -2,11 +2,11 @@
 title: "エンプラ&オンプレでもAnsible導入成功したのでユーザー会で発表してきた"
 date: 2018/02/09 11:12:14
 postid: ""
-tag:
+tags:
   - Ansible
   - 登壇レポート
   - IaC
-category:
+categories:
   - DevOps
 thumbnail: /images/2018/20180209/thumbnail_20180209.png
 author: 齋場俊太朗

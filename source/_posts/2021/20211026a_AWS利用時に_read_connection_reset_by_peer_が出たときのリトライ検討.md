@@ -2,7 +2,7 @@
 title: "AWS利用時に read: connection reset by peer が出たときのリトライ検討"
 date: 2021/10/26 00:00:00
 postid: a
-tag:
+tags:
   - AWS
   - Network
   - リトライ
@@ -10,7 +10,7 @@ tag:
   - トラブルシュート
   - Kinesis
   - TCP/IP
-category:
+categories:
   - Programming
 thumbnail: /images/2021/20211026a/thumbnail.png
 author: 真野隼記

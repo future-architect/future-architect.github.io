@@ -2,7 +2,7 @@
 title: "Goのおすすめのフレームワークはnet/http"
 date: 2021/07/14 00:00:00
 postid: a
-tag:
+tags:
   - Go
   - 技術選定
   - net/http

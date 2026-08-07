@@ -2,11 +2,11 @@
 title: "Terraform連載2024 hclwriteを用いたtfコード生成入門"
 date: 2024/03/12 00:00:00
 postid: a
-tag:
+tags:
   - Terraform
   - コード生成
   - Go
-category:
+categories:
   - DevOps
 thumbnail: /images/2024/20240312a/thumbnail.png
 author: 真野隼記

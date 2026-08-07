@@ -2,13 +2,13 @@
 title: "uroborosql-fmtにおける2WaySQLフォーマット (前編: フォーマット方法編)"
 date: 2024/10/18 00:00:00
 postid: a
-tag:
+tags:
   - VSCode
   - フォーマッター
   - コアテク
   - 2WaySQL
   - Rust
-category:
+categories:
   - Programming
 thumbnail: /images/2024/20241018a/thumbnail.png
 author: 川渕皓太

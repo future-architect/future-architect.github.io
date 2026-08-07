@@ -2,11 +2,11 @@
 title: "go-swaggerでhello world"
 date: 2020/08/24 00:00:00
 postid: ""
-tag:
+tags:
   - Go
   - go-swagger
   - 入門
-category:
+categories:
   - Programming
 thumbnail: /images/2020/20200824/thumbnail.png
 author: 伊藤真彦

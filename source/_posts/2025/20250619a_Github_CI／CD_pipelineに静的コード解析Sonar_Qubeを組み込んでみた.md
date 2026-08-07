@@ -2,11 +2,11 @@
 title: GitHub ActionsのCI/CDパイプラインに静的コード解析Sonar Qubeを組み込んでみた
 date: 2025/06/19 00:00:00
 postid: a
-tag:
+tags:
   - CI/CD
   - GitHubActions
   - 静的解析
-category:
+categories:
   - DevOps
 thumbnail: /images/2025/20250619a/thumbnail.png
 author: 松本朝香

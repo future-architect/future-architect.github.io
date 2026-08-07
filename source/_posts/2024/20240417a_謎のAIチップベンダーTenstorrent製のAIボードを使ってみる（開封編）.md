@@ -2,10 +2,10 @@
 title: "謎のAIチップベンダーTenstorrent製のAIボードを使ってみる（開封編）"
 date: 2024/04/17 00:00:00
 postid: a
-tag:
+tags:
   - AI
   - RISC-V
-category:
+categories:
   - DataScience
 thumbnail: /images/2024/20240417a/thumbnail.jpg
 author: 山本力世

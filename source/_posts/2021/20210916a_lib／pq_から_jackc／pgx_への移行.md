@@ -2,12 +2,12 @@
 title: "lib/pq から jackc/pgx への移行"
 date: 2021/09/16 00:00:00
 postid: a
-tag:
+tags:
   - PostgreSQL
   - Go
   - ORM
   - jackc/pgx
-category:
+categories:
   - Programming
 thumbnail: /images/2021/20210916a/thumbnail.png
 author: 筒井悠平

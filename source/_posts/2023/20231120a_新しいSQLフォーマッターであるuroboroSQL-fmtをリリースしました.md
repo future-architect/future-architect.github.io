@@ -2,13 +2,13 @@
 title: "新しいSQLフォーマッターであるuroboroSQL-fmtをリリースしました"
 date: 2023/11/20 00:00:00
 postid: a
-tag:
+tags:
   - フォーマッター
   - uroboroSQL
   - WebAssembly
   - SQL
   - Rust
-category:
+categories:
   - DB
 thumbnail: /images/2023/20231120a/thumbnail.png
 author: 山田修路

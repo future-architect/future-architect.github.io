@@ -2,11 +2,11 @@
 title: "Bluetoothで位置推定"
 date: 2022/07/25 00:00:00
 postid: a
-tag:
+tags:
   - 電子工作
   - Bluetooth
   - 位置特定
-category:
+categories:
   - IoT
 thumbnail: /images/2022/20220725a/thumbnail.png
 author: 岸下優介

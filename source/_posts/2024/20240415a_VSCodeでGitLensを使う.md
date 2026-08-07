@@ -2,13 +2,13 @@
 title: "VSCodeでGitLensを使う"
 date: 2024/04/15 00:00:00
 postid: a
-tag:
+tags:
   - VSCode
   - Git
   - Gitクライアント
   - コードリーディング
   - 便利ツール
-category:
+categories:
   - DevOps
 thumbnail: /images/2024/20240415a/thumbnail.png
 author: 棚井龍之介

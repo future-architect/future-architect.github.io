@@ -2,11 +2,11 @@
 title: "Unreal Engine5で簡単な色塗りゲームを作ろう！"
 date: 2023/11/27 00:00:00
 postid: a
-tag:
+tags:
   - UnrealEngine
   - ゲーム制作
   - 初心者向け
-category:
+categories:
   - Programming
 thumbnail: /images/2023/20231127a/thumbnail.jpg
 author: 関根正大

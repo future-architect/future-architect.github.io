@@ -2,13 +2,13 @@
 title: SQL実行時のブルームフィルタ(Bloom Filter)アルゴリズム
 date: 2016-10-31 12:21:10
 postid: ''
-tag:
+tags:
   - SQL
   - データモデル
   - アルゴリズム
   - 実行計画
   - データ構造
-category:
+categories:
   - DB
 author: 杉江伸祐
 lede: 重要なアルゴリズムであるにもかかわらず、まとまった情報が少ないSQL実行時のブルームフィルタ(Bloom Filter)アルゴリズムについて紹介します。

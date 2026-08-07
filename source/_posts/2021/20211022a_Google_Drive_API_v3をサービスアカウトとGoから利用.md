@@ -2,11 +2,11 @@
 title: "Google Drive API v3をサービスアカウトとGoから利用"
 date: 2021/10/22 00:00:00
 postid: a
-tag:
+tags:
   - GoogleWorkspace
   - Go
   - GoogleCloud
-category:
+categories:
   - Programming
 thumbnail: /images/2021/20211022a/thumbnail.png
 author: 真野隼記

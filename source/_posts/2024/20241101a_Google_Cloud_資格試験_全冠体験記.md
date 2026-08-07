@@ -2,11 +2,11 @@
 title: "Google Cloud 資格試験 全冠体験記"
 date: 2024/11/01 00:00:00
 postid: a
-tag:
+tags:
   - GoogleCloud
   - 合格記
   - 全冠
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2024/20241101a/thumbnail.jpg
 author: 逆瀬川滉大

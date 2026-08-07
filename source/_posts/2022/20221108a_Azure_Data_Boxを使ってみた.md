@@ -2,11 +2,11 @@
 title: "Azure Data Boxを使ってみた"
 date: 2022/11/08 00:00:00
 postid: a
-tag:
+tags:
   - Azure
   - データ移行
   - クラウドマイグレーション
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2022/20221108a/thumbnail.JPG
 author: 一ノ瀬秀都

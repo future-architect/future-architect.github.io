@@ -2,11 +2,11 @@
 title: "Qiita Advent Calendar 2021 に参加します"
 date: 2021/11/29 00:00:00
 postid: a
-tag:
+tags:
   - TechBlog
   - アドベントカレンダー
   - Qiita
-category:
+categories:
   - Culture
 thumbnail: /images/2021/20211129a/thumbnail.jpg
 author: 宮永崇史

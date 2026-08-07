@@ -2,10 +2,10 @@
 title: "CheetahGrid+Vue.jsをエンプラで使ってみた"
 date: 2020/09/24 00:00:00
 postid: ""
-tag:
+tags:
   - CheetahGrid
   - Vue.js
-category:
+categories:
   - Frontend
 thumbnail: /images/2020/20200924/thumbnail.png
 author: 信田和哉

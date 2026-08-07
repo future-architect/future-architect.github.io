@@ -2,11 +2,11 @@
 title: "PostgreSQL17リリース：to_regtypemod関数と型修飾子について"
 date: 2024/10/23 00:00:01
 postid: b
-tag:
+tags:
   - PostgreSQL
   - PostgreSQL17
   - SQL
-category:
+categories:
   - DB
 thumbnail: /images/2024/20241023b/thumbnail.png
 author:  山本竜玄

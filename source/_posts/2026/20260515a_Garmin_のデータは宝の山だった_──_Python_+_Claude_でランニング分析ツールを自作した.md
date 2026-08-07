@@ -2,11 +2,11 @@
 title: "Garmin のデータは宝の山だった ── Python + Claude でランニング分析ツールを自作した"
 date: 2026/05/15 00:00:00
 postid: a
-tag:
+tags:
   - Claude
   - Python
   - スポーツ
-category:
+categories:
   - AIDD
 thumbnail: /images/2026/20260515a/thumbnail.png
 author: 山下量之

@@ -2,10 +2,10 @@
 title: "TerraCurl でProviderがサポートしていないリソースをTerraCurlで作成する"
 date: 2023/03/28 00:00:00
 postid: a
-tag:
+tags:
   - Terraform
   - curl
-category:
+categories:
   - DevOps
 thumbnail: /images/2023/20230328a/thumbnail.png
 author: 真野隼記

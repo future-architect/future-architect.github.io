@@ -2,12 +2,12 @@
 title: "Sentence-Transformersを使ってみた！YouTube動画のセリフを手軽にセマンティック検索"
 date: 2023/09/06 00:00:00
 postid: a
-tag:
+tags:
   - ChatGPT
   - embedding
   - SentenceTransformers
   - AI
-category:
+categories:
   - DataScience
 thumbnail: /images/2023/20230906a/thumbnail.jpg
 author: 王紹宇

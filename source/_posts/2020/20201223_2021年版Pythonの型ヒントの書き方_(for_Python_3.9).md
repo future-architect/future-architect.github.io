@@ -2,13 +2,13 @@
 title: "2021年版Pythonの型ヒントの書き方 (for Python 3.9)"
 date: 2020/12/23 00:00:00
 postid: ""
-tag:
+tags:
   - Python
   - PyCharm
   - VSCode
   - ジェネリクス
   - Mypy
-category:
+categories:
   - Programming
 thumbnail: /images/2020/20201223/thumbnail.png
 author: 澁川喜規

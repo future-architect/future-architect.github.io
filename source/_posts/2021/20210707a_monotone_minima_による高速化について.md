@@ -2,10 +2,10 @@
 title: "monotone minima による高速化について"
 date: 2021/07/07 00:00:00
 postid: a
-tag:
+tags:
   - アルゴリズム
   - 最適化
-category:
+categories:
   - Programming
 thumbnail: /images/2021/20210707a/thumbnail.png
 author: 山田太樹

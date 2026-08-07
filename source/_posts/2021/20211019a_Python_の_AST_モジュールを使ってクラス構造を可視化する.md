@@ -2,14 +2,14 @@
 title: "Engineer Camp2021: Python の AST モジュールを使ってクラス構造を可視化する"
 date: 2021/10/19 00:00:00
 postid: a
-tag:
+tags:
   - Python
   - 静的解析
   - 構文解析
   - コアテク
   - インターン
   - インターン2021
-category:
+categories:
   - Programming
 thumbnail: /images/2021/20211019a/thumbnail.PNG
 author: 空閑康太

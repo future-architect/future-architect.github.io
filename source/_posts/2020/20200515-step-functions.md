@@ -2,13 +2,13 @@
 title: "Serverless連載6: AWSのStep FunctionsとLambdaでServelessなBatch処理を実現する"
 date: 2020/05/15 22:25:58
 postid: ""
-tag:
+tags:
   - サーバーレス
   - AWS
   - DynamoDB
   - StepFunctions
   - バッチ処理
-category:
+categories:
   - Programming
 thumbnail: /images/2020/20200515/thumbnail.png
 author: 真野隼記

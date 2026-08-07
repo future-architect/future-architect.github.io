@@ -2,11 +2,11 @@
 title: "Engineer Camp 2024 参加記：自然言語処理の研究開発で大崎から長崎へ"
 date: 2025/04/24 00:00:00
 postid: a
-tag:
+tags:
   - インターン
   - インターン2024
   - NLP
-category:
+categories:
   - DataScience
 thumbnail: /images/2025/20250424a/thumbnail.jpg
 author: 羽根田賢和

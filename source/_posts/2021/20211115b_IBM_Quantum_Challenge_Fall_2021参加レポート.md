@@ -2,10 +2,10 @@
 title: "IBM Quantum Challenge Fall 2021参加レポート"
 date: 2021/11/15 00:00:01
 postid: b
-tag:
+tags:
   - ハッカソン
   - コンテスト
-category:
+categories:
   - Programming
 thumbnail: /images/2021/20211115b/thumbnail.png
 author: 宮永崇史

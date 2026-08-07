@@ -2,11 +2,11 @@
 title: "Goのデバッグ環境 on VSCode"
 date: 2020/11/17 00:00:00
 postid: ""
-tag:
+tags:
   - Go
   - VSCode
   - 環境構築
-category:
+categories:
   - Programming
 thumbnail: /images/2020/20201117/thumbnail.png
 author: 富山龍之介

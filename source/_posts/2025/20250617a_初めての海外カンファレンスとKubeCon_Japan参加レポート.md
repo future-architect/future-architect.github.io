@@ -2,11 +2,11 @@
 title: "初めての海外カンファレンスとKubeCon Japan参加レポート"
 date: 2025/06/17 00:00:00
 postid: a
-tag:
+tags:
   - KubeCon
   - CNCF
   - 参加レポート
-category:
+categories:
   - DevOps
 thumbnail: /images/2025/20250617a/thumbnail.jpg
 author: 伊藤太斉

@@ -2,11 +2,11 @@
 title: "GCP Professional Cloud Network Engineer に合格しました"
 date: 2020/09/02 00:00:00
 postid: ""
-tag:
+tags:
   - GoogleCloud
   - 合格記
   - Network
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2020/20200902/thumbnail.png
 author: 西田好孝

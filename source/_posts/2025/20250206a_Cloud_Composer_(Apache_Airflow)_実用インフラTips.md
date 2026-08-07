@@ -2,10 +2,10 @@
 title: "Cloud Composer (Apache Airflow) 実用インフラTips"
 date: 2025/02/06 00:00:00
 postid: a
-tag:
+tags:
   - Airflow
   - GoogleCloud
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2025/20250206a/thumbnail.png
 author: 岸下優介

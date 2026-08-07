@@ -2,11 +2,11 @@
 title: "WindowsのVPN切り替えコマンドで学ぶ各シェルのエイリアス設定方法"
 date: 2022/11/15 00:00:00
 postid: a
-tag:
+tags:
   - Windows
   - VPN
   - 環境構築
-category:
+categories:
   - DevOps
 thumbnail: /images/2022/20221115a/thumbnail.png
 author: ダワージャルガルオチラル

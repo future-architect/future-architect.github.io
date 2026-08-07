@@ -2,11 +2,11 @@
 title: "AWS Certified Advanced Networking - Specialty 合格体験記 - 廃止直前の駆け込み受験"
 date: 2026/07/08 00:00:00
 postid: a
-tag:
+tags:
   - AWS
   - 合格記
   - Network
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2026/20260708a/thumbnail.png
 author: 棚井龍之介

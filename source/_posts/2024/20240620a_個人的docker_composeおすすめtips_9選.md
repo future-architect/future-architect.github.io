@@ -2,11 +2,11 @@
 title: "個人的docker composeおすすめtips 9選"
 date: 2024/06/20 00:00:00
 postid: a
-tag:
+tags:
   - Docker
   - DockerCompose
   - Tips
-category:
+categories:
   - DevOps
 thumbnail: /images/2024/20240620a/thumbnail.jpg
 author: 市川燿

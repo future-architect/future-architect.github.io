@@ -2,10 +2,10 @@
 title: "100%型安全なgolangORM「ent」を使ってみた"
 date: 2021/07/28 00:00:00
 postid: a
-tag:
+tags:
   - Go
   - ORM
-category:
+categories:
   - Programming
 thumbnail: /images/2021/20210728a/thumbnail.png
 author: 宮崎将太

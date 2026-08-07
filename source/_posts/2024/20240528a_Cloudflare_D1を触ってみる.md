@@ -2,10 +2,10 @@
 title: "Cloudflare D1を触ってみる"
 date: 2024/05/28 00:00:00
 postid: a
-tag:
+tags:
   - Cloudflare
   - SQLite
-category:
+categories:
   - DB
 thumbnail: /images/2024/20240528a/thumbnail.png
 author: 真野隼記

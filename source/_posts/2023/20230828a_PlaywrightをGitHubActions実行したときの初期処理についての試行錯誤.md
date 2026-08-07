@@ -2,10 +2,10 @@
 title: "PlaywrightをGitHubActions実行したときの初期処理についての試行錯誤"
 date: 2023/08/28 00:00:00
 postid: a
-tag:
+tags:
   - Playwright
   - GitHubActions
-category:
+categories:
   - DevOps
 thumbnail: /images/2023/20230828a/thumbnail.png
 author: 枇榔晃裕

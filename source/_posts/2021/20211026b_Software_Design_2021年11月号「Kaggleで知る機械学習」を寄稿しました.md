@@ -2,14 +2,14 @@
 title: "Software Design 2021年11月号「Kaggleで知る機械学習」を寄稿しました"
 date: 2021/10/26 00:00:01
 postid: b
-tag:
+tags:
   - Kaggle
   - 機械学習
   - NLP
   - 画像処理
   - 出版
   - SoftwareDesign
-category:
+categories:
   - DataScience
 thumbnail: /images/2021/20211026b/thumbnail.jpeg
 author: 玉木竜二

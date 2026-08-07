@@ -2,11 +2,11 @@
 title: "S3 Tables×AWS Glueで作る次世代データ分析基盤"
 date: 2026/06/05 00:00:00
 postid: a
-tag:
+tags:
   - Glue
   - S3
   - データレイク
-category:
+categories:
   - DataEngineering
 thumbnail: /images/2026/20260605a/thumbnail.png
 author: 鈴木風真

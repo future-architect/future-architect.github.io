@@ -2,12 +2,12 @@
 title: "grpc-gatewayでgRPCとREST両対応のサーバを作る"
 date: 2022/06/24 00:00:00
 postid: a
-tag:
+tags:
   - gRPC
   - WebAPI
   - IDL
   - ProtocolBuffers
-category:
+categories:
   - Programming
 thumbnail: /images/2022/20220624a/thumbnail.png
 author:  関靖秀

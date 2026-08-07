@@ -2,11 +2,11 @@
 title: "nektos/act はMakefileの代わりになるか？"
 date: 2025/06/05 00:00:00
 postid: a
-tag:
+tags:
   - Makefile
   - タスクランナー
   - GitHubActions
-category:
+categories:
   - DevOps
 thumbnail: /images/2025/20250605a/thumbnail.jpg
 author: 真野隼記

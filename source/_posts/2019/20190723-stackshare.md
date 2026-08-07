@@ -2,11 +2,11 @@
 title: "Future IoTのstackshareを公開しました"
 date: 2019/07/23 08:35:13
 postid: ""
-tag:
+tags:
   - 技術選定
   - FutureIoT
   - ベンダーロックイン
-category:
+categories:
   - IoT
 author: 武田大輝
 lede: "先日「Future IoT」のstackshareを公開しました。

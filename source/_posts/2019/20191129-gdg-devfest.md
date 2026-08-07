@@ -2,12 +2,12 @@
 title: "GDG DevFest in 信州2019に登壇しました"
 date: 2019/11/29 13:58:44
 postid: ""
-tag:
+tags:
   - GoogleCloud
   - GCPUG
   - 登壇レポート
   - GDG
-category:
+categories:
   - Infrastructure
 author: 伊藤太斉
 lede: "普段はGCPの開発支援を行なっているインフラエンジニアです。今回は私の地元である長野で開催された GDG Devfest 信州 に参加しました。今回でこちらの勉強会の参加は2回目になるのですが、登壇する機会をいただいたのでその時のことを書いていきます。"

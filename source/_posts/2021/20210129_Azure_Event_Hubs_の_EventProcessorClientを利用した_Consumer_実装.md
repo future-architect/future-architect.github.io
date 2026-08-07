@@ -2,10 +2,10 @@
 title: "Azure Event Hubs の EventProcessorClientを利用した Consumer 実装"
 date: 2021/01/29 00:00:00
 postid: ""
-tag:
+tags:
   - Azure
   - Java
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2021/20210129/thumbnail.png
 author: 多賀聡一朗

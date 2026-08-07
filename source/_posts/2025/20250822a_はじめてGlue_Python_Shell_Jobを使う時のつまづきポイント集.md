@@ -2,13 +2,13 @@
 title: "はじめてGlue Python Shell Jobを使う時のつまづきポイント集"
 date: 2025/08/22 00:00:00
 postid: a
-tag:
+tags:
   - AWS
   - Glue
   - ETL
   - Glue Python Shell
   - 初心者向け
-category:
+categories:
   - DataEngineering
 thumbnail: /images/2025/20250822a/thumbnail.jpg
 author: 八木雅斗

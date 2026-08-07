@@ -2,11 +2,11 @@
 title: "Meta Quest 3開封の儀＆フルカラーパススルーで家にテルミンを置いた"
 date: 2023/10/13 00:00:00
 postid: a
-tag:
+tags:
   - MetaQuest
   - 音楽
   - Unity
-category:
+categories:
   - VR
 thumbnail: /images/2023/20231013a/thumbnail.jpg
 author: 藤井亮佑

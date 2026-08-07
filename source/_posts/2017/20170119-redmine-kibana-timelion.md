@@ -2,11 +2,11 @@
 title: "マネージャーがうれしいRedmineデータのEVM表示方法を公開します！！"
 date: 2017/01/19 18:00:00
 postid: ""
-tag:
+tags:
   - Kibana
   - Redmine
   - 可視化
-category:
+categories:
   - Management
 thumbnail: /images/2017/20170119/thumbnail_20170119.jpg
 author: 近藤雅章

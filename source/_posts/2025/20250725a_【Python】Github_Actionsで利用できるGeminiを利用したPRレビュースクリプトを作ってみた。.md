@@ -2,12 +2,12 @@
 title: "GitHub Actionsで利用できるGeminiを利用したPRレビュースクリプトを作ってみた。"
 date: 2025/07/25 00:00:00
 postid: a
-tag:
+tags:
   - Gemini
   - GitHub
   - Python
   - コードレビュー
-category:
+categories:
   - AIDD
 thumbnail: /images/2025/20250725a/thumbnail.png
 author:  片岡久人

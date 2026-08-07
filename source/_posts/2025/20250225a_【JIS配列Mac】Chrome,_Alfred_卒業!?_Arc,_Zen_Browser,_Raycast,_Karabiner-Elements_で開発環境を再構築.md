@@ -2,11 +2,11 @@
 title: "【JIS配列Mac】Chrome, Alfred 卒業!? Arc, Zen Browser, Raycast, Karabiner-Elements で開発環境を再構築"
 date: 2025/02/25 00:00:00
 postid: a
-tag:
+tags:
   - Mac
   - 環境構築
   - キーバインド
-category:
+categories:
   - DevOps
 thumbnail: /images/2025/20250225a/thumbnail.png
 author: 棚井龍之介

@@ -2,13 +2,13 @@
 title: "Kong API Gatewayを使ってResource Serverを保護する"
 date: 2022/10/06 00:00:00
 postid: a
-tag:
+tags:
   - OAuth
   - OIDC
   - APIGateway
   - JWT
   - Keycloak
-category:
+categories:
   - 認証認可
 thumbnail: /images/2022/20221006a/thumbnail.png
 author: 李光焄

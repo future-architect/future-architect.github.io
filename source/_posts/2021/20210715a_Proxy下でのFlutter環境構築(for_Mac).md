@@ -2,11 +2,11 @@
 title: "Proxy下でのFlutter環境構築(for Mac)"
 date: 2021/07/15 00:00:00
 postid: a
-tag:
+tags:
   - Flutter
   - プロキシ
   - 環境構築
-category:
+categories:
   - Mobile
 thumbnail: /images/2021/20210715a/thumbnail.png
 author: 斎藤賢太

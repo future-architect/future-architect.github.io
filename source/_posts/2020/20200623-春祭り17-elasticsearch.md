@@ -2,11 +2,11 @@
 title: "Elasticsearch入門"
 date: 2020/06/23 10:14:50
 postid: ""
-tag:
+tags:
   - Elasticsearch
   - 全文検索
   - 初心者向け
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2020/20200623/thumbnail.png
 author: 町田聖慈

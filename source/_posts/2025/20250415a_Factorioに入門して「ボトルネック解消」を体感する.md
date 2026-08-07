@@ -2,10 +2,10 @@
 title: "Factorioに入門して「ボトルネック解消」を体感する"
 date: 2025/04/15 00:00:00
 postid: a
-tag:
+tags:
   - 生成AI
   - ゲーム
-category:
+categories:
   - Management
 thumbnail: /images/2025/20250415a/thumbnail.png
 author: 棚井龍之介

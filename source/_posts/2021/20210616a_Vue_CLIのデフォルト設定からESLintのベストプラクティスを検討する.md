@@ -2,12 +2,12 @@
 title: "Vue CLIのデフォルト設定からESLintのベストプラクティスを検討する"
 date: 2021/06/16 00:00:00
 postid: a
-tag:
+tags:
   - Vue.js
   - Node.js
   - ESLint
   - EditorConfig
-category:
+categories:
   - Frontend
 thumbnail: /images/2021/20210616a/thumbnail.png
 author: 伊藤真彦

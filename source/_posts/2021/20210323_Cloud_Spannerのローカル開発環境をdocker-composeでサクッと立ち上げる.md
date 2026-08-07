@@ -2,12 +2,12 @@
 title: "Cloud Spannerのローカル開発環境をdocker-composeでサクッと立ち上げる"
 date: 2021/03/23 00:00:00
 postid: ""
-tag:
+tags:
   - Spanner
   - GoogleCloud
   - DockerCompose
   - エミュレータ
-category:
+categories:
   - DB
 thumbnail: /images/2021/20210323/thumbnail.png
 author: 齋場俊太朗

@@ -2,11 +2,11 @@
 title: "FigmaからFlutterに変換するプラグインを比較する"
 date: 2021/10/21 00:00:00
 postid: a
-tag:
+tags:
   - Figma
   - Flutter
   - 技術選定
-category:
+categories:
   - Mobile
 thumbnail: /images/2021/20211021a/thumbnail.png
 author: 越島亮介

@@ -2,11 +2,11 @@
 title: "CI/CD初心者のためのJenkins入門"
 date: 2024/04/19 00:00:00
 postid: a
-tag:
+tags:
   - 入門
   - Jenkins
   - CI/CD
-category:
+categories:
   - DevOps
 thumbnail: /images/2024/20240419a/thumbnail.png
 author: 中邨英里佳

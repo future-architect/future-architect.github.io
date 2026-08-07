@@ -2,11 +2,11 @@
 title: "ESP32とGoogleSpreadSheetで始めるIoT入門"
 date: 2024/04/23 00:00:00
 postid: a
-tag:
+tags:
   - ESP32
   - スプレッドシート
   - GAS
-category:
+categories:
   - IoT
 thumbnail: /images/2024/20240423a/thumbnail.png
 author: 高世駿

@@ -2,10 +2,10 @@
 title: "Enginner Camp 2022に参加しました（HIG編）"
 date: 2022/09/16 00:00:00
 postid: a
-tag:
+tags:
   - インターン
   - インターン2022
-category:
+categories:
   - Culture
 thumbnail: /images/2022/20220916a/thumbnail.png
 author: 永田遊希

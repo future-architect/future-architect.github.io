@@ -2,11 +2,11 @@
 title: "今なぜ「アルゴリズム」を学ぶのか？ —— Software Design2026年1月号への寄稿によせて"
 date: 2026/02/17 00:00:00
 postid: a
-tag:
+tags:
   - アルゴリズム
   - 出版
   - SoftwareDesign
-category:
+categories:
   - Programming
 thumbnail: /images/2026/20260217a/thumbnail.jpg
 author: 真野隼記

@@ -2,13 +2,13 @@
 title: "最新テクノロジーでスポーツアイデアソンをやって中高生に教わった大事なこと"
 date: 2017/11/13 13:08:13
 postid: ""
-tag:
+tags:
   - デザイン思考
   - プログラミング教育
   - アイデアソン
   - 子ども
   - スポーツ
-category:
+categories:
   - VR
 thumbnail: /images/2017/20171113/thumbnail_20171113.png
 author: 姜恵林

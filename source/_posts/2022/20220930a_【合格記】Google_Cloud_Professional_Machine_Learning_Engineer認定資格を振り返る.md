@@ -2,12 +2,12 @@
 title: "【合格記】Google Cloud Professional Machine Learning Engineer認定資格を振り返る"
 date: 2022/09/30 00:00:00
 postid: a
-tag:
+tags:
   - GoogleCloud
   - 合格記
   - PMLE
   - 機械学習
-category:
+categories:
   - DataScience
 thumbnail: /images/2022/20220930a/thumbnail.png
 author: 岸下優介

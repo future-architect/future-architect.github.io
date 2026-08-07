@@ -2,7 +2,7 @@
 title: スケーラブルデータベース ～クラウドにおける後悔しないデータベース選定～
 date: 2020/07/03 10:34:11
 postid: ''
-tag:
+tags:
   - KVS
   - 技術選定
   - 要件定義
@@ -10,7 +10,7 @@ tag:
   - BigQuery
   - Snowflake
   - DWH
-category:
+categories:
   - DB
 thumbnail: /images/2020/20200703/thumbnail.png
 author: 杉江伸祐

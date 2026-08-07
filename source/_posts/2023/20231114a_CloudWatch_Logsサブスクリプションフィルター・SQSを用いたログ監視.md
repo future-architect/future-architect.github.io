@@ -2,13 +2,13 @@
 title: "CloudWatch Logsサブスクリプションフィルター・SQSを用いたログ監視"
 date: 2023/11/14 00:00:00
 postid: a
-tag:
+tags:
   - ログ
   - 保守運用
   - AWS
   - CloudWatch
   - SQS
-category:
+categories:
   - DevOps
 thumbnail: /images/2023/20231114a/thumbnail.png
 author: 内田敦也

@@ -2,12 +2,12 @@
 title: "VPC内のAmazon API Gatewayをインターネットオーバーで疎通確認する"
 date: 2021/09/24 00:00:00
 postid: a
-tag:
+tags:
   - AWS
   - APIGateway
   - Go
   - VPC
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2021/20210924a/thumbnail.png
 author: 真野隼記

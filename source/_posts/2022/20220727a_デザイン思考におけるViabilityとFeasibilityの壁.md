@@ -2,11 +2,11 @@
 title: "デザイン思考におけるViabilityとFeasibilityの壁"
 date: 2022/07/27 00:00:00
 postid: a
-tag:
+tags:
   - デザイン思考
   - デザインワーク
   - UI/UX
-category:
+categories:
   - Business
 thumbnail: /images/2022/20220727a/thumbnail.PNG
 author: ヴーホアン・ミン

@@ -2,10 +2,10 @@
 title: "PostgreSQL: 4億件のテーブルでSeq Scanが選ばれる問題を、統計情報(n_distinct)の改善で解決するまでのプロセス"
 date: 2025/10/10 00:00:00
 postid: a
-tag:
+tags:
   - PostgreSQL
   - 実行計画
-category:
+categories:
   - DB
 thumbnail: /images/2025/20251010a/thumbnail.png
 author: 市川裕也

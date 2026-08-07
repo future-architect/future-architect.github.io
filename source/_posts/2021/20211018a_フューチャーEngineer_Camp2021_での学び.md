@@ -2,11 +2,11 @@
 title: "Engineer Camp2021（スマートファクトリー）での学び"
 date: 2021/10/18 00:00:00
 postid: a
-tag:
+tags:
   - インターン
   - インターン2021
   - 工場
-category:
+categories:
   - IoT
 thumbnail: /images/2021/20211018a/thumbnail.png
 author: 森下俊平

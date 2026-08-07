@@ -2,12 +2,12 @@
 title: "Rundeck(Community版)を触ってみた"
 date: 2023/10/25 00:00:00
 postid: a
-tag:
+tags:
   - ジョブスケジューラ
   - IaC
   - 保守運用
   - クラウドマイグレーション
-category:
+categories:
   - DevOps
 thumbnail: /images/2023/20231025a/thumbnail.png
 author: 都筑博紀

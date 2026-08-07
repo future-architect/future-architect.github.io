@@ -2,11 +2,11 @@
 title: "PDFをBigqueryにぶっこんで効率よく構造化する"
 date: 2025/07/24 00:00:00
 postid: a
-tag:
+tags:
   - Gemini
   - BigQuery
   - GoogleCloud
-category:
+categories:
   - DataScience
 thumbnail: /images/2025/20250724a/thumbnail.png
 author: 大前七奈

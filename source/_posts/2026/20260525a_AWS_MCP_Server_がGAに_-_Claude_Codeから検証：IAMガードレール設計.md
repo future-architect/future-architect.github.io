@@ -2,10 +2,10 @@
 title: "AWS MCP Server がGAに - Claude Codeから検証: IAMガードレール設計"
 date: 2026/05/25 00:00:00
 postid: a
-tag:
+tags:
   - AWS
   - ClaudeCode
-category:
+categories:
   - AIDD
 thumbnail: /images/2026/20260525a/thumbnail.png
 author: 棚井龍之介

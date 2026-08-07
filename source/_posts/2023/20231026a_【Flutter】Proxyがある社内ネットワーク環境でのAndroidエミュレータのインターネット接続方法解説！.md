@@ -2,12 +2,12 @@
 title: "【Flutter】Proxyがある社内ネットワーク環境でAndroidエミュレータからインターネットに接続する方法"
 date: 2023/10/26 00:00:00
 postid: a
-tag:
+tags:
   - Flutter
   - プロキシ
   - Android
   - エミュレータ
-category:
+categories:
   - Mobile
 thumbnail: /images/2023/20231026a/thumbnail.png
 author: 後藤田千里

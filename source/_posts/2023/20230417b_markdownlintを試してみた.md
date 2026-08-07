@@ -2,12 +2,12 @@
 title: "markdownlintで設計書の品質を高める"
 date: 2023/04/17 00:00:01
 postid: b
-tag:
+tags:
   - Markdown
   - Linter
   - Markdownlint
   - ドキュメント
-category:
+categories:
   - DevOps
 thumbnail: /images/2023/20230417b/thumbnail.png
 author: 真野隼記

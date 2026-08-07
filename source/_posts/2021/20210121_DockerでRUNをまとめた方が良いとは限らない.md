@@ -2,10 +2,10 @@
 title: "DockerでRUNをまとめた方が良いとは限らない"
 date: 2021/01/21 00:00:00
 postid: ""
-tag:
+tags:
   - Docker
   - コンテナビルド
-category:
+categories:
   - DevOps
 thumbnail: /images/2021/20210121/thumbnail.png
 author: 澁川喜規

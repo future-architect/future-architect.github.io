@@ -2,13 +2,13 @@
 title: "stree：S3バケットをtreeするCLIコマンド"
 date: 2023/09/26 00:00:00
 postid: a
-tag:
+tags:
   - AWS
   - S3
   - OSS
   - CLI
   - Go
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2023/20230926a/thumbnail.png
 author: 宮永崇史

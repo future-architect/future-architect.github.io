@@ -2,11 +2,11 @@
 title: "【合格体験記】Google Cloudの入門試験：Cloud Digital Leader"
 date: 2023/12/26 00:00:00
 postid: a
-tag:
+tags:
   - 合格記
   - GoogleCloud
   - CDL
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2023/20231226a/thumbnail.JPG
 author: 村上一彦

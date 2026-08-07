@@ -2,10 +2,10 @@
 title: "GKEでIdentity-Aware Proxyを利用したWebアプリケーション認証"
 date: 2023/01/13 00:00:00
 postid: a
-tag:
+tags:
   - GoogleCloud
   - GKE
-category:
+categories:
   - 認証認可
 thumbnail: /images/2023/20230113a/thumbnail.png
 author: 渡邉光

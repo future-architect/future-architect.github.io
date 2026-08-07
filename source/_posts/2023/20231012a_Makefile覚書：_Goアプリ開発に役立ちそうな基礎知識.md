@@ -2,13 +2,13 @@
 title: "Makefile覚書: Goアプリ開発に役立ちそうな基礎知識"
 date: 2023/10/12 00:00:00
 postid: a
-tag:
+tags:
   - Makefile
   - タスクランナー
   - Go
   - チーム開発
   - EditorConfig
-category:
+categories:
   - DevOps
 thumbnail: /images/2023/20231012a/thumbnail.png
 author: 真野隼記

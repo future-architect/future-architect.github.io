@@ -2,13 +2,13 @@
 title: "社内勉強会で発表したGCP資料を公開します"
 date: 2020/04/24 10:23:37
 postid: ""
-tag:
+tags:
   - GoogleCloud
   - 初心者向け
   - 社内勉強会
   - BigQuery
   - Kubernetes
-category:
+categories:
   - DevOps
 thumbnail: /images/2020/20200424/thumbnail.png
 author: 伊藤太斉

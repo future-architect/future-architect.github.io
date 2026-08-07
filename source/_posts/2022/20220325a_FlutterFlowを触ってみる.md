@@ -2,12 +2,12 @@
 title: "FlutterFlowを触ってみる"
 date: 2022/03/25 00:00:00
 postid: a
-tag:
+tags:
   - Flutter
   - UI/UX
   - ノーコード
   - ローコード
-category:
+categories:
   - Mobile
 thumbnail: /images/2022/20220325a/thumbnail.png
 author: 宮崎将太

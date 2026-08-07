@@ -2,12 +2,12 @@
 title: "New ReverseProxy Rewrite hook を動かしながら理解する"
 date: 2023/01/31 00:00:00
 postid: a
-tag:
+tags:
   - Go
   - Go1.20
   - リバースプロキシ
   - RFC
-category:
+categories:
   - Programming
 thumbnail: /images/2023/20230131a/thumbnail.png
 author: 棚井龍之介

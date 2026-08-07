@@ -2,13 +2,13 @@
 title: "Great ExpectationsでBigQueryのデータ品質を監視する"
 date: 2023/05/31 00:00:00
 postid: a
-tag:
+tags:
   - Great Expectations
   - BigQuery
   - AI監視
   - バリデーション
   - データマネジメント
-category:
+categories:
   - DataEngineering
 thumbnail: /images/2023/20230531a/thumbnail.png
 author: 板野竜也

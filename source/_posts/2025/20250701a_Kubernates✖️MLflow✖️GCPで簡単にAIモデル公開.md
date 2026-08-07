@@ -2,13 +2,13 @@
 title: "Kubernates✖️MLflow✖️GCPで簡単にAIモデル公開"
 date: 2025/07/01 00:00:00
 postid: a
-tag:
+tags:
   - CNCF
   - MLflow
   - MLOps
   - GoogleCloud
   - Minikube
-category:
+categories:
   - DataScience
 thumbnail: /images/2025/20250701a/thumbnail.png
 author: 大前七奈

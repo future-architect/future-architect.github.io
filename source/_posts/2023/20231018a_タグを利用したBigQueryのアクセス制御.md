@@ -2,12 +2,12 @@
 title: "タグを利用したBigQueryのアクセス制御"
 date: 2023/10/18 00:00:00
 postid: a
-tag:
+tags:
   - BigQuery
   - IAM
   - GoogleCloud
   - アクセス制御
-category:
+categories:
   - DataEngineering
 thumbnail: /images/2023/20231018a/thumbnail.png
 author: 岸下優介

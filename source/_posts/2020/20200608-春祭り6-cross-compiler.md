@@ -2,10 +2,10 @@
 title: "とあるマイコンのクロスコンパイラ"
 date: 2020/06/08 10:37:41
 postid: ""
-tag:
+tags:
   - マイコン
   - コンパイラ
-category:
+categories:
   - IoT
 thumbnail: /images/2020/20200608/thumbnail.png
 author: 栗田真

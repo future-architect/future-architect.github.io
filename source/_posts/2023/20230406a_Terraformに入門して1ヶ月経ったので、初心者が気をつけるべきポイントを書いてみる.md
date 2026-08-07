@@ -2,11 +2,11 @@
 title: "Terraformに入門して1ヶ月経ったので、初心者が気をつけるべきポイントを書いてみる"
 date: 2023/04/06 00:00:00
 postid: a
-tag:
+tags:
   - Terraform
   - 初心者向け
   - 入門
-category:
+categories:
   - DevOps
 thumbnail: /images/2023/20230406a/thumbnail.png
 author: 大岩潤矢

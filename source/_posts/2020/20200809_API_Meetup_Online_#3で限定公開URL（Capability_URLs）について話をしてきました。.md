@@ -2,13 +2,13 @@
 title: "API Meetup Online #3で限定公開URL（Capability URLs）について話をしてきました。"
 date: 2020/08/09 00:00:00
 postid: ""
-tag:
+tags:
   - HTTP
   - Web
   - 署名付きURL
   - WebAPI
   - 登壇レポート
-category:
+categories:
   - Programming
 thumbnail: /images/2020/20200809/thumbnail.png
 author: 澁川喜規

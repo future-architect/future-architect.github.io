@@ -2,12 +2,12 @@
 title: "GUI GitツールのRebase, Cherry pick"
 date: 2021/04/20 00:00:00
 postid: b
-tag:
+tags:
   - Git
   - VSCode
   - Gitクライアント
   - 便利ツール
-category:
+categories:
   - DevOps
 thumbnail: /images/2021/20210420b/thumbnail.png
 author: 市川燿

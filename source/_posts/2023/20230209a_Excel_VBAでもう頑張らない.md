@@ -2,11 +2,11 @@
 title: "Excel VBAでもう頑張らない"
 date: 2023/02/09 00:00:00
 postid: a
-tag:
+tags:
   - PowerShell
   - VBA
   - Excel
-category:
+categories:
   - Programming
 thumbnail: /images/2023/20230209a/thumbnail.png
 author: 澁川喜規

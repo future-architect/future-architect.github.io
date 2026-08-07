@@ -2,12 +2,12 @@
 title: "gRPCのGo実装の新星、Connect"
 date: 2022/06/23 00:00:00
 postid: a
-tag:
+tags:
   - gRPC
   - IDL
   - Connect
   - Go
-category:
+categories:
   - Programming
 thumbnail: /images/2022/20220623a/thumbnail.jpg
 author: 澁川喜規

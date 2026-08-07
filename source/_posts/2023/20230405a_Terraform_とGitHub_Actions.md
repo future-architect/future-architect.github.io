@@ -2,12 +2,12 @@
 title: "Terraform とGitHub Actions"
 date: 2023/04/05 00:00:00
 postid: a
-tag:
+tags:
   - Terraform
   - GitHubActions
   - AWS
   - CI/CD
-category:
+categories:
   - DevOps
 thumbnail: /images/2023/20230405a/thumbnail.png
 author: 前原応光

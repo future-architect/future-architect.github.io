@@ -2,12 +2,12 @@
 title: "【合格記】Google Cloud Professional Data Engineer認定資格を振り返る【2023年度版】"
 date: 2023/09/15 00:00:00
 postid: a
-tag:
+tags:
   - PDE
   - GoogleCloud
   - 合格記
   - Udemy
-category:
+categories:
   - DataEngineering
 thumbnail: /images/2023/20230915a/thumbnail.png
 author: 岸下優介

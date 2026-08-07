@@ -2,10 +2,10 @@
 title: "Cloudflare R2 + NextCloudで作る自分専用クラウドストレージのススメ"
 date: 2024/06/03 00:00:00
 postid: a
-tag:
+tags:
   - S3
   - Cloudflare
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2024/20240603a/thumbnail.png
 author: 大岩潤矢

@@ -2,10 +2,10 @@
 title: "Airflow の SLA設定方法"
 date: 2020/08/27 00:00:00
 postid: ""
-tag:
+tags:
   - Airflow
   - Python
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2020/20200827/thumbnail.png
 author: 多賀聡一朗

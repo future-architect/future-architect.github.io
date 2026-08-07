@@ -2,10 +2,10 @@
 title: "Artifact Registry利用料金の最適化方針と対応手順"
 date: 2026/05/19 00:00:00
 postid: a
-tag:
+tags:
   - Terraform
   - GoogleCloud
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2026/20260519a/thumbnail.png
 author: 大江悠斗

@@ -2,11 +2,11 @@
 title: "Playwright連載始まります"
 date: 2023/08/21 00:00:00
 postid: a
-tag:
+tags:
   - Playwright
   - E2Eテスト
   - Cypress
-category:
+categories:
   - Frontend
 thumbnail: /images/2023/20230821a/thumbnail.png
 author: 澁川喜規

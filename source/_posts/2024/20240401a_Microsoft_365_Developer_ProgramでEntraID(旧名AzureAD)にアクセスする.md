@@ -2,11 +2,11 @@
 title: "Microsoft 365 Developer ProgramでEntraID(旧名AzureAD)にアクセスする"
 date: 2024/04/01 00:00:00
 postid: a
-tag:
+tags:
   - EntraID
   - Azure
   - Microsoft
-category:
+categories:
   - 認証認可
 thumbnail: /images/2024/20240401a/thumbnail.png
 author: 澁川喜規

@@ -2,12 +2,12 @@
 title: "署名付きURLを利用したファイルアップロードWeb API設計の勘所"
 date: 2024/07/05 00:00:00
 postid: a
-tag:
+tags:
   - 署名付きURL
   - Web
   - 設計
   - WebAPI
-category:
+categories:
   - Programming
 thumbnail: /images/2024/20240705a/thumbnail.png
 author: 武田大輝

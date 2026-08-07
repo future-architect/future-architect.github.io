@@ -2,11 +2,11 @@
 title: "AWS LambdaにおけるGo Contextの取り扱い"
 date: 2021/06/02 00:00:00
 postid: a
-tag:
+tags:
   - Go
   - Lambda
   - context
-category:
+categories:
   - Programming
 thumbnail: /images/2021/20210602a/thumbnail.png
 author: 伊藤真彦

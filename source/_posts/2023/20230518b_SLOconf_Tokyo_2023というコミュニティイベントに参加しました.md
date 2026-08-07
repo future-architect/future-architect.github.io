@@ -2,12 +2,12 @@
 title: "SLOconf Tokyo 2023というコミュニティイベントに参加しました"
 date: 2023/05/18 00:00:01
 postid: b
-tag:
+tags:
   - SRE
   - SLO
   - 参加レポート
   - 心理的安全性
-category:
+categories:
   - DevOps
 thumbnail: /images/2023/20230518b/thumbnail.png
 author: 原木翔

@@ -2,13 +2,13 @@
 title: "Future Tech Night #19「新聞業界を変革するクラウドサービス「GlyphFeeds」を支えるAWSサービス」"
 date: 2022/02/24 00:00:00
 postid: a
-tag:
+tags:
   - 登壇レポート
   - TechNight
   - AWS
   - CMS
   - GlyphFeeds
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2022/20220224a/thumbnail.png
 author: 岡田珠美

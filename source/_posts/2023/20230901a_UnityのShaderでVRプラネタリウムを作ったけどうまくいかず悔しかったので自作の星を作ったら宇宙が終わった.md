@@ -2,10 +2,10 @@
 title: "UnityのShaderでVRプラネタリウムを作ったけどうまくいかず悔しかったので自作の星を作ったら宇宙が終わった"
 date: 2023/09/01 00:00:00
 postid: a
-tag:
+tags:
   - Unity
   - 宇宙
-category:
+categories:
   - VR
 thumbnail: /images/2023/20230901a/thumbnail.png
 author: 藤井亮佑

@@ -2,11 +2,11 @@
 title: "SpringBootでDIを駆使したルールエンジン開発"
 date: 2020/09/18 00:00:00
 postid: ""
-tag:
+tags:
   - SpringBoot
   - Java
   - GlyphFeeds
-category:
+categories:
   - Programming
 thumbnail: /images/2020/20200918/thumbnail.png
 author: 渡邉拓

@@ -2,13 +2,13 @@
 title: "Lambda×Go並列処理で100万回APIを呼び出す"
 date: 2022/05/16 00:00:00
 postid: a
-tag:
+tags:
   - AWS
   - Lambda
   - Go
   - 並列処理
   - 性能検証
-category:
+categories:
   - Programming
 thumbnail: /images/2022/20220516a/thumbnail.jpg
 author: 後藤玲雄

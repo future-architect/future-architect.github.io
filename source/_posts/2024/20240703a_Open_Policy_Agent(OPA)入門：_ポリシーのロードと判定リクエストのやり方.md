@@ -2,11 +2,11 @@
 title: "Open Policy Agent(OPA)入門: ポリシーのロードと判定リクエストのやり方"
 date: 2024/07/03 00:00:00
 postid: a
-tag:
+tags:
   - OpenPolicyAgent
   - Go
   - Rego
-category:
+categories:
   - DevOps
 thumbnail: /images/2024/20240703a/thumbnail.png
 author: 関靖秀

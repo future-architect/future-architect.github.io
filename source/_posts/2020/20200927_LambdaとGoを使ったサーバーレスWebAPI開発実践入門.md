@@ -2,14 +2,14 @@
 title: "LambdaとGoを使ったサーバーレスWebAPI開発実践入門"
 date: 2020/09/27 00:00:00
 postid: ""
-tag:
+tags:
   - Go
   - AWS
   - サーバーレス
   - go-swagger
   - Terraform
   - 入門
-category:
+categories:
   - DevOps
 thumbnail: /images/2020/20200927/thumbnail.png
 author: 辻大志郎

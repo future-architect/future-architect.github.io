@@ -2,10 +2,10 @@
 title: "FigmaのOverlayに超入門してみた"
 date: 2022/04/18 00:00:01
 postid: b
-tag:
+tags:
   - Figma
   - 入門
-category:
+categories:
   - Mobile
 thumbnail: /images/2022/20220418b/thumbnail.png
 author: 真野隼記

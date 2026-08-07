@@ -2,13 +2,13 @@
 title: "【MLOps】 Azure Data FactoryとAzure Purviewを使ってAI Searchに登録してみた"
 date: 2025/05/12 00:00:01
 postid: b
-tag:
+tags:
   - MLOps
   - RAG
   - インターン
   - インターン2024
   - Azure
-category:
+categories:
   - DataScience
 thumbnail: /images/2025/20250512b/thumbnail.png
 author: 菅野滉大

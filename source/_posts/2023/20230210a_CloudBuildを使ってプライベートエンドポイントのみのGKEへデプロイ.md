@@ -2,12 +2,12 @@
 title: "CloudBuildを使ってプライベートエンドポイントのみのGKEへデプロイ"
 date: 2023/02/10 00:00:00
 postid: a
-tag:
+tags:
   - Kubernetes
   - GKE
   - GoogleCloud
   - CloudBuild
-category:
+categories:
   - DevOps
 thumbnail: /images/2023/20230210a/thumbnail.png
 author: 渡邉光

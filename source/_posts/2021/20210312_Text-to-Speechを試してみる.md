@@ -2,10 +2,10 @@
 title: "Text-to-Speechを試してみる"
 date: 2021/03/12 00:00:00
 postid: ""
-tag:
+tags:
   - GoogleCloud
   - TextToSpeech
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2021/20210312/thumbnail.png
 author: 村瀬善則

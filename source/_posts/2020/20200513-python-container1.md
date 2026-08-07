@@ -2,11 +2,11 @@
 title: "仕事でPythonコンテナをデプロイする人向けのDockerfile (1): オールマイティ編"
 date: 2020/05/13 08:56:40
 postid: ""
-tag:
+tags:
   - Docker
   - Python
   - コンテナビルド
-category:
+categories:
   - DevOps
 thumbnail: /images/2020/20200513/thumbnail.png
 author: 澁川喜規

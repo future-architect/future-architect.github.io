@@ -2,11 +2,11 @@
 title: "Foursquare - Location Matching 参加記 (7th / 1083)"
 date: 2022/07/20 00:00:00
 postid: a
-tag:
+tags:
   - Kaggle
   - TensorFlow
   - クラスタリング
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2022/20220720a/thumbnail.png
 author: 金子剛士

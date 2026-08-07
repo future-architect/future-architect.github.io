@@ -2,10 +2,10 @@
 title: "Engineer Camp 2022（プロパンガス配送計画の最適化に向けた数値データ解析）参戦記"
 date: 2022/09/14 00:00:00
 postid: a
-tag:
+tags:
   - インターン
   - インターン2022
-category:
+categories:
   - Culture
 thumbnail: /images/2022/20220914a/thumbnail.jpg
 author: 荒木太一

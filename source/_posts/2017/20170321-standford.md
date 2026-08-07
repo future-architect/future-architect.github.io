@@ -2,10 +2,10 @@
 title: "スタンフォード大学で食べたピーナッツサラダは、格別だった♥"
 date: 2017/03/21 12:00:00
 postid: ""
-tag:
+tags:
   - Elastic{ON}
   - デザイン思考
-category:
+categories:
   - Culture
 author: 前原応光
 lede: "Elastic{ON}への参加のためにサンフランシスコにやって来ましたので、まず現地レポートをお届けします！"

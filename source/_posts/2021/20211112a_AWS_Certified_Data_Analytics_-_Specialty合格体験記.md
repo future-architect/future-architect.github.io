@@ -2,11 +2,11 @@
 title: "AWS Certified Data Analytics - Specialty合格体験記"
 date: 2021/11/12 00:00:00
 postid: a
-tag:
+tags:
   - AWS
   - 合格記
   - データレイク
-category:
+categories:
   - DataEngineering
 thumbnail: /images/2021/20211112a/thumbnail.png
 author: 伊藤真彦

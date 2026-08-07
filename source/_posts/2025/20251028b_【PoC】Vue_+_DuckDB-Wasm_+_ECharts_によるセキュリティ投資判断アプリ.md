@@ -2,11 +2,11 @@
 title: "【PoC】Vue + DuckDB-Wasm + ECharts によるセキュリティ投資判断アプリ"
 date: 2025/10/28 00:00:01
 postid: b
-tag:
+tags:
   - Vue.js
   - 可視化
   - WebAssembly
-category:
+categories:
   - Frontend
 thumbnail: /images/2025/20251028b/thumbnail.png
 author: 松本朝香

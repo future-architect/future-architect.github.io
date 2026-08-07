@@ -2,12 +2,12 @@
 title: "GoとPoatgreSQLでCOPY"
 date: 2021/07/27 00:00:00
 postid: a
-tag:
+tags:
   - SQL
   - PostgreSQL
   - Go
   - jackc/pgx
-category:
+categories:
   - Programming
 thumbnail: /images/2021/20210727a/thumbnail.png
 author: 澁川喜規

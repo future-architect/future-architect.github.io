@@ -2,12 +2,12 @@
 title: "KMSで暗号化してLambdaで復号化する"
 date: 2021/04/13 00:00:00
 postid: "a"
-tag:
+tags:
   - Lambda
   - AWS
   - Terraform
   - 暗号
-category:
+categories:
   - Security
 thumbnail: /images/2021/20210413a/thumbnail.png
 author: 棚井龍之介

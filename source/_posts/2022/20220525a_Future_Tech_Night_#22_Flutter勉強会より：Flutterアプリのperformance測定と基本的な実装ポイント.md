@@ -2,12 +2,12 @@
 title: "Future Tech Night #22 Flutter勉強会より：Flutterアプリのperformance測定と基本的な実装ポイント"
 date: 2022/05/25 00:00:00
 postid: a
-tag:
+tags:
   - Flutter
   - プロファイリング
   - 性能検証
   - 登壇レポート
-category:
+categories:
   - Mobile
 thumbnail: /images/2022/20220525a/thumbnail.png
 author: 藤田春佳

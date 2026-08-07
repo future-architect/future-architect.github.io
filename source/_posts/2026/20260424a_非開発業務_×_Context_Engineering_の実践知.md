@@ -2,12 +2,12 @@
 title: "非開発業務 × Context Engineering の実践知"
 date: 2026/04/24 00:00:00
 postid: a
-tag:
+tags:
   - LLM
   - AIエージェント
   - コンテキストエンジニアリング
   - Copilot
-category:
+categories:
   - AIDD
 thumbnail: /images/2026/20260424a/thumbnail.png
 author: 星名藍乃介

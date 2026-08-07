@@ -2,12 +2,12 @@
 title: "FutureTechNight#20 TerraformState縛りの勉強会に登壇しました"
 date: 2022/03/30 00:00:00
 postid: a
-tag:
+tags:
   - Terraform
   - TechNight
   - 登壇レポート
   - tfstate
-category:
+categories:
   - DevOps
 thumbnail: /images/2022/20220330a/thumbnail.png
 author: 棚井龍之介

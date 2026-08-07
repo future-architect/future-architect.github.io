@@ -2,10 +2,10 @@
 title: "DynamoDB設計ガイドラインを公開しました"
 date: 2026/02/27 00:00:00
 postid: a
-tag:
+tags:
   - DynamoDB
   - ガイドライン
-category:
+categories:
   - DB
 thumbnail: /images/2026/20260227a/thumbnail.jpg
 author: 後藤玲雄

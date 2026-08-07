@@ -2,14 +2,14 @@
 title: "MONETマーケットプレイス × OSS活用でさっくりデモアプリ開発"
 date: 2021/08/26 00:00:00
 postid: a
-tag:
+tags:
   - MaaS
   - MONETマーケットプレイス
   - 外部寄稿
   - Vue.js
   - TypeScript
   - Vuetify
-category:
+categories:
   - Frontend
 thumbnail: /images/2021/20210826a/thumbnail.gif
 author: kazuma-takeuchi

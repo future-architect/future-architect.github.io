@@ -2,11 +2,11 @@
 title: "マネージャーがうれしいRedmineデータのグラフ表示方法を公開します！！"
 date: 2016/09/20 18:00:00
 postid: ""
-tag:
+tags:
   - Kibana
   - Redmine
   - 可視化
-category:
+categories:
   - Management
 thumbnail: /images/2016/20160920/thumbnail_20160920.jpg
 author: 近藤雅章

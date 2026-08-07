@@ -2,10 +2,10 @@
 title: "OpenAPI Generatorでrust-serverのコードを生成して、GET/POSTメソッドを呼び出すまで"
 date: 2022/08/31 00:00:00
 postid: a
-tag:
+tags:
   - OpenAPIGenerator
   - Rust
-category:
+categories:
   - Programming
 thumbnail: /images/2022/20220831a/thumbnail.png
 author: 中川旭

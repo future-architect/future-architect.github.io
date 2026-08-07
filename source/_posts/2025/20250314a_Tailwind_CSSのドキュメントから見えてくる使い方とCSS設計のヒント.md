@@ -2,10 +2,10 @@
 title: "Tailwind CSSのドキュメントから見えてくる使い方とCSS設計のヒント"
 date: 2025/03/14 00:00:00
 postid: a
-tag:
+tags:
   - TailwindCSS
   - CSS
-category:
+categories:
   - Frontend
 thumbnail: /images/2025/20250314a/thumbnail.png
 author: 澁川喜規

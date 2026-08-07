@@ -2,11 +2,11 @@
 title: "fromJsonをNamed ConstructorsでもStaticメソッドでもなく、factoryコンストラクタで書く理由"
 date: 2022/03/28 00:00:00
 postid: a
-tag:
+tags:
   - Flutter
   - Dart
   - コーディング規約
-category:
+categories:
   - Mobile
 thumbnail: /images/2022/20220328a/thumbnail.png
 author: 真野隼記

@@ -2,11 +2,11 @@
 title: "WebAssemblyとEmscriptenに入門した"
 date: 2023/05/17 00:00:00
 postid: a
-tag:
+tags:
   - 入門
   - WebAssembly
   - C/C++
-category:
+categories:
   - Frontend
 thumbnail: /images/2023/20230517a/thumbnail.png
 author: 森直也

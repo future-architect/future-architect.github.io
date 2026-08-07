@@ -2,12 +2,12 @@
 title: "VS CodeによるiOSアプリ開発入門〜ビルド＆ラン〜"
 date: 2025/04/25 00:00:00
 postid: a
-tag:
+tags:
   - VSCode
   - Swift
   - iOS
   - Xcode
-category:
+categories:
   - Mobile
 thumbnail: /images/2025/20250425a/thumbnail.png
 author: 清水雄一郎

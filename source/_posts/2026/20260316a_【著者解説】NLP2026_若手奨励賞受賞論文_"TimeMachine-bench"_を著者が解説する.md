@@ -2,10 +2,10 @@
 title: "【著者解説】NLP2026 若手奨励賞受賞論文 \"TimeMachine-bench\" を著者が解説する"
 date: 2026/03/16 00:00:00
 postid: a
-tag:
+tags:
   - NLP
   - 論文紹介
-category:
+categories:
   - DataScience
 thumbnail: /images/2026/20260316a/thumbnail.png
 author: 藤井諒

@@ -2,12 +2,12 @@
 title: "API GatewayとLambdaで実装するプライベートなMCPサーバー"
 date: 2026/03/24 00:00:00
 postid: a
-tag:
+tags:
   - MCP
   - Lambda
   - Dify
   - APIGateway
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2026/20260324a/thumbnail.png
 author: 木村太陽

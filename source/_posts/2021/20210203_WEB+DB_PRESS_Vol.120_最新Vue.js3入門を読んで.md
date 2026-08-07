@@ -2,12 +2,12 @@
 title: "WEB+DB PRESS Vol.120 最新Vue.js3入門を読んで"
 date: 2021/02/03 00:00:00
 postid: ""
-tag:
+tags:
   - Vue.js
   - Vue3
   - 書評
   - WEB+DBPRESS
-category:
+categories:
   - Frontend
 thumbnail: /images/2021/20210203/thumbnail.jpg
 author: 久保勇暉

@@ -2,11 +2,11 @@
 title: "FlutterをElectronと組み合わせる"
 date: 2021/12/28 00:00:00
 postid: a
-tag:
+tags:
   - Flutter
   - Electron
   - Dart
-category:
+categories:
   - Mobile
 thumbnail: /images/2021/20211228a/thumbnail.png
 author: 伊藤真彦

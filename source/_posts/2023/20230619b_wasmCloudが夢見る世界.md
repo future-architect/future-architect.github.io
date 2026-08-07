@@ -2,10 +2,10 @@
 title: "wasmCloudが夢見る世界"
 date: 2023/06/19 00:00:01
 postid: b
-tag:
+tags:
   - WebAssembly
   - CNCF
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2023/20230619b/thumbnail.png
 author: 澁川喜規

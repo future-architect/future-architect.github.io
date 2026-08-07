@@ -2,10 +2,10 @@
 title: "GCP Associate Cloud Engineer 合格記"
 date: 2021/06/25 00:00:00
 postid: a
-tag:
+tags:
   - GoogleCloud
   - 合格記
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2021/20210625a/thumbnail.png
 author: 鈴木崇史

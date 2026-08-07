@@ -2,12 +2,12 @@
 title: "Future社員が使っているWindows便利ツール（新人さん向け）"
 date: 2022/01/07 00:00:00
 postid: a
-tag:
+tags:
   - 便利ツール
   - 新人向け
   - 初心者向け
   - 環境構築
-category:
+categories:
   - Business
 thumbnail: /images/2022/20220107a/thumbnail.gif
 author: 青柳雄登

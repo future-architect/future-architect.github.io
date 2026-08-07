@@ -2,13 +2,13 @@
 title: "Difyで生成AIアプリケーション入門　後編：自作プログラムで機能追加して生成AIの指向性と精度を高める"
 date: 2024/04/04 00:00:00
 postid: a
-tag:
+tags:
   - 生成AI
   - Dify
   - ノーコード
   - Claude
   - Java
-category:
+categories:
   - DataScience
 thumbnail: /images/2024/20240404a/thumbnail.png
 author: 前川喜洋

@@ -2,12 +2,12 @@
 title: "MacをWindows/Linux風な操作感にする、Hammerspoonで始める環境構築"
 date: 2024/02/22 00:00:00
 postid: a
-tag:
+tags:
   - キーバインド
   - Mac
   - ショートカット
   - 環境構築
-category:
+categories:
   - DevOps
 thumbnail: /images/2024/20240222a/thumbnail.jpg
 author: 山本竜玄

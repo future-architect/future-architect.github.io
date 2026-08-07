@@ -2,12 +2,12 @@
 title: "GitLab CIを新人研修に導入した話"
 date: 2023/03/06 00:00:00
 postid: a
-tag:
+tags:
   - 新人研修
   - CI/CD
   - GitLab
   - GitLab CI
-category:
+categories:
   - DevOps
 thumbnail: /images/2023/20230306a/thumbnail.png
 author: 柳澤隆太郎

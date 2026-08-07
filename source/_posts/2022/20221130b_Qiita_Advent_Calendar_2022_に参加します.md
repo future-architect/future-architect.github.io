@@ -2,11 +2,11 @@
 title: "Qiita Advent Calendar 2022 に参加します"
 date: 2022/11/30 00:00:01
 postid: b
-tag:
+tags:
   - Qiita
   - アドベントカレンダー
   - インデックス
-category:
+categories:
   - Culture
 thumbnail: /images/2022/20221130b/thumbnail.png
 author: 伊藤太斉

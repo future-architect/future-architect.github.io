@@ -2,9 +2,9 @@
 title: "Prometheus/Grafanaを使ってみる"
 date: 2024/04/17 00:00:01
 postid: b
-tag:
+tags:
   - Grafana
-category:
+categories:
   - DevOps
 thumbnail: /images/2024/20240417b/thumbnail.png
 author: 伊藤太斉

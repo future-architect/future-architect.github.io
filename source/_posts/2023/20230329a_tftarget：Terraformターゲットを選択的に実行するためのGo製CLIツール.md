@@ -2,12 +2,12 @@
 title: "tftarget:Terraformターゲットを選択的に実行するためのGo製CLIツール"
 date: 2023/03/29 00:00:00
 postid: a
-tag:
+tags:
   - Terraform
   - OSS
   - CLI
   - Go
-category:
+categories:
   - DevOps
 thumbnail: /images/2023/20230329a/thumbnail.jpg
 author: 宮永崇史

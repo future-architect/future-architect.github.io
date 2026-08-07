@@ -2,12 +2,12 @@
 title: "ProxyとDockerと新人社員と時々わたし"
 date: 2020/10/20 00:00:00
 postid: ""
-tag:
+tags:
   - プロキシ
   - Docker
   - Network
   - DockerCompose
-category:
+categories:
   - DevOps
 thumbnail: /images/2020/20201020/thumbnail.png
 author: 栗田真

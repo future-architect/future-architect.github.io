@@ -2,12 +2,12 @@
 title: "はじめてのStreamlit with Google Cloud"
 date: 2025/04/22 00:00:00
 postid: a
-tag:
+tags:
   - GoogleCloud
   - CloudRun
   - Python
   - 可視化
-category:
+categories:
   - DataEngineering
 thumbnail: /images/2025/20250422a/thumbnail.png
 author: 柴田健太

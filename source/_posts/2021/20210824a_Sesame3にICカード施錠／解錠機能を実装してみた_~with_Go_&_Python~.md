@@ -2,11 +2,11 @@
 title: "Sesame3にICカード施錠/解錠機能を実装してみた with Go & Python"
 date: 2021/08/24 00:00:00
 postid: a
-tag:
+tags:
   - Go
   - Python
   - RaspberryPi
-category:
+categories:
   - IoT
 thumbnail: /images/2021/20210824a/thumbnail.png
 author: 宮永崇史

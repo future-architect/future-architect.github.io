@@ -2,13 +2,13 @@
 title: "PostgreSQL設計ガイドラインのご紹介"
 date: 2025/05/30 00:00:00
 postid: a
-tag:
+tags:
   - PostgreSQL
   - AWS
   - RDS
   - ガイドライン
   - データモデル
-category:
+categories:
   - DB
 thumbnail: /images/2025/20250530a/thumbnail.png
 author: 宮崎将太

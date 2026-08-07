@@ -2,12 +2,12 @@
 title: "GoogleWorkspace SDKのAPIリクエスト間隔は気を付けましょう"
 date: 2022/06/09 00:00:00
 postid: a
-tag:
+tags:
   - GoogleWorkspace
   - GoogleCloud
   - スロットリング
   - 失敗談
-category:
+categories:
   - Programming
 thumbnail: /images/2022/20220609a/thumbnail.png
 author: 岸下優介

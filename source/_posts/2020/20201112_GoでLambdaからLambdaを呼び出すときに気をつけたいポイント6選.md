@@ -2,12 +2,12 @@
 title: "GoでLambdaからLambdaを呼び出すときに気をつけたいポイント6選"
 date: 2020/11/12 00:00:00
 postid: ""
-tag:
+tags:
   - AWS
   - Go
   - Lambda
   - VPC
-category:
+categories:
   - Programming
 thumbnail: /images/2020/20201112/thumbnail.png
 author: 辻大志郎

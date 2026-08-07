@@ -2,9 +2,9 @@
 title: "Spring Boot マルチDataSource構成で secondary DB だけに Flyway を適用する"
 date: 2026/04/10 00:00:00
 postid: a
-tag:
+tags:
   - SpringBoot
-category:
+categories:
   - DB
 thumbnail: /images/2026/20260410a/thumbnail.png
 author: 二村暢之

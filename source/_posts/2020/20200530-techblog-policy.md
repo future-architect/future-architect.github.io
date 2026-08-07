@@ -2,10 +2,10 @@
 title: "フューチャー技術ブログの運営で心がけていること"
 date: 2020/05/30 13:28:08
 postid: ""
-tag:
+tags:
   - TechBlog
   - 運営
-category:
+categories:
   - Culture
 thumbnail: /images/2020/20200530/thumbnail.png
 author: 真野隼記

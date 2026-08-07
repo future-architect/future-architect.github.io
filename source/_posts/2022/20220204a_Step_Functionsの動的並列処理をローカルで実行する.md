@@ -2,14 +2,14 @@
 title: "Step Functionsの動的並列処理をローカルで実行する"
 date: 2022/02/04 00:00:00
 postid: a
-tag:
+tags:
   - LocalStack
   - StepFunctions
   - Lambda
   - Python
   - Pipenv
   - 並列処理
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2022/20220204a/thumbnail.png
 author: 宮永崇史

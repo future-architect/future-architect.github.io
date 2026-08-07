@@ -2,10 +2,10 @@
 title: "cfn-guardを使ってTerraformをポリシーチェックしようとした話"
 date: 2024/03/18 00:00:00
 postid: a
-tag:
+tags:
   - Terraform
   - Policy-as-Code
-category:
+categories:
   - DevOps
 thumbnail: /images/2024/20240318a/thumbnail.png
 author: 原木翔

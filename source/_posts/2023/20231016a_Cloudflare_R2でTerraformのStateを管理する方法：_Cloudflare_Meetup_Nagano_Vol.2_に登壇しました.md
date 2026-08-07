@@ -2,12 +2,12 @@
 title: "Cloudflare R2でTerraformのStateを管理する方法: Cloudflare Meetup Nagano Vol.2 に登壇しました"
 date: 2023/10/16 00:00:00
 postid: a
-tag:
+tags:
   - Cloudflare
   - Terraform
   - 登壇レポート
   - tfstate
-category:
+categories:
   - DevOps
 thumbnail: /images/2023/20231016a/thumbnail.png
 author: 伊藤太斉

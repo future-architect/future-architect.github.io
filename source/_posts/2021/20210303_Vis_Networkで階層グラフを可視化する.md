@@ -2,13 +2,13 @@
 title: "Vis Networkで階層グラフを可視化する"
 date: 2021/03/03 00:00:00
 postid: ""
-tag:
+tags:
   - 可視化
   - JavaScript
   - コアテク
   - 技術選定
   - 階層グラフ
-category:
+categories:
   - Frontend
 thumbnail: /images/2021/20210303/thumbnail.png
 author: 山田修路

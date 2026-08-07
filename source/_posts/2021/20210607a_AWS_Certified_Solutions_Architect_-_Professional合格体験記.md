@@ -2,10 +2,10 @@
 title: "AWS Certified Solutions Architect - Professional合格体験記"
 date: 2021/06/07 00:00:00
 postid: a
-tag:
+tags:
   - 合格記
   - AWS
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2021/20210607a/thumbnail.png
 author: 伊藤真彦

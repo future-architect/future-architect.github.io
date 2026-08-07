@@ -2,11 +2,11 @@
 title: "Future Tech Night(第6弾：GCP x インフラ構築編)を開催しました"
 date: 2021/03/06 00:00:00
 postid: ""
-tag:
+tags:
   - GoogleCloud
   - 登壇レポート
   - TechNight
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2021/20210306/thumbnail.png
 author: 村田靖拓

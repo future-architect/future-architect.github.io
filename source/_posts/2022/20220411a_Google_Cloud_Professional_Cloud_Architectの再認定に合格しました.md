@@ -2,10 +2,10 @@
 title: "Google Cloud Professional Cloud Architectの再認定に合格しました"
 date: 2022/04/11 00:00:00
 postid: a
-tag:
+tags:
   - GoogleCloud
   - 合格記
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2022/20220411a/thumbnail.png
 author: 伊藤太斉

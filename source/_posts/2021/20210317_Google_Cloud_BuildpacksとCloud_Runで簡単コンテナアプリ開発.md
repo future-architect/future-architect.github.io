@@ -2,13 +2,13 @@
 title: "Google Cloud BuildpacksとCloud Runで簡単コンテナアプリ開発"
 date: 2021/03/17 00:00:00
 postid: ""
-tag:
+tags:
   - GoogleCloud
   - Buildpacks
   - CloudRun
   - Docker
   - コンテナデプロイ
-category:
+categories:
   - DevOps
 thumbnail: /images/2021/20210317/thumbnail.png
 author: 伊藤太斉

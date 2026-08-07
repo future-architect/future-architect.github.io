@@ -2,12 +2,12 @@
 title: "Software Design 2024年9月号 Goのエラーハンドリングと向き合う ベストな設計戦略を徹底解剖を寄稿しました"
 date: 2024/08/27 00:00:00
 postid: a
-tag:
+tags:
   - SoftwareDesign
   - Go
   - 出版
   - エラーハンドリング
-category:
+categories:
   - Programming
 thumbnail: /images/2024/20240827a/thumbnail.png
 author: 後藤玲雄

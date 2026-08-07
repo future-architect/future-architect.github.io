@@ -2,13 +2,13 @@
 title: "Future Tech Night #9 ～運用で後悔しないためのAWS設計術～を開催しました。"
 date: 2021/05/27 00:00:00
 postid: a
-tag:
+tags:
   - AWS
   - TechNight
   - 保守運用
   - 登壇レポート
   - 設計
-category:
+categories:
   - DevOps
 thumbnail: /images/2021/20210527a/thumbnail.png
 author: 村瀬善則

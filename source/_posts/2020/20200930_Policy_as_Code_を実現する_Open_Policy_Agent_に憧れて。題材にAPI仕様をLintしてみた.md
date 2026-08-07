@@ -2,14 +2,14 @@
 title: "Policy as Code を実現する Open Policy Agent に憧れて。ポリシーコードでAPI仕様をLintする"
 date: 2020/09/30 00:00:00
 postid: ""
-tag:
+tags:
   - CNCF
   - OpenPolicyAgent
   - Swagger
   - OpenAPI
   - Go
   - Policy-as-Code
-category:
+categories:
   - DevOps
 thumbnail: /images/2020/20200930/thumbnail.png
 author: 真野隼記

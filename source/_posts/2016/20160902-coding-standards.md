@@ -2,10 +2,10 @@
 title: "システム屋さんがうれしいJava8対応のコーディング規約を公開します！！"
 date: 2016/09/02 13:00:00
 postid: ""
-tag:
+tags:
   - Java
   - コーディング規約
-category:
+categories:
   - Programming
 thumbnail: /images/2016/20160902/thumbnail_20160902.png
 author: 星賢一

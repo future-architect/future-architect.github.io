@@ -2,11 +2,11 @@
 title: "【Claude Design】インフラ構成のお絵描きからリソース実装までをClaudeで一本化してみた"
 date: 2026/05/01 00:00:00
 postid: a
-tag:
+tags:
   - ClaudeCode
   - Terraform
   - AWS
-category:
+categories:
   - AIDD
 thumbnail: /images/2026/20260501a/thumbnail.jpg
 author: 福島雅都

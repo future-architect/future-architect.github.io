@@ -2,11 +2,11 @@
 title: "フューチャー製OSSのreguerrに入門しつつ、エラーハンドリングしてPRあげてみた"
 date: 2022/04/19 00:00:00
 postid: a
-tag:
+tags:
   - Go
   - OSS
   - エラーハンドリング
-category:
+categories:
   - Programming
 thumbnail: /images/2022/20220419a/thumbnail.png
 author: 村田靖拓

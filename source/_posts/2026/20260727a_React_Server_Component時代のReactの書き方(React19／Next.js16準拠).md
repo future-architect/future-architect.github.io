@@ -2,11 +2,11 @@
 title: "React Server Component時代のReactの書き方(React19/Next.js16準拠)"
 date: 2026/07/27 00:00:00
 postid: a
-tag:
+tags:
   - Next.js
   - React
   - サーバーコンポーネント
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2026/20260727a/thumbnail.png
 author: 澁川喜規

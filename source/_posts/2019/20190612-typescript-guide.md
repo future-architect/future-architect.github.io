@@ -2,12 +2,12 @@
 title: "TypeScript教育用コンテンツ公開のお知らせ"
 date: 2019/06/12 15:04:53
 postid: ""
-tag:
+tags:
   - TypeScript
   - ガイドライン
   - 初心者向け
   - 入門
-category:
+categories:
   - Frontend
 author: 澁川喜規
 lede: "2019年頭より少しずつ書いていたTypeScriptの教育コンテンツをクリエイティブ・コモンズ4.0の表示 - 継承 （CC BY-SA 4.0）で公開します。といっても完成版ではなく、アーリーアクセス版のような品質であることをご了承ください。"

@@ -2,13 +2,13 @@
 title: "Google Cloud Next Tokyo '24 2日目参加レポート"
 date: 2024/08/05 00:00:00
 postid: a
-tag:
+tags:
   - GoogleCloud
   - GoogleCloudNext
   - GoogleCloudNext2024
   - 参加レポート
   - Spanner
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2024/20240805a/thumbnail.png
 author: 岸下優介

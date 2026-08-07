@@ -2,11 +2,11 @@
 title: "dbt Core × BigQueryを使ったデータ変換をやってみた"
 date: 2025/05/15 00:00:00
 postid: a
-tag:
+tags:
   - dbt
   - GoogleCloud
   - BigQuery
-category:
+categories:
   - DataEngineering
 thumbnail: /images/2025/20250515a/thumbnail.png
 author: 片岡久人

@@ -2,12 +2,12 @@
 title: "データベースマイグレーション ～OracleからPostgreSQLへ～　ー第１回ー"
 date: 2018/05/29 11:06:05
 postid: ""
-tag:
+tags:
   - PostgreSQL
   - Oracle
   - DB移行
   - 実行計画
-category:
+categories:
   - DB
 author: 岸田聡
 lede: "エンタープライズ領域においてマイグレーション例が多いOracleからPostgreSQLについて、考慮すべき事項について2回にわたり紹介します"

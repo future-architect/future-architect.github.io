@@ -2,10 +2,10 @@
 title: "AWS Certified Database - Specialty合格体験記"
 date: 2021/11/12 00:00:01
 postid: b
-tag:
+tags:
   - AWS
   - 合格記
-category:
+categories:
   - DB
 thumbnail: /images/2021/20211112b/thumbnail.png
 author: 伊藤真彦

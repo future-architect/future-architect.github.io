@@ -2,11 +2,11 @@
 title: "新人研修有志が初心者向けにバーチャルコンテストを実施しました & Tips"
 date: 2020/07/15 10:51:27
 postid: ""
-tag:
+tags:
   - 競技プログラミング
   - 新人研修
   - 社内勉強会
-category:
+categories:
   - Culture
 thumbnail: /images/2020/20200715/thumbnail.png
 author: 佐藤尭彰

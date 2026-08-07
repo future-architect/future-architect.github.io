@@ -2,10 +2,10 @@
 title: "Web API The Good Partsを読んだ感想"
 date: 2022/11/10 00:00:00
 postid: a
-tag:
+tags:
   - WebAPI
   - 書評
-category:
+categories:
   - Programming
 thumbnail: /images/2022/20221110a/thumbnail.png
 author: 藤戸四恩

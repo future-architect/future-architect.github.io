@@ -2,11 +2,11 @@
 title: "FlutterでMONETマーケットプレイスAPIを使ってみた"
 date: 2021/05/17 00:00:00
 postid: a
-tag:
+tags:
   - MONETマーケットプレイス
   - MaaS
   - Flutter
-category:
+categories:
   - Mobile
 thumbnail: /images/2021/20210517a/thumbnail.png
 author: 越島亮介

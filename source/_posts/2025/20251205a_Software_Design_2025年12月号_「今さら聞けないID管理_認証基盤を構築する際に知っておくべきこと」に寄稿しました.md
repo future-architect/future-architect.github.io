@@ -2,11 +2,11 @@
 title: "Software Design 2025年12月号 「今さら聞けないID管理 認証基盤を構築する際に知っておくべきこと」に寄稿しました"
 date: 2025/12/05 00:00:00
 postid: a
-tag:
+tags:
   - 出版
   - SoftwareDesign
   - Auth0
-category:
+categories:
   - 認証認可
 thumbnail: /images/2025/20251205a/thumbnail.png
 author: 藤井亮佑

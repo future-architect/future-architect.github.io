@@ -2,12 +2,12 @@
 title: "AWS Glue Data CatalogでCSVを扱う"
 date: 2021/10/06 00:00:00
 postid: a
-tag:
+tags:
   - Glue
   - Python
   - AWS
   - データカタログ
-category:
+categories:
   - DataEngineering
 thumbnail: /images/2021/20211006a/thumbnail.png
 author: 山田勇一

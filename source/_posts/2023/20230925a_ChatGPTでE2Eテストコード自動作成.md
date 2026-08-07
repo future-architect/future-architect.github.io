@@ -2,7 +2,7 @@
 title: "ChatGPTでE2Eテストコード自動作成"
 date: 2023/09/25 00:00:00
 postid: a
-tag:
+tags:
   - ChatGPT
   - プロンプトエンジニアリング
   - E2Eテスト
@@ -10,7 +10,7 @@ tag:
   - Playwright
   - Cypress
   - 登壇レポート
-category:
+categories:
   - AIDD
 thumbnail: /images/2023/20230925a/thumbnail.png
 author: 澁川喜規

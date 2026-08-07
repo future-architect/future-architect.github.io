@@ -2,10 +2,10 @@
 title: "GCP連載#8 gcloud compute sshじゃなくてsshコマンドを使いたいあなたへ"
 date: 2020/02/17 10:56:29
 postid: ""
-tag:
+tags:
   - GoogleCloud
   - 踏み台
-category:
+categories:
   - Infrastructure
 author: 木村拓海
 lede: "ssh先のGCEインスタンスとクライアント間で、キーペア(秘密鍵/公開鍵)の自動生成 -> GCEインスタンスへの鍵配置を自動で行ってくれて、ユーザーは鍵の存在を意識することなくsshできるコマンドですが、gcloud compute sshコマンドじゃなくて、素のsshコマンドでGCEインスタンスにsshしたい、という方もいらっしゃるのではないでしょうか。そんな方は、きっと ~/.ssh 配下に生成された秘密鍵 とホスト情報を ~/.ssh/config に手動で追加されていることでしょう。"

@@ -2,11 +2,11 @@
 title: "SpringBootで動的な条件をもとにDIしたい"
 date: 2022/07/29 00:00:00
 postid: a
-tag:
+tags:
   - SpringBoot
   - DI
   - Java
-category:
+categories:
   - Programming
 thumbnail: /images/2022/20220729a/thumbnail.png
 author: 澁川喜規

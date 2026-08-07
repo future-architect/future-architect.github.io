@@ -2,11 +2,11 @@
 title: "cf-terraformingで入門するCloudflare"
 date: 2023/05/02 00:00:00
 postid: a
-tag:
+tags:
   - Cloudflare
   - IaC
   - Terraform
-category:
+categories:
   - DevOps
 thumbnail: /images/2023/20230502a/thumbnail.png
 author: 伊藤太斉

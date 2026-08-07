@@ -2,13 +2,13 @@
 title: "Future Tech Night #14〜IDaaS/OSS/Managed比較〜"
 date: 2021/08/12 00:00:01
 postid: b
-tag:
+tags:
   - IDaaS
   - TechNight
   - 登壇レポート
   - Auth0
   - Keycloak
-category:
+categories:
   - 認証認可
 thumbnail: /images/2021/20210812b/thumbnail.jpg
 author: 山田勇一

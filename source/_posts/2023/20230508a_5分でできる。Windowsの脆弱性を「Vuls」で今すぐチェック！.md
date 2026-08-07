@@ -2,10 +2,10 @@
 title: 5分でできる。Windowsの脆弱性を「Vuls」で今すぐチェック！
 date: 2023/05/08 00:00:00
 postid: a
-tag:
+tags:
   - OSS
   - Vuls
-category:
+categories:
   - Security
 thumbnail: /images/2023/20230508a/vuls.png
 author: 島ノ江励

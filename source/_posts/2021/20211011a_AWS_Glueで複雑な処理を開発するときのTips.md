@@ -2,13 +2,13 @@
 title: "AWS Glueで複雑な処理を開発するときのTips"
 date: 2021/10/11 00:00:00
 postid: a
-tag:
+tags:
   - AWS
   - Glue
   - SQL
   - Athena
   - Tips
-category:
+categories:
   - DataEngineering
 thumbnail: /images/2021/20211011a/thumbnail.png
 author: 藤田春佳

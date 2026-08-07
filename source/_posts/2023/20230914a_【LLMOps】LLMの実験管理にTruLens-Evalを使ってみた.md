@@ -2,12 +2,12 @@
 title: "【LLMOps】LLMの実験管理にTruLens-Evalを使ってみた"
 date: 2023/09/14 00:00:00
 postid: a
-tag:
+tags:
   - LLM
   - MLOps
   - LLMOps
   - 実験管理
-category:
+categories:
   - DataScience
 thumbnail: /images/2023/20230914a/thumbnail.png
 author: 吉田尚暉

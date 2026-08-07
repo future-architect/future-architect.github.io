@@ -2,11 +2,11 @@
 title: "GCPのRegion間レイテンシからサービスのRegion集約を考察する"
 date: 2020/08/13 00:00:00
 postid: ""
-tag:
+tags:
   - GoogleCloud
   - Network
   - Terraform
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2020/20200813/thumbnail.png
 author: 西田好孝

@@ -2,12 +2,12 @@
 title: "2026年2月版: Dev Containersでプチはまり(Node.js 24とPostgreSQL 18とプロキシ)"
 date: 2026/02/13 00:00:00
 postid: a
-tag:
+tags:
   - Dev Containers
   - Node.js
   - PostgreSQL
   - プロキシ
-category:
+categories:
   - Programming
 thumbnail: /images/2026/20260213a/thumbnail.png
 author: 澁川喜規

@@ -2,10 +2,10 @@
 title: "Cloud Data Fusionで始めるETL入門"
 date: 2023/04/20 00:00:00
 postid: a
-tag:
+tags:
   - GoogleCloud
   - ETL
-category:
+categories:
   - DataEngineering
 thumbnail: /images/2023/20230420a/thumbnail.png
 author: 市川浩暉

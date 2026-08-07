@@ -2,14 +2,14 @@
 title: "DynamoDB×Go#3 Go CDKでどこまでいける？機能を調べてみた"
 date: 2020/02/28 10:13:26
 postid: ""
-tag:
+tags:
   - Go
   - AWS
   - DynamoDB×Go
   - DynamoDB
   - GoCDK
   - バッチ処理
-category:
+categories:
   - Programming
 thumbnail: /images/2020/20200228/thumbnail.png
 author: 真野隼記

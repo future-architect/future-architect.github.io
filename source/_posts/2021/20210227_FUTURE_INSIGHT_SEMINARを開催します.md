@@ -2,10 +2,10 @@
 title: "FUTURE INSIGHT SEMINARを開催します"
 date: 2021/02/27 00:00:00
 postid: ""
-tag:
+tags:
   - 最適化
   - コンサルティング
-category:
+categories:
   - Culture
 thumbnail: /images/2021/20210227/thumbnail.jpg
 author: 松本妹子

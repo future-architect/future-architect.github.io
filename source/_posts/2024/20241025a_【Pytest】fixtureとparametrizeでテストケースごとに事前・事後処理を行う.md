@@ -2,11 +2,11 @@
 title: "【Pytest】fixtureとparametrizeでテストケースごとに事前・事後処理を行う"
 date: 2024/10/25 00:00:00
 postid: a
-tag:
+tags:
   - Python
   - テスト
   - pytest
-category:
+categories:
   - Programming
 thumbnail: /images/2024/20241025a/thumbnail.png
 author: 原田達也

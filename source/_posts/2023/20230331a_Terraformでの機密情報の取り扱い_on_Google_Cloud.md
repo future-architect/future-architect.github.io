@@ -2,12 +2,12 @@
 title: "Terraformでの機密情報の取り扱い on Google Cloud"
 date: 2023/03/31 00:00:00
 postid: a
-tag:
+tags:
   - GoogleCloud
   - 暗号
   - Terraform
   - Terraform1.4
-category:
+categories:
   - Security
 thumbnail: /images/2023/20230331a/thumbnail.png
 author: 岸下優介

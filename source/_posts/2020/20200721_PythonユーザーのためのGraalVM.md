@@ -2,11 +2,11 @@
 title: PythonユーザーのためのGraalVM
 date: 2020/07/21 00:00:00
 postid: ""
-tag:
+tags:
   - GraalVM
   - Python
   - Java
-category:
+categories:
   - Programming
 thumbnail: /images/2020/20200721/thumbnail.png
 author: 澁川喜規

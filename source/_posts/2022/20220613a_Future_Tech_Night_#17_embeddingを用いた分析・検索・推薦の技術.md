@@ -2,14 +2,14 @@
 title: "Future Tech Night #17 embeddingを用いた分析・検索・推薦の技術"
 date: 2022/06/13 00:00:00
 postid: a
-tag:
+tags:
   - TensorFlow
   - NLP
   - embedding
   - 機械学習
   - TechNight
   - 登壇レポート
-category:
+categories:
   - DataScience
 thumbnail: /images/2022/20220613a/thumbnail.png
 author: 金子剛士

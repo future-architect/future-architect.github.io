@@ -2,10 +2,10 @@
 title: "Notary v2（Notation）によるコンテナイメージ署名"
 date: 2025/06/16 00:00:01
 postid: b
-tag:
+tags:
   - CNCF
   - コンテナ
-category:
+categories:
   - Security
 thumbnail: /images/2025/20250616b/thumbnail.png
 author: 真野隼記

@@ -2,13 +2,13 @@
 title: "AWS Lambdaのランタイムを provided.al2023 に更新する際、2バイナリをzipして対応してみた"
 date: 2024/02/26 00:00:00
 postid: a
-tag:
+tags:
   - Lambda
   - AWS
   - Makefile
   - バージョンアップ
   - リリース
-category:
+categories:
   - DevOps
 thumbnail: /images/2024/20240226a/thumbnail.png
 author: 真野隼記

@@ -2,12 +2,12 @@
 title: "Step Functions を利用して感じた Airflow との比較"
 date: 2022/01/11 00:00:00
 postid: a
-tag:
+tags:
   - AWS
   - 技術選定
   - StepFunctions
   - Airflow
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2022/20220111a/thumbnail.png
 author: 多賀聡一朗

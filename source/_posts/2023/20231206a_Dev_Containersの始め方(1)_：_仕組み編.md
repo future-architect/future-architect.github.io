@@ -2,13 +2,13 @@
 title: "Dev Containersの始め方(1) : 仕組み編"
 date: 2023/12/06 00:00:00
 postid: a
-tag:
+tags:
   - Dev Containers
   - Docker
   - VSCode
   - PyCon
   - 登壇レポート
-category:
+categories:
   - DevOps
 thumbnail: /images/2023/20231206a/thumbnail.jpg
 author: 澁川喜規

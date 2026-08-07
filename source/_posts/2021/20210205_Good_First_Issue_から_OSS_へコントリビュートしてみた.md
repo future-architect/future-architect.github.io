@@ -2,11 +2,11 @@
 title: "Good First Issue から OSS へコントリビュートしてみた"
 date: 2021/02/05 00:00:00
 postid: ""
-tag:
+tags:
   - OSS
   - OSSコントリビュート
   - go-swagger
-category:
+categories:
   - Programming
 thumbnail: /images/2021/20210205/thumbnail.png
 author: 多賀聡一朗

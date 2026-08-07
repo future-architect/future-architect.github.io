@@ -2,13 +2,13 @@
 title: "HTTP検索条件、GETにするか？POSTにするか？"
 date: 2021/05/18 00:00:00
 postid: a
-tag:
+tags:
   - HTTP
   - Web
   - WebAPI
   - 設計
   - RFC
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2021/20210518a/thumbnail.jpg
 author: 真野隼記

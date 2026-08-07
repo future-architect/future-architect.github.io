@@ -2,12 +2,12 @@
 title: "Azure BicepリンターでBicepコードを最新化：効率的なリファクタリング手法"
 date: 2025/05/09 00:00:01
 postid: b
-tag:
+tags:
   - Azure
   - IaC
   - Linter
   - FutureOne
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2025/20250509b/thumbnail.png
 author: 三浦克之

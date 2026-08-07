@@ -2,9 +2,9 @@
 title: "S3 TablesのIceberg形式で、timestamptz型の登録に苦戦した話"
 date: 2026/07/02 00:00:00
 postid: a
-tag:
+tags:
   - S3
-category:
+categories:
   - Programming
 thumbnail: /images/2026/20260702a/thumbnail.png
 author: 鈴木風真

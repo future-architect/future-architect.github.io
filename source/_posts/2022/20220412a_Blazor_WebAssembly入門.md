@@ -2,10 +2,10 @@
 title: "Blazor WebAssembly入門"
 date: 2022/04/12 00:00:00
 postid: a
-tag:
+tags:
   - WebAssembly
   - C#
-category:
+categories:
   - Frontend
 thumbnail: /images/2022/20220412a/thumbnail.png
 author: 清水

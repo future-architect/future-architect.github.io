@@ -2,11 +2,11 @@
 title: "WSLで始めるサーバーサイドSwift 入門 ～Hummingbird～"
 date: 2024/04/18 00:00:00
 postid: a
-tag:
+tags:
   - Swift
   - WSL
   - Ubuntu
-category:
+categories:
   - Mobile
 thumbnail: /images/2024/20240418a/thumbnail.png
 author: 清水雄一郎

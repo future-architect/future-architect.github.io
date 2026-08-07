@@ -2,11 +2,11 @@
 title: "Go Tips連載6: Error wrappingされた各クラウドSDKの独自型エラーを扱う"
 date: 2020/05/23 11:12:30
 postid: ""
-tag:
+tags:
   - Go
   - GoTips連載
   - エラーハンドリング
-category:
+categories:
   - Programming
 thumbnail: /images/2020/20200523/thumbnail.png
 author: 真野隼記

@@ -2,11 +2,11 @@
 title: "GCP連載#7 GCPのData Transfer Serviceを使って簡単にS3からBigQueryにデータ転送をしてみる"
 date: 2020/02/14 09:39:28
 postid: ""
-tag:
+tags:
   - GoogleCloud
   - S3
   - BigQuery
-category:
+categories:
   - DataEngineering
 author: 加部達郎
 lede: "突然ですがAWSを利用しているけどビッグデータの蓄積や解析はBigQueryで実施したい、なんて意見も最近多くなってきているようですね。実際にS3からBigQueryのデータ転送について検索すると、自前でデータ転送を作成してみましたや、データ転送をサービスとして販売しているような会社もあります。そんな中GCPが提供しているBigQeryへのデータ転送サービスDataTransferServiceのソース元としてS3が追加され、簡単にS3からBigQueryのデータ転送のジョブを作成できるようになりました。"

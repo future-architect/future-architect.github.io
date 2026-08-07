@@ -2,14 +2,14 @@
 title: "AWS初心者向けNW構築ハンズオン-Internal編-"
 date: 2021/08/31 00:00:00
 postid: a
-tag:
+tags:
   - AWS
   - Network
   - 初心者向け
   - VPC
   - トラブルシュート
   - ハンズオン
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2021/20210831a/thumbnail.png
 author: 加藤周平

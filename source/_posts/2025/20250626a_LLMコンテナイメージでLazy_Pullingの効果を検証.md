@@ -2,14 +2,14 @@
 title: "LLMコンテナイメージでLazy Pullingの効果を検証"
 date: 2025/06/26 00:00:00
 postid: a
-tag:
+tags:
   - LLM
   - コンテナ
   - Docker
   - KubeCon
   - CNCF
   - ECS
-category:
+categories:
   - DevOps
 thumbnail: /images/2025/20250626a/thumbnail.png
 author: 鈴木崇史

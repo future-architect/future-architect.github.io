@@ -2,11 +2,11 @@
 title: "Goならわかるシステムプログラミングが増刷されて初版4刷になりました"
 date: 2020/04/27 10:03:55
 postid: ""
-tag:
+tags:
   - Go
   - 出版
   - システムコール
-category:
+categories:
   - Programming
 thumbnail: /images/2020/20200427/thumbnail.jpeg
 author: 澁川喜規

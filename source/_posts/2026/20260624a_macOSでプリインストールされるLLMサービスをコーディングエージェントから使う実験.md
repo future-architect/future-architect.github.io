@@ -2,10 +2,10 @@
 title: "macOSでプリインストールされるLLMサービスをコーディングエージェントから使う実験"
 date: 2026/06/24 00:00:00
 postid: a
-tag:
+tags:
   - Mac
   - LLM
-category:
+categories:
   - AIDD
 thumbnail: /images/2026/20260624a/thumbnail.png
 author: 澁川喜規

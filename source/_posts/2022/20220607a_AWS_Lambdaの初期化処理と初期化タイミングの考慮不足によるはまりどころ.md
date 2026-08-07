@@ -2,12 +2,12 @@
 title: "AWS Lambdaの初期化処理と初期化タイミングの考慮不足によるはまりどころ"
 date: 2022/06/07 00:00:00
 postid: a
-tag:
+tags:
   - AWS
   - 失敗談
   - Lambda
   - TCP/IP
-category:
+categories:
   - Programming
 thumbnail: /images/2022/20220607a/thumbnail.png
 author: 辻大志郎

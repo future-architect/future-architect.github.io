@@ -2,14 +2,14 @@
 title: AWSサービストリガによるLambda起動
 date: 2020/07/22 00:00:00
 postid: ""
-tag:
+tags:
   - AWS
   - サーバーレス
   - LocalStack
   - Lambda
   - DynamoDB
   - Go
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2020/20200722/thumbnail.png
 author: 加部達郎

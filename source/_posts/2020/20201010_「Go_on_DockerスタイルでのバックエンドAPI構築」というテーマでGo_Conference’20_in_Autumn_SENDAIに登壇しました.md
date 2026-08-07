@@ -2,13 +2,13 @@
 title: "「Go on DockerスタイルでのバックエンドAPI構築」というテーマでGo Conference’20 in Autumn SENDAIに登壇しました"
 date: 2020/10/10 00:00:00
 postid: ""
-tag:
+tags:
   - Go
   - GoConference
   - Docker
   - 登壇レポート
   - カンファレンス
-category:
+categories:
   - DevOps
 thumbnail: /images/2020/20201010/thumbnail.png
 author: 伊藤真彦

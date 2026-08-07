@@ -2,10 +2,10 @@
 title: "Docker Desktop有償化！どのライセンス契約する？"
 date: 2022/01/24 00:00:00
 postid: a
-tag:
+tags:
   - Docker
   - ライセンス
-category:
+categories:
   - DevOps
 thumbnail: /images/2022/20220124a/thumbnail.png
 author: 澁川喜規

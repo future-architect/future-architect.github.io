@@ -2,13 +2,13 @@
 title: "Future Tech Night #19 CodePipelineを用いたECS on EC2でのBlue/Greenデプロイメント"
 date: 2022/03/14 00:00:00
 postid: a
-tag:
+tags:
   - 登壇レポート
   - TechNight
   - AWS
   - ECS
   - リリース
-category:
+categories:
   - DevOps
 thumbnail: /images/2022/20220314a/thumbnail.png
 author: 渡邉光

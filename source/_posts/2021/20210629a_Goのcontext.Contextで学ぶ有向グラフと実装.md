@@ -2,11 +2,11 @@
 title: "Goのcontext.Contextで学ぶ有向グラフと実装"
 date: 2021/06/29 00:00:00
 postid: a
-tag:
+tags:
   - アルゴリズム
   - Go
   - context
-category:
+categories:
   - Programming
 thumbnail: /images/2021/20210629a/thumbnail.png
 author: 辻大志郎

@@ -2,12 +2,12 @@
 title: "PostgreSQL拡張機能のPLV8を使ってみた"
 date: 2024/08/30 00:00:00
 postid: a
-tag:
+tags:
   - PostgreSQL
   - JavaScript
   - TypeScript
   - Vite
-category:
+categories:
   - DB
 thumbnail: /images/2024/20240830a/thumbnail.png
 author: 岸本卓也

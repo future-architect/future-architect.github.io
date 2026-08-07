@@ -2,11 +2,11 @@
 title: "Goで作ったロジックにWebUIをつけてGitHubページに公開する"
 date: 2022/10/24 00:00:00
 postid: a
-tag:
+tags:
   - Next.js
   - Go
   - WebAssembly
-category:
+categories:
   - Frontend
 thumbnail: /images/2022/20221024a/thumbnail.png
 author: 澁川喜規

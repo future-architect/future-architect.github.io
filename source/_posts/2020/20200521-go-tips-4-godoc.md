@@ -2,12 +2,12 @@
 title: "Go Tips連載4: GoDocの読み方"
 date: 2020/05/21 22:23:40
 postid: ""
-tag:
+tags:
   - Go
   - GoDoc
   - ドキュメント
   - GoTips連載
-category:
+categories:
   - Programming
 thumbnail: /images/2020/20200521/thumbnail.png
 author: 澁川喜規

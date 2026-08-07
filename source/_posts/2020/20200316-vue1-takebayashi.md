@@ -2,11 +2,11 @@
 title: "その値、Vue.jsは監視していますか？～Vue.jsで値が更新されないときに気をつけるところ～"
 date: 2020/03/16 11:49:57
 postid: ""
-tag:
+tags:
   - Vue.js
   - 初心者向け
   - トラブルシュート
-category:
+categories:
   - Frontend
 author: 竹林康太
 lede: "私がVue.jsをキャッチアップしていく過程の中で遭遇したトラブルに関する解決方法を共有します。"

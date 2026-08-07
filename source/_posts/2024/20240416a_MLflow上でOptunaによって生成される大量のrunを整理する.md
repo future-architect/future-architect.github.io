@@ -2,11 +2,11 @@
 title: "MLflow上でOptunaによって生成される大量のrunを整理する"
 date: 2024/04/16 00:00:00
 postid: a
-tag:
+tags:
   - MLOps
   - MLflow
   - Python
-category:
+categories:
   - DataScience
 thumbnail: /images/2024/20240416a/thumbnail.png
 author: 齋藤智和

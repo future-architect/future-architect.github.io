@@ -2,11 +2,11 @@
 title: "uroborosql-fmtにおける2WaySQLフォーマット (後編: 結果検証編)"
 date: 2024/10/21 00:00:00
 postid: a
-tag:
+tags:
   - uroboroSQL
   - フォーマッター
   - Rust
-category:
+categories:
   - Programming
 thumbnail: /images/2024/20241021a/thumbnail.png
 author: 齋藤俊哉

@@ -2,14 +2,14 @@
 title: "DynamoDBをS3へExportして、Glue+AthenaでSQLを実行する"
 date: 2021/04/03 00:00:00
 postid: ""
-tag:
+tags:
   - DynamoDB
   - S3
   - Glue
   - Athena
   - AWS
   - SQL
-category:
+categories:
   - DataEngineering
 thumbnail: /images/2021/20210403/thumbnail.png
 author: 棚井龍之介

@@ -2,12 +2,12 @@
 title: "go-smtp-mockをSMTPのモックサーバにして単体テストする"
 date: 2024/07/10 00:00:00
 postid: a
-tag:
+tags:
   - テスト
   - メール
   - Go
   - モック
-category:
+categories:
   - Programming
 thumbnail: /images/2024/20240710a/thumbnail.png
 author: 真野隼記

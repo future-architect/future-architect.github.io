@@ -2,12 +2,12 @@
 title: "VPC外からCloud SQL Auth Proxyを利用したPrivate IP Cloud SQLへの接続"
 date: 2023/10/19 00:00:00
 postid: a
-tag:
+tags:
   - CloudSQL
   - GoogleCloud
   - IAM
   - プロキシ
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2023/20231019a/thumbnail.png
 author: 岸下優介

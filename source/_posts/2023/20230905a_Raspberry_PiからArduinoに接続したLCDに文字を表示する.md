@@ -2,12 +2,12 @@
 title: "Raspberry PiからArduinoに接続したLCDに文字を表示する"
 date: 2023/09/05 00:00:00
 postid: a
-tag:
+tags:
   - RaspberryPi
   - Arduino
   - 初心者向け
   - 電子工作
-category:
+categories:
   - IoT
 thumbnail: /images/2023/20230905a/thumbnail.png
 author: 水田祐介

@@ -2,13 +2,13 @@
 title: "Real World HTTP 第2版はなぜ1.5倍になったのか"
 date: 2020/04/21 09:55:14
 postid: ""
-tag:
+tags:
   - 出版
   - Web
   - HTTP
   - O'Reilly
   - RealWorldHTTP
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2020/20200421/thumbnail.jpeg
 author: 澁川喜規

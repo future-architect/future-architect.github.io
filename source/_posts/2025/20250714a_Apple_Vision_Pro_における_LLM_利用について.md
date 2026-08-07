@@ -2,11 +2,11 @@
 title: "Apple Vision Pro における LLM 利用について"
 date: 2025/07/14 00:00:00
 postid: a
-tag:
+tags:
   - VisionPro
   - LLM
   - Apple
-category:
+categories:
   - VR
 thumbnail: /images/2025/20250714a/thumbnail.png
 author: 山本力世

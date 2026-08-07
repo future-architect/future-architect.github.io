@@ -2,11 +2,11 @@
 title: AWS認定 Machine learning specialty 合格記
 date: 2020/07/29 00:00:00
 postid: ""
-tag:
+tags:
   - AWS
   - 機械学習
   - 合格記
-category:
+categories:
   - DataScience
 thumbnail: /images/2020/20200729/thumbnail.png
 author: 伊藤真彦

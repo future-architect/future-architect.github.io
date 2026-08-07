@@ -2,11 +2,11 @@
 title: "技術書は「読む」から「呼び出す」へ：ACM経由のO'Reilly Online Learning契約とMCP連携の実践"
 date: 2026/05/13 00:00:00
 postid: a
-tag:
+tags:
   - O'Reilly
   - ClaudeCode
   - MCP
-category:
+categories:
   - AIDD
 thumbnail: /images/2026/20260513a/thumbnail.png
 author: 棚井龍之介

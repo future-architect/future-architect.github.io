@@ -2,12 +2,12 @@
 title: "C/C++を呼び出しているRustのWASM化"
 date: 2023/06/05 00:00:00
 postid: a
-tag:
+tags:
   - WebAssembly
   - Rust
   - C/C++
   - tree-sitter
-category:
+categories:
   - Programming
 thumbnail: /images/2023/20230602a/thumbnail.png
 author: 川渕皓太

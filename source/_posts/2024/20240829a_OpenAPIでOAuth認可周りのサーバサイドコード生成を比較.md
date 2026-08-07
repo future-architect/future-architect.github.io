@@ -2,7 +2,7 @@
 title: "OpenAPIでOAuth認可周りのサーバサイドコード生成を比較"
 date: 2024/08/29 00:00:00
 postid: a
-tag:
+tags:
   - OpenAPI
   - OAuth
   - OIDC
@@ -10,7 +10,7 @@ tag:
   - OpenSSL
   - OpenAPIGenerator
   - JWT
-category:
+categories:
   - 認証認可
 thumbnail: /images/2024/20240829a/thumbnail.png
 author: 真野隼記

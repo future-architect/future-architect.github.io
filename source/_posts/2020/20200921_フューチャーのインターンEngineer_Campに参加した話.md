@@ -2,11 +2,11 @@
 title: "フューチャーのインターンEngineer Camp2020（モビリティサービスプラットフォーム）に参加した話"
 date: 2020/09/21 00:00:00
 postid: ""
-tag:
+tags:
   - インターン
   - インターン2020
   - MaaS
-category:
+categories:
   - Culture
 thumbnail: /images/2020/20200921/thumbnail.png
 author: 岡部公亮

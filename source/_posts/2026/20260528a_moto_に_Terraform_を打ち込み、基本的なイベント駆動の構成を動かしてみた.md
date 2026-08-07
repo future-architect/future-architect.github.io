@@ -2,10 +2,10 @@
 title: "moto に Terraform を打ち込み、基本的なイベント駆動の構成を動かしてみた"
 date: 2026/05/28 00:00:00
 postid: a
-tag:
+tags:
   - Terraform
   - モック
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2026/20260528a/thumbnail.png
 author: 市川裕也

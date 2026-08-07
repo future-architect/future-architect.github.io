@@ -2,13 +2,13 @@
 title: "【Terraform】プロビジョニングとはなんぞや？"
 date: 2025/04/03 00:00:00
 postid: a
-tag:
+tags:
   - Terraform
   - 初心者向け
   - AWS
   - Ansible
   - 用語解説
-category:
+categories:
   - DevOps
 thumbnail: /images/2025/20250403a/thumbnail.png
 author:  森友雅

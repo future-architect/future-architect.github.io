@@ -2,12 +2,12 @@
 title: "AWS CLIで用いるMFAをちょっとだけ便利に扱えるツールを公開しました"
 date: 2021/04/26 00:00:00
 postid: a
-tag:
+tags:
   - AWS
   - IAM
   - OSS
   - Go
-category:
+categories:
   - Security
 thumbnail: /images/2021/20210426a/thumbnail.jpg
 author: 辻大志郎

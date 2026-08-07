@@ -2,12 +2,12 @@
 title: "夏の自由研究：CreateMLを使ってカブトムシを分類するミニアプリを作ってみる。"
 date: 2023/08/31 00:00:00
 postid: a
-tag:
+tags:
   - Swift
   - iOS
   - 機械学習
   - 画像処理
-category:
+categories:
   - Mobile
 thumbnail: /images/2023/20230831a/thumbnail.png
 author: 橋本竜我

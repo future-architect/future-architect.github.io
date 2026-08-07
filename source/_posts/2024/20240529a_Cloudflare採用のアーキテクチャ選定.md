@@ -2,12 +2,12 @@
 title: "Cloudflare採用のアーキテクチャ選定"
 date: 2024/05/29 00:00:00
 postid: a
-tag:
+tags:
   - Cloudflare
   - アーキテクチャ
   - CDN
   - WAF
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2024/20240529a/thumbnail.png
 author: 宮崎将太

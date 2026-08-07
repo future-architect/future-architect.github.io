@@ -2,13 +2,13 @@
 title: "自宅だと apt update ができなかった話（WSL2 + 社内VPN環境での名前解決の遅延）"
 date: 2026/04/21 00:00:01
 postid: b
-tag:
+tags:
   - WSL
   - VPN
   - Ubuntu
   - 環境構築
   - トラブルシュート
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2026/20260421b/thumbnail.png
 author: 清水雄一郎

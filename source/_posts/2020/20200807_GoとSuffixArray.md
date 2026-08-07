@@ -2,11 +2,11 @@
 title: GoとSuffixArray
 date: 2020/08/07 00:00:00
 postid: ""
-tag:
+tags:
   - Go
   - アルゴリズム
   - 文字列処理
-category:
+categories:
   - Programming
 thumbnail: /images/2020/20200807/thumbnail.png
 author: 辻大志郎

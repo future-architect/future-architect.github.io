@@ -2,12 +2,12 @@
 title: "Transformerの文章生成の仕組みを理解する"
 date: 2025/02/26 00:00:00
 postid: a
-tag:
+tags:
   - AI
   - LLM
   - Transformer
   - 論文紹介
-category:
+categories:
   - DataScience
 thumbnail: /images/2025/20250226a/thumbnail.jpg
 author: 森友雅

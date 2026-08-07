@@ -2,10 +2,10 @@
 title: "protoファイルからコードを自動生成するprotocのプラグインの作り方"
 date: 2024/06/04 00:00:00
 postid: a
-tag:
+tags:
   - gRPC
   - ProtocolBuffers
-category:
+categories:
   - Programming
 thumbnail: /images/2024/20240604a/thumbnail.jpg
 author: 関靖秀

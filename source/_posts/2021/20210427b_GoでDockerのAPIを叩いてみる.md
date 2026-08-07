@@ -2,14 +2,14 @@
 title: "GoでDockerのAPIを叩いてみる"
 date: 2021/04/27 00:00:03
 postid: b
-tag:
+tags:
   - Docker
   - TechNight
   - 登壇レポート
   - Go
   - OSS
   - ログ
-category:
+categories:
   - DevOps
 thumbnail: /images/2021/20210427b/thumbnail.png
 author: 澁川喜規

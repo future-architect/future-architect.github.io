@@ -2,10 +2,10 @@
 title: "EDIFACTメッセージ処理をJavaでスクラッチ実装した試行錯誤"
 date: 2026/01/14 00:00:00
 postid: a
-tag:
+tags:
   - Java
   - 業界ドメイン
-category:
+categories:
   - IoT
 thumbnail: /images/2026/20260114a/thumbnail.jpg
 author: 辻大志郎

@@ -2,11 +2,11 @@
 title: "DJI Mobile SDKのサンプルコードでシミュレータを動かしてみる"
 date: 2024/05/21 00:00:00
 postid: a
-tag:
+tags:
   - エミュレータ
   - Android
   - ドローン
-category:
+categories:
   - Mobile
 thumbnail: /images/2024/20240521a/thumbnail.png
 author: 大前七奈

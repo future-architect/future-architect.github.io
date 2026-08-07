@@ -2,14 +2,14 @@
 title: "GoでMQTT!!　～温湿度マイスターbotの作成～(前編)"
 date: 2021/09/29 00:00:00
 postid: a
-tag:
+tags:
   - AWSIoT
   - RaspberryPi
   - Python
   - MQTT
   - BOT
   - ハンズオン
-category:
+categories:
   - IoT
 thumbnail: /images/2021/20210929a/thumbnail.png
 author: 宮永崇史

@@ -2,11 +2,11 @@
 title: "実験して入門するKubernetes：Pod起動の裏側を追っていたら、どうしてもSchedulerを止めてみたくなった件"
 date: 2026/03/25 00:00:00
 postid: a
-tag:
+tags:
   - Kubernetes
   - Minikube
   - 初心者向け
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2026/20260325a/thumbnail.jpg
 author: 内堀航輝

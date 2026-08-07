@@ -2,10 +2,10 @@
 title: "【合格記】Google Cloud Professional Developer認定資格を振り返る"
 date: 2024/01/17 00:00:00
 postid: a
-tag:
+tags:
   - GoogleCloud
   - 合格記
-category:
+categories:
   - Infrastructure
 thumbnail: /images/2024/20240117a/thumbnail.png
 author: 岸下優介

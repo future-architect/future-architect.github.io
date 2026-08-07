@@ -2,12 +2,12 @@
 title: "WordPressの脆弱性への攻撃とセキュリティ対策の実施"
 date: 2022/04/14 00:00:00
 postid: a
-tag:
+tags:
   - 脆弱性
   - Vuls
   - FutureVuls
   - JVN
-category:
+categories:
   - Security
 thumbnail: /images/2022/20220414a/thumbnail.png
 author: 八田奈子

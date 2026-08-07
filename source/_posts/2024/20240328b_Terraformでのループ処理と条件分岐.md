@@ -2,10 +2,10 @@
 title: "Terraformでのループ処理と条件分岐"
 date: 2024/03/28 00:00:01
 postid: b
-tag:
+tags:
   - Terraform
   - 初心者向け
-category:
+categories:
   - DevOps
 thumbnail: /images/2024/20240328b/thumbnail.png
 author: 小林弘樹
