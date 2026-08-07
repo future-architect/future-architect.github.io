@@ -8,6 +8,7 @@ tags:
   - 静的解析
 categories:
   - DevOps
+series: "CI/CD"
 thumbnail: /images/2025/20250619a/thumbnail.png
 author: 松本朝香
 lede: １か月前、情報安全確保支援士を受験してきまして、問題の選択肢にあった SonarQube という初耳ワードがどんなOSSなのか気になりました。タイミングよくこの『CI/CD
@@ -15,7 +16,7 @@ lede: １か月前、情報安全確保支援士を受験してきまして、�
 
 ---
 
-[CI/CD連載](/articles/20250603a/) 4本目の記事です。
+[CI/CD連載](/articles/20250603a/) 5本目の記事です。
 
 # はじめに
 

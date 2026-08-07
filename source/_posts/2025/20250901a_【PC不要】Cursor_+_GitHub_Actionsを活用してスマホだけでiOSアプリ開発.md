@@ -11,6 +11,7 @@ tags:
   - アプリストア審査
 categories:
   - AIDD
+series: "夏の自由研究2025"
 thumbnail: /images/2025/20250901a/thumbnail.png
 author: 清水雄一郎
 lede: "スマホだけでスマホアプリ作れたらカッコよくないですか？楽しそうですよね？PCを触らずスマホ縛りというルールで開発したアプリは、こちらです。"

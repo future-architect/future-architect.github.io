@@ -9,6 +9,7 @@ tags:
   - CI/CD
 categories:
   - DevOps
+series: "Terraform2023"
 thumbnail: /images/2023/20230405a/thumbnail.png
 author: 前原応光
 lede: "今までは、GitLab でTerraform を利用する機会が多かったのですが、今回は、GitHub Actions を利用することになりました。そこで実施した内容をこの記事に書いていきたいと思います。"

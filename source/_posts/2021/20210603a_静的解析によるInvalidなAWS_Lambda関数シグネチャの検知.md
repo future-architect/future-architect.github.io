@@ -9,6 +9,7 @@ tags:
   - 静的解析
 categories:
   - Programming
+series: "サーバレス2021"
 thumbnail: /images/2021/20210603a/thumbnail.jpg
 author: 辻大志郎
 lede: "AWS Lambdaの関数シグネチャを静的解析することで、より安全にAWS Lambdaを実装する方法を紹介します。"

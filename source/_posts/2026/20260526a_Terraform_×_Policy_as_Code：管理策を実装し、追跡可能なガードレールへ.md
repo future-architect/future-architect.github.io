@@ -7,6 +7,7 @@ tags:
   - Policy-as-Code
 categories:
   - Infrastructure
+series: "Terraform2026"
 thumbnail: /images/2026/20260526a/thumbnail.jpg
 author: 棚井龍之介
 lede: "「PaC は管理策を実装するのである。通常、PaC が実装する管理は、組織が作成または採用した標準に由来する。これらの統制は、追跡可能で監査可能でなければならない。」"

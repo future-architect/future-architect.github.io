@@ -6,8 +6,10 @@ tags:
   - PostgreSQL
   - PostgreSQL18
   - UUID
+  - インデックス
 categories:
   - DB
+series: "PostgreSQL18リリース"
 thumbnail: /images/2025/20251006a/thumbnail.png
 author: 澁川喜規
 lede: "PostgreSQL 18ではUUIDv7生成に対応しました。今までのUUID v4(完全ランダム)は主キーとして使うと、ソート順で扱おうとするPostgreSQLの内部構造のB-Treeと相性が悪く..."

@@ -7,6 +7,7 @@ tags:
   - 保守運用
 categories:
   - DevOps
+series: "秋のブログ週間2022"
 thumbnail: /images/2022/20221107a/thumbnail.png
 author: 岸下優介
 lede: "最近、Netflixで配信中のSpotify創業ドキュメンタリー：The Playlistを見ました。そんなわけでSpotify熱が高まっていたこと、自分がプロジェクトの方でSRE活動に関わっていることもあり.."

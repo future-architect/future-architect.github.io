@@ -7,6 +7,7 @@ tags:
   - Linux
 categories:
   - Infrastructure
+series: "シェルスクリプト"
 thumbnail: /images/2021/20210401/thumbnail.png
 author: 市川諒
 lede: "過去Shell Scriptでゴリゴリスクリプトを書いたりしていましたが（環境が許せば）Pythonで書くことが個人的に増えてきました。いざShell Scriptに戻ってきたときに配列と連想配列について調べ直すコトがままあったので、ここに記したいと思います。"

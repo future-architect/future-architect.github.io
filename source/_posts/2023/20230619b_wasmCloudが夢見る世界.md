@@ -7,6 +7,7 @@ tags:
   - CNCF
 categories:
   - Infrastructure
+series: "CNCF2023"
 thumbnail: /images/2023/20230619b/thumbnail.png
 author: 澁川喜規
 lede: "サーバーレスのランタイムに興味があり、CNCFのプロジェクトを見たところ、それに関連しそうなwasmCloudというものがあったので見てみました。ぱっと見wasmで書いたロジックを実行するフレームワークに見えますが、wasm製アプリケーションのためのOSのようなものです。"

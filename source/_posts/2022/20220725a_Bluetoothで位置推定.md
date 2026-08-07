@@ -8,13 +8,14 @@ tags:
   - 位置特定
 categories:
   - IoT
+series: "地図・GIS・位置特定"
 thumbnail: /images/2022/20220725a/thumbnail.png
 author: 岸下優介
 lede: "マイコンとか電子工作などIoT関連が好きで、Bluetooth信号を使った位置推定手法について調査したことがあったので、紹介します。"
 ---
 # はじめに
 
-[地図・GIS・位置特定に関する連載](/articles/20220719a/)の6日目のエントリーです。
+[地図・GIS・位置特定に関する連載](/articles/20220719a/)の5日目のエントリーです。
 マイコンとか電子工作などIoT関連が好きで、Bluetooth信号を使った位置推定手法について調査したことがあったので、紹介します。
 
 # Bluetoothとは

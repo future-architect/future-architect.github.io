@@ -8,6 +8,7 @@ tags:
   - MicroPython
 categories:
   - IoT
+series: "春の入門祭り2025"
 thumbnail: /images/2025/20250522a/thumbnail.png
 author: 生駒開
 lede: "「自分の手で作ったコードが、現実世界のモノを動かす」という体験をしてみたくなりました。そこで目をつけたのが Raspberry Pi です。"

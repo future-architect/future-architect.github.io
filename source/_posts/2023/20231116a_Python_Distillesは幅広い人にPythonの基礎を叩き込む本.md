@@ -8,6 +8,7 @@ tags:
   - O'Reilly
 categories:
   - Programming
+series: "秋のブログ週間2023"
 thumbnail: /images/2023/20231116a/thumbnail.png
 author: 澁川喜規
 lede: "Python Distilledという本がオライリーから出版されました。作者のDave Beazleyはかなり昔からPythonを使い込んでいる人ですので、この本には信頼しかない、と思い読んでみました"

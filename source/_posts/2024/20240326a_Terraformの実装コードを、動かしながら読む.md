@@ -9,13 +9,14 @@ tags:
   - Copilot
 categories:
   - DevOps
+series: "Terraform2024"
 thumbnail: /images/2024/20240326a/thumbnail.png
 author: 棚井龍之介
 lede: "Terraform 連載ということで、そういえば、実装コードは Go で書かれていたな、コマンドの使い方はインフラエンジニアの皆様が書いてくれるはずなので、コードリーディングしようかな"
 ---
 <img src="/images/2024/20240326a/top.png" alt="" width="800" height="539">
 
-[Terraform連載2024](/articles/20240311a/) の10本目記事です。
+[Terraform連載2024](/articles/20240311a/) の9本目記事です。
 
 # はじめに
 

@@ -11,6 +11,7 @@ tags:
   - コンテナビルド
 categories:
   - DevOps
+series: "CNCF2020"
 thumbnail: /images/2020/20201002/thumbnail.png
 author: 澁川喜規
 lede: "CNCF連載の第4回は、CNCFのSandboxプロジェクトのBuildpacksについて紹介します。* https://buildpacks.io"

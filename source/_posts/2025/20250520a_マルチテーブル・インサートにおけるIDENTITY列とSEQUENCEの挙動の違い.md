@@ -8,6 +8,7 @@ tags:
   - IDENTITY
 categories:
   - DB
+series: "春の入門祭り2025"
 thumbnail: /images/2025/20250520a/thumbnail.png
 author: 姫路康太郎
 lede: "OracleDBにおける主要な採番方法であるSEQUENCEとIDENTITY列について、基本的な使い方を説明します。続いて、複数のテーブルへ同時にデータを投入する際に利用できるOracleDB特有のマルチテーブル・インサート構文における、それぞれの採番の実装方法と挙動の違いに焦点を当てて解説します"

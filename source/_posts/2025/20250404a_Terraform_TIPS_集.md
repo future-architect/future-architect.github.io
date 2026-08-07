@@ -7,6 +7,7 @@ tags:
   - Tips
 categories:
   - DevOps
+series: "Terraform2025"
 thumbnail: /images/2025/20250404a/thumbnail.png
 author: 前原応光
 lede: "Terraform を利用する中でこんな使い方があるのかってことを少しでも知ってもらえればと思い、TIPS 集を書いています。"

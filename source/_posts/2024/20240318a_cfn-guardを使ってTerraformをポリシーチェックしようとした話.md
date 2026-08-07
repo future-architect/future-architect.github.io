@@ -7,6 +7,7 @@ tags:
   - Policy-as-Code
 categories:
   - DevOps
+series: "Terraform2024"
 thumbnail: /images/2024/20240318a/thumbnail.png
 author: 原木翔
 lede: "cfn-guardを使用してTerraformをポリシーチェックしようとした話をします。"

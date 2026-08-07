@@ -7,13 +7,14 @@ tags:
   - ORM
 categories:
   - Programming
+series: "GoのORマッパー"
 thumbnail: /images/2021/20210728a/thumbnail.png
 author: 宮崎将太
 lede: "golang ORM連載の2記事目となります。はじめまして、TIGの宮崎将太です。突然ですがみなさん、ORMは何を使用していますか？"
 ---
 # はじめに
 
-[golang ORM連載](/articles/20210726a/)の2記事目となります。TIGの宮崎将太です。
+[golang ORM連載](/articles/20210726a/)の3記事目となります。TIGの宮崎将太です。
 
 突然ですがみなさん、O/Rマッパは何を使用していますか？
 

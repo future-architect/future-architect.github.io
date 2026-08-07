@@ -10,6 +10,7 @@ tags:
   - バッチ処理
 categories:
   - Programming
+series: "サーバレス2020"
 thumbnail: /images/2020/20200515/thumbnail.png
 author: 真野隼記
 lede: "AWS StepFunctionsとLambdaを活用してバッチ処理を行う記事です。"

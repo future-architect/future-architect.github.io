@@ -7,6 +7,7 @@ tags:
   - CNCF
 categories:
   - DevOps
+series: "CNCF2023"
 thumbnail: /images/2023/20230621a/thumbnail.png
 author: 真野隼記
 lede: "クラウドネイティブなフィーチャーフラグの標準とAPI、SDKを提供するOpenFeatureについてです"

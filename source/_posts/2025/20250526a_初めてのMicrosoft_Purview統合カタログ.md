@@ -8,6 +8,7 @@ tags:
   - データマネジメント
 categories:
   - DataEngineering
+series: "春の入門祭り2025"
 thumbnail: /images/2025/20250526a/thumbnail.png
 author: 佐々木伸悟
 lede: "データカタログを調査することになり、その一つとしてMicrosoft Purviewについて調査を行いました。その際に前もって知っていれば理解が早かったなと思ったことや触ってみて気になった箇所をまとめておきます。"

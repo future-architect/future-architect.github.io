@@ -7,6 +7,7 @@ tags:
   - ETL
 categories:
   - DataEngineering
+series: "春の入門祭り2023"
 thumbnail: /images/2023/20230420a/thumbnail.png
 author: 市川浩暉
 lede: "「Cloud Data Fusionで始めるETL入門」ということで、Google CloudでETL/ELTを構築できる「Cloud Data Fusion」を利用して、ETLを作成します。"

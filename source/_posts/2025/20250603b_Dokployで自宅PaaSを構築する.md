@@ -7,6 +7,7 @@ tags:
   - コンテナ
 categories:
   - DevOps
+series: "CI/CD"
 thumbnail: /images/2025/20250603b/thumbnail.png
 author: 澁川喜規
 lede: "Dokployというのを知ったので動かしてみました。よくあるクラウドサービスのPaaSマネージドサービスようなインフラをオンプレ環境やVPSなどに簡単に構築できるものです。"

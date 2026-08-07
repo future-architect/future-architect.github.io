@@ -10,6 +10,7 @@ tags:
   - Swagger
 categories:
   - Mobile
+series: "Dart/Flutter2021"
 thumbnail: /images/2021/20210511b/thumbnail.png
 author: 宮崎将太
 lede: "突然ですがみなさん、Swagger使いたいですよね。"

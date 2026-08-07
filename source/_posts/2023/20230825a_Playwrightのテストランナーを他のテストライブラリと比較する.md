@@ -12,6 +12,7 @@ tags:
   - Jest
 categories:
   - Frontend
+series: "Playwright"
 thumbnail: /images/2023/20230825a/thumbnail.png
 author: 澁川喜規
 lede: "テスティングフレームワークには大きく2つの流派があります。ひとつはJUnit、あるいはその祖先の　SUnitをベースにしたTDDスタイルものです。TDDスタイルはテスト関数、もしくはメソッドを実行します。"

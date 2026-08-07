@@ -7,6 +7,7 @@ tags:
   - SQLite
 categories:
   - DB
+series: "Cloudflare"
 thumbnail: /images/2024/20240528a/thumbnail.png
 author: 真野隼記
 lede: "Cloudflare D1を触ってみました。"

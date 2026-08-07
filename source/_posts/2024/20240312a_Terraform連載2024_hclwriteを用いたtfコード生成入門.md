@@ -8,6 +8,7 @@ tags:
   - Go
 categories:
   - DevOps
+series: "Terraform2024"
 thumbnail: /images/2024/20240312a/thumbnail.png
 author: 真野隼記
 lede: "Terraformファイルをコード生成するため、hclwriteというGoパッケージの使い方を調べました。"

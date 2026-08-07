@@ -8,6 +8,7 @@ tags:
   - 初心者向け
 categories:
   - Infrastructure
+series: "春の入門祭り2020"
 thumbnail: /images/2020/20200623/thumbnail.png
 author: 町田聖慈
 lede: "全文検索エンジンとして高い人気を誇る「Elasticsearch」についての入門記事です。Elasticsearchは「全文検索システム」を提供するソフトウェアです。全文検索とは検索手法の一つで、文字列をキーにして複数の文書データをまたがって検索し、目的のデータを探し出す機能のことを指します。"

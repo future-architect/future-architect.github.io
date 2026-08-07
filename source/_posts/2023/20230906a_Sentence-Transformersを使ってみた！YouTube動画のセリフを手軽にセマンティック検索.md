@@ -9,6 +9,7 @@ tags:
   - AI
 categories:
   - DataScience
+series: "夏の自由研究2023"
 thumbnail: /images/2023/20230906a/thumbnail.jpg
 author: 王紹宇
 lede: "テキストの埋め込みエンコーダーを使ってセマンティック検索をおもちゃレベルで簡単に実装する方法を紹介します。分かりやすいように、YouTubeの動画のセリフをコーパスとして使用します。"

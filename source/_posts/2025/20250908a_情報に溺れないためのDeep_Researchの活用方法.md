@@ -9,6 +9,7 @@ tags:
   - DeepResearch
 categories:
   - Business
+series: "夏の自由研究2025"
 thumbnail: /images/2025/20250908a/thumbnail.png
 author: 仲田帆志弥
 lede: "みなさんは、Deep Researchの膨大な出力を見て読む気が無くなったり、読み終えたのに知りたいことは書かれていなかった経験はありませんか？この記事では、Deep Researchの出力の読みにくさや知りたい情報にたどり着けない問題をどうすれば改善できるのか試行錯誤した内容をシェアします。"

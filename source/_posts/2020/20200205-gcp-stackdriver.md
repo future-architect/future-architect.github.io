@@ -10,6 +10,7 @@ tags:
   - ログ
 categories:
   - DevOps
+series: "GCP2020"
 author: 真野隼記
 lede: "Google Cloudをテーマにした連載企画を始めるということで、初回はStackdriver Loggingの活用方法をまとめます。
 

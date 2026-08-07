@@ -8,6 +8,7 @@ tags:
   - クラスタリング
 categories:
   - Infrastructure
+series: "地図・GIS・位置特定"
 thumbnail: /images/2022/20220720a/thumbnail.png
 author: 金子剛士
 lede: "先日Kaggleで開催された「Foursquare - Location Matching」コンペ(以下4sqコンペ)に社外の知人共にチームで参加し、1083チーム中7位をとりました。（初の金メダルでKaggle Competitions Masterになりました！)本記事では参加記として以下の内容を紹介します。"

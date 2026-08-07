@@ -7,6 +7,7 @@ tags:
   - バイトコード
 categories:
   - Programming
+series: "春の入門祭り2025"
 thumbnail: /images/2025/20250529a/thumbnail.png
 author: 岸本卓也
 lede: "私は Java の経験が長いのですが、JVM やバイトコードといった Java で処理が実行される根本的な仕組みへの理解が薄かったため改めて向き合うことにしました。"

@@ -9,6 +9,7 @@ tags:
   - データマネジメント
 categories:
   - DataEngineering
+series: "Terraform2025"
 thumbnail: /images/2025/20250407a/thumbnail.png
 author: 大前七奈
 lede: "Terraformは、インフラ構築をコードで管理できる強力なツールですが、BigQueryのデータ管理においては、特有の課題に直面することがあります。本記事では、TerraformでBigQueryを扱う際に陥りやすい落とし穴と、データ管理の品質を高めるための対策について、サンプルコードを交えながら解説します。"

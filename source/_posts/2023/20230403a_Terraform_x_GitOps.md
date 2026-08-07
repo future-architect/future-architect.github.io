@@ -9,6 +9,7 @@ tags:
   - CI/CD
 categories:
   - DevOps
+series: "Terraform2023"
 thumbnail: /images/2023/20230403a/thumbnail.png
 author: 川口翔大
 lede: "Terraform x GitOps ということで、いつかちゃんと調べておきたいなと思いながらなかなかできていなかったことについて調査していこうかなーと思います。そもそも Terraform x GitOps とはなんぞやということからですが。"

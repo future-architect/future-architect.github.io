@@ -8,6 +8,7 @@ tags:
   - C/C++
 categories:
   - Frontend
+series: "春の入門祭り2023"
 thumbnail: /images/2023/20230517a/thumbnail.png
 author: 森直也
 lede: "EmscriptenはC/C++をWebAssemblyにコンパイルするツールである、Emscriptenに入門した際の流れや気付きについて紹介します。"
@@ -18,7 +19,7 @@ lede: "EmscriptenはC/C++をWebAssemblyにコンパイルするツールであ�
 
 はじめまして。2022年4月入社、金融グループ所属の森です。
 
-[春の入門ブログ連載](/articles/20230417a/)の19日目の記事です。
+[春の入門ブログ連載](/articles/20230417a/)の18日目の記事です。
 
 WebAssembly/Emscriptenに入門した際の流れや気付きについて紹介します。
 

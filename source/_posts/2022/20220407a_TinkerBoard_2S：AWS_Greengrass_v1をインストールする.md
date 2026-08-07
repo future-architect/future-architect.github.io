@@ -8,6 +8,7 @@ tags:
   - シングルボード
 categories:
   - IoT
+series: "電子工作/IoT"
 thumbnail: /images/2022/20220407a/thumbnail.png
 author: 宮永崇史
 lede: "ASUSが販売しているシングルボードコンピュータTinekr Board2SにAWS Greengrassの環境を構築したので記事にまとめました。"

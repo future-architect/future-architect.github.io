@@ -8,6 +8,7 @@ tags:
   - デスクトップアプリ
 categories:
   - Mobile
+series: "Dart/Flutter2022"
 thumbnail: /images/2022/20220318a/thumbnail.png
 author: 澁川喜規
 lede: "FlutterのWindows対応が正式版になったので軽く試してみました。Flutterのいつものインストール手順でインストールします。"

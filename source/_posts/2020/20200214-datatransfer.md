@@ -8,6 +8,7 @@ tags:
   - BigQuery
 categories:
   - DataEngineering
+series: "GCP2020"
 author: 加部達郎
 lede: "突然ですがAWSを利用しているけどビッグデータの蓄積や解析はBigQueryで実施したい、なんて意見も最近多くなってきているようですね。実際にS3からBigQueryのデータ転送について検索すると、自前でデータ転送を作成してみましたや、データ転送をサービスとして販売しているような会社もあります。そんな中GCPが提供しているBigQeryへのデータ転送サービスDataTransferServiceのソース元としてS3が追加され、簡単にS3からBigQueryのデータ転送のジョブを作成できるようになりました。"
 ---

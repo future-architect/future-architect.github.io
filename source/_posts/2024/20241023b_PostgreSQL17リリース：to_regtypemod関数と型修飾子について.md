@@ -8,6 +8,7 @@ tags:
   - SQL
 categories:
   - DB
+series: "PostgreSQL17リリース"
 thumbnail: /images/2024/20241023b/thumbnail.png
 author:  山本竜玄
 lede: "PostgreSQL 17ではバーフォーマンスの改善や、JSON周りなど大奥のアップデートが追加されていますが、その中でもデータ型文字列からデータ型の型修飾子を取得する関数to_regtypemodが新規に追加されました。"

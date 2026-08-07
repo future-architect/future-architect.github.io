@@ -9,6 +9,7 @@ tags:
   - WAF
 categories:
   - Infrastructure
+series: "Cloudflare"
 thumbnail: /images/2024/20240529a/thumbnail.png
 author: 宮崎将太
 lede: "どんなアーキテクチャでCloudflareを採用したのか？結論ですが、ハイブリッドクラウド構成でのCDN/WAFとして"

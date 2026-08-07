@@ -9,6 +9,7 @@ tags:
   - EditorConfig
 categories:
   - Frontend
+series: "フロントエンド"
 thumbnail: /images/2021/20210616a/thumbnail.png
 author: 伊藤真彦
 lede: "今回は愛用しているVue CLIを利用して、フロントエンドアプリケーションの詳細な設定について調査してみました。"

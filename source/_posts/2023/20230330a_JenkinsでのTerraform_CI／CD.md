@@ -9,6 +9,7 @@ tags:
   - CI/CD
 categories:
   - DevOps
+series: "Terraform2023"
 thumbnail: /images/2023/20230330a/thumbnail.png
 author: 渡邉光
 lede: "プロジェクトでJenikisを利用する機会があり、初めてJenkinsfileでTerraformのCI/CD環境を構築する機会があったので記事に残そうと思います。クラウドを使っているとAWSではCodeBuild、Google CloudではCloudBuildのサービスをCI/CD環境として利用するのでyamlでのCI/CDスクリプトには慣れていましたが..."

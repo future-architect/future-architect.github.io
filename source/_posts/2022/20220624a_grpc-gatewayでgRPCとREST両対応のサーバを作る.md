@@ -9,6 +9,7 @@ tags:
   - ProtocolBuffers
 categories:
   - Programming
+series: "サービス間通信とIDL（インタフェース記述言語）"
 thumbnail: /images/2022/20220624a/thumbnail.png
 author:  関靖秀
 lede: "昨日に続き、gRPCネタです。この記事では次のネタを扱います。- gRPCの概観- gRPCとWebブラウザの関係性"

@@ -10,11 +10,12 @@ tags:
   - TypeScript
 categories:
   - DataScience
+series: "春の入門祭り2025"
 thumbnail: /images/2025/20250421a/thumbnail.png
 author: 市川裕也
 lede: "最近 MCP への注目が急速に高まっていますよね。私も気になっていた人の一人だったのですが、そんな中「エンジニアはとりあえずMCPサーバを作ってみるとよい」というポストを見かけました。「じゃあ何か作ってみるか」と思い、Google Calendar の予定を取得するための MCP サーバを作ってみました。"
 ---
-[春の入門祭り2025](/articles/20250413a/) 6日目です。
+[春の入門祭り2025](/articles/20250413a/) 5日目です。
 
 こんにちは、CSIGの市川です。普段は FutureVuls チームで開発・カスタマーサポートの業務をしています。
 

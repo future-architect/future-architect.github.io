@@ -8,6 +8,7 @@ tags:
   - AWS
 categories:
   - AIDD
+series: "春の入門祭り2026"
 thumbnail: /images/2026/20260501a/thumbnail.jpg
 author: 福島雅都
 lede: "Claude Design、最近話題になっていますね。"

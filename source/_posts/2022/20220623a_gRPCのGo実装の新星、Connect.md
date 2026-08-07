@@ -9,6 +9,7 @@ tags:
   - Go
 categories:
   - Programming
+series: "サービス間通信とIDL（インタフェース記述言語）"
 thumbnail: /images/2022/20220623a/thumbnail.jpg
 author: 澁川喜規
 lede: "6/1に公開されたばかりのgRPC関連のライブラリのConnectを紹介することにしました。"

@@ -12,11 +12,12 @@ tags:
   - JWT
 categories:
   - 認証認可
+series: "夏の自由研究2024"
 thumbnail: /images/2024/20240829a/thumbnail.png
 author: 真野隼記
 lede: "夏といえばコード生成というわけで、HTTP API仕様を定義するOpenAPIの security schemes（認証認可を定義するための箇所）で、Bearer／OAuth2／OpenID Connect 認証を設定すると、各コードジェネレータはどういったコード生成をしてくれるかを調べました。"
 ---
-[夏の自由研究連載2024](/articles/20240819a/) の5日目です。
+[夏の自由研究連載2024](/articles/20240819a/) の3日目です。
 
 # はじめに
 

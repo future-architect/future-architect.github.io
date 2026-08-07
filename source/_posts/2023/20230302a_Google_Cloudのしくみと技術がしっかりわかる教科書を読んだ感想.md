@@ -9,6 +9,7 @@ tags:
   - BigQuery
 categories:
   - Infrastructure
+series: "読書感想文"
 thumbnail: /images/2023/20230302a/thumbnail.png
 author: 藤戸四恩
 lede: "積読消化目的で参加させていただきました。図解即戦力 Google Cloudのしくみと技術がこれ1冊でしっかりわかる教科書を選んだ理由としては、CCoEメンバーに参加しGoogle Cloud に触れる機会があったのですが、いままではCloudというものに触れてこなかったため掴みたいと考えたからです"

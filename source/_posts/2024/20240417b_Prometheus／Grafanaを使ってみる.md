@@ -6,6 +6,7 @@ tags:
   - Grafana
 categories:
   - DevOps
+series: "春の入門祭り2024"
 thumbnail: /images/2024/20240417b/thumbnail.png
 author: 伊藤太斉
 lede: "PrometheusはSoundCloud社によって開発されたオープンソースの監視ソフトウェアです。GoogleでKubernetesの前身となったBorgという分散システムがあり..."
@@ -13,7 +14,7 @@ lede: "PrometheusはSoundCloud社によって開発されたオープンソー�
 
 こんにちは。TIGの伊藤です。
 
-[春の入門連載](/articles/20240408a/)7日目です。
+[春の入門連載](/articles/20240408a/)6日目です。
 
 ## 新しいこと、始めたい、知りたい
 

@@ -9,6 +9,7 @@ tags:
   - Copilot
 categories:
   - AIDD
+series: "春の入門祭り2026"
 thumbnail: /images/2026/20260424a/thumbnail.png
 author: 星名藍乃介
 lede: "お問い合わせ対応業務にLLM Agentを導入してみたお話です。"

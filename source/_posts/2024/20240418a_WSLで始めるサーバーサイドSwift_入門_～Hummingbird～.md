@@ -8,6 +8,7 @@ tags:
   - Ubuntu
 categories:
   - Mobile
+series: "春の入門祭り2024"
 thumbnail: /images/2024/20240418a/thumbnail.png
 author: 清水雄一郎
 lede: "SwiftにおけるWebフレームワークを取り上げます。SwiftはiOSアプリ開発のイメージが強いと思いますが、iOSアプリ開発以外でも利用できることを紹介します。"
@@ -17,7 +18,7 @@ lede: "SwiftにおけるWebフレームワークを取り上げます。Swiftは
 # はじめに
 
 こんにちは。HealthCare Innovation Group(HIG)[^1]所属の清水です。
-[春の入門連載2024](/articles/20240408a/)、6本目の記事です。
+[春の入門連載2024](/articles/20240408a/)、7本目の記事です。
 
 SwiftにおけるWebフレームワークを取り上げます。Swift[^7]はiOSアプリ開発のイメージが強いと思いますが、iOSアプリ開発以外でも利用できることを紹介します。
 （macOS以外でもSwiftが動かせたら楽しいなというモチベーションで記事を執筆しております）。

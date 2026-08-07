@@ -8,6 +8,7 @@ tags:
   - 翻訳
 categories:
   - Programming
+series: "Python"
 thumbnail: /images/2021/20210927b/thumbnail.png
 author: 澁川喜規
 lede: "最近社内でも使う人が徐々に増えている？Pythonの連載記事を開始しようと思います。本エントリーではPythonドキュメントの日本語訳プロジェクトに参加してみた話を紹介します。"

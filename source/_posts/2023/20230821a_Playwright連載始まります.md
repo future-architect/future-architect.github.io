@@ -6,8 +6,10 @@ tags:
   - Playwright
   - E2Eテスト
   - Cypress
+  - インデックス
 categories:
   - Frontend
+series: "Playwright"
 thumbnail: /images/2023/20230821a/thumbnail.png
 author: 澁川喜規
 lede: "現在人気が高まりつつあって、Cypressを追い抜こうとしているのがPlaywrightです。かなりCypressを意識して機能追加を行なってきている印象があります。現時点では..."

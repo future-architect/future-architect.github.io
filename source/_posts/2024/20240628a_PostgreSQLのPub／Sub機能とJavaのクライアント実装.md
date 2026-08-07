@@ -7,6 +7,7 @@ tags:
   - Java
 categories:
   - DB
+series: "Qiitaアドベントカレンダー2024"
 thumbnail: /images/2024/20240628a/thumbnail.png
 author:  柳原光佑
 lede: "Pub/Sub型のメッセージングアーキテクチャを採用するにあたっては、kafkaなどのブローカーミドルウェアや、Amazon SNS、Google Cloud Pub/Subなどのマネージドサービスを利用するケースが多いかと思います。ところでPostgreSQLでも実はPub/Subができます。すでに業務でPostgreSQLを使っていれば、新たにPub/Subブローカーを構築しなくても、疎結合なシステム間通信を簡易的に実現できます。"

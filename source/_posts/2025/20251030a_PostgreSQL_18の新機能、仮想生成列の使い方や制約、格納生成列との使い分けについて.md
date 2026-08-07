@@ -7,13 +7,14 @@ tags:
   - PostgreSQL18
 categories:
   - DB
+series: "PostgreSQL18リリース"
 thumbnail: /images/2025/20251030a/thumbnail.jpg
 author: 真野隼記
 lede: "仮想生成列についてまとめます。PostgreSQLで従来から利用できた格納生成列や、生成列自体の説明から合わせて紹介します。"
 ---
 <img src="/images/2025/20251030a/top.jpg" alt="top.jpg" width="800" height="664" loading="lazy">
 
-[PostgreSQL 18連載](/articles/20251006a/)の3本目です。
+[PostgreSQL 18連載](/articles/20251006a/)の6本目です。
 
 [PostgreSQL 18がリリース](https://www.postgresql.org/about/news/postgresql-18-released-3142/)され、仮想生成列についてまとめます。PostgreSQLで従来から利用できた格納生成列や、生成列自体と合わせて紹介します。
 

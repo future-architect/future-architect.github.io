@@ -10,6 +10,7 @@ tags:
   - テスト
 categories:
   - Infrastructure
+series: "Terraform2026"
 thumbnail: /images/2026/20260527a/thumbnail.jpg
 author: 香村真紀
 lede: "AWS SAM CLI は Docker を使って Lambda 実行環境をローカルに再現するため、AWS へデプロイせずに関数の動作確認ができます。Terraform 構成のまま使える点が便利だったので、ローカルテストとデプロイの方法を紹介します。"

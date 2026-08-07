@@ -8,6 +8,7 @@ tags:
   - 電子工作
 categories:
   - IoT
+series: "春の入門祭り2025"
 thumbnail: /images/2025/20250416a/thumbnail.png
 author: 橋本竜我
 lede: "Embedded Swiftを用いてRaspberry Pi Pico WをLチカさせてみました！"

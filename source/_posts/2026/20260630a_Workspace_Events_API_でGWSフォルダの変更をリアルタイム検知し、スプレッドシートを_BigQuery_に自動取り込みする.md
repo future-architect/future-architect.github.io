@@ -7,8 +7,10 @@ tags:
   - GoogleWorkspace
   - PubSub
   - BigQuery
+  - インデックス
 categories:
   - DataEngineering
+series: "データエンジニアリング"
 thumbnail: /images/2026/20260630a/thumbnail.jpg
 author: 柴田健太
 lede: "Google Drive の共有フォルダにあるスプレッドシートが更新されたら、自動的にテーブルとしてBigQueryに取り込みたい。このような仕組みを作りたいと思うことは誰にでもあると思います。従来は Google Drive API の changes.watch を使った Webhook ベースの方法が一般的でしたが..."
