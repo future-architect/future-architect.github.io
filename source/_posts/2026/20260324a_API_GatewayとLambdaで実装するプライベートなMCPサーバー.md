@@ -8,7 +8,7 @@ tags:
   - Dify
   - APIGateway
 categories:
-  - Infrastructure
+  - AIDD
 thumbnail: /images/2026/20260324a/thumbnail.png
 author: 木村太陽
 lede: "Strategic AI Group/MLOpsチームでアルバイトをしている木村です。アルバイトでは最新技術の調査を担当し、社内や案件にて活用することを想定したシステム導入の検証を実施しています。AWS上のLambdaで自作したプライベートなMCPサーバーをDify上で使用する手順について記事にします。"
