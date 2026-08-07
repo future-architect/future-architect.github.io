@@ -9,7 +9,7 @@ tags:
   - ベンダーロックイン
 categories:
   - Infrastructure
-series: "Qiitaのアドベントカレンダー記事"
+series: "Qiitaアドベントカレンダー2024"
 thumbnail: /images/2024/20240617b/thumbnail.png
 author: 武田大輝
 lede: "この記事はQiitaのアドベントカレンダー記事のリバイバル公開です。※ 当時の記事から、一部表現を見直し加筆しています。先日ガートナーのレポートで「多くの企業において、特定のクラウドベンダにシステムを集中させるリスクの重要度が上昇している」との発表がありました。"

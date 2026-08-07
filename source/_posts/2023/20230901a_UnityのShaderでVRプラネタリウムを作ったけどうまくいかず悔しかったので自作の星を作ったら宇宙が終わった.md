@@ -7,7 +7,7 @@ tags:
   - 宇宙
 categories:
   - VR
-series: "Playwright連載"
+series: "Playwright"
 thumbnail: /images/2023/20230901a/thumbnail.png
 author: 藤井亮佑
 lede: "実は私、星を見るのが好きなので、天体望遠鏡を買ったり、星を撮るためにカメラを買ったりしています。せっかくならいい環境で見たいので、南は沖縄から北は北海道まで星を見に行っています。（海外も行きたい）"

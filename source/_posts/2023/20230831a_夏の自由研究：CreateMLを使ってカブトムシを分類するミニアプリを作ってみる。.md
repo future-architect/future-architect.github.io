@@ -9,7 +9,7 @@ tags:
   - 画像処理
 categories:
   - Mobile
-series: "夏の自由研究ブログ連載2023"
+series: "夏の自由研究2023"
 thumbnail: /images/2023/20230831a/thumbnail.png
 author: 橋本竜我
 lede: "夏の風物詩であるカブトムシやクワガタを識別するミニアプリを作りました。"

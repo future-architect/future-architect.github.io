@@ -8,7 +8,7 @@ tags:
   - CI/CD
 categories:
   - DevOps
-series: "春の入門連載2024"
+series: "春の入門祭り2024"
 thumbnail: /images/2024/20240419a/thumbnail.png
 author: 中邨英里佳
 lede: "業務の中で初めてJenkinsに触れたので、以下の内容についてまとめたいと思います。"

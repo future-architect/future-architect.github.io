@@ -11,7 +11,7 @@ tags:
   - インターン2021
 categories:
   - Programming
-series: "Python連載"
+series: "Python"
 thumbnail: /images/2021/20211019a/thumbnail.PNG
 author: 空閑康太
 lede: "Future のインターン Engineer Camp に参加した空閑です。今回のインターンではソースコード静的解析システムの開発に取り組みました。そこで本記事では、開発内容の一部である、Python の AST モジュールを使ったクラス構造の可視化について紹介します。Python の環境構築については以下を参考にしました。[サーバーアプリ開発環境"

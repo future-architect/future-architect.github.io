@@ -9,7 +9,7 @@ tags:
   - Android
 categories:
   - Mobile
-series: "サーバレス連載"
+series: "サーバレス2020"
 thumbnail: /images/2020/20200330/thumbnail.png
 author: 佐藤尚至
 lede: "Android Developerの佐藤です。モバイルアプリ品質強化の強い味方となってくれるFirebase Crashlyticsを紹介したいと思います！Firebaseとは、AndroidやiOSなどのモバイルアプリのバックエンド機能を提供してくれるサービスです。提供されているサービスは..."

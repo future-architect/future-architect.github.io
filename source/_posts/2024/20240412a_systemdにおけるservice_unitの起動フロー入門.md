@@ -7,7 +7,7 @@ tags:
   - 入門
 categories:
   - Infrastructure
-series: "春の入門連載2024"
+series: "春の入門祭り2024"
 thumbnail: /images/2024/20240412a/thumbnail.jpg
 author: 森大作
 lede: "Linuxのsystemdにおけるservice unitの起動と停止のフローに関して説明します"

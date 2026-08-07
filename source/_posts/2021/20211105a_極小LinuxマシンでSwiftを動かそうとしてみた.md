@@ -8,7 +8,7 @@ tags:
   - Linux
 categories:
   - IoT
-series: "秋のブログ週間（2021）"
+series: "秋のブログ週間2021"
 thumbnail: /images/2021/20211105a/thumbnail.jpeg
 author: 山本力世
 lede: "今回ターゲットとした極小Linuxマシンは、M5Stack UnitV2になります。こちらのマシンは、ARM Cortex-A7デュアルコア1.2GHz、128MBメモリ、512MB内蔵フラッシュ、microSDスロット、Full HDカメラ、Wi-Fi、冷却ファンを搭載し、OSはLinuxがプリインストールされていますが..."

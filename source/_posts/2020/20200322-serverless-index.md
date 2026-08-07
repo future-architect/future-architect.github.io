@@ -7,7 +7,7 @@ tags:
   - インデックス
 categories:
   - Programming
-series: "サーバレス連載"
+series: "サーバレス2020"
 thumbnail: /images/2020/20200322/thumbnail.png
 author: admin
 lede: "AWSのLambdaに代表されるサーバレスアプリは実行時のみ稼働するため、サーバー稼働によるあらゆるコストから解放され、システム開発の工数を減らすことができます。例えば何らかのAPIを提供する場合でも、API GatewayとLambdaを組み合わせることで提供可能です。"

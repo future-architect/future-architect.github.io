@@ -6,7 +6,7 @@ tags:
   - S3
 categories:
   - Programming
-series: "データエンジニアリング連載"
+series: "データエンジニアリング"
 thumbnail: /images/2026/20260702a/thumbnail.png
 author: 鈴木風真
 lede: "S3 Tablesという型があります。今回、このtimestamptz型でカラムを登録しようとしたとき、いろいろ面白い発見があったので、記事にしたいと思います。"

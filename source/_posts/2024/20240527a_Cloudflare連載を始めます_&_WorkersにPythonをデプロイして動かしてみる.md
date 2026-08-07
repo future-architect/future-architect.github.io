@@ -9,7 +9,7 @@ tags:
   - インデックス
 categories:
   - Infrastructure
-series: "Cloudflare連載"
+series: "Cloudflare"
 thumbnail: /images/2024/20240527a/thumbnail.jpg
 author: 伊藤太斉
 lede: "Cloudflareは、インターネット上で運営されている最大のネットワークの1つです。ユーザーは、Webサイトやサービスのセキュリティとパフォーマンスを向上させる目的でCloudflareサービスを利用しています。"

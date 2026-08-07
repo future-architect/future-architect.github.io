@@ -8,7 +8,7 @@ tags:
   - IaC
 categories:
   - Infrastructure
-series: "Terraform連載2026"
+series: "Terraform2026"
 thumbnail: /images/2026/20260601a/thumbnail.jpg
 author: 永井辰弥
 lede: "AIって便利ですよね。新しい分野の学習にAIは欠かせなくなりました。ただAIはもっともらしい嘘をつく可能性もあり、信頼できる一次情報（公式ドキュメント）に当たることは重要だと思います。"

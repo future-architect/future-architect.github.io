@@ -11,7 +11,7 @@ tags:
   - Policy-as-Code
 categories:
   - DevOps
-series: "CNCF連載（2020）"
+series: "CNCF2020"
 thumbnail: /images/2020/20200930/thumbnail.png
 author: 真野隼記
 lede: "Open Policy Agent（OPA）は汎用的なポリシーエンジンで、Rego と呼ばれるポリシー言語で定義されたルールに従って、入力がポリシーに沿っているか否かの判定を移譲させることができます。Regoで宣言的にポリシーを実装し、Policy as Code を実現できます。コーディング規約も一種のポリシーとみなして、Open API Spec（Swagger）をLinter的にチェックするツールを題材に、OPAを用いて開発してみたいと思います。"

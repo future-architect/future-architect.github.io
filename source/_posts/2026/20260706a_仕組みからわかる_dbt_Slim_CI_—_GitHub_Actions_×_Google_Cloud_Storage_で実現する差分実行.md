@@ -9,7 +9,7 @@ tags:
   - GitHubActions
 categories:
   - DataEngineering
-series: "データエンジニアリング連載"
+series: "データエンジニアリング"
 thumbnail: /images/2026/20260706a/thumbnail.jpg
 author: 片岡久人
 lede: "dbt の CI を効率化する Slim CI を、dbt Core + BigQuery + GitHub Actions + Google Cloud Storage（以下 GCS） の構成で、どうやって実現するのかを解説します。"

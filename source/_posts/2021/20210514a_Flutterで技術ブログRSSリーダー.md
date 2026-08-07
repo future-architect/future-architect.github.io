@@ -7,7 +7,7 @@ tags:
   - Dart
 categories:
   - Mobile
-series: "Dart/Flutter連載（2021）"
+series: "Dart/Flutter2021"
 thumbnail: /images/2021/20210514a/thumbnail.png
 author: 真野隼記
 lede: "FlutterでRSSを用いてフューチャー技術ブログリーダーを作ろうと思います。"

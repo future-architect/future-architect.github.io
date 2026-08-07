@@ -10,7 +10,7 @@ tags:
   - S3
 categories:
   - Infrastructure
-series: "GlyphFeeds連載企画"
+series: "GlyphFeeds"
 thumbnail: /images/2020/20200916/thumbnail.png
 author: 出口豊
 lede: "今回は、GlyphFeedsの素材受信インターフェース構築を介してAmazon Simple Queue Service の検証について紹介します。"

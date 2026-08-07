@@ -7,7 +7,7 @@ tags:
   - 競技プログラミング
 categories:
   - Security
-series: "春の入門ブログ連載"
+series: "春の入門祭り2023"
 thumbnail: /images/2023/20230425a/thumbnail.png
 author: 藤戸四恩
 lede: "Hack The BoxのStarting PointのTIER2のOopsieを解いてみました。"

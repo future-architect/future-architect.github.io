@@ -9,7 +9,7 @@ tags:
   - UML
 categories:
   - DevOps
-series: "秋のブログ週間（2021）"
+series: "秋のブログ週間2021"
 thumbnail: /images/2021/20211108a/thumbnail.png
 author: ヴーホアン・ミン
 lede: "PlantUMLで使えるテーマについてのご紹介です。以前、チームで機能設計するためのPlantUML標準化の記事でも書かせていただきましたが、PlantUMLのデフォルトカラーって少しドライですよね。色の好みは人それぞれで、あれはあれでカッコよさはありますが、複雑な図は少しでも可愛く描きたい・楽しく見たいものです。"

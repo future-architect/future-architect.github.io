@@ -8,7 +8,7 @@ tags:
   - SwiftUI
 categories:
   - Mobile
-series: "春の入門連載2024"
+series: "春の入門祭り2024"
 thumbnail: /images/2024/20240430a/thumbnail.jpeg
 author: 橋本竜我
 lede: みなさん、お使いのiPhoneではダークモードorライトモードどちらに設定していますか。それとも、Automaticに設定していますか。

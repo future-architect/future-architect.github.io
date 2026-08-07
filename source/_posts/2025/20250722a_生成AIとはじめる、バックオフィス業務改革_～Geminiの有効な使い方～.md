@@ -8,7 +8,7 @@ tags:
   - Gems
 categories:
   - Business
-series: "AI Tips連載"
+series: "AI Tips"
 thumbnail: /images/2025/20250722a/thumbnail.png
 author: 村田靖拓
 lede: "バックオフィスの方へのヒアリングを通じて、生成AIの活用（本記事においてはGeminiの活用を想定）を通じて効率化・省力化を狙いたい業務シーンやニーズがいくつか浮かび上がってきました。"

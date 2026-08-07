@@ -7,7 +7,7 @@ tags:
   - TextToSpeech
 categories:
   - Infrastructure
-series: "GCP連載2021"
+series: "GCP2021"
 thumbnail: /images/2021/20210312/thumbnail.png
 author: 村瀬善則
 lede: "昨年に続きGCP連載企画の参加です。私個人としてはGCPはほとんど利用したことがないので、せっかくだから面白そうなことを試してみようと思い、今回はText-to-Speechについて試してみることにしました。読んで字のごとくですがテキストを自然な音声に変換するサービスで、40以上の言語と方言で220種類以上の音声から選択できます。話す速度や声の高さも変更することができます。"

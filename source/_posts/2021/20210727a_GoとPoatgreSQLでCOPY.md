@@ -9,7 +9,7 @@ tags:
   - jackc/pgx
 categories:
   - Programming
-series: "GoのORマッパー連載"
+series: "GoのORマッパー"
 thumbnail: /images/2021/20210727a/thumbnail.png
 author: 澁川喜規
 lede: "データベースでパフォーマンスが大きな問題になりがちなのが、バッチでのデータのインサートと、複雑なクエリーです。が、今回は後者は置いといて、前者のデータの取り込みについて扱います。データの挿入の高速化は最近、ちょびっと大事かなと思うところがあります。というのも..."

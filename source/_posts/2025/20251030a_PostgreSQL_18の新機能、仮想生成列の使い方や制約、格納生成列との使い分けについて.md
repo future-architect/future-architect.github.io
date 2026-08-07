@@ -7,7 +7,7 @@ tags:
   - PostgreSQL18
 categories:
   - DB
-series: "PostgreSQL18連載"
+series: "PostgreSQL18リリース"
 thumbnail: /images/2025/20251030a/thumbnail.jpg
 author: 真野隼記
 lede: "仮想生成列についてまとめます。PostgreSQLで従来から利用できた格納生成列や、生成列自体の説明から合わせて紹介します。"

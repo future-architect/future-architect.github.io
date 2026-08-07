@@ -9,7 +9,7 @@ tags:
   - TCP/IP
 categories:
   - Infrastructure
-series: "夏の自由研究ブログ連載2021"
+series: "夏の自由研究2021"
 thumbnail: /images/2021/20210823b/thumbnail.png
 author: 棚井龍之介
 lede: "夏の自由研究ブログ連載2021の第1投稿として、Wiresharkで実際に流れるパケットを観察し、通信プロトコルの動きを見てみました。"

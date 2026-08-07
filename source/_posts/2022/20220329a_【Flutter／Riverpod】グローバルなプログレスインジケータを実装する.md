@@ -7,7 +7,7 @@ tags:
   - 状態管理
 categories:
   - Mobile
-series: "Dart/Flutter連載（2022）"
+series: "Dart/Flutter2022"
 thumbnail: /images/2022/20220329a/thumbnail.gif
 author: 武田大輝
 lede: "アプリケーションを開発していて、下記のようなプログレスインジケータを表示したいケースがあるかと思います。今回はこのようなインジケータをページ共通的に制御することを目的として、その実装方法を説明していきます。!"

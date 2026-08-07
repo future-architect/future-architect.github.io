@@ -9,7 +9,7 @@ tags:
   - コード生成
 categories:
   - Programming
-series: "GoのORマッパー連載"
+series: "GoのORマッパー"
 thumbnail: /images/2021/20210730a/thumbnail.png
 author: 筒井悠平
 lede: "SQLBoilerを使用したDBスキーマ駆動なREST APIサーバの開発ワークフローを紹介します。"

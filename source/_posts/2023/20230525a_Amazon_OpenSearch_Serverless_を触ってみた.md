@@ -9,7 +9,7 @@ tags:
   - AWS
 categories:
   - Infrastructure
-series: "春の入門ブログ連載"
+series: "春の入門祭り2023"
 thumbnail: /images/2023/20230525a/thumbnail.png
 author: 齊藤英比古
 lede: "Amazon OpenSearch Service を触る機会があり、興味があったのでプレビューで公開されていたServerless版でいろいろ試していました"

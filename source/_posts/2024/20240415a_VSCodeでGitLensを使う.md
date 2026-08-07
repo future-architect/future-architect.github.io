@@ -10,7 +10,7 @@ tags:
   - 便利ツール
 categories:
   - DevOps
-series: "春の入門連載2024"
+series: "春の入門祭り2024"
 thumbnail: /images/2024/20240415a/thumbnail.png
 author: 棚井龍之介
 lede: "VSCodeの拡張機能である「GitLens — Supercharge Git in VS Codeを取り上げます"

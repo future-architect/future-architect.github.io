@@ -8,7 +8,7 @@ tags:
   - Flutter
 categories:
   - Mobile
-series: "Dart/Flutter連載（2022）"
+series: "Dart/Flutter2022"
 thumbnail: /images/2022/20220321a/thumbnail.png
 author: 岸下優介
 lede: "FlutterとTensorFlow Liteを使ったモバイル画像識別について執筆させて頂きます。TensorFlow Liteとは..."

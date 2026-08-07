@@ -8,7 +8,7 @@ tags:
   - アクセス制御
 categories:
   - DevOps
-series: "Terraform連載2025"
+series: "Terraform2025"
 thumbnail: /images/2025/20250401a/thumbnail.png
 author: 真野隼記
 lede: "Pikeを触ってみた記事です。"

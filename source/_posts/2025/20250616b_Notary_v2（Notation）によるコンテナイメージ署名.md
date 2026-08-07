@@ -7,7 +7,7 @@ tags:
   - コンテナ
 categories:
   - Security
-series: "CNCF連載（2025）"
+series: "CNCF2025"
 thumbnail: /images/2025/20250616b/thumbnail.png
 author: 真野隼記
 lede: "CNCFのIncubatingプロジェクトである、Notary v2を用いて、コンテナイメージにデジタル署名してみた記事です。"

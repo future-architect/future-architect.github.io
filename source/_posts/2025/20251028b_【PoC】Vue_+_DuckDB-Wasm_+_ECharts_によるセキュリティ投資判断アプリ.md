@@ -8,7 +8,7 @@ tags:
   - WebAssembly
 categories:
   - Frontend
-series: "Vue.js連載"
+series: "Vue.js2025"
 thumbnail: /images/2025/20251028b/thumbnail.png
 author: 松本朝香
 lede: "経営者がセキュリティ投資判断をしやすくする簡易ダッシュボードを構築しました！使用するデータ量が多くなってもブラウザで固まらず、今後の拡張性も加味した構成にしたかったため..."

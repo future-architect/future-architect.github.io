@@ -9,7 +9,7 @@ tags:
   - 電子工作
 categories:
   - IoT
-series: "夏の自由研究ブログ連載2023"
+series: "夏の自由研究2023"
 thumbnail: /images/2023/20230905a/thumbnail.png
 author: 水田祐介
 lede: "Raspberry Piに立てたWebサーバのブラウザから好きな文字列を入力してArduinoに接続したLCDに表示するまでをやっていきます"

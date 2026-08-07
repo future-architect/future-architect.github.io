@@ -9,7 +9,7 @@ tags:
   - ドキュメント
 categories:
   - DevOps
-series: "春の入門ブログ連載"
+series: "春の入門祭り2023"
 thumbnail: /images/2023/20230417b/thumbnail.png
 author: 真野隼記
 lede: "Markdownで設計書を充実させようとすればするほど、設計書間やメンバー間のちょっとした揺れで、本質的なレビューがしにくく感じるようになりました。そこでMarkdownのLintツールを導入するモチベーションが高まりました。"

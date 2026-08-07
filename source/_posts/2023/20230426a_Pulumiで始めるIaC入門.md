@@ -7,7 +7,7 @@ tags:
   - 入門
 categories:
   - DevOps
-series: "春の入門ブログ連載"
+series: "春の入門祭り2023"
 thumbnail: /images/2023/20230426a/thumbnail.png
 author: 渡邉光
 lede: "春の入門ということで、改めてIaCのメリット・デメリットについて整理してみました。また、PulumiというIaCツールに入門してみたので、皆さんと一緒にPulumiについて理解していきたいと思います。"

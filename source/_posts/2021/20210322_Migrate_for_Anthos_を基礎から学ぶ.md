@@ -8,7 +8,7 @@ tags:
   - Anthos
 categories:
   - Infrastructure
-series: "GCP連載2021"
+series: "GCP2021"
 thumbnail: /images/2021/20210322/thumbnail.png
 author: 村田靖拓
 lede: "前回は越島さんによる分かりやすい Anthos 概要紹介記事でしたが、今回も前回に続いての Anthos ネタです"

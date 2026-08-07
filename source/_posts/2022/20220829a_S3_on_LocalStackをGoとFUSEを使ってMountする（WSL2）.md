@@ -9,7 +9,7 @@ tags:
   - WSL
 categories:
   - Programming
-series: "夏の自由研究ブログ連載2022"
+series: "夏の自由研究2022"
 thumbnail: /images/2022/20220829a/thumbnail.png
 author: 真野隼記
 lede: "go-fuse でLocalStackでローカル環境にエミュレートされるS3バケットをマウントするツールを開発しました。"
