@@ -7,6 +7,7 @@ tags:
   - 初心者向け
 categories:
   - DevOps
+series: "Terraform連載2024"
 thumbnail: /images/2024/20240328b/thumbnail.png
 author: 小林弘樹
 lede: "Terraformでは似たリソースを複数構築する際に、ループ処理や条件分岐を利用することで、コードの冗長化を防ぎ、可読性や保守性を上げることができます。初心者目線で「Terraformのコードをスマートに書きたい！」というモチベーションのもと本記事を書いてみました。"

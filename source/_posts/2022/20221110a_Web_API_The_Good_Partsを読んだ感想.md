@@ -7,6 +7,7 @@ tags:
   - 書評
 categories:
   - Programming
+series: "秋のブログ週間（2022）"
 thumbnail: /images/2022/20221110a/thumbnail.png
 author: 藤戸四恩
 lede: "今までWeb APIに関してしっかりと勉強をしたことがなかったので、Web APIの設計方法や考え方をしっかりと学びたいと思い、おすすめの本を周りの人に聞いた際にWeb API The Good Partsを薦めていただき、実際に購入して読みました。"

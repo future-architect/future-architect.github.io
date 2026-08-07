@@ -7,6 +7,7 @@ tags:
   - Bluetooth
 categories:
   - Mobile
+series: "電子工作/IoT連載"
 thumbnail: /images/2022/20220404b/thumbnail.png
 author: 真野隼記
 lede: "PhilipsののLEDをLチカ（LEDをチカチカさせる）する記事です。普通のLEDだと面白くないので、Philips HueのLEDを購入しました。接続ですが、Bluetooth（BLE: Bluetooth Low Energy）で直接LEDの操作をします。"

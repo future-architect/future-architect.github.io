@@ -10,6 +10,7 @@ tags:
   - Kinesis
 categories:
   - Programming
+series: "サーバレス連載企画"
 thumbnail: /images/2020/20200727/thumbnail.png
 author: 真野隼記
 lede: "ここ数年は産業向けのIoT（例えば工場IoTやモビリティIoT）を行っています。工場をハックするための基本知識 の記事を書いた棚井さんと同じチームに所属しています。サーバレス連載企画 の第8弾目として、Serverlessの代表格であるAWS LambdaでGoを用いてKinesisに対するKPL/KCL相当の処理についてまとめていきます。"

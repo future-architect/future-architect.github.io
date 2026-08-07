@@ -9,6 +9,7 @@ tags:
   - TypeScript
 categories:
   - Frontend
+series: "フロントエンド連載"
 thumbnail: /images/2021/20210614b/thumbnail.png
 author: 中川旭
 lede: "Vue Testing LibraryはVue.js公式のライブラリであるvue-test-utilをベースとする、DOM Testing LibraryのVue.js用拡張です。Vue Testing Libraryを用いると、Vue.js公式ライブラリであるvue-test-utilと比較して内部構造を意識せずにテストを作成できます。"

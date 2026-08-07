@@ -34,6 +34,7 @@ tags:
   - UUID
 categories:
   - Programming
+series: "Go 1.27 リリース連載"
 thumbnail: /images/2026/20260804a/thumbnail.jpg
 author: 武田大輝
 lede: "Go 1.27 で標準ライブラリに追加されたuuidパッケージを扱います。"
@@ -46,6 +47,9 @@ lede: "Go 1.27 で標準ライブラリに追加されたuuidパッケージを�
 - `lede` は一覧・OGP に出る概要文
 - 画像は `<img src="/images/2026/20260804a/xxx.jpg" alt="" width="1024" height="559" loading="lazy">` のように実寸の width/height を明記する
 - 連載記事は冒頭で `[連載名](/articles/20260728a/) の N 本目です。` と相対リンクで親記事を参照する
+- `series` は連載への所属。値がそのまま連載名として表示され、記事末に前 / 次 と索引へのリンクが出る（`scripts/series.js`）
+  - 索引記事は `series` に加えて `インデックス` タグを付ける。連載を束ねる年間企画（「2026年 フューチャー技術ブログリレー企画」など）には `series` を付けない
+  - 並び順は日付昇順。「N本目」は表示しない。本文が名乗る番号と日付順の位置は70連載中37件でズレており、機械が本文と違うことを言う方が害が大きい
 
 新規記事を追加したら、画像ディレクトリ `source/images/<年>/<記事ID>/` も併せて作る。
 

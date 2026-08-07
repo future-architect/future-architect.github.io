@@ -10,6 +10,7 @@ tags:
   - uroboroSQL
 categories:
   - Programming
+series: "Qiitaのアドベントカレンダー記事"
 thumbnail: /images/2024/20240627a/thumbnail
 author: 星賢一
 lede: "筆者自身もコミッターとして関わるJavaのDB永続化ライブラリ「uroboroSQL」の紹介です。"

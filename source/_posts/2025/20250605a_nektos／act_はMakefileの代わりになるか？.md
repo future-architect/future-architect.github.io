@@ -8,6 +8,7 @@ tags:
   - GitHubActions
 categories:
   - DevOps
+series: "CI/CD連載"
 thumbnail: /images/2025/20250605a/thumbnail.jpg
 author: 真野隼記
 lede: "GitHub Actionsをローカル環境で実行できる nektos/act をMakefileやTaskfileなどのタスクランナーの代わりとして使えるのか、試してみた記事です"

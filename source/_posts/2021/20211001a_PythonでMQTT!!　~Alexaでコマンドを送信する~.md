@@ -9,6 +9,7 @@ tags:
   - Python
 categories:
   - IoT
+series: "Python連載"
 thumbnail: /images/2021/20211001a/thumbnail.jpg
 author: 宮永崇史
 lede: "この記事は温度と湿度、不快指数を定期投稿するbotの作成を目指してハンズオンを進める構成となっています。"

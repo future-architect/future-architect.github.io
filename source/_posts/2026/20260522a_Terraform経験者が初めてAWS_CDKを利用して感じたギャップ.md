@@ -9,6 +9,7 @@ tags:
   - IaC
 categories:
   - Infrastructure
+series: "Terraform連載2026"
 thumbnail: /images/2026/20260522a/thumbnail.png
 author: 八木雅斗
 lede: "入社以来、IaCツールは一貫してTerraformを利用してきましたが、最近の業務ではAWS CDKを利用しています。AWS CDKを実際に触ってみて、これまでTerraformの考え方に慣れ親しんでいたこともあり、いくつかギャップを感じる場面がありました。"

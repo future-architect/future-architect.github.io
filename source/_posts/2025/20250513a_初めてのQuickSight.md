@@ -9,6 +9,7 @@ tags:
   - 可視化
 categories:
   - DataScience
+series: "春の入門祭り2025"
 thumbnail: /images/2025/20250513a/thumbnail.png
 author: 板垣翼
 lede: "Amazon QuickSightの入門記事です。最近、業務で触れる機会があったので、これから入門される方々の取っ掛かりとなるような内容になるようまとめます。"

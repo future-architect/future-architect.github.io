@@ -6,6 +6,7 @@ tags:
   - HackTheBox
 categories:
   - Security
+series: "秋のブログ週間2024"
 thumbnail: /images/2024/20241030a/thumbnail.png
 author: 島ノ江励
 lede: TryHackMe に関するブログや、最近このようなセキュリティ系の記事が無かったこと、最近私も TryHackMe に課金して利用していることから、今回このテーマで記事を書こうと思い寄稿しました。

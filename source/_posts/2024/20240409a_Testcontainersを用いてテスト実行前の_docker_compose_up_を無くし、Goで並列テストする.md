@@ -7,6 +7,7 @@ tags:
   - Go
 categories:
   - Programming
+series: "春の入門連載2024"
 thumbnail: /images/2024/20240409a/thumbnail.png
 author: 真野隼記
 lede: "Testcontainers を用いて、単体テスト実行前に docker compose up -d 無しで、PostgreSQLにアクセスする単体テストを行う、入門記事です。"

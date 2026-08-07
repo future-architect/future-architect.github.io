@@ -8,6 +8,7 @@ tags:
   - パーティション
 categories:
   - DB
+series: "PostgreSQL 17のリリース記念連載"
 thumbnail: /images/2024/20241106a/thumbnail.png
 author: 真野隼記
 lede: "パーティションテーブルに対して宣言的に排他制約を設定できるようになったアップデートについて取り上げます。"

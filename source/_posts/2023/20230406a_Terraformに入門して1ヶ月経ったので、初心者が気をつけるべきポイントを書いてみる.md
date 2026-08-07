@@ -8,6 +8,7 @@ tags:
   - 入門
 categories:
   - DevOps
+series: "Terraform連載2023"
 thumbnail: /images/2023/20230406a/thumbnail.png
 author: 大岩潤矢
 lede: "初心者がTerraformを扱う際に気をつけるべきポイントについて、自分が1ヶ月間みっちりTerraformを触った経験をもとに紹介したいと思います。"

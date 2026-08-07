@@ -7,6 +7,7 @@ tags:
   - TerraformCloud
 categories:
   - Infrastructure
+series: "Terraform連載2026"
 thumbnail: /images/2026/20260521a/thumbnail.jpg
 author: 片岡久人
 lede: "インフラストラクチャをコードで管理する「Terraform」と、そのマネージドサービスである「Terraform Cloud（現：HCP Terraform）」についての入門的な話をします。"

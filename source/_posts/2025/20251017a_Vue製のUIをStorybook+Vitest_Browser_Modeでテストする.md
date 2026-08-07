@@ -8,6 +8,7 @@ tags:
   - テスト
 categories:
   - Frontend
+series: "Vue.js連載"
 thumbnail: /images/2025/20251017a/thumbnail.png
 author: 小杉山護
 lede: "昨今では生成AIを用いたコーディング、Vibe Codingが盛んに行われていますね。人間の代わりに生成AIがコードを書いてくれるというのは非常に魅力的ですが、その過程で生み出されるコードの品質はまだまだ発展途上の段階にあります。"

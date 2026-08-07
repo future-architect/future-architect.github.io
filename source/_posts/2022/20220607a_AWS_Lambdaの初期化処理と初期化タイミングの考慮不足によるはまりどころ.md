@@ -9,6 +9,7 @@ tags:
   - TCP/IP
 categories:
   - Programming
+series: "失敗談をテーマにした連載"
 thumbnail: /images/2022/20220607a/thumbnail.png
 author: 辻大志郎
 lede: "AWS Lambdaで、予約済同時実行数を1に制限して使っていたときに、初期化処理と初期化タイミングの考慮不足により、はまったことがありました。本記事ではLambdaの初期化処理についておさらいした後、はまったケースの事例や原因、対応した方法を紹介します。"

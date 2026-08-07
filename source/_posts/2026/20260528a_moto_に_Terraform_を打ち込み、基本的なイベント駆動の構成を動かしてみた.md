@@ -7,6 +7,7 @@ tags:
   - モック
 categories:
   - Infrastructure
+series: "Terraform連載2026"
 thumbnail: /images/2026/20260528a/thumbnail.png
 author: 市川裕也
 lede: "Terraform を打ち込むことができる AWS エミュレータの「moto」を紹介します。"

@@ -9,6 +9,7 @@ tags:
   - OSS
 categories:
   - Frontend
+series: "秋のブログ週間（2021）"
 thumbnail: /images/2021/20211104a/thumbnail.png
 author: 澁川喜規
 lede: "FutureにはCheetah Gridという最速のウェブフロントエンド用のテーブルコンポーネントがあります。会社のお仕事コードは基本的にVue.jsが採用されることが多く、Cheetah GridもVue.js版のコンポーネントも提供されています。僕はなぜかReact案件が多くて慣れていることもあり、ちょっとしたコードもReactで書きたいと思っています。ちょっとしたツールを実装する上でかっこよくて性能が良いテーブルコンポーネントも欲しいのでCheetah GridのReact版が欲しいなとずっと思っていたので、今回作ってみました。"

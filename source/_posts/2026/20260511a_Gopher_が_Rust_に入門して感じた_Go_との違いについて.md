@@ -9,6 +9,7 @@ tags:
   - Go
 categories:
   - Programming
+series: "春の入門祭り2026"
 thumbnail: /images/2026/20260511a/thumbnail.jpg
 author: 市川裕也
 lede: "業務では主に Go を書いているのですが、「Rust は面白い」という話は方々から聞いており、自分もどこかで学んでおきたい、という気持ちがありました。そこで、せっかくの入門祭りということで、これを機に Rust に入門してみることにしました。"

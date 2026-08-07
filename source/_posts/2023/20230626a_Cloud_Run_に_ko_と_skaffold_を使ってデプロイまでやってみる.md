@@ -10,6 +10,7 @@ tags:
   - CNCF
 categories:
   - DevOps
+series: "CNCF連載（2023）"
 thumbnail: /images/2023/20230626a/thumbnail.png
 author: 川口翔大
 lede: "CNCF の Knative を基盤として利用している Cloud Run と CNCF の各種ビルドツール ko, skaffold、Cloud Deploy を用いたうえで、アプリケーションのビルドからデプロイまでを行います。"

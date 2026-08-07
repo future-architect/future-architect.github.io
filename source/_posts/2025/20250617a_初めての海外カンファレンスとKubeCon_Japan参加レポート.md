@@ -8,6 +8,7 @@ tags:
   - 参加レポート
 categories:
   - DevOps
+series: "CNCF連載（2025）"
 thumbnail: /images/2025/20250617a/thumbnail.jpg
 author: 伊藤太斉
 lede: "このCNCF連載とタイミングを同じくして開催しているKubeCon + CloudNativeCon Japanに参加してきたので、1日目に私が回ったセッションや会場の雰囲気についてお伝えできればと思います。"

@@ -8,6 +8,7 @@ tags:
   - PostgreSQL18
 categories:
   - DB
+series: "PostgreSQL18連載"
 thumbnail: /images/2025/20251008a/thumbnail.jpg
 author: 山本竜玄
 lede: "PostgreSQL 18の新機能と、あわせて基礎的な使い方まで記載します。"

@@ -7,6 +7,7 @@ tags:
   - Cloudflare
 categories:
   - Infrastructure
+series: "Cloudflare連載"
 thumbnail: /images/2024/20240603a/thumbnail.png
 author: 大岩潤矢
 lede: "今回はCloudflare連載ということで、Cloudflareのサービス、Cloudflare R2と、NextCloudを利用した自分専用クラウドストレージの構築について紹介します。"

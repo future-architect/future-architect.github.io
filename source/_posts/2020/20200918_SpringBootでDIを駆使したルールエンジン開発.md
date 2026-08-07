@@ -8,6 +8,7 @@ tags:
   - GlyphFeeds
 categories:
   - Programming
+series: "GlyphFeeds連載企画"
 thumbnail: /images/2020/20200918/thumbnail.png
 author: 渡邉拓
 lede: "GlyphFeedsCMSにおけるSpringを駆使したルールエンジンについてです！新聞業界の多種多様に変化する業務体系に対してどのようにシステムを構築したかご紹介致します。ニュース（＝コンテンツ）を世の中に配信していく過程において、新聞社には大きく次のアクターが関わります。"

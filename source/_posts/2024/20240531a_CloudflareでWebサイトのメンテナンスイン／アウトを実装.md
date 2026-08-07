@@ -7,6 +7,7 @@ tags:
   - CDN
 categories:
   - Infrastructure
+series: "Cloudflare連載"
 thumbnail: /images/2024/20240531a/thumbnail.jpg
 author: 小林弘樹
 lede: "CloudflareをCDNやDNSに利用しているサービスにおいて、CDNレイヤでメンテナンスイン/アウトを実装する方法を書いてみます。"

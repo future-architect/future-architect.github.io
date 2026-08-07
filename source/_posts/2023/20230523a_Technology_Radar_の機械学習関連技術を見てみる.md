@@ -8,6 +8,7 @@ tags:
   - MLOps
 categories:
   - DataScience
+series: "春の入門ブログ連載"
 thumbnail: /images/2023/20230523a/thumbnail.png
 author: 小橋昌明
 lede: "IT業界に身を置いていると、今の技術トレンドが気になるときがありますよね。業界の潮流を把握する方法の1つとしてTechnology Radarという文書があるので、今回紹介します。"

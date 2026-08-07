@@ -9,6 +9,7 @@ tags:
   - RFC
 categories:
   - Programming
+series: "Go 1.20リリース連載"
 thumbnail: /images/2023/20230131a/thumbnail.png
 author: 棚井龍之介
 lede: "- はじめに- 概要を確認- Proposal の内容と RFC の確認- 実際に動かしながら、Go1.19 と Go1.20 の違いを確認- まとめ"

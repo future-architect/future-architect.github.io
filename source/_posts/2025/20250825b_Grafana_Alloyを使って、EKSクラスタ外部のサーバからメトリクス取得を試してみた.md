@@ -11,6 +11,7 @@ tags:
   - オブサーバビリティ
 categories:
   - DevOps
+series: "夏の自由研究2025"
 thumbnail: /images/2025/20250825b/thumbnail.png
 author:  二宮佑斗
 lede: "Grafana Alloyの豊富な機能の一部を利用してEKSクラスタ外部のサーバ監視に挑戦してみました。本記事では、その設定手順や使ってみて分かったポイントを、初めてAlloyに触れた目線でご紹介します。"

@@ -9,6 +9,7 @@ tags:
   - cursor
 categories:
   - AIDD
+series: "春の入門祭り2025"
 thumbnail: /images/2025/20250428a/thumbnail.gif
 author: 小橋昌明
 lede: "生成AIを使った開発手法の進化は目を見張るものがあります。私自身は業務でAI駆動開発をすることは無いのですが、CursorやClineなどのニュースを見ない日はありません。"

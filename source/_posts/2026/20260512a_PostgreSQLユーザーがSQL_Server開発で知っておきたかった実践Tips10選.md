@@ -6,6 +6,7 @@ tags:
   - PostgreSQL
 categories:
   - DB
+series: "春の入門祭り2026"
 thumbnail: /images/2026/20260512a/thumbnail.jpg
 author: 辻大志郎
 lede: "ここ数年は PostgreSQL を中心に開発していましたが、最近 SQL Server（Azure SQL Database）を利用する機会がありました。細かいところで、いくつか PostgreSQL と SQL Server で挙動が異なる点がありました。"

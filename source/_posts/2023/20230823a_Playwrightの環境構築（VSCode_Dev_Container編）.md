@@ -9,6 +9,7 @@ tags:
   - 環境構築
 categories:
   - Frontend
+series: "Playwright連載"
 thumbnail: /images/2023/20230823a/thumbnail.png
 author: 武田大輝
 lede: "VSCode Dev Containersを利用してPlaywrightの実行環境をコンテナ上に構築する手順を説明します。"

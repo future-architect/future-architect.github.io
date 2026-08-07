@@ -9,6 +9,7 @@ tags:
   - CI/CD
 categories:
   - DevOps
+series: "GCP連載2021"
 thumbnail: /images/2021/20210315/thumbnail.png
 author: 前原応光
 lede: "ゆるふわエンジニアの前原です。本記事では、ビルド周りをよしなにやってくれるCloud Build について紹介したいと思います。"

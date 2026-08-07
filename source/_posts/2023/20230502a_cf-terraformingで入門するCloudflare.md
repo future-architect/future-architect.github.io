@@ -8,6 +8,7 @@ tags:
   - Terraform
 categories:
   - DevOps
+series: "春の入門ブログ連載"
 thumbnail: /images/2023/20230502a/thumbnail.png
 author: 伊藤太斉
 lede: "cf-terraformingは、Cloudflareにて開発されているOSSで、その名前の通り、Cloudflare上のリソースをHCL化し、出力されたソースを利用してTerraformのState管理下にすることができるツールです"

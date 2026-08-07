@@ -8,6 +8,7 @@ tags:
   - サーバーレス
 categories:
   - Infrastructure
+series: "春の入門ブログ連載"
 thumbnail: /images/2023/20230509a/thumbnail.png
 author: 佐藤更星
 lede: "2023/03/07から一般提供が開始された新サービス「AWS Application Composer」を使ってみて、どんな人向けか、強み・弱みは何かというところを見ていきます。"

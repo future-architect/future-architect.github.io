@@ -8,6 +8,7 @@ tags:
   - OpenAPI
 categories:
   - DataScience
+series: "CNCF連載（2025）"
 thumbnail: /images/2025/20250625a/thumbnail.png
 author: 原木翔
 lede: "Dapr Agentsの検討記事です。Dapr Agents の技術的背景や意義を「Agentic AI」や「ワークフロー」の側面から探ります。"

@@ -7,6 +7,7 @@ tags:
   - スクレイピング
 categories:
   - Infrastructure
+series: "春の入門連載2024"
 thumbnail: /images/2024/20240411a/thumbnail.png
 author: 岸本卓也
 lede: "ある静的サイトジェネレーターで生成された膨大なドキュメントの検索において、全文検索機能はあるものの以下の課題を感じることがありました。"

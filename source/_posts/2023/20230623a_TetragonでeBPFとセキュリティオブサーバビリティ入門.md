@@ -9,6 +9,7 @@ tags:
   - Linux
 categories:
   - Security
+series: "CNCF連載（2023）"
 thumbnail: /images/2023/20230623a/thumbnail.png
 author: 鈴木崇史
 lede: "数年前にクラウドネイティブ注目技術として挙げられたeBPFにかねてよりキャッチアップしたいなと思っていたので、この連載のタイミングでeBPFとその関連プロダクトに入門してみることにしました。CNCFプロジェクト傘下のeBPFを活用したプロダクトとしてはCiliumに触ってみます。"

@@ -9,6 +9,7 @@ tags:
   - ローコード
 categories:
   - Mobile
+series: "Dart/Flutter連載（2022）"
 thumbnail: /images/2022/20220325a/thumbnail.png
 author: 宮崎将太
 lede: "Flutter連載6回目としてFlutterFlowについて調べてみました。GoogleI/O'21でFlutterFlowというFlutterのノーコードのサービスが発表されました。"

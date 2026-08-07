@@ -8,6 +8,7 @@ tags:
   - コスト削減
 categories:
   - DB
+series: "春の入門祭り2025"
 thumbnail: /images/2025/20250512a/thumbnail.jpg
 author:  八木雅斗
 lede: "AWSコストの内訳で大きな割合を占めていた数百億オーダーのデータ（=Item）を保存しているDynamoDBのコストを削減する機会があり、その中で行った施策を「春の入門祭り2025」にあわせて共有します。"

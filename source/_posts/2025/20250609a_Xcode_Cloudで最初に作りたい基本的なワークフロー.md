@@ -8,6 +8,7 @@ tags:
   - Xcode
 categories:
   - Mobile
+series: "CI/CD連載"
 thumbnail: /images/2025/20250609a/thumbnail.png
 author: 橋本竜我
 lede: "Apple 純正のCI/CDサービスである Xcode Cloud を初めて導入するときに、導入時にまず押さえておきたいポイントを実際に試し、まとめた記事です。"

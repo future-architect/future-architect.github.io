@@ -8,6 +8,7 @@ tags:
   - GKE
 categories:
   - DevOps
+series: "GCP連載2021"
 thumbnail: /images/2021/20210318/thumbnail.jpg
 author: 関靖秀
 lede: "テーマは、2021年2月24日に公開されたGKE Autopilotです。この記事は、Kubernetesに触ったことがない方でもわかるように、最も簡単な構成で試してみました。Kubernetesを触ったことがない方にもみていただけるとありがたく思います。"

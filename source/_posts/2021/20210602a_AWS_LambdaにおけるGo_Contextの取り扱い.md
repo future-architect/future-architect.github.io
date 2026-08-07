@@ -8,6 +8,7 @@ tags:
   - context
 categories:
   - Programming
+series: "Serverless連載2021"
 thumbnail: /images/2021/20210602a/thumbnail.png
 author: 伊藤真彦
 lede: "サーバーレス連載の3記事目ですTIGの伊藤真彦です。GoでLambdaにデプロイするコードを書くにあたり、aws-lambda-goを利用できます。その際のtips紹介記事です。"

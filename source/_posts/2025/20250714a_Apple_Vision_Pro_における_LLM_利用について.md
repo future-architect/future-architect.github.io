@@ -8,6 +8,7 @@ tags:
   - Apple
 categories:
   - VR
+series: "AI Tips連載"
 thumbnail: /images/2025/20250714a/thumbnail.png
 author: 山本力世
 lede: "Apple Vision ProでLLMを利用する方法について整理していきます"

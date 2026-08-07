@@ -7,6 +7,7 @@ tags:
   - 設計
 categories:
   - Mobile
+series: "Dart/Flutter連載（2022）"
 thumbnail: /images/2022/20220316a/thumbnail.png
 author: 武田大輝
 lede: "FlutterでWidgetを開発するとき、Stateless WidgetやStateful Widgetを継承したクラスを作成することが一般的だと思います。一方でクラスを定義せずとも、Widgetを返却するFunctionを定義することで同様のことが実現できるのでは？と考えたことはないでしょうか。"

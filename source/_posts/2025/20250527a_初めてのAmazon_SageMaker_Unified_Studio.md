@@ -9,6 +9,7 @@ tags:
   - データマネジメント
 categories:
   - DataEngineering
+series: "春の入門祭り2025"
 thumbnail: /images/2025/20250527a/thumbnail.png
 author: 中神孝士
 lede: "カタログ管理やデータ活用を行うツールとしてAmazon SageMaker Unified Studioの調査・検証を行ったので触ってみた所感やポイントなどつらつらとこの記事に書いていこうと思います。"

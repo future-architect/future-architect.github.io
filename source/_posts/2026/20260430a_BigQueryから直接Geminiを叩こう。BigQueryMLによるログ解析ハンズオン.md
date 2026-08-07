@@ -8,6 +8,7 @@ tags:
   - Gemini
 categories:
   - DataScience
+series: "春の入門祭り2026"
 thumbnail: /images/2026/20260430a/thumbnail.png
 author: 柴田健太
 lede: "BigQuery上のデータに対して、外部APIを呼び出すことなく、クエリ内でGeminiによるテキスト生成やデータ解析を行う手順をまとめました。"

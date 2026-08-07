@@ -9,6 +9,7 @@ tags:
   - GCS
 categories:
   - DevOps
+series: "Terraform連載2023"
 thumbnail: /images/2023/20230327b/thumbnail.png
 author: 渡邉光
 lede: "Terraform 1.4.0のENHANCEMENTSで以下の機能が追加されました。backend/gcs: Add storage_custom_endpoint argument, to allow communication with the backend via a Private Service Connect endpoint. 内容はtfstateが保存されているGCSへのアクセスがインターネット経由ではなく.."

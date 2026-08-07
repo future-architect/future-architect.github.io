@@ -7,6 +7,7 @@ tags:
   - GoogleCloud
 categories:
   - Infrastructure
+series: "Terraform連載2026"
 thumbnail: /images/2026/20260519a/thumbnail.png
 author: 大江悠斗
 lede: "初めてArtifact Registryに触れたのでその内容について紹介させてください。Artifact RegistryとはGoogle Cloud環境で開発の成果物を一元管理・保管するサービスです。主に以下の3つの特徴があります。"

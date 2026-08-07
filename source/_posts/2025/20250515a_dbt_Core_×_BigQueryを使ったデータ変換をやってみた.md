@@ -8,6 +8,7 @@ tags:
   - BigQuery
 categories:
   - DataEngineering
+series: "春の入門祭り2025"
 thumbnail: /images/2025/20250515a/thumbnail.png
 author: 片岡久人
 lede: "データ分析基盤の構築や運用において注目を集めているdbt の入門記事です。dbtを活用して、データ変換の一連の手順を示すことで、これからdbtを試してみようと考えている方の導入を支援できれば幸いです。。"

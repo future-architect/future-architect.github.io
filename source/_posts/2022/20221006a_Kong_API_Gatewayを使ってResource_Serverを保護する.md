@@ -10,6 +10,7 @@ tags:
   - Keycloak
 categories:
   - 認証認可
+series: "認証認可連載"
 thumbnail: /images/2022/20221006a/thumbnail.png
 author: 李光焄
 lede: "API Gatewayのミドルウェア製品となるKongを使ってResource Serverを構築する方法について話します。"

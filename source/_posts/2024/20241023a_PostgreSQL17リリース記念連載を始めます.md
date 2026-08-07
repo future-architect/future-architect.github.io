@@ -5,8 +5,10 @@ postid: a
 tags:
   - PostgreSQL
   - PostgreSQL17
+  - インデックス
 categories:
   - DB
+series: "PostgreSQL 17のリリース記念連載"
 thumbnail: /images/2024/20241023a/thumbnail.png
 author: 真野隼記
 lede: "PostgreSQL 17がリリースされたことを記念し、ブログ連載を始めます"

@@ -7,6 +7,7 @@ tags:
   - 最適化
 categories:
   - Programming
+series: "アルゴリズムとデータ構造連載"
 thumbnail: /images/2021/20210707a/thumbnail.png
 author: 山田太樹
 lede: "私は学生時代競技プログラミングに打ち込んでおりました｡今回フューチャー技術ブログでアルゴリズムの記事を書く機会を頂きとても嬉しいです！よろしくお願いします！本記事では､最適化問題を解く上でのシンプルな高速化手法である monotone minima について説明します｡"

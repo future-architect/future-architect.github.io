@@ -8,6 +8,7 @@ tags:
   - Linux
 categories:
   - Infrastructure
+series: "CNCF連載（2023）"
 thumbnail: /images/2023/20230622a/thumbnail.png
 author: 原木翔
 lede: "CNCFのホスト対象にCloudサービスに関係するプロジェクトは多いですが、全てではありません。オンプレミス環境に関するプロダクトも数多く存在します。今回はそんなオンプレミス環境向けのCNCF sandboxプロジェクトの1つ、Tinkerbellを紹介します。"
