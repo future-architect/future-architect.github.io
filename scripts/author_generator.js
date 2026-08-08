@@ -5,16 +5,17 @@ const {getSNSCnt, getTwitterCnt, getFacebookCnt, getHatebuCnt, getPocketCnt} = r
 const moment = require('moment');
 
 hexo.extend.generator.register("author", function(locals) {
-    let posts = locals.posts;
-
-    posts.filter(post => Array.isArray(post.author)).forEach(post => {
+    // 共著は著者ごとに単著の複製を作って数える。
+    // locals.posts は他のジェネレータと共有しているので、そこに push しない。
+    // ジェネレータの実行順は保証されず、アーカイブや一覧が複製を含んだり
+    // 含まなかったりして、同じ記事が二重に出る（#2055）
+    const expanded = locals.posts.toArray().slice();
+    locals.posts.filter(post => Array.isArray(post.author)).forEach(post => {
       post.author.forEach(name => {
-        let copy = Object.assign({}, post);
-        copy.author = name; // 単著に設定し直し
-        posts.data.push(copy);
-        posts.length++;
+        expanded.push(Object.assign({}, post, {author: name}));
       });
     });
+    const posts = new locals.posts.constructor(expanded);
 
     let authorPosts = posts.map(post => post.author).unique().map(author => ({name:author, posts:posts.find({author})}));
 
@@ -46,7 +47,8 @@ hexo.extend.generator.register("author", function(locals) {
 
 // Author Root Page
 hexo.extend.generator.register("authors", function(locals) {
-   return  pagination('authors', locals.posts.slice(0, 1), {
+   // ページ生成に1件必要なだけのダミー。並べてから取らないと OGP 画像が実行ごとに変わる
+   return  pagination('authors', locals.posts.sort('-date').slice(0, 1), {
         layout: ['authors', 'archive', 'index'],
     });
 });

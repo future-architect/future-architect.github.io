@@ -54,7 +54,9 @@ function getCategoryRelatedPosts(ctx, post, excludeIds) {
     if (snsA !== snsB) {
       return snsB - snsA;
     } else {
-      return b.date.valueOf() - a.date.valueOf();
+      // 日付も同じなら パスで決める（決着が無いとビルドごとに並びが変わる）
+      return b.date.valueOf() - a.date.valueOf()
+        || (a.path < b.path ? -1 : a.path > b.path ? 1 : 0);
     }
   });
 
@@ -135,12 +137,12 @@ hexo.extend.helper.register('list_related_posts', function() {
     return diff >= 0 ? diff : -diff * PAST_PENALTY;
   };
 
-  relatedPosts.sort((a, b) => {
-    if (b.score !== a.score) {
-      return b.score - a.score;
-    }
-    return dateDistance(a) - dateDistance(b);
-  });
+  // 最後にパスで決める。スコアと日付距離が同点になる組があり、
+  // 決着が無いとビルドごとに選ばれる記事が入れ替わる
+  relatedPosts.sort((a, b) =>
+    b.score - a.score
+    || dateDistance(a) - dateDistance(b)
+    || (a.path < b.path ? -1 : a.path > b.path ? 1 : 0));
 
   // 4. 記事数がmaxCountに満たない場合はカテゴリから補填
   if (relatedPosts.length < maxCount) {
