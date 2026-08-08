@@ -22,8 +22,10 @@
  * 不統一だった。機械が一方の流儀で番号を振ると、他方の114記事で
  * 本文の「4本目です」と食い違う。番号が無いより害が大きい。
  *
- * 全何本かはこの流儀に依存しないので出せる。索引は連載の目次であって
- * 本編ではないため、本数には数えない。
+ * 全何本かはこの流儀に依存しないので出せる。索引記事も1本に数える。
+ * 索引は目次であると同時に読み物でもあり、そこだけ本編と分ける根拠がない。
+ * 本文が「1本目です」と名乗る記事が日付順では2番目に来ることになるが、
+ * 番号は出さないので食い違いは表に出ない。
  *
  * ナビに出す題名からは、連載名を名乗り直している部分を落とす。
  * 連載名は見出しに出ているので、前 / 次 の両方で繰り返すと本題が埋もれる。
@@ -97,8 +99,6 @@ function build(site) {
   const series = new Map(); // 記事のパス -> その記事から見た連載
   for (const [name, posts] of groups) {
     const index = posts.find(p => p.tags && p.tags.some(t => t.name === 'インデックス'));
-    // 索引は本編に数えない。索引記事自身から見た本数も同じ値になる
-    const total = posts.length - (index ? 1 : 0);
 
     // 落とすのはナビの表示だけ。記事の title そのものは触らない
     const nav = posts.map(p => ({path: p.path, title: navTitle(p.title, name)}));
@@ -106,7 +106,7 @@ function build(site) {
     posts.forEach((post, i) => {
       series.set(post.path, {
         name,
-        total,
+        total: posts.length,
         index: index && index !== post ? index : null,
         prev: i > 0 ? nav[i - 1] : null,
         next: i < posts.length - 1 ? nav[i + 1] : null
