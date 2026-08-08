@@ -79,40 +79,49 @@ function getQuarterlyCategoryData() {
 hexo.extend.helper.register('get_quarterly_category_data', getQuarterlyCategoryData);
 
 /**
- * /categories/ の一覧用データ。カテゴリごとに件数・直近1年の投稿数・
- * よく使われるタグ（上位5個）を返す (#2056)。
+ * カテゴリ1つ分の統計。件数・寄稿者数（累計・直近1年）と
+ * よく使われるタグ（上位5個）を返す。
  * カテゴリ名は広い言葉なので、代表タグを添えて中身の見当を付けられるようにする
  */
-hexo.extend.helper.register('category_index', function() {
+function buildCategoryStats(category) {
   const oneYearAgo = Date.now() - 365 * 24 * 60 * 60 * 1000;
+  const tagCount = new Map();
+  const authors = new Set();
+  const recentAuthors = new Set();
+  let recent = 0;
+  category.posts.forEach(post => {
+    const isRecent = post.date.valueOf() >= oneYearAgo;
+    if (isRecent) recent++;
+    // 共著の旧記事は author が配列
+    [].concat(post.author || []).forEach(a => {
+      authors.add(a);
+      if (isRecent) recentAuthors.add(a);
+    });
+    (post.tags ? post.tags.toArray() : []).forEach(tag => {
+      tagCount.set(tag.name, (tagCount.get(tag.name) || 0) + 1);
+    });
+  });
+  const topTags = [...tagCount.entries()]
+    // インデックスは連載索引の構造タグで、カテゴリの中身を表さない
+    .filter(([name]) => name !== 'インデックス')
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([name, count]) => {
+      const tag = this.site.tags.findOne({name});
+      return {name, count, path: tag ? tag.path : `tags/${name}/`};
+    });
+  return {name: category.name, path: category.path, count: category.length, recent, authorCount: authors.size, recentAuthorCount: recentAuthors.size, topTags};
+}
+
+// /categories/ の一覧用データ (#2056)
+hexo.extend.helper.register('category_index', function() {
   return this.site.categories.toArray()
     .sort((a, b) => b.length - a.length)
-    .map(category => {
-      const tagCount = new Map();
-      const authors = new Set();
-      const recentAuthors = new Set();
-      let recent = 0;
-      category.posts.forEach(post => {
-        const isRecent = post.date.valueOf() >= oneYearAgo;
-        if (isRecent) recent++;
-        // 共著の旧記事は author が配列
-        [].concat(post.author || []).forEach(a => {
-          authors.add(a);
-          if (isRecent) recentAuthors.add(a);
-        });
-        (post.tags ? post.tags.toArray() : []).forEach(tag => {
-          tagCount.set(tag.name, (tagCount.get(tag.name) || 0) + 1);
-        });
-      });
-      const topTags = [...tagCount.entries()]
-        // インデックスは連載索引の構造タグで、カテゴリの中身を表さない
-        .filter(([name]) => name !== 'インデックス')
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 5)
-        .map(([name, count]) => {
-          const tag = this.site.tags.findOne({name});
-          return {name, count, path: tag ? tag.path : `tags/${name}/`};
-        });
-      return {name: category.name, path: category.path, count: category.length, recent, authorCount: authors.size, recentAuthorCount: recentAuthors.size, topTags};
-    });
+    .map(category => buildCategoryStats.call(this, category));
+});
+
+// カテゴリ個別ページ用。一覧と同じ統計を個別ページにも出す (#2084)
+hexo.extend.helper.register('category_stats', function(name) {
+  const category = this.site.categories.findOne({name});
+  return category ? buildCategoryStats.call(this, category) : null;
 });
