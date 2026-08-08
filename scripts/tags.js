@@ -41,11 +41,13 @@ hexo.extend.helper.register('ranking_tags', function() {
   // 5記事以上、シェア数/投稿数のランキング
   const rankings = tagPosts.filter(tp => tp.count >= 5).sort(compareFunc).slice(0, 30)
 
+  // マークアップは関連タグ・「今年使われ始めたタグ」と同じチップに揃える。
+  // 以前は素のテキストリンクで、同じページ内でタグの見た目が割れていた (#2052)
   let result = "";
   rankings.map(tp => {
-    result += `<li class="popular-tag-list"><a href="/tags/${tp.tag.name}" title="&#9825;${tp.shareCount}">${tp.tag.name} <span class="pupular-tag-count">${tp.count}</span></a></li>`;
+    result += `<li class="tag-list-item"><a class="tag-list-link" href="${this.url_for(tp.tag.path)}" rel="tag" title="${tp.tag.name} の記事 ${tp.count}本（総シェア ${tp.shareCount}）">${tp.tag.name}<span class="tag-list-count">${tp.count}</span></a></li>`;
   });
-  return `<ul class="popular-tag">${result}</ul>`;
+  return `<div class="blog-tags"><div class="widget"><ul class="tag-list">${result}</ul></div></div>`;
 });
 
 const totalCount = (posts) => {
