@@ -62,8 +62,13 @@ hexo.extend.helper.register('list_authors', function(year = 'all') {
     count_posts = author => this.site.posts.filter(post => post.date.format("YYYY") === year && post.author === author).length;
   }
 
-  // 投稿数で著者をソート
-  const compareFunc = (a, b) => count_posts(b) - count_posts(a);
+  // 投稿数で著者をソート。同数のときは名前で決める。
+  // 決着を付けないと site.authors の並び（ファイルを読んだ順）がそのまま出て、
+  // 同じ入力からビルドしても実行ごとに順序が変わる。
+  // localeCompare ではなくコードポイント比較にしているのは、
+  // 環境の ICU/ロケールに結果を左右させないため
+  const compareFunc = (a, b) =>
+    count_posts(b) - count_posts(a) || (a < b ? -1 : a > b ? 1 : 0);
   const postRankings = this.site.authors.filter(author => !Array.isArray(author)).sort(compareFunc);
 
   // authorMapperを定義。yearの値によって処理を分岐する

@@ -1,6 +1,6 @@
 ---
 title: "クラウドロックインされないアーキテクチャ「Cloud Agnostic Architecture」のすすめ"
-date: 2024/06/17 00:00:00
+date: 2024/06/17 00:00:01
 postid: b
 tags:
   - AWS
