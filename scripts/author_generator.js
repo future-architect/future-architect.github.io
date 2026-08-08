@@ -135,20 +135,15 @@ hexo.extend.helper.register('post_author_link', function(post) {
 
 // チャート表示用のデータを生成
 hexo.extend.helper.register('generate_post_series', function(author) {
-  const acc = generateSeries(this.site.posts, author);
-  const postSeries = acc.map(e => e.count).join(",")
-  return postSeries;
+  return generateSeries(this.site.posts, author).map(e => e.count).join(',');
 });
 
 hexo.extend.helper.register('generate_post_month', function(author) {
-  const acc = generateSeries(this.site.posts, author);
-  const postSeries = acc.map(e => e.yyyyMM).join(",")
-  return postSeries;
+  return generateSeries(this.site.posts, author).map(e => e.yyyyMM).join(',');
 });
 
 hexo.extend.helper.register('max_post_month', function(author) {
-  const acc = generateSeries(this.site.posts, author);
-  return Math.max(5, Math.max(...acc.map(item => item.count))); // 最小は5とする
+  return Math.max(5, ...generateSeries(this.site.posts, author).map(e => e.count)); // 最小は5
 });
 
 const generateSeries = (posts, author) => {
@@ -202,21 +197,16 @@ const generateSeries = (posts, author) => {
 /*
  * 著者一覧ページ
  */
-hexo.extend.helper.register('max_yearly_authors', function(author) {
-  const acc = generateAuthorsSeriesAll(this.site.posts);
-  return Math.max(100, Math.max(...acc.map(item => item.authors.unique().length))); // 最小は5とする
+hexo.extend.helper.register('max_yearly_authors', function() {
+  return Math.max(100, ...generateAuthorsSeriesAll(this.site.posts).map(e => e.authors.unique().length)); // 最小は100
 });
 
 hexo.extend.helper.register('generate_yearly_authors_series_x', function() {
-  const acc = generateAuthorsSeriesAll(this.site.posts);
-  const postSeries = acc.map(e => e.year).join(",")
-  return postSeries;
+  return generateAuthorsSeriesAll(this.site.posts).map(e => e.year).join(',');
 });
 
 hexo.extend.helper.register('generate_yearly_authors_series_y', function() {
-  const acc = generateAuthorsSeriesAll(this.site.posts);
-  const postSeries = acc.map(e => e.authors.unique().length).join(",")
-  return postSeries;
+  return generateAuthorsSeriesAll(this.site.posts).map(e => e.authors.unique().length).join(',');
 });
 
 const generateAuthorsSeriesAll = posts => {
