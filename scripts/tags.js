@@ -15,6 +15,24 @@ hexo.extend.helper.register('count_tags', function() {
   return this.site.tags.length;
 });
 
+// 初出が新しいタグ。新しく登場したトピックの入口として /tags/ に並べる (#2052)。
+// 「今年初出」だと年明けや更新が止まったときに空になるため、
+// トップページの「新着記事」と同じ発想の件数固定にする
+hexo.extend.helper.register('recent_new_tags', function(limit = 15) {
+  return this.site.tags
+    .map(tag => {
+      const first = tag.posts.map(p => p.date).reduce((a, b) => (a.isBefore(b) ? a : b));
+      return {name: tag.name, path: tag.path, count: tag.posts.length, first};
+    })
+    .sort((a, b) => b.first - a.first)
+    .slice(0, limit);
+});
+
+hexo.extend.helper.register('median_tags_per_post', function() {
+  const counts = this.site.posts.map(p => (p.tags ? p.tags.length : 0)).sort((a, b) => a - b);
+  return counts[Math.floor(counts.length / 2)] || 0;
+});
+
 hexo.extend.helper.register('ranking_tags', function() {
   const tagPosts = this.site.tags.map(tag => ({tag:tag, posts:tag.posts, count:tag.posts.length, shareCount:totalCount(tag.posts)}));
 
@@ -23,11 +41,13 @@ hexo.extend.helper.register('ranking_tags', function() {
   // 5記事以上、シェア数/投稿数のランキング
   const rankings = tagPosts.filter(tp => tp.count >= 5).sort(compareFunc).slice(0, 30)
 
+  // マークアップは関連タグ・「今年使われ始めたタグ」と同じチップに揃える。
+  // 以前は素のテキストリンクで、同じページ内でタグの見た目が割れていた (#2052)
   let result = "";
   rankings.map(tp => {
-    result += `<li class="popular-tag-list"><a href="/tags/${tp.tag.name}" title="&#9825;${tp.shareCount}">${tp.tag.name} <span class="pupular-tag-count">${tp.count}</span></a></li>`;
+    result += `<li class="tag-list-item"><a class="tag-list-link" href="${this.url_for(tp.tag.path)}" rel="tag" title="${tp.tag.name} の記事 ${tp.count}本（総シェア ${tp.shareCount}）">${tp.tag.name}<span class="tag-list-count">${tp.count}</span></a></li>`;
   });
-  return `<ul class="popular-tag">${result}</ul>`;
+  return `<div class="blog-tags"><div class="widget"><ul class="tag-list">${result}</ul></div></div>`;
 });
 
 const totalCount = (posts) => {
