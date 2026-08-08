@@ -14,6 +14,25 @@ hexo.extend.helper.register('count_tags', function() {
   return this.site.tags.length;
 });
 
+// 今年になって初めて使われたタグ。新しく登場したトピックの入口として
+// /tags/ に並べる (#2052)。年初は空になりうるので、テンプレート側は
+// 空なら節ごと出さない
+hexo.extend.helper.register('new_tags_of_year', function() {
+  const year = new Date().getFullYear();
+  return this.site.tags
+    .map(tag => {
+      const first = tag.posts.map(p => p.date).reduce((a, b) => (a.isBefore(b) ? a : b));
+      return {name: tag.name, path: tag.path, count: tag.posts.length, first};
+    })
+    .filter(t => t.first.year() === year)
+    .sort((a, b) => b.first - a.first);
+});
+
+hexo.extend.helper.register('median_tags_per_post', function() {
+  const counts = this.site.posts.map(p => (p.tags ? p.tags.length : 0)).sort((a, b) => a - b);
+  return counts[Math.floor(counts.length / 2)] || 0;
+});
+
 hexo.extend.helper.register('ranking_tags', function() {
   const tagPosts = this.site.tags.map(tag => ({tag:tag, posts:tag.posts, count:tag.posts.length, shareCount:totalCount(tag.posts)}));
 
