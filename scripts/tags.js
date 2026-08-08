@@ -24,7 +24,8 @@ hexo.extend.helper.register('recent_new_tags', function(limit = 15) {
       const first = tag.posts.map(p => p.date).reduce((a, b) => (a.isBefore(b) ? a : b));
       return {name: tag.name, path: tag.path, count: tag.posts.length, first};
     })
-    .sort((a, b) => b.first - a.first)
+    // 同点の決着が無いとビルドごとに並びが変わる
+    .sort((a, b) => b.first - a.first || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
     .slice(0, limit);
 });
 
@@ -52,7 +53,11 @@ hexo.extend.helper.register('median_tags_per_post', function() {
 hexo.extend.helper.register('ranking_tags', function() {
   const tagPosts = this.site.tags.map(tag => ({tag:tag, posts:tag.posts, count:tag.posts.length, shareCount:totalCount(tag.posts)}));
 
-  const compareFunc = (a, b) => (b.shareCount + b.count)/b.count - (a.shareCount + a.count)/a.count;
+  // 同点の決着が無いとビルドごとに並びが変わる
+  const score = t => (t.shareCount + t.count) / t.count;
+  const compareFunc = (a, b) =>
+    score(b) - score(a)
+    || (a.tag.name < b.tag.name ? -1 : a.tag.name > b.tag.name ? 1 : 0);
 
   // 5記事以上、シェア数/投稿数のランキング
   const rankings = tagPosts.filter(tp => tp.count >= 5).sort(compareFunc).slice(0, 30)
