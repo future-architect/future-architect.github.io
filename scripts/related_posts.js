@@ -5,6 +5,7 @@
 const maxCount = 3;
 const {getSNSCnt} = require('./lib/sns');
 const {postListItem} = require('./lib/post_list');
+const {navLinkedPaths} = require('./lib/series');
 
 // HTMLを生成するロジックを共通関数として外に切り出す
 function generateRelatedPostsHtml(posts) {
@@ -39,14 +40,14 @@ function getReferencePostIds(ctx, post) {
 }
 
 // カテゴリから関連記事を取得する関数（変更なし）
-function getCategoryRelatedPosts(ctx, post, excludeIds) {
+function getCategoryRelatedPosts(ctx, post, isExcluded) {
   const currentCategory = post.categories.data[0];
   if (!currentCategory) {
     return [];
   }
 
   const categoryPosts = currentCategory.posts.data
-    .filter(p => p._id !== post._id && !excludeIds.has(p._id));
+    .filter(p => p._id !== post._id && !isExcluded(p));
 
   categoryPosts.sort((a, b) => {
     const snsA = getSNSCnt(a.permalink);
@@ -70,8 +71,11 @@ hexo.extend.helper.register('list_related_posts', function() {
     return `<p class="related-posts-none">No related post.</p>`;
   }
 
-  // 0. 「この記事を参照している記事」と重複しないよう、除外対象を先に求める
+  // 0. 記事末尾で同じ記事が二度出ないよう、除外対象を先に求める。
+  //    「この記事を参照している記事」と、連載ナビが既にリンクしている記事（索引・前・次）
   const referenceIds = getReferencePostIds(this, post);
+  const linked = navLinkedPaths(this.site, post);
+  const isExcluded = p => referenceIds.has(p._id) || linked.has(p.path);
 
   // 1. 全著者数を取得し、著者のIDFを計算
   const allPostsCount = this.site.posts.length;
@@ -85,12 +89,12 @@ hexo.extend.helper.register('list_related_posts', function() {
   // 2. 関連度スコアリング (タグと著者のIDFを考慮)
   const tagRelatedPosts = post.tags.data
     .flatMap(tag => tag.posts.data)
-    .filter(p => p._id !== post._id && !referenceIds.has(p._id));
+    .filter(p => p._id !== post._id && !isExcluded(p));
 
   if (tagRelatedPosts.length === 0) {
     // タグ関連記事がなければカテゴリの記事を取得し、HTMLを生成して返す
     console.log(`[INFO] Related Posts: No tag-related posts found for "${post.title}". Falling back to category.`);
-    const categoryPosts = getCategoryRelatedPosts(this, post, referenceIds);
+    const categoryPosts = getCategoryRelatedPosts(this, post, isExcluded);
     return generateRelatedPostsHtml(categoryPosts);
   }
 
@@ -146,7 +150,7 @@ hexo.extend.helper.register('list_related_posts', function() {
 
   // 4. 記事数がmaxCountに満たない場合はカテゴリから補填
   if (relatedPosts.length < maxCount) {
-    const postsToFill = getCategoryRelatedPosts(this, post, referenceIds);
+    const postsToFill = getCategoryRelatedPosts(this, post, isExcluded);
     postsToFill.forEach(p => {
       if(relatedPosts.findIndex(rp => rp._id === p._id) === -1) {
         relatedPosts.push(p);

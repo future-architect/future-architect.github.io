@@ -1,12 +1,17 @@
 'use strict';
 
 const {postListItem} = require('./lib/post_list');
+const {navLinkedPaths} = require('./lib/series');
 
 hexo.extend.helper.register('list_reference_posts', function() {
+
+  // 連載ナビが既に出している記事は落とす。すぐ上に同じ導線があるため
+  const linked = navLinkedPaths(this.site, this.post);
 
   const referencePosts = this.site.posts.data
     .filter(p => p.content.includes(this.post.path))
     .filter(p => p.path !== this.post.path) // その記事で自分がセルフリンクされている場合は除去
+    .filter(p => !linked.has(p.path))
     // site.posts.data は日付順に並んでいない。以前は reverse() を掛けるだけで
     // 順序が不定のまま先頭5件を出しており、「新しい5件」ですら無かった。
     // 新しい順に並べて、参照の広がりを新しいものから辿れるようにする
