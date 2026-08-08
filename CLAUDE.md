@@ -135,6 +135,7 @@ bootstrap-subset → metronic → theme-styles.styl の順で `/css/site.css` �
   | 一覧ページの見出し `.list-page` | 記事タイトルと同じ（`.article-title` と同一ルール） | 〃 |
   | 一覧ページの統計（数値 / ラベル） | `clamp(17px, 1rem + 0.4vw, 20px)` / 12px | 〃 |
   | 脚注（`#footnotelist li`） | `1em` = 13px | 〃 |
+  | 記事概要文 `.lede`（一覧 / We're hiring カード） | `1.2em` = 15.6px / 継承 = 13px | 〃 |
   | コードブロック | 13px（`line-height` は `font-size × 1.6` で追従） | `highlight.styl` の変数 |
 
 - コードブロックのサイズは本文との相対バランスを見て 15px → 14px → 13px と
