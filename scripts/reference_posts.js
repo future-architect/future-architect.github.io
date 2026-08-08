@@ -4,6 +4,8 @@ const {postListItem} = require('./lib/post_list');
 
 hexo.extend.helper.register('list_reference_posts', function() {
 
+  // 連載ナビと重複しても落とさない。ここは推薦ではなく、実際に張られた
+  // リンクの記録なので、重複を理由に消すと件数が実態とずれる
   const referencePosts = this.site.posts.data
     .filter(p => p.content.includes(this.post.path))
     .filter(p => p.path !== this.post.path) // その記事で自分がセルフリンクされている場合は除去
