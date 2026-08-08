@@ -125,6 +125,36 @@ hexo.extend.helper.register('count_authors', function(year='all') {
   return posts.map(post => post.author).unique().length;
 });
 
+// 著者ページの傾向表示用 (#2082)。よく投稿するカテゴリ（上位3）と
+// よく使うタグ（上位10）、直近1年の投稿数を返す
+hexo.extend.helper.register('author_stats', function(name) {
+  const oneYearAgo = Date.now() - 365 * 24 * 60 * 60 * 1000;
+  const posts = this.site.posts.filter(post => [].concat(post.author || []).includes(name));
+  const catCount = new Map();
+  const tagCount = new Map();
+  let recent = 0;
+  posts.forEach(post => {
+    if (post.date.valueOf() >= oneYearAgo) recent++;
+    (post.categories ? post.categories.toArray() : []).forEach(c => {
+      const e = catCount.get(c.name) || {name: c.name, path: c.path, count: 0};
+      e.count++;
+      catCount.set(c.name, e);
+    });
+    (post.tags ? post.tags.toArray() : []).forEach(t => {
+      const e = tagCount.get(t.name) || {name: t.name, path: t.path, count: 0};
+      e.count++;
+      tagCount.set(t.name, e);
+    });
+  });
+  const byCount = (a, b) => b.count - a.count;
+  return {
+    recent,
+    topCategories: [...catCount.values()].sort(byCount).slice(0, 3),
+    // インデックスは連載索引の構造タグで、執筆傾向を表さない
+    topTags: [...tagCount.values()].filter(t => t.name !== 'インデックス').sort(byCount).slice(0, 10),
+  };
+});
+
 hexo.extend.helper.register('post_author_link', function(post) {
   const author = post.author || 'Anonymous';
   // li の直下に li を入れるとパーサが外側の li を閉じてしまい、
