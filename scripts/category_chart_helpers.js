@@ -89,9 +89,12 @@ hexo.extend.helper.register('category_index', function() {
     .sort((a, b) => b.length - a.length)
     .map(category => {
       const tagCount = new Map();
+      const authors = new Set();
       let recent = 0;
       category.posts.forEach(post => {
         if (post.date.valueOf() >= oneYearAgo) recent++;
+        // 共著の旧記事は author が配列
+        [].concat(post.author || []).forEach(a => authors.add(a));
         (post.tags ? post.tags.toArray() : []).forEach(tag => {
           tagCount.set(tag.name, (tagCount.get(tag.name) || 0) + 1);
         });
@@ -105,6 +108,6 @@ hexo.extend.helper.register('category_index', function() {
           const tag = this.site.tags.findOne({name});
           return {name, count, path: tag ? tag.path : `tags/${name}/`};
         });
-      return {name: category.name, path: category.path, count: category.length, recent, topTags};
+      return {name: category.name, path: category.path, count: category.length, recent, authorCount: authors.size, topTags};
     });
 });
