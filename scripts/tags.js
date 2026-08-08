@@ -5,7 +5,8 @@ const {getSNSCnt} = require('./lib/sns');
 
 // /tags
 hexo.extend.generator.register("tags", function(locals) {
-   return  pagination('tags', locals.posts.slice(0, 1), {
+   // ページ生成に1件必要なだけのダミー。並べてから取らないと OGP 画像が実行ごとに変わる
+   return  pagination('tags', locals.posts.sort('-date').slice(0, 1), {
         layout: ['tags', 'archive', 'index'],
     });
 });

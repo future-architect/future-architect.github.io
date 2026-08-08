@@ -5,17 +5,17 @@ const {getSNSCnt, getTwitterCnt, getFacebookCnt, getHatebuCnt, getPocketCnt} = r
 const moment = require('moment');
 
 hexo.extend.generator.register("author", function(locals) {
-    let posts = locals.posts;
+    // author は1記事1名。配列だと著者ページの記事一覧に入らず、集計からも
+    // 漏れるが、ビルドは通ってしまうので、ここで止めて気づけるようにする
+    const coAuthored = locals.posts.filter(post => Array.isArray(post.author)).toArray();
+    if (coAuthored.length) {
+      throw new Error(
+        'author は1記事1名です。配列になっています:\n  ' +
+        coAuthored.map(post => post.source).join('\n  ')
+      );
+    }
 
-    posts.filter(post => Array.isArray(post.author)).forEach(post => {
-      post.author.forEach(name => {
-        let copy = Object.assign({}, post);
-        copy.author = name; // 単著に設定し直し
-        posts.data.push(copy);
-        posts.length++;
-      });
-    });
-
+    const posts = locals.posts;
     let authorPosts = posts.map(post => post.author).unique().map(author => ({name:author, posts:posts.find({author})}));
 
     const generator_config = this.config.author_generator || {};
@@ -46,7 +46,8 @@ hexo.extend.generator.register("author", function(locals) {
 
 // Author Root Page
 hexo.extend.generator.register("authors", function(locals) {
-   return  pagination('authors', locals.posts.slice(0, 1), {
+   // ページ生成に1件必要なだけのダミー。並べてから取らないと OGP 画像が実行ごとに変わる
+   return  pagination('authors', locals.posts.sort('-date').slice(0, 1), {
         layout: ['authors', 'archive', 'index'],
     });
 });
@@ -66,7 +67,7 @@ hexo.extend.helper.register('list_authors', function(year = 'all') {
   // localeCompare を使わないのは環境の ICU/ロケールに左右させないため
   const compareFunc = (a, b) =>
     count_posts(b) - count_posts(a) || (a < b ? -1 : a > b ? 1 : 0);
-  const postRankings = this.site.authors.filter(author => !Array.isArray(author)).sort(compareFunc);
+  const postRankings = this.site.authors.slice().sort(compareFunc);
 
   // authorMapperを定義。yearの値によって処理を分岐する
   let authorMapper;
@@ -118,43 +119,31 @@ hexo.extend.helper.register('list_authors', function(year = 'all') {
 
 // 全著者数を表示
 hexo.extend.helper.register('count_authors', function(year='all') {
-  if (year === 'all') {
-    const coAuthors = this.site.posts.filter(post => Array.isArray(post.author)).map(post => post.author).flat();
-    const singleAuthors = this.site.posts.filter(post => !Array.isArray(post.author)).map(post => post.author);
-    return coAuthors.concat(singleAuthors).unique().length;
-  }
-
-  const coAuthors = this.site.posts.filter(post =>  post.date.format("YYYY") === year && Array.isArray(post.author)).map(post => post.author).flat();
-  const singleAuthors = this.site.posts.filter(post =>  post.date.format("YYYY") === year && !Array.isArray(post.author)).map(post => post.author);
-  return coAuthors.concat(singleAuthors).unique().length;
+  const posts = year === 'all'
+    ? this.site.posts
+    : this.site.posts.filter(post => post.date.format("YYYY") === year);
+  return posts.map(post => post.author).unique().length;
 });
 
 hexo.extend.helper.register('post_author_link', function(post) {
-  const authors = [].concat(post.author || 'Anonymous');
+  const author = post.author || 'Anonymous';
   // li の直下に li を入れるとパーサが外側の li を閉じてしまい、
   // 著者だけ blog-info-item を持たない li に分割されて間隔が崩れる (#2049)
-  const link = authors.map(author =>
-    `<a href="/authors/${encodeURI(author)}" title="${author}さんの記事一覧へ" class="post-author">${author}</a>`
-  ).join("、")
+  const link = `<a href="/authors/${encodeURI(author)}" title="${author}さんの記事一覧へ" class="post-author">${author}</a>`;
   return `<li class="blog-info-item">${link}</li>`
 });
 
 // チャート表示用のデータを生成
 hexo.extend.helper.register('generate_post_series', function(author) {
-  const acc = generateSeries(this.site.posts, author);
-  const postSeries = acc.map(e => e.count).join(",")
-  return postSeries;
+  return generateSeries(this.site.posts, author).map(e => e.count).join(',');
 });
 
 hexo.extend.helper.register('generate_post_month', function(author) {
-  const acc = generateSeries(this.site.posts, author);
-  const postSeries = acc.map(e => e.yyyyMM).join(",")
-  return postSeries;
+  return generateSeries(this.site.posts, author).map(e => e.yyyyMM).join(',');
 });
 
 hexo.extend.helper.register('max_post_month', function(author) {
-  const acc = generateSeries(this.site.posts, author);
-  return Math.max(5, Math.max(...acc.map(item => item.count))); // 最小は5とする
+  return Math.max(5, ...generateSeries(this.site.posts, author).map(e => e.count)); // 最小は5
 });
 
 const generateSeries = (posts, author) => {
@@ -208,21 +197,16 @@ const generateSeries = (posts, author) => {
 /*
  * 著者一覧ページ
  */
-hexo.extend.helper.register('max_yearly_authors', function(author) {
-  const acc = generateAuthorsSeriesAll(this.site.posts.filter(p => !Array.isArray(p.author)));
-  return Math.max(100, Math.max(...acc.map(item => item.authors.unique().length))); // 最小は5とする
+hexo.extend.helper.register('max_yearly_authors', function() {
+  return Math.max(100, ...generateAuthorsSeriesAll(this.site.posts).map(e => e.authors.unique().length)); // 最小は100
 });
 
 hexo.extend.helper.register('generate_yearly_authors_series_x', function() {
-  const acc = generateAuthorsSeriesAll(this.site.posts.filter(p => !Array.isArray(p.author)));
-  const postSeries = acc.map(e => e.year).join(",")
-  return postSeries;
+  return generateAuthorsSeriesAll(this.site.posts).map(e => e.year).join(',');
 });
 
 hexo.extend.helper.register('generate_yearly_authors_series_y', function() {
-  const acc = generateAuthorsSeriesAll(this.site.posts.filter(p => !Array.isArray(p.author)));
-  const postSeries = acc.map(e => e.authors.unique().length).join(",")
-  return postSeries;
+  return generateAuthorsSeriesAll(this.site.posts).map(e => e.authors.unique().length).join(',');
 });
 
 const generateAuthorsSeriesAll = posts => {

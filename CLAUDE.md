@@ -43,7 +43,8 @@ lede: "Go 1.27 で標準ライブラリに追加されたuuidパッケージを�
 
 - `categories` は既存の語彙から選ぶ。使用実績（記事数）: Programming 337 / DevOps 184 / Infrastructure 160 / Frontend 130 / Culture 121 / DataScience 113 / DB 70 / Mobile 57 / IoT 53 / Business 51 / DataEngineering 43 / Security 38 / Management 37 / AIDD 27 / 認証認可 25 / VR 20
   - `AI` は `AIDD` に、`Design` は `UI/UX` タグに統合済み。`_config.yml` の `alias` で転送している
-- `author` は `_profile.yml` に未登録なら追記する。複数著者は配列可
+- `author` は `_profile.yml` に未登録なら追記する。**1記事1名**（配列にしない）。
+  共著は著者ごとの集計・一覧・チャートで扱いが分かれ、規則が追えなくなる
 - `date` は同日に複数投稿するとき、`postid` の順に時刻をずらす（`a` は `00:00:00`、`b` は `00:00:01`）。
   完全に同じ日時だと一覧の並びが同着になり、ビルドごとに順序が入れ替わる（#2055）
 - `lede` は一覧・OGP に出る概要文
