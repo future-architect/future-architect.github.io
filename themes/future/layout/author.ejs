@@ -15,15 +15,41 @@
       <li><span class="summary-count"><%= page.hatebu %></span><br><span class="summary-label">はてブ</span></li>
       <li><span class="summary-count"><%= page.pocket %></span><br><span class="summary-label">Pocket</span></li>
     </ul>
+    <% const as = author_stats(page.author); %>
+    <%# 直近1年（#2082）は全期間の統計と時間軸が違うので、混ぜずに行を分ける。
+        カテゴリ・タグページ (#2084 / #2088) と同じ構成 %>
+    <ul class="summary">
+      <li><span class="summary-count"><%= as.recent %></span><br><span class="summary-label">直近1年の投稿</span></li>
+    </ul>
     <%- get_profile(page.author) %>
+    <% if (as.topCategories.length) { %>
+    <h2 class="bottom-content-header">よく投稿するカテゴリ</h2>
+    <%# カテゴリはタグと誤認しないようチップにせず、記事メタデータと同じ
+        テキストリンク（.article-category-link）で並べる %>
+    <ul class="author-top-categories">
+      <% as.topCategories.forEach(function(c){ %>
+      <li><a class="article-category-link" href="<%- url_for(c.path) %>" title="<%= page.author %>さんの <%= c.name %> カテゴリの記事 <%= c.count %>本"><%= c.name %> (<%= c.count %>)</a></li>
+      <% }) %>
+    </ul>
+    <% } %>
+    <% if (as.topTags.length) { %>
+    <h2 class="bottom-content-header">よく使うタグ</h2>
+    <div class="blog-tags">
+      <ul class="tag-list">
+        <% as.topTags.forEach(function(t){ %>
+        <li class="tag-list-item"><a class="tag-list-link" href="<%- url_for(t.path) %>" rel="tag" title="<%= page.author %>さんの <%= t.name %> の記事 <%= t.count %>本"><%= t.name %><span class="tag-list-count"><%= t.count %></span></a></li>
+        <% }) %>
+      </ul>
+    </div>
+    <% } %>
+    <h2 class="bottom-content-header">月別投稿数</h2>
     <div id="chart" style="width:95%;min-height:250px"></div>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.1.2/dist/echarts.min.js" integrity="sha384-QqZssazD9IzPiEJz2lyFewTMgYObqDWxBfCX5k5E4n4fH7ygMIqp6A6Ek8HIrRyQ" crossorigin="anonymous"></script>
     <script type="text/javascript">
       let myChart = echarts.init(document.getElementById('chart'));
       let option = {
-        title: {
-            text: '月別投稿数'
-        },
+        <%# タイトルは直上の h2 が担うので、チャート内では重ねない %>
+        title: {},
         tooltip: {
             trigger: 'axis'
         },
@@ -60,6 +86,7 @@
     %>
     <%= count_author(page.author) %>記事中の <%= start_post %> ～ <%= end_post %> を表示
     <% } %>
-    <%- partial('_partial/archive', {pagination: config.author, index: true}) %>
+    <%# 見出しの語彙はホーム・カテゴリ・タグページに合わせる %>
+    <%- partial('_partial/archive', {pagination: config.author, index: true, list_heading: page.current === 1 ? '新着記事' : '記事一覧'}) %>
   </section>
 </div>
