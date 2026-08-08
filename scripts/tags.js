@@ -28,6 +28,22 @@ hexo.extend.helper.register('recent_new_tags', function(limit = 15) {
     .slice(0, limit);
 });
 
+// タグ個別ページの統計。カテゴリページ (#2084) と同じ「直近1年」を出す (#2088)
+hexo.extend.helper.register('tag_stats', function(name) {
+  const tag = this.site.tags.findOne({name});
+  if (!tag) return null;
+  const oneYearAgo = Date.now() - 365 * 24 * 60 * 60 * 1000;
+  const recentAuthors = new Set();
+  let recent = 0;
+  tag.posts.forEach(post => {
+    if (post.date.valueOf() < oneYearAgo) return;
+    recent++;
+    // 共著の旧記事は author が配列
+    [].concat(post.author || []).forEach(a => recentAuthors.add(a));
+  });
+  return {recent, recentAuthorCount: recentAuthors.size};
+});
+
 hexo.extend.helper.register('median_tags_per_post', function() {
   const counts = this.site.posts.map(p => (p.tags ? p.tags.length : 0)).sort((a, b) => a - b);
   return counts[Math.floor(counts.length / 2)] || 0;
