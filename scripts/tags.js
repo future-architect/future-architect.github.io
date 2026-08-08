@@ -14,18 +14,17 @@ hexo.extend.helper.register('count_tags', function() {
   return this.site.tags.length;
 });
 
-// 今年になって初めて使われたタグ。新しく登場したトピックの入口として
-// /tags/ に並べる (#2052)。年初は空になりうるので、テンプレート側は
-// 空なら節ごと出さない
-hexo.extend.helper.register('new_tags_of_year', function() {
-  const year = new Date().getFullYear();
+// 初出が新しいタグ。新しく登場したトピックの入口として /tags/ に並べる (#2052)。
+// 「今年初出」だと年明けや更新が止まったときに空になるため、
+// トップページの「新着記事」と同じ発想の件数固定にする
+hexo.extend.helper.register('recent_new_tags', function(limit = 15) {
   return this.site.tags
     .map(tag => {
       const first = tag.posts.map(p => p.date).reduce((a, b) => (a.isBefore(b) ? a : b));
       return {name: tag.name, path: tag.path, count: tag.posts.length, first};
     })
-    .filter(t => t.first.year() === year)
-    .sort((a, b) => b.first - a.first);
+    .sort((a, b) => b.first - a.first)
+    .slice(0, limit);
 });
 
 hexo.extend.helper.register('median_tags_per_post', function() {
