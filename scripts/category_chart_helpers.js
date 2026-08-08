@@ -77,3 +77,34 @@ function getQuarterlyCategoryData() {
 
 // ヘルパーとして登録
 hexo.extend.helper.register('get_quarterly_category_data', getQuarterlyCategoryData);
+
+/**
+ * /categories/ の一覧用データ。カテゴリごとに件数・直近1年の投稿数・
+ * よく使われるタグ（上位5個）を返す (#2056)。
+ * カテゴリ名は広い言葉なので、代表タグを添えて中身の見当を付けられるようにする
+ */
+hexo.extend.helper.register('category_index', function() {
+  const oneYearAgo = Date.now() - 365 * 24 * 60 * 60 * 1000;
+  return this.site.categories.toArray()
+    .sort((a, b) => b.length - a.length)
+    .map(category => {
+      const tagCount = new Map();
+      let recent = 0;
+      category.posts.forEach(post => {
+        if (post.date.valueOf() >= oneYearAgo) recent++;
+        (post.tags ? post.tags.toArray() : []).forEach(tag => {
+          tagCount.set(tag.name, (tagCount.get(tag.name) || 0) + 1);
+        });
+      });
+      const topTags = [...tagCount.entries()]
+        // インデックスは連載索引の構造タグで、カテゴリの中身を表さない
+        .filter(([name]) => name !== 'インデックス')
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([name, count]) => {
+          const tag = this.site.tags.findOne({name});
+          return {name, count, path: tag ? tag.path : `tags/${name}/`};
+        });
+      return {name: category.name, path: category.path, count: category.length, recent, topTags};
+    });
+});
