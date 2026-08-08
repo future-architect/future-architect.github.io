@@ -1,6 +1,6 @@
 ---
 title: "GoとDynamoDBを用いた開発で反省していること"
-date: 2022/06/01 00:00:00
+date: 2022/06/01 00:00:01
 postid: b
 tags:
   - DynamoDB
