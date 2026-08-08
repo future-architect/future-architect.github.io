@@ -131,9 +131,11 @@ hexo.extend.helper.register('count_authors', function(year='all') {
 
 hexo.extend.helper.register('post_author_link', function(post) {
   const authors = [].concat(post.author || 'Anonymous');
+  // li の直下に li を入れるとパーサが外側の li を閉じてしまい、
+  // 著者だけ blog-info-item を持たない li に分割されて間隔が崩れる (#2049)
   const link = authors.map(author =>
-    `<li><a href="/authors/${encodeURI(author)}" title="${author}さんの記事一覧へ" class="post-author">${author}</a></li>`
-  ).join("")
+    `<a href="/authors/${encodeURI(author)}" title="${author}さんの記事一覧へ" class="post-author">${author}</a>`
+  ).join("、")
   return `<li class="blog-info-item">${link}</li>`
 });
 
