@@ -5,7 +5,6 @@ postid: ""
 tags:
   - Go
   - AWS
-  - DynamoDB×Go
   - DynamoDB
   - GoCDK
   - バッチ処理
