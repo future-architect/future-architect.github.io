@@ -22,7 +22,7 @@ lede: "ちょっとしたオブジェクトストレージ前提のシステム�
 
 ちょっとしたウェブアプリのバックエンドのストレージとしてオブジェクトストレージが欲しくなったのですが、これまではminioをたまに使ったりしていたものの、別のものを検討するにあたり、docker composeで一緒に起動するという使い方で使いやすいものということで、いろいろ比べてrustfsを選んでみました。
 
-# compose.yamlでの利用方法
+## compose.yamlでの利用方法
 
 rustfsの公式イメージをそのまま使うだけです。一瞬で起動します。
 
@@ -82,7 +82,7 @@ volumes:
 
 <img src="/images/2026/20260403a/screenshot_console.png" alt="" width="1200" height="816" loading="lazy">
 
-# Presigned URL
+## Presigned URL
 
 これでAWS SDKを使ったデータの読み書きは問題ありませんでしたが、Presigned URLの発行で問題が発生しました。rustfsの問題というかDockerを使っているから起きた問題ですが、rustfsでは、Presigned URLで発行されるURLはリクエスト時のホスト情報をもとに作られます。Dockerの中からは`http://rustfs:9000`というドメインでアクセスしますが、外からは`http://localhost:9000`なので、発行されたURLのままではアクセスできないということが起きました。
 
@@ -135,7 +135,7 @@ volumes:
 
 `Endpoint`を書き換えたクライアントを一時的に作るという方針でも、実際にそのクライアントでS3にリクエストを投げることはなくてURLの発行にしか使わないので問題なく利用できるんですね。てっきり、一時的に利用可能なトークン的なURLとして発行されてサーバー側に情報を持っているのかと思いましたが、そんなことはないんですね。勉強になりました。
 
-# まとめ
+## まとめ
 
 S3以外もいろいろ必要となる場合は他のAWSエミュレータ（[moto](https://github.com/getmoto/moto)とか[floci](https://github.com/hectorvent/floci)とか)の方が良いかもしれませんが、今回はS3だけが欲しかったのでrustfsを選んでみて使ってみたメモでした。
 

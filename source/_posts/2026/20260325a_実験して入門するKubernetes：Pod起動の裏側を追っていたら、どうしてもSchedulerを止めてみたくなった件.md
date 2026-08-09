@@ -15,7 +15,7 @@ lede: "Kubernetesの基礎的な挙動を追ってみることにしました。
 
 <img src="/images/2026/20260325a/top.jpg" alt="" width="1024" height="572">
 
-# はじめに
+## はじめに
 
 最近、コンテナオーケストレーションの技術領域に興味をもち、Kubernetesを触り始めました。早速自宅で飼ってるMiniPC（ホームサーバ）にArgoCDやLonghornを入れてみたものの、Deployment、Pod、Serviceなど初めましての概念ばかり。気づいたら、AIの指示通りにただコマンド打つマンになっていました。
 
@@ -23,7 +23,7 @@ lede: "Kubernetesの基礎的な挙動を追ってみることにしました。
 
 ※実験にはMinikubeを使っています。初学者が調べながらまとめたものなので、誤りがあればご指摘ください。
 
-# Pod起動までの流れの概要
+## Pod起動までの流れの概要
 
 Podが起動するまでの流れを紹介します。複数のKubernetesコンポーネントが登場しますが、この記事のメインテーマではないため、用語は簡単な説明に留めます。詳細が気になる方は、既存の解説記事や[公式ドキュメント](https://kubernetes.io/ja/docs/concepts/overview/components/)をご参照ください。
 
@@ -46,7 +46,7 @@ podが起動
 
 > 補足：`kubectl run`はPodを直接作成します。Deployment経由の場合は、Controller ManagerがDeploymentデータ → ReplicaSetデータ → Podデータ と各種データを作成するステップが加わります。この記事では、簡略化のため`kubectl run`による直接的な作成を追いかけます。
 
-# 実験1：イベントログでPod作成の流れを確認する
+## 実験1：イベントログでPod作成の流れを確認する
 
 最初の実験として、実際に`kubectl run`を実行し、出力されるイベントログを確認してみます。
 
@@ -225,7 +225,7 @@ metadata:
 
 概要で確認した通り、まずSchedulerがノードを割り当てた後、そのノードのkubeletがコンテナの起動処理を行っていることが、実際のログからも確認できました。
 
-# Static PodとMirror Pod
+## Static PodとMirror Pod
 
 ここまででpodが起動するまでの流れはわかったのですが、ここで1つ疑問が湧きました。
 
@@ -257,7 +257,7 @@ spec:
 
 ただ、このStatic PodはAPI Serverを経由しないため、etcd上に実体がありません。そのままでは、`kubectl get pods`で確認できず、クラスタ全体の状態を一元管理する上で不便です。そこでkubeletは、**Mirror Pod**と呼ばれる読み取り専用のPodを作成します。`kubectl get pods -n kube-system`で見える`kube-scheduler-minikube`は、実はこのMirror Podでした。
 
-# 実験2：Schedulerを止めてみる
+## 実験2：Schedulerを止めてみる
 
 ここまでの話が本当なら、以下が成り立つはずです。
 
@@ -267,7 +267,7 @@ spec:
 
 というわけで、さっそく試してみましょう。
 
-## 1. Mirror Podを削除する
+### 1. Mirror Podを削除する
 
 `kubectl delete pod`で`kube-scheduler-minikube`を削除してみます。しかし、何度削除しても、即座に復活し、`kubectl get pods`の結果に出てきます。
 
@@ -281,7 +281,7 @@ kube-scheduler-minikube            1/1     Running   0          5s
 ...
 ```
 
-## 2. マニフェストファイルを移動する
+### 2. マニフェストファイルを移動する
 
 次に`minikube ssh`でMinikubeのノード内入り、マニフェストファイルを他の場所に動かしてみます（削除すると戻すのが面倒なので`mv`にしました）。
 
@@ -301,7 +301,7 @@ kube-proxy-fj8zg                   1/1     Running   0          11h
 storage-provisioner                1/1     Running   0          11h
 ```
 
-## 3. Schedulerなしで新しいPodを作成する
+### 3. Schedulerなしで新しいPodを作成する
 
 このSchedulerがいない状態で、新しいPodを作成してみます。Podデータ自体は作成できましたが、STATUSが`Pending`のまま動かず、NODEも`<none>`のままです（必要な情報を出力するため`custom-columns`オプションをつけています）。
 
@@ -320,7 +320,7 @@ new-pod                      Pending   <none>
 
 Schedulerがいないと、Podデータは作成されても、ノードが割り当てられないため、冒頭で確認したフローのSchedulerのステップで処理が止まってしまうことが実際の挙動でも確認できました。
 
-# おわりに
+## おわりに
 
 解説動画や記事を見ても、Kubernetesの各概念やその関係性がピンとこず、「デプロイするとPodが作れてその中にコンテナがいるらしい」くらいの認識でした。そんな状態だったので、当然`kubectl`コマンドの意味がわかるはずもなく、結果としてAIの指示通りにコマンド打つマンと化していました。
 
