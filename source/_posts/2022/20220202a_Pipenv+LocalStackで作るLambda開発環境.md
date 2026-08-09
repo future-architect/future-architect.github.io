@@ -16,7 +16,7 @@ lede: "PipenvとLocalStackを使用したLambda開発環境の構築を紹介し
 ---
 <img src="/images/2022/20220202a/eyecatch.png" alt="" width="969" height="484" loading="lazy">
 
-# はじめに
+## はじめに
 
 こんにちは、TIG/DXユニット所属の宮永です。
 PipenvとLocalStackを使用したLambda開発環境の構築を紹介します。
@@ -32,12 +32,12 @@ Pipenvを使用することでzipの容量を節約しながらLambdaをデプ�
 やや長い記事となっていますので、「LocalStackへのデプロイ」の章だけでも見ていただけると幸いです。</p>
 :::
 
-# Pipenvとは
+## Pipenvとは
 
 Pipenvはパッケージ管理ツールです。似たようなツールにPoetry等があります。
 Poetryを使用したPython開発環境の構築は[澁川さんの記事](https://future-architect.github.io/articles/20210611a/)がとても参考になりますのでぜひご覧ください。
 
-# 開発環境
+## 開発環境
 
 開発に取り組む前に筆者の開発環境を記載します。記事中Linuxコマンドを使用している箇所があります。Windowsで開発される方はWSLを使用することをおすすめいたします。
 
@@ -48,7 +48,7 @@ Poetryを使用したPython開発環境の構築は[澁川さんの記事](https
 * docker compose v2
 * AWS CLI v2
 
-# プロジェクトの作成
+## プロジェクトの作成
 
 まずはPipenvをダウンロードしましょう。
 
@@ -119,7 +119,7 @@ Pipenvでパッケージをインストールする際は`pipenv install`コマ�
 一方、このコマンドに`--dev`オプションをつけてインストールした際は`[dev-packages]`でパッケージ管理されます。
 この点については後ほど「LocalStackへのデプロイ」で説明します。
 
-## 開発パッケージのインストール
+### 開発パッケージのインストール
 
 続いてテスト環境を構築します。以下のコマンドでpytestをインストールします。
 
@@ -151,7 +151,7 @@ Alternatively, run a command inside the virtualenv with pipenv run.
 pipenv install mypy --dev
 ```
 
-## デプロイパッケージのインストール
+### デプロイパッケージのインストール
 
 Pythonの標準パッケージ以外にも使用したいパッケージはあると思います。
 Lambdaを実行する上で必要となる外部パッケージは`--dev`オプションは付けずにインストールします。
@@ -166,11 +166,11 @@ pipenv install pandas xlwt xlsxwriter
 ローカル環境でLambdaのデプロイと実行を確認するためLocalStackを使用します。
 次の章でLocalStackの準備をします。
 
-# LocalStackの準備
+## LocalStackの準備
 
 LocalStackを使用して、Lambdaのデプロイと動作検証を行います。
 
-## docker-compose.ymlの作成
+### docker-compose.ymlの作成
 
 以下のような`docker-compose.yml`を用意してください。
 
@@ -203,7 +203,7 @@ docker compose up --build
 起動が確認できたらLocalStackの準備も完了です。
 次にAWS CLIの設定を行います。
 
-## AWS CLIの設定
+### AWS CLIの設定
 
 AWS CLIでは認証情報などをプロファイルとして保存できます。
 AWS CLIをインストールされた方はご自身が使用しているOSのhomeディレクトリに`.aws`の隠しファルダがあります。(エクスプローラーなどで確認する場合は隠しフォルダを表示するように設定してください。)`.aws`フォルダ配下には.`config`と
@@ -225,9 +225,9 @@ aws_access_key_id = test
 aws_secret_access_key = test
 ```
 
-# デモアプリの実装
+## デモアプリの実装
 
-## 最終的なディレクトリ構成
+### 最終的なディレクトリ構成
 
 以降、複数のファイルを作成します。最終的なディレクトリ構成を記載しますので、適宜参考にしてください。
 
@@ -257,7 +257,7 @@ aws_secret_access_key = test
     └── utils.py
 ```
 
-## 全体構成
+### 全体構成
 
 今回作成するのはS3バケットからJSONファイルを取得し、ETL処理後にExcelファイルとして再度S3バケットに格納するアプリです。
 S3バケットに格納したExcelファイルはAWS CLIコマンドでファイルをダウンロードして想定通りの挙動をしているか検証します。
@@ -265,7 +265,7 @@ S3バケットに格納したExcelファイルはAWS CLIコマンドでファイ
 
 <img src="/images/2022/20220202a/構成.png" alt="構成" width="1200" height="810" loading="lazy">
 
-## アプリ機能詳細
+### アプリ機能詳細
 
 JSON→ExcelのETL処理について以下記載します。
 S3バケットには予め以下の構造をもつJSONファイルを配置しておきます。
@@ -317,7 +317,7 @@ S3バケットには予め以下の構造をもつJSONファイルを配置し�
 |001|般若 竜門|2|75|2021-07-19|75|
 |002|十河 アンナ|2|57|2021-09-06|57|
 
-## ハンドラの実装
+### ハンドラの実装
 
 それではアプリ本体を実装します。
 Lambdaは`lambda.py`と`model.py`の２つで構成します。
@@ -438,7 +438,7 @@ Success: no issues found in 2 source files
 
 次にテストコードを実装します。
 
-## テストコードの実装
+### テストコードの実装
 
 テストにはpytestを使用します。プロジェクトルートに`tests`フォルダを作成し、`model.py`をテストする`test_model.py`を実装します。
 
@@ -565,7 +565,7 @@ tests/test_model.py::test_process[input_dict0-expected_dict0] PASSED            
 
 無事テストを通過しました🎉
 
-# LocalStackへのデプロイ
+## LocalStackへのデプロイ
 
 Lambdaのzip化やLocalStackへのデプロイは`Makefile`で管理します。
 
@@ -573,7 +573,7 @@ Lambdaのzip化やLocalStackへのデプロイは`Makefile`で管理します。
 
 参考：[破壊的変更 - AWS CLI バージョン 1 からバージョン 2 への移行](https://docs.aws.amazon.com/ja_jp/cli/latest/userguide/cliv2-migration.html#cliv2-migration-binaryparam)
 
-## Makefile全貌
+### Makefile全貌
 
 以下作成した`Makefile`です。
 
@@ -649,7 +649,7 @@ json:
 	python utils/utils.py 100
 ```
 
-## デプロイパッケージのzip化
+### デプロイパッケージのzip化
 
 ポイントはzipコマンド部です。
 
@@ -751,9 +751,9 @@ Lambdaのデプロイに成功していれば以下のレスポンスが返っ�
 LocalStackへのLambdaデプロイに成功しました🎉
 最後に動作検証をします。
 
-# 動作検証
+## 動作検証
 
-## テストデータの作成
+### テストデータの作成
 
 まずはETL処理元のテストデータを作成します。
 ルートディレクトリに`utils/utils.py`を作成し、以下のコードを実装します。
@@ -831,7 +831,7 @@ mimesisはダミーデータを作成するパッケージ、fireはPythonスク
 python utils.py 100
 ```
 
-## Lambdaの実行
+### Lambdaの実行
 
 それではデプロイしたLambdaを呼び出します。AWS CLIのinvoke実行時に`--payload '{ "input_obj": "test.json" }'`を付与することでLambdaに`test.json`の場所を渡します。
 
@@ -864,7 +864,7 @@ make download
 
 https://github.com/orangekame3/pipenv-lambda
 
-# さいごに
+## さいごに
 
 今回はPipenvとLocalStackを使用してLambdaの開発環境を構築しました。
 

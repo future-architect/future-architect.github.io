@@ -19,7 +19,7 @@ lede: "フューチャーでアルバイトをしている齋藤ですインタ�
 こちらは[PostgreSQL Advent Calendar 2022](https://qiita.com/advent-calendar/2022/postgresql) カレンダー2枚目・15日目の投稿となります。
 前回は、[@hmatsu47](https://qiita.com/hmatsu47)さんの[Supabase で TCE（透過的列暗号化）を軽く試してみた](https://qiita.com/hmatsu47/items/8de48e81a660eabe4bf0)でした。
 
-# はじめに
+## はじめに
 
 こんにちは、フューチャーでアルバイトをしている齋藤です。以前は同社のインターンでSQLフォーマッタを作成していました([記事](/articles/20220916b/))。現在はインターン中に作成していたSQLフォーマッタをPostgreSQLの構文に対応させる作業に取り組んでいます。
 
@@ -32,7 +32,7 @@ VSCode拡張機能化に関する記事:
 1. [Language Server Protocolを用いたVSCode拡張機能開発 \(前編\) \| フューチャー技術ブログ](/articles/20221124a/)
 2. [Language Server Protocolを用いたVSCode拡張機能開発 \(後編\) \| フューチャー技術ブログ](/articles/20221125a/)
 
-# アウトライン
+## アウトライン
 
 本記事のアウトラインは以下の通りです。
 
@@ -42,7 +42,7 @@ VSCode拡張機能化に関する記事:
 4. 構文についての説明
 5. BETWEEN述語の規則を追加
 
-# tree-sitter
+## tree-sitter
 
 [tree-sitter](https://tree-sitter.github.io/tree-sitter/)は文法からパーサ(構文解析器)を自動生成するパーサジェネレータツールであり、生成されたパーサで構文解析を行うライブラリでもあります。特徴として、一般的なパーサライブラリでは抽象構文木(AST)を構築するのに対し、tree-sitterで生成されたパーサは具象構文木(CST)を構築するという点があげられます。CSTについては[インターンの記事](/articles/20220916c/#:~:text=AST%E3%81%8C%E6%84%8F%E5%91%B3%E3%81%AE%E3%81%AA%E3%81%84%E6%83%85%E5%A0%B1(%E4%BE%8B%3A%20%E3%82%B3%E3%83%A1%E3%83%B3%E3%83%88%E3%82%84%E5%A4%9A%E9%87%8D%E6%8B%AC%E5%BC%A7%E3%81%AA%E3%81%A9)%E3%82%92%E4%BF%9D%E6%8C%81%E3%81%97%E3%81%AA%E3%81%84%E3%81%AE%E3%81%AB%E5%AF%BE%E3%81%97%E3%81%A6%E3%80%81CST%E3%81%AF%E3%81%9D%E3%81%AE%E3%82%88%E3%81%86%E3%81%AA%E6%83%85%E5%A0%B1%E3%82%82%E4%BF%9D%E6%8C%81%E3%81%97%E3%81%BE%E3%81%99%E3%80%82)で取り上げています。
 
@@ -52,17 +52,17 @@ VSCode拡張機能化に関する記事:
 * [Vimのすゝめ改 \- Tree\-sitter について \| 株式会社創夢 — SOUM/misc](https://www.soum.co.jp/misc/vim-advanced/6/)
 * [EmacsでTree\-sitterを利用してシンタックスハイライトできるようにする](https://zenn.dev/hyakt/articles/6ff892c2edbabb)
 
-# tree-sitter-sql
+## tree-sitter-sql
 
 [tree-sitter-sql](https://github.com/m-novikov/tree-sitter-sql)はtree-sitter用に書かれたSQLの文法とその文法によって生成されたパーサライブラリです。SQLの中でも、PostgreSQLにフォーカスしていたようです。インターンで作成したフォーマッタは、このライブラリによる構文解析結果をもちいてSQLのフォーマットを行っています。
 
 しかし、BETWEEN述語や`UNION`、`INTERSECT`などの結合演算など、基本的な構文であるにもかかわらず、対応していない構文が存在します。本記事では、その中でもBETWEEN述語に対応させるための構文拡張を行います。
 
-# 環境構築
+## 環境構築
 
 まず、tree-sitterの構文拡張のために行った環境構築について説明します。
 
-### tree-sitter-cliのインストール
+#### tree-sitter-cliのインストール
 
 tree-sitterでパーサを生成するために、tree-sitter-cliをインストールします(参考[Tree-sitter | Creating Parser](https://tree-sitter.github.io/tree-sitter/creating-parsers#getting-started))。また、tree-sitterによるパーサを開発するためには、Node.jsとCコンパイラが必要です。今回使用したバージョンは以下の通りです。
 
@@ -72,7 +72,7 @@ tree-sitterでパーサを生成するために、tree-sitter-cliをインスト
 |gcc |12.2.0 |
 |tree-sitter|0.20.7|
 
-### tree-sitter-sqlのインストール
+#### tree-sitter-sqlのインストール
 
 [tree-sitter-sql](https://github.com/m-novikov/tree-sitter-sql)をcloneします。tree-sitter用のSQL構文はいくつかありますが、今回は最もスター数が多いものを選択しました。
 
@@ -99,7 +99,7 @@ cd ./tree-sitter-sql
 tree-sitter test
 ```
 
-### 構文解析例
+#### 構文解析例
 
 実際にパースしてみましょう。以下のファイルを用意します。
 
@@ -123,13 +123,13 @@ $ tree-sitter parse ./exapmles/simple.sql
       (identifier [3, 4] - [3, 11]))))
 ```
 
-# CSTの出力について
+## CSTの出力について
 
 上述した`tree-sitter parse`により出力される結果では、ノードのラベルのみ表示されており、識別子やキーワードなどが表示されません。そこで、パース結果からCSTを出力する処理を自作しました。
 
 言語にはRustを使用します。
 
-### 準備
+#### 準備
 
 `tree-sitter-sql`の結果を利用してCSTを出力するためのプロジェクトを作成します。
 
@@ -159,7 +159,7 @@ note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
 tree-sitter = "~0.20.3"
 ```
 
-### 実装
+#### 実装
 
 `main.rs`に次のように実装しました。
 
@@ -214,7 +214,7 @@ fn visit(cursor: &mut TreeCursor, depth: usize, src: &str) {
 }
 ```
 
-### 実行例
+#### 実行例
 
 作成したプログラムを用いて、実際にCSTを表示してみましょう。
 
@@ -240,13 +240,13 @@ source_file [(0, 0)-(1, 12)]
 
 ノードに対応する文字列とキーワードを出力できました。
 
-# 構文例
+## 構文例
 
 次に、tree-sitter用の構文について簡単に紹介します。
 
 tree-sitter では文法を `grammar.js` に記述します。clone した tree-sitter-sql のルートディレクトリにある `grammar.js`を編集していきます。ここではDSL([ドメイン固有言語](https://ja.wikipedia.org/wiki/%E3%83%89%E3%83%A1%E3%82%A4%E3%83%B3%E5%9B%BA%E6%9C%89%E8%A8%80%E8%AA%9E))について細かくは説明しないので、詳しく知りたい方は[tree-sitterのドキュメント](https://tree-sitter.github.io/tree-sitter/creating-parsers#the-grammar-dsl)を参照してください。
 
-### 規則
+#### 規則
 
 例えば、tree-sitter-sql で WHERE句は以下のように記述されています([where_clauseの定義](https://github.com/m-novikov/tree-sitter-sql/blob/218b672499729ef71e4d66a949e4a1614488aeaa/grammar.js#L909))。
 
@@ -258,7 +258,7 @@ where_clause: $ => seq(kw("WHERE"), $._expression)
 
 `kw`関数はtree-sitter-sqlの`grammar.js`で定義されている関数で、キーワード(`k`ey`w`ord)が大文字か小文字であるかを考慮しなくするなどの処理を行います。パース時には、`where`や`WHERE`というキーワードとマッチします([kw関数の定義](https://github.com/m-novikov/tree-sitter-sql/blob/218b672499729ef71e4d66a949e4a1614488aeaa/grammar.js#L29))。
 
-### アンダースコアから始まる規則
+#### アンダースコアから始まる規則
 
 規則名の先頭の文字をアンダースコアから始めることで、生成されるCSTにノードとして出現させないように設定できます([ドキュメント](https://tree-sitter.github.io/tree-sitter/creating-parsers#hiding-rules))。例えば、算術演算や識別子、リテラルなどの式は`_expression`という名前で以下のように定義されています。
 
@@ -305,7 +305,7 @@ where_clause: $ => seq(kw("WHERE"), $._expression)
   (number "3))
 ```
 
-### 優先度、結合性
+#### 優先度、結合性
 
 ここで詳細は述べませんが、tree-sitterは明示しない場合、曖昧な文法を扱うことができません([参考](https://tree-sitter.github.io/tree-sitter/creating-parsers#the-grammar-dsl:~:text=conflicts%20%2D%20an%20array,dynamic%20precedence.))。
 
@@ -345,12 +345,12 @@ const PREC = {
 
 優先度は、`NOT > AND > OR`になっています。優先度が高いものほど優先して結合されるため、上述の論理式をtree-sitter-sqlでパースすると、`((NOT X) AND Y) OR Z`と解釈されます。なお、`prec.left`は左結合であることを意味しています。
 
-### extras
+#### extras
 
 ファイルのどこに現れてもよい規則をextrasで記述できます。
 これを使って、コメントや空白、改行を簡単に記述できます([コメント、空白の定義](https://github.com/m-novikov/tree-sitter-sql/blob/218b672499729ef71e4d66a949e4a1614488aeaa/grammar.js#L75))が、CST上では直感的でない場所位置に現れる場合もあります([インターンの記事後編](https://future-architect.github.io/articles/20220916c/#:~:text=%E3%82%B3%E3%83%A1%E3%83%B3%E3%83%88%E3%81%AE%E6%83%85%E5%A0%B1%E3%81%AFCST%E4%B8%8A%E3%81%AB%E4%BF%9D%E6%8C%81%E3%81%95%E3%82%8C%E3%81%BE%E3%81%99%E3%81%8C%E3%80%81%E7%9B%B4%E6%84%9F%E7%9A%84%E3%81%A7%E3%81%AA%E3%81%84%E4%BD%8D%E7%BD%AE%E3%81%AB%E7%8F%BE%E3%82%8C%E3%81%A6%E3%81%97%E3%81%BE%E3%81%86%E5%A0%B4%E5%90%88%E3%81%8C%E3%81%82%E3%82%8A%E3%81%BE%E3%81%99%E3%80%82)参照)。
 
-# BETWEEN述語への対応
+## BETWEEN述語への対応
 
 現状のtree-sitter-sqlを使用して、`BETWEEN`を含むSQLをパースできるか確認してみましょう。以下のようなファイルを用意します。
 
@@ -388,7 +388,7 @@ $ tree-sitter parse .\examples\between.sql
 
 構文エラーが発生し、WHERE句内のBETWEEN述語には対応していないことがわかります。[grammar.jsを見てみるとBETWEENというキーワードはWINDOW関数のFRAME句にしか想定していない](https://github.com/m-novikov/tree-sitter-sql/blob/218b672499729ef71e4d66a949e4a1614488aeaa/grammar.js#L1071)ため、BETWEENがERRORノードと扱われているようです。
 
-### 規則の追加
+#### 規則の追加
 
 BETWEEN述語に対応する規則がそもそも存在していないことがわかったため、文法を拡張することで対応していきます。
 
@@ -458,7 +458,7 @@ Possible resolutions:
 
 `prec.left`は左結合であることを示し、`PREC.comparative`で比較演算子と同じ優先度であることを指定しています。比較演算子は`AND`よりも高い優先度であるため、`X BETWEEN Y AND Z AND W`は`(X BETWEEN Y AND Z) AND W`と解釈されます。
 
-### 動作確認
+#### 動作確認
 
 次のファイルをパースしてみましょう。
 
@@ -512,7 +512,7 @@ source_file [(0, 0)-(6, 31)]
 
 これで`BETWEEN`を含むSQLがパースできるようになりました！
 
-### テストの追加
+#### テストの追加
 
 最後に、今回追加したBETWEEN述語の拡張を`tree-sitter test`([Tree\-sitter｜Creating Parsers](https://tree-sitter.github.io/tree-sitter/creating-parsers#command-test))でテストできるようにしましょう。
 
@@ -581,6 +581,6 @@ syntax highlighting:
   ✓ update.sql (10 assertions)
 ```
 
-# まとめ
+## まとめ
 
 本記事では、tree-sitter-sqlでBETWEEN述語を扱えるように構文拡張を行いました。tree-sitter用のSQL構文はまだまだ未完成なので、皆さんも一緒によりよいパーサを作ってみませんか？

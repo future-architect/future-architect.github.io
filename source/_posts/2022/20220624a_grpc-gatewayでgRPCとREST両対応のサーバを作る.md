@@ -14,7 +14,7 @@ thumbnail: /images/2022/20220624a/thumbnail.png
 author:  関靖秀
 lede: "昨日に続き、gRPCネタです。この記事では次のネタを扱います。- gRPCの概観- gRPCとWebブラウザの関係性"
 ---
-# はじめに
+## はじめに
 
 TIGの関です。[サービス間通信とIDL（インタフェース記述言語）連載](/articles/20220622a/)の3本目です。
 
@@ -25,13 +25,13 @@ TIGの関です。[サービス間通信とIDL（インタフェース記述言�
 - grpc-gatewayとは何か？
 - gRPCとその周辺ツールを使ったサーバ開発の流れ
 
-# gRPC概観
+## gRPC概観
 
 gRPCは、HTTP2をベースにしたRPC（リモートプロシージャコール）フレームワークです。
 
 テキストベースのJSONを用いた一般的なREST APIに対して、gRPCは高効率にデータのやりとりをできたり、双方向の通信ができたり、ストリーミングにも対応していたりといった特長があります。このため、gRPCは現状では主にバックエンドサーバ間の通信に利用されています。
 
-## gRPCとProtocol Buffers
+### gRPCとProtocol Buffers
 
 gRPCはProtocol Buffersのツールチェーンを活用すると便利であり、多くの場合下記の流れに沿ってプログラムを作ることになります。
 
@@ -43,14 +43,14 @@ gRPCはProtocol Buffersのツールチェーンを活用すると便利であり
 
 protocはC++で実装されていますが、各言語用プラグインは別の言語で実装でき、プラグインを自作することで関連ツールを作ることもできます。
 
-## gRPCとブラウザの関係
+### gRPCとブラウザの関係
 
 ブラウザの持つ制約のため、2022年6月現在、gRPCはブラウザからの直接利用はできません。このため、ブラウザから利用するには何らかのプロトコル変換が必要になります。現状、次の2つの方法があります。
 
 - gRPC Webに対応させる。
 - 何らかの手段で、HTTP APIにマッピングする。
 
-### gRPC Web
+#### gRPC Web
 
 gRPC Webは大雑把にいうと、一部機能に制約をかけることでgRPCをブラウザからもアクセスできるようにしたプロトコルです。Content-Typeは`application/grpc-web`もしくは`application/grpc-web-text`になっています。実際に流れるデータフォーマットはProtocol BuffersやJSONなど複数のフォーマットに対応しているため、送信側が明示することになっています。
 
@@ -58,7 +58,7 @@ gRPC Webは大雑把にいうと、一部機能に制約をかけることでgRP
 
 gRPCサーバ側をgRPC Webに対応させるには、プロトコル変換を行うリバースプロキシを配置するか、同一コードでgRPC Webにも対応するサーバを作成するかのどちらかです。リバースプロキシとしてはenvoyとnginxが候補になりますが、envoyが人気のようです。昨日紹介された[Connect](https://connect.build/docs/introduction/)はプロキシなしでgRPCとgRPC Webに両対応するコードを生成するプラグインになります。
 
-### HTTP APIへのマッピング
+#### HTTP APIへのマッピング
 
 HTTP APIにマッピングする方法はさらに2つに分けられ、RPC定義からルールベースで自動マッピングする方法と自力でマッピングする方法とがあります。
 
@@ -70,9 +70,9 @@ HTTP APIにマッピングする方法はさらに2つに分けられ、RPC定�
 
 この記事ではgrpc-gatewayを取り扱います。
 
-# grpc-gatewayとその使い方
+## grpc-gatewayとその使い方
 
-## grpc-gatewayとは？
+### grpc-gatewayとは？
 
 前述の通り、protoファイルに記述されたgRPCのRPC定義をHTTP APIにマッピングするためのprotocのプラグインです。
 
@@ -91,16 +91,16 @@ HTTP APIへのマッピングにはprotoファイルにマッピングのため�
 
 ちなみにですが、実はルールベースの自動マッピングもできるようです。
 
-## grpc-gatewayの利用時に参考になるサイト
+### grpc-gatewayの利用時に参考になるサイト
 
-### grpc-gateway公式
+#### grpc-gateway公式
 
 以下はgrpc-gatewayの公式サイトです。
 
 - [公式リポジトリ](https://github.com/grpc-ecosystem/grpc-gateway)
 - [公式ドキュメント](https://grpc-ecosystem.github.io/grpc-gateway/)
 
-### Google API
+#### Google API
 
 grpc-gatewayの利用有無を問わず、gRPCを使ったシステムを作る際に参考にできるものとして、Google APIがあります。
 
@@ -111,9 +111,9 @@ gRPCの設計について述べた書籍や記事はREST APIに比べると少�
 - [Google API公式リポジトリ](https://github.com/googleapis/googleapis)
 - [API設計ガイド](https://cloud.google.com/apis/design?hl=ja)
 
-## grpc-gatewayを使った開発の流れ
+### grpc-gatewayを使った開発の流れ
 
-### リポジトリ
+#### リポジトリ
 
 [grpc-gateway-example](https://github.com/sayshu-7s/grpc-gateway-example/tree/v0.0.0)として公開しました。
 
@@ -239,11 +239,11 @@ Evansから見てみましょう。
 
 先ほどエラーだった値を入力して返却されており、ちゃんと反映されてますね。REST APIで作成したリソースがgRPCでも取得でき、同一サーバで動いていることがわかります。
 
-### コードの解説
+#### コードの解説
 
 さて、コードとその作成方法の解説に入ります。
 
-### 構成
+#### 構成
 
 構成は↓のようになっています。
 
@@ -291,9 +291,9 @@ genに生成されたライブラリを使って、serverディレクトリに�
 
 cmdにあるserver, gatewayはそれぞれgRPCサーバとgatewayのエントリーポイントです。gatewayの実装でやることはあまりないので、main.goに全て書きました。
 
-### 実装の流れ
+#### 実装の流れ
 
-#### protoファイルの作成
+##### protoファイルの作成
 
 まずは、protoファイルを作ります。このリポジトリでは、protoディレクトリ配下に自信が提供するRPCを定義したprotoファイルを格納しています。先ほど記載したものを再掲です。
 
@@ -329,7 +329,7 @@ GetMessageメソッドは、GetMessageRequestを受け取り、単一ExampleMess
 
 実はProtocol Buffersは[JSONへのマッピング方法](https://developers.google.com/protocol-buffers/docs/proto3#json)がLanguage Guideに規定されており、JSON化はそれに従って行われます。このため、HTTPマッピングが必要なのは、エンドポイントの設計とリクエストの各フィールドをパスパラメータ、HTTPボディ、クエリパラメータのどこに入れるのかが大半です。
 
-#### コードの生成
+##### コードの生成
 
 さて、protoファイルを作ったら次はprotocとプラグインを使ったコード生成です。tools/gen.shを実行すれば生成できるようにしています。が実コマンドは下記の感じになります。
 
@@ -356,7 +356,7 @@ GetMessageメソッドは、GetMessageRequestを受け取り、単一ExampleMess
 
 protocと一緒についてくるプラグイン以外は、必要に応じてインストールが必要です。上記4つとも全てインストールが必要で、その方法はDockerfileに記載されています。
 
-#### サーバの実装
+##### サーバの実装
 
 コードを作ったら次はサーバ実装です。基本的な流れは、コード生成先のpackageで、`UnimplementedExampleApi`みたいな構造体があるので、これを埋め込んだ構造体を↓のように作ります。この埋め込みは前方互換性を担保するためにMustで行う必要があります。
 
@@ -428,7 +428,7 @@ func main() {
 
 さて、ここまでで、gRPCサーバが実装できました。
 
-#### gatewayの実装
+##### gatewayの実装
 
 次は、gatewayの実装です。こちらは、一度作れば追加作業はあまりないです。
 
@@ -488,7 +488,7 @@ gatewayは基本的にhttpパッケージのHanlderになっているので、�
 
 gRPCサーバもgatewayも、起点となるServerやServMuxを生成し、それらに実際の処理を行う構造体やエンドポイントを"登録"するような流れであることがわかるでしょう。
 
-# 補足: streamはどのような扱いになるのか？
+## 補足: streamはどのような扱いになるのか？
 
 grpcは双方向のストリーム処理をサポートします。grpc-gatewayではサポートされるのでしょうか？ また、されるとしたらどのようにサポートされるのでしょうか？
 
@@ -519,7 +519,7 @@ curl -v -X POST "http://localhost:8080/example-messages:batchGet" -H "Content-Ty
 `Transfer-Encoding: chunked`とあるように、レスポンス内容が確定する前からチャンクでデータを流していることがわかります。
 少し気になるのは`Content-Type: application/json`となっていることです。NDJSONのMIME Typeは`application/x-ndjson`のはずなので、これは不正な気がします。まだ調べてないですが、なんらか対処が必要かもしれません。
 
-# まとめ
+## まとめ
 
 grpcについての概観をみた後、grpc-gatewayを使ってgRPC, REST APIの両方に対応するサーバを実装する流れを説明しました。gRPCに加えてProtocol Buffers関連の知識も必要なので最初は少し大変かもしれませんが、高効率で双方向通信をサポートしていることは魅力的な特長です。REST APIに比べるとやや敷居が高いgRPCですが、大まかな流れはそこまで複雑ではなかったのではないでしょうか。自分も学習しつつ開発を進めているところです。
 

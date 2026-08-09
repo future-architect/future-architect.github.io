@@ -16,7 +16,7 @@ lede: "チームの輪読会でKuberntes完全ガイドを読みました。 k8s
 
 <img src="/images/2022/20220112a/minikube.png" alt="" width="1000" height="519">
 
-# k8s学習環境が欲しい
+## k8s学習環境が欲しい
 
 こんにちはTIG鈴木です。
 
@@ -26,13 +26,13 @@ lede: "チームの輪読会でKuberntes完全ガイドを読みました。 k8s
 
 k8s完全ガイドでは[minikube](https://github.com/kubernetes/minikube)だったり[kind](https://kind.sigs.k8s.io/)だったりが紹介されています
 
-# ローカル環境もそれなりにめんどくさい
+## ローカル環境もそれなりにめんどくさい
 
 ところがminikubeだとGKEとは使い勝手が違っていて、k8s本通りに検証できない部分があり、初学者の私は混乱してしまいました。
 
 ということで、私がひっかかったポイント（おもにServiceまわり）を踏まえて、k8s学習を進めるためのいくつかTipsを紹介します。
 
-# minikubeとは
+## minikubeとは
 
 ローカルk8sクラスタをを簡単に構築できる定番のツールです。DockerやVirtualBoxで仮想マシンが立ち上がりその上にk8sが構築されます。
 
@@ -54,7 +54,7 @@ NAMES
 362ee8fb5198   gcr.io/k8s-minikube/kicbase:v0.0.26   "/usr/local/bin/entr…"   2 hours ago   Up 2 hours   127.0.0.1:49177->22/tcp, 127.0.0.1:49176->2376/tcp, 127.0.0.1:49175->5000/tcp, 127.0.0.1:49174->8443/tcp, 127.0.0.1:49173->32443/tcp   minikube
 ```
 
-# Serviceまわり
+## Serviceまわり
 
 **NodePort**は<ノードのIP>:< Port >への通信をPodに転送する形で、アプリケーションの外部疎通性を確保するリソースです。
 
@@ -111,7 +111,7 @@ test-deployment   LoadBalancer   10.108.139.68   10.108.139.68   80:31284/TCP   
 
 `curl 10.108.139.68:80` で疎通が確認できます。
 
-# Ingress
+## Ingress
 
 Ingressを使う場合は、Ingressコントローラをデプロイする必要があります。
 minikubeではそのためのaddonが用意されています。
@@ -162,7 +162,7 @@ test-ingress    <none>   *       192.168.49.2   80      13m
 
 [ingress-dns](https://minikube.sigs.k8s.io/docs/handbook/addons/ingress-dns/) addonを使えば、Ingressで設定したホスト名をホストサーバから解決することが可能らしいです。ちょっと試せていないですが、参考までに。
 
-# Horizontal Pod Autoscaler
+## Horizontal Pod Autoscaler
 
 Horizontal Pod Autoscaler(HPA)はCPUやメモリ消費に基づいてPodをスケールさせる機能です。HPAを使うためには、Podの消費するリソースをmetricsとして取得できる必要があります。minikubeではaddonとしてmetrics-serverを有効化します。
 
@@ -181,7 +181,7 @@ test-nginx   0m           1Mi
 
 この状態であれば、[HPAのチュートリアル](https://kubernetes.io/ja/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/)で、HPAが機能することを確認できます。
 
-# Multi-Node Clusterとスケジューリング
+## Multi-Node Clusterとスケジューリング
 
 minikubeはデフォルトで1 nodeで起動します。なのでそのままでは、Node AffinityやPod Affinityなど高度なスケジューリング機能の検証ができません。
 
@@ -241,7 +241,7 @@ hello-7db79cdc77-68mvs   1/1     Running   0          4m23s   10.244.0.3   minik
 hello-7db79cdc77-gkpwm   1/1     Running   0          4m23s   10.244.1.5   minikube-m02   <none>           <none>
 ```
 
-# まとめ
+## まとめ
 
 minikubeでk8sを学習していく際のTipsをご紹介しました。minikube以外にも[microk8s](https://microk8s.io/), [kind](https://kind.sigs.k8s.io/)などローカルk8sクラスタ構築ツールの選択肢はありますし、VMとkubeadmで構築するのも勉強になると思います。
 入門者のお役に立てれば幸いです！

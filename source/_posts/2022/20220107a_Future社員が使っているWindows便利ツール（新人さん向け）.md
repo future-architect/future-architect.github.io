@@ -13,14 +13,14 @@ thumbnail: /images/2022/20220107a/thumbnail.gif
 author: 青柳雄登
 lede: "2020年4月入社の青柳です。タイトルにある通り便利ツールをまとめてみました。今回は、新入社員や入社前の大学生をターゲットに、誰でもすぐに使えるツールを紹介しているので、まだ使っていないツールがあればぜひ使ってみて下さい。※前提としてwindowsの方向けなので、Macの方はごめんなさい:bow_tone2:"
 ---
-# はじめに
+## はじめに
 
 こんにちは。2020年4月入社の青柳です。タイトルにある通り便利ツールをまとめてみました。
 
 今回は、新入社員や入社前の大学生をターゲットに、誰でもすぐに使えるツールを紹介しているので、まだ使っていないツールがあればぜひ使ってみて下さい。
 ※前提としてWindowsの方向けなので、Macの方はごめんなさい🙇🏼
 
-# everything
+## everything
 
 <img src="/images/2022/20220107a/everything2.gif" alt="everything" width="1160" height="428" loading="lazy">
 
@@ -34,7 +34,7 @@ https://forest.watch.impress.co.jp/library/software/everything/
 
 もはや必須ツールですね。
 
-# cribor
+## cribor
 
 <img src="/images/2022/20220107a/cribor1.gif" alt="cribor1" width="1200" height="372" loading="lazy">
 
@@ -46,7 +46,7 @@ https://forest.watch.impress.co.jp/library/software/clibor/
 
 いたってシンプルな機能ですが、一度使うとすぐに便利さがわかると思います。
 
-# Tablacus Explorer
+## Tablacus Explorer
 
 <img src="/images/2022/20220107a/TablacusExplorer.gif" alt="TablacusExplorer.gif" width="862" height="451" loading="lazy">
 
@@ -56,7 +56,7 @@ https://tablacus.github.io/explorer.html
 
 似たようなツールで「QTTabBar」もあるが、個人的にはこちらがおすすめ。アドイン機能も充実しているので、好きなようにカスタマイズもできます。
 
-# orchis launcher
+## orchis launcher
 
 <img src="/images/2022/20220107a/orchislauncher.gif" alt="orchislauncher.gif" width="768" height="348" loading="lazy">
 
@@ -68,7 +68,7 @@ https://forest.watch.impress.co.jp/library/software/orchis/
 
 みなさんもカッコよく使いこなして！
 
-# OneNote
+## OneNote
 
 <img src="/images/2022/20220107a/ScreenToGif_2.gif" alt="ScreenToGif.gif" width="1200" height="604" loading="lazy">
 
@@ -80,7 +80,7 @@ https://www.microsoft.com/ja-jp/microsoft-365/onenote/digital-note-taking-app
 
 まさにノートのような使い方ができて非常に便利です。
 
-# ScreenToGif
+## ScreenToGif
 
 <img src="/images/2022/20220107a/ScreenToGif.gif" alt="ScreenToGif.gif" width="469" height="72" loading="lazy">
 
@@ -92,7 +92,7 @@ https://www.screentogif.com/
 
 工夫次第で使い道はいくらでもありそうなので、一度使ってみて欲しいです。
 
-# 最後に
+## 最後に
 
 テレワークだと先輩社員の仕事を直接見れず、どんなツールを使っているのか知る機会が少ないですよね。
 

@@ -15,7 +15,7 @@ lede: "Pyright を LSP サーバとした自作クライアントを実装しま
 
 <img src="/images/2022/20220303a/PyrightLarge.png" alt="" width="565" height="234">
 
-# はじめに
+## はじめに
 
 こんにちは、Future でアルバイトをしている空閑と申します。本記事ではタイトルの通り、Pyright を LSP (Language Server Protocol) サーバとした自作クライアントを実装しますが、その前に経緯について説明します。本節では実装については触れません。
 
@@ -25,9 +25,9 @@ lede: "Pyright を LSP サーバとした自作クライアントを実装しま
 
 問題は、LSP クライアントをエディタ（主に VSCode）以外で実装するサンプルがほとんどないことです。解析ツールはコマンドラインで動作するようにしたいため、エディタ依存の機能は使えません。[LSP の仕様](https://microsoft.github.io/language-server-protocol/specifications/specification-current/)は公開されているものの、詳細な手順については記載がありません。特に Pyright における初期化の手順は、実際の実装を追う必要があり苦戦しました。次節以降では、初期化の手順を含めた自作 LSP クライアントの実装方法を紹介します。
 
-# 自作 LSP クライアントの作成
+## 自作 LSP クライアントの作成
 
-## 仕様
+### 仕様
 
 - 解析対象：Python
 - LSP サーバ：Pyright
@@ -36,7 +36,7 @@ lede: "Pyright を LSP サーバとした自作クライアントを実装しま
   - サーバ・クライアント間のメッセージ送受信
   - メッセージによる簡単な解析結果の取得
 
-## 最低限実装が必要なメッセージ
+### 最低限実装が必要なメッセージ
 
 1. [Initialize Request](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#initialize)：サーバの初期化を要求
 2. [Initialized Notification](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#initialized)：クライアント側の初期化が完了したことを通知
@@ -44,9 +44,9 @@ lede: "Pyright を LSP サーバとした自作クライアントを実装しま
 
 詳しくは [Pyright を LSP サーバとした自作 LSP クライアント（調査編）](/articles/20220302a/)を参照してください。
 
-# 実装
+## 実装
 
-## サーバ起動・メッセージ受信
+### サーバ起動・メッセージ受信
 
 LSP サーバのパスを指定し、子プロセスで起動します。Pyright のリポジトリをクローンした場合、サーバのパスは `pyright/packages/pyright/langserver.index.js` です。Pyright は実行時引数で通信方法を指定できます。`--node-ipc`、`--stdio`、`--socket={number}` から選ぶことができますが、今回は `--node-ipc` を採用します。
 
@@ -89,7 +89,7 @@ main();
 }
 ```
 
-## Initialize Request
+### Initialize Request
 
 今はまだ起動してメッセージを受信するだけのプログラムなので、今度はメッセージを送信してみます。仕様では最初に Initialize Request を送ることになっているので、これを実装します。サーバにリクエストを送る場合には `connection.sendRequest(type, params)` を使います。`type` はメソッドの種類、`params` はメソッド固有のパラメータになります。これらの型定義は [`vscode-languageserver-protocol`](https://www.npmjs.com/package/vscode-languageserver-protocol) にあるので、適当に参照します。
 
@@ -145,7 +145,7 @@ Initialize Request が正しく送れていると、Initialize Result が返っ�
 }
 ```
 
-## Initialized Notification
+### Initialized Notification
 
 次は Initialize Result を受けて、クライアント側の初期化が終わったことを通知するために Initialized Notification を送信します。サーバに通知を送る場合には `connection.sendNotification(type, params)` を使います。`InitializedParams` は空のオブジェクトなので実装はしないで `{}` を直接入力することにします。
 
@@ -201,7 +201,7 @@ main();
 }
 ```
 
-## DidChangeWorkspaceFolders Notification
+### DidChangeWorkspaceFolders Notification
 
 ワークスペースフォルダを変更するメソッドを実装します。これを実行することで、解析対象のフォルダを変更できます。`InitializeParams` 同様に `DidChangeWorkspaceFoldersParams` を実装します。プロパティは多いですが、単にワークスペースとして認識するフォルダの追加と削除を行っているだけです。また、DidChangeWorkspaceFolders Notification はデフォルトではサーバ側から認識されないため、`InitializeParams.capabilities` にワークスペース機能があることを記載します。詳細は、[Pyright を LSP サーバとした自作 LSP クライアント（調査編）](/articles/20220302a/)で解説しています。
 
@@ -260,7 +260,7 @@ Auto-excluding \path\to\myvenv
 Found {number} source files
 ```
 
-## 解析メッセージ
+### 解析メッセージ
 
 以上で、解析に必要な初期化メッセージをすべて実装したことになり、ここから先は自由にメッセージを送信できます。今回は最近のエディタでよく見かける、[Hover Request](https://microsoft.github.io/language-server-protocol/specification#textDocument_hover) を送信してみます。[FastAPI](https://fastapi.tiangolo.com/ja/) を使用した以下のファイルを対象にします。
 
@@ -307,7 +307,7 @@ connection.sendRequest(
 }
 ```
 
-## 全体の実装
+### 全体の実装
 
 <details>
   <summary>長いので折り畳み</summary>
@@ -404,11 +404,11 @@ main();
 </div>
 </details>
 
-# 感想
+## 感想
 
 今回は、自作の LSP クライアントを実装しました。機能としては不十分ですが、遊ぶ分には楽しめると思います。本来の目的は既存のメッセージを組み合わせての解析なのですが、実際のところかなり面倒です…。LSP が解析目的のプロトコルではないので当然ですが。現在は Pyright 内部をいじることも検討しているので、LSP サーバ側の実装についても今後機会があれば紹介したいと思います。
 
-# 参考
+## 参考
 
 - https://microsoft.github.io/language-server-protocol/
 - https://docs.microsoft.com/en-us/visualstudio/extensibility/language-server-protocol?view=vs-2022

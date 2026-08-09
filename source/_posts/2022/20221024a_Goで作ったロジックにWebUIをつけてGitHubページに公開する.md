@@ -20,7 +20,7 @@ https://shibukawa.github.io/md2sql/
 
 ウェブフロントエンド部分はNext.jsの静的サイトで、GoはWASMにしてロードして実行しています。WASMを使うのは初めてなのであえて選んでみました。
 
-# GoをWASM化する
+## GoをWASM化する
 
 もともとCLIツールは作っておりました。CLIのメインは[cmd/md2sql/main.go](https://github.com/shibukawa/md2sql/blob/main/cmd/md2sql/main.go)で作っていました。この中でやっていることは
 
@@ -91,7 +91,7 @@ GOOS=js GOARCH=wasm go build -o md2sql.wasm
 cp "$(go env GOROOT)/misc/wasm/wasm_exec.js" .
 ```
 
-# Webの画面を作る
+## Webの画面を作る
 
 /cmd/frontendをつくるようにcreate-next-appを実行し、最近お気に入りの[Tailwind.CSSとdaisyUI](https://future-architect.github.io/articles/20211124a/)の組み合わせで、ページトップのスクリーンショットのような画面を作りました。テキストボックスに入れられたソースコードを``useRef``の変数に一時変数に入れておいて、generateボタンを押されたらGoコードを呼び出して実行します。
 
@@ -144,7 +144,7 @@ declare var md2sql:{
 }
 ```
 
-# 繋げる部分のコード
+## 繋げる部分のコード
 
 wasm_exec.jsをロードして実行するコードを書きます。Next.jsでは任意のページ内とかコンポーネント内で宣言しておけば、ページのヘッダー部分に`<script>`タグを作って遅延ロードしてくれる[`next/script`コンポーネント](https://nextjs.org/docs/basic-features/script)があるのでこれを使います。一応この[wasm_exec.jsの型定義も](https://www.npmjs.com/package/@types/golang-wasm-exec)入れようと思えば入れられますが、今回はts-ignoreで済ませてしまいました。定型文ですし。GitHubページのプロジェクトページなのでjsもwasmもパスが`/md2sql/`以下にある想定で書きます。
 
@@ -183,7 +183,7 @@ WASMのロジックは生成のコールバックが呼ばれた時に呼び出�
 
 接点としてはこの「起動時のロード」と、ローダーが登録した関数の呼び出しだけですので、あとはウェブフロントエンド作れる人には特に問題なく進められると思います。
 
-# まとめ
+## まとめ
 
 思ったよりもWASM化が簡単にできました。作業時間の半分はGitHubページのフォルダがルート直下じゃないことで起きる問題のトラブルシュートでした。繋ぐ部分を作ってローカルで試すのは思ったよりもすぐでした。
 
@@ -191,7 +191,7 @@ WASMのロジックは生成のコールバックが呼ばれた時に呼び出�
 
 今後も、小さいな補助ツールを作ったらウェブで簡単に実行できるようにしていこうと思いました。
 
-# 参考
+## 参考
 
 * [GoのコードをWebAssenblyにコンパイルしてブラウザ上でGoを実行する](https://www.asobou.co.jp/blog/web/go-webassembly)
 * [Go and WebAssembly (I): interacting with your browser JS API](https://macias.info/entry/202003151900_go_wasm_js.md)

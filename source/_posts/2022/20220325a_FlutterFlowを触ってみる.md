@@ -16,14 +16,14 @@ lede: "Flutter連載6回目としてFlutterFlowについて調べてみました
 ---
 <img src="/images/2022/20220325a/image.png" alt="image.png" width="1200" height="675" loading="lazy">
 
-# はじめに
+## はじめに
 
 TIGの宮崎将太です。
 
 [Flutter連載6回目](/articles/20220315a/)としてFlutterFlowについて調べてみました。
 ※2022年3月時点でFreeプランで検証しています。
 
-# What's Flutter Flow
+## What's Flutter Flow
 
 GoogleI/O'21でFlutterFlowというFlutterのノーコードのサービスが発表されました。
 
@@ -31,7 +31,7 @@ GUIだけでグリグリアプリが作れちゃうという例のアレです�
 
 個人的にノーコードツールに懐疑的な印象を持っているので、実際に現場に適用できそうかという観点で調べてみました。
 
-# 機能&料金体型
+## 機能&料金体型
 
 出落ちになりますが、プラン別の機能と料金体系です。
 
@@ -54,14 +54,14 @@ GUIだけでグリグリアプリが作れちゃうという例のアレです�
 | **Firebase ContentMangeer**        | ProプランのみFirestoreデータをFlutterFlowGUI上で編集できるようになるとのこと。                                                                                                                                                                          |               |                   |       ○      |
 | **料金**                           | per month                                                                                                                                                                                                                                               |       0$      |        30$        |      70$     |
 
-# 使い方
+## 使い方
 
 FlutterFlowアカウント自体は無料で作成が可能です。
 https://app.flutterflow.io/create-account
 
 以降はアカウントを作成した前提で話を進めます。
 
-## プロジェクト作成
+### プロジェクト作成
 
 テンプレートからプロジェクトを作成するかblankプロジェクトを作成するか選択可能です。
 Freeプランで利用可能なテンプレートは現時点で8種類あり、大半がFirebase利用を前提としていました。
@@ -72,7 +72,7 @@ Freeプランで利用可能なテンプレートは現時点で8種類あり、
 
 <img src="/images/2022/20220325a/909972bf-5d96-3dc5-4a1e-22fc212e209d.png" alt="プロジェクト作成の流れ3" width="816" height="646" loading="lazy">
 
-## 画面デザイン
+### 画面デザイン
 
 メインのデザイン画面はこんな感じです
 
@@ -89,14 +89,14 @@ TextやColumn、RowなどおなじみのWigdetがデフォルトで登録され�
 
 <img src="/images/2022/20220325a/image_3.png" alt="画面ごとの表示やWidgetのツリー表示" width="354" height="906" loading="lazy">
 
-## Action設定
+### Action設定
 
 配置した部品にGUIでActionを設定できます。
 設定可能なActionはデフォルトで用意されているものとカスタムで作成できるものがあり、Navigatorの使用やAlertなんかはデフォルトで用意されています。
 
 <img src="/images/2022/20220325a/image_4.png" alt="GUIを用いたAction設定" width="1200" height="515" loading="lazy">
 
-## コンポーネント作成
+### コンポーネント作成
 
 GUIとコードベースでコンポーネントを作成できます。
 部品として永続化してDRYに書くことは問題なくできそうです。
@@ -104,7 +104,7 @@ GUIとコードベースでコンポーネントを作成できます。
 
 <img src="/images/2022/20220325a/ezgif.com-gif-maker.gif" alt="コンポーネント作成のGifどうが" width="800" height="544" loading="lazy">
 
-## LocalState
+### LocalState
 
 アプリケーショングローバルな値をLocalStateとして設定しておけます。
 ローカルDBへの永続化も可能です。
@@ -112,7 +112,7 @@ ActionやCustomFunctionから適宜参照、設定ができます。
 
 <img src="/images/2022/20220325a/image_5.png" alt="アプリケーショングローバルな値をLocalStateとして設定" width="1200" height="734" loading="lazy">
 
-## APICall
+### APICall
 
 ここが残念なところ....
 FreePlan/Standardでは任意のAPICall設定ができません。Backendを簡単に使用する場合はFirebaseを使うことが縛りになってしまうよう。
@@ -120,7 +120,7 @@ FreePlan/Standardでは任意のAPICall設定ができません。Backendを簡�
 
 <img src="/images/2022/20220325a/image_6.png" alt="API呼び出し" width="1200" height="745" loading="lazy">
 
-## 生成ソースコード
+### 生成ソースコード
 
 最後に、FreePlanでも画面のソース閲覧は可能です（プロジェクト全体のダウンロードやGithub接続は不可）。
 ちょっとコードを眺めてみましょう。
@@ -421,7 +421,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
 あくまでデザイン部分の参考程度の使い道にな理想です。
 ちなみに、テーマはFlutterFlowプロジェクトでグローバル設定が可能で、`FlutterFlowTheme`はその設定にアクセスしているものと思われます。
 
-# 使い所
+## 使い所
 
 軽く触ってみた感触と料金体系を見た感じ、以下の感触でした。
 

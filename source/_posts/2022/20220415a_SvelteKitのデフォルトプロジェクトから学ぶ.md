@@ -41,7 +41,7 @@ $ npm install
 $ npm run dev -- --open
 ```
 
-# サンプルプロジェクトのページ構成
+## サンプルプロジェクトのページ構成
 
 サンプルプロジェクトは3つのページがあります。静的なAbout以外に、よくあるカウンターと、ToDoがあります。カウンターはSvelte単体でも実現できるような内容で、ToDoはウェブサービスアクセスを伴うサンプルです。
 
@@ -67,11 +67,11 @@ $ npm run dev -- --open
 
 ぱっと見て想像できるルールはこんな感じです。
 
-## ``src/routes``の階層がURLになりそう
+### ``src/routes``の階層がURLになりそう
 
 Next.jsの``pages``みたいな感じのようです。[Routing](https://kit.svelte.dev/docs/routing)ページを見て答え合わせすると、やはりこのファイルシステムがそのままURLになるよ、と書いてあります。便利ですよねこれ。
 
-## ``src/routes/__layout.svelte``も共通部分を書きそう
+### ``src/routes/__layout.svelte``も共通部分を書きそう
 
 おそらくこれはきっとどのページでも今日で使われるヘッダーとかフッターとかを書きそうで、.svelteだからきっと動的なコンポーネントも使えそうな気がします。
 
@@ -89,7 +89,7 @@ Next.jsの``pages``みたいな感じのようです。[Routing](https://kit.sve
 
 階層構造のサポートはSvelteのRouter機能のポイントらしく、レイアウトとかエラーページとかは特定のフォルダ内でのみに適用とかができるみたいです。
 
-## app.htmlが最終的に作られるアプリケーションの枠組みっぽい
+### app.htmlが最終的に作られるアプリケーションの枠組みっぽい
 
 __layout.svelteと違い、きっと静的な共通要素、例えばmetaタグとかはここに書くんだろうと思われます。しかし、これに関する直接的な解説はドキュメントにはありません。ドキュメントの中に書かれているapp.htmlに関する要素は、2つだけです。
 
@@ -103,7 +103,7 @@ __layout.svelteと違い、きっと静的な共通要素、例えばmetaタグ�
 > * ``%svelte.head%`` — ページ固有の`<title>`などの`<head>`に置かれるHTMLに置き換えられる
 > * ``%svelte.body%`` — SvelteがレンダリングするボディのHTMLに置き換えられる
 
-# API周り
+## API周り
 
 SvelteじゃなくてSvelteKitを選びたいニーズとしては主にサーバーもTypeScriptやJavaScriptも書きたいというのがあると思います。それ以外にもすでに説明したrouter周りで楽がしたい、静的コンテンツ生成に使いたい、というのもあると思いますが、ここではサーバーAPI提供側のコードを見ていきます。
 
@@ -133,7 +133,7 @@ export const get: RequestHandler = async () => {
 
 アンダースコアで除外できることは[プライベートモジュール](https://kit.svelte.dev/docs/routing#private-modules)で説明されていました。ピリオドもプライベート扱い（`.well-known`を除く)とのこと。
 
-## メソッドオーバーライド
+### メソッドオーバーライド
 
 動かしてみて、おっと思ったのが、`_method=DELETE`というところですね。HTTP的にはメソッドはたくさんありますが、JavaScriptを使わずにHTTPのフォームを使って送れるのはGETとPOSTのみです。そこで、POSTにいろいろなメソッドも振る舞わせるというメソッドオーバーライドというのがあります。
 
@@ -155,7 +155,7 @@ const config = {
 
 [メソッドオーバーライド](https://kit.svelte.dev/docs/routing#endpoints-http-method-overrides)のドキュメントにいろいろ書かれています。フロント側でがんばらなくてもできるようにする配慮があるのはいいですね。
 
-## フォームのパース
+### フォームのパース
 
 サンプルを見ると、`request`のメソッドを使うことで、フロントから渡されるリクエストを処理できるみたいですね。
 
@@ -173,7 +173,7 @@ export const post: RequestHandler = async ({ request, locals }) => {
 
 このリクエストオブジェクトは[ボディのパースのドキュメント](https://kit.svelte.dev/docs/routing#endpoints-body-parsing)のリンクを見る限り、[ブラウザのAPIと同じ](https://developer.mozilla.org/en-US/docs/Web/API/Request)っぽい。
 
-## サンプルのAPI実装のバックエンドの中身
+### サンプルのAPI実装のバックエンドの中身
 
 サーバーコード側の実装を見てみたら、fetchでsvelteが提供しているサーバーにリクエストを飛ばしているっぽいですね。サンプル用にサーバー維持するのすごい。たしかにストレージ周りだとSQLにしてもMongoDBなどにしても、SvelteKitの書き方を伝えたい、というニーズ以上のさまざまな前提知識が発生しがちなので、この割り切りは理解できます。
 
@@ -194,7 +194,7 @@ export function api(method: string, resource: string, data?: Record<string, unkn
 
 [NeDB](https://dbdb.io/db/nedb)みたいなのでもいいのに、と思ったら、NeDBはもうメンテナンス中止していたんですね。残念。
 
-# フック
+## フック
 
 ソースフォルダの中にhooks.tsという気になるファイルがありました。中を見ると、CookieからユーザーIDを取り出し、なければUUIDを生成して`event.locals.userid`に格納しています。ウェブアプリケーションフレームワークに頻出するミドルウェアと近そうです。
 
@@ -217,7 +217,7 @@ response.headers.set(
 
 Cookieへの書き込みは、ヘッダーに直接入れていますが、[ドキュメント](https://kit.svelte.dev/docs/routing#endpoints-setting-cookies)でもそうなっていますね。面白いですね。
 
-# それ以外の要素
+## それ以外の要素
 
 生成されたコードにはないがドキュメントにある項目は以下の通りです。あとはこのあたりをピックアップして読んでみたら、SvelteKitの機能をざっと掴むには良いかなと思いました。
 
@@ -227,7 +227,7 @@ Cookieへの書き込みは、ヘッダーに直接入れていますが、[ド�
 
 あとは、デプロイ時の環境ごとの違いは[アダプター](https://kit.svelte.dev/docs/adapters)というものにまとめられているので、何かしらのアダプターについては学ぶことになるかと思います。
 
-# (補足)Playwright
+## (補足)Playwright
 
 SvelteKitのプロジェクト作成ではJestとかVitestのような普通のテスティングフレームワークではなくて、E2EのPlaywrightの生成のみに対応しています。
 
@@ -252,7 +252,7 @@ SvelteKitのプロジェクト作成ではJestとかVitestのような普通の�
 
 TypeScript周りはいろいろ[Issueがどんどん修正されている](https://github.com/sveltejs/kit/issues?q=is%3Aissue+playwright+is%3Aopen)ので、もうちょっと新しいバージョンなら問題なくなるんじゃないかと思います。[Issue](https://github.com/sveltejs/kit/issues/4143)を見ると、PlaywrightじゃないUnit Testについて はvitest側のsveltekit対応の改善待ちステータスのようです。
 
-# まとめ
+## まとめ
 
 SvelteKitを学ぼうと思ったけど、チュートリアル的なコンテンツがなく、上からドキュメント読むのもいいけど手っ取り早く概要を掴もうと思って、デフォルトプロジェクトのコードリーディングなどをしつつ、ドキュメントをつまみ食いするスタイルで学習してみました。
 

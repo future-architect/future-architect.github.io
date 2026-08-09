@@ -18,7 +18,7 @@ lede: "PythonでWebAPIを構築しました。その際にOpenAPI Generatorが�
 
 この記事は[Python Advent Calendar 2022](https://qiita.com/advent-calendar/2022/python) カレンダー2の3日目です。昨日はtttakehさんの[じゃんけん画像を分類してみた](https://zenn.dev/takeguchi/articles/672ff3b34753a7)でした。
 
-# はじめに
+## はじめに
 
 こんにちは。TIG DXユニットの村上です！
 
@@ -28,13 +28,13 @@ lede: "PythonでWebAPIを構築しました。その際にOpenAPI Generatorが�
 
 今回はGo言語ではなくPythonでWeb APIを構築しました。その際にOpenAPI Generatorが便利だったのでご共有します。
 
-# OpenAPI Generator
+## OpenAPI Generator
 
 [OpenAPI Generator](https://github.com/OpenAPITools/openapi-generator)はAPIリクエストやレスポンスの内容を定義し、それを元にプログラムを自動生成するツールです。
 
 API定義ファイルの書き方の例と、そこからコードを自動生成する方法をご紹介します。
 
-## API定義ファイル
+### API定義ファイル
 
 今回のファイル名は`openapi.yaml`とします。
 以下のようにリクエストパラメータやレスポンスを定義します。
@@ -138,7 +138,7 @@ components:
 
 `operationId`で指定した部分が自動生成コードに関数名として反映されます。
 
-## コードの自動生成
+### コードの自動生成
 
 生成方法はいくつかありますが、今回はdockerを使って自動生成します。
 サーバ側、クライアント側どちらを生成するかはgeneratorのコマンドライン引数によって決まります。
@@ -167,7 +167,7 @@ docker run --rm -v ${PWD}:/local openapitools/openapi-generator-cli generate -i 
 
 Pythonのimportパスにも関わってくるため、プロジェクトに沿った名前にすると良いと思います。
 
-## 自動生成されたファイル
+### 自動生成されたファイル
 
 自動生成されたサーバ側のディレクトリ及びその内部のファイルを見ていきたいと思います。
 上記の`openapi.yaml`からは以下の内容が出力されました。
@@ -207,7 +207,7 @@ Pythonのimportパスにも関わってくるため、プロジェクトに沿�
 テスト用のファイルまで自動生成してくれます。
 そのままこのディレクトリをプロジェクトディレクトリにできるレベルです。
 
-### openapi_server
+#### openapi_server
 
 APIの本体は`openapi_server`になります。この中の`controllers`にAPIの中身を実装していくことになります。
 
@@ -290,7 +290,7 @@ paths:
 
 上記の場合、`/v1/sc/{security_cd}/stockPrice`がコールされた時、`openapi_server/controllers/stock_price_controller.py`の`stock_price関数`が呼び出されることになります。
 
-### .openapi-generator-ignore
+#### .openapi-generator-ignore
 
 このファイルには自動生成時に上書きを禁止するディレクトリやファイルを指定します。
 
@@ -303,7 +303,7 @@ openapi_server/controllers/*
 openapi_server/test/*
 ```
 
-### Dockerfile
+#### Dockerfile
 
 このDockerfileを使うことで、ローカルに簡単にwebサーバを立てることができます。
 
@@ -319,7 +319,7 @@ $ curl http://localhost:8080/v1/sc/4722/stockPrice
 "do some magic!"
 ```
 
-# おわりに
+## おわりに
 
 Python自体が動的型付け言語なだけあってプログラミング時に型を常に気にする必要があり、結構精神を擦り減らすと思います。
 

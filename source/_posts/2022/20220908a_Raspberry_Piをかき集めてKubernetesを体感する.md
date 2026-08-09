@@ -15,7 +15,7 @@ lede: "業務でGKE（Google Kubernetes Engine）を利用することがある�
 
 [夏の自由研究ブログ連載2022](/articles/20220822a/) の10本目です。
 
-# はじめに
+## はじめに
 
 TIG 岸下です。業務でGKE（Google Kubernetes Engine）を利用することがあるのですが、Kubernetesの挙動や仕組みなど如何せん理解が難しいです。
 
@@ -25,7 +25,7 @@ TIG 岸下です。業務でGKE（Google Kubernetes Engine）を利用するこ�
 
 参考：[RaspberryPi 4 にUbuntu20.04 をインストールして、Kubernetes を構築してコンテナを動かす](https://qiita.com/yasthon/items/c29d0b9ce34d66eab3ec)
 
-# 今回Kubernetes構築するにあたって用意したもの
+## 今回Kubernetes構築するにあたって用意したもの
 
 - Raspberry Pi3 Model B（メモリ1GB）
 - Raspberry Pi4 Model B（メモリ4GB）
@@ -38,22 +38,22 @@ TIG 岸下です。業務でGKE（Google Kubernetes Engine）を利用するこ�
 
 各種Raspberry Piの電源はコンセントから取っています。
 
-# ラズパイの設定
+## ラズパイの設定
 
 - 3台共通のものと、3台それぞれで設定する内容があるので注意して下さい。
 
-## OS
+### OS
 
 - OS: Ubuntu 20.04LTS（3台共通）
 
 [Raspberry Pi Imager](https://www.raspberrypi.com/software/)を使うと簡単にSDカードへOSを焼くことが出来ます。
 SDカード3枚全てにUbuntu 20.04LTSを焼きます。
 
-## Kubernetesのバージョン
+### Kubernetesのバージョン
 
 - v1.25.0
 
-## 初期設定（3台共通）
+### 初期設定（3台共通）
 
 ラズパイにOSをインストールしたSDカードを差し込み、パッケージを最新版にしておきます。
 
@@ -62,9 +62,9 @@ sudo apt update
 sudo apt upgrade -y
 ```
 
-## ネットワーク周り
+### ネットワーク周り
 
-### 物理的な構成図
+#### 物理的な構成図
 
 <img src="/images/2022/20220908a/Screenshot_from_2022-09-04_20-54-30.png" alt="Screenshot_from_2022-09-04_20-54-30.png" width="1200" height="732" loading="lazy">
 
@@ -80,7 +80,7 @@ sudo apt upgrade -y
 
 で構成しております。
 
-### ネットワークの設定（ラズパイ3台それぞれで）
+#### ネットワークの設定（ラズパイ3台それぞれで）
 
 上記のIPアドレスを各ラズパイに割り振って固定化します。
 以下のファイルを作成します。
@@ -116,19 +116,19 @@ ifconfig
 # でインストール
 ```
 
-### SSHの設定（デスクトップPC）
+#### SSHの設定（デスクトップPC）
 
 IPアドレスの固定化が完了したので、ここからはSSHで操作を行うようにします。
 
 **※SSHは利用しなくても設定できますが、3台分のラズパイのディスプレイを切り替える作業のストレスが無くなります。**
 
-#### VSCodeのRemote SSHを用意
+##### VSCodeのRemote SSHを用意
 
 デスクトップPCにてVSCodeをインストールして、「拡張機能」から[Remote - SSH](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh)をインストールしてください。
 
 <img src="/images/2022/20220908a/Screenshot_from_2022-09-03_15-19-08.png" alt="Screenshot_from_2022-09-03_15-19-08.png" width="1200" height="233" loading="lazy">
 
-#### SSH構成ファイルを用意
+##### SSH構成ファイルを用意
 
 VSCodeウィンドウ左下の「＞＜」をクリックして、「SSH構成ファイルを開く」から`config`を開いて以下のように設定して保存します。
 
@@ -150,13 +150,13 @@ Host rpi3
 - IPアドレスは自宅の環境に合わせて適宜変更して下さい。
 - User名を変更している場合も適宜変更して下さい。
 
-#### 各ラズパイに接続する
+##### 各ラズパイに接続する
 
 VSCodeウィンドウ左下の「＞＜」をクリックして、「ホストに接続する」からホスト名を選んで接続します。
 初回は接続キーの登録が行われるため、キーが表示されたら「続行」を押し、あとはログイン用のパスワードを入力すると接続できます。
 複数台同時に接続できるので、3画面分用意しておけばデスクトップPC側からラズパイの操作が可能となります。
 
-### ホスト名の変更（ラズパイ3台それぞれ）
+#### ホスト名の変更（ラズパイ3台それぞれ）
 
 ここからはまたラズパイの操作となります。
 以下のホスト名を割り振っていきましょう。
@@ -172,7 +172,7 @@ sudo hostnamectl set-hostname mas.example.com # 各々のラズパイでhostname
 hostname # 変更の確認作業
 ```
 
-### /etc/hostsの設定（ラズパイ3台共通）
+#### /etc/hostsの設定（ラズパイ3台共通）
 
 ホスト名とIPアドレスを対応させるために、`etc/hosts`に以下の内容を追記します。
 
@@ -192,7 +192,7 @@ sudo vi /etc/hosts
 
 これによって、ネットワークの名前解決ができるようになります。
 
-#### 余談
+##### 余談
 
 以下はKubernetesの設定とは関係のない話なので余談ですが、ターミナル上で
 
@@ -204,7 +204,7 @@ ssh work01.example.com
 これはDNS（Domain Name Service）でも同じことが行われています。
 DNSについては、ぜひTIG西田さんの[NW入門](https://future-architect.github.io/articles/20200604/)を読んでみてください。ハンズオン形式でわかりやすいと思います。
 
-### IPv6の停止（ラズパイ3台共通）
+#### IPv6の停止（ラズパイ3台共通）
 
 IPv6は今回利用しないので停止します。
 `sysctl.conf`をvimで開きます。
@@ -225,7 +225,7 @@ net.ipv6.conf.eth0.disable_ipv6 = 1
 net.ipv6.conf.lo.disable_ipv6 = 1
 ```
 
-#### 余談
+##### 余談
 
 また余談ですが、最近はKubernetesでIPv4/IPv6デュアルスタックが利用できるそうです。
 参考：[IPv4/IPv6デュアルスタック](https://kubernetes.io/ja/docs/concepts/services-networking/dual-stack/)
@@ -236,7 +236,7 @@ net.ipv6.conf.lo.disable_ipv6 = 1
 IPv6自体はIPv4アドレスの枯渇問題を解決するためのプロトコルで、他にもIPv4に対する不満の多くを一挙に解消しようとしています（[マスタリングTCP/IP入門編](https://www.ohmsha.co.jp/book/9784274224478/) P.171）。
 デュアルスタック機能によって、お互いは仕様の異なるプロトコルスタックですが共存させる仕組みで、やはりどちらのプロトコルも使えるのが美味しいポイントとなるのでしょうか。利用する機会があればまた調べて見ようと思います。
 
-### timezone, keymapの変更（ラズパイ3台共通）
+#### timezone, keymapの変更（ラズパイ3台共通）
 
 タイムゾーンを日本に、keymapを日本語にします。
 
@@ -248,14 +248,14 @@ sudo timedatectl set-timezone Asia/Tokyo
 sudo localectl set-keymap jp106
 ```
 
-## Kubernetes周り
+### Kubernetes周り
 
 ここからKubernetes周りの設定を行っていきます。
 基本はkubeadmの設定に沿っていきます。
 
 参考：[kubeadmのインストール](https://kubernetes.io/ja/docs/setup/production-environment/tools/kubeadm/install-kubeadm/)
 
-### iptablesがnftablesバックエンドを使用しないようにする（ラズパイ3台共通）
+#### iptablesがnftablesバックエンドを使用しないようにする（ラズパイ3台共通）
 
 > nftablesバックエンドは現在のkubeadmパッケージと互換性がありません。(ファイアウォールルールが重複し、kube-proxyを破壊するためです。)
 
@@ -274,7 +274,7 @@ sudo update-alternatives --set ebtables /usr/sbin/ebtables-legacy
 
 参考：[kubernetes: iptablesがnftablesバックエンドを使用しないようにする](https://kubernetes.io/ja/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#iptables%E3%81%8Cnftables%E3%83%90%E3%83%83%E3%82%AF%E3%82%A8%E3%83%B3%E3%83%89%E3%82%92%E4%BD%BF%E7%94%A8%E3%81%97%E3%81%AA%E3%81%84%E3%82%88%E3%81%86%E3%81%AB%E3%81%99%E3%82%8B)
 
-### Dockerのインストール（ラズパイ3台共通）
+#### Dockerのインストール（ラズパイ3台共通）
 
 参考：[Install Docker Engine on Ubuntu](https://docs.docker.com/engine/install/ubuntu/)
 
@@ -319,7 +319,7 @@ docker run hello-world
 # Hello from Docker!と表示されればOK
 ```
 
-### kubeadm、kubelet、kubectlのインストール（ラズパイ3台共通）
+#### kubeadm、kubelet、kubectlのインストール（ラズパイ3台共通）
 
 参考：[kubeadm、kubelet、kubectlのインストール](https://kubernetes.io/ja/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#kubeadm-kubelet-kubectl%E3%81%AE%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AB)
 
@@ -338,7 +338,7 @@ sudo apt-mark hold kubelet kubeadm kubectl
 
 そもそもこのkubeadm、kubelet、kubectlは何に使われるのでしょうか？
 
-#### kubeadm
+##### kubeadm
 
 参考：[Kubeadm](https://kubernetes.io/docs/reference/setup-tools/kubeadm/)
 
@@ -350,7 +350,7 @@ sudo apt-mark hold kubelet kubeadm kubectl
 
 クラスタの立ち上げまではkubeadmが面倒見てくれて、残りのツールとか設定は各々よしなにやりましょうという感じでしょうか。
 
-#### kubelet
+##### kubelet
 
 参考：[kubelet](https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/)
 
@@ -379,18 +379,18 @@ kubeletを理解する前に、クラスターの全体像をまず理解する�
 
 kubeletは各Pod内の管理・仲介者と考えておくとよさそうです。
 
-#### kubectl
+##### kubectl
 
 参考：[kubectlの概要](https://kubernetes.io/ja/docs/reference/kubectl/overview/)
 
 kubectlはKubernetesクラスターを制御するためのコマンドラインインタフェース（CLI）です。ターミナルからKubernetesクラスターを制御するのに使われます。
 
-### cgroupでmemoryの有効化（ラズパイ3台共通）
+#### cgroupでmemoryの有効化（ラズパイ3台共通）
 
 Kubernetesを利用する際に、cgroupのmemoryを有効化する必要があります。
 はて、cgroupとは何なんでしょうか。
 
-#### Kubernetes内でのcgroup
+##### Kubernetes内でのcgroup
 
 参考：[Linuxカーネルのコンテナ機能［2］ ─cgroupとは？（その1）](https://gihyo.jp/admin/serial/01/linux_containers/0003)
 参考：[Kubernetes で cgroup がどう利用されているか](https://valinux.hatenablog.com/entry/20210114)
@@ -399,7 +399,7 @@ cgroupはControle Groupの略で、プロセスをグループ化して、その
 
 kubeletの説明の中でPodSpecの話が出てきました。PodSpecのファイルではPod内のコンテナに関する情報を書くわけですが、この中でCPUやメモリの量も制限する（`resources`の`limits`）ことが可能です。正にここでcgroupが使われていて、ラズパイの計算リソースに対して、例えば計算リソースをそこまで必要としないPodに対しては制限をすることで、ラズパイのリソースを無駄に食い潰さないようにできます。
 
-#### 有効化の設定
+##### 有効化の設定
 
 さて、cgroupのメモリーを有効化していきます。
 以下のコマンドで確認すると、初期では無効化（末尾が0）されています。
@@ -437,11 +437,11 @@ cat /proc/cgroups | grep memory
 memory  7       107     1
 ```
 
-# Kubernetesクラスターの作成
+## Kubernetesクラスターの作成
 
 参考：[kubeadmを使用したクラスターの作成](https://kubernetes.io/ja/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/)
 
-## コントロールプレーンノードの初期化（マスターノードのラズパイのみ）
+### コントロールプレーンノードの初期化（マスターノードのラズパイのみ）
 
 先程も出てきましたが、コントロールプレーンノード＝マスターノードです。
 マスターノードにて操作を行っていきます。
@@ -461,7 +461,7 @@ sudo kubeadm init --apiserver-advertise-address=192.168.1.101 --pod-network-cidr
 初期化後、`kubeadm join 192.168.1.101:6443 --token ...`という出力が出たら、どこかのテキストエディタにコピーしておきます。
 このコマンドはワーカーノードを追加する際に利用します。
 
-### もしinit時に`container runtime is not running`というエラーが出た場合
+#### もしinit時に`container runtime is not running`というエラーが出た場合
 
 参考：[Kubeadm unknown service runtime.v1alpha2.RuntimeService #4581](https://github.com/containerd/containerd/issues/4581)
 
@@ -480,7 +480,7 @@ sudo rm /etc/containerd/config.toml
 systemctl restart containerd
 ```
 
-## 環境変数と入力補完の設定（マスターノードのラズパイのみ）
+### 環境変数と入力補完の設定（マスターノードのラズパイのみ）
 
 kubectlをroot以外のユーザーでも実行できるようにするために、以下の設定を行っていきます。
 
@@ -499,7 +499,7 @@ echo "source <(kubectl completion bash)" >> $HOME/.bashrc
 source ~/.bashrc
 ```
 
-## Flannelの設定（マスターノードのラズパイのみ）
+### Flannelの設定（マスターノードのラズパイのみ）
 
 先程もちょろっと説明しましたが、Flannelはノードを跨いでコンテナ同士が通信できるようにするPodネットワークアドオンになります。
 コンテナにはIPアドレスが付与されるのですが、Internal IPなのでそのままだとノードを跨いでコンテナ間で通信できません。これを解決するために、Flannelによってノード間をつなぐネットワークに仮想的なトンネル（オーバーレイネットワーク）を構成することで、Kubernetesクラスター内のPod同士の通信（Podネットワーク）を実現しています。
@@ -519,7 +519,7 @@ NAME                    READY   STATUS    RESTARTS   AGE
 kube-flannel-ds-qcspv   1/1     Running   0          23m
 ```
 
-## ロードバランサーのインストール（マスターノードのラズパイのみ）
+### ロードバランサーのインストール（マスターノードのラズパイのみ）
 
 [こちら](https://qiita.com/yasthon/items/c29d0b9ce34d66eab3ec)を参考にして作っているので、同様にMetalLBをインストールします。
 [MetalLB, bare metal load-balancer for Kubernetes](https://metallb.universe.tf/installation/)を参考にインストールします。
@@ -541,7 +541,7 @@ controller-8689779bc5-txnbg   0/1     Pending   0          70s
 speaker-vcg4j                 1/1     Running   0          70s
 ```
 
-## ワーカーノードをクラスタにジョイン
+### ワーカーノードをクラスタにジョイン
 
 先程、テキストエディタにコピーしておいたコマンドを実行します。
 **※`sudo`忘れに注意**
@@ -579,7 +579,7 @@ work02     Ready      worker          121m   v1.25.0
 
 これでクラスタの完成です。遂に我が家にKubernetesがやって来ました。
 
-### もしコピー&ペーストを忘れた場合
+#### もしコピー&ペーストを忘れた場合
 
 以下のコマンドで発行したトークンを確認することが出来ます。
 
@@ -602,9 +602,9 @@ CA証明書のhashも必要なので、以下のコマンドで出力させま�
 openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'
 ```
 
-# Kubernetesでコンテナを動かす
+## Kubernetesでコンテナを動かす
 
-## yamlファイルの作成とapply
+### yamlファイルの作成とapply
 
 [Dockerが動作しているホストのHostnameを表示するNginxコンテナ](https://qiita.com/yasthon/items/6a4627f249bb7fa52eb9)をお借りして、Metal-LBででロードバランシングします。
 
@@ -699,7 +699,7 @@ spec:
 kubectl apply -f display-hostname.yaml
 ```
 
-## 動作確認
+### 動作確認
 
 色々確認していきましょう。
 
@@ -757,7 +757,7 @@ HOSTNAME : work01
 アクセスするたびに接続先が変わっていることから、ロードバランシングされていることが見受けられます。
 同じネットワーク内につながっているPCであれば、ブラウザから上記アドレスへアクセスすることも可能です。
 
-## 可用性を体感する
+### 可用性を体感する
 
 [こちら](https://qiita.com/yasthon/items/c29d0b9ce34d66eab3ec#kubernetes-%E3%81%A7-%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E3%82%92%E5%8B%95%E3%81%8B%E3%81%99)の記事同様、ワーカーを物理的に落としても外部IPへアクセスできることを確認します。
 ワーカーノード（1）に接続されたLANケーブルを抜いてアクセスしてみます。
@@ -800,7 +800,7 @@ curl: (7) Failed to connect to 192.168.1.210 port 8080: No route to host
 
 当然ですが、アクセスできないことが確認できます。
 
-## 再起動してみる
+### 再起動してみる
 
 クラスターを止めずに全ノード再起動して、再度確認してみます。
 
@@ -840,7 +840,7 @@ HOSTNAME : work01
 
 このように、ラズパイ自体を再起動してもまたクラスタが立ち上がっていることが確認できます。
 
-# まとめ
+## まとめ
 
 ラズパイを使ってKubernetesのクラスタを作成し、ロードバランシング・可用性を体感できました。クラウド上でゴニョゴニョ行われていることに対して、物理的な構成から作ってみることで解像度が上がった気がします。また、Kubernetes周りで使われている技術（cgroup, kubeadm, kubelet, flannel, ...）について調べながら進めることで、Kubernetesに対して理解が進みました。
 今回、コンテナの構成に関しては自分で作らなかったので、次はWebアプリでも作ってデプロイしてみたいと思います。

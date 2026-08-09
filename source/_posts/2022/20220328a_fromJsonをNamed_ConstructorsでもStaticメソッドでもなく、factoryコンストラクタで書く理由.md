@@ -16,7 +16,7 @@ lede: "Dartはコンストラクタがたくさんパターンがありますが
 
 <img src="/images/2022/20220328a/Dart_programming_language_logo.svg.png" alt="" width="1024" height="320">
 
-# はじめに
+## はじめに
 
 TIG真野です。[Dart/Flutter連載2022](/articles/20220315a/)の7日目です。
 
@@ -59,7 +59,7 @@ class Album {
 
 なお、JSONのシリアライズ・デシリアライズの細かい実装はいくつか流派がありますが、今回は[JSON and serialization](https://docs.flutter.dev/development/data-and-backend/json)でいう manual serialization で説明します（サンプルコードがそれだからです）。その他の実装手法については触れません。
 
-## Static Methodで無い理由
+### Static Methodで無い理由
 
 Static Methodで実装した例です。呼び出され方は変わりませんし、ほぼstaticがついたくらいの変更でしょうか（正確にはAlbumとfromJsonの間はドットからスペースに変わりましたが）
 
@@ -79,7 +79,7 @@ Static Methodで実装した例です。呼び出され方は変わりません�
 
 では Named Constructorsにしなかったのはなぜでしょうか。
 
-## Albumのフィールドが全てfinalであることをまず強調したい
+### Albumのフィールドが全てfinalであることをまず強調したい
 
 まず前提について補足させてください。DartではJavaのようにコンストラクタの引数違いでオーバーライドができず、代わりに「コンストラクタ名.任意名称」という形で別名を付けて複数のインスタンス生成方法を提供していきます。これをNamed Constructorsと言います。
 
@@ -101,7 +101,7 @@ finalなフィールドの初期化ですが、次のようにNamed Constructors
 
 finalを外す以外に、2つほどfinalなフィールドを初期化する実装方法が思いつきます。
 
-### finalの初期化方法1: initializing formalを用いる
+#### finalの初期化方法1: initializing formalを用いる
 
 Albumの生成的コンストラクタ（generative constructor）は `this` キーワードで定義（[initializing formal](https://dart-lang.github.io/linter/lints/prefer_initializing_formals.html)）されています。念のための補足ですが、Albumの生成的コンストラクタは以下の部分です。
 
@@ -127,7 +127,7 @@ Albumの生成的コンストラクタ（generative constructor）は `this` キ
 
 初見はなんだコレと思いましたが、慣れるとよくできていると思わなくもないです。
 
-### finalの初期化方法2: Initializer list
+#### finalの初期化方法2: Initializer list
 
 コンストラクタの後に「:」を記載し、ここでフィールドに代入ができます。Initializer listと呼びます。Java経験者の方向けにはインスタンス初期化子みたいな感じといったほうが早いかもしれません。コンストラクタが動く前に動作するようで、finalなフィールドへの代入ができます。
 
@@ -140,7 +140,7 @@ Albumの生成的コンストラクタ（generative constructor）は `this` キ
 
 さて、1,2の2つの手法を紹介しました。今回のAlbumのfromJson()では、Named Constructorsでも実装可能でした。ただ、ちょっと細かい手段を使わないとfinalフィールドの初期化ができないため、サンプルコード上はfactoryコンストラクタを採用したのかなと邪推します。flutter.dev にでてくるサンプルコードの中には、[2の手法で書いた例](https://docs.flutter.dev/development/data-and-backend/json#serializing-json-inside-model-classes) もあるので、正直どっちでも良いのかなと思います。
 
-## factoryコンストラクタを使うメリット
+### factoryコンストラクタを使うメリット
 
 A tour of the Dart languageの[factoryコンストラクタの章](https://dart.dev/guides/language/language-tour#factory-constructors)には以下のように書かれています。
 
@@ -176,7 +176,7 @@ A tour of the Dart languageの[factoryコンストラクタの章](https://dart.
 
 これらの違いから、とりあえずHTTPレスポンスボディのJSONからインスタンスを生成するコードは、拡張性を考えてサンプルコード的にはfactoryで作っておくのも一手としてはありかなと思います。将来の拡張性を考えて予め備えておく考えは、個人的には余り好きでははないですが（意図が読めないので）、factoryに関してはコード量もほぼ変わらないので、そこに躓く人は少ないと思うからです。
 
-## まとめ
+### まとめ
 
 * Album.fromJson()の例だと、リダイレクトやInitializer listを用いると Named Constructorでも実装でき、factoryコンストラクタと大差ないのでどっちでも良い
 * JSON周りの取り扱いで、入力チェックや項目編集をコンストラクト無いで行うのであればfactoryコンストラクタを利用する必要がある（正確にはヘルパー関数を用いればNamed Constructorでも実装できなくも無い）

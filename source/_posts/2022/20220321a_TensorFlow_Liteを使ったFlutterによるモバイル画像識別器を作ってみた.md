@@ -13,12 +13,12 @@ thumbnail: /images/2022/20220321a/thumbnail.png
 author: 岸下優介
 lede: "FlutterとTensorFlow Liteを使ったモバイル画像識別について執筆させて頂きます。TensorFlow Liteとは..."
 ---
-# はじめに
+## はじめに
 
 初めまして、2022年中途入社でTIG所属の岸下です。
 本記事は[Flutter連載](/articles/20220315a/)の4記事目になり、FlutterとTensorFlow Liteを使ったモバイル画像識別について執筆させて頂きます。
 
-# TensorFlow Liteとは
+## TensorFlow Liteとは
 
 近年ではご存じの方も多くなってきたかと思いますが、[TensorFlow](https://www.tensorflow.org/?hl=ja)はGoogle社が開発を行っているディープラーニングを行うためのフレームワークの一種です。
 TensorFlowを使えば、
@@ -34,7 +34,7 @@ TensorFlowを使えば、
 
 TFLiteはCPU上で演算を行うことに特化しており、スマホなどのモバイル端末上でもほぼリアルタイム（CPU次第）でAI処理を行うことが可能となります。
 
-# なぜTFLiteだとCPU上で演算可能なのか
+## なぜTFLiteだとCPU上で演算可能なのか
 
 主にTFLiteでは**量子化**されたAIモデルを推論に用います。
 
@@ -44,7 +44,7 @@ AIモデルの中身では入力された特徴量に対して重み付け演算
 
 詳しくは、[TensorFlow Lite 8ビット量子化の仕様](https://www.tensorflow.org/lite/performance/quantization_spec?hl=ja)を読まれるとわかりやすいと思います。
 
-# FlutterとTFLiteを用いてホットドッグ識別器を作ってみる
+## FlutterとTFLiteを用いてホットドッグ識別器を作ってみる
 
 <img src="/images/2022/20220321a/eca77278-952d-59c0-aa1b-97aa98a5d453.png" alt="ホットドッグ画像" width="533" height="1113" loading="lazy">
 
@@ -52,13 +52,13 @@ AIモデルの中身では入力された特徴量に対して重み付け演算
 元ネタは海外ドラマの[シリコンバレー](https://www.amazon.co.jp/gp/video/detail/B07D43SV5F/ref=atv_dp_season_select_s4)です。
 ぜひドラマも見てみてください。
 
-## モデルの準備
+### モデルの準備
 
 モデルはPythonを使って学習し、量子化しました。
 モデルの学習は[転移学習と微調整](https://www.tensorflow.org/tutorials/images/transfer_learning)を参考に学習しています。
 モデルの量子化は[トレーニング後の量子化](https://www.tensorflow.org/lite/performance/post_training_quantization?hl=ja)を参考にpbモデルから.tfliteへint8量子化を行っています。
 
-### assetsファイルの準備
+#### assetsファイルの準備
 
 Flutterのプロジェクトファイルに`assets`ディレクトリを作って、tfliteファイルを入れましょう。
 `pubspec.yaml`の変更も忘れずに。
@@ -73,7 +73,7 @@ flutter:
       - assets/labels.txt
 ```
 
-## 使用ライブラリ
+### 使用ライブラリ
 
 - [tflite_flutter](https://pub.dev/packages/tflite_flutter)^0.9.0
   - TFLiteの演算処理を担ってくれます。
@@ -84,14 +84,14 @@ flutter:
 - [google_fonts](https://pub.dev/packages/google_fonts/install)^2.3.1
   - UIにそれっぽいフォントが欲しかったので使いました。
 
-## tflite_flutterの注意点
+### tflite_flutterの注意点
 
 tflite_flutterを使用する前にTFliteの動的ライブラリをワークフォルダにインストールする必要があります。
 [Initial setup : Add dynamic libraries to your app](https://pub.dev/packages/tflite_flutter#important-initial-setup--add-dynamic-libraries-to-your-app)
 
 使用PCがLinuxであれば`install.sh`、Windowsであれば`install.bat`を↑のpub.devページからダウンロードして、Flutterのプロジェクトフォルダに置いてください。置いた後、コマンドラインから`sh install.sh`や`insatall.bat`を入力してファイルの実行を行ってください。あとはよしなにやってくれます。
 
-## 画像識別クラス（classifier.dart）
+### 画像識別クラス（classifier.dart）
 
 画像を識別するためのClassifierクラスを作っていきます。
 
@@ -99,7 +99,7 @@ tflite_flutterを使用する前にTFliteの動的ライブラリをワークフ
 
 全体コードは[こちら](https://github.com/bigface0202/Hotdog_or_NotHotdog/tree/master/tflite_img_recognition/lib)から参考にしてください。
 
-### 変数の宣言
+#### 変数の宣言
 
 ```dart classifier.dart（変数の宣言）
   // 推論エンジン
@@ -138,7 +138,7 @@ tflite_flutterを使用する前にTFliteの動的ライブラリをワークフ
 他にも`NormalizeOp`は正規化オプションで、入力画像の正規化に使われます。
 ちなみに`NormalizeOp`に入力する値は`NormalizeOp(mean, stddev)`になっています。平均と標準偏差ですね。
 
-### コンストラクタ、モデルのロード
+#### コンストラクタ、モデルのロード
 
 ```dart classifier.dart（コンストラクタ、モデルのロード）
   /* コンストラクタ */
@@ -176,7 +176,7 @@ tflite_flutterを使用する前にTFliteの動的ライブラリをワークフ
 今回は入力画像サイズが160×160で、int8量子化されたモデルを使うので型はuint8になります。
 また、出力を格納する`_outputBuffer`もここで出力サイズと型を指定します。
 
-### 画像の前処理と推論
+#### 画像の前処理と推論
 
 ```dart classifier.dart（画像から推論）
   /* 画像の前処理 */
@@ -227,13 +227,13 @@ AIモデルの中では、画像の色合いや配色パターンの特徴から
 
 推論エンジンをDestroyする場合は、`close()`でいけます。
 
-## 画面の構築と画像の取得（main.dart, index_scree.dart, image_input.dart）
+### 画面の構築と画像の取得（main.dart, index_scree.dart, image_input.dart）
 
 画像を取得するための`image_input.dart`と画面を作っていきます。
 重要そうな部分だけ解説を入れていきます。
 画面の全体コードは[こちら](https://github.com/bigface0202/Hotdog_or_NotHotdog/tree/master/tflite_img_recognition/lib)から参考にしてください。
 
-### 画像の取得とinitState
+#### 画像の取得とinitState
 
 ```dart image_input.dart（画像の取得と初期化）
   // 取得した画像ファイル
@@ -294,7 +294,7 @@ AIモデルの中では、画像の色合いや配色パターンの特徴から
 
 また、`initState()`内で`Classifier`のコンストラクタを呼び出し、初期化します。
 
-### 推論
+#### 推論
 
 ```dart image_input.dart（推論）
   /* 推論処理 */
@@ -331,7 +331,7 @@ AIモデルの中では、画像の色合いや配色パターンの特徴から
 
 これでインタラクティブに推論できるように構築できました。レイアウトは適当なので、色々変えてみてもいいかもしれません。
 
-# 推論してみる
+## 推論してみる
 
 <img src="/images/2022/20220321a/fa8d1a39-a1b8-044e-4faa-04523e5bf10f.gif" alt="" width="532" height="1118" loading="lazy">
 
@@ -340,7 +340,7 @@ AIモデルの中では、画像の色合いや配色パターンの特徴から
 推論処理自体は大体80～90msで結構スムーズに動いてそうです！
 原作通りいけば、これで僕にもベンチャーキャピタルから話が…
 
-# おわりに
+## おわりに
 
 TFLiteを使えばFlutterでもDeepLearningができます！
 
