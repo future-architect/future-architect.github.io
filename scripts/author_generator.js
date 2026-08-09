@@ -239,6 +239,20 @@ hexo.extend.helper.register('generate_yearly_authors_series_y', function() {
   return generateAuthorsSeriesAll(this.site.posts).map(e => e.authors.unique().length).join(',');
 });
 
+// 新規寄稿者の割合（%）。「新規」は前年に投稿が無かった寄稿者（#2073）。
+// 初出ベースではないので、数年ぶりに復帰した人も新規に数える。
+// 最初の年は前年が無く全員新規（100%）になるだけなので欠損にする
+hexo.extend.helper.register('yearly_new_author_ratio', function() {
+  const series = generateAuthorsSeriesAll(this.site.posts);
+  // 共著の旧記事は author が配列なので flat で展開する
+  const sets = series.map(e => new Set(e.authors.flat()));
+  return series.map((e, i) => {
+    if (i === 0 || sets[i].size === 0) return "'-'";
+    const newcomers = [...sets[i]].filter(a => !sets[i - 1].has(a)).length;
+    return Math.round(newcomers * 100 / sets[i].size);
+  }).join(',');
+});
+
 const generateAuthorsSeriesAll = posts => {
   const group = posts.reduce((acc, cur) => {
     const item = acc.find(p => p.year === cur.date.format("YYYY"));
