@@ -2,7 +2,6 @@
 
 const pagination = require('hexo-pagination');
 const {getSNSCnt, getTwitterCnt, getFacebookCnt, getHatebuCnt, getPocketCnt} = require('./lib/sns');
-const moment = require('moment');
 
 hexo.extend.generator.register("author", function(locals) {
     // author は1記事1名。配列だと著者ページの記事一覧に入らず、集計からも
@@ -184,65 +183,62 @@ hexo.extend.helper.register('post_author_link', function(post) {
   return `<li class="blog-info-item">${link}</li>`
 });
 
-// チャート表示用のデータを生成
-hexo.extend.helper.register('generate_post_series', function(author) {
-  return generateSeries(this.site.posts, author).map(e => e.count).join(',');
-});
+// 著者ページの月別投稿数チャート用データ (#2135 / #2138 / #2140)。
+// カテゴリごとの積み上げにするため {months, series} を JSON で返す
+hexo.extend.helper.register('author_monthly_chart', function(name) {
+  const posts = this.site.posts.filter(post => [].concat(post.author || []).includes(name));
+  // month(YYYY/MM) -> category -> count
+  const byMonth = new Map();
+  const catTotal = new Map();
+  let min = null;
+  let max = null;
+  posts.forEach(post => {
+    const ym = post.date.format('YYYY/MM');
+    if (!min || ym < min) min = ym;
+    if (!max || ym > max) max = ym;
+    // カテゴリは第1のものだけ数える。複数カテゴリを全部積むと
+    // 合計が投稿数と合わなくなる
+    const cat = post.categories && post.categories.length ? post.categories.first().name : '未分類';
+    catTotal.set(cat, (catTotal.get(cat) || 0) + 1);
+    if (!byMonth.has(ym)) byMonth.set(ym, new Map());
+    const m = byMonth.get(ym);
+    m.set(cat, (m.get(cat) || 0) + 1);
+  });
+  if (!min) return JSON.stringify({months: [], series: []});
 
-hexo.extend.helper.register('generate_post_month', function(author) {
-  return generateSeries(this.site.posts, author).map(e => e.yyyyMM).join(',');
-});
-
-hexo.extend.helper.register('max_post_month', function(author) {
-  return Math.max(5, ...generateSeries(this.site.posts, author).map(e => e.count)); // 最小は5
-});
-
-const generateSeries = (posts, author) => {
-  const target = posts.filter(post => post.author === author);
-  const start = moment.min(...target.map(item => item.date)).clone(); // Add操作で副作用があるのでclone
-  const end = moment.max(...target.map(item => item.date));
-
-  let fillingItems = [];
-  for (;;) {
-    const date = start.add(1, 'M')
-    fillingItems.push({
-      yyyyMM: date.format("YYYYMM"),
-      count:0
-    })
-    if (date.format("YYYYMM") === end.format("YYYYMM") || date >= end) {
-      break;
+  // 期間が12ヶ月未満だと軸が数ヶ月分しかなく見栄えが悪い (#2140)。
+  // 同一年に収まるなら 1〜12月へ、年をまたぐ短い期間は末尾から12ヶ月に広げる
+  let startY = +min.slice(0, 4);
+  let startM = +min.slice(5);
+  const endY = +max.slice(0, 4);
+  const endM = +max.slice(5);
+  const span = (endY - startY) * 12 + (endM - startM) + 1;
+  if (span < 12) {
+    if (startY === endY) {
+      startM = 1;
+    } else {
+      const s = endY * 12 + (endM - 1) - 11;
+      startY = Math.floor(s / 12);
+      startM = (s % 12) + 1;
     }
   }
+  const endTotal = startY === endY && span < 12 ? 12 : endM;
 
-  const group = target.reduce((acc, cur) => {
-    const item = acc.find(p => p.yyyyMM === cur.date.format("YYYYMM"));
-    if (item) {
-      item.count++;
-    } else {
-      acc.push({
-        yyyyMM: cur.date.format("YYYYMM"),
-        count: 1
-      });
-    }
-    return acc;
-  }, []);
+  const months = [];
+  for (let y = startY, m = startM; y < endY || (y === endY && m <= endTotal); m === 12 ? (y++, m = 1) : m++) {
+    months.push(`${y}/${String(m).padStart(2, '0')}`);
+  }
 
-  const merge = group.concat(fillingItems).reduce((acc, cur) => {
-    const item = acc.find(p => p.yyyyMM === cur.yyyyMM);
-    if (item) {
-      item.count += cur.count;
-    } else {
-      acc.push(cur);
-    }
-    return acc;
-  }, []);
-
-  merge.sort((a, b) => {
-    return a.yyyyMM.localeCompare(b.yyyyMM);
-  });
-
-  return merge;
-}
+  // 積み上げの並びは合計の多いカテゴリから。凡例の順もこれに従う
+  const cats = [...catTotal.entries()].sort((a, b) => b[1] - a[1]).map(([c]) => c);
+  const series = cats.map(cat => ({
+    name: cat,
+    type: 'bar',
+    stack: 'total',
+    data: months.map(ym => (byMonth.get(ym) && byMonth.get(ym).get(cat)) || 0),
+  }));
+  return JSON.stringify({months, series});
+});
 
 
 /*
