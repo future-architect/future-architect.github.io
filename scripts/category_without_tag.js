@@ -19,10 +19,11 @@ hexo.extend.generator.register('category_without_tag', function(locals) {
     const dominant = dominantTag(category);
     if (!dominant) return;
 
-    pages.push(...pagination(category.path + dominant.slug, dominant.rest.sort('-date'), {
+    const rest = dominant.rest.sort('-date');
+    pages.push(...pagination(category.path + dominant.slug, rest, {
       layout: ['category-without', 'archive', 'index'],
       perPage,
-      data: {category: category.name, excludedTag: dominant.name}
+      data: {category: category.name, excludedTag: dominant.name, withoutPosts: rest, withoutPath: category.path + dominant.slug + '/'}
     }));
   });
 

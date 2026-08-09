@@ -120,6 +120,11 @@ hexo.extend.helper.register('category_index', function() {
     .map(category => buildCategoryStats.call(this, category));
 });
 
+// 絞り込んだ一覧用。カテゴリと同じ統計を、記事の部分集合に対して出す (#2038)
+hexo.extend.helper.register('stats_of_posts', function(name, path, posts) {
+  return buildCategoryStats.call(this, {name, path, length: posts.length, posts});
+});
+
 // カテゴリ個別ページ用。一覧と同じ統計を個別ページにも出す (#2084)
 hexo.extend.helper.register('category_stats', function(name) {
   const category = this.site.categories.findOne({name});
