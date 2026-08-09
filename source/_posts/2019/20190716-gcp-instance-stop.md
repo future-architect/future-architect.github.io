@@ -11,7 +11,7 @@ categories:
 author: 真野隼記
 lede: "GCPのインスタンス（GCE, SQL, GKE）を自動で停止させるGoで書かれたツールをGitHubに公開しました。"
 ---
-# はじめに
+## はじめに
 
 こんにちは、TIG DXユニットの真野です。2019年時点ではフューチャーに入社して9年目、主にバックエンド側の設計や開発をしています。
 
@@ -26,7 +26,7 @@ https://github.com/future-architect/gcp-instance-scheduler
 
 このツールを用いてGCPを利用しない時間帯を上手く指定することで、クラウドの運用費用を節約できます。
 
-# ツールの概要
+## ツールの概要
 
 `state-scheduler:true` というラベルがついた、GCE, SQL, GKEなどのインスタンスを停止します。
 GKEの場合は、ノードプールを構成するインスタンスグループのサイズを0にすることで実現します。
@@ -44,11 +44,11 @@ GKEの場合は、ノードプールを構成するインスタンスグルー�
 
  [^1]: 参考: https://cloud.google.com/scheduler/docs/start-and-stop-compute-engine-instances-on-a-schedule
 
-# デプロイ方法
+## デプロイ方法
 
 ツールのデプロイ手順を1~3の順に説明します。
 
-## 1. ラベルの設定
+### 1. ラベルの設定
 
 停止したいインスタンスのラベルに `state-scheduler:true` を設定する必要があります。
 ラベルの設定はもちろん管理コンソールから手動で行っても良いですし、下記のようなgcloudコマンドでも設定できます。
@@ -71,7 +71,7 @@ gcloud container clusters update <cluster-name> \
   --update-labels state-scheduler=true
 ```
 
-## 2. Cloud Functionのデプロイ
+### 2. Cloud Functionのデプロイ
 
 デプロイには [gcloud](https://cloud.google.com/sdk/gcloud/) が必要ですのでインストールしておきます。
 
@@ -86,7 +86,7 @@ gcloud functions deploy ReceiveEvent --project <project-id> \
   --trigger-topic instance-scheduler-event
 ```
 
-## 3. Cloud Schedulerの設定
+### 3. Cloud Schedulerの設定
 
 最後にスケジューラの設定を行います。
 
@@ -108,7 +108,7 @@ gcloud beta scheduler jobs create pubsub shutdown-workday \
 
 テキストでは長いですが、コマンド数として少ないので簡単に適用できると思います。
 
-# こぼれ話（ツール設計について）
+## こぼれ話（ツール設計について）
 
 このGCP停止ツールの特徴として、Goの[GCP SDK](https://godoc.org/cloud.google.com/go)経由でインスタンスの制御を行っています。
 
@@ -122,7 +122,7 @@ gcloud beta scheduler jobs create pubsub shutdown-workday \
 
 結果として、個人的なプライベートの小さなGCP環境にでも簡単に適用できるので、これはこれで良かったなと思っています。
 
-# 今後
+## 今後
 
 まだまだ、稼働し始めたところで作りが甘いところがあり、継続的に改善していきます。
 例えば、2019年7月時点では以下のような面を機能拡張していこうとなっています。
