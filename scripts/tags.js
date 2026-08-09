@@ -50,7 +50,7 @@ hexo.extend.helper.register('median_tags_per_post', function() {
   return counts[Math.floor(counts.length / 2)] || 0;
 });
 
-hexo.extend.helper.register('ranking_tags', function() {
+hexo.extend.helper.register('ranking_tags', function(limit = 30) {
   const tagPosts = this.site.tags.map(tag => ({tag:tag, posts:tag.posts, count:tag.posts.length, shareCount:totalCount(tag.posts)}));
 
   // 同点の決着が無いとビルドごとに並びが変わる
@@ -60,7 +60,7 @@ hexo.extend.helper.register('ranking_tags', function() {
     || (a.tag.name < b.tag.name ? -1 : a.tag.name > b.tag.name ? 1 : 0);
 
   // 5記事以上、シェア数/投稿数のランキング
-  const rankings = tagPosts.filter(tp => tp.count >= 5).sort(compareFunc).slice(0, 30)
+  const rankings = tagPosts.filter(tp => tp.count >= 5).sort(compareFunc).slice(0, limit)
 
   // マークアップは関連タグ・「今年使われ始めたタグ」と同じチップに揃える。
   // 以前は素のテキストリンクで、同じページ内でタグの見た目が割れていた (#2052)
