@@ -233,67 +233,46 @@ hexo.extend.helper.register('author_monthly_chart', function(name) {
 /*
  * 著者一覧ページ
  */
-hexo.extend.helper.register('generate_yearly_authors_series_x', function() {
-  return generateAuthorsSeriesAll(this.site.posts).map(e => e.year).join(',');
-});
-
-hexo.extend.helper.register('generate_yearly_authors_series_y', function() {
-  return generateAuthorsSeriesAll(this.site.posts).map(e => e.authors.unique().length).join(',');
-});
-
-// 新規寄稿者の割合（%）。「新規」は前年に投稿が無かった寄稿者（#2073）。
-// 初出ベースではないので、数年ぶりに復帰した人も新規に数える。
-// 最初の年は前年が無く全員新規（100%）になるだけなので欠損にする
-// 年ごとの新規／継続の寄稿者数。積み上げ棒にすると合計がその年の著者数になる。
-// 「新規」はその年より前に一度も出ていない人。前年比ではない
-function yearlyAuthorSplit(posts) {
-  const series = generateAuthorsSeriesAll(posts);
-  const seen = new Set();
-  return series.map(e => {
-    const authors = new Set(e.authors.flat());
-    let fresh = 0;
-    authors.forEach(a => { if (!seen.has(a)) fresh++; });
-    authors.forEach(a => seen.add(a));
-    return {year: e.year, fresh, returning: authors.size - fresh};
+// 四半期ごとの寄稿者数を 継続・新規・再開 に分けて返す (#2145)。
+// 新規 = その四半期が初投稿。
+// 再開 = 過去に投稿があるが、直前の活動四半期から1年より長くあいた。
+// 継続 = 直前の活動四半期から1年以内
+hexo.extend.helper.register('quarterly_author_types', function() {
+  const qOf = date => date.year() * 4 + Math.floor(date.month() / 3);
+  const activity = new Map(); // 著者 -> 活動した四半期の Set
+  let minQ = Infinity;
+  let maxQ = -Infinity;
+  this.site.posts.forEach(post => {
+    const q = qOf(post.date);
+    if (q < minQ) minQ = q;
+    if (q > maxQ) maxQ = q;
+    if (!activity.has(post.author)) activity.set(post.author, new Set());
+    activity.get(post.author).add(q);
   });
-}
+  if (minQ === Infinity) {
+    return JSON.stringify({quarters: [], continuing: [], newcomers: [], returning: []});
+  }
 
-hexo.extend.helper.register('yearly_new_authors', function() {
-  return yearlyAuthorSplit(this.site.posts).map(e => e.fresh).join(',');
-});
-
-hexo.extend.helper.register('yearly_returning_authors', function() {
-  return yearlyAuthorSplit(this.site.posts).map(e => e.returning).join(',');
-});
-
-hexo.extend.helper.register('yearly_new_author_ratio', function() {
-  const series = generateAuthorsSeriesAll(this.site.posts);
-  // 共著の旧記事は author が配列なので flat で展開する
-  const sets = series.map(e => new Set(e.authors.flat()));
-  return series.map((e, i) => {
-    if (i === 0 || sets[i].size === 0) return "'-'";
-    const newcomers = [...sets[i]].filter(a => !sets[i - 1].has(a)).length;
-    return Math.round(newcomers * 100 / sets[i].size);
-  }).join(',');
-});
-
-const generateAuthorsSeriesAll = posts => {
-  const group = posts.reduce((acc, cur) => {
-    const item = acc.find(p => p.year === cur.date.format("YYYY"));
-    if (item) {
-      item.authors.push(cur.author);
-    } else {
-      acc.push({
-        year: cur.date.format("YYYY"),
-        authors: [cur.author],
-      });
-    }
-    return acc;
-  }, []);
-
-  group.sort((a, b) => {
-    return a.year.localeCompare(b.year);
+  const size = maxQ - minQ + 1;
+  const continuing = new Array(size).fill(0);
+  const newcomers = new Array(size).fill(0);
+  const returning = new Array(size).fill(0);
+  activity.forEach(set => {
+    const qs = [...set].sort((a, b) => a - b);
+    qs.forEach((q, i) => {
+      if (i === 0) {
+        newcomers[q - minQ]++;
+      // 4四半期差はちょうど1年後の同じ四半期。それより長くあいたら再開
+      } else if (q - qs[i - 1] > 4) {
+        returning[q - minQ]++;
+      } else {
+        continuing[q - minQ]++;
+      }
+    });
   });
-
-  return group;
-}
+  const quarters = [];
+  for (let q = minQ; q <= maxQ; q++) {
+    quarters.push(`${Math.floor(q / 4)}-Q${(q % 4) + 1}`);
+  }
+  return JSON.stringify({quarters, continuing, newcomers, returning});
+});
