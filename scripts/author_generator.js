@@ -233,67 +233,51 @@ hexo.extend.helper.register('author_monthly_chart', function(name) {
 /*
  * 著者一覧ページ
  */
-hexo.extend.helper.register('generate_yearly_authors_series_x', function() {
-  return generateAuthorsSeriesAll(this.site.posts).map(e => e.year).join(',');
-});
-
-hexo.extend.helper.register('generate_yearly_authors_series_y', function() {
-  return generateAuthorsSeriesAll(this.site.posts).map(e => e.authors.unique().length).join(',');
-});
-
-// 新規寄稿者の割合（%）。「新規」は前年に投稿が無かった寄稿者（#2073）。
-// 初出ベースではないので、数年ぶりに復帰した人も新規に数える。
-// 最初の年は前年が無く全員新規（100%）になるだけなので欠損にする
-// 年ごとの新規／継続の寄稿者数。積み上げ棒にすると合計がその年の著者数になる。
-// 「新規」はその年より前に一度も出ていない人。前年比ではない
-function yearlyAuthorSplit(posts) {
-  const series = generateAuthorsSeriesAll(posts);
-  const seen = new Set();
-  return series.map(e => {
-    const authors = new Set(e.authors.flat());
-    let fresh = 0;
-    authors.forEach(a => { if (!seen.has(a)) fresh++; });
-    authors.forEach(a => seen.add(a));
-    return {year: e.year, fresh, returning: authors.size - fresh};
+// 年ごとの寄稿者数を 継続・新規・再開 に分けて返す (#2145)。
+// 新規 = その年が初投稿。
+// 再開 = 過去に投稿があるが、前年には無い（2年以上あいた）。
+// 継続 = 前年にも投稿がある。
+// あわせて 常連 = 2年連続で年2本以上（上期・下期に1本のペースを続けている人。
+// 継続などの内訳と重なるため、積み上げには入れず別系列で返す）(#2149)
+hexo.extend.helper.register('yearly_author_types', function() {
+  const activity = new Map(); // 著者 -> (年 -> 本数)
+  let minY = Infinity;
+  let maxY = -Infinity;
+  this.site.posts.forEach(post => {
+    const y = post.date.year();
+    if (y < minY) minY = y;
+    if (y > maxY) maxY = y;
+    if (!activity.has(post.author)) activity.set(post.author, new Map());
+    const m = activity.get(post.author);
+    m.set(y, (m.get(y) || 0) + 1);
   });
-}
+  if (minY === Infinity) {
+    return JSON.stringify({years: [], continuing: [], newcomers: [], returning: [], regulars: []});
+  }
 
-hexo.extend.helper.register('yearly_new_authors', function() {
-  return yearlyAuthorSplit(this.site.posts).map(e => e.fresh).join(',');
-});
-
-hexo.extend.helper.register('yearly_returning_authors', function() {
-  return yearlyAuthorSplit(this.site.posts).map(e => e.returning).join(',');
-});
-
-hexo.extend.helper.register('yearly_new_author_ratio', function() {
-  const series = generateAuthorsSeriesAll(this.site.posts);
-  // 共著の旧記事は author が配列なので flat で展開する
-  const sets = series.map(e => new Set(e.authors.flat()));
-  return series.map((e, i) => {
-    if (i === 0 || sets[i].size === 0) return "'-'";
-    const newcomers = [...sets[i]].filter(a => !sets[i - 1].has(a)).length;
-    return Math.round(newcomers * 100 / sets[i].size);
-  }).join(',');
-});
-
-const generateAuthorsSeriesAll = posts => {
-  const group = posts.reduce((acc, cur) => {
-    const item = acc.find(p => p.year === cur.date.format("YYYY"));
-    if (item) {
-      item.authors.push(cur.author);
-    } else {
-      acc.push({
-        year: cur.date.format("YYYY"),
-        authors: [cur.author],
-      });
-    }
-    return acc;
-  }, []);
-
-  group.sort((a, b) => {
-    return a.year.localeCompare(b.year);
+  const size = maxY - minY + 1;
+  const continuing = new Array(size).fill(0);
+  const newcomers = new Array(size).fill(0);
+  const returning = new Array(size).fill(0);
+  const regulars = new Array(size).fill(0);
+  activity.forEach(counts => {
+    const ys = [...counts.keys()].sort((a, b) => a - b);
+    ys.forEach((y, i) => {
+      if (i === 0) {
+        newcomers[y - minY]++;
+      } else if (y - ys[i - 1] > 1) {
+        returning[y - minY]++;
+      } else {
+        continuing[y - minY]++;
+      }
+      if (counts.get(y) >= 2 && (counts.get(y - 1) || 0) >= 2) {
+        regulars[y - minY]++;
+      }
+    });
   });
-
-  return group;
-}
+  const years = [];
+  for (let y = minY; y <= maxY; y++) {
+    years.push(String(y));
+  }
+  return JSON.stringify({years, continuing, newcomers, returning, regulars});
+});

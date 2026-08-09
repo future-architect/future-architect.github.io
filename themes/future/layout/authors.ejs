@@ -45,13 +45,30 @@
           /categories/ の「カテゴリ別 投稿数の推移」と同じ型 %>
       <h2 class="bottom-content-header">年別 著者数の推移</h2>
       <div id="chart" style="width:95%;min-height:350px"></div>
+      <%# 種別の定義。凡例のホバーでも出すが、タッチ端末はホバーが無いので
+          注記でも読めるようにする %>
+      ※継続=前年にも投稿 ／ 再開=2年以上あいての投稿 ／ 新規=初投稿 ／ 常連=2年連続で年2本以上
       <script src="https://cdn.jsdelivr.net/npm/echarts@5.1.2/dist/echarts.min.js"></script>
       <script type="text/javascript">
+        <%# 継続・新規・再開の3種別 (#2145)。定義はヘルパー（yearly_author_types）側 %>
+        const chartData = <%- yearly_author_types() %>;
+        const typeNotes = {
+          '継続': '前年にも投稿がある',
+          '再開': '過去に投稿があるが前年には無い（2年以上あいての投稿）',
+          '新規': 'この年が初投稿',
+          '常連': '2年連続で年2本以上（上期・下期に1本のペース）'
+        };
         let myChart = echarts.init(document.getElementById('chart'));
         let option = {
           <%# タイトルは直上の h2 が担うので、チャート内では重ねない %>
           title: {},
-          legend: {},
+          <%# 凡例のホバーで種別の定義を出す %>
+          legend: {
+            tooltip: {
+              show: true,
+              formatter: p => typeNotes[p.name] || p.name
+            }
+          },
           tooltip: {
               trigger: 'axis'
           },
@@ -61,22 +78,36 @@
           xAxis: {
               type: 'category',
               boundaryGap: true,
-              data: [<%= generate_yearly_authors_series_x() %>]
+              data: chartData.years
           },
-          <%# 積み上げの合計がその年の著者数になるので、軸は1本で足りる %>
+          <%# 積み上げの合計がその四半期の著者数になるので、軸は1本で足りる %>
           yAxis: { type: 'value', name: '人', min: 0 },
+          <%# 土台の継続から順に積む。色は ECharts 既定パレット（他ページのチャートと同じ）%>
           series: [
               {
-                  name: '継続の寄稿者',
+                  name: '継続',
                   type: 'bar',
                   stack: 'authors',
-                  data: [<%= yearly_returning_authors() %>]
+                  data: chartData.continuing
               },
               {
-                  name: '新規の寄稿者',
+                  name: '再開',
                   type: 'bar',
                   stack: 'authors',
-                  data: [<%= yearly_new_authors() %>]
+                  data: chartData.returning
+              },
+              {
+                  name: '新規',
+                  type: 'bar',
+                  stack: 'authors',
+                  data: chartData.newcomers
+              },
+              <%# 常連（2年連続で年2本以上）は継続などの内訳と重なるため、
+                  積み上げに混ぜず折れ線で重ねる (#2149) %>
+              {
+                  name: '常連',
+                  type: 'line',
+                  data: chartData.regulars
               }
           ]
         };
