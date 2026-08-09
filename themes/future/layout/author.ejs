@@ -62,6 +62,9 @@
       <%# カテゴリごとの積み上げ棒 (#2138)。期間の穴埋めと軸の下限12ヶ月は
           ヘルパー側（author_monthly_chart）が持つ (#2140) %>
       const chartData = <%- author_monthly_chart(page.author) %>;
+      <%# 軸が12ヶ月以下（投稿の少ない著者）なら月ラベルが全部読めるので毎月出す。
+          長期の著者は潰れるため年の変わり目だけにする (#2135) %>
+      const monthlyLabels = chartData.months.length <= 12;
       let myChart = echarts.init(document.getElementById('chart'));
       let option = {
         <%# タイトルは直上の h2 が担うので、チャート内では重ねない %>
@@ -77,17 +80,19 @@
             type: 'category',
             boundaryGap: true,
             data: chartData.months,
-            <%# 毎月のラベルは潰れて読めない (#2135)。年の変わり目と先頭だけ
-                「2026年」と出し、月の詳細はツールチップに任せる %>
             axisLabel: {
               interval: 0,
-              formatter: (value, index) => (index === 0 || value.endsWith('/01')) ? value.slice(0, 4) + '年' : ''
+              formatter: (value, index) => monthlyLabels
+                ? value
+                : ((index === 0 || value.endsWith('/01')) ? value.slice(0, 4) + '年' : '')
             }
         },
         yAxis: {
             type: 'value',
             <%# 投稿数は整数。自動目盛だと 0.5 刻みが出ることがある %>
-            minInterval: 1
+            minInterval: 1,
+            <%# 上限は最低3。月1本の著者が天井に張り付いて見えるのを避ける %>
+            max: value => Math.max(3, value.max)
         },
         series: chartData.series
       };
