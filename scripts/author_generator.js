@@ -227,10 +227,6 @@ const generateSeries = (posts, author) => {
 /*
  * 著者一覧ページ
  */
-hexo.extend.helper.register('max_yearly_authors', function() {
-  return Math.max(100, ...generateAuthorsSeriesAll(this.site.posts).map(e => e.authors.unique().length)); // 最小は100
-});
-
 hexo.extend.helper.register('generate_yearly_authors_series_x', function() {
   return generateAuthorsSeriesAll(this.site.posts).map(e => e.year).join(',');
 });
