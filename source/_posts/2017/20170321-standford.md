@@ -11,7 +11,7 @@ author: 前原応光
 lede: "Elastic{ON}への参加のためにサンフランシスコにやって来ましたので、まず現地レポートをお届けします！"
 ---
 
-# はじめに
+## はじめに
 
 おはようございます！
 ゆるふわエンジニアの前原ですー
@@ -28,7 +28,7 @@ lede: "Elastic{ON}への参加のためにサンフランシスコにやって�
 
 ...てことで、今日も1日元気に過ごすために朝食を摂りたいと思います。
 
-# Morning
+## Morning
 
 朝食は、Posh Bagel！
 通勤前の人たちで賑わっているベーグルが美味しいお店です。
@@ -42,7 +42,7 @@ lede: "Elastic{ON}への参加のためにサンフランシスコにやって�
 
 <img src="/images/2017/20170321/photo_20170321_02.jpeg" loading="lazy">
 
-## スタンフォード大学到着
+### スタンフォード大学到着
 
 これから洋平さんに会いに行くため、スタンフォード大学へ！
 
@@ -63,7 +63,7 @@ lede: "Elastic{ON}への参加のためにサンフランシスコにやって�
 
 <img src="/images/2017/20170321/photo_20170321_05.jpeg" loading="lazy">
 
-## お祈りタイム
+### お祈りタイム
 
 まずは、スタンフォード大学内にある教会でお祈りタイム。
 
@@ -71,7 +71,7 @@ lede: "Elastic{ON}への参加のためにサンフランシスコにやって�
 
 <img src="/images/2017/20170321/photo_20170321_07.jpg" loading="lazy">
 
-# Jen-Hsun Huang Engineering Center
+## Jen-Hsun Huang Engineering Center
 
 コンピュータサイセンス学科のある校舎を洋平さんに最適ルートで案内してもらいました。
 
@@ -98,7 +98,7 @@ PCだけでなく工作できる環境があるのは素敵ですね。
 
 <img src="/images/2017/20170321/photo_20170321_11.jpeg" loading="lazy">
 
-## Hewlett-Packard
+### Hewlett-Packard
 
 Jen-Hsun Huang Engineering Centerから離れ、次の目的地に洋平さんに案内してもらいます。
 その途中にヒューレットとパッカードのビルが両サイドに構えています。
@@ -114,7 +114,7 @@ Jen-Hsun Huang Engineering Centerから離れ、次の目的地に洋平さん�
 * The William Gates Computer Science Building
 <img src="/images/2017/20170321/photo_20170321_14.jpeg" loading="lazy">
 
-# Lunch
+## Lunch
 
 濃厚な午前中を過ごしたので・・・ランチ！
 洋平さんのオススメのお店を教えてもらい、いざランチへ！
@@ -131,7 +131,7 @@ Jen-Hsun Huang Engineering Centerから離れ、次の目的地に洋平さん�
 
 <img src="/images/2017/20170321/photo_20170321_16.jpeg" loading="lazy">
 
-## d.school
+### d.school
 
 ご飯を食べて元気になったところで次なるところへ移動！
 
@@ -168,7 +168,7 @@ d.schoolでは人間を中心にしたデザインから、いままでの経験
 
 <img src="/images/2017/20170321/photo_20170321_21.jpeg" loading="lazy">
 
-# 散歩
+## 散歩
 
 スタンフォード大学の学生は、イメージ通り芝生でくつろいだりしているみたいですね。
 涼しい顔をして、くつろいでいる感じですが、実際は、深夜も家でめっちゃ勉強しているらしいです。
@@ -177,7 +177,7 @@ d.schoolでは人間を中心にしたデザインから、いままでの経験
 
 <img src="/images/2017/20170321/photo_20170321_22.jpeg" loading="lazy">
 
-# おわりに
+## おわりに
 
 スタンフォード大学。ここでたくさんの優秀な学生が誕生するだけでなく、イノベーションも数々生まれる環境。
 こういった環境に私達の会社からも当たり前に留学できる環境を整えていきたいですね。
