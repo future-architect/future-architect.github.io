@@ -57,11 +57,22 @@ function author_to_url(author) {
 }
 
 hexo.extend.helper.register('list_authors', function(year = 'all') {
-  // 年指定、または全期間での投稿数をカウントする関数を定義
-  let count_posts = author => this.site.posts.filter(post => post.author === author).length;
-  if (year != 'all') {
-    count_posts = author => this.site.posts.filter(post => post.date.format("YYYY") === year && post.author === author).length;
-  }
+  // 著者ごとの件数と活動年を、先に記事1周で数え切る。
+  // 以前は sort の比較関数の中で毎回全記事を filter しており、
+  // 著者数 × 比較回数 × 記事数で /authors/ のレンダリングに数十秒かかっていた。
+  // 共著（author が配列）を数えないのは従来の === 比較と同じ挙動
+  const countByAuthor = new Map();
+  const yearsByAuthor = new Map();
+  this.site.posts.forEach(post => {
+    const a = post.author;
+    const y = post.date.year();
+    if (year === 'all' || String(y) === year) {
+      countByAuthor.set(a, (countByAuthor.get(a) || 0) + 1);
+    }
+    if (!yearsByAuthor.has(a)) yearsByAuthor.set(a, new Set());
+    yearsByAuthor.get(a).add(y);
+  });
+  const count_posts = author => countByAuthor.get(author) || 0;
 
   // 投稿数の降順。同数は名前で決める（決着が無いとビルドごとに並びが変わる）。
   // localeCompare を使わないのは環境の ICU/ロケールに左右させないため
@@ -79,8 +90,10 @@ hexo.extend.helper.register('list_authors', function(year = 'all') {
     const twoYearsAgo = currentYear - 2; // 2年前 (2023)
 
     // 特定の年に著者の投稿があるかチェックするヘルパー
-    const hasPostsInYear = (author, checkYear) =>
-      this.site.posts.some(post => post.date.year() === checkYear && post.author === author);
+    const hasPostsInYear = (author, checkYear) => {
+      const years = yearsByAuthor.get(author);
+      return years ? years.has(checkYear) : false;
+    };
 
     authorMapper = author => {
       let suffix = '';
