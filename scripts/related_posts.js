@@ -3,6 +3,8 @@
 // 関連記事の最大表示件数
 // 記事が長文化する傾向にあるため、記事末尾のスクロール量を抑える目的で絞っている
 const maxCount = 3;
+// 同じ連載の記事のスコアに掛ける係数（#2124）
+const SAME_SERIES_PENALTY = 0.5;
 const {getSNSCnt} = require('./lib/sns');
 const {postListItem} = require('./lib/post_list');
 const {navLinkedPaths} = require('./lib/series');
@@ -125,6 +127,13 @@ hexo.extend.helper.register('list_related_posts', function() {
 
     if (p.author === post.author) {
       score += authorIDF[p.author];
+    }
+
+    // 同じ連載の記事は連載ナビで辿れるので、関連記事の枠を使う価値が低い。
+    // 連載はタグを共有するためスコアが高くなりやすく、放っておくと枠を占める。
+    // 除外はしない。連載の中でも本当に関連が深い回はある
+    if (post.series && p.series === post.series) {
+      score *= SAME_SERIES_PENALTY;
     }
 
     acc.push({ ...p, score: score });
