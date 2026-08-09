@@ -14,7 +14,7 @@ author: 星賢一
 lede: "弊社発のOSSプロダクト「uroboroSQL」をSpring Boot上で動かすサンプルアプリケーションを作ってみました。"
 ---
 
-# uroboroSQLについて
+## uroboroSQLについて
 
 こんにちは。星です。
 
@@ -34,7 +34,7 @@ uroboroSQLもこういったJavaにおけるDB永続化ライブラリの1つで
 > uroboroSQLの紹介 (OSC2017 Nagoya) #oscnagoya
 > https://www.slideshare.net/KenichiHoshi1/uroborosql-osc2017-nagoya-oscnagoya
 
-# uroboroSQLを利用したSpring BootによるWebアプリケーション
+## uroboroSQLを利用したSpring BootによるWebアプリケーション
 
 さて、JavaでWebアプリケーションを開発するとき、いわゆるWebアプリケーションフレームワークをどうするかという話がありますが、有償のWebアプリケーションサーバを利用する前提であれば、Java EEは有力な選択肢でしょうし、そうでなければ、Spring Framework(Spring Boot)、Play Frameworkなどが有力かなと思います。特に最近はPaaSなどでコンテナ上で動かす場合は、TomcatやJettyなどを組み込んで、実行可能jarにしてデプロイするという方式もトレンドでしょうか。
 
@@ -49,7 +49,7 @@ uroboroSQLは、特定のWebアプリケーションフレームワークには�
 - uroboroSQL PetClinic
   - https://github.com/shout-star/uroborosql-springboot-demo
 
-# uroboroSQL PetClinic
+## uroboroSQL PetClinic
 
 <img src="/images/2017/20170828/photo_20170828_01.jpg" class="img-middle-size" loading="lazy">
 
@@ -64,7 +64,7 @@ uroboroSQLは、特定のWebアプリケーションフレームワークには�
 
 ログイン不要で利用できたり、DBの排他制御がなかったりと、あくまでサンプルという位置づけですね。
 
-# uroboroSQLとSpring Boot連携
+## uroboroSQLとSpring Boot連携
 
 Spring Bootだと、通常はSpring Data JPAを利用することが多いかと思いますが、今回は uroboroSQLと連携させるので、application.ymlで定義した`DataSource`を、uroboroSQLのSqlConfigに渡してやる必要があります。
 
@@ -115,7 +115,7 @@ public abstract class BaseController {
 
 本来は`DefaultSqlConfig#getConfig`に直接`DataSource`を渡したいところだったんですが、uroboroSQL v0.2ではそのインタフェースがなくて、`getConnection`することにしました。ちなみに、v0.3では`DataSource`を直接渡せるようにする予定です。
 
-# 検索処理の実装
+## 検索処理の実装
 
 飼い主の検索画面(Find Owner)で、飼い主(Owner)の名字(LastName)で検索ボタンを押下したときに呼び出される実装は下記のようになります。
 
@@ -175,7 +175,7 @@ uroboroSQLはSQLを実装する方式のライブラリなので、ご覧の通�
 なお、実際に自分で実装してみて、`SQLException`の検査例外が邪魔に感じたので、uroboroSQL v0.3からは実行時例外にする予定です。
 やはり自身で実装してみると気づきがあるものですね。
 
-# 登録処理の実装
+## 登録処理の実装
 
 <img src="/images/2017/20170828/photo_20170828_04.png" class="img-middle-size" loading="lazy">
 
@@ -259,7 +259,7 @@ Spring Bootによって、フロントエンドから渡されたJSONがOwnerと
 
 uroboroSQLもv0.2より、JPAライクなO/Rマッピング機能を追加したことにより、INSERT/UPDATEといった処理はSQL不要でシンプルに実装できました。
 
-# まとめ
+## まとめ
 
 というわけで、uroboroSQLとSpring BootのWebアプリケーションの実装を見てきましたが、いかがでしたしょうか？
 
@@ -274,7 +274,7 @@ uroboroSQLは現在v0.3に向けて、鋭意開発を進めており、まだま
 
 uroboroSQL PetClinicも認証機能など、エンタープライズ用途の参考になるような機能をまだまだ追加していきたいと思っていますので、こちらもよろしくお願いします。
 
-## 番外編：SQLログ表示機能
+### 番外編：SQLログ表示機能
 
 <img src="/images/2017/20170828/photo_20170828_05.png" class="img-middle-size" loading="lazy">
 
@@ -287,7 +287,7 @@ uroboroSQL PetClinicも認証機能など、エンタープライズ用途の参
 - オープンソースカンファレンス2017 Tokyo/Fall - オープンソースの文化祭！
   - https://www.ospn.jp/osc2017-fall/
 
-# 関連サイト
+## 関連サイト
 
 - uroboroSQL PetClinic
   - https://github.com/shout-star/uroborosql-springboot-demo
@@ -296,7 +296,7 @@ uroboroSQL PetClinicも認証機能など、エンタープライズ用途の参
 - uroboroSQL Document
   - https://future-architect.github.io/uroborosql-doc/
 
-## 参考
+### 参考
 
 - Spring Boot
   - https://projects.spring.io/spring-boot/
