@@ -4,8 +4,9 @@ date: 2026/07/02 00:00:00
 postid: a
 tags:
   - S3
+  - AWS
 categories:
-  - Programming
+  - Infrastructure
 series: "データエンジニアリング"
 thumbnail: /images/2026/20260702a/thumbnail.png
 author: 鈴木風真
