@@ -29,49 +29,35 @@ hexo.extend.helper.register('ave_posts', function(year) {
   return Math.floor(ave * 10) / 10;
 });
 
+// 年ページは週単位、全期間は四半期単位で数える。
+// 年を月で切ると12本しか立たず、全期間の四半期と粒度が変わらなかった（#2121）。
+//
+// 投稿が無い期間も 0 で埋める。記事のある期間だけを並べると、
+// 間隔が詰まって「毎週出ている」ように見えてしまう
 const generatePostsSeries = (posts, year) => {
-  let target = posts;
-  if (year) {
-    target = posts.filter(post => post.date.format("YYYY") === year.toString());
-  }
+  const target = year
+    ? posts.filter(post => post.date.format('YYYY') === year.toString())
+    : posts;
 
-  const group = target.reduce((acc, cur) => {
-    const month = Number(cur.date.format('MM'));
-    let quarterNum;
-    if (month <=3) {
-      quarterNum = 1;
-    } else if (month <= 6) {
-      quarterNum = 2;
-    } else if (month <= 9) {
-      quarterNum = 3;
-    } else {
-      quarterNum = 4;
-    }
+  const quarterOf = date => `${date.format('YYYY')}年${Math.ceil(Number(date.format('MM')) / 3)}Q`;
+  const keyOf = date => (year ? date.clone().startOf('isoWeek').format('MM/DD') : quarterOf(date));
 
-    let groupKey;
-    if (year) {
-      groupKey = cur.date.format("YYYY年MM月")
-    } else {
-      const quarter = cur.date.format("YYYY") + '年' + quarterNum + 'Q'
-      groupKey = quarter
-    }
-
-    const item = acc.find(p => p.groupKey === groupKey);
-    if (item) {
-      item.count++;
-    } else {
-      acc.push({
-        ym: cur.date.format("YYYYMM"),
-        groupKey: groupKey,
-        count: 1,
-      });
-    }
-    return acc;
-  }, []);
-
-  group.sort((a, b) => {
-    return a.groupKey.localeCompare(b.groupKey);
+  const counts = new Map();
+  let first = null;
+  let last = null;
+  target.forEach(post => {
+    const key = keyOf(post.date);
+    counts.set(key, (counts.get(key) || 0) + 1);
+    const at = year ? post.date.clone().startOf('isoWeek') : post.date.clone().startOf('quarter');
+    if (!first || at.isBefore(first)) first = at.clone();
+    if (!last || at.isAfter(last)) last = at.clone();
   });
+  if (!first) return [];
 
-  return group;
+  const series = [];
+  for (const at = first.clone(); !at.isAfter(last); at.add(1, year ? 'week' : 'quarter')) {
+    const key = year ? at.format('MM/DD') : quarterOf(at);
+    series.push({groupKey: key, count: counts.get(key) || 0});
+  }
+  return series;
 }
