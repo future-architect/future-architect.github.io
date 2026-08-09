@@ -6,9 +6,16 @@
   <main class="col-xs-12 col-sm-12 col-md-10">
     <section id="main" class="margin-top-30">
       <h1 class="list-page margin-bottom-20">タグ一覧</h1>
+      <%# 平均と中央値を並べるのは、少数の大きいタグに引っ張られて
+          両者が倍以上ずれるため。片方だけでは付け方の実態が分からない %>
+      <% const perPost = tags_per_post(); %>
+      <% const perTag = posts_per_tag(); %>
       <ul class="summary">
         <li><span class="summary-count"><%= count_tags() %></span><br><span class="summary-label">タグ</span></li>
-        <li><span class="summary-count"><%= median_tags_per_post() %></span><br><span class="summary-label">記事あたり（中央値）</span></li>
+        <li><span class="summary-count"><%= perPost.mean %></span><br><span class="summary-label">記事あたりのタグ（平均）</span></li>
+        <li><span class="summary-count"><%= perPost.median %></span><br><span class="summary-label">記事あたりのタグ（中央値）</span></li>
+        <li><span class="summary-count"><%= perTag.mean %></span><br><span class="summary-label">タグあたりの記事（平均）</span></li>
+        <li><span class="summary-count"><%= perTag.median %></span><br><span class="summary-label">タグあたりの記事（中央値）</span></li>
       </ul>
       <%# セクション見出しはホーム（archive.ejs）と同じ bottom-content-header で
           上下に余白を取り、節の塊が分かれて見えるようにする。
@@ -30,6 +37,25 @@
           </ul>
         </div>
       </div>
+      <%# タグがどれだけ増えてきたか。初出の年で数える。
+          「定着したか」で積み上げる案もあったが、新しい年ほど再利用の
+          機会が無いだけで交絡するため、新規数だけを出す %>
+      <h2 class="bottom-content-header">新しく使われたタグの数</h2>
+      <div id="chart" style="width:100%;min-height:250px"></div>
+      <script src="https://cdn.jsdelivr.net/npm/echarts@5.1.2/dist/echarts.min.js"></script>
+      <script type="text/javascript">
+        const chartData = <%- new_tags_by_year() %>;
+        const myChart = echarts.init(document.getElementById('chart'));
+        myChart.setOption({
+          tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+          grid: { left: 0, right: '2%', containLabel: true },
+          xAxis: { type: 'category', data: chartData.years },
+          yAxis: { type: 'value', min: 0 },
+          color: ['#337ab7'],
+          series: [{ name: '新しく使われたタグ', type: 'bar', data: chartData.counts }]
+        });
+      </script>
+
       <h2 class="bottom-content-header">タグクラウド</h2>
       <div class="tag-cloud footer-gap">
       <%- custom_tagcloud({min_font:12, max_font:36}) %>
