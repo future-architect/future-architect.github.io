@@ -14,7 +14,7 @@ lede: "公式チュートリアルDevelop in SwiftのModels and persistence、Da
 
 <img src="/images/2024/20240522a/image.png" alt="" width="1103" height="542" loading="lazy">
 
-# はじめに
+## はじめに
 
 HealthCare Innovation Group(HIG)[^1]の橋本です。
 
@@ -22,7 +22,7 @@ HealthCare Innovation Group(HIG)[^1]の橋本です。
 
 今回は、1つ目の **Models and persistence編** です。Models and persistenceセクションで学んだこと、Wrap-upのExtend your appの追加課題をやってみたので、これらについてまとめています。
 
-# 本記事でわかること
+## 本記事でわかること
 
 - `SwiftData`の基本的な使い方
   - `SwiftData`の導入
@@ -30,13 +30,13 @@ HealthCare Innovation Group(HIG)[^1]の橋本です。
   - `SwiftUI`の`View`との連携
 - Wrap-upのExtend your appの追加課題の解答例を知ることができる
 
-# 環境
+## 環境
 
 - OS: macOS Sonoma 14.4.1
 - Xcode: 15.3 (15E204a)
 - Swift: 5.10
 
-# 目次
+## 目次
 
 - SwiftDataとは
 - Save data
@@ -47,7 +47,7 @@ HealthCare Innovation Group(HIG)[^1]の橋本です。
 - Wrap-up: Models and persistence
 - おわりに
 
-# SwiftDataとは
+## SwiftDataとは
 
 <img src="/images/2024/20240522a/image_2.png" alt="" width="1200" height="419" loading="lazy">
 
@@ -69,11 +69,11 @@ SwiftDataの主な特徴としては、
 SwiftDataはiOS17.0+, iPadOS17.0+で使用可能であること。
 :::
 
-# Save data
+## Save data
 
 Models and persistenceセクションのSave dataを進めていきます。
 
-## Section 1~3(UI等のSwiftDataに直接関係のない事前準備)
+### Section 1~3(UI等のSwiftDataに直接関係のない事前準備)
 
 以下は、Section1~3まで対応後のコードです。この時点では`SwiftData`を使用していないため、誕生日を登録しても、アプリキルすると登録したデータは削除されてしまいます。
 
@@ -157,7 +157,7 @@ struct ContentView: View {
 
 </details>
 
-## Section４: Convert your structure to a SwiftData model
+### Section４: Convert your structure to a SwiftData model
 
 先程作成した`Friend`構造体を`SwiftData`モデルに変換します。
 
@@ -186,7 +186,7 @@ import Foundation
 }
 ```
 
-## Section5: Connect SwiftData and SwiftUI
+### Section5: Connect SwiftData and SwiftUI
 
 `SwiftData`と`SwiftUI`の`View`を連携させます。
 `SwiftUI`におけるエントリーポイントである`~App.swift`に次のコードを追加することで、`SwiftData`によって永続化させたデータの保存場所と`View`を連携させることができます。
@@ -264,7 +264,7 @@ struct ContentView: View {
 }
 ```
 
-## Section6: Use model data to fill out the UI
+### Section6: Use model data to fill out the UI
 
 モデルデータを使ってUIをいい感じに整えていきます。
 主に以下2点を実現させます。
@@ -350,15 +350,15 @@ struct ContentView: View {
 }
 ```
 
-## Wrap-up: Models and persistence
+### Wrap-up: Models and persistence
 
 次のページの`Extend your app`の次の２つのお題に取り組みたいと思います。
 
 https://developer.apple.com/tutorials/develop-in-swift/models-and-persistence-conclusion
 
-### Extend your app（ソートする基準の変更、降順or昇順）
+#### Extend your app（ソートする基準の変更、降順or昇順）
 
-#### Sort the birthday list by name instead of birthday.
+##### Sort the birthday list by name instead of birthday.
 
 これはとても簡単に修正できます。
 `@Query(sort: \Friend.birthday)`を`@Query(sort: \Friend.name)`に変えるだけです。
@@ -373,7 +373,7 @@ https://developer.apple.com/tutorials/develop-in-swift/models-and-persistence-co
 @Query(sort: \Friend.name, order: .reverse) private var friends: [Friend]
 ```
 
-#### Add a notes property to Friend to plan how you’ll celebrate a friend’s birthday.
+##### Add a notes property to Friend to plan how you’ll celebrate a friend’s birthday.
 
 これもおまけ的な内容ですが、簡単に実装してみます。
 
@@ -464,20 +464,20 @@ struct ContentView: View {
 
 </details>
 
-#### 完成したサンプルアプリ
+##### 完成したサンプルアプリ
 
 追加した友達の誕生日のデータがアプリをキルしても、再度立ち上げると残っていることが確認できました！
 `SwiftData`を使って、データを永続化させることに成功！！
 
 <img src="/images/2024/20240522a/Simulator_Screen_Recording_-_iPhone_15_-_2024-05-15_at_20.26.56.gif" alt="" width="218" height="474" loading="lazy">
 
-# おわりに
+## おわりに
 
 公式チュートリアル[Develop in Swift](https://developer.apple.com/tutorials/develop-in-swift)を使って`SwiftData`の基本的な使い方を学びました。気になった方は、実際にチュートリアルを1つずつ実際にコードを書きながら、進めることをおすすめします。
 
 次回は、公式チュートリアル[Develop in Swift](https://developer.apple.com/tutorials/develop-in-swift/)のData editing and navigation編を公開したいと思います。
 
-# 参考
+## 参考
 
 - SwiftData | Apple Developer Document https://developer.apple.com/documentation/swiftdata
 - Meet SwiftData https://developer.apple.com/videos/play/wwdc2023/10187/

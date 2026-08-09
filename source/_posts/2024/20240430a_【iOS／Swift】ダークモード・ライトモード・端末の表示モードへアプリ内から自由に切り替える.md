@@ -15,7 +15,7 @@ lede: みなさん、お使いのiPhoneではダークモードorライトモー
 ---
 [春の入門連載](/articles/20240408a/)の14本目です。
 
-# はじめに
+## はじめに
 
 HealthCare Innovation Group(HIG)[^1]所属の橋本です。
 
@@ -31,19 +31,19 @@ HealthCare Innovation Group(HIG)[^1]所属の橋本です。
 
 そんなiPhoneにおけるダークモード・ライトモードの切り替えをアプリ内から行う方法の例を紹介したいと思います。
 
-# 環境
+## 環境
 
 - OS：macOS Sonoma 14.4.1
 - Xcode：15.3 (15E204a)
 - Swift：5.10
 
-# ゴールイメージ
+## ゴールイメージ
 
 今回作成する表示モードをピッカーで選択できる設定画面です。
 
 <img src="/images/2024/20240430a/Simulator_Screen_Recording_-_iPhone_15_Pro_-_2024-04-12_at_23.16.27.gif" alt="Simulator_Screen_Recording_-_iPhone_15_Pro_-_2024-04-12_at_23.16.27.gif" width="240" height="520" loading="lazy">
 
-# 実装方法
+## 実装方法
 
 まず、切り替えたい３つの表示モードを列挙型で定義しておきます。
 
@@ -120,13 +120,13 @@ Done！
 
 触れていませんでしたが、@AppStoregeで端末内部に`DisplayMode`を記憶させているので、アプリキル後に立ち上げた際には、以前の設定値が保存されるようにもなっています。
 
-# おわりに
+## おわりに
 
 ダークモード・ライトモード・端末の設定のモードにアプリ内から切り替える方法を扱いました。
 
 このようにダークモード、ライトモードを変えること自体は簡単ですが、それぞれの色を各画面に対応させるほうが大変ですね。色の管理にはAsset Catalogを使うことでダークモード、ライトモードの色を設定しておく方法がありますが、このあたりについても、うまいやり方があればご紹介したいと思います。
 
-# 参考
+## 参考
 
 - https://developer.apple.com/documentation/uikit/uisplitviewcontroller/1623194-displaymode
 - https://developer.apple.com/documentation/swiftui/view/preferredcolorscheme(_:)

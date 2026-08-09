@@ -15,7 +15,7 @@ lede: "CloudflareをCDNやDNSに利用しているサービスにおいて、CDN
 
 [Cloudflare連載](/articles/20240527a/)4日目の記事です。
 
-# はじめに
+## はじめに
 
 TIG DXチームの小林弘樹です。
 
@@ -23,27 +23,27 @@ TIG DXチームの小林弘樹です。
 
 CloudflareをCDNやDNSに利用しているサービスにおいて、CDNレイヤでメンテナンスイン/アウトを実装する方法を書いてみます。
 
-# 概要
+## 概要
 
-## やりたいこと
+### やりたいこと
 
 - Cloudflare上にメンテナンスページ（htmlファイル）をデプロイする
 - 運用保守拠点からのアクセスはオリジンにアクセスさせ、その他一般ユーザーからのアクセスはメンテナンスページにリダイレクトさせる
 - Cloudflare APIを利用して、メンテナンスイン/アウトを自動化する
 
-## 利用サービス
+### 利用サービス
 
 - [Cloudflare R2](https://developers.cloudflare.com/r2/)
 - [Cloudflare Rules(Single Redirects)](https://developers.cloudflare.com/rules/url-forwarding/single-redirects/)
 
-# ドメイン取得・管理
+## ドメイン取得・管理
 
 今回の構成はCloudflare上でドメインを管理していることが前提となります。
 Cloudflareでドメインを取得したり、取得済みのドメインをCloudflareに移管する方法については、詳しくわかりやすい情報が多く公開されているため他の記事を参照してください。
 
-# Cloudflare R2設定
+## Cloudflare R2設定
 
-## バケット構築
+### バケット構築
 
 まずはバケットを作ります。
 2024/05現在では凝った設定はできないため、ただ箱のみとなります。
@@ -55,7 +55,7 @@ resource "cloudflare_r2_bucket" "maintenance" {
 }
 ```
 
-## パブリックアクセス設定
+### パブリックアクセス設定
 
 Cloudflare R2の設定画面からパブリックアクセス設定の「ドメインに接続」をクリックし、Cloudflareで管理しているドメインを利用して任意のドメインを入力します
 
@@ -65,7 +65,7 @@ Cloudflare R2の設定画面からパブリックアクセス設定の「ドメ�
 
 <img src="/images/2024/20240531a/r2_setting_2.jpg" alt="r2_setting_2.jpg" width="1200" height="291" loading="lazy">
 
-## htmlファイルアップロード
+### htmlファイルアップロード
 
 メンテナンスページ（htmlファイル）のデプロイは自動化したいため、APIでのアップロードを行います。
 
@@ -101,9 +101,9 @@ aws configureでアクセスキーとシークレットアクセスキーを設�
 aws s3 cp $HTML_PATH s3://$R2_BUCKET_NAME --endpoint-url https://$R2_ENDPOINT --region apac
 ```
 
-# リダイレクトルール設定
+## リダイレクトルール設定
 
-## 許可IPリスト作成
+### 許可IPリスト作成
 
 まずメンテンナンス中でもアクセスを許可したい運用保守拠点のIPアドレスリストを作成します。
 
@@ -119,7 +119,7 @@ aws s3 cp $HTML_PATH s3://$R2_BUCKET_NAME --endpoint-url https://$R2_ENDPOINT --
 
 <img src="/images/2024/20240531a/rule_setting_3.jpg" alt="rule_setting_3.jpg" width="1159" height="627" loading="lazy">
 
-## リダイレクトルール作成
+### リダイレクトルール作成
 
 作成したIPリスト以外のIPリストからのアクセスはメンテナンスページにリダイレクトするように設定します。
 
@@ -152,7 +152,7 @@ resource "cloudflare_ruleset" "single_redirects" {
 
 ```
 
-## なぜリダイレクトルールか
+### なぜリダイレクトルールか
 
 Cloudflareでこのようなリダイレクトを行いたいときには、他に以下の手段があります。
 
@@ -164,11 +164,11 @@ Cloudflareでこのようなリダイレクトを行いたいときには、他�
 
 Workersはより細かく柔軟に設定が可能ですが、今回のような単純なリダイレクト制御の場合はそこまでは不要であるため、よりシンプルなリダイレクトルールを採用しています。
 
-# 自動化設定
+## 自動化設定
 
 自動化についてはGitHub Actionsなどを想定してはしていますが、特定のサービスに依存はしないためコマンドのみ記載します。
 
-## APIトークン作成
+### APIトークン作成
 
 まずはAPIで色々と実行するためにAPIトークンを作成します。
 
@@ -188,7 +188,7 @@ Workersはより細かく柔軟に設定が可能ですが、今回のような�
 
 <img src="/images/2024/20240531a/auto_setting_3.jpg" alt="auto_setting_3.jpg" width="946" height="439" loading="lazy">
 
-## メンテナンスイン
+### メンテナンスイン
 
 以下のコマンドでメンテナンスインを実現できます。
 
@@ -209,7 +209,7 @@ curl -X POST https://api.cloudflare.com/client/v4/zones/$ZONE_ID/purge_cache \
     -d '{"purge_everything":true}'
 ```
 
-## メンテナンスアウト
+### メンテナンスアウト
 
 以下のコマンドでメンテナンスアウトを実現できます。
 
@@ -230,7 +230,7 @@ curl -X POST https://api.cloudflare.com/client/v4/zones/$ZONE_ID/purge_cache \
     -d '{"purge_everything":true}'
 ```
 
-## 【補足】ルールセットID（&ルールID）の確認方法
+### 【補足】ルールセットID（&ルールID）の確認方法
 
 著者が調べた限りでは、画面上で簡単にルールセットIDを確認する方法がありませんでしたので、Cloudflare APIを利用して確認しています。
 
@@ -248,7 +248,7 @@ curl -X GET https://api.cloudflare.com/client/v4/zones/$ZONE_ID/rulesets/$RULESE
     -H "Content-Type:application/json"
 ```
 
-# 最後に
+## 最後に
 
 Cloudflare R2とリダイレクトルールを利用してメンテナンスイン/アウトを実装できました。
 

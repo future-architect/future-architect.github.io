@@ -14,13 +14,13 @@ lede: "ElasticsearchからOpenSearchに移行した際のGo用クライアント
 ---
 <img src="/images/2024/20240523a/top.png" alt="" width="1000" height="484">
 
-# はじめに
+## はじめに
 
 はじめまして。2023年秋入社した、Technology Innovation Group (TIG)  大江聖太郎です。
 
 ElasticsearchからOpenSearchに移行した際のGo用クライアントの実装についてまとめます。
 
-# 背景
+## 背景
 
 ElasticsearchからOpenSearchへの移行を行った際に、利用するGoのクライアントもElasticsearch用のものからOpenSearch用に変更しました。
 
@@ -28,12 +28,12 @@ ElasticsearchからOpenSearchへの移行を行った際に、利用するGoの�
 
 そんな苦労がありましたので、少しでもお役に立てればという思いから実装例を紹介していきます。
 
-# 使用するクライアント
+## 使用するクライアント
 
 - 今まで使っていたクライアント: [olivere/elastic](https://github.com/olivere/elastic)
 - 今回新たに使うクライアント: [opensearch-go](https://github.com/opensearch-project/opensearch-go)
 
-# 各メソッド
+## 各メソッド
 
 それでは、各メソッドの実装の違いについて詳しく見ていきましょう。
 
@@ -41,15 +41,15 @@ ElasticsearchからOpenSearchへの移行を行った際に、利用するGoの�
 この記事では分量を少なくする目的で、[ステータスコードのエラーハンドリング](#ステータスコードのエラーハンドリング)の章を除き、エラーハンドリングを全て握りつぶして記載します。
 :::
 
-## 追加/更新系メソッド
+### 追加/更新系メソッド
 
-### Index
+#### Index
 
 Indexメソッドは、OpenSearchにおいてデータをIndex[^1]に登録し、既に既存のデータがある場合は上書きする処理です。RDSにおけるUpsertのようなものです。
 
 [^1]: IndexとはRDSにおけるテーブルのようなものです。Elasticsearch/OpenSearchの用語について詳しくは[こちら](https://www.elastic.co/jp/blog/what-is-an-elasticsearch-index)をご覧ください。
 
-#### olivere/elasticの実装
+##### olivere/elasticの実装
 
 ``` golang
 package main
@@ -72,7 +72,7 @@ func main() {
 }
 ```
 
-#### opensearch-goの実装
+##### opensearch-goの実装
 
 ```go
 package main
@@ -103,7 +103,7 @@ func main() {
 }
 ```
 
-### Update
+#### Update
 
 Updateはその名の通り既に存在するドキュメントを更新する操作です。
 
@@ -113,7 +113,7 @@ Updateはその名の通り既に存在するドキュメントを更新する�
 2. 特にドキュメントに変更点がない場合、Indexはバージョンがインクリメントされるが、Updateはされない
 3. Updateの方がパフォーマンス面では優れている
 
-#### olivere/elasticの実装
+##### olivere/elasticの実装
 
 ```go
 package main
@@ -136,7 +136,7 @@ func main() {
 }
 ```
 
-#### opensearch-goの実装
+##### opensearch-goの実装
 
 ```go
 package main
@@ -166,7 +166,7 @@ func main() {
 }
 ```
 
-#### 実装方法の違い
+##### 実装方法の違い
 
 パラメーターは同じですが、大きな違いとして4点あります。
 
@@ -177,13 +177,13 @@ func main() {
 3. olivere/elasticはDo()メソッドを明示的に呼び出して操作を適用しますが、opensearch-goはIndex()メソッドが自動的にDo()を実行する設計となっています
 4. opensearch-goではアップデートするフィールドと値を、"doc"フィールドの中に入れてネストする必要があります。olivere/elasticの方ではそのようにする必要はないです
 
-## 取得系メソッド
+### 取得系メソッド
 
-### GET
+#### GET
 
 Getは、特定の1つのドキュメントを取得する操作です。
 
-#### olivere/elasticの実装
+##### olivere/elasticの実装
 
 ```go
 package main
@@ -211,7 +211,7 @@ func main() {
 }
 ```
 
-#### opensearch-goの実装
+##### opensearch-goの実装
 
 ```go
 package main
@@ -254,11 +254,11 @@ func main() {
 }
 ```
 
-### SEARCH
+#### SEARCH
 
 Searchは、クエリパラメーターを渡し、特定の条件に当てはまるドキュメントのリストを取得する操作です。
 
-#### olivere/elasticの実装
+##### olivere/elasticの実装
 
 ```go
 package main
@@ -300,7 +300,7 @@ func main() {
 }
 ```
 
-#### opensearch-goの実装
+##### opensearch-goの実装
 
 ```go
 package main
@@ -377,15 +377,15 @@ func main() {
 }
 ```
 
-### 実装方法の違い
+#### 実装方法の違い
 
 - olivere/elasticでは取得したドキュメント本体がそのまま*json.RawMessage型のレスポンスで返るのに対し、opensearch-goではドキュメント本体以外にSeqNoやPrimaryTermを含むio.ReadCloser型の構造体として返る。そのためopensearch-goではアプリ側でレスポンスをjson.Decoderを使ってDecodeした上で、そこからドキュメント本体を抜き出す必要がある
 - queryStringを渡す際、olivere/elasticの場合はNewQueryStringQueryを呼び出し、elastic.QueryStringQueryの構造体にする必要がある。opensearch-goの場合はWithQueryにそのまま渡せる
 - ソートフィールドを渡す時、olivere/elasticの場合はSort項目用に[]elastic.Sorter型が用意されていて、SortByに[]elastic.Sorter型の構造体を渡せばよい。一方opensearch-goの場合はそもそもソートフィールド用の型が用意されていないため、自前の構造体を作成し、WithBodyの形で渡す必要がある
 
-## ステータスコードのエラーハンドリング
+### ステータスコードのエラーハンドリング
 
-#### olivere/elasticの実装
+##### olivere/elasticの実装
 
 ```go
 package main
@@ -412,7 +412,7 @@ func main() {
 }
 ```
 
-#### opensearch-goの実装
+##### opensearch-goの実装
 
 ```go
 package main
@@ -454,13 +454,13 @@ func main() {
 }
 ```
 
-### 実装方法の違い
+#### 実装方法の違い
 
 ドキュメントが見つからなかったとき、登録に失敗したときなど、Elasticsearch/OpenSearchから400や404のステータスコードでのエラーが返ってきますが、その際に以下の違いがあります。
 
 - olivere/elasticでは返り値のerrとして返るのでそれを見ればよいが、opensearch-goではステータスコードのエラーはレスポンスの中に含まれており、レスポンスの中身を見て判断する必要がある
 
-# おわりに
+## おわりに
 
 ElasticsearchのクライアントとOpenSearchのクライアントの違いについてまとめました。
 

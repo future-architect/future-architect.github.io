@@ -15,7 +15,7 @@ lede: "Pub/Sub型のメッセージングアーキテクチャを採用するに
 
 本記事は[「珠玉のアドベントカレンダー記事をリバイバル公開します」](/articles/20240617a/)企画のために、[以前Qiitaに投稿した記事](https://qiita.com/ksky/items/8933348de5af00e45ffe)を改訂したものです。
 
-## はじめに
+### はじめに
 
 Pub/Sub型のメッセージングアーキテクチャを採用するにあたっては、kafkaなどのブローカーミドルウェアや、Amazon SNS、Google Cloud Pub/Subなどのマネージドサービスを利用するケースが多いかと思います。ところでPostgreSQLでも実はPub/Subができます。
 
@@ -25,7 +25,7 @@ Pub/Sub型のメッセージングアーキテクチャを採用するにあた�
 ※実行環境はPostgreSQL 16.2とJava 21です
 ※データベースの文字コードはUTF-8としています
 
-# NOTIFY/LISTEN
+## NOTIFY/LISTEN
 
 PostgreSQLのPub/Sub機能に関連するクエリは次の3つです。
 
@@ -66,7 +66,7 @@ UNLISTEN foo;
 続いて、本機能の主な仕様を挙げつつ利用時の考慮点を示します。
 詳細は[公式ドキュメント](https://www.postgresql.jp/document/current/index.html)をご覧いただければと思います。
 
-## チャネル
+### チャネル
 
 * チャネルはPub/Sub通信する際のキーとなる任意の文字列です。LISTEN対象のチャネルとNOTIFYを実行するチャネルが異なるとデータのやり取りができません。
 * 1つのセッションで複数のチャネルをLISTENできます。
@@ -80,14 +80,14 @@ UNLISTEN foo;
 
 * 63バイトを超えるチャネルは登録できません。超えた分は切り捨てて処理されます。この制限はテーブルなど他のデータベースオブジェクトとも共通しています。
 
-## スコープ
+### スコープ
 
 * Pub/Subを行うDBセッションは、同一データベースに接続し、かつ同じチャネルを通知対象としなければいけません。
 * データベースが同じであれば、スキーマが異なっていても通知できます。!
 
 <img src="/images/2024/20240628a/68747470733a2f2.png" alt="68747470733a2f2.png" width="1200" height="579" loading="lazy">
 
-## ペイロードのデータ型・サイズ
+### ペイロードのデータ型・サイズ
 
 * ペイロードに乗せられるデータはテキストのみで、バイナリは送受信できません。
 * バイナリデータを乗せる場合は`encode`関数でテキスト形式に変換したり、呼出元アプリでJSON文字列等にシリアライズしてあげる必要があります。
@@ -98,7 +98,7 @@ UNLISTEN foo;
     SQL state: 22023
     ```
 
-## トランザクション
+### トランザクション
 
 * トランザクション内でNOTIFYしたデータは、COMMITしたタイミングで、LISTENしたセッションに通知されます。ROLLBACKすると通知されません。
 * トランザクション内でNOTIFYしたデータの中で、ペイロードが同一のものはまとめられます。送信順序は保証されます。
@@ -117,17 +117,17 @@ COMMIT;
 -- Asynchronous notification "foo" with payload "c" received from server process with PID 14728.
 ```
 
-## 未処理メッセージの蓄積サイズ
+### 未処理メッセージの蓄積サイズ
 
 * DBインスタンスには、トランザクションが未完了なメッセージをメモリ上に溜めておくことが出来るNotificationキューを持っています。標準インストールの場合サイズは8GBで、使用量が半分になると警告ログが出力されます。
 * トランザクションが終了するとキューデータがクリーンアップされます。ペイロードを目一杯使った場合およそ100万件で上限に掛かるため、適当な件数単位でCOMMITしましょう。
 * Notificationキューの使用率は`pg_notification_queue_usage`関数で確認できます(0から1までの小数で表現)。
 
-# JavaによるPub/Subクライアント実装
+## JavaによるPub/Subクライアント実装
 
 これまで記載したPub/Sub通信をJavaで実装するときのパターンを3種類紹介します。
 
-## PostgreSQL JDBCドライバ
+### PostgreSQL JDBCドライバ
 
 PostgreSQL本家のJDBCドライバを使った実装例です（本家の実装例は[こちら](https://jdbc.postgresql.org/documentation/server-prepare/#listen--notify)）。
 Mavenを使う場合は以下の依存関係を追加します。
@@ -196,7 +196,7 @@ private void notify(final String channel, final String payload) {
 * `PgConnection#getNotifications(int timeoutMillis)`を使うと、通知が来るまで指定の時間ここでブロックするため、ループで囲えばロングポーリング的なロジックになります。
 * なお`NOTIFY`クエリでペイロードのパラメータバインドを試みると`org.postgresql.util.PSQLException`が出てしまうので代わりに`pg_notify`を実行しています。[^1]
 
-## PGJDBC-NG
+### PGJDBC-NG
 
 * [PGJDBC-NG](https://impossibl.github.io/pgjdbc-ng/)はJDBC4.2に準拠し、PostgreSQLの機能をより高度に使うことをめざして開発されているOSSです。
 
@@ -239,7 +239,7 @@ private void startListen(final String channel) {
 ご覧の通り、こちらは通知受信時の動作をイベントリスナーの形で実装できます。
 チャネルを指定してリスナーを登録することも可能です。
 
-## R2DBC
+### R2DBC
 
 [R2DBC](https://r2dbc.io/)は、リアクティブプログラミングの観点から新たに開発されたJDBCドライバです。
 Reactive Streamsに完全準拠し、I/Oは完全にノンブロッキングであると謳っています。
@@ -310,7 +310,7 @@ JavaのStream APIと似たスタイルで非同期・ストリーム処理を作
 * [ReactorでN+1問題な処理を実装してみた話](https://cero-t.hatenadiary.jp/entry/20171215/1513290305)
 * [怖くないR2DBC](https://bufferings.hatenablog.com/entry/2018/11/18/102433)
 
-# おわりに
+## おわりに
 
 PostgreSQLのNOTIFY/LISTENは[リリース9.0](https://www.postgresql.jp/document/9.4/html/release-9-0.html)で、待ち状態イベントの格納先が従来のシステムテーブルからメモリキューに代わり、通知と一緒にペイロードを送信できるようになったことで、おおよそ現在の形になりました。近年もリリース13.0で性能向上を遂げており、地味な機能ながら進化を続けているようです。
 

@@ -15,7 +15,7 @@ lede: "SwiftにおけるWebフレームワークを取り上げます。Swiftは
 ---
 <img src="/images/2024/20240418a/image.png" alt="image.png" width="851" height="200" loading="lazy">
 
-# はじめに
+## はじめに
 
 こんにちは。HealthCare Innovation Group(HIG)[^1]所属の清水です。
 [春の入門連載2024](/articles/20240408a/)、7本目の記事です。
@@ -23,7 +23,7 @@ lede: "SwiftにおけるWebフレームワークを取り上げます。Swiftは
 SwiftにおけるWebフレームワークを取り上げます。Swift[^7]はiOSアプリ開発のイメージが強いと思いますが、iOSアプリ開発以外でも利用できることを紹介します。
 （macOS以外でもSwiftが動かせたら楽しいなというモチベーションで記事を執筆しております）。
 
-## Swift における Web フレームワーク
+### Swift における Web フレームワーク
 
 そもそもSwiftにおけるWebフレームワークは、何があるでしょうか？
 
@@ -39,7 +39,7 @@ GitHub Star 数を比較した図を以下に示します。
 <img src="/images/2024/20240418a/star-history-2024416.png" alt="" width="1200" height="866" loading="lazy">
 （参考：https://star-history.com/#hummingbird-project/hummingbird&vapor/vapor&Date）
 
-## Hummingbird とは
+### Hummingbird とは
 
 軽量で依存関係が少ないことを売りとしているフレームワークの1つです。
 
@@ -53,9 +53,9 @@ Hummingbird は、最小限のコアフレームワークのみを提供して�
 
 https://docs.hummingbird.codes/2.0/documentation/hummingbird/
 
-## セットアップ
+### セットアップ
 
-### 環境情報
+#### 環境情報
 
 本記事は、以下の環境で実施を確認しています。
 
@@ -75,7 +75,7 @@ https://docs.hummingbird.codes/2.0/documentation/hummingbird/
 - Ubuntu のバージョン: 22.04.4 LTS
 - Swift のバージョン: 5.10
 
-### Swift のインストール
+#### Swift のインストール
 
 まずは、SwiftをUbuntu上にインストールします。
 [Hummingbirdの公式ドキュメント](https://docs.hummingbird.codes/2.0/documentation/hummingbird/)にはSwift自体のインストールに関する記載はなかったため、[Vaporの公式ドキュメント](https://docs.vapor.codes/ja/install/linux/)を参考にSwiftly[^3]を用いてインストールしました。
@@ -107,13 +107,13 @@ Swift version 5.10 (swift-5.10-RELEASE)
 Target: x86_64-unknown-linux-gnu
 ```
 
-## Hummingbird を用いたToDoアプリの構築（公式チュートリアル）
+### Hummingbird を用いたToDoアプリの構築（公式チュートリアル）
 
 ここから先は、Hummingbird 公式ドキュメント記載のチュートリアルを元に Hummingbird のセットアップからToDoアプリの構築までのハンズオンを試してみます。
 
 https://docs.hummingbird.codes/2.0/tutorials/todos/
 
-### Hummingbird のセットアップ
+#### Hummingbird のセットアップ
 
 ```bash
 # プロジェクトDirectoryの作成
@@ -228,7 +228,7 @@ Hello
 
 簡単ですね🎉
 
-### ToDoアプリの構築
+#### ToDoアプリの構築
 
 ここでは、Hummingbird を利用してToDoをDBに登録するところまで試してみます。
 PostgresNIO[^4] というPostgreSQL用のSwiftクライアントを利用することで、ToDoをPostgreSQLに登録します。
@@ -326,7 +326,7 @@ hummingbird=# \q
 
 https://github.com/hummingbird-project/hummingbird-examples/tree/main/todos-postgres-tutorial
 
-### 動作確認
+#### 動作確認
 
 これまで構築したものの動作確認を行います。
 
@@ -365,7 +365,7 @@ hummingbird=# select * from todos;
 
 POSTしたToDoが、DB側に登録されていることを確認できました🎉
 
-# さいごに
+## さいごに
 
 Swift の Web フレームワークの1つである、Hummingbird をセットアップから紹介しました。
 

@@ -15,7 +15,7 @@ lede: "2023年3月31日にリリースされたLocalStack v2.0.0から、LocalSt
 
 <img src="/images/2024/20240220a/localstack.png" alt="" width="800" height="400">
 
-# はじめに
+## はじめに
 
 TIG 真野です。
 
@@ -27,7 +27,7 @@ TIG 真野です。
 
 ただし、少なくてもKinesis Data Streamsに関しては、`v2.3.0` からアップデートが入り本記事の対応が不要になりました。LocalStackのその他サービスでハマった場合にこの記事を確認いただくと良いかなと思います。エラーログでこの記事を見つけた方は、LocalStackのバージョンを上げることで解決することもあるようですので、まずバージョンアップを試してみることを推奨します。
 
-## 背景
+### 背景
 
 LocalStackは様々なAWSサービスをローカルやCI環境で再現してくれるエミュレータです。こういったサービスの難しいポイントの1つは、AWSのサービスや機能はどんどん増え豊富になっていくため、追随するためにはイメージサイズが肥大化しいくことでしょう。
 
@@ -53,7 +53,7 @@ RUN --mount=type=cache,target=/root/.cache \
 
 Kinesis Data StreamsなどもDynamoDBと同じようにプリインストールできないかという要望も[#8300](https://github.com/localstack/localstack/issues/8300)で上げられましたが、やはりイメージサイズとのバランス問題で棄却されています。何かしらプリインストールしないと困るユースケースが無いと追加はされないような雰囲気があります。
 
-## Installation of kinesis-mock failed
+### Installation of kinesis-mock failed
 
 LocalStackでKinesis Data Streamsのストリームを作成しようとした場合に、`Installation of kinesis-mock failed` というエラーが出るケースについて話します。ログ内容としては次のようなものです。
 
@@ -95,7 +95,7 @@ localstack-1  | An error occurred (InternalError) when calling the CreateStream 
 
 しかし、チームメンバー全員にこの手順を行ってもらうのは手間ですし、証明書をGit管理にもしたくないでしょう。ファイルサーバやGoogle Driveのようなコラボレーションツール上にも、こういった手順は廃れがちであるため、あまり配備したくない場合が多いでしょう。
 
-## Dockerfile上で対応する
+### Dockerfile上で対応する
 
 サーバからTLS証明書をダウンロードするために、OpenSSLを利用します。
 
@@ -169,7 +169,7 @@ localstack-1  | 2024-02-17T06:13:49.936  INFO --- [   asgi_gw_0] localstack.requ
 
 動的にパッケージを取得し、Kinesisのストリームが上手く作成されていることが分かります。
 
-## LocalStack側でアップデートが入ったのか、Kinesis Data Streamsに対しては対応が不要になったようです
+### LocalStack側でアップデートが入ったのか、Kinesis Data Streamsに対しては対応が不要になったようです
 
 この記事を書くにあたり、元のエラーログを発生させようとしていて気がついたのですが、`v2.3.0` でアップデートが入ったようで、Kinesis Data Streamsについては対応が不要です。
 
@@ -182,7 +182,7 @@ localstack-1  | 2024-02-17T06:13:49.936  INFO --- [   asgi_gw_0] localstack.requ
 
 おそらく、Kinesisのモックをバイナリからscala.js版に入れ替えた [Use scala.js for executable and docker image #531](https://github.com/etspaceman/kinesis-mock/pull/531) で解消されたのかなと予測しますが、詳細は未調査です。
 
-## まとめ
+### まとめ
 
 LocalStack v2からイメージの構成が変わって、起動時に動的にパッケージをインストールするケースがあります。その場合にネットワーク環境によっては外部リソースの取得に失敗するため、CA証明書の設定が必要。OpenSSLで自動化すると楽になるかもしれない、という記事でした。
 

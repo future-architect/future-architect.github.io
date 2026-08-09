@@ -15,7 +15,7 @@ lede: "AirPods Proの空間オーディオ機能にあるヘッドトラッキ�
 ---
 <img src="/images/2024/20240605a/image.png" alt="" width="1200" height="390" loading="lazy">
 
-# はじめに
+## はじめに
 
 HealthCare Innovation Group(HIG)[^1]の橋本です。
 
@@ -29,7 +29,7 @@ HealthCare Innovation Group(HIG)[^1]の橋本です。
 
 私はその中の1つ、空間オーディオ機能でヘッドトラッキングしていることに目をつけ、頭の角度の取得をしてみました。
 
-# 環境
+## 環境
 
 - OS: macOS Sonoma 14.5
 - Xcode: 15.4 (15F31d)
@@ -40,7 +40,7 @@ HealthCare Innovation Group(HIG)[^1]の橋本です。
 AirPods(第３世代)、AirPods Pro(全世代)、AirPods Max
 (参考URL: [AirPodsユーザガイド 空間オーディオとヘッドトラッキングを操作する](https://support.apple.com/ja-jp/guide/airpods/dev00eb7e0a3/web))
 
-# 今回作ったもの
+## 今回作ったもの
 
 AirPodsProで取得した頭の角度でリアルタイムにキャラクター動かせるミニアプリ。
 
@@ -52,13 +52,13 @@ AirPodsProで取得した頭の角度でリアルタイムにキャラクター�
 
 このミニアプリで使用したフレームワークや各種APIを紹介していきたいと思います。
 
-## CoreMotionフレームワークとは
+### CoreMotionフレームワークとは
 
 [CoreMotion](https://developer.apple.com/documentation/coremotion)とは、各種Appleが提供するハードウェア（iOS, iPadOS, watchOS, visionOS device）のモーションデータを取得できるフレームワークです。
 
 CoreMotionフレームワークのひとつのクラスとして、`CMHeadphoneMotionManager`があります。
 
-## [CMHeadphoneMotionManager](https://developer.apple.com/documentation/coremotion/cmheadphonemotionmanager)
+### [CMHeadphoneMotionManager](https://developer.apple.com/documentation/coremotion/cmheadphonemotionmanager)
 
 このクラスを使うことで名前の通り、ヘッドフォンのモーション情報をアプリに提供することが可能になります。
 
@@ -71,21 +71,21 @@ CoreMotionフレームワークのひとつのクラスとして、`CMHeadphoneM
 
 今回使用する`CMHeadphoneMotionManager`が持つ主なメソッドについて、説明します。
 
-### [isDeviceMotionAvailable](https://developer.apple.com/documentation/coremotion/cmmotionmanager/1616094-isdevicemotionavailable)
+#### [isDeviceMotionAvailable](https://developer.apple.com/documentation/coremotion/cmmotionmanager/1616094-isdevicemotionavailable)
 
 接続している端末でCoreMotionが使えるか否かをBool値で返すメソッド。
 
-### [startDeviceMotionUpdates(to:withHandler)](https://developer.apple.com/documentation/coremotion/cmmotionmanager/1616048-startdevicemotionupdates)
+#### [startDeviceMotionUpdates(to:withHandler)](https://developer.apple.com/documentation/coremotion/cmmotionmanager/1616048-startdevicemotionupdates)
 
 モーションデータの更新を開始し、データの更新を指定のキューに送信するメソッド。
 
-### [stopDeviceMotionUpdate()](https://developer.apple.com/documentation/coremotion/cmmotionmanager/1616115-stopdevicemotionupdates)
+#### [stopDeviceMotionUpdate()](https://developer.apple.com/documentation/coremotion/cmmotionmanager/1616115-stopdevicemotionupdates)
 
 モーションデータの更新を停止するメソッド。
 
-# 実際にアプリを作ってみる
+## 実際にアプリを作ってみる
 
-## 事前準備
+### 事前準備
 
 CoreMotionフレームワークが使えるように、Info.plistに`NSMotionUsageDescription`キーを追加、説明を記載します。
 
@@ -103,7 +103,7 @@ INFOPLIST_KEY_NSMotionUsageDescription = "To sync the movements of the character
 
 <img src="/images/2024/20240605a/d972ec41-263c-c9de-0ebf-3dfce17b2334.jpeg" alt="" width="400" height="866" loading="lazy">
 
-## HeadTrackingを管理するクラスを用意する
+### HeadTrackingを管理するクラスを用意する
 
 HeadTrackingを監視するために、HeadTrackingManagerクラスを定義します。このクラスを使うことで、モーションデータを取得し、リアルタイムでSwiftUIビューに反映させることができます。
 
@@ -160,11 +160,11 @@ class HeadTrackingManager: ObservableObject {
 }
 ```
 
-## 全体概要
+### 全体概要
 
 このクラスは`ObservableObject`プロトコルに準拠させ、SwiftUIビューと連携して動作させるようにしています。
 
-## 各プロパティの説明
+### 各プロパティの説明
 
 - `motionManager: CMHeadphoneMotionManager`
     MHeadphoneMotionManager のインスタンスで、ヘッドモーションデータの取得を管理する。
@@ -178,7 +178,7 @@ class HeadTrackingManager: ObservableObject {
 
 次に、各メソッドを説明します。
 
-## startTracking()
+### startTracking()
 
 モーションデータの取得を開始するメソッド。
 
@@ -207,7 +207,7 @@ func startTracking() {
 
 モーションデータを提供できるかどうかを`isDeviceMotionAvailable`で確認します。その後、モーションデータの更新を開始し、データが取得されるたびに`Task`クロージャ内で、`updateMotionData(_:)`メソッドを呼び出します。
 
-## stopTracking()
+### stopTracking()
 
 モーションデータの取得を停止するメソッド。`stopDeviceMotionUpdates()` メソッドを呼び、モーションデータの取得を停止します。
 
@@ -217,7 +217,7 @@ func stopTracking() {
 }
 ```
 
-### updateMotionData(_ motion: CMDeviceMotion) async
+#### updateMotionData(_ motion: CMDeviceMotion) async
 
 モーションデータの取得、更新を行うメソッド。
 
@@ -235,7 +235,7 @@ UI更新を安全に行うために、`MainActor.run`内でUIの更新を行う�
 
 取得した姿勢データ`attitude`を使用して、`pitch`、`roll`、`yaw`の更新を行います。
 
-## Viewに反映させる
+### Viewに反映させる
 
 最後に、取得したデータを元にキャラクターを３次元空間でぐりぐり動かせるようにします。
 
@@ -276,7 +276,7 @@ Button {
 
 全体のコードは次に記載しているので、手元で試してみてください。
 
-## コード全体
+### コード全体
 
 <details><summary>HeadTrackingApp.swift</summary>
 
@@ -399,13 +399,13 @@ struct ContentView: View {
 
 </details>
 
-# さいごに
+## さいごに
 
 `CMHeadphoneMotionManager`を使うことでとても簡単にHeadTrackingを行うことができました！
 
 今後は、今回取得した頭の角度データを時系列データとして扱い、`HealthKit`フレームワークの`HKHealthStore`に保存したりして健康促進に活用できないか等、色々検討したいと思います。
 
-# 参考
+## 参考
 
 - AirPods Pro（第2世代）
 https://www.apple.com/jp/airpods-pro/

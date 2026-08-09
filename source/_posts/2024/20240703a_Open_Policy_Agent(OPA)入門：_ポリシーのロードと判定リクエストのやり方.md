@@ -12,31 +12,31 @@ thumbnail: /images/2024/20240703a/thumbnail.png
 author: 関靖秀
 lede: "Open Policy Agentを実際にどうやって判定をリクエストするのかやポリシーの管理方法についてはまとまった情報が少なかったため、こちらにまとめようと思いました。"
 ---
-# はじめに
+## はじめに
 
 こんにちは、関です。
 
 業務で[Open Policy Agent(OPA)](https://www.openpolicyagent.org)に触れる機会があり、公式ドキュメントや関連記事を呼んだのですが、ユースケースやPolicyの記述方法についての説明に比べて、実際にどうやって判定をリクエストするのかやポリシーの管理方法について情報が少なかったため、こちらにまとめます。
 
-# OPAとは？
+## OPAとは？
 
 Open Policy Agent（OPA, オーパと発音）は汎用PolicyEngineで、統一された方法でポリシーによる判定をすることが可能になります。
 
 OPAが担うのは、あくまでポリシーによる意思決定部分で、その決定を適用するのは、OPAに意思決定を依頼する別のソフトウェアなどが行う必要があります。
 
-## そもそもPolicyとは？
+### そもそもPolicyとは？
 
 ポリシーとは組織の長期的な成功に重要なソフトウェアの振る舞いを支配する一連のルールのことです。
 
 このルールには法的な要請や、技術的な要請、ミスの再発防止などのための重要なナレッジを含みます。もっとも初歩的な形のポリシーは、書かれたものを手運用で適用していたり、組織の文化や暗黙知になります。アプリのロジックや、デプロイ時に静的に設定されることもあります。ソフトウェアサービスそのものにハードコードされていることも多いです。
 
-## Policy as Code
+### Policy as Code
 
 ポリシーをコードとして表現することで、管理、自動化を可能にする考え方です。
 
 ソフトウェア開発のベストプラクティスである、バージョン管理、自動テスト、自動デプロイといった恩恵をポリシーの管理にも適用できます。OPAはRegoという記述言語を用いてポリシーを記述できます。
 
-## Policy decoupling
+### Policy decoupling
 
 ポリシーの管理をソフトウェアそのものから分離することをPolicy decouplingと呼びます。これにより、ソフトウェサービスのポリシーを、コンパイルやデプロイなしで変更できるようになります。つまり、ポリシーのデプロイとサービスのデプロイが分離されます。これに伴い、ビジネス要求の変化への適応がしやすくなり、違反の検知能力、ポリシーへの準拠や一貫性の向上、ヒューマンエラーの緩和が実現します。
 
@@ -46,9 +46,9 @@ OPAが担うのは、あくまでポリシーによる意思決定部分で、�
 
 OPAは、ポリシー管理を必要とするソフトウェアとは別プロセスとしても動作できるので、Policy decouplingを実現できます。
 
-# OPAによるポリシー判定
+## OPAによるポリシー判定
 
-## 概念的なモデル
+### 概念的なモデル
 
 ここまでは、ポリシーを主体に、OPAができることを述べてきました。ここでは、OPAによるポリシー判定の流れを概念的に説明します。図にすると以下のようになります。
 
@@ -56,7 +56,7 @@ OPAは、ポリシー管理を必要とするソフトウェアとは別プロ�
 
 OPAは判定リクエストを受け付ける前に、インメモリにPolicyとDataをロードします。Policyは判定に使われるルール群、Dataはポリシーの判定に使われるリクエスト間で共通するデータです。ロードのやり方は別で説明します。Queryは判定リクエストです。この中には、JSONの値（input）と、レスポンスとして受け取りたい項目の指定が含まれています。レスポンスとして受け取りたい項目を指定することで、どのPolicyで評価するかが決まります。Queryを受け取ったOPAは、inputとDataを、レスポンスを構成するために必要なポリシーで評価し、その結果であるDecisionをJSONとして返却します。
 
-## OPAの配布形態と評価をリクエストする際のインタフェース
+### OPAの配布形態と評価をリクエストする際のインタフェース
 
 OPAは、以下の3種類の形態で配布されています。
 
@@ -85,11 +85,11 @@ Terraformと統合する際には、[Terraform planの実行結果をJSONに変�
 
 他にも、Goライブラリを使って自作ツールを作り、CI上で利用する方法も取れます。以前当社のブログに載せられた[Policy as Code を実現する Open Policy Agent に憧れて。ポリシーコードでAPI仕様をLintする](https://future-architect.github.io/articles/20200930/)はこの方法を使っています。
 
-# 動作例
+## 動作例
 
 [how-to-use-opa](https://github.com/sayshu-7s/how-to-use-opa)に動作例として使えるコードを配置しています。必要に応じて動かしてもらえたらと思います。
 
-## 題材
+### 題材
 
 ここで、ユーザがリソースにアクセスする際の認可を題材にして、OPAに認可判定をリクエストする方法を見てみましょう。
 
@@ -133,7 +133,7 @@ Dataとして、ユーザごとにアクセス可能なresourceIDが存在する
 }
 ```
 
-## ポリシーとDataの作成、バンドルの準備
+### ポリシーとDataの作成、バンドルの準備
 
 まずはポリシーとDataを作成します。ポリシーは[Rego](https://www.openpolicyagent.org/docs/latest/policy-language/)という言語を用います。
 
@@ -180,15 +180,15 @@ Bundleを作るには、`opa build`コマンドを使います。以下のコマ
 opa build -o bundle.tar.gz ./policies
 ```
 
-## 呼び出し方
+### 呼び出し方
 
 少々厄介なことに、OPAは呼び出し方によって渡すJSONのフォーマット、出力のフォーマットが異なります。ここでは各呼び出し方と、出力のフォーマットを見ていきます。
 
-### CLI
+#### CLI
 
 CLIで呼び出して即時に結果を受け取るには、`opa exec`コマンドを使う方法と、開発時の動作確認などで便利な`opa eval`コマンドを使う方法があります。
 
-#### opa execコマンドによる呼び出し
+##### opa execコマンドによる呼び出し
 
 入力データを以下のように作ります。
 
@@ -253,7 +253,7 @@ opa exec --decision "/example" -b ./bundle.tar.gz  input_cli.json
 
 `input_cli.json`に対するresultは、辞書隣、`allow`の他に、`user_resource.json`由来の`user_resource`というキーも含まれていることがわかります。
 
-#### opa evalコマンドによる呼び出し
+##### opa evalコマンドによる呼び出し
 
 `opa eval`コマンドはより簡易的に使えるコマンドで、`opa exec`コマンドと同じような呼び出し方ができます。ただし、引数の指定方法は異なっており、特にレスポンスの項目指定の方法は、Regoファイル中でデータを参照するときと同じ方式を使う必要があります。以下は、`opa exec`の最初に実行したコマンドと同じ意味を持つコマンドです。
 
@@ -288,11 +288,11 @@ opa eval -d bundle.tar.gz -i input_cli.json "data.example.allow"
 opa eval -d ./policies -i input_cli.json "data.example.allow"
 ```
 
-## HTTP API
+### HTTP API
 
-### サーバの起動方法
+#### サーバの起動方法
 
-#### `opa run`コマンドによる起動
+##### `opa run`コマンドによる起動
 
 `opa run --server`コマンドを使うことで、OPAをHTTP APIとして起動できます。`-b`オプションで利用対象のBundleを指定できます。
 
@@ -308,7 +308,7 @@ opa run --addr :8080 --server --bundle bundle.tar.gz
 opa run -a :8080 -s -b bundle.tar.gz
 ```
 
-#### コンテナイメージによる起動
+##### コンテナイメージによる起動
 
 OPAはコンテナイメージとしても配布されています。以下のコマンドで、`opa run --server`コマンドと同等のサーバを起動できます。
 
@@ -316,7 +316,7 @@ OPAはコンテナイメージとしても配布されています。以下の�
 docker run --rm -p 8181:8181 -v ${PWD}/bundle.tar.gz:/bundle.tar.gz openpolicyagent/opa run --server --addr :8181 --bundle /bundle.tar.gz
 ```
 
-### curlコマンドによる呼び出し例
+#### curlコマンドによる呼び出し例
 
 curlコマンドで、HTTP APIを使った判定リクエストをしてみます。リクエストはPOSTで投げます。CLIからの利用とフォーマットが異なることに注意が必要です。
 
@@ -347,7 +347,7 @@ curl -vX POST -H 'Content-Type: application/json' -d @input-api.json  http://loc
 {"result":true}
 ```
 
-## Goライブラリ
+### Goライブラリ
 
 Goのライブラリは2種類あって、高レベルAPIを提供する`sdk`パッケージと低レベルAPIを提供する`rego`パッケージがあります。多くの場合は`sdk`パッケージが有用とされていますが、Bundleやポリシーの読み出し方が限定的だったりと、そこまで使いやすい印象はありませんでした。多くの場合、CLIやHTTP APIで事足りると思うので、詳細は省きます。以下、参考URLです。
 
@@ -358,7 +358,7 @@ Goのライブラリは2種類あって、高レベルAPIを提供する`sdk`パ
   - [Integrating with the Go API](https://www.openpolicyagent.org/docs/latest/integration/#integrating-with-the-go-api)
   - [公式ドキュメント](https://pkg.go.dev/github.com/open-policy-agent/opa@v0.65.0/rego)
 
-# PolicyとDataのロード方法
+## PolicyとDataのロード方法
 
 ここまで、ロード済みのポリシーを使った判定リクエストの方法を見てきました。ここでは、ポリシーのロード方法について見ていきます。ポリシーの主要なロード方法は以下の3つです。
 
@@ -366,11 +366,11 @@ Goのライブラリは2種類あって、高レベルAPIを提供する`sdk`パ
 - Bundleサーバからのダウンロード
 - REST APIによるポリシー・Dataの作成
 
-## コマンドライン引数による直接指定
+### コマンドライン引数による直接指定
 
 これまで利用してきた方法がこれになります。追加で述べることはありません。
 
-## Bundleサーバからのダウンロード
+### Bundleサーバからのダウンロード
 
 Bundleを管理する中で最もポピュラーな方法が、Bundleを配布するWebサーバを作成し、そこからダウンロードする方法です。この方法の利点は、アプリ+OPAのデプロイとポリシーのデプロイが分離され、ポリシーのみを更新できることです。Webサーバの機能としては,[Bundle Service API](https://www.openpolicyagent.org/docs/latest/management-bundles/#bundle-service-api)が指定する方式でBundleファイルを提供できれば問題なく、nginxはもちろんのこと、Amazon S3, Google Cloud Storage, Azure Blob Storageといったオブジェクトストレージにも対応しています。詳細は[Bundles](https://www.openpolicyagent.org/docs/latest/management-bundles/)を参照してください。
 
@@ -437,10 +437,10 @@ opa_1            | }
 
 こちらについても、[how-to-use-opa](https://github.com/sayshu-7s/how-to-use-opa)に入れていますので、お試しいただけたらと思います。
 
-## REST APIによるポリシー・Dataの作成
+### REST APIによるポリシー・Dataの作成
 
 [Policy API](https://www.openpolicyagent.org/docs/latest/rest-api/#policy-api)を使うことで、ポリシーを動的にCRUDできます。また、[Data API](https://www.openpolicyagent.org/docs/latest/rest-api/#data-api)を使うことで、DataをCRUDできます。Data APIは、判定リクエストを送る際に利用するAPIと共通です。普通のREST APIで、特に難しくないので詳細は公式ドキュメントを見てもらえたらと思います。
 
-# 終わりに
+## 終わりに
 
 OPAの入門編ということで、簡単なユースケースを題材にして、OPAに判定リクエストを行う方法と、ポリシーやDataをロードする方法についてまとめました。この記事が誰かの役に立てば幸いです。

@@ -25,7 +25,7 @@ lede: "筆者自身もコミッターとして関わるJavaのDB永続化ライ�
 
 https://github.com/future-architect/uroborosql
 
-# はじめに
+## はじめに
 
 エンタープライズシステム開発では、まだまだJavaで作られていることが多く、システム特性上、やはりRDBを利用するケースが多いですよね。
 
@@ -39,7 +39,7 @@ https://github.com/future-architect/uroborosql
 CockroachDBもしぶとく生き残っていて何よりです。
 :::
 
-# JavaとRDBの歴史
+## JavaとRDBの歴史
 
 2000年代前半にJavaで作られたシステムは、JDBCのAPIをそのまま利用することも多かったのですが、その後、Hibernate、iBatis(現在のMyBatis)、SeaserプロジェクトのS2Daoなどをはじめとして、O/Rマッパー(O/Rマッパ)が開発され、利用されるようになりました。
 
@@ -55,7 +55,7 @@ CockroachDBもしぶとく生き残っていて何よりです。
 （SpringBootの場合、王道的にSpring Data JPAを選定しているケースも多いとは思います）
 :::
 
-# uroboroSQLとは
+## uroboroSQLとは
 
 uroboroSQLは、JavaにおけるDB永続化ライブラリの1つであり、基本的にはJavaからSQLを生成することよりも、SQLに足りないところをJavaで補うアプローチを採用しています。
 
@@ -63,9 +63,9 @@ uroboroSQLは、JavaにおけるDB永続化ライブラリの1つであり、基
 
 2017年にOSSとして公開後も、社内で脈々と使い続け、都度フィードバックを受けて、2024年6月現在までバージョンアップを継続しています。
 
-## 特徴的な機能
+### 特徴的な機能
 
-### 開発時に便利なREPL機能搭載
+#### 開発時に便利なREPL機能搭載
 
 2Way-SQLでの開発時にビルド不要で即試すことが可能です。
 
@@ -73,13 +73,13 @@ uroboroSQLは、JavaにおけるDB永続化ライブラリの1つであり、基
 <img src="/images/2024/20240627a/asciicast.png" alt="asciicast" width="1200" height="558" loading="lazy">
 </a>
 
-### カバレッジレポート
+#### カバレッジレポート
 
 SQL文の条件分岐を集計してカバレッジレポートを行うことが可能です。
 
 <img src="/images/2024/20240627a/coverage.png" alt="" width="1200" height="1133" loading="lazy">
 
-## その他の特徴
+### その他の特徴
 
 | 項目              | uroboroSQLの対応                |
 |-------------------|-------------------------------|
@@ -109,7 +109,7 @@ SQL文の条件分岐を集計してカバレッジレポートを行うこと�
 
 ※2024/06/25時点最新バージョンとなるv0.26.8時点
 
-# uroboroSQLのコードサンプル
+## uroboroSQLのコードサンプル
 
 さて、ライブラリを理解するには、利用時にどんな実装になるのか見るのが手っ取り早いですよね。
 というわけで、よく利用する実装をサンプルとして、まとめました。
@@ -117,13 +117,13 @@ SQL文の条件分岐を集計してカバレッジレポートを行うこと�
 2017年の初版執筆時点では、公式ドキュメントよりも豊富だと思っていましたが、2024年時点では公式ドキュメントが充実していますので、是非こちら↓もご覧ください。
 https://future-architect.github.io/uroborosql-doc/
 
-## 接続
+### 接続
 
 ```java
 SqlConfig config = UroboroSQL.builder("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", "sa", "sa").build();
 ```
 
-## トランザクション
+### トランザクション
 
 | トランザクションタイプ | トランザクション有り                                                                                                                                 | トランザクションなし                       |
 | :--------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------- |
@@ -143,7 +143,7 @@ try (SqlAgent agent = config.agent()) {
 }
 ```
 
-## SQLファイルインタフェース（2way-SQL）
+### SQLファイルインタフェース（2way-SQL）
 
 ```sql department/select_department.sql
 SELECT /* _SQL_ID_ */
@@ -196,7 +196,7 @@ WHERE
 
 > S2Dao等と同じ文法で、SQL内でコメント標記で分岐を記述することができます。
 
-### SELECT(リスト取得)
+#### SELECT(リスト取得)
 
 ```java
 try (SqlAgent agent = config.agent()) {
@@ -207,7 +207,7 @@ try (SqlAgent agent = config.agent()) {
 }
 ```
 
-### SELECT(Stream取得、Map型)
+#### SELECT(Stream取得、Map型)
 
 ```java
 try (SqlAgent agent = config.agent()) {
@@ -218,7 +218,7 @@ try (SqlAgent agent = config.agent()) {
 }
 ```
 
-### SELECT(Stream取得、モデル型)
+#### SELECT(Stream取得、モデル型)
 
 ```java
 try (SqlAgent agent = config.agent()) {
@@ -229,7 +229,7 @@ try (SqlAgent agent = config.agent()) {
 }
 ```
 
-### SELECT(1件取得、Map型、取得できない場合例外)
+#### SELECT(1件取得、Map型、取得できない場合例外)
 
 ```java
 try (SqlAgent agent = config.agent()) {
@@ -240,7 +240,7 @@ try (SqlAgent agent = config.agent()) {
 }
 ```
 
-### SELECT(1件取得、モデル型、取得できない場合例外)
+#### SELECT(1件取得、モデル型、取得できない場合例外)
 
 ```java
 try (SqlAgent agent = config.agent()) {
@@ -251,7 +251,7 @@ try (SqlAgent agent = config.agent()) {
 }
 ```
 
-### SELECT(1件取得、Map型、Optional)
+#### SELECT(1件取得、Map型、Optional)
 
 ```java
 try (SqlAgent agent = config.agent()) {
@@ -263,7 +263,7 @@ try (SqlAgent agent = config.agent()) {
 }
 ```
 
-### SELECT(1件取得、モデル型、Optional)
+#### SELECT(1件取得、モデル型、Optional)
 
 ```java
 try (SqlAgent agent = config.agent()) {
@@ -275,7 +275,7 @@ try (SqlAgent agent = config.agent()) {
 }
 ```
 
-### SELECT(1件のみ取得、モデル型、取得できない場合と2件以上取得した場合に例外)
+#### SELECT(1件のみ取得、モデル型、取得できない場合と2件以上取得した場合に例外)
 
 ```java
 try (SqlAgent agent = config.agent()) {
@@ -288,7 +288,7 @@ try (SqlAgent agent = config.agent()) {
 
 ---
 
-### INSERT/UPDATE/DELETE
+#### INSERT/UPDATE/DELETE
 
 ```java
 try (SqlAgent agent = config.agent()) {
@@ -311,7 +311,7 @@ try (SqlAgent agent = config.agent()) {
 }
 ```
 
-### INSERT/UPDATE/DELETE(バッチ実行)
+#### INSERT/UPDATE/DELETE(バッチ実行)
 
 ```java
 List<Map<String, Object>> inputList = new ArrayList<>();
@@ -338,7 +338,7 @@ try (SqlAgent agent = config.agent()) {
 }
 ```
 
-## DAOインタフェース
+### DAOインタフェース
 
 下記のようなモデルクラスがある前提とします。
 
@@ -360,7 +360,7 @@ public class Department {
 - `@Id/@GeneratedValue`が付与されたフィールドはDBの自動採番を利用することをマークします。
 - `@Version`が付与されたフィールドは楽観ロック用のバージョン情報としてuroboroSQLが認識し、UPDATE時にはSET句で+1され、WHERE句の検索条件に追加されてSQLを発行し、更新件数が0の場合に`OptimisticLockException`を発生させます。
 
-### SELECT(主キー検索)
+#### SELECT(主キー検索)
 
 ```java
 try (SqlAgent agent = config.agent()) {
@@ -370,7 +370,7 @@ try (SqlAgent agent = config.agent()) {
 
 ```
 
-### SELECT(条件指定検索、ソート順、悲観ロック)
+#### SELECT(条件指定検索、ソート順、悲観ロック)
 
 ```java
 try (SqlAgent agent = config.agent()) {
@@ -411,7 +411,7 @@ try (SqlAgent agent = config.agent()) {
 
 ---
 
-### INSERT
+#### INSERT
 
 ```java
 try (SqlAgent agent = config.agent()) {
@@ -438,7 +438,7 @@ try (SqlAgent agent = config.agent()) {
 
 ```
 
-### UPDATE
+#### UPDATE
 
 ```java
 try (SqlAgent agent = config.agent()) {
@@ -461,7 +461,7 @@ try (SqlAgent agent = config.agent()) {
 
 ```
 
-### MERGE
+#### MERGE
 
 PKによるレコードの検索を行い、レコードがない場合はINSERT、ある場合はUPDATEします。
 
@@ -476,7 +476,7 @@ try (SqlAgent agent = config.agent()) {
 }
 ```
 
-### DELETE / TRUNCATE
+#### DELETE / TRUNCATE
 
 ```java
 try (SqlAgent agent = config.agent()) {
@@ -493,14 +493,14 @@ try (SqlAgent agent = config.agent()) {
 
 ```
 
-# おわりに
+## おわりに
 
 この記事の初版公開から7年ぶりに更新しようとしたら、自分でも驚くほど機能追加されていて、よい振り返りとなりました。
 OSSにしても社内プロダクトにしても、継続的にアップデートし続けるのが一番大変だなとしみじみ感じますね。
 
 顧客向けの大規模エンタープライズ開発では、リリースしてから5-10年後にさくっと全部作り直しましょうというケースのほうが稀で、長く使い続けたいというニーズが強いため、下位互換性を失うにしても移行しやすいかどうかも重要なので、これからも継続の価値と意義を再認識して、アップデートを続けていきたいと思います。
 
-# 参考：uroboroSQLドキュメント、ツール、サンプル
+## 参考：uroboroSQLドキュメント、ツール、サンプル
 
 - uroboroSQL日本語ドキュメント
   - https://future-architect.github.io/uroborosql-doc/

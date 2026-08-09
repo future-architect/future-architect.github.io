@@ -16,7 +16,7 @@ lede: "PostgreSQLで手続き型処理を実装することにがっつりと向
 ---
 <img src="/images/2024/20240830a/plv8-eyecatch.png" alt="plv8-eyecatch.png" width="1200" height="437" loading="lazy">
 
-# はじめに
+## はじめに
 
 こんにちは、TIGの岸本卓也です。[夏の自由研究連載2024](/articles/20240819a/) シリーズです。
 
@@ -24,11 +24,11 @@ lede: "PostgreSQLで手続き型処理を実装することにがっつりと向
 
 その中でもJavaScriptで実装できる[PLV8](https://plv8.github.io/)は手馴染みが良さそうで興味を惹かれたので試してみることにしました。
 
-# DBの準備
+## DBの準備
 
 適当にPostgreSQLデータベースとサンプルDBを作成しておきます。
 
-## DBインスタンス
+### DBインスタンス
 
 Amazon RDS for PostgreSQLを利用してPostgreSQL 16.3のデータベースを作成しました。大手のクラウドベンダーではマネージドサービスのDBでもPLV8に対応しています。
 
@@ -59,15 +59,15 @@ order by extname;
 select plv8_version();
 ```
 
-## サンプルDB
+### サンプルDB
 
 今回は [PostgreSQL wiki](https://wiki.postgresql.org/wiki/Sample_Databases) に掲載されている [Pagila](https://github.com/devrimgunduz/pagila) を利用しました。
 
-# DO ブロックでの実行
+## DO ブロックでの実行
 
 PLV8は `DO` による無名コードブロック実行にも対応しているため、手始めに DO ブロックで試してみます。
 
-## 素朴なSQL実行の例
+### 素朴なSQL実行の例
 
 ```sql
 do $$
@@ -97,7 +97,7 @@ NOTICE:  There is 15 inactive members.
 DO
 ```
 
-## SELECT 結果をカーソルで取得する例
+### SELECT 結果をカーソルで取得する例
 
 `plv8.execute` ではSQL実行結果を一度に取得しますが、カーソルを使って逐次取得できます。カーソルで取得する方法を試してみます。
 
@@ -180,9 +180,9 @@ DO
 
 </details>
 
-# 関数として作成して実行
+## 関数として作成して実行
 
-## CREATE FUNCTION 文を手作成
+### CREATE FUNCTION 文を手作成
 
 カーソルで取得する例のSQLを関数にして実行してみます。DO ブロックの代わりに CREATE FUNCTION にするだけなので、ついでに閾値を関数の引数で渡すように変更してみます。
 
@@ -243,11 +243,11 @@ NOTICE:  id: 526, name: KARL
 
 DO ブロックでの実行と同じ結果が得られました。
 
-## JavaScript実装をバンドルして CREATE FUNCTION SQL を生成
+### JavaScript実装をバンドルして CREATE FUNCTION SQL を生成
 
 前の例では CREATE FUNCTION 文を手作成しました。そのSQLにおいて1行目と最終行以外はJSの実装です。であれば、JS部分は独立して開発して最後に CREATE FUNCTION 文を生成できれば色々捗りそうです。それをやってくれるツールである[PLV8ify](https://github.com/divyenduz/plv8ify)が公式ドキュメントで[紹介](https://plv8.github.io/#plv8ify)されていますので、ここからはPLV8ifyを使った関数の開発を試してみます。
 
-### PLV8関数開発環境の構築
+#### PLV8関数開発環境の構築
 
 適当なNode.js環境をインストールしておきます。今回はv20.16.0のNode.jsを利用しました。
 
@@ -283,7 +283,7 @@ npm install dayjs
 
 なお、 `plv8ify` は実際には上記でインストールされたバージョンそのものではなく、バグと思われる挙動や利便性向上をローカルで修正したものを使用しました。このため、ここより後の例ではTypeScriptで実装した関数に対して生成される CREATE FUNCTION 文の関数定義では関数名と引数名が snake_case 化されるようにしています。
 
-### PLV8関数のTS実装例
+#### PLV8関数のTS実装例
 
 前の手作成 CREATE FUNCTION の例をTS実装にし、ついでに検索結果をログではなく戻り値として返却するように変更したものがこちらです。
 
@@ -348,7 +348,7 @@ pagila=> select * from fetch_top_customers(40) as (id integer, name varchar);
 
 手作成 CREATE FUNCTION の例と同じ結果が得られました。
 
-### 実践的な例
+#### 実践的な例
 
 より実践的な例としてPL/pgSQLの関数をPLV8関数に実装し直してみます。対象はサンプルDBにある `rewards_report` 関数です。ただし素の `rewards_report` 関数は `CURRENT_DATE` が使われていてテストしにくいため、 `CURRENT_DATE` 部分を引数で指定できるように変更した以下の関数を対象とします。
 
@@ -525,7 +525,7 @@ pagila-> from rewards_report(10, 40, '2022-06-22');
 
 PLV8版の関数でもPL/pgSQL版の関数と同じ結果が得られました。
 
-### 外部ライブラリの利用
+#### 外部ライブラリの利用
 
 `rewards_report` 関数は `LAST_DAY` 関数を呼び出していますが、前の例では既存の関数をSQLで呼び出していました。PLV8関数からPLV8関数を呼び出す場合はSQL実行よりも簡単に[呼び出す手段がある](https://plv8.github.io/#-code-plv8-find_function-code-)ため、 `LAST_DAY` 関数もPLV8化してみます。この関数は日付を扱うため、日時を扱う外部ライブラリの利用も試してみます。今回はDay.jsを利用し、以下のようにTS実装しました。
 
@@ -611,7 +611,7 @@ pagila-> from v8_rewards_report3(10, 40, '2022-06-22');
 
 PL/pgSQL版の関数と同じ結果が得られました。
 
-### Unit test
+#### Unit test
 
 PostgreSQL関数を問題なくTS実装できることが確認できたので、次はTS実装のテストを試します。今回はテストフレームワークとモック作成にVitestを利用しました。シンプルな例として、サンプルDBにある `inventory_in_stock` 関数をPLV8化した以下のTS実装を使います。
 
@@ -719,7 +719,7 @@ test('貸出履歴ありだがすべて返却済みなら、在庫あり', () =>
    Duration  600ms (transform 151ms, setup 0ms, collect 123ms, tests 2ms, environment 0ms, prepare 146ms)
 ```
 
-# まとめ
+## まとめ
 
 JavaScriptでPostgreSQLの手続き型処理を実装できる拡張機能PLV8を試した結果の感想は以下です。
 

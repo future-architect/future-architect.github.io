@@ -16,7 +16,7 @@ lede: "昨今のOpenAI需要によって、Azure環境の利用を本格的に�
 
 [Terraform連載2024を](/articles/20240311a/) の8本目です。
 
-# はじめに
+## はじめに
 
 こんにちは、SAIG(Strategic AI Group)の真鍋です。
 
@@ -24,7 +24,7 @@ lede: "昨今のOpenAI需要によって、Azure環境の利用を本格的に�
 
 Azure環境でTerraformを利用する際、裏で動いているリソースプロバイダーについてご紹介します。
 
-# Terraform実行時に踏んだエラー
+## Terraform実行時に踏んだエラー
 
 利用中のAzure環境にて`terraform plan`を実行した際に、下記エラーが発生しました。
 
@@ -50,7 +50,7 @@ Terraformコード上はVMやStorage Account等、作成権限が確認できて
 
 ちなみに利用するAzure環境は他チームから払い出された環境であり、Terraform実行時に認証した個人アカウントは権限が絞られています。
 
-# リソースプロバイダーとは
+## リソースプロバイダーとは
 
 今回遭遇したエラーのproviderはリソースプロバイダーといい、[Azure サービスのリソース プロバイダーとは何か](https://learn.microsoft.com/ja-jp/azure/azure-resource-manager/management/azure-services-resource-providers)に説明があります。
 
@@ -69,7 +69,7 @@ REST APIへリクエストを送信した際にAzureリソースマネージャ�
 
 今回のエラーは、Terraformプロバイダーの1つであるAzureRM利用時にリソースプロバイダーを登録しようとして発生しました。
 
-# Terraform実行時におけるリソースプロバイダー
+## Terraform実行時におけるリソースプロバイダー
 
 AzureにおけるTerraformプロバイダーとしては下記が用意されています。
 
@@ -96,7 +96,7 @@ provider "azurerm" {
 
 [Azure Provider#skip_provider_registration](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs#skip_provider_registration)
 
-# 解決法
+## 解決法
 
 今回発生したエラーの解決には下記1,2の方法が考えられます。
 
@@ -109,7 +109,7 @@ provider "azurerm" {
 
 私たちは、リソースプロバイダーの登録をより上位の管理者に依頼して実施するフローを作成した上で、2つ目の方法を採用しました。同一サブスクリプション内で複数チームがそれぞれTerraform実行するようなケースにおいて、利用可能なリソースを制限する場合等に採り得る方法なのかと思います。
 
-# さいごに
+## さいごに
 
 これまで強い権限でTerraformを操作していたためリソースプロバイダーを意識することは無かったのですが、今回はチームの運用ポリシーとして権限が制限されていたため改めて調査しました。
 
