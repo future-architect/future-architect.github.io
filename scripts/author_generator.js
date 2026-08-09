@@ -206,27 +206,16 @@ hexo.extend.helper.register('author_monthly_chart', function(name) {
   });
   if (!min) return JSON.stringify({months: [], series: []});
 
-  // 期間が12ヶ月未満だと軸が数ヶ月分しかなく見栄えが悪い (#2140)。
-  // 同一年に収まるなら 1〜12月へ、年をまたぐ短い期間は末尾から12ヶ月に広げる
-  let startY = +min.slice(0, 4);
-  let startM = +min.slice(5);
+  // 軸は暦年に揃える。開始は初投稿年の1月、終了は最終投稿年の12月 (#2140)。
+  // 投稿月そのままだと数ヶ月分しか無い著者の軸が中途半端な月で
+  // 始まり・止まりして見栄えが悪い。全著者を同じ規則にする
+  const startY = +min.slice(0, 4);
   const endY = +max.slice(0, 4);
-  const endM = +max.slice(5);
-  const span = (endY - startY) * 12 + (endM - startM) + 1;
-  if (span < 12) {
-    if (startY === endY) {
-      startM = 1;
-    } else {
-      const s = endY * 12 + (endM - 1) - 11;
-      startY = Math.floor(s / 12);
-      startM = (s % 12) + 1;
-    }
-  }
-  const endTotal = startY === endY && span < 12 ? 12 : endM;
-
   const months = [];
-  for (let y = startY, m = startM; y < endY || (y === endY && m <= endTotal); m === 12 ? (y++, m = 1) : m++) {
-    months.push(`${y}/${String(m).padStart(2, '0')}`);
+  for (let y = startY; y <= endY; y++) {
+    for (let m = 1; m <= 12; m++) {
+      months.push(`${y}/${String(m).padStart(2, '0')}`);
+    }
   }
 
   // 積み上げの並びは合計の多いカテゴリから。凡例の順もこれに従う
