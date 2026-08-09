@@ -251,6 +251,28 @@ hexo.extend.helper.register('generate_yearly_authors_series_y', function() {
 // 新規寄稿者の割合（%）。「新規」は前年に投稿が無かった寄稿者（#2073）。
 // 初出ベースではないので、数年ぶりに復帰した人も新規に数える。
 // 最初の年は前年が無く全員新規（100%）になるだけなので欠損にする
+// 年ごとの新規／継続の寄稿者数。積み上げ棒にすると合計がその年の著者数になる。
+// 「新規」はその年より前に一度も出ていない人。前年比ではない
+function yearlyAuthorSplit(posts) {
+  const series = generateAuthorsSeriesAll(posts);
+  const seen = new Set();
+  return series.map(e => {
+    const authors = new Set(e.authors.flat());
+    let fresh = 0;
+    authors.forEach(a => { if (!seen.has(a)) fresh++; });
+    authors.forEach(a => seen.add(a));
+    return {year: e.year, fresh, returning: authors.size - fresh};
+  });
+}
+
+hexo.extend.helper.register('yearly_new_authors', function() {
+  return yearlyAuthorSplit(this.site.posts).map(e => e.fresh).join(',');
+});
+
+hexo.extend.helper.register('yearly_returning_authors', function() {
+  return yearlyAuthorSplit(this.site.posts).map(e => e.returning).join(',');
+});
+
 hexo.extend.helper.register('yearly_new_author_ratio', function() {
   const series = generateAuthorsSeriesAll(this.site.posts);
   // 共著の旧記事は author が配列なので flat で展開する
