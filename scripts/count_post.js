@@ -80,9 +80,8 @@ hexo.extend.helper.register('summary_yearly_term', function(year) {
 /*
  * カテゴリ個別ページ
  */
-hexo.extend.helper.register('summary_category', function(category) {
-  const posts = this.site.posts.filter(post => post.categories.map(c => c.name).includes(category));
-
+// 記事の集合に対する反響の合計。カテゴリ・タグ・絞り込み後の一覧で共用する
+function summaryOf(posts) {
   const total = posts.map(post => getSNSCnt(post.permalink)).reduce((acc, cur) => acc + cur);
   const authors = posts.map(post => post.author).flat().unique().length;
   const tw = posts.map(post => getTwitterCnt(post.permalink)).reduce((acc, cur) => acc + cur);
@@ -98,7 +97,13 @@ hexo.extend.helper.register('summary_category', function(category) {
     hatebu: hatebu,
     pocket: pocket
   };
+}
+
+hexo.extend.helper.register('summary_category', function(category) {
+  return summaryOf(this.site.posts.filter(post => post.categories.map(c => c.name).includes(category)));
 });
+
+hexo.extend.helper.register('summary_posts', summaryOf);
 
 /*
  * タグ個別ページ
