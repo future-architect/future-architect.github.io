@@ -1,13 +1,11 @@
 'use strict';
 
+// 年ページの上限は 15 固定。平日しか公開せず2週で束ねるので机上10程度に収まる。
+// 1日2本出していた時期の山は上にはみ出して切れて良い
 hexo.extend.helper.register('max_posts', function(year) {
-  let defaultMax = 100;
-  if (year) {
-    defaultMax = 30;
-  }
-
-  const acc = generatePostsSeries(this.site.posts, year);
-  return Math.max(defaultMax, Math.max(...acc.map(item => item.count)));
+  if (year) return 15;
+  const acc = generatePostsSeries(this.site.posts);
+  return Math.max(100, ...acc.map(item => item.count));
 });
 
 hexo.extend.helper.register('generate_posts_series_x', function(year) {
@@ -29,8 +27,9 @@ hexo.extend.helper.register('ave_posts', function(year) {
   return Math.floor(ave * 10) / 10;
 });
 
-// 年ページは週単位、全期間は四半期単位で数える。
-// 年を月で切ると12本しか立たず、全期間の四半期と粒度が変わらなかった（#2121）。
+// 年ページは2週単位、全期間は四半期単位で数える。
+// 年を月で切ると12本しか立たず、全期間の四半期と粒度が変わらなかった。
+// 週だと細かすぎたので2週で合算する（#2121）。
 //
 // 投稿が無い期間も 0 で埋める。記事のある期間だけを並べると、
 // 間隔が詰まって「毎週出ている」ように見えてしまう
@@ -40,24 +39,32 @@ const generatePostsSeries = (posts, year) => {
     : posts;
 
   const quarterOf = date => `${date.format('YYYY')}年${Math.ceil(Number(date.format('MM')) / 3)}Q`;
-  const keyOf = date => (year ? date.clone().startOf('isoWeek').format('MM/DD') : quarterOf(date));
+  const bucketOf = date => (year ? date.clone().startOf('isoWeek') : date.clone().startOf('quarter'));
+
+  const starts = target.map(post => bucketOf(post.date));
+  if (starts.length === 0) return [];
+  let first = starts[0].clone();
+  let last = starts[0].clone();
+  starts.forEach(at => {
+    if (at.isBefore(first)) first = at.clone();
+    if (at.isAfter(last)) last = at.clone();
+  });
+
+  // 2週ごとに合算するので、最初の週からの経過週で束ねる
+  const step = year ? 2 : 1;
+  const unit = year ? 'week' : 'quarter';
+  const indexOf = at => Math.floor(at.diff(first, unit) / step);
 
   const counts = new Map();
-  let first = null;
-  let last = null;
-  target.forEach(post => {
-    const key = keyOf(post.date);
-    counts.set(key, (counts.get(key) || 0) + 1);
-    const at = year ? post.date.clone().startOf('isoWeek') : post.date.clone().startOf('quarter');
-    if (!first || at.isBefore(first)) first = at.clone();
-    if (!last || at.isAfter(last)) last = at.clone();
+  starts.forEach(at => {
+    const i = indexOf(at);
+    counts.set(i, (counts.get(i) || 0) + 1);
   });
-  if (!first) return [];
 
   const series = [];
-  for (const at = first.clone(); !at.isAfter(last); at.add(1, year ? 'week' : 'quarter')) {
-    const key = year ? at.format('MM/DD') : quarterOf(at);
-    series.push({groupKey: key, count: counts.get(key) || 0});
+  for (let i = 0; i <= indexOf(last); i++) {
+    const at = first.clone().add(i * step, unit);
+    series.push({groupKey: year ? at.format('MM/DD') : quarterOf(at), count: counts.get(i) || 0});
   }
   return series;
 }
