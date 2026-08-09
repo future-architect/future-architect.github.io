@@ -236,28 +236,32 @@ hexo.extend.helper.register('author_monthly_chart', function(name) {
 // 年ごとの寄稿者数を 継続・新規・再開 に分けて返す (#2145)。
 // 新規 = その年が初投稿。
 // 再開 = 過去に投稿があるが、前年には無い（2年以上あいた）。
-// 継続 = 前年にも投稿がある
+// 継続 = 前年にも投稿がある。
+// あわせて 常連 = 2年連続で年2本以上（上期・下期に1本のペースを続けている人。
+// 継続などの内訳と重なるため、積み上げには入れず別系列で返す）(#2149)
 hexo.extend.helper.register('yearly_author_types', function() {
-  const activity = new Map(); // 著者 -> 活動した年の Set
+  const activity = new Map(); // 著者 -> (年 -> 本数)
   let minY = Infinity;
   let maxY = -Infinity;
   this.site.posts.forEach(post => {
     const y = post.date.year();
     if (y < minY) minY = y;
     if (y > maxY) maxY = y;
-    if (!activity.has(post.author)) activity.set(post.author, new Set());
-    activity.get(post.author).add(y);
+    if (!activity.has(post.author)) activity.set(post.author, new Map());
+    const m = activity.get(post.author);
+    m.set(y, (m.get(y) || 0) + 1);
   });
   if (minY === Infinity) {
-    return JSON.stringify({years: [], continuing: [], newcomers: [], returning: []});
+    return JSON.stringify({years: [], continuing: [], newcomers: [], returning: [], regulars: []});
   }
 
   const size = maxY - minY + 1;
   const continuing = new Array(size).fill(0);
   const newcomers = new Array(size).fill(0);
   const returning = new Array(size).fill(0);
-  activity.forEach(set => {
-    const ys = [...set].sort((a, b) => a - b);
+  const regulars = new Array(size).fill(0);
+  activity.forEach(counts => {
+    const ys = [...counts.keys()].sort((a, b) => a - b);
     ys.forEach((y, i) => {
       if (i === 0) {
         newcomers[y - minY]++;
@@ -266,11 +270,14 @@ hexo.extend.helper.register('yearly_author_types', function() {
       } else {
         continuing[y - minY]++;
       }
+      if (counts.get(y) >= 2 && (counts.get(y - 1) || 0) >= 2) {
+        regulars[y - minY]++;
+      }
     });
   });
   const years = [];
   for (let y = minY; y <= maxY; y++) {
     years.push(String(y));
   }
-  return JSON.stringify({years, continuing, newcomers, returning});
+  return JSON.stringify({years, continuing, newcomers, returning, regulars});
 });
