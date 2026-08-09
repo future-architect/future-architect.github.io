@@ -13,15 +13,15 @@ author: 藤戸四恩
 lede: "Playwrightは、Microsoftが開発したE2Eテストフレームワークです。Cypressと同様に、Chromium、Firefox、Safariなどのブラウザ上でE2Eテストの実行を自動化できます。"
 ---
 
-# はじめに
+## はじめに
 
 藤戸四恩です。[Playwright連載](/articles/20230821a/)の1本目は環境構築について説明します。
 
-## Playwrightとは
+### Playwrightとは
 
 Playwrightは、Microsoftが開発したE2Eテストフレームワークです。Cypressと同様に、Chromium、Firefox、Safariなどのブラウザ上でE2Eテストの実行を自動化できます。
 
-## Playwrightのインストール
+### Playwrightのインストール
 
 Playwrightをインストールするには、npm yarn pnpmのいずれを使用してインストールできます。
 
@@ -82,7 +82,7 @@ Happy hacking! 🎭
 
 Happy hacking!と表示されたらインストール成功です。
 
-## Playwrightの基本的な使い方
+### Playwrightの基本的な使い方
 
 ```ts
 test('テストケース名', async ({ page }) => {
@@ -94,7 +94,7 @@ test関数にテストケースを記載を行っていきます。test関数の
 
 ここでは、よく使う基本的なコマンドをいくつか紹介します。
 
-### Webサイトを訪れる
+#### Webサイトを訪れる
 
 ```ts test1.spec.ts
 import { test, expect, type Page } from '@playwright/test';
@@ -106,7 +106,7 @@ test('webサイトを訪れる', async ({ page }) => {
 
 `page.goto`関数内で指定したURLへ遷移します。
 
-### 要素の取得
+#### 要素の取得
 
 要素を取得する際は、コードジェネレータを使って要素名を取得するのが便利です。
 
@@ -130,7 +130,7 @@ getByLabel以外にも要素を取得する方法はあります。
 
 * [公式ドキュメント_locators](https://playwright.dev/docs/locators)
 
-### 要素を操作
+#### 要素を操作
 
 GitHubアイコンの要素を取得できたので、クリックをしたいと思います。
 
@@ -155,7 +155,7 @@ test('Githubアイコンをクリック', async ({ page }) => {
 }
 ```
 
-## チェックする
+### チェックする
 
 GitHubのアイコンをクリックした際に遷移先のURLに`playwright`が含まれることをテストします。
 
@@ -185,7 +185,7 @@ test('githubアイコンの遷移先URLにplaywrightが含まれる', async ({ p
   });
 ```
 
-## テストの実行
+### テストの実行
 
 全てのテストを実行するには以下のコマンドを実行します。
 
@@ -202,7 +202,7 @@ To open last HTML report run:
 
 用意された9件のテストすべてに成功（passed）したことが表示されました。
 
-### テストファイルの指定
+#### テストファイルの指定
 
 ファイル名(今回はtest1.spec.ts)を指定して実行するには以下のコマンドを実行します。
 
@@ -219,7 +219,7 @@ To open last HTML report run:
 
 作成した3件のテストすべてに成功（passed）したことが表示されました。
 
-## テストレポートの出力
+### テストレポートの出力
 
 Playwrightでは実行結果をHTMLのレポートとして表示できます。
 
@@ -233,7 +233,7 @@ npx playwright show-report
 
 <img src="/images/2023/20230822a/画像1.png" alt="" width="1060" height="346" loading="lazy">
 
-## 終わりに
+### 終わりに
 
 Playwrightのインストール方法と基本的な使い方を紹介しました。
 

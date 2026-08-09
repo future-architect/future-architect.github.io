@@ -13,7 +13,7 @@ thumbnail: /images/2023/20230210a/thumbnail.png
 author: 渡邉光
 lede: "筋肉エンジニアの渡邉です。最近はGCP/GKEについて勉強しています。今回はGitHubへのPushをトリガーにCloudBuildを起動し、プライベートエンドポイントのみのGKEへデプロイする基盤を作りましたので、共有したいと思います。GCPリソースはTerraformで作成しています。"
 ---
-# 初めに
+## 初めに
 
 こんにちは！ 筋肉エンジニアの渡邉です。最近はGCP/GKEについて勉強しています。
 
@@ -21,7 +21,7 @@ lede: "筋肉エンジニアの渡邉です。最近はGCP/GKEについて勉強
 
 GCPリソースはTerraformで作成しています。CloudBuildとGitHubの連携は一部画面による紐づけが必要になるので、手動でCloudBuildを作成した後、terraform importでコード管理するようにしました。
 
-# デプロイフロー
+## デプロイフロー
 
 <img src="/images/2023/20230210a/Deploy_Architecture.drawio.png" alt="Deploy_Architecture.drawio.png" width="901" height="264" loading="lazy">
 
@@ -33,7 +33,7 @@ GCPリソースはTerraformで作成しています。CloudBuildとGitHubの連�
 4. CloudBuildでコンテナをビルド、Artifact RegistoryにコンテナイメージをPush
 5. CloudBuildからGKEへコンテナイメージをデプロイ
 
-# アプリケーションコード
+## アプリケーションコード
 
 Goで記述されたアプリケーションを書きました。
 リクエストを投げると、Hello world!とVersionとHostnameをレスポンスします。
@@ -100,11 +100,11 @@ CMD ["go", "run", "main.go" ]
 EXPOSE 8080
 ```
 
-# GKEのアーキテクチャ
+## GKEのアーキテクチャ
 
 <img src="/images/2023/20230210a/architecture.drawio.png" alt="architecture.drawio.png" width="1151" height="429" loading="lazy">
 
-## クラスタ構成
+### クラスタ構成
 
 - **クラスタバージョン**：1.23.13-gke.900（リリースチャンネルをSTABLEで構築した時のデフォルトバージョン）
 - **リージョンクラスタ**：本番環境で利用することを考慮して可用性を高くしたいため
@@ -113,7 +113,7 @@ EXPOSE 8080
 - **限定公開クラスタ**：Control Planeへのアクセスがプライベートエンドポイントのみの「パブリックエンドポイントアクセスが無効」で構成しています。ノードには内部IPアドレスしか付与されず、Control Planeへのアクセスは内部ネットワークからのみしかアクセスできません。
 ※この構成は制限が厳しいのでセキュリティ要件的に問題なければ、「パブリック エンドポイント アクセスが有効、承認済みネットワークが有効」で構築してもよいです。
 
-## Manifest
+### Manifest
 
 GoのアプリケーションコンテナをGKE上にPodとして建てたいので、deploymentを作成します。containers.imageにはArtifact Registryに保存されているイメージ名を指定します。containerPortにはDockerfileのEXPOSEで指定した8080を指定します。
 
@@ -220,7 +220,7 @@ manifestファイルの適用自体は踏み台サーバから実行していま
 
 <img src="/images/2023/20230210a/2-Application-Access①.png" alt="2-Application-Access①.png" width="344" height="119" loading="lazy">
 
-# CloudBuildの作成
+## CloudBuildの作成
 
 現状の状態だと
 
@@ -233,9 +233,9 @@ manifestファイルの適用自体は踏み台サーバから実行していま
 となるため、デプロイまでに非常に手間がかかります。
 GitHubへのPushをトリガーに上記の手順の3~5を自動化したいため、CloudBuildを利用します。
 
-## CloudBuildトリガーの作成
+### CloudBuildトリガーの作成
 
-### GitHubとの連携
+#### GitHubとの連携
 
 CloudBuildとGitHub（プライベートリポジトリ）を連携するためには画面での認証手続きが生じるため、一旦Terraformでは作成せず手動で設定を行いました。
 手動で設定が完了した後、terraform importコマンドを利用してコード管理するようにします。
@@ -294,7 +294,7 @@ Install Google Cloud Buildの画面から
 
 <img src="/images/2023/20230210a/1-CloudBuild⑨.png" alt="1-CloudBuild⑨.png" width="975" height="882" loading="lazy">
 
-### terraform importの実行
+#### terraform importの実行
 
 作成したトリガーの「実行」の隣をクリックし、リソースパスをコピーをクリックします（terraform importで利用します）。。
 <img src="/images/2023/20230210a/1-CloudBuild⑩.png" alt="1-CloudBuild⑩.png" width="1011" height="883" loading="lazy">
@@ -322,21 +322,21 @@ terraform import後
 
 を指定してterraform applyをして適用します。
 
-# CloudBuildからGKE Control Planeへの接続
+## CloudBuildからGKE Control Planeへの接続
 
 今回、Control Planeへのアクセスにプライベートエンドポイントのみの「パブリックエンドポイントアクセスが無効」でGKEを構成しているため、CloudBuildからGKE Control Planeへの接続も内部ネットワーク経由でプライベートエンドポイントに対して行わなければいけません。
 （GKEをパブリック エンドポイント アクセスが有効、承認済みネットワークが有効で構成している場合は、CloudBuildからGKE Control Planeへのアクセスもパブリックエンドポイントに対して行う必要がありますが、CloudBuildの外部IPはユーザで指定できずビルド環境ごとに変わってしまい、承認済みネットワークが定義できないので、少しトリッキーなやり方をしないとアクセスができないです）。。
 CloudBuildからGKE Control Planeのプライベートエンドポイント接続を内部ネットワークを経由するようにしたいので、CloudBuildをPrivate Poolを利用するように作成します。
 Cloud Build プライベート プールを使用した限定公開 Google Kubernetes Engine クラスタへのアクセスはGoogle Cloudの[アーキテクチャセンター](https://cloud.google.com/architecture/accessing-private-gke-clusters-with-cloud-build-private-pools)にも記載されているので、詳しくはこちらの記事をご覧ください。
 
-## ネットワークアーキテクチャ
+### ネットワークアーキテクチャ
 
 CloudBuildからGKEへデプロイするためのネットワークアーキテクチャの完成図になります。
 <img src="/images/2023/20230210a/New_architecture.drawio.png" alt="New_architecture.drawio.png" width="1200" height="355" loading="lazy">
 
 それぞれ詳細を見ていきましょう。
 
-### CloudBuild Private Poolとsample-build-vpc間
+#### CloudBuild Private Poolとsample-build-vpc間
 
 <img src="/images/2023/20230210a/between_sample_vpc_private_pool.drawio.png" alt="between_sample_vpc_private_pool.drawio.png" width="1200" height="355" loading="lazy">
 
@@ -354,7 +354,7 @@ Private Poolとプライベート接続する用のVPCには、**名前付きIP�
 この設定により、のちにPrivate PoolにGKE Control PlaneのCIDR(192.168.64.0/28)が広報されます。
 <img src="/images/2023/20230210a/4-network-architecuture④.png" alt="4-network-architecuture④.png" width="1200" height="847" loading="lazy">
 
-### GKE Control Planeとmy-stg-environment-vpc間
+#### GKE Control Planeとmy-stg-environment-vpc間
 
 <img src="/images/2023/20230210a/between_gke_control_plane_my_stg_environment.drawio.png" alt="between_gke_control_plane_my_stg_environment.drawio.png" width="1200" height="355" loading="lazy">
 
@@ -362,7 +362,7 @@ GKE Control Planeとmy-stg-environment-vpcを接続しているVPC Peeringのカ
 これにより、のちにHA VPN Gatewayを通じて広報されてきたPrivate PoolのCIDR(192.168.3.0/24)をGKE Control Plane側に広報できます。
 <img src="/images/2023/20230210a/4-network-architecuture①.png" alt="4-network-architecuture①.png" width="1200" height="849" loading="lazy">
 
-### HA VPNの作成
+#### HA VPNの作成
 
 <img src="/images/2023/20230210a/between_sample_build_vpc_my_stg_environment.drawio.png" alt="between_sample_build_vpc_my_stg_environment.drawio.png" width="1200" height="355" loading="lazy">
 
@@ -408,11 +408,11 @@ my-stg-environmentにCloudBuild Private PoolのCIDR(192.168.3.0/24)を広報し�
 
 ここまでの設定で、CloudBuildからGKEへデプロイするためのネットワークアーキテクチャの完成になります。
 
-# デプロイの実施
+## デプロイの実施
 
 上記でCloudBuildから内部ネットワークを経由してGKE Contorl Planeへ通信できるルートができたので、実際にデプロイを実施してみましょう。
 
-## CloudBuild.yaml
+### CloudBuild.yaml
 
 CloudBuildでビルドを実行するためには、ビルド構成ファイルを作成する必要があります。
 ビルド構成ファイルには、各ビルドSTEPごとに実行したい処理を記述します。
@@ -512,7 +512,7 @@ options:
         └── main.go
 ```
 
-## アプリケーションコードの修正
+### アプリケーションコードの修正
 
 Version: 1.0.0　→　Version: 2.0.0へ修正してmainブランチにPushします。
 
@@ -548,7 +548,7 @@ To https://GitHub.com/xxxxxxxx/xxxxxxxx.git
    cef9c7d..0f0a907  main -> main
 ```
 
-## CloudBuildのビルド画面
+### CloudBuildのビルド画面
 
 GitHubにPushされたことをトリガーにCloudBuildのビルドが実行されます（過去にビルドに苦戦したビルド履歴が残っていますね（笑））
 
@@ -566,7 +566,7 @@ CloudBuildのビルドが正常終了したので、再度ドメインに対し�
 
 <img src="/images/2023/20230210a/3-Deploy③.png" alt="3-Deploy③.png" width="352" height="93" loading="lazy">
 
-## Podのライフサイクル
+### Podのライフサイクル
 
 最後のビルドステップでGKEへのデプロイが行われます。
 
@@ -616,7 +616,7 @@ hello-go-deployment-78b555bdf6-z5rk8   0/1     Terminating         0          7m
 hello-go-deployment-78b555bdf6-z5rk8   0/1     Terminating         0          7m13s
 ```
 
-# 最後に
+## 最後に
 
 今回はCloudBuildを利用したGKEへの継続デプロイ基盤について記載しました。GKEは限定公開クラスタでControl Planeへのアクセスがプライベートエンドポイントのみの「パブリックエンドポイントアクセスが無効」構築しているため、Cloud BuildからGKEのControl Planeへのアクセスを成功させるためのネットワーク構成が複雑になってしまいましたが、限定公開クラスタで「パブリック エンドポイント アクセスが有効、承認済みネットワークが無効」で構築すればCloudBuildでPrivate PoolやHA VPNで作成することもなくパブリックエンドポイント経由でControl Planeへアクセスができます。セキュリティ要件次第でデプロイフローやアーキテクチャなどは変更してください。
 

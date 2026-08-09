@@ -13,7 +13,7 @@ thumbnail: /images/2023/20230414a/thumbnail.png
 author: 板野竜也
 lede: "データ/モデル監視ツールであるVertex AI Model MonitoringとEvidently AIを利用して両者を様々な観点で検証していきます。"
 ---
-# 1. はじめに
+## 1. はじめに
 
 こんにちは、フューチャーでアルバイトをしている板野です。
 
@@ -27,7 +27,7 @@ lede: "データ/モデル監視ツールであるVertex AI Model MonitoringとE
 
 ※データ/モデル監視の基本については、以前に投稿された記事：[MLシステムにおけるモデル・データの監視【概要編】](/articles/20230412a/)をご参照ください。
 
-# 2. Output Metricsの監視項目
+## 2. Output Metricsの監視項目
 
 Output Metricsを監視するには**モデルからの出力**が必要となります。
 
@@ -51,18 +51,18 @@ Output Metricsを監視するには**モデルからの出力**が必要とな�
 「モデル精度」については正解データが必要なため、ユースケースによっては指標が出るまでに遅れがあります。\
 例えば、人力で正解ラベルを付与しなければならない場合はその分待たなくてはなりません。
 
-# 3. 前提条件
+## 3. 前提条件
 
 [前回の記事](/articles/20230413a/)の`今回想定するユースケース`の部分と合わせてあるので、詳細は割愛しますが、以下の前提条件で検証を行います。
 
 * 天気や気温等の特徴からその日のシェアバイク利用数を予測する**回帰モデル**を構築している
 * Vertex AIのAutoML(表形式)で訓練している
 
-# 4. Vertex AIでOutput Metricsを監視
+## 4. Vertex AIでOutput Metricsを監視
 
 Vertex AI自体にバージョンの概念はありませんが、2023/3/29時点の操作画面となります。
 
-## 4.1. 監視できる項目
+### 4.1. 監視できる項目
 
 Vertex AIでは、以下のような指標を監視できます。
 
@@ -75,14 +75,14 @@ Vertex AIでは、以下のような指標を監視できます。
 * （2）特徴量寄与率
   * Shapleyのサンプリング近似値（[詳細](https://cloud.google.com/ai-platform/prediction/docs/ai-explanations/overview?hl=ja#compare-methods)）
 
-## 4.2. 監視設定と監視結果
+### 4.2. 監視設定と監視結果
 
-### 4.2.1. 必要なもの
+#### 4.2.1. 必要なもの
 
 * [★1] 説明変数列（特徴量データの列）, 目的変数列（正解データの列）を含むデータ
   * Google Cloud Strage上のCSVファイル or BigQuery上のデータ であること
 
-### 4.2.2. 手順
+#### 4.2.2. 手順
 
 Moder Registryから作成したモデル・バージョンの詳細画面に行き、「評価を作成」をクリックします。
 
@@ -100,19 +100,19 @@ Moder Registryから作成したモデル・バージョンの詳細画面に行
 
 評価や特徴量寄与率計算のための予測（推論）はここで動いています。
 
-### 4.2.3. 監視結果
+#### 4.2.3. 監視結果
 
 評価の結果は以下のように見ることができます。特徴量の重要度もヒストグラムで確認できます。
 
 <img src="/images/2023/20230414a/2023-04-03-09-47-27.png" alt="" width="1200" height="730" loading="lazy">
 
-### 4.2.4. 自動化とアラート
+#### 4.2.4. 自動化とアラート
 
 今回の記事には含まれていませんが、以上の手順を自動化する場合、[Vertex AI API](https://cloud.google.com/vertex-ai/docs/tabular-data/forecasting/evaluate-model?hl=ja#api)を利用して自動で定期実行できると考えられます。
 
 Vertex AI自体に、評価結果が悪くなった際のアラート発生機能はありませんが、REST APIの結果を受け取り、前回の評価結果と比較するシステムを構築すればアラートを発生させることも可能と考えられます。
 
-## 4.3. コスト
+### 4.3. コスト
 
 * 実装コスト
   * 評価を行うこと自体はVertex AIのコンソール画面から設定できるのでほぼ実装コストは掛かりません
@@ -121,11 +121,11 @@ Vertex AI自体に、評価結果が悪くなった際のアラート発生機�
   * 評価ジョブ自体にどのくらいのノード時間を費やしているか不明ですが、少なくとも評価ジョブに含まれるバッチ予測ジョブには[こちら](https://cloud.google.com/vertex-ai/pricing?hl=ja#prediction-prices)に示されている費用が掛かると考えられます
   * Vertex AI APIを動かすサーバ・関数等のコストが掛かります
 
-# 5. Evidently AIでOutput Metricsを監視
+## 5. Evidently AIでOutput Metricsを監視
 
 Evidently AIのバージョンは`0.2.6`を使用しています。
 
-## 5.1. 監視できる項目
+### 5.1. 監視できる項目
 
 Evidently AIでは、以下のような指標を監視できます。
 
@@ -140,9 +140,9 @@ Evidently AIでは、以下のような指標を監視できます。
 
 また、Evidently AIでは視覚的にモデルの精度変化を把握できるようなグラフも出力できます。
 
-## 5.2. 監視設定と監視結果
+### 5.2. 監視設定と監視結果
 
-### 5.2.1 必要なもの
+#### 5.2.1 必要なもの
 
 * [★2] 説明変数列（特徴量データの列）, 正解データ列(`target`), 予測結果データ列(`prediction`) を含むデータ
   * DataFrame型として読み取れる形式
@@ -153,7 +153,7 @@ Evidently AIでは、以下のような指標を監視できます。
 
 <img src="/images/2023/20230414a/2023-03-22-14-50-10.png" alt="" width="199" height="197" loading="lazy">
 
-### 5.2.2. 手順
+#### 5.2.2. 手順
 
 Evidently AIのライブラリが入っている環境下で以下のコードを実行する。
 
@@ -195,7 +195,7 @@ report.run(current_data=df2, reference_data=df1,column_mapping=None) #[★5]
 report.show(mode='inline') # Notebookのセル出力で結果を表示する
 ```
 
-### 5.2.3. 監視結果
+#### 5.2.3. 監視結果
 
 「（1）モデル精度」として、以下のようにMAE等の基本的な数値指標を出力できます。
 
@@ -234,7 +234,7 @@ report.show(mode='inline') # Notebookのセル出力で結果を表示する
 今回出力したグラフは一例ですが、Evidently AIでは他にも様々なグラフを出力できます。\
 詳しくは[公式ドキュメント](https://docs.evidentlyai.com/reference/all-metrics#regression)を参照してください。
 
-### 5.2.4. 自動化とアラート
+#### 5.2.4. 自動化とアラート
 
 以上の手順を自動化するための実装コストは大きいと考えられます。\
 まず、[Vertex AI API](https://cloud.google.com/vertex-ai/docs/tabular-data/classification-regression/get-batch-predictions?hl=ja#api:-csv)からバッチ予測をリクエストし、その結果をCSVファイル形式等で受け取ります。\
@@ -244,7 +244,7 @@ report.show(mode='inline') # Notebookのセル出力で結果を表示する
 その結果を受け取り、前回の評価結果と比較するシステムを構築すればアラートを発生させることが可能と考えられます。\
 ※Evidently AIのTestについては[前回の記事](★リンクお願いします)に詳細があります。
 
-## 5.3. コスト
+### 5.3. コスト
 
 * 実装コスト
   * ユースケースに合わせてPythonコードを実装する必要がありますが、コードは単純でドキュメントも分かりやすく、評価自体はローコードで実装可能です
@@ -252,7 +252,7 @@ report.show(mode='inline') # Notebookのセル出力で結果を表示する
 * 金銭的コスト
   * Evidently AIを動かすサーバ・関数等のコストが掛かります
 
-## 6. まとめ
+### 6. まとめ
 
 本記事ではVertex AIとEvidently AIを用いたOutput Metrics監視の検証を行いました。\
 検証の結果を以下の表にまとめます。様々な観点で両者を比較しているので、ご参考になれば幸いです。

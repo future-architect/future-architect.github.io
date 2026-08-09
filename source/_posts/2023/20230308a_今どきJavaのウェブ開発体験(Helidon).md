@@ -39,7 +39,7 @@ JavaでWebサービス開発というと、SpringBoot、という時代が長く
 
 <img src="/images/2023/20230308a/image.png" alt="image.png" width="870" height="684" loading="lazy">
 
-# Helidon
+## Helidon
 
 MicroProfile準拠のウェブアプリケーションフレームワークは、[Quarkus](https://quarkus.io/)(Red Hat), [Helidon](https://helidon.io/)(Oracle), [Open Liberty](https://openliberty.io/)(IBM)などたくさん出ています。ただし、対応するMicroProfileのバージョンは微妙に違うようです。
 
@@ -54,7 +54,7 @@ Helidonには2つのフレーバーがあります。[迷ったらMPの方を使
 * Helidon SE: スパルタンな軽量サーバー
 * Helidon MP: MicroProfile互換のサーバー
 
-# Helidon MPの環境設定
+## Helidon MPの環境設定
 
 [Helidon Starter](https://helidon.io/starter/3.1.1?step=1)というWebサイトがあり、ここをぽちぽちするだけでプロジェクトの雛形ができあがります。Spring Starterみたいですね。それ以外にも、[helidon CLI](https://helidon.io/docs/v3/#/about/cli)というのがあり、今時なシンプルコマンドラインでビルドしたりができます。mvnとかgradleを叩く必要はなくなります。
 
@@ -71,7 +71,7 @@ $ helidon dev
 $ helidon build
 ```
 
-# Helidonのコードを見てみる
+## Helidonのコードを見てみる
 
 ``helidon init``で出来上がったプロジェクトを見てみます。Helidon MPを使うよとか、パッケージ名とかを適当に入れるだけでできます。Spring Starterよりもかなりシンプルです（ウェブに特化していてSpring Batchとかそういうバリエーションがないからですが）。
 
@@ -115,7 +115,7 @@ public class GreetResource {
 
 実行は`helidon dev`コマンドで行えます。デバッグモード起動です。`helidon build`して`java -jar target/[アプリケーション].jar`でもいけます。Go並に簡単。
 
-# コンテナのビルド
+## コンテナのビルド
 
 すでにjarへのビルドは触れました。コンテナのビルドもDockerfileが生成されているので簡単です。Dockerfileは3つあり、今時のJavaのアップデートの恩恵が受けられます。
 
@@ -172,7 +172,7 @@ func main() {
 
 ```
 
-## ネイティブビルドのエラー対策
+### ネイティブビルドのエラー対策
 
 [こちらのissue](https://github.com/helidon-io/helidon/issues/6260)を立てたところ、contributorの方に反応していただけました。少し`Dockerfile.native`の修正と`pom.xml`の修正が必要です。
 
@@ -192,7 +192,7 @@ func main() {
 
 これでビルドできました！
 
-# まとめ
+## まとめ
 
 ということで、コードを書かずにサンプルを動かしただけですが、今時のJavaの開発を体験してみました。ネイティブイメージのビルドはまだエラーがありますが（回避は可能）、`helidon`コマンドでプロジェクト作成から開発サーバーの起動ができ、jarもビルドできました。また、Dockerイメージのビルドも、最初からDockerfileがついてくるので簡単にでき、デプロイも簡単そうです。ウェブ開発に必要なものがコンパクトにまとまっていますね。PythonでFastAPI環境を作るよりも簡単なぐらい。
 

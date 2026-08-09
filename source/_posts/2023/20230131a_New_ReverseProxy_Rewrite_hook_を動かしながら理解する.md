@@ -17,7 +17,7 @@ lede: "- はじめに- 概要を確認- Proposal の内容と RFC の確認- 実
 
 <img src="/images/2023/20230131a/top.png" alt="" width="800" height="481">
 
-# 目次
+## 目次
 
 - はじめに
 - 概要を確認
@@ -25,7 +25,7 @@ lede: "- はじめに- 概要を確認- Proposal の内容と RFC の確認- 実
 - 実際に動かしながら、Go1.19 と Go1.20 の違いを確認
 - まとめ
 
-# はじめに
+## はじめに
 
 こんにちは。
 フューチャーアーキテクト株式会社、HR/新卒採用チームの棚井です。
@@ -35,7 +35,7 @@ lede: "- はじめに- 概要を確認- Proposal の内容と RFC の確認- 実
 本記事は[Go 1.20 リリース連載](/articles/20230123a/) の 1 つです。
 Go1.20 の **New ReverseProxy Rewrite hook** について解説していきます。
 
-# 概要を確認
+## 概要を確認
 
 New ReverseProxy Rewrite hook はコアライブラリー（httputil）への機能追加です。
 Release Note では[こちら](https://tip.golang.org/doc/go1.20#reverseproxy_rewrite)、Proposal は[こちら](https://github.com/golang/go/issues/50580)から確認できます。
@@ -138,7 +138,7 @@ this call was relayed by the reverse proxy
 
 概要の確認はここまでとして、この Rewrite hook について「それで、何が嬉しいの？」の疑問を解消するために、Proposal の内容と照らし合わせながら説明していきます。
 
-# Proposal の内容と RFC の確認
+## Proposal の内容と RFC の確認
 
 Proposal は [net/http/httputil: ReverseProxy can remove headers added by Director #50580](https://github.com/golang/go/issues/50580) です。
 
@@ -181,7 +181,7 @@ RFC のリンクを貼ってもらえているので、ちょっとだけ内容�
 
 このような RFC にて定義された「hop-by-hop ヘッダーを通過させない仕様」や「Connection ヘッダー情報のハンドリング仕様」への対応実装は、[この部分](https://github.com/golang/go/blob/release-branch.go1.20/src/net/http/httputil/reverseproxy.go#L289-L543)で確認できます。
 
-# 実際に動かしながら、Go1.19 と Go1.20 の違いを確認
+## 実際に動かしながら、Go1.19 と Go1.20 の違いを確認
 
 [example_test.go](https://wgithub.com/golang/go/blob/release-branch.go1.20/src/net/http/httputil/example_test.go)のコードを加工しながら、Go1.20 と Go1.19 での挙動の違いを見ていきます。
 
@@ -490,7 +490,7 @@ X-Forwarded-For: 127.0.0.1
 
 Go1.20 で追加された Rewrite hook はこの問題に対応するもので、先に見ましたように [ProxyRequest.SetXForwarded](https://pkg.go.dev/net/http/httputil@master#ProxyRequest.SetXForwarded) を利用して 3 つの Forwarded ヘッダー（The X-Forwarded-For、X-Forwarded-Host、X-Forwarded-Proto）を追加することで「Director で追加した X-Forwarded- ヘッダーが削除されてしまう現象」対応しています。
 
-# まとめ
+## まとめ
 
 - プロキシサーバーのリクエストルーティングで、これまで Director を使っていたところは、これからは Rewrite を使おう
 - Rwrite に渡す ProxyRequest にて SetXForwarded を呼ぶことで、プロキシサーバーの情報 X-Forwarded-For,Host,Proto を自動追加してくれて便利

@@ -15,14 +15,14 @@ thumbnail: /images/2023/20230626a/thumbnail.png
 author: 川口翔大
 lede: "CNCF の Knative を基盤として利用している Cloud Run と CNCF の各種ビルドツール ko, skaffold、Cloud Deploy を用いたうえで、アプリケーションのビルドからデプロイまでを行います。"
 ---
-# はじめに
+## はじめに
 
 こんにちは！
 TIG コアテクチームの川口です。本記事は、[CNCF連載](/articles/20230619a/) の5回目の記事になります。
 
 本記事では、CNCF の Knative を基盤として利用している Cloud Run と CNCF の各種ビルドツール ko, skaffold、Cloud Deploy を用いたうえで、アプリケーションのビルドからデプロイまでを行います。
 
-## 扱う技術要素
+### 扱う技術要素
 
 今回は、合計5つの技術要素を扱います。
 
@@ -30,7 +30,7 @@ TIG コアテクチームの川口です。本記事は、[CNCF連載](/articles
 
 <img src="/images/2023/20230626a/image.png" alt="image.png" width="1166" height="788" loading="lazy">
 
-### Cloud Run （Knative）
+#### Cloud Run （Knative）
 
 [**Cloud Run**](https://cloud.google.com/run) は、Google Cloud におけるコンテナベースのサーバーレスコンピューティングサービスとしてよく知られているものかと思います。こちらは、基盤として [**Knative**](https://www.cncf.io/projects/knative/) を採用しています。
 
@@ -38,13 +38,13 @@ TIG コアテクチームの川口です。本記事は、[CNCF連載](/articles
 
 今回は、この Cloud Run に Go 製アプリケーションをデプロイしていこうと思います。
 
-### ko
+#### ko
 
 [ko](https://www.cncf.io/projects/ko/) は、Go のコンテナイメージを Dockerfile 無しに簡単にビルドできるツールです。また、2022年の12月に CNCF の Sandbox プロジェクトとして承認されています。
 
 「Dockerfile 無しに」という言葉だと、2018年10月に Incubating プロジェクトとして承認された [Buildpacks](https://www.cncf.io/projects/buildpacks/) が想起されますが、 [こちらの記事](https://cloud.google.com/blog/ja/products/containers-kubernetes/ship-your-go-applications-faster-cloud-run-ko) でそちらとの比較が行われています。Buildpacks では、Go 以外にも Java・Node・Python 等といった言語がビルドができるという差異がありますが、今回は Go を扱うということもあり ko を利用したいと思います。
 
-### Skaffold
+#### Skaffold
 
 [Skaffold](https://skaffold.dev/docs/) は、コンテナベース（特に Kubernetes アプリケーション）の継続的な開発を容易にするコマンドラインツールです。ビルド・デプロイ・テストといった CI 上で扱うような各種機能がいくつか実装されていたり、本記事では扱いませんがローカル開発の際にも、[開発時に便利となるローカルでのアプリケーション実行](https://skaffold.dev/docs/workflows/dev/) も行えます。
 
@@ -62,7 +62,7 @@ TIG コアテクチームの川口です。本記事は、[CNCF連載](/articles
 
 その他の詳細に関しては、[ドキュメント](https://skaffold.dev/docs/) を参照ください。
 
-### Artifact Registry
+#### Artifact Registry
 
 [Artifact Registry](https://cloud.google.com/artifact-registry/docs/overview) は、Google Cloud におけるマネージドのアーティファクト管理サービスです。
 
@@ -70,7 +70,7 @@ Docker コンテナイメージのほか、Java・Node・Python といった各�
 
 今回は、先述の ko・Skaffold を用い、この Artifact Registry にて Docker コンテナイメージを管理してもらうことにします。
 
-### Cloud Deploy
+#### Cloud Deploy
 
 [Cloud Deploy](https://cloud.google.com/deploy/docs/overview) は、Google Cloud 上で CD を行うためのサービスです。
 
@@ -87,7 +87,7 @@ Cloud Deploy を用いたデプロイの流れとしては、ざっくりと以�
 
 この辺の用語は、なかなかとっかかりしづらいところがありますが [こちら](https://cloud.google.com/deploy/docs/terminology) にまとまって説明がされているので、困ったら参照するとよさそうです。
 
-## 手順
+### 手順
 
 それでは次の手順でさっそく始めていきます。
 
@@ -95,13 +95,13 @@ Cloud Deploy を用いたデプロイの流れとしては、ざっくりと以�
 2. コンテナイメージのプッシュ。
 3. Cloud Deploy でデプロイ。
 
-# Go アプリケーションの作成
+## Go アプリケーションの作成
 
 Hello World を返すような API を v1・v2 として作成していきます。
 
 この記事での成果物は、 https://github.com/kawaguchisan-sk/cloud-run-sample にて公開しています。本記事で行う各種コマンドも、Makefile 上に記載しているので参考ください。
 
-## Prerequisite
+### Prerequisite
 
 ```bash
 # Go
@@ -109,7 +109,7 @@ $ go version
 go version go1.20.5 darwin/arm64
 ```
 
-## ソースコード
+### ソースコード
 
 以下のように 8080 ポートをリッスンして、"/" にアクセスされたら、"Hello World v1!" を返すものとします。
 
@@ -133,11 +133,11 @@ func HelloServer(w http.ResponseWriter, r *http.Request) {
 }
 ```
 
-# コンテナイメージのプッシュ
+## コンテナイメージのプッシュ
 
 それでは先の手順で作成した Go アプリケーションを ko と Skaffold を用いてコンテナイメージにして Artifact Registry にプッシュします。
 
-## Prerequisite
+### Prerequisite
 
 ```bash
 # （ko）
@@ -160,7 +160,7 @@ $ gcloud artifacts repositories create hello-world \
     --repository-format=docker
 ```
 
-## Skaffold を用いたコンテナイメージのプッシュ
+### Skaffold を用いたコンテナイメージのプッシュ
 
 まずは以下のようにして、`skaffold_v1.yaml`・`skaffold_v2.yaml` を作成します。
 （本記事では触れませんが、[Profiles 機能](https://skaffold.dev/docs/environment/profiles/) を使うとより dry に書くこともできます）。
@@ -202,11 +202,11 @@ $ skaffold build \
 
 <img src="/images/2023/20230626a/Screenshot_2023-05-03_at_19.59.11.png" alt="" width="1200" height="179" loading="lazy">
 
-# Cloud Deploy でデプロイ
+## Cloud Deploy でデプロイ
 
 コンテナイメージのプッシュまで、ko と Skaffold を用いて行うことができました。最後に、Cloud Deploy を使って Cloud Run にデプロイを行いましょう。
 
-## Skaffold に Cloud Run の設定を追記
+### Skaffold に Cloud Run の設定を追記
 
 はじめに先ほど作成した `skaffold_v1.yaml`・`skaffold_v2.yaml` に以下のように Cloud Run の設定を追記します。
 
@@ -275,7 +275,7 @@ $ skaffold build \
 }
 ```
 
-## デリバリーパイプラインの作成
+### デリバリーパイプラインの作成
 
 まずは、以下のような `deploy.yaml` を作成します。
 
@@ -316,7 +316,7 @@ $ gcloud deploy apply \
 
 <img src="/images/2023/20230626a/image_2.png" alt="image.png" width="1200" height="642" loading="lazy">
 
-## Cloud Deploy によるデプロイ
+### Cloud Deploy によるデプロイ
 
 ここまでで、 `build_v1.json` という成果物をローカルにアウトプットできていて、またデリバリーパイプラインの設定も行えているはずです。
 
@@ -339,7 +339,7 @@ $ gcloud deploy releases create v1 \
 
 <img src="/images/2023/20230626a/image_3.png" alt="image.png" width="1200" height="153" loading="lazy">
 
-## Cloud Deploy によるカナリアデプロイ
+### Cloud Deploy によるカナリアデプロイ
 
 ここまでくれば、一通りの機能に触れることができました。
 
@@ -415,7 +415,7 @@ $ gcloud deploy releases create v2 \
 
 <img src="/images/2023/20230626a/image_6.png" alt="" width="1200" height="272" loading="lazy">
 
-# おわりに
+## おわりに
 
 本記事では、Cloud Run や CNCF の各種ビルドツール、Cloud Deploy を用いてビルドからカナリアデプロイまでやってみました。
 

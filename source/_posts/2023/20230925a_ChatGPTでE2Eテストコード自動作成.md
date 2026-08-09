@@ -51,7 +51,7 @@ ChatGPTが話題を席巻してしばらく経ちます。とはいえ、内製�
 
 生成されたものは自分の著作物ではないので、テストコードには「ChatGPTで生成しました」みたいな引用元を書いて引用として扱うとさらに安全なのではないかと思います。他者著作物の利用の手段として。
 
-# PlaywrightのE2Eテストを生成してみる
+## PlaywrightのE2Eテストを生成してみる
 
 本ブログでもすでにCypressの記事が何本かあったり、[Software DesignでCypress連載](https://future-architect.github.io/articles/20211218a/)をしたり、[Playwright連載](https://future-architect.github.io/articles/20230821a/)をおこなったり、E2Eテストについてはかなり触れています。
 
@@ -117,7 +117,7 @@ await submitButton.click()
 
 ここは手修正する必要がありそうです。BardとかBing Chatを使ってもだいたい同じでしたが、Bing Chatは「getByRole、getByLabelを使って書き換えてください」というと、そこそこの打率で書き換えてくれましたが、たまに公式の1.27から提供されたAPIではなく[@testing-library/playwright](https://github.com/testing-library/playwright-testing-library)ベースのコードを出力することもありました。独創的、バランス、安定問わず。
 
-# Cypress向けはどうか？
+## Cypress向けはどうか？
 
 実はCypress向けだとばっちり決まります。
 
@@ -144,7 +144,7 @@ describe('Login Form', () => {
 
 いい感じですね。このまま使えそうな勢い。Cypressはずっと安定したAPIを提供し、Playwrightはアクティブに機能追加したりしている印象がありますが、これが生成AI経由に使い勝手に影響を与えるというのはなかなか興味深い結果です。
 
-# まとめ
+## まとめ
 
 Playwrightの方がちょっとイマイチでしたが、将来性は感じる結果は得られました。HTMLを渡すだけでそれを操作するコードを書いてくれました。Cypressはばっちりでしたので、いっそのことPlaywrightでテストを書く場合に、Cypress向けに生成したコードを何かしらのスクリプトで書き換えて使う方が良いかもしれません。
 

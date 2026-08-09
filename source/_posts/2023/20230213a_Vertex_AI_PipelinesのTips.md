@@ -14,11 +14,11 @@ author: 平野甫
 lede: "Vertex AI Pipelinesを利用してみて分かったTipsについて、いくつかピックアップしてまとめました。なお、コードは全てPython・Kubeflowを用いた場合を記載しています。Vertex AI Pipelinesとは、GCP上でMLパイプライン機能を提供するサービスです。サーバーレス方式でMLワークフローをオーケストレートします。"
 mathjax: true
 ---
-# はじめに
+## はじめに
 
 こんにちは、フューチャーでアルバイトをしている平野です。今回は、Vertex AI Pipelinesを利用してみて分かったTipsについて、いくつかピックアップしてまとめました。なお、コードは全てPython・Kubeflowを用いた場合を記載しています。
 
-# 前提知識
+## 前提知識
 
 Vertex AI Pipelinesとは、GCP上でMLパイプライン機能を提供するサービスです。サーバーレス方式でMLワークフローをオーケストレートします。
 
@@ -30,7 +30,7 @@ Vertex AI Pipelinesとは、GCP上でMLパイプライン機能を提供する�
 [Kubeflowのドキュメント](https://www.kubeflow.org/docs/)
 Vertex AI Pipelinesを使う際に参照することになる、Kubeflowの公式ドキュメントです。こちらもKubeflowの概要からコンポーネントの作成・パイプラインの実行、サンプルなどがまとめてあります。
 
-## 関連用語
+### 関連用語
 
 [MLOps on GCP 入門 〜Vertex AI Pipelines 実践〜](https://recruit.gmo.jp/engineer/jisedai/blog/vertex-ai-pipelines-intro/)で分かりやすく解説されていたため、参考にさせていただきました。
 
@@ -48,22 +48,22 @@ Vertex AI Pipelinesを使う際に参照することになる、Kubeflowの公�
 
 <img src="/images/2023/20230213a/pipeline_example.png" alt="pipeline_example.png" width="960" height="540" loading="lazy">
 
-### 参考
+#### 参考
 
 * [MLOps on GCP 入門 〜Vertex AI Pipelines 実践〜](https://recruit.gmo.jp/engineer/jisedai/blog/vertex-ai-pipelines-intro/)
 
-# Tips
+## Tips
 
-## 【基本】パイプラインを実装するには？
+### 【基本】パイプラインを実装するには？
 
 おさらいとしてパイプラインの実装方法から始めます。ここではコンポーネントを実装する方法の内、以下２つを紹介します。
 
 （1） 自前のDocker imageを使って実装
 （2） 事前のDocker imageの準備なしでPythonスクリプトのみで実装
 
-### （1） 自前のDocker imageを使って実装するには？
+#### （1） 自前のDocker imageを使って実装するには？
 
-#### 1. コンポーネントの作成
+##### 1. コンポーネントの作成
 
 **コンテナ（Dockerfile+src）とコンポーネント定義yamlを用意する**
 
@@ -131,7 +131,7 @@ implementation:
     ]
 ```
 
-#### 2. パイプラインの作成
+##### 2. パイプラインの作成
 
 **Pythonでパイプラインを定義する（コンポーネントの依存関係定義など）**
 
@@ -163,7 +163,7 @@ compiler.Compiler().compile(pipeline_func=pipeline,
 
 パイプラインを定義したファイルを実行すると、パイプライン実行時に必要なjsonファイルが`compiler.Compiler().compile()`の`package_path`に指定したパス（上記の例では`pipeline.json`）に生成されます。
 
-### （2） 事前のDocker imageの準備なしでPythonスクリプトのみで実装には？
+#### （2） 事前のDocker imageの準備なしでPythonスクリプトのみで実装には？
 
 Vertex AI Pipelinesでは、コンポーネントの処理内容をPythonの関数として記述することでPythonスクリプトのみでコンポーネントを作成できます。その一方で関数の定義の仕方には若干の癖があります。コンポーネントの関数はstandaloneである必要があり、以下の要件を満たす必要があります。
 
@@ -221,12 +221,12 @@ compiler.Compiler().compile(pipeline_func=pipeline,
 
 ```
 
-### 参考
+#### 参考
 
 * [Vertex Pipelinesによる機械学習パイプラインの実行](https://zenn.dev/dhirooka/articles/71a5fc473baefb)
 * [Building Python function-based components](https://www.kubeflow.org/docs/components/pipelines/v1/sdk/python-function-components/)
 
-## コンポーネントの依存関係を制御するには？
+### コンポーネントの依存関係を制御するには？
 
 （1）パイプラインの実行順序は基本的にはコンポーネントの入出力の関係から自動的に決定されます。
 
@@ -305,12 +305,12 @@ def pipeline() -> None:
 
 <img src="/images/2023/20230213a/dependancy2.png" alt="dependancy2.png" width="792" height="246" loading="lazy">
 
-### 参考
+#### 参考
 
 * [Explicitly dependent tasks](https://www.kubeflow.org/docs/components/pipelines/v2/author-a-pipeline/tasks/#explicitly-dependent-tasks)
 * [ジョブの実行順序を指定する](https://qiita.com/f6wbl6/items/ef2603bf47a47ffd63ac#%E3%82%B8%E3%83%A7%E3%83%96%E3%81%AE%E5%AE%9F%E8%A1%8C%E9%A0%86%E5%BA%8F%E3%82%92%E6%8C%87%E5%AE%9A%E3%81%99%E3%82%8B)
 
-## パイプラインを起動するには？
+### パイプラインを起動するには？
 
 パイプラインの起動方法としては、GUIから起動する方法とPythonスクリプトやノートブックから起動する方法があります。GUIから起動する方法については以下の参考の`コンソール`をご確認ください。
 
@@ -345,11 +345,11 @@ job.submit()
 
 `job.submit()`のほかに`job.run()`も利用でき、両者の違いは、`submit()`はジョブを投げ終わると終了、`run()`はジョブを投げた後、パイプラインの状態を定期的に表示してくれます。
 
-### 参考
+#### 参考
 
 * [パイプラインを実行する](https://cloud.google.com/vertex-ai/docs/pipelines/run-pipeline?hl=ja#console)
 
-## 各コンポーネントに指定したスペックを割り当てるには？
+### 各コンポーネントに指定したスペックを割り当てるには？
 
 マシンタイプを指定しない場合にはデフォルトで`e2-standard-4`（4コアのCPUと16GBのメモリ）が利用されます。コンポーネントのマシンタイプを指定するには、`set_cpu_limit`、`set_memory_limit`、`add_node_selector_constraint`、`set_gpu_limit`を利用します。マシンタイプを指定するとVertex AI Pipelines側が指定されたスペックに最も近いマシンを自動で割り当てます。
 
@@ -395,12 +395,12 @@ def pipeline(learning_rate: float = 0.1, max_depth: int = 10) -> None:
     }
 ```
 
-### 参考
+#### 参考
 
 * [パイプライン ステップのマシンタイプを指定する](https://cloud.google.com/vertex-ai/docs/pipelines/machine-types?hl=ja)
 * [カスタム トレーニング用のコンピューティング リソースを構成する](https://cloud.google.com/vertex-ai/docs/training/configure-compute?hl=ja#create_custom_job_machine_types-python)
 
-## 実行結果のキャッシュを利用するには？
+### 実行結果のキャッシュを利用するには？
 
 Vertex AI Pipelinesでは、パイプライン全体、タスク単位でキャッシュを利用するかどうかを選択できます。パイプライン全体でキャッシュを利用する場合には、コンパイルしたパイプラインを実行する際に`enable_caching`を`True`にすることでキャッシュを利用できます。なお、`enable_caching`はデフォルトで`True`となっているのでむしろキャッシュを利用したくない場合に`False`にすることになると思います。
 
@@ -444,11 +444,11 @@ def pipeline() -> None:
 
 <img src="/images/2023/20230213a/component_detail_cached.png" alt="component_detail_cached.png" width="641" height="317" loading="lazy">
 
-### 参考
+#### 参考
 
 * [実行キャッシュの構成](https://cloud.google.com/vertex-ai/docs/pipelines/configure-caching?hl=ja)
 
-## パイプラインを定期実行するには？
+### パイプラインを定期実行するには？
 
 パイプラインの定期実行はCloud Schedulerを利用することで可能です。
 
@@ -546,14 +546,14 @@ gcloud scheduler jobs create http run-pipeline \
     --time-zone=Asia/Tokyo
 ```
 
-### 参考
+#### 参考
 
 * [Cloud Scheduler でパイプライン実行をスケジュールする](https://cloud.google.com/vertex-ai/docs/pipelines/schedule-cloud-scheduler?hl=ja)
 * [Google Cloud CLI を使用して Cloud Functions（第 2 世代）の関数を作成してデプロイする](https://cloud.google.com/functions/docs/create-deploy-gcloud?hl=ja#functions-prepare-environment-python)
 * [cron ジョブを作成して構成する](https://cloud.google.com/scheduler/docs/creating?hl=ja#gcloud_2)
 * [gcloud コマンドライン リファレンス](https://cloud.google.com/sdk/gcloud/reference/scheduler/jobs/update/http?hl=ja)
 
-## 引数を渡すには？
+### 引数を渡すには？
 
 ユーザ→パイプライン、コンポーネント→コンポーネント
 
@@ -664,15 +664,15 @@ def pipeline(a: list = [1, 2, 3]) -> None:
 
 複数データを出力する場合は、`NamedTuple`を用いて属性名を指定して出力し、それらを受け取る際には`<task_name>.outputs['<key>']`で各データを指定します。
 
-### 参考
+#### 参考
 
 * [Understanding how data is passed between components](https://www.kubeflow.org/docs/components/pipelines/v1/sdk/python-function-components/#understanding-how-data-is-passed-between-components)
 * [Kubeflow Pipelinesにおけるコンポーネント間のデータ受け取り方・渡し方まとめ - その1](https://qiita.com/f6wbl6/items/f668368222983f7f8f46)
 * [Kubeflow Pipelinesにおけるコンポーネント間のデータ受け取り方・渡し方まとめ - その2](https://qiita.com/f6wbl6/items/9080670c21bb35c37c0c)
 
-## パラメータ・中間データ・モデルを管理するには？
+### パラメータ・中間データ・モデルを管理するには？
 
-### 入力パラメータの保存
+#### 入力パラメータの保存
 
 パイプラインを定義した関数の入力が自動で保存されます。例えばパイプラインを以下のような関数とした場合、`learning_rate`と`max_depth`が「パイプライン実行分析」の「実行パラメータ」や、パイプライン比較の「パラメータ」として表示されます。
 
@@ -686,7 +686,7 @@ def pipeline(learning_rate: float = 0.1, max_depth: int = 10) -> None:
 
 <img src="/images/2023/20230213a/param.png" alt="param.png" width="647" height="220" loading="lazy">
 
-### データセット、モデル、指標の保存
+#### データセット、モデル、指標の保存
 
 データを保存するには、コンポーネントの関数の引数に`Output[<type>]`もしくは`OutputPath("<type>")`型の引数を作ることで可能です。`<type>`には`Dataset`、`Model`、`Metrics`、`Execution`が指定できます。
 
@@ -733,7 +733,7 @@ def evaluate(dataset: Input[Dataset], model: Input[Model], metrics: Output[Metri
 →各データについて、後から確認したくなった場合、Vertex AI Pipelinesでは、どのようなパイプラインの中で生成されたのかをGUIで見ることができます。
 <img src="/images/2023/20230213a/data_lineage_modified.png" alt="data_lineage_modified.png" width="1200" height="382" loading="lazy">
 
-## ログを確認するには？
+### ログを確認するには？
 
 ログはパイプラインのコンポーネントごとに見ることができます。
 
@@ -741,18 +741,18 @@ Vertex AI Pipelinesのコンソールからログを見たいパイプライン�
 
 ログは標準出力、標準エラー出力に出力されたものがログに表示されます。
 
-## 処理時間・起動時間（Pythonスクリプト・Docker image）を確認するには？
+### 処理時間・起動時間（Pythonスクリプト・Docker image）を確認するには？
 
 パイプラインの処理時間や開始時刻、終了時刻はパイプライン一覧のページから確認できます。
 <img src="/images/2023/20230213a/time.png" alt="time.png" width="1200" height="306" loading="lazy">
 また、パイプラインの詳細のページからは各コンポーネントの処理時間、開始時刻、終了時刻を確認できます。
 <img src="/images/2023/20230213a/time_component.png" alt="time_component.png" width="515" height="468" loading="lazy">
 
-## パイプラインのグループ分け・実行結果を比較するには？
+### パイプラインのグループ分け・実行結果を比較するには？
 
 Vertex AI Pipelinesでは、パイプライン実行で生じる様々なデータ（入力パラメータ、データセット、モデル、指標、etc）を保存でき、後でそれらを確認したり、複数のパイプラインを比較したりできます。データの保存については[パラメータ・中間データ・モデルを管理するには？](#パラメータ中間データモデルを管理するには)をご覧ください。
 
-### パイプラインのグルーピング
+#### パイプラインのグルーピング
 
 パイプラインをのちの比較のためにグルーピングしておきたい場合には、Vertex AI Experimentsが便利です。Vertex AI Experimentsではexperimentを作成してそこにパイプラインを登録できます。experimentの作成は以下のようにしてできます。
 
@@ -789,7 +789,7 @@ experimentはサイドバーの「テスト」から見ることができます�
 
 <img src="/images/2023/20230213a/experiment.png" alt="experiment.png" width="752" height="318" loading="lazy">
 
-### パイプラインの比較
+#### パイプラインの比較
 
 パイプラインを比較する方法はVertex AI PipelinesのGUIから行う方法と、Vertex AI Experimentsから行う方法の2種類あります。
 
@@ -829,7 +829,7 @@ if __name__ == "__main__":
 以下が実行結果です。
 <img src="/images/2023/20230213a/compare_pipelines_in_terminal.png" alt="compare_pipelines_in_terminal.png" width="1200" height="49" loading="lazy">
 
-## Vertex AI Pipelinesを利用するコストは？
+### Vertex AI Pipelinesを利用するコストは？
 
 Vertex AI Pipelinesでは、パイプライン実行ごとに0.03ドルかかります（執筆時点）
 
@@ -842,11 +842,11 @@ $$(パイプライン実行料金)+(n1-standard-4の1時間当たりの料金) \
 かかる計算になります。
 料金の詳細については、以下の参考のリンク先をご参照ください。
 
-### 参考
+#### 参考
 
 [Vertex AI Pipelinesの料金](https://cloud.google.com/vertex-ai/pricing?hl=ja#pipelines)
 
-## 起動時間の目安は？
+### 起動時間の目安は？
 
 環境や実行するパイプラインによって起動時間は変わると思いますが、参考までに以下のような簡単なパイプラインで確認してみたところ、約1分後に`print`の内容がログに表示されました。
 
@@ -881,7 +881,7 @@ if __name__ == "__main__":
 ログ
 <img src="/images/2023/20230213a/startuptime.png" alt="startuptime.png" width="686" height="42" loading="lazy">
 
-## ディレクトリ構成はどうすればよい？
+### ディレクトリ構成はどうすればよい？
 
 コンポーネント関連のファイルは、例えば以下のような構成が記載されています。
 
@@ -901,20 +901,20 @@ components/<component group>/<component name>/
 
 実際にこの構成で管理された[公式のサンプルコード](https://github.com/kubeflow/pipelines/tree/master/components/contrib/sample/keras/train_classifier)がありましたので、詳細はそちらをご参照ください。
 
-### 参考
+#### 参考
 
 * [Organizing the component files](https://www.kubeflow.org/docs/components/pipelines/v1/sdk/component-development/#organizing-the-component-files)
 
-## テストはどうすればよい？
+### テストはどうすればよい？
 
 [kubeflowの公式のサンプル](https://github.com/kubeflow/pipelines/tree/6ee767769d8b8daa61379be6511e7375f8de0a55/samples/test)では、`unittest`を用いたテストの例がありました。
 
-### 参考
+#### 参考
 
 * [Vertex Pipelines コードを管理するためのベスト プラクティス](https://cloud.google.com/blog/ja/topics/developers-practitioners/best-practices-managing-vertex-pipelines-code)
 * [Writing tests](https://www.kubeflow.org/docs/components/pipelines/v1/sdk/best-practices/#writing-tests)
 
-## パイプライン実行のためのサービスアカウントは？
+### パイプライン実行のためのサービスアカウントは？
 
 Vertex AI Pipelines関連のサービスアカウントは、パイプライン実行の際に指定できるサービスアカウントと、パイプライン実行時に各種リソースにアクセスするためにGoogle側が作成するService agents（`gcp-sa-aiplatform-cc.iam.gserviceaccount.com`と`gcp-sa-aiplatform.iam.gserviceaccount.com`）の計3つが存在します。
 
@@ -926,13 +926,13 @@ Compute Engineのデフォルトのサービスアカウントには、**プロ�
 
 `gcp-sa-aiplatform-cc.iam.gserviceaccount.com`はカスタムトレーニングコードを実行する際に利用され、`gcp-sa-aiplatform.iam.gserviceaccount.com`はVertex AI全般の機能を動作させるために利用されるようです。これら2つのアカウントが持つロールについては[こちら](https://cloud.google.com/iam/docs/understanding-roles#service-agents-roles)をご参照ください。
 
-### 参考
+#### 参考
 
 * [きめ細かい権限を持つサービス アカウントを構成する](https://cloud.google.com/vertex-ai/docs/pipelines/configure-project#service-account)
 * [Service agents](https://cloud.google.com/iam/docs/service-agents)
 * [IAM によるアクセス制御](https://cloud.google.com/vertex-ai/docs/general/access-control#service-agents)
 
-## 気を付けるべきクォータ制限は？
+### 気を付けるべきクォータ制限は？
 
 Vertex AI Pipelinesでは、パイプラインジョブの同時実行数やタスクの並列実行数に上限が存在します。また、1つのパイプラインジョブで実行できるタスク数、入出力にも上限があります。
 |  項目  |  値  |
@@ -943,10 +943,10 @@ Vertex AI Pipelinesでは、パイプラインジョブの同時実行数やタ�
 |  パイプライン**タスク**あたりの入力アーティファクトと出力アーティファクト  |  100  |
 |  パイプライン**ジョブ**あたりの入力アーティファクトと出力アーティファクト  |  10,000  |
 
-### 参考
+#### 参考
 
 * [割り当てと上限](https://cloud.google.com/vertex-ai/docs/quotas?hl=ja#vertex-ai-pipelines)
 
-## おわりに
+### おわりに
 
 Vertex AI Pipelinesを利用するにあたって気になりそうなことをまとめました。皆様の一助となれば幸いです。

@@ -32,13 +32,13 @@ Serverless版は、無料利用枠がないため、入門のために少し触�
 
 いくらかかかってもいいけどとりあえず触って感触掴みたい！ みたいな方はServerless版をどうぞ。
 
-# Amazon OpenSearch Serverless
+## Amazon OpenSearch Serverless
 
 プレビュー版から一般提供開始にかわりました。
 
 https://aws.amazon.com/jp/about-aws/whats-new/2023/01/amazon-opensearch-serverless-available/
 
-## そもそも OpenSearch とは？
+### そもそも OpenSearch とは？
 
 > OpenSearch は、リアルタイムのアプリケーションモニタリング、ログ分析、ウェブサイト検索などの幅広いユースケースにご利用いただける分散型、コミュニティ主導型、Apache 2.0 ライセンス、100% オープンソースの検索および分析スイートです。
 >
@@ -66,7 +66,7 @@ https://catalog.us-east-1.prod.workshops.aws/workshops/26c005b2-b387-454a-b201-9
 
 https://www.elastic.co/jp/blog/elastic-and-amazon-reach-agreement-on-trademark-infringement-lawsuit
 
-## Amazon OpenSearch Serverless 概要
+### Amazon OpenSearch Serverless 概要
 
 - Amazon OpenSearch Service のサーバーレス版
 - クライアントは Amazon OpenSearch Service と同様の方法で操作可能
@@ -78,13 +78,13 @@ https://www.elastic.co/jp/blog/elastic-and-amazon-reach-agreement-on-trademark-i
 <img src="/images/2023/20230525a/Black_Belt_Amazon_OpenSearch_Serverless_27スライド.png" alt="Black_Belt_Amazon_OpenSearch_Serverless_27スライド" width="1200" height="679" loading="lazy">
 [引用元 2023/01 [AWS Black Belt Online Seminar] Amazon OpenSearch Serverless 27スライド目](https://pages.awscloud.com/rs/112-TZM-766/images/AWS-Black-Belt_2023_AmazonOpenSearchServerless_0131_v1.pdf)
 
-### 公式ページはこちら
+#### 公式ページはこちら
 
 - https://aws.amazon.com/jp/opensearch-service/features/serverless/
 
 公式ページでは、以下の情報がまとまっています
 
-#### リソース
+##### リソース
 
 - ポッドキャスト
   - Amazon OpenSearch Serverless の紹介
@@ -97,7 +97,7 @@ https://www.elastic.co/jp/blog/elastic-and-amazon-reach-agreement-on-trademark-i
   - デモ: Searching with Amazon OpenSearch Serverless
   - デモ: Log analytics with Amazon OpenSearch Service
 
-## お試し
+### お試し
 
 1. **Amazon OpenSearch Serverless の TOP**
    - Amazon OpenSearch Service のトップにサーバーレスのメニューが追加されておりそこからサーバーレス版にアクセスができる
@@ -174,7 +174,7 @@ https://www.elastic.co/jp/blog/elastic-and-amazon-reach-agreement-on-trademark-i
    <font color="red">アカウントとパスワードで制御されておりアクセスできないとは言え、インターネット上に公開状態のままなのは良くないため、不要であれば必ず消しましょう。</font>
    <img src="/images/2023/20230525a/image_10.png" alt="image.png" width="1200" height="138" loading="lazy">
 
-## まとめ
+### まとめ
 
 個人的に、ぱっとOpenSearchが使えるので入門で使うにはちょうどいいのでは？ と思っており、まとめられて非常に満足です。
 

@@ -14,7 +14,7 @@ lede: "CircleCIでGitHubのPR作成時の負荷を軽減するために、PR作�
 ---
 <img src="/images/2023/20230307a/theme.png" alt="" width="1200" height="673" loading="lazy">
 
-# はじめに
+## はじめに
 
 こんにちは。
 フューチャーアーキテクト株式会社、TIG/EXユニット所属の宮永です。
@@ -24,7 +24,7 @@ lede: "CircleCIでGitHubのPR作成時の負荷を軽減するために、PR作�
 
 本記事ではCircleCIでGitHubのPR作成時の負荷を軽減するために、PR作成者の自動アサインおよびラベルの付与を自動化した話をご紹介します。
 
-# 経緯
+## 経緯
 
 CircleCIでGitHubのPullRequest作成時の負荷を軽減したいと思った経緯について説明します。
 
@@ -81,7 +81,7 @@ release.ymlを作成したらリリース時にGenerate release noteを押下す
 
 この「きちんとラベルを付与する」というのは簡単な作業に思えますが案外忘れてしまいがちです。せっかくリリースノートの自動生成まで行ったのですから、ラベルの付与も自動化してしまいたいと思い、CircleCIベースでラベルの付与を自動化しました。
 
-# ラベルの振り分け方
+## ラベルの振り分け方
 
 さて、ラベルの振り分け方ですがいくつか方法が考えられます。例えば特定のディレクトリの変更に依存してラベルを付与する方法です。
 
@@ -97,7 +97,7 @@ release.ymlを作成したらリリース時にGenerate release noteを押下す
 
 加えて、諸事情がありGitHub ActionsではなくCircleCI上に導入したかったので、[actions/labeler](https://github.com/actions/labeler)の導入は見送りました。
 
-# GitHub CLIの利用
+## GitHub CLIの利用
 
 どうやら、自前でGitHubAPIを操作する必要が出てきそうでしたので、まずはGitHub CLIでラベルの付与操作などがサポートされていないかを調査したところ、それらしい機能がサポートされていることがわかりました。
 
@@ -144,7 +144,7 @@ Set the new title.
 
 今回利用するのは`--add-label`です。
 
-# CircleCIの設定
+## CircleCIの設定
 
 GitHub CLIでなんとかなりそうなことが判明しましたので、あとはCircleCIでの実行環境です。
 
@@ -308,7 +308,7 @@ fi
 done
 ```
 
-# 動作確認
+## 動作確認
 
 ::: note info
 CircleCIのOnly build pull requests
@@ -327,7 +327,7 @@ add_label.shでは、author.nameがスペースで区切られていないこと
 アカウント名にスペースが含まれる場合は、author.nameを別にリクエストして変数に格納するなどしてください。
 :::
 
-# 少しハマったところ
+## 少しハマったところ
 
 [circleci/github-cli](https://circleci.com/developer/orbs/orb/circleci/github-cli)の`- gh/setup`は何も指定しないとGitHub CLIのデフォルトバージョンは2.3.0です。
 記事執筆時の2023年2月18日にローカルにインストールされていたGitHub CLIは2.23.0でした。
@@ -347,7 +347,7 @@ https://github.com/cli/cli/releases/tag/v2.23.0
     version: 2.23.0
 ```
 
-# おわりに
+## おわりに
 
 今回、諸事情がありGitHubActionsではなくCircleCIで実装しましたが、GitHubActionsであればGitHub CLIはプリインストールされているので本記事よりも簡単に導入できます。
 

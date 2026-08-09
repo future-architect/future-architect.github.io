@@ -53,7 +53,7 @@ test('loads and displays greeting', async () => {
 
 どちらにせよ、E2Eテストではなるべく使わない方が良いでしょう。眼に見える要素を使ってテストを書くべきです。
 
-# 代わりに何を使えば良いか？
+## 代わりに何を使えば良いか？
 
 Testing LibraryもPlaywrightも、どちらもリファレンスでは同じような並びに並んでいることがわかります。アルファベット順ではないです。この順番で利用を検討していけば良いという推奨の順番と考えても良いと思います。(Testing-LibraryはByの前に、get, find, query, getAll, findAll, queryAllと6パターンの接頭辞のバリエーションがあります)
 
