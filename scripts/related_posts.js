@@ -7,8 +7,36 @@ const {getSNSCnt} = require('./lib/sns');
 const {postListItem} = require('./lib/post_list');
 const {navLinkedPaths} = require('./lib/series');
 
+/**
+ * 上位から maxCount 本選ぶ。ただし同じ連載の記事で全部は埋めない。
+ *
+ * 3枠すべてが同じ連載になると、連載ナビと索引で辿れる範囲しか出ず、
+ * 関連記事の枠から得られる導線がゼロになる。少なくとも1枠は連載の外から取る。
+ *
+ * 逆に締め出しはしない。テーマが自由な連載（春の入門祭りなど）では、
+ * 同じ連載でも独立した記事なので、関連が強ければ出す価値がある。
+ */
+function pickRelatedPosts(posts, series) {
+  if (!series) return posts.slice(0, maxCount);
+
+  const picked = [];
+  const deferred = [];
+  for (const p of posts) {
+    if (picked.length >= maxCount) break;
+    const sameSeries = p.series === series;
+    if (sameSeries && picked.filter(x => x.series === series).length >= maxCount - 1) {
+      deferred.push(p);
+      continue;
+    }
+    picked.push(p);
+  }
+  // 連載の外から埋まらなかったときは、抑えた分を戻す
+  return picked.concat(deferred).slice(0, maxCount);
+}
+
 // HTMLを生成するロジックを共通関数として外に切り出す
-function generateRelatedPostsHtml(posts) {
+function generateRelatedPostsHtml(posts, series) {
+  posts = pickRelatedPosts(posts, series);
   const count = Math.min(maxCount, posts.length);
   if (count === 0) {
     return `<p class="related-posts-none">No related post.</p>`;
@@ -75,6 +103,9 @@ hexo.extend.helper.register('list_related_posts', function() {
   //    「この記事を参照している記事」と、連載ナビが既にリンクしている記事（索引・前・次）
   const referenceIds = getReferencePostIds(this, post);
   const linked = navLinkedPaths(this.site, post);
+  // 同じ連載の記事は出さない。連載ナビが索引へのリンクを持ち、索引には
+  // その連載の全記事が並ぶので、連載内はすべてナビ経由で辿れる。
+  // 関連記事の役割は他の導線で辿り着けない関係を見せることなので枠を使わない
   const isExcluded = p => referenceIds.has(p._id) || linked.has(p.path);
 
   // 1. 全著者数を取得し、著者のIDFを計算
@@ -95,7 +126,7 @@ hexo.extend.helper.register('list_related_posts', function() {
     // タグ関連記事がなければカテゴリの記事を取得し、HTMLを生成して返す
     console.log(`[INFO] Related Posts: No tag-related posts found for "${post.title}". Falling back to category.`);
     const categoryPosts = getCategoryRelatedPosts(this, post, isExcluded);
-    return generateRelatedPostsHtml(categoryPosts);
+    return generateRelatedPostsHtml(categoryPosts, post.series);
   }
 
   const tagIDF = {};
@@ -159,5 +190,5 @@ hexo.extend.helper.register('list_related_posts', function() {
   }
 
   // 最終的な記事リストをHTMLに変換して返す
-  return generateRelatedPostsHtml(relatedPosts);
+  return generateRelatedPostsHtml(relatedPosts, post.series);
 });
