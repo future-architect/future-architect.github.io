@@ -23,19 +23,19 @@ lede: "Google Agent Development KitやLangChainエコシステムを触る機会
 
 これらの膨大な情報源から、LLM（大規模言語モデル)が直接情報にアクセスし、理解できるようになることは、実用的なAIソリューションを構築する上で不可欠だと考えています。
 
-# PDFとは
+## PDFとは
 
 PDF（Portable Document Format）は、文書をアプリケーションやOS、デバイスに依存せずに表示・印刷できるようにするためのファイル形式です。PDFは「PostScriptの描画モデルに基づき、印刷だけでなく、電子的な文書交換に最適化された静的なファイルフォーマット」として広く利用されています。
 
 PDFの内部構造について、zawakinさんの[僕「PDFとは何か知りたい」](https://qiita.com/zawawahoge/items/4312649f8d56f8983ffb)のQiita記事も参考になります。
 
-# 課題感
+## 課題感
 
 しかし、PDFの内部構造が「グラフィックコマンドの集合体」であるため、単純なコピー＆ペーストではテキスト情報を正確に抽出することが難しいという課題があります。
 
 特に、スキャンされたPDF（画像PDF）の場合はOCR（光学文字認識）が必須となり、この抽出精度がRAG（Retrieval-Augmented Generation）システムの性能に直結します。
 
-# PDF抽出フロー
+## PDF抽出フロー
 
 このような課題を解決し、PDFから効率的かつ正確に構造化されたデータを抽出するために、以下のフローを考案しました。このフローでは、特にプロンプト設計とBigQuery MLを活用しています。
 
@@ -64,7 +64,7 @@ graph TD
 
 </details>
 
-# プロンプト設計
+## プロンプト設計
 
 LangChainの公式ドキュメントでは、PDFから構造化データを抽出する際に、Pydanticの型をセットでLLMに渡すことが推奨されています。
 
@@ -192,13 +192,13 @@ PDFファイルを受け取った後、その内容を詳細に分析し、デ�
 }
 ```
 
-# 今回利用するPDFサンプル
+## 今回利用するPDFサンプル
 
 来月開催されるGoogle Next Tokyoの登録済みセッションのPDFです。
 
 <img src="/images/2025/20250724a/image.png" alt="image.png" width="1200" height="548" loading="lazy">
 
-# 準備完了！さて、BigqueryMLで抽出しよう
+## 準備完了！さて、BigqueryMLで抽出しよう
 
 上記のプロンプト設計とPDF抽出フローが整えば、いよいよBigQuery MLを使ってPDFからのデータ抽出を実行できます。BigQuery MLは、SQLインターフェースを通じて機械学習モデルを利用できるため、データエンジニアやアナリストが手軽にLLMを活用したデータ抽出パイプラインを構築できます。
 
@@ -255,7 +255,7 @@ ML.GENERATE_TEXT関数のMAX_OUTPUT_TOKENSがデフォルトで1024です。ユ�
 https://cloud.google.com/bigquery/docs/reference/standard-sql/bigqueryml-syntax-generate-text#syntax_for_standard_tables
 :::
 
-# PDF抽出結果
+## PDF抽出結果
 
 **タスク1: PDFスキーマの抽出**
 
@@ -462,7 +462,7 @@ https://cloud.google.com/bigquery/docs/reference/standard-sql/bigqueryml-syntax-
 
 これらの結果は、LLMとBigQuery MLを組み合わせることで、これまで手作業や複雑なスクリプトが必要だったPDFからのデータ抽出を、効率的かつ柔軟に自動化できる可能性を強く示しています。
 
-# まとめ
+## まとめ
 
 PDFからの効率的な情報抽出を実現するため、LLMとBigQuery MLを組み合わせたソリューションを紹介しました。特に、動的にPDFのスキーマをLLMに抽出させることで、様々な形式の社内文書に対応できる柔軟性の高いシステムを構築できることがご理解いただけたかと思います。
 

@@ -17,7 +17,7 @@ lede: "GitHub Actionsを利用して、CI/CDパイプライン上で実行可能
 
 [AI Tips連載](/articles/20250707a/)の10日目の記事です。
 
-# はじめに
+## はじめに
 
 製造エネルギー事業部の片岡です。
 
@@ -34,7 +34,7 @@ GitHub CopilotにもAIレビュー機能は実装されていますが、現状�
 
 このような課題を解決するため、GitHub ActionsでGeminiを動かし、CI/CDパイプライン上で実行可能なPRのAIレビュー用スクリプトをご紹介します。
 
-# 前提
+## 前提
 
 本記事では下記の記事を参考に、Github Actions＆VertexAIの構成を踏襲し、下記の記事では具体的に紹介されていなかった、**Github Actionsで実行する「Geminiにレビューを依頼し、レビュー結果をGithubのPRに反映する」スクリプトの部分について紹介します。**
 
@@ -44,7 +44,7 @@ GitHub CopilotにもAIレビュー機能は実装されていますが、現状�
 Github ActionsのWorkflow定義やプロンプトの実装に関しては↑の記事を参照してください。
 :::
 
-# PRへのAIレビュースクリプト
+## PRへのAIレビュースクリプト
 
 早速ですが、Gemini APIとGitHub APIを連携させてPRに対してレビューをする実装の例を以下に示します。
 
@@ -216,20 +216,20 @@ if __name__ == "__main__":
 
 :::
 
-# スクリプトの実行結果
+## スクリプトの実行結果
 
 このスクリプトに関するPRを作成し、スクリプトを実行したところ、
 下記のようにPRのコード差分に対してレビューコメントが記載されることが確認できました。
 
 <img src="/images/2025/20250725a/image.png" alt="image.png" width="833" height="424" loading="lazy">
 
-# おわりに
+## おわりに
 
 GitHub ActionsとGemini APIを連携させることで、プルリクエストを自動でAIレビューするスクリプトについて紹介しました。
 
 今後は、Geminiに渡すプロンプトをさらに改善、AIレビューを実施するタイミングを適正化などを実施すると、よりAIレビューが品質の強化に寄与できるものとなると思います。
 
-# 参考（利用ライブラリ）
+## 参考（利用ライブラリ）
 
 - [pygithub](https://pypi.org/project/PyGithub/)
 - [google-genai](https://pypi.org/project/google-genai/)

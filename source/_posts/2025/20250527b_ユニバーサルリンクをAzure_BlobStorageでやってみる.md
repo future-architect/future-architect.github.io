@@ -18,17 +18,17 @@ lede: ".NET MAUIでiOS向けアプリを開発中、WebアプリからiOSアプ�
 :::
 
 
-# はじめに
+## はじめに
 
 .NET MAUIでiOS向けアプリを開発中、WebアプリからiOSアプリを呼び出す必要がでてきたため、ユニバーサルリンクを実装しました。WebサーバーはAzure Blob Storageの静的サイトを利用します。
 
-# ユニバーサルリンクとは
+## ユニバーサルリンクとは
 
 ユニバーサルリンク（Universal Links）は、Webサイトへのリンクをクリックしたときに、そのリンクに対応するiOSアプリがインストールされていれば直接アプリを起動し、インストールされていなければWebサイトを表示するという機能です。
 
 - 参考: [Allowing apps and websites to link to your content](https://developer.apple.com/documentation/xcode/allowing-apps-and-websites-to-link-to-your-content/)
 
-## 仕組み
+### 仕組み
 
 1. WebサーバーにApple App Site Association （以下: AASA）ファイルを置いておきます
 2. Apple CDNが定期的にWebサーバーのAASAファイルをクロールします
@@ -39,7 +39,7 @@ lede: ".NET MAUIでiOS向けアプリを開発中、WebアプリからiOSアプ�
 
 <img src="/images/2025/20250527b/mermaid-diagram-2025-05-27-102746.png" width="800" height="644">
 
-# WebサーバーにAzure Blob Storageを利用する
+## WebサーバーにAzure Blob Storageを利用する
 
 上記の通り、AppleCDNがアクセスできるWebサーバを準備し、UniversalLink用のAASAファイルを配備する必要があります。
 
@@ -47,9 +47,9 @@ lede: ".NET MAUIでiOS向けアプリを開発中、WebアプリからiOSアプ�
 
 - 参考: [Azure Storage での静的 Web サイト ホスティング](https://learn.microsoft.com/ja-jp/azure/storage/blobs/storage-blob-static-website?WT.mc_id=AZ-MVP-5002499)
 
-# Azure Storage構築
+## Azure Storage構築
 
-## ストレージアカウントの作成
+### ストレージアカウントの作成
 
 まずはストレージアカウントを作成します。
 
@@ -61,7 +61,7 @@ lede: ".NET MAUIでiOS向けアプリを開発中、WebアプリからiOSアプ�
 
 <img src="/images/2025/20250527b/image_2.png" alt="image.png" width="1200" height="279" loading="lazy">
 
-## 静的サイトを有効化
+### 静的サイトを有効化
 
 概要の下の方の機能タブから静的Webサイトを選択します。
 
@@ -77,7 +77,7 @@ lede: ".NET MAUIでiOS向けアプリを開発中、WebアプリからiOSアプ�
 
 <img src="/images/2025/20250527b/image_5.png" alt="image.png" width="1200" height="454" loading="lazy">
 
-## AASAファイルを配置
+### AASAファイルを配置
 
 AASAファイルを準備します。
 
@@ -130,7 +130,7 @@ AASAファイルを準備します。
 
 <img src="/images/2025/20250527b/image_8.png" alt="image.png" width="1200" height="606" loading="lazy">
 
-## $WebをPublic化
+### $WebをPublic化
 
 Apple CDNがアップロードしたAASAファイルを取得できるようにします。 コンテナを選択してアクセスレベルを変更します。 デフォルトだとプライベートになっていると思うので、コンテナしておきます。
 
@@ -142,7 +142,7 @@ AASAファイルを確認します。
 
 <img src="/images/2025/20250527b/image_10.png" alt="image.png" width="1200" height="415" loading="lazy">
 
-## Apple CDNを確認
+### Apple CDNを確認
 
 アップロード後、しばらくするとAASAファイルをApple CDNが回収してくれます。
 
@@ -152,7 +152,7 @@ AASAファイルを確認します。
 
 以上で環境構築は完了です。
 
-# Mauiアプリの設定
+## Mauiアプリの設定
 
 MauiプロジェクトのPlatformフォルダのIOSフォルダ直下に `Entitlements.plist` を作成します。内容は以下の通りです。
 
@@ -284,7 +284,7 @@ protected override void OnAppLinkRequestReceived(Uri uri)
 
 Mauiアプリの修正は以上です。
 
-# Apple DeveloperアカウントのアプリIDに、関連ドメインの使用を許可
+## Apple DeveloperアカウントのアプリIDに、関連ドメインの使用を許可
 
 UniversalLinkを使うにはApple上のアプリに使用を許可する必要があります。
 
@@ -300,7 +300,7 @@ UniversalLinkを使うにはApple上のアプリに使用を許可する必要�
    <img src="/images/2025/20250527b/image_13.png" alt="image.png" width="941" height="473" loading="lazy">
 6. 最後にVisual Studioのプロファイルを更新します
 
-# アプリをリリースする
+## アプリをリリースする
 
 あとはアプリをリリースするだけです。デバッグでも大丈夫です。
 
@@ -310,7 +310,7 @@ UniversalLinkを使うにはApple上のアプリに使用を許可する必要�
 
 <img src="/images/2025/20250527b/image_14.png" alt="image.png" width="600" height="1300" loading="lazy">
 
-# 最後に
+## 最後に
 
 Azure Blob Storageの静的サイト機能で簡単にUniversalLink用のWebサーバを立ち上げられました。
 

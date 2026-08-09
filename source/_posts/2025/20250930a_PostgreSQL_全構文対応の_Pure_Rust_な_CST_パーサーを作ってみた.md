@@ -13,7 +13,7 @@ thumbnail: /images/2025/20250930a/thumbnail.png
 author: 山田修路
 lede: "先日リリースされたuroboroSQL-fmt ver1.0.0では、過去バージョンの課題を解決するために、新たに自作したパーサーを利用するように変更しました。"
 ---
-# はじめに
+## はじめに
 
 こんにちは、Core Technology Groupの山田です。
 PostgreSQL のフォーマッターである uroborosql-fmt[^1] の開発に携わっています。
@@ -38,17 +38,17 @@ PostgreSQL のフォーマッターである uroborosql-fmt[^1] の開発に携�
 本記事のAppendixではflex・bisonの定義ファイルの構造、2WaySQLのエラー回復について説明していますが、発展的な内容であるため、興味のある方以外は読み飛ばしていただいて問題ありません。
 :::
 
-# 背景
+## 背景
 
 uroborosql-fmt では tree-sitter-sql という CST パーサーを用いてパースしていました[^2]。
 
 開発初期には当時存在したパーサーを調査し最も有望そうなものを選定しましたが、開発を進めるにつれて tree-sitter-sql の課題[^3]が浮き彫りになってきました。
 
-## 1. サポートされている文法が少なく grammar の改善にも工数がかかる
+### 1. サポートされている文法が少なく grammar の改善にも工数がかかる
 
 tree-sitter-sql でサポートされている文法が少なく、フォーマッター改修の際に tree-sitter-sql の変更が伴うことによる工数増や、そもそも tree-sitter-sql に手を入れられる人でないと uroborosql-fmt の改善ができないといった問題がありました。
 
-## 2. wasm にコンパイルする際に wasm-bindgen を使用できない
+### 2. wasm にコンパイルする際に wasm-bindgen を使用できない
 
 tree-sitter は C のコードを出力するため、 FFI で uroborosql-fmt からCの関数を呼び出すつくりになっています。 C への FFI を含むため wasm32-unknown-unknown ターゲットでビルドすることができず、 wasm-bindgen を利用できませんでした。そこで emscripten でビルドすることで wasm にコンパイルしていますが、以下の2点の理由でいまいちでした。
 
@@ -57,11 +57,11 @@ tree-sitter は C のコードを出力するため、 FFI で uroborosql-fmt �
 
 これらの課題を満たすライブラリが存在しなかった[^4]ため自作してみました。
 
-# 方針
+## 方針
 
 PostgreSQL のパーサーを Rust に porting することで全ての文法をカバーするパーサーを作成することができるのではないかと考え、その方針で進めました。
 
-## PostgreSQLのパーサーの流れ
+### PostgreSQLのパーサーの流れ
 
 PostgreSQL のパーサー[^5]はこのような構成だと認識しています。
 
@@ -73,7 +73,7 @@ PostgreSQL のパーサー[^5]はこのような構成だと認識していま�
 パース過程のイメージ画像
 <img src="/images/2025/20250930a/2025-02-28_14h09_26.png" alt="2025-02-28_14h09_26.png" width="983" height="855" loading="lazy">
 
-## porting の方針
+### porting の方針
 
 以下の方針で porting を行いました。
 
@@ -82,33 +82,33 @@ PostgreSQL のパーサー[^5]はこのような構成だと認識していま�
 1. 構文解析器は定義ファイル (gram.y) をパースし、文法定義から構文解析表を生成しパーサーを生成
 1. 構文解析表は比較的大きいサイズなので、wasmにした際のサイズを抑えるために圧縮
 
-# 対応
+## 対応
 
 具体的な対応内容を紹介します。
 
-## 1. PostgreSQL のソースにパッチ適用
+### 1. PostgreSQL のソースにパッチ適用
 
 PostgreSQL の素の字句解析器ではコメントはスキップされてしまうため、コメントもトークン化できるよう PostgreSQL のソースに [libpg_query](https://github.com/pganalyze/libpg_query/tree/17-latest) のパッチを適用しました
 
-## 2. 字句解析器の C のソースを porting
+### 2. 字句解析器の C のソースを porting
 
 字句解析器の定義ファイル (scan.l) に含まれる C のコードを Rust に porting していきました。また、字句解析器の処理で [キーワードか否かを判定しているところ](https://github.com/postgres/postgres/blob/master/src/backend/parser/scan.l#L1079) があるため、[kwlist.h](https://github.com/postgres/postgres/blob/master/src/include/parser/kwlist.h)をパースしキーワードの一覧を作成なども行っています。
 その後、定義やルールを読み込んで、porting した Rust コードとあわせて字句解析器を生成しました。
 
 flex の定義ファイルの構造についての簡単な説明は、Appendix.1 flex の定義ファイルの構造をご覧ください。
 
-## 3. 構文解析器の porting
+### 3. 構文解析器の porting
 
 構文解析器の定義ファイル (gram.y) については一切変更を入れず、ファイルの内容を読み込んで構文解析表[^9]を生成しました。
 また、構文解析表を基にLR構文解析を実施する処理は bison の porting ではなく独自にLALR法を実装しました。
 
 bison の定義ファイルの構造についての簡単な説明は、Appendix. 2 bison の定義ファイルの構造をご覧ください。
 
-## 4. 構文解析表の圧縮
+### 4. 構文解析表の圧縮
 
 構文解析表はサイズがやや大きく、wasm のサイズを小さくするために圧縮して埋め込み、実行時に展開しています。
 
-# 完成
+## 完成
 
 こちらで[デモ](https://tanzaku.github.io/postgresql-cst-parser/)を用意しているので、興味のある方はぜひ試してみてください。
 gram.y で定義された grammar 通りの CST が出来るため決して使い勝手のよい形のツリーではありませんが、PostgreSQLの全ての構文をカバーしており、フォーマッターに利用するものとしては十分なものが出来たと考えています。
@@ -116,7 +116,7 @@ gram.y で定義された grammar 通りの CST が出来るため決して使�
 また当初想定していなかったメリットとして、2WaySQL で出てくる通常のパーサーではパースエラーとなるような SQL も自然とパースする仕組みを作れるようになりました。
 興味があれば Appendix.3. 2WaySQL のエラー回復をご参照ください。
 
-# さいごに
+## さいごに
 
 最初は実験的なコードの予定でしたが、uroborosql-fmt をより発展させていくためにパーサーを置き替えることになり、約半年かけて置き換えを実施しました。自作のパーサーに置き替えることで PostgreSQL のバージョンアップに追従するコストや保守コストなどがかかってくるため負の側面が大きいことも理解していますが、よりよいツールを開発し、生産性や品質を高めるために頑張っていきたいと思っています。
 
@@ -124,9 +124,9 @@ crateもリリースしておいたので、興味があればぜひ使ってみ
 
 - [postgresql-cst-parser - crates.io: Rust Package Registry](https://crates.io/crates/postgresql-cst-parser)
 
-# Appendix
+## Appendix
 
-## 1. flex の定義ファイルの構造
+### 1. flex の定義ファイルの構造
 
 flex の定義ファイルは以下のような構造になっています。
 ※ PostgreSQL の定義ファイルの雰囲気を理解できる最低限の内容に絞っています。
@@ -139,7 +139,7 @@ flex の定義ファイルは以下のような構造になっています。
 ユーザーコード
 ```
 
-### 定義セクション
+#### 定義セクション
 
 定義セクションでは、字句解析器の状態の定義と、ルールセクションで使用するパターンの定義を行うことができます。
 
@@ -169,7 +169,7 @@ decdigit		[0-9]
 decinteger		{decdigit}(_?{decdigit})*
 ```
 
-### ルールセクション
+#### ルールセクション
 
 ルールセクションは字句解析器のメインの部分で、状態ごとにルールにマッチした際のアクションを定義することができます。
 アクションはCのコードになっており、この中で字句解析器の状態を変更したり、トークンを受理することができます。
@@ -193,7 +193,7 @@ decinteger		{decdigit}(_?{decdigit})*
 <状態名>パターン2	アクション
 ```
 
-#### 状態遷移の例
+##### 状態遷移の例
 
 アクション部で `BEGIN(遷移先の状態)` と書くことで、別の状態に遷移することができます。
 以下の例では `{xcstart}` のパターンにマッチした際に、`BEGIN(xc)` を呼び出すことでC形式のコメント内部を表す xc に遷移しています。
@@ -209,7 +209,7 @@ decinteger		{decdigit}(_?{decdigit})*
 				}
 ```
 
-#### 余談
+##### 余談
 
 定義ファイルを見ると、これまで知らなかった書き方を知ることがあります。
 
@@ -248,13 +248,13 @@ xnstart			[nN]{quote}
 				}
 ```
 
-### 参考
+#### 参考
 
 1. Lexical Analysis With Flex, for Flex 2.6.2: Format https://westes.github.io/flex/manual/Format.html#Format
 1. Flex: 3. Flex記述言語 https://web.sfc.wide.ad.jp/~sagawa/gnujdoc/flex-2.5.4/flex-ja_3.html
 1. Flex - Flex記述言語 https://www.asahi-net.or.jp/~wg5k-ickw/html/online/flex-2.5.4/flex_5.html
 
-## 2. bison の定義ファイルの構造
+### 2. bison の定義ファイルの構造
 
 bison の定義ファイルは以下のような構造になっています。
 ※ PostgreSQL の定義ファイルの雰囲気を理解できる最低限の内容に絞っています
@@ -275,9 +275,9 @@ Bison宣言部（Bison declarations）
 
 上の構造は[こちら](https://guppy.eng.kagawa-u.ac.jp/2019/Compiler/bison-1.2.8/bison-ja_6.html#:~:text=%E7%B5%82%E3%82%8F%E3%82%8A%E3%81%BE%E3%81%99%E3%80%82-,Bison%E6%96%87%E6%B3%95%E3%81%AE%E6%A6%82%E8%A6%81,-Bison%E6%96%87%E6%B3%95%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB) に記載されています。
 
-### Bison宣言部
+#### Bison宣言部
 
-#### 1. tokenの宣言
+##### 1. tokenの宣言
 
 パーサーで使用するトークンの宣言を行うことができます。
 
@@ -288,7 +288,7 @@ Bison宣言部（Bison declarations）
 %token			LESS_EQUALS GREATER_EQUALS NOT_EQUALS
 ```
 
-#### 2. 結合性の宣言
+##### 2. 結合性の宣言
 
 結合性の宣言を行うことができます。
 %leftで左結合、%rightで右結合、%nonassocで無結合を宣言できます。
@@ -307,7 +307,7 @@ Bison宣言部（Bison declarations）
 %nonassoc	ESCAPE			/* ESCAPE must be just above LIKE/ILIKE/SIMILAR */
 ```
 
-### 文法規則部
+#### 文法規則部
 
 以下のような形式で文法規則が与えられます。
 
@@ -342,22 +342,22 @@ SelectStmt: select_no_parens			%prec UMINUS
 		;
 ```
 
-### 参考
+#### 参考
 
 1. Bison 3.8.1 https://www.gnu.org/software/bison/manual/bison.html
 1. Bison 1.28 - Bison文法ファイル https://guppy.eng.kagawa-u.ac.jp/2019/Compiler/bison-1.2.8/bison-ja_6.html
 1. Bison入門: 1. Bisonの概念 https://web.sfc.wide.ad.jp/~sagawa/gnujdoc/bison-1.28/bison-ja_4.html
 
-## 3. 2WaySQL のエラー回復
+### 3. 2WaySQL のエラー回復
 
-### 2WaySQLとは
+#### 2WaySQLとは
 
 コメントで制御フローやバインド変数などを記述し、動的に SQL を生成するような実行方法です。動的生成に関わる部分がコメントで記載されており、単体の SQL 文としても実行できるため 2Way と呼ばれています。
 上述の通り 2WaySQL は基本的には単体の SQL ファイルとして実行可能になっていますが、時に単体では SQL として実行できないようなケースも存在します。
 
 当社で開発、公開しているOSSである [uroboroSQL](https://future-architect.github.io/uroborosql-doc/) も 2WaySQL が利用可能なライブラリで、uroborosql-fmt は 2WaySQL のフォーマットもサポートしています。以下の説明では [uroboroSQL](https://future-architect.github.io/uroborosql-doc/) の 2WaySQL 前提としています。
 
-### 1. バインドパラメータのサンプル値漏れ
+#### 1. バインドパラメータのサンプル値漏れ
 
 uroboroSQLでは、以下のようにバインドパラメータをセットすることができます。この SQL を uroboroSQL を使わずに実行した場合は name カラムに foo という値がセットされ、uroboroSQL で実行した場合には 'foo' は無視され name にバインドした値で置き替えられます。
 
@@ -376,7 +376,7 @@ select
 ;
 ```
 
-### 2. 置換文字列のサンプル値漏れ
+#### 2. 置換文字列のサンプル値漏れ
 
 以下のような置換文字列でも同様にサンプル値が漏れていることがありますが、こちらも同様にエラーを回復することができます。
 
@@ -387,7 +387,7 @@ from    /*$table_name*/ -- 置換文字列のサンプル値が欠けている
 ;
 ```
 
-### 3. 不要なカンマ
+#### 3. 不要なカンマ
 
 uroboroSQL では、以下のようにselectやorder byの直後に余計なカンマがあっても実行できます[^10]。サンプル値漏れと同様に通常のパーサーではエラーになりますが、新パーサーではこちらもエラー回復し、さらに余計な `,` を保持した CST を構築することができます。
 
@@ -409,7 +409,7 @@ order by
 ,  emp_no
 ```
 
-### 4. 不要なand/or
+#### 4. 不要なand/or
 
 uroboroSQL では、以下のように where の直後に余計な and/or があっても実行できます。新パーサーではこちらもエラー回復し、余計な and/or を保持した CST を構築することができます。
 

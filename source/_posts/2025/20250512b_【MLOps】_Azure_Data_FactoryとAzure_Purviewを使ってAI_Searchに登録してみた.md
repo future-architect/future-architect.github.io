@@ -20,15 +20,15 @@ lede: "MLOpsを推進するためのツールとして、Azure Data FactoryとAz
 当時から変更がある可能性がある旨はご承知おきください。
 :::
 
-# 初めに
+## 初めに
 
 こんにちは、SAIG/MLOpsチームでインターンをしていた菅野です。
 
 データ処理やデータ管理を効率化できるAzure Data FactoryとAzure Purviewを検証しました。
 
-# 背景
+## 背景
 
-## MLOpsとは
+### MLOpsとは
 
 近年、チャットボットによる問い合わせ対応や、ECサイトのレコメンデーションなど機械学習を用いたサービスが増えるとともに、これらのシステムを効率的に運用することが重要になってきました。
 
@@ -40,7 +40,7 @@ lede: "MLOpsを推進するためのツールとして、Azure Data FactoryとAz
 
 本記事ではMLOpsを推進するためのツールとして、**Azure Data Factory**と**Azure Purview**について検証します。
 
-## RAG(Retrieval Augmented Generation)
+### RAG(Retrieval Augmented Generation)
 
 様々なタスクをこなせる便利な生成AIですが、こなすことができないタスクもあります。それは学習データに含まれていない情報に基づく回答を生成することです。
 
@@ -72,7 +72,7 @@ RAGには、検索フェーズと生成フェーズの2段階が存在します�
 - [検索インデックスの概要 - Azure AI Search | Microsoft Learn](https://learn.microsoft.com/ja-jp/azure/search/search-what-is-an-index)
 - [基本概念から理解するAzure AI Search - Azure OpenAI Serviceとの連携まで - 電通総研 テックブログ](https://tech.dentsusoken.com/entry/2024/02/19/%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5%E3%81%8B%E3%82%89%E7%90%86%E8%A7%A3%E3%81%99%E3%82%8BAzure_AI_Search_-_Azure_OpenAI_Service%E3%81%A8%E3%81%AE%E9%80%A3%E6%90%BA%E3%81%BE%E3%81%A7#%E6%A4%9C%E7%B4%A2%E3%82%A4%E3%83%B3%E3%83%87%E3%83%83%E3%82%AF%E3%82%B9%E3%81%AE%E3%82%B9%E3%82%AD%E3%83%BC%E3%83%9E%E8%A8%AD%E8%A8%88)
 
-## Azure AI Searchを用いたRAGにおける課題
+### Azure AI Searchを用いたRAGにおける課題
 
 優秀な検索エンジンであるAzure AI Searchですが、RAGを実現する際に2つ課題があります。
 
@@ -84,7 +84,7 @@ RAGには、検索フェーズと生成フェーズの2段階が存在します�
 2. **どのような前処理を経て、Azure AI Searchに登録されたのかわからない**
   Azure AI Searchのインデックスに登録するためには、チャンキングや、テキストをベクトルに変換するエンベディングなどの前処理が必要になります。しかし現状のシステムだと、どのような前処理を経てAzure AI Searchに保存されたのかがわからなく、正確性が担保できません。
 
-# 目的
+## 目的
 
 上記の課題を解決することが本検証の目的となります。本記事では、Azure Data FactoryとAzure Purviewを用いて、課題解決を目指します。
 
@@ -93,11 +93,11 @@ RAGには、検索フェーズと生成フェーズの2段階が存在します�
 1. **Azure Purview**を用いて、リネージ管理
 どのデータを基に、どのような前処理を経て、どのファイルに保存したのかを記録し管理することを**リネージ管理**といいます。このリネージ管理をAzure Purviewの機能を用いて実現します。
 
-# ツールの紹介
+## ツールの紹介
 
 今回検証するAzure Data FactoryとAzure Purviewについて紹介します。
 
-## Azure Data Factoryとは
+### Azure Data Factoryとは
 
 Azure Data Factoryは、Microsoftが提供するクラウド型のデータ統合サービスで、オンプレミスにあるデータやクラウド上にあるデータを効率的に移動・変換・統合が可能です。Azure Data Factoryを利用することで、異なるデータソースからのデータを収集・統合・変換して、機械学習モデルの訓練や評価に必要な形式に整えることができます。
 
@@ -120,37 +120,37 @@ Azure Logic Appsとの違い
 | ワークフローの自動化 | ビジネスプロセスの多段階自動化                | データパイプラインの設計・自動実行       |
 :::
 
-## Azure Purviewとは
+### Azure Purviewとは
 
 Azure Purviewは、オンプレおよびクラウドに散在しているデータを管理し、統制する「データガバナンス」ソリューションです。主に、データの保護、データソースを跨いだデータ検索、データがどのように処理されたのかを管理するデータリネージの機能などがあります。本検証では特にデータリネージ機能について検証します。
 
 - [Microsoft Purview の詳細 | Microsoft Learn](https://learn.microsoft.com/ja-jp/purview/purview)
 
-## Azure Data FactoryとAzure Purviewでできること
+### Azure Data FactoryとAzure Purviewでできること
 
 Azure Data Factoryを用いることで、様々なデータソースからデータを取得して処理を行うことができます。
 
 またAzure Data FactoryとAzure Purviewを組み合わせることで、データ処理とデータ管理にかかる人的コストを削減ができます。
 
-### 1. コスト削減
+#### 1. コスト削減
 
 Azure Data Factoryでは、**インフラの管理やメンテナンスが不要**です。また、**データ処理を自動化**することで、エンジニアが定期的にプログラムを実行する手間を省くことができます。さらにAzure Purviewを用いることで、どのデータからどのようなプロセスを経て作成されたかなどの**リネージ管理**をおこなうことができます。データの正確性を担保することでデータの再利用がしやすくなり、再びデータ処理などをする手間がなくなります。
 
-### 2. データの一元化
+#### 2. データの一元化
 
 Azure Data Factoryは多様なデータソース（オンプレミスやクラウド、構造化データや非構造化データ）をサポートしており[(参考：対応しているデータソース)]( https://learn.microsoft.com/ja-jp/azure/data-factory/connector-overview#supported-data-stores)、簡単にデータを取り込み、統合ができます。一度登録したデータソースであれば、すぐに呼び出して使うことができます。また、Azure Purviewを用いることでデータソースを跨いだデータの検索、参照できます。
 
-### 3. 可視化
+#### 3. 可視化
 
 Azure Data FactoryとAzure Purviewにはビジュアルインタフェースがあり、データ処理のフローやデータ依存関係を視覚的に管理できます。これにより、処理の流れやデータの関係性を素早く理解ができます。
 
-# 検証
+## 検証
 
 本記事で検証したAzureのUIは2024年9月時点でのものです。
 
-## Azure Data FactoryとAzure Purviewの利用手順
+### Azure Data FactoryとAzure Purviewの利用手順
 
-### 初期設定
+#### 初期設定
 
 Azure Data FactoryとAzure Purviewで作業を始めるための設定の流れです。
 
@@ -181,13 +181,13 @@ Azure Data FactoryとAzure Purviewで作業を始めるための設定の流れ�
 
    <img src="/images/2025/20250512b/image_5.png" alt="" width="1200" height="633" loading="lazy">
 
-### Azure Data Factoryによるデータソースの登録
+#### Azure Data Factoryによるデータソースの登録
 
 以下の手順で登録します。
 
 <img src="/images/2025/20250512b/image_6.png" alt="" width="1200" height="851" loading="lazy">
 
-### Azure Data Factoryによるパイプライン作成
+#### Azure Data Factoryによるパイプライン作成
 
 Azure Data Factoryは、**データセット**、**パイプライン**、**データフロー**という3つの要素から構成されます。
 
@@ -223,17 +223,17 @@ Azure Data Factoryに慣れるため、以下のようなパイプラインを�
 
 <img src="/images/2025/20250512b/image_11.png" alt="" width="882" height="408" loading="lazy">
 
-## Azure Data FactoryとAzure Purviewの動作確認
+### Azure Data FactoryとAzure Purviewの動作確認
 
 作成したパイプラインを用いて、Azure Data FactoryとAzure Purviewの機能を確認します。
 
-### 作成したパイプラインの処理結果
+#### 作成したパイプラインの処理結果
 
 作成したパイプラインをKaggleの[titanicデータ](https://www.kaggle.com/competitions/titanic)に対して、実行してみると正しくデータ処理を行えていることが確認できました。
 
 <img src="/images/2025/20250512b/image_12.png" alt="" width="1200" height="1017" loading="lazy">
 
-### パイプラインの自動トリガー
+#### パイプラインの自動トリガー
 
 Azure Data Factoryで作成したパイプラインは、様々な方法で実行させることができます。
 
@@ -254,7 +254,7 @@ Azure Data Factoryで作成したパイプラインは、様々な方法で実�
 
 <img src="/images/2025/20250512b/image_14.png" alt="" width="1199" height="289" loading="lazy">
 
-### リネージ管理
+#### リネージ管理
 
 接続しておいたAzure Purviewから、リネージを確認してみます。
 
@@ -264,11 +264,11 @@ Data flow 1の処理内容が知りたいときは、「Azure Data Factoryで開
 
 <img src="/images/2025/20250512b/image_15.png" alt="" width="1200" height="424" loading="lazy">
 
-## Azure AI Searchのインデックスに登録
+### Azure AI Searchのインデックスに登録
 
 使い方が分かったところで、Azure Data Factoryを用いて、Azure AI Searchのインデックスにフューチャー技術ブログのテキストを登録してみようと思います。
 
-### 初期設定
+#### 初期設定
 
 Azure AI Searchのインデックス登録のために、以下のリソースを作成します。
 
@@ -276,7 +276,7 @@ Azure AI Searchのインデックス登録のために、以下のリソース�
   作成したリソース内でテキストエンベディングのを行うモデルをデプロイします。今回はtext-embedding-ada-002モデルを使用します。
 - Azure AI Search
 
-### 手法
+#### 手法
 
 今回は以下の流れでテキストデータをAzure AI Searchインデックスに登録します。
 
@@ -295,13 +295,13 @@ AI Searchインデックスに登録するパイプラインは以下のよう�
 
 <img src="/images/2025/20250512b/image_17.png" alt="" width="1061" height="359" loading="lazy">
 
-#### 1. フューチャー技術ブログからテキストデータを取得/保存
+##### 1. フューチャー技術ブログからテキストデータを取得/保存
 
 Databricksを用いて、フューチャー技術ブログの情報を取得し、Azure Blobストレージに保存します。
 
 Azure Data FactoryのWebアクティビティを用いて、フューチャー技術ブログの情報を取得もできますが、Databricksを用いました。
 
-#### 2. テキストファイルからテキストデータを取得
+##### 2. テキストファイルからテキストデータを取得
 
 まず、「Get Metadata」アクティビティを用いて、ディレクトリ内のファイル名を配列として取得します。データセットを指定することで、そのデータセットに関する情報を取得できます。今回は以下の3つを取得します。
 
@@ -328,7 +328,7 @@ Azure Data FactoryのWebアクティビティを用いて、フューチャー�
 
 <img src="/images/2025/20250512b/image_20.png" alt="" width="1200" height="492" loading="lazy">
 
-#### 3. Azure OpenAIでベクトル化
+##### 3. Azure OpenAIでベクトル化
 
 読み取った文章をAPI経由でAzure OpenAIに渡してベクトル化します。
 
@@ -365,7 +365,7 @@ Azure Data FactoryのWebアクティビティを用いて、フューチャー�
     }
    ```
 
-#### 4. 文章、タイトル、ベクトル等をAzure AI Searchインデックスに登録
+##### 4. 文章、タイトル、ベクトル等をAzure AI Searchインデックスに登録
 
 Azure OpenAIから作成したベクトルや、本文をAPIを経由してAzure AI Searchに保存します。
 
@@ -390,13 +390,13 @@ Azure OpenAIから作成したベクトルや、本文をAPIを経由してAzure
     "content_vec": "@{activity('<アクティビティ名>').output.data[0].embedding}"
    ```
 
-### 動作確認
+#### 動作確認
 
 Azure AI Searchのインデックスを見てみます。ファイル名や文章、ベクトルが正しく保存されていることがわかります。このインデックスを用いてRAGを実現できます。
 
 <img src="/images/2025/20250512b/image_21.png" alt="" width="821" height="461" loading="lazy">
 
-### Azure Purviewによるリネージ管理
+#### Azure Purviewによるリネージ管理
 
 Azure Purviewを用いたリネージ管理は今回実現できませんでした。考えられる原因は以下です。
 
@@ -405,7 +405,7 @@ Azure Purviewを用いたリネージ管理は今回実現できませんでし�
 
 解決策として、前処理を行った後のベクトル等のデータを一度どこかのストレージに保存することなどが考えられます。
 
-# まとめ
+## まとめ
 
 今回の検証では以下を行いました。
 
@@ -434,7 +434,7 @@ Azure Purviewを用いたリネージ管理は今回実現できませんでし�
   - 軽く導入するには費用が高い点
   - Azure Data Factory側で、適切な設定をしないとリネージ管理されない点
 
-# 展望
+## 展望
 
 インターン期間の関係で検証しきれなかった点があるので記載いたします。
 
@@ -448,7 +448,7 @@ Azure Purviewを用いたリネージ管理は今回実現できませんでし�
 - 適切なチャンク分けを行い、Azure AI Searchに登録
 - Azure AI Searchの検索精度
 
-# 感想
+## 感想
 
 Engineer Campに参加させていただき、これまで触れてこなかったAzureサービスに初めて触れることができ、とても新鮮な体験となりました。普段プログラムを作成して行っている処理を、驚くほど簡単に実現できることに衝撃をうけ、クラウドサービスがこれほど流行している理由が理解できました。
 

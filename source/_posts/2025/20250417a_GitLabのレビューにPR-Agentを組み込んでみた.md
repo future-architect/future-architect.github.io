@@ -12,7 +12,7 @@ thumbnail: /images/2025/20250417a/thumbnail.png
 author: 髙橋遼
 lede: "フューチャーでは、Gitホスティング環境として、SaaSとしてのGitHubだけでなく、社内開発基盤運用チームが構築・運用している、オンプレミス版のGitLabも利用可能となっています。"
 ---
-# はじめに
+## はじめに
 
 こんにちは。フューチャーの社内セキュリティ部門、SATの髙橋です。
 
@@ -36,7 +36,7 @@ GitLabの公式AIソリューションとしては、[GitLab Duo](https://about.
 **本記事執筆時点（2025年4月）** においては、前述の社内環境内ではまだ利用できません。
 :::
 
-# PR-Agentとは
+## PR-Agentとは
 
 PR-Agentは、大規模言語モデル(LLM)を活用してPull Requestに関連する様々なタスクを自動化・強化するために設計されたオープンソース**ツール**です。
 
@@ -46,7 +46,7 @@ Qodo(旧CodiumAI)によって開発が進められており、Apache 2.0ライ�
 
 最大の特徴は、**Pull Requestを基にしたレビュー関連機能の提供に特化している**点にあります。LLMへの対応状況は、[こちら](https://github.com/qodo-ai/pr-agent/blob/main/pr_agent/algo/__init__.py)で確認できますが、Geminiを始め、代表的なLLMは利用可能となっています。最近公開されたモデルも随時リストアップされていることから、新型モデルへの対応が迅速に行われていることが伺えます。
 
-## PR-Agentとのやり取り
+### PR-Agentとのやり取り
 
 PR-Agentとのやり取りは、Pythonで実装されたCLIツール(後述)、またはPull Request上のコメントから以下のようなスラッシュコマンドを経由して行います。
 
@@ -85,7 +85,7 @@ PR-Agentとのやり取りは、Pythonで実装されたCLIツール(後述)、�
   - cli: `N/A`
     - PR-Agentで利用可能な機能についての一覧を取得できます
 
-# PR-Agent導入
+## PR-Agent導入
 
 PR-Agentの導入について紹介します。
 
@@ -104,7 +104,7 @@ GitLabへの導入の場合、大きく分けて次の２パターンでの構�
 - プロジェクトごとのCI Pipeline定義への修正しなくても済む
   - PR-Agentの挙動は、後述する設定ファイルによってリポジトリごとにカスタマイズ可能です
 
-## GitLab Webhook Serverの構築
+### GitLab Webhook Serverの構築
 
 1. まずは、GitLab上で、操作対象のグループ、プロジェクトに対して「`Reporter`」ロールをもったユーザーを用意してください
 2. 1.で用意したユーザーにおいて、`api`操作権限を与えた`Personal Access Token`を生成します
@@ -156,7 +156,7 @@ GitLabへの導入の場合、大きく分けて次の２パターンでの構�
 - comment
 - merge request events
 
-## `.pr-agent.toml`(Configuration File)について
+### `.pr-agent.toml`(Configuration File)について
 
 OSS版のPR-Agentの各種挙動は、対象リポジトリのデフォルトブランチのルートに`.pr-agent.toml`という設定ファイルをアップロードすることで制御が可能です。
 
@@ -205,7 +205,7 @@ extra_instructions = "Please use Japanese."
   - LLMに対して、追加のプロンプトを入れることができます
     ここでは、各種操作について日本語で回答をしてほしいという意味を込めたプロンプトを入れています
 
-# 実際の動作イメージ
+## 実際の動作イメージ
 
 PR-Agentとのやり取りのイメージの実例をご紹介します。
 
@@ -261,7 +261,7 @@ pr_commands = [
 
 オプション次第ではpushまで行ってくれるようなので、履歴管理が捗りそうです。
 
-# さいごに
+## さいごに
 
 導入してみての所感は、Pull Request駆動のレビューに特化したOSSとして見れば、必要十分な機能が提供されているなという印象です。
 

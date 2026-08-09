@@ -23,7 +23,7 @@ lede: "機械学習モデルを本番環境で運用する際、スケーラビ�
 
 本記事では、MLflowで管理されたモデルを、Kubernetes上で動作する高機能なMLモデルサービング基盤KServeにデプロイする方法を解説します。ローカル環境でKubernetesを簡単に扱えるminikubeを用いた構築手順から、Google Kubernetes Engine (GKE) へのデプロイ、さらにはCI/CDへの応用まで、実践的なMLOpsの構築方法を詳しく紹介します。
 
-# バージョン
+## バージョン
 
 本記事で利用を想定しているツールのバージョンは以下の通りです。
 
@@ -31,7 +31,7 @@ lede: "機械学習モデルを本番環境で運用する際、スケーラビ�
 - [mlflow](https://mlflow.org/docs/latest/ml/): v3.1.1
 - [kserve](https://github.com/kserve/kserve): v0.13.0
 
-# なぜFastAPIでなく、Kubernates?
+## なぜFastAPIでなく、Kubernates?
 
 MLflowの公式サイトでも以下のように書かれています。
 
@@ -39,13 +39,13 @@ MLflowの公式サイトでも以下のように書かれています。
 
 端的にいうと、**MLflowのFastAPIによるモデルデプロイは手軽ですが、本番環境には不向きです。FastAPIは大規模な利用を想定しておらず、スケーラビリティやサーバー管理に課題があるためです。**
 
-# minikubeとKubernatesの関係
+## minikubeとKubernatesの関係
 
 Kubernates (k8s) は、コンテナ化されたアプリケーションのデプロイ、スケーリング、管理を自動化するためのオープンソースプラットフォームです。本番環境で広く使われていますが、学習や開発のために手元で動かすには、セットアップが複雑です。
 
 そこで登場するのが minikube です。minikubeは、自分のPC（Windows, macOS, Linux）上に、仮想的に単一ノードのKubernatesクラスタを簡単に構築できるツールです。Kubernatesの機能を学習したり、アプリケーションをデプロイしてテストしたりするのに最適です。つまり、<strong>「minikubeは、Kubernatesを手軽に試すためのローカル環境構築ツール」</strong>だと理解すると分かりやすいでしょう。
 
-# スケーラブルにモデル公開できるのがKserve
+## スケーラブルにモデル公開できるのがKserve
 
 KServeはKubernetes上で動作する、本番環境向けの高度なMLモデルサービング基盤です。サーバーレスでの自動スケールやカナリアリリースといった機能を提供し、単純なデプロイ方法では難しい拡張性や安定性を実現します。
 
@@ -55,22 +55,22 @@ KServeはKubernetes上で動作する、本番環境向けの高度なMLモデ�
 
 <img src="/images/2025/20250701a/image_2.png" alt="image.png" width="720" height="431" loading="lazy">
 
-# 構築手順(MacOS版)
+## 構築手順(MacOS版)
 
-## 1. PCにツールをインストール
+### 1. PCにツールをインストール
 
 ```sh install.sh
 brew install minikube  # クラスタ構築用
 brew install kubectl  # Kubernates操作用
 ```
 
-## 2. pipでmlflowをインストール
+### 2. pipでmlflowをインストール
 
 ```sh install.sh
 pip install mlflow
 ```
 
-## 3. ベストモデルの訓練後、MLserverでローカルテスト
+### 3. ベストモデルの訓練後、MLserverでローカルテスト
 
 GCPで訓練する場合、直接にステップ５へ飛ばしていただいてOKです。
 
@@ -84,7 +84,7 @@ curl -X POST -H "Content-Type:application/json" --data '{"inputs": [[14.23, 1.71
 {"predictions": [-0.03416275504140387]}
 ```
 
-## 3. ローカルクラスタにkserveをインストール
+### 3. ローカルクラスタにkserveをインストール
 
 ```sh
 minikube start
@@ -97,7 +97,7 @@ kubectl apply -f https://github.com/kserve/kserve/releases/download/v0.13.0/kser
 公式サイトではkindを利用してインストールすることをすすめしていますが、今回minikube上で動かすには、minikubeの作法に合わせた手順（例えば、minikubeのDockerデーモンを利用してイメージをビルドする、またはyamlで構築するなど）に読み替える必要がありました。
 :::
 
-## 4. ローカルDockerとminikubeでテストデプロイ
+### 4. ローカルDockerとminikubeでテストデプロイ
 
 KServeにモデルをデプロイするための定義ファイル（マニフェスト）を用意します。以下がDockerを利用したときの書き方となります。
 
@@ -139,7 +139,7 @@ kubectl apply -f inferenceservice.yaml -n mlflow-kserve-test
 kubectl get inferenceservice mlflow-model -n mlflow-kserve-test
 ```
 
-## 5. GCSにアップロード、Google Kubernate Engine(GKE)へデプロイ
+### 5. GCSにアップロード、Google Kubernate Engine(GKE)へデプロイ
 
 CLI経由してGKEにも直接にデプロイできます。Kserve定義ファイルの書き方は少々先のものと異なります。
 
@@ -191,15 +191,15 @@ kubectl get inferenceservice mlflow-model -n mlflow-kserve-test
 
 さらなる発展として、```deploy_gke.sh```のbashスクリプトを、GitHub actionsに組み込めば、リポジトリに新しいモデルがプッシュされたら、自動でGCSにアップロードされ、KServeにデプロイされます。これは、MLOpsにおけるCI/CD（継続的インテグレーション/継続的デリバリー）の基本的な流れです。
 
-# あとがき
+## あとがき
 
 前職(メーカのデータサイエンティスト)の経験上、モデルのバージョン管理やデプロイ管理が非常に煩雑な印象でしたが、記事を通じてMLflowのモデル管理ダッシュボードの便利さ・kubernateへのデプロイドの手軽さなどMLOps周りのエコシステムをしっかり体感できて感動しました。
 
 また、現在主にデータ基盤構築プロジェクトのアーキテクトとしてつとめていますが、データを使ってモデルを構築したあとのMlOpsを触る機会がなく、今回記事を書かせてもらうのを機に、触りたかったGKEを触れてとても大満足でした。今回の記事は、書き手にとってブログ記事を書く価値と意義を改めて体感できた一本です。
 
-# 番外編
+## 番外編
 
-## 番外編１：minikubeとkind：なにか違うの？
+### 番外編１：minikubeとkind：なにか違うの？
 
 kind (Kubernetes IN Docker) もminikubeと同様にローカルでKubernatesクラスタを構築するツールですが、いくつかの違いがあります。
 
@@ -209,7 +209,7 @@ kind (Kubernetes IN Docker) もminikubeと同様にローカルでKubernatesク�
 |仕組み|仮想マシン（Hyper-V, VirtualBoxなど）またはDockerコンテナ上にクラスタを構築  |各ノードをDockerコンテナとして実行  |
 |手軽さ|ダッシュボードやIngressなどのアドオンが豊富で、コマンド一つで有効化できるため、初心者にも扱いやすい  |よりKubernatesのコアな機能に近く、設定の自由度が高い。CI環境での利用実績が豊富  |
 
-## 番外編２：kubeflowとMLflow：なにか違うの？
+### 番外編２：kubeflowとMLflow：なにか違うの？
 
 どちらもMLOps（機械学習基盤）のための強力なツールですが、スコープと目的が異なります。
 
@@ -221,7 +221,7 @@ kind (Kubernetes IN Docker) もminikubeと同様にローカルでKubernatesク�
 
 一言でいうと、MLflowが「実験とモデル」の管理ツールであるのに対し、Kubeflowは「ML全体のワークフロー」をKubernates上で動かすための基盤です。 今回の構成では、Kubernates上でモデルをサービングする部分にKServeを使い、モデル管理の部分でMLflowの思想を取り入れています。
 
-# 参考記事
+## 参考記事
 
 - [Develop ML model with MLflow and deploy to Kubernetes | MLflow](https://mlflow.org/docs/latest/ml/deployment/deploy-model-to-kubernetes/tutorial#step-6-test-model-serving-locally)
 - [Kubeflow: How to Install and Launch Kubeflow on your Local Machine | Towards Data Science](https://towardsdatascience.com/kubeflow-how-to-install-and-launch-kubeflow-on-your-local-machine-e0d7b4f7508f/)

@@ -17,7 +17,7 @@ lede: "Azure Bicepは、Microsoft Azureのリソースを効率的に管理す�
 グループ会社であるFutureOneの Qiita Organizationで公開された [記事](https://qiita.com/Miura597/items/b83e3371ec97b8dea74c) をクロスポストで公開しています。
 :::
 
-# はじめに
+## はじめに
 
 Azure Bicepは、Microsoft Azureのリソースを効率的に管理するために開発された宣言型の言語です。Azure上のインフラストラクチャをコードとして定義し、デプロイが可能です。
 
@@ -25,7 +25,7 @@ Azure Bicepは便利で強力なツールですが、Azureの急速な進化に�
 
 本記事では、Microsoft社のツールを使ったBicepコードの効率的な最新化する方法を紹介します。
 
-# Bicep リンター
+## Bicep リンター
 
 Bicepコードの最新化に役立つのが、[Bicepリンター](https://learn.microsoft.com/ja-jp/azure/azure-resource-manager/bicep/linter)です。
 
@@ -33,13 +33,13 @@ Bicepコードの最新化に役立つのが、[Bicepリンター](https://learn
 
 こちらのツールを使うことで、コードの最新化が効率的に実施できます。
 
-# 環境情報
+## 環境情報
 
 今回は、`C:\Bicep` に配置した `main.bicep`* と呼び出されるモジュール群を対象にコードの最新化を行います。
 
 <img src="/images/2025/20250509b/image.png" alt="image.png" width="981" height="413" loading="lazy">
 
-## 事前準備
+### 事前準備
 
 最新のAPIバージョンが表示されない場合もあるため、以下のアップデートを事前に行っておきます。
 
@@ -47,7 +47,7 @@ Bicepコードの最新化に役立つのが、[Bicepリンター](https://learn
 az bicep upgrade
 ```
 
-# リンターの実行
+## リンターの実行
 
 以下コマンドでリンターを実行できます。
 
@@ -211,7 +211,7 @@ az bicep lint -f .\main.bicep
 
 <img src="/images/2025/20250509b/image_4.png" alt="" width="1200" height="158" loading="lazy">
 
-# リファクタリング方法
+## リファクタリング方法
 
 警告が出たリソースのコードを確認します。
 
@@ -221,7 +221,7 @@ VSCode用のBicep拡張機能をインストールしている場合はそのリ
 
 <img src="/images/2025/20250509b/image_5.png" alt="" width="1200" height="277" loading="lazy">
 
-# さいごに
+## さいごに
 
 以上が最新APIバージョンへの効率的な対応方法のご紹介でした。
 

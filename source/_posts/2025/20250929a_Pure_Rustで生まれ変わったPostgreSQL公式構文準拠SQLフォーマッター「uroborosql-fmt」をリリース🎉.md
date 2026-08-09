@@ -13,7 +13,7 @@ thumbnail: /images/2025/20250929a/thumbnail.png
 author: 川渕皓太
 lede: "roborosql-fmtの新バージョンv1.0.0をリリースしました。当社のSQLフォーマッター開発の歩みと課題の変遷について紹介します"
 ---
-# はじめに
+## はじめに
 
 <img src="/images/2025/20250929a/top.png" alt="" width="630" height="229" loading="lazy">
 
@@ -38,7 +38,7 @@ lede: "roborosql-fmtの新バージョンv1.0.0をリリースしました。当
 - [PostgreSQL 全構文対応の Pure Rust な CST パーサーを作ってみた](/articles/20250930a/)
 - [半年がかりのパーサー移行を成功に導いた戦略 ～Rust製SQLフォーマッター開発の裏側～](/articles/20251001a/)
 
-# 当社のSQLフォーマッター開発の歩みと課題の変遷
+## 当社のSQLフォーマッター開発の歩みと課題の変遷
 
 当社ではこれまでにもSQLフォーマッターを開発・公開してきました。
 
@@ -51,7 +51,7 @@ lede: "roborosql-fmtの新バージョンv1.0.0をリリースしました。当
 | **2022** | **uroborosql-fmt v0.1.0**             | ・Rustで開発（wasm化やVSCode拡張化が可能）<br>・`tree-sitter-sql`のパース結果を利用しており高速                                                                                                                                                                                                                            | ・`tree-sitter-sql`の文法が不完全で、PostgreSQLの追従・修正コストがかかる<br>・文法を増やすとバイナリサイズが大きくなる<br>・`tree-sitter-sql`のC言語依存によりwasm化が複雑 | ・[新しいSQLフォーマッターであるuroboroSQL-fmtをリリースしました &#124; フューチャー技術ブログ](/articles/20231120a/)                         |
 | **2025** | **uroborosql-fmt v1.0.0**             | ・Rustで開発（wasm化やVSCode拡張化が可能）<br>・公式PostgreSQL文法に準拠したパーサー([postgresql-cst-parser](https://github.com/future-architect/postgresql-cst-parser))のパース結果を利用しているため、**文法の追従コストが低い**<br>・postgresql-cst-parserは十分に高速であり、**パーサー自体も高速**<br>・Pure Rustであるため、**wasm化が容易** |                                                                                                                                                                             |                                                                                                                                                                                 |
 
-# パーサー移行の背景とメリット
+## パーサー移行の背景とメリット
 
 uroborosql-fmt v0.1.0ではパーサーとして [tree-sitter-sql](https://github.com/future-architect/tree-sitter-sql)を利用していましたが、開発を進めるにつれて以下3点の課題が判明しました。
 
@@ -87,7 +87,7 @@ uroborosql-fmt v0.1.0ではパーサーとして [tree-sitter-sql](https://githu
 
 新パーサーの詳細については後日ブログで公開する予定です。
 
-# 利用方法
+## 利用方法
 
 現在以下の3種類の方法で利用することができます。
 
@@ -95,7 +95,7 @@ uroborosql-fmt v0.1.0ではパーサーとして [tree-sitter-sql](https://githu
 1. VSCode拡張
 1. CLIツール
 
-## 1. ブラウザツール
+### 1. ブラウザツール
 
 [デモページ](https://future-architect.github.io/uroborosql-fmt/ja.html)からブラウザ上で試すことができます。使い方の詳細はデモページをご覧ください。
 
@@ -103,7 +103,7 @@ uroborosql-fmt v0.1.0ではパーサーとして [tree-sitter-sql](https://githu
 <img src="/images/2025/20250929a/image_3.png" alt="image.png" width="1200" height="750" loading="lazy">
 </a>
 
-## 2. VSCode拡張
+### 2. VSCode拡張
 
 1. [uroborosql-fmtの拡張機能](https://marketplace.visualstudio.com/items?itemName=Future.uroborosql-fmt)をインストールしてください
 1. settings.jsonに以下の設定を入れてください
@@ -121,7 +121,7 @@ uroborosql-fmt v0.1.0ではパーサーとして [tree-sitter-sql](https://githu
 
 <img src="/images/2025/20250929a/image_4.png" alt="image.png" width="1200" height="705" loading="lazy">
 
-## 3. CLIツール
+### 3. CLIツール
 
 1. Rustをインストールしてください。([インストール方法](https://www.rust-lang.org/ja/tools/install))
 1. 以下を実行してください
@@ -136,7 +136,7 @@ uroborosql-fmt v0.1.0ではパーサーとして [tree-sitter-sql](https://githu
     uroborosql-fmt-cli --write target.sql
     ```
 
-# 今後の展望
+## 今後の展望
 
 今後は対応構文の拡張とLinter機能の開発を行う予定です。
 
@@ -146,7 +146,7 @@ Linter機能は具体的に、以下のような警告・エラーをVSCode上�
 - 存在しないカラム・テーブルを参照している場合はエラー
 - NullableなカラムをINNER JOINしている場合は警告
 
-# 最後に
+## 最後に
 
 まだまだ開発途上であり、フォーマットできない構文も多くあります。
 不具合や要望等ございましたらお気軽に以下リポジトリまでissueやPRを頂ければと思います。

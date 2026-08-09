@@ -15,7 +15,7 @@ author: 小川智也
 lede: "AWSを用いた生成AIアプリケーションの実装として、Generative AI Use Cases JP についての検証を行いました。"
 ---
 
-# はじめに
+## はじめに
 
 こんにちは、SAIG/MLOpsチームでアルバイトをしている小川です。
 
@@ -26,7 +26,7 @@ AWSを用いた生成AIアプリケーションの実装として、Generative A
 当時から変更がある可能性がある旨はご承知おきください。
 :::
 
-# 検証内容
+## 検証内容
 
 生成AIを簡単に素早く使いたいという要望を実現するために検証を行いました。GenUにはCloudFormationを用いて実装する方法と、CDKを用いて実装する方法があり、これらの違いは以下のようになっています。
 
@@ -47,7 +47,7 @@ GenUについての詳しい情報は以下のリンクに記載されていま�
 - [aws-samples/generative-ai-use-cases-jp: すぐに業務活用できるビジネスユースケース集付きの安全な生成AIアプリ実装](https://github.com/aws-samples/generative-ai-use-cases-jp)
 - [生成AIユースケースを考え倒すためのGenerative AI Use Cases JP (GenU)の魅力と使い方 - Speaker Deck](https://speakerdeck.com/okamotoaws/sheng-cheng-aiyusukesuwokao-edao-sutamenogenerative-ai-use-cases-jp-genu-nomei-li-toshi-ifang)
 
-# アプリケーションのアーキテクチャ
+## アプリケーションのアーキテクチャ
 
 アプリケーションのアーキテクチャは下の画像のようになっていて、点線で囲まれている部分はオプションです。
 
@@ -61,11 +61,11 @@ GenUについての詳しい情報は以下のリンクに記載されていま�
 
 ▲ [GitHub - aws-samples/generative-ai-use-cases-jp: すぐに業務活用できるビジネスユースケース集付きの安全な生成AIアプリ実装](https://github.com/aws-samples/generative-ai-use-cases-jp)より引用
 
-## CloudFormationを用いた際のアーキテクチャ
+### CloudFormationを用いた際のアーキテクチャ
 
 CloudFormationを使用して構築し、RAGを有効化すると、上図のデフォルトの構成に加えて、点線部分のAWS WAF、RAGチャット機能(Amazon Kendra、S3)が追加でデプロイされます。
 
-# 実装手順
+## 実装手順
 
 アプリケーションの実装のための手順は以下のようになっています。
 
@@ -76,7 +76,7 @@ CloudFormationを使用して構築し、RAGを有効化すると、上図のデ
 
 以下、順番に手順を説明していきます。
 
-## モデルの有効化
+### モデルの有効化
 
 まずは、[Bedrockのモデルを有効化](https://catalog.workshops.aws/generative-ai-use-cases-jp/ja-JP/setup/self-paced/enable-models)する必要があります。すでに有効化している場合はこの手順は不要です。
 
@@ -85,7 +85,7 @@ CloudFormationを使用して構築し、RAGを有効化すると、上図のデ
 
 <img src="/images/2025/20250207a/コメント_2024-10-30_143519.png" alt="コメント_2024-10-30_143519.png" width="933" height="196" loading="lazy">
 
-## WAFの作成
+### WAFの作成
 
 [WAFを作成](https://catalog.workshops.aws/generative-ai-use-cases-jp/ja-JP/deploy-application/cloudformation/create-waf)の手順に従って作成しました。
 
@@ -99,7 +99,7 @@ CloudFormationを使用して構築し、RAGを有効化すると、上図のデ
 
 - スタックの作成を押すと、WAFが作成される
 
-## アプリケーションの作成
+### アプリケーションの作成
 
 [アプリの作成](https://catalog.workshops.aws/generative-ai-use-cases-jp/ja-JP/deploy-application/cloudformation/create-application)の手順に従って作成しました。
 
@@ -114,36 +114,36 @@ CloudFormationを使用して構築し、RAGを有効化すると、上図のデ
 
 - スタックの作成を押すと、アプリケーションが作成される
 
-## RAG用データの追加
+### RAG用データの追加
 
 1. S3へのファイルアップロード
 2. KendraとS3の連携
 
 という手順で行われます。
 
-### S3へのファイルアップロード
+#### S3へのファイルアップロード
 
 [S3へのアップロード](https://catalog.workshops.aws/generative-ai-use-cases-jp/ja-JP/add-data/kendra/upload-to-s3)の手順に従って作業を進めました。このリンクにわかりやすい手順が紹介されているため、詳細な手順に関しては省略します。作成したアプリケーションには、Amazon Kendraと連携するためのgenerativeaiusecasesstack-ragdatasourcebucketからはじまるS3バケットが含まれます。このバケットの中の`docs/` というフォルダにデータを追加することで、RAGチャットが使用可能になります。例えば社内文書を活用したRAGを実装したい場合、`docs/` 以下に社内ドキュメントをアップロードすることで実装可能です。デフォルトでBedrockのドキュメントのpdfが`docs/` 配下に置かれています。
 
-### KendraとS3の連携
+#### KendraとS3の連携
 
 Amazon Kendraに移動し、[KendraとS3の連携](https://catalog.workshops.aws/generative-ai-use-cases-jp/ja-JP/add-data/kendra/integrate-with-kendra)の手順に従って作業を進めました。このリンクにわかりやすい手順が紹介されているため、詳細な手順に関しては省略します。Kendraには、generative-ai-use-cases-index という名前の Kendra インデックスが作成されており、先ほどのS3のデータソースと連携されています。現時点では先ほどアップロードしたオブジェクトはKendraインデックスと同期していないため、同期させる必要があります。Sync nowというボタンを押すことで同期が可能です。また、今回のように手動で同期させるのではなく、スケジュールを設定することで同期を自動化することもできます。
 
-# 実装したアプリ画面
+## 実装したアプリ画面
 
-## CloudFormationで、RAGを有効化して実装した際の画面
+### CloudFormationで、RAGを有効化して実装した際の画面
 
 <img src="/images/2025/20250207a/コメント_2024-10-23_170544.png" alt="コメント_2024-10-23_170544.png" width="1200" height="634" loading="lazy">
 
 <img src="/images/2025/20250207a/コメント_2024-10-23_170425.png" alt="コメント_2024-10-23_170425.png" width="1200" height="626" loading="lazy">
 
-## チャット(テキストのみ入力/画像とテキストを入力)
+### チャット(テキストのみ入力/画像とテキストを入力)
 
 <img src="/images/2025/20250207a/コメント_2024-10-23_170932.png" alt="コメント_2024-10-23_170932.png" width="1200" height="629" loading="lazy">
 
 <img src="/images/2025/20250207a/コメント_2024-10-23_170845.png" alt="コメント_2024-10-23_170845.png" width="1200" height="631" loading="lazy">
 
-## RAG
+### RAG
 
 サンプルとして提供されていたBedrockのドキュメントと、勤怠システムのドキュメントについての質問をすると、その内容と参照したpdfのページも出力してくれます。
 
@@ -151,15 +151,15 @@ Amazon Kendraに移動し、[KendraとS3の連携](https://catalog.workshops.aws
 
 <img src="/images/2025/20250207a/コメント_2024-10-23_173626.png" alt="コメント_2024-10-23_173626.png" width="1200" height="632" loading="lazy">
 
-## 翻訳
+### 翻訳
 
 <img src="/images/2025/20250207a/コメント_2024-10-23_174033.png" alt="コメント_2024-10-23_174033.png" width="1200" height="631" loading="lazy">
 
-## 校正
+### 校正
 
 <img src="/images/2025/20250207a/コメント_2024-10-23_174055.png" alt="コメント_2024-10-23_174055.png" width="1200" height="627" loading="lazy">
 
-## その他の機能、課題
+### その他の機能、課題
 
 ほかにも機能があり、[アプリケーションの確認](https://catalog.workshops.aws/generative-ai-use-cases-jp/ja-JP/use-application/create-account)で、どのような機能が実装されているか詳しく紹介されています。
 
@@ -169,15 +169,15 @@ Amazon Kendraに移動し、[KendraとS3の連携](https://catalog.workshops.aws
 
 また、このアプリケーションのリポジトリを確認すると継続的なアップデートが行われています。そのため、今後新しい機能が実装されることを考えると、CDKを用いて実装した方がより多くの機能を実装できます。
 
-# CDKを使う場合の構築手順
+## CDKを使う場合の構築手順
 
 CDKを使う場合のデプロイ手順が[リポジトリ](https://github.com/aws-samples/generative-ai-use-cases-jp?tab=readme-ov-file#%E3%83%87%E3%83%97%E3%83%AD%E3%82%A4)で紹介されています。リポジトリをクローンした後、[cdk.jsonの値を変更し、デフォルトではデプロイされないリソースを有効化](https://github.com/aws-samples/generative-ai-use-cases-jp/blob/main/docs/DEPLOY_OPTION.md#cdkjson-%E3%81%AE%E5%80%A4%E3%82%92%E5%A4%89%E6%9B%B4%E3%81%99%E3%82%8B%E6%96%B9%E6%B3%95)することで、カスタマイズが可能です。npmコマンドのインストールなどの環境構築が必要なため、CloudFormationよりは手間がかかるというデメリットもあります。
 
-# 機能一覧
+## 機能一覧
 
 ここでは、CloudFormationを用いてGenUを構築してみる中でできること、できないことについて整理します。
 
-## CloudFormationで構築したアプリケーションでできること
+### CloudFormationで構築したアプリケーションでできること
 
 - 認証機能
 - チャット機能(マルチモーダル)
@@ -190,7 +190,7 @@ CDKを使う場合のデプロイ手順が[リポジトリ](https://github.com/a
 - Webコンテンツ抽出
 - 画像生成機能
 
-## CDKを用いるとできるが、CloudFormationで構築したアプリケーションでできないこと
+### CDKを用いるとできるが、CloudFormationで構築したアプリケーションでできないこと
 
 - Agentチャット(Web検索を用いたRAGチャット)
 - UI、ロゴの変更
@@ -215,7 +215,7 @@ https://catalog.workshops.aws/generative-ai-use-cases-jp/ja-JP/agents-for-amazon
   - [SQL生成のユースケースを追加](https://aws.amazon.com/jp/blogs/news/how-to-generative-ai-use-cases-jp/)
   - サイドバーにユースケースとして追加する際にフロントエンドのコードの変更も必要
 
-# コスト
+## コスト
 
 RAGチャットを有効化しないときのコストの試算では、月額合計料金：39.63 (USD)となっています。(詳細は以下のリンク)
 
@@ -229,11 +229,11 @@ RAGチャット(Knowledge Bases)を有効化するときのコストの試算で
 
 - [社内知識を活用した生成 AI チャットボットを構築したい (Knowledge Bases 版) | AWS](https://aws.amazon.com/jp/cdp/genai-chat-app/)
 
-# まとめ
+## まとめ
 
 今回はGenUについて、CloudFormationでの構築がどれぐらい簡単に行えるのかに重点を置いて検証を行いました。検証を通して、CloudFormationを用いると数クリックで以下の機能を持つ生成AIチャットアプリケーションが簡単に構築できることがわかりました。
 
-## 機能一覧
+### 機能一覧
 
 - 認証機能
 - チャット機能(マルチモーダル)
@@ -248,19 +248,19 @@ RAGチャット(Knowledge Bases)を有効化するときのコストの試算で
 
 しかし、 CloudFormationを用いた場合は最新のリポジトリが反映されていないというデメリットがありました。また、今回はCDKを用いた場合の検証は行っていませんが、以下のようなメリット、デメリットがあると考えられます。
 
-## CDKを用いた場合のメリット
+### CDKを用いた場合のメリット
 
 - 最新のリポジトリが反映されている
 - 2024/12/18現在、GenUのリポジトリは日々更新されており、新機能の実装が今後も期待される
 
-## CDKを用いた場合のデメリット
+### CDKを用いた場合のデメリット
 
 - デプロイ手順がCloudFormationよりは手間がかかる
 
-## 構築してみた感想
+### 構築してみた感想
 
 今回は[生成 AI 体験ワークショップ](https://catalog.workshops.aws/generative-ai-use-cases-jp/ja-JP)を参考にGenUをCloudFormationを用いて構築しました。数クリックで豊富な機能を持つチャットアプリケーションを構築できたため、非常に便利だと感じました。基本部分がサーバーレスのため、試しやすいということも魅力だと思います。また、Streaming Responseも実装されているため、ChatGPTやClaudeなどの他のチャットアプリケーションと比較しても使いづらさを感じませんでした。実際に複数の企業での[活用事例](https://github.com/aws-samples/generative-ai-use-cases-jp?tab=readme-ov-file#%E3%81%8A%E5%AE%A2%E6%A7%98%E4%BA%8B%E4%BE%8B)があり、導入することで業務効率化も期待できると思いました。
 
-# 感想
+## 感想
 
 今回、9か月間SAIG/MLOpsチームでアルバイトをさせていただきました。その間、主にチャットアプリケーションに関する業務を行ってきました。業務を通して、AIだけでなくそれを支えるインフラ技術の重要性について学ぶことができました。また、大学ではあまり触れないクラウドサービスを用いた構築検証など、非常に貴重な体験となりました。アルバイトで取り組む内容に関しても、社員の方々には自分の興味を考慮してタスクを割り当てていただき、楽しく業務に取り組むことができました。大学でAIの研究をしており、その応用に興味のあった自分にとっては非常に学びのある環境で働くことができました。また、技術以外に関しても、リモートで働いていたため、現状や質問したいことなどをうまく言語化する能力も身についたと思います。技術面に加えて、ソフトスキルに関しても非常に学びのある時間を過ごさせていただきました。ありがとうございました。

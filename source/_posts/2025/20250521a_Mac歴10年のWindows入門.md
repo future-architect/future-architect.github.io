@@ -19,7 +19,7 @@ lede: "Windowsを徹底的にMacBookに近づけ、快適な作業環境を構�
 
 <img src="/images/2025/20250521a/mac_windows.png" alt="" width="1200" height="800" loading="lazy">
 
-# はじめに
+## はじめに
 
 こんにちは。TIG（Technology Innovation Group）の長谷川です。2025年11月にWeb系企業からの転職でキャリア入社し、現在は主にフロントエンド開発を担当しています。
 
@@ -33,7 +33,7 @@ lede: "Windowsを徹底的にMacBookに近づけ、快適な作業環境を構�
 
 「Mac派だけど諸事情でWindowsに触れることになった」方はもちろん **「元々Windowsユーザだけど便利な設定を知りたい」という方にも役立つ内容**となっていますので、ぜひ最後までご覧ください。
 
-# 前提
+## 前提
 
 MacユーザーがWindows環境で快適に作業するためのアプローチは、以下の3つに大別できます。
 
@@ -45,7 +45,7 @@ MacユーザーがWindows環境で快適に作業するためのアプローチ�
 
 なお、使用するOSはWindows 11です。
 
-# 目指す使用感
+## 目指す使用感
 
 普段のMacBook使用スタイルは非常にシンプルで、**「内蔵のキーボードとトラックパッドのみを使う」派**です。[BetterTouchTool（以下BTT）](https://folivora.ai/)でジェスチャーを割り当て、さまざまな操作を実現しています。
 
@@ -56,7 +56,7 @@ MacBookの使い方から離れないために、Windowsをカスタマイズを
 
 最初は外付けキーボード自体を使わないつもりでしたが、現在はリモートワークの際には分割キーボードを利用しています。
 
-# トラックパッド
+## トラックパッド
 
 最初に取り組むのは、トラックパッドのつらさへの対処です。
 
@@ -68,7 +68,7 @@ cf. [Windows 11 で Apple Magic Trackpad を快適に使う方法](https://mlabo
 
 これでまずはトラックパッドがMacに近づきました🎉
 
-# Windowsの設定をMac風に
+## Windowsの設定をMac風に
 
 Magic Trackpadの導入により、カーソルの操作性が向上しました。
 
@@ -135,7 +135,7 @@ Magic Trackpadの導入により、カーソルの操作性が向上しました
   - 後述するAutoHotKeyを使わない場合の英数/かなの切り替えはGoogle日本語入力の機能で対応できそう
     - cf. [Google日本語入力で無変換キーでIMEをオン/オフする - 日記とか、工作記録とか](https://windvoice.hatenablog.jp/entry/2021/08/13/110812)
 
-# キーボードの調整
+## キーボードの調整
 
 US配列（Mac）とJIS配列（Windows）の差によるキーボードの課題は以下の3つ。
 
@@ -150,7 +150,7 @@ US配列（Mac）とJIS配列（Windows）の差によるキーボードの課�
 
 （Macの場合は大抵 `command + ⚪︎` ですが、Windowsは操作によって`Windows` `Alt` `Ctrl` を使い分ける印象がありますね。思想の違いがありそう。）
 
-## Change Key の活用
+### Change Key の活用
 
 キーボード配列はそれぞれ以下のようになっています。
 
@@ -174,7 +174,7 @@ US配列（Mac）とJIS配列（Windows）の差によるキーボードの課�
 - [Mac 慣れした私に Windows が支給されたので、まず設定したこと | フューチャー技術ブログ](https://future-architect.github.io/articles/20230216a/#caps-lock-H-F-B-P-N-A-E)
 - [【Change Key】キーボードの割り当てを変更するソフトの使い方 | ナポリタン寿司のPC日記](https://www.naporitansushi.com/changekey/)
 
-## ULE4JIS でUS配列風に
+### ULE4JIS でUS配列風に
 
 JIS配列を完全にUS配列で上書きするとたまに不都合があるため、[ULE4JIS](https://github.com/dezz/ULE4JIS/tree/master) を導入し、必要に応じてON/OFFを切り替える方式を採用しました。スタートアップに登録して運用しています。
 
@@ -190,7 +190,7 @@ JIS配列を完全にUS配列で上書きするとたまに不都合があるた
 - [ノートパソコンはJIS配列で外付けキーボードをUS配列に（Windows）](https://mastdesign.me/20240107-jiskeyboard-uskeyboard/)
 - [Windows11のスタートアップを設定する方法 - mouse LABO](https://www.mouse-jp.co.jp/mouselabo/entry/2024/01/24/100037)
 
-## AutoHotKey による魔改造
+### AutoHotKey による魔改造
 
 Change KeyとULE4JISのおかげで普通にタイピングできるようにはなりました。
 
@@ -208,7 +208,7 @@ Change KeyとULE4JISのおかげで普通にタイピングできるようには
 
 `main.ahk` をスタートアップに登録しておくと快適です。
 
-### main.ahk
+#### main.ahk
 
 ```lisp
 #Requires AutoHotkey v2.0
@@ -364,7 +364,7 @@ minimizedWindows := []
 }
 ```
 
-### applications.ahk
+#### applications.ahk
 
 ```lisp
 #Requires AutoHotkey v2.0
@@ -428,7 +428,7 @@ minimizedWindows := []
 #HotIf
 ```
 
-### utils.ahk
+#### utils.ahk
 
 ```lisp
 #Requires AutoHotkey v2.0
@@ -447,7 +447,7 @@ class Utils {
 }
 ```
 
-### configs.ahk
+#### configs.ahk
 
 ```lisp
 #Requires AutoHotkey v2.0
@@ -462,11 +462,11 @@ class Configs {
 }
 ```
 
-### lib/IMEv2.ahk
+#### lib/IMEv2.ahk
 
 https://github.com/k-ayaki/IMEv2.ahk/blob/master/IMEv2.ahk を利用させていただきました。
 
-# 各種ツール
+## 各種ツール
 
 その他導入した便利なツールを紹介します。
 
@@ -517,7 +517,7 @@ https://github.com/k-ayaki/IMEv2.ahk/blob/master/IMEv2.ahk を利用させてい
   - Scroll Sensitivityを`3`にする（Editor, Workbenchの両方）
     - デフォルトだとトラックパッドでのスクロールが遅いため
 
-# おわりに
+## おわりに
 
 今回紹介した設定やツールを駆使することで、WindowsをMacのように扱えるようになりました。
 
@@ -528,7 +528,7 @@ Windowsを使い始めて半年が経ちますが、業務終了後や休日にM
 
 みなさんも良いWindowsライフを！🍎
 
-# おまけ：Macに導入したWindows的ツール
+## おまけ：Macに導入したWindows的ツール
 
 最後に、逆にMacに導入した便利ツールもご紹介。
 

@@ -17,7 +17,7 @@ lede: "初めてtry! Swift Tokyo 2025に参加してきました！参加報告�
 
 <img src="/images/2025/20250416b/9addbdc8-d932-4dfc-ab35-fb5a7cf56fd0.jpeg" alt="" width="1080" height="1210" loading="lazy">
 
-# はじめに
+## はじめに
 
 HealthCare Innovation Group(HIG)[^1]の橋本です。
 
@@ -25,7 +25,7 @@ HealthCare Innovation Group(HIG)[^1]の橋本です。
 
 参加報告として、興味深かったセッションや参加して感じたことなどを共有します。
 
-# try! Swift Tokyoとは
+## try! Swift Tokyoとは
 
 <img src="/images/2025/20250416b/image.png" alt="" width="1200" height="326" loading="lazy">
 
@@ -41,7 +41,7 @@ Swiftを使った開発のコツや最新の事例を求めて世界中から開
 
 会場は、昭和記念公園が隣にあったり、自然と調和した商業施設も隣接していたり、とてもリラックスできるような場所でした。（立川ステージガーデンの椅子がとても座りやすく、セッションの視聴に集中することができました。）
 
-## try! Swift Tokyo 2025のアプリ
+### try! Swift Tokyo 2025のアプリ
 
 try! Swift Tokyo 2025を楽しむための公式アプリがありました。
 
@@ -62,7 +62,7 @@ visionOS対応もしており、Apple Vision Proユーザーの方は、会場�
 
 <img src="/images/2025/20250416b/image_2.png" alt="image.png" width="600" height="483" loading="lazy">
 
-# 良かった・役に立った・もっと理解したいと思ったセッション
+## 良かった・役に立った・もっと理解したいと思ったセッション
 
 私が視聴して良かった・役に立った・もっと理解したいと思ったセッションをいくつか紹介します。
 
@@ -70,7 +70,7 @@ visionOS対応もしており、Apple Vision Proユーザーの方は、会場�
 try! Swift Tokyo 2025の全セッションはtry!Swift TokyoのHPの[タイムテーブル](https://tryswift.jp/#timetable)からご確認ください。
 :::
 
-## iOS17,16,15での新機能(セッション動画は[こちら](https://youtu.be/qY09lmDo7GU?si=AMweGOy0GHKfX0Sz))
+### iOS17,16,15での新機能(セッション動画は[こちら](https://youtu.be/qY09lmDo7GU?si=AMweGOy0GHKfX0Sz))
 
 タイトルの通り、iOS17,16,15それぞれで新しい利用できるようになったAPIを紹介する発表でした。
 WWDCのセッション動画で利用できると知っても、使えるようになるまでにタイムラグがあったりするのでこのタイミングでiOS17,16,15のAPIをいくつかキャッチアップできたのはとても良かったです。具体的には以下のAPIの紹介がありました。
@@ -110,7 +110,7 @@ WWDCのセッション動画で利用できると知っても、使えるよう�
   - [contenttransition(_:)](https://developer.apple.com/documentation/swiftui/view/contenttransition(_:))
   - [numericText(countsDown:)](https://developer.apple.com/documentation/SwiftUI/ContentTransition/numericText(countsDown:)) → 数字のカウントダウン、アップのアニメーションをリッチなものにできる
 
-## 日本語でのSwiftプログラミング(セッション動画は[こちら](https://youtu.be/uVgxJpSvp-I?si=2V68kkoMoIE1Y91D))
+### 日本語でのSwiftプログラミング(セッション動画は[こちら](https://youtu.be/uVgxJpSvp-I?si=2V68kkoMoIE1Y91D))
 
 Xcode,Swiftにおいて、日本語の識別子は基本的にサポートしている。パフォーマンス面でも問題ないとのこと。
 テスト関数名は、日本語にしてもいいかな何て思ったりもしました。
@@ -124,7 +124,7 @@ Xcode,Swiftにおいて、日本語の識別子は基本的にサポートして
 }
 ```
 
-## ⚡️ Swift × Android: Skipが切り拓くクロスプラットフォーム開発の未来(セッション動画は[こちら](https://youtu.be/FtO6ocYGnwc?si=38sl1SH-RcBBmkRM))
+### ⚡️ Swift × Android: Skipが切り拓くクロスプラットフォーム開発の未来(セッション動画は[こちら](https://youtu.be/FtO6ocYGnwc?si=38sl1SH-RcBBmkRM))
 
 SwiftとXcodeを使って、iOSとAndroidのアプリを作成できるツール[Skip](https://skip.tools/)の実用性と今後クロスプラットフォーム対応の主流となるかについて、スピーカーが実際にアプリを作成したときの経験が紹介されていました。
 
@@ -142,7 +142,7 @@ SwiftとXcodeを使って、iOSとAndroidのアプリを作成できるツール
 - https://github.com/skiptools
 - https://github.com/skiptools/skip-ui
 
-## Foreign FunctionとMemory APIとSwift/Java相互運用性(セッション動画は[こちら](https://youtu.be/vgtzhTOhEbs?si=ZUJVcoSCiv71FFNj))
+### Foreign FunctionとMemory APIとSwift/Java相互運用性(セッション動画は[こちら](https://youtu.be/vgtzhTOhEbs?si=ZUJVcoSCiv71FFNj))
 
 SwiftとJavaを相互に利用する方法について紹介がありました。
 開発段階であるライブラリ[swiftlang/swift-java](https://github.com/swiftlang/swift-java)をAppleのエンジニアでContributorである[Konrad](https://github.com/ktoso)さんがお話されていました。
@@ -156,13 +156,13 @@ SwiftとJavaを相互に利用する方法について紹介がありました�
 
 内容は私には理解が難しい部分が多々あったが、弊社ではJavaを使う案件が多いので、該当レポジトリの内容とセッションを見直したいと思いました。セッションの中で、UIをSwiftUIで残りの内部ロジック等をJavaに寄せることができるようなお話もあり、とても興味深いものでした。
 
-## SwiftUI を最適化するためのレンダーループの理解(セッション動画は[こちら](https://youtu.be/x-HWEwlkJME?si=97NxB0tNemiebits))
+### SwiftUI を最適化するためのレンダーループの理解(セッション動画は[こちら](https://youtu.be/x-HWEwlkJME?si=97NxB0tNemiebits))
 
 SwiftUIを最適化するために、理解が必要なSwiftUIのレンダリングの仕組みや具体的な例を用いて表示遅延が起こる原因や解決策についての紹介がありました。
 
 SwiftUIViewがどのようにレンダリングされているかという質問に対しては、レンダーループを理解することが近道です。
 
-### レンダーループ(Render loop)
+#### レンダーループ(Render loop)
 
 レンダーループ(Render loop)とは、アプリのUIがどのように更新され、画面に表示するかを管理する継続的なサイクルを指します。
 
@@ -180,7 +180,7 @@ SwiftUIViewがどのようにレンダリングされているかという質問
 5. Display
    - Diplay Bufferのピクセルデータをユーザー用の最終的な視覚情報に変換する
 
-### サンプルプロジェクトによる例示
+#### サンプルプロジェクトによる例示
 
 サンプルコード: https://github.com/pradnya-nikam/trySwiftTokyoPrad2025
 
@@ -219,7 +219,7 @@ SwiftUIViewがどのようにレンダリングされているかという質問
 - https://developer.apple.com/videos/play/tech-talks/10857/?time=1091
 - (My own talk that talks about Rendering on UIKit) https://www.youtube.com/watch?v=gbAjrPqFLUY
 
-# さいごに
+## さいごに
 
 今回は一般参加で、try! Swift Tokyo2025に参加しました!
 

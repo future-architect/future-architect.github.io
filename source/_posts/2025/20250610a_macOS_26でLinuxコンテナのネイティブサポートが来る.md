@@ -24,7 +24,7 @@ lede: "現在開催中のWWDCで、Linuxコンテナネイティブサポート�
 
 <blockquote class="twitter-tweet"><p lang="ja" dir="ltr">WWDCで一番期待しているのは、AIでも新型Macの発表でもなくて、macOS Subsystem for Linuxです。メモリバルーニングで固定メモリ割り当てなくてもいいLinuxサブシステムが実現できるAPIはすでにある。そうすれば少ないメモリでも効率よくコンテナ起動したりできる。</p>&mdash; 渋川よしき (@shibu_jp) <a href="https://twitter.com/shibu_jp/status/1788736360934965574?ref_src=twsrc%5Etfw">May 10, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
-# container
+## container
 
 今回、Apple は 2 つの OSS を公開しました。前者がコマンドラインツールで後者はバックエンドのサービス？のようです。[前者の Release にあるインストーラ](https://github.com/apple/container/releases)でインストールすれば後者からは特にダウンロードする必要はありません。OSS で修正したい人向けにソースが公開されています。
 
@@ -45,7 +45,7 @@ Docker とほぼ互換の container コマンドで起動すれば素早く立�
 container run --rm -it --name debian debian:bookworm
 ```
 
-# コンテナを Linux 以外で動かす歴史
+## コンテナを Linux 以外で動かす歴史
 
 コンテナは Linux の軽量なリソース分離の仕組みを活用して、VM よりもコンパクトな独立した OS 環境を作って起動する、というのが元の始まりです。ただし、Linux 以外だと Linux カーネルの仕組みは使えないため、仮想 OS で Linux を入れてから動かす必要がありました。
 
@@ -71,7 +71,7 @@ Apple は確か 2022 年に Virtualization Framework をリリースしました
 
 Linux カーネルは[ここの説明](https://github.com/apple/containerization/tree/main?tab=readme-ov-file#pre-build-kernel)によると、virtio だけカーネルに組み込み（モジュールではなく）にしておけば良いうという感じのようですね。Microsoft は[いろいろカスタム](https://github.com/microsoft/WSL2-Linux-Kernel)していた気がしますが。
 
-# WSL2 との違い
+## WSL2 との違い
 
 現状の僕の理解で WSL2 との違いはこうじゃないかというのを書いてみました。
 
@@ -83,7 +83,7 @@ macOS はそのようなハイパーバイザの上で動く感じではなく�
 
 皆さんのパソコンではプログラムはたくさんの共有ライブラリを使っています。100 個のプログラムが共通の dll なり.so なりを使ていたとして、100 個分のメモリは使わず、ディスクから読み込んだプログラムイメージは物理メモリ上は 1 つだけ配置されて、仮想メモリの形で見た目のアドレスだけ複製されているような形になります。macOS のほうの Linux カーネルも同じような感じでメモリ共有されるのかどうかはわからないのですが、もし共有されるとしたら面白いな、と思っています。
 
-# compose や Dev Containers はまだ動かない
+## compose や Dev Containers はまだ動かない
 
 現状は単独の Docker 相当の機能のみの提供となっています。compose もありません。
 

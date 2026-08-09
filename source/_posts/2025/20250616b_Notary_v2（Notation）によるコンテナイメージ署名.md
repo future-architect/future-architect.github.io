@@ -16,7 +16,7 @@ lede: "CNCFのIncubatingプロジェクトである、Notary v2を用いて、�
 
 [CNCF連載](/articles/20250616a/ )の1本目です。
 
-# はじめに
+## はじめに
 
 TIG真野です。[KubeCon + CloudNativeCon](https://events.linuxfoundation.org/kubecon-cloudnativecon-japan/) の日本初開催、おめでとうございます！
 
@@ -24,7 +24,7 @@ CNCFのIncubatingプロジェクトである、Notary v2を用いて、コンテ
 
 CI/CDを狙ったサプライチェーン攻撃が増えている昨今、デプロイ対象のコンテナイメージが正しい手順で作成されたか検証することの重要性はますます高まっているように感じます。業界でよく行われているコンテナイメージの署名とその検証がどのように行われているか興味が合ったため、OCI（Open Container Initiative）準拠でデファクトに近い位置づけであったNotaryを触ってみした。
 
-# Notary v2とは
+## Notary v2とは
 
 [Notary](https://notaryproject.dev/)は、コンテナイメージにデジタル署名を行い、その真正性（誰が作ったか）と完全性（改ざんされていないか）を保証し、CLI実装が [Notation](https://github.com/notaryproject/notation) です。Notaryは現在v2です。特徴として署名データをイメージと同じレジストリ内に保存することがあり、これによりポータビリティが高いと言われます。v1時代はレジストリをまたいでイメージを移動させると、署名が失われるという課題があったそうで、再設計されたためv2になったそうです。
 
@@ -34,7 +34,7 @@ CI/CDを狙ったサプライチェーン攻撃が増えている昨今、デプ
 
 ちなみに、類似のイメージ署名ツールとしては、[Sigstore](https://www.sigstore.dev/)（Cosign）も有名で、勢いがあるかもしれません。こちらはGitHubなどのOIDCアカウントで署名するという、キーレスが特徴とのこと。記事を書いている途中で気がついたのですが、こちらの方が面白そうなツールですね。
 
-# Notaryの想定される使い所
+## Notaryの想定される使い所
 
 Notary（実際に用いるのはCLI実装のNotation）の使い所ですが、以下のようなフローを想定しています。
 
@@ -48,7 +48,7 @@ Notary（実際に用いるのはCLI実装のNotation）の使い所ですが、
 
 より詳しくは、[ECS × AWS Signer を使ったイメージ署名ワークフローを試してみた](https://speakerdeck.com/ozawa/ecs-x-aws-signer-woshi-tutaimesishu-ming-wakuhurowoshi-sitemita) の記事が参考になりました。
 
-# Notationのインストール
+## Notationのインストール
 
 [Install the notation CLI](https://notaryproject.dev/docs/user-guides/installation/cli/) に従い、Notationをインストールします。
 
@@ -76,7 +76,7 @@ Go version:  go1.24.1
 Git commit:  6c5c35a0207eebf8d4d6d2efad66b798457a6622
 ```
 
-# コンテナレジストリを起動
+## コンテナレジストリを起動
 
 DockerHubにプッシュしてもよいですが、単なる技術検証で用いるのは迷惑だと思ったので、ローカルPC上にレジストリを起動させます。同じく、CNCFのSandboxプロジェクトの、 [Zot](https://zotregistry.dev/v2.1.4/) という軽量OCIレジストリを利用します。
 
@@ -111,7 +111,7 @@ Docker DesktopのGUIから、歯車マーク > Docker Engine で、以下の設�
 docker start zot
 ```
 
-# テストキーと自己署名証明書を生成する
+## テストキーと自己署名証明書を生成する
 
 署名するためのテスト RSA キーと、検証するための自己署名 X.509 証明書を、以下で生成します。あくまで動作確認用のコマンドとのこと。プロダクションで利用時は[こちらの手順](https://aws.amazon.com/jp/blogs/containers/announcing-container-image-signing-with-aws-signer-and-amazon-eks/)を参考にして、 AWS Signer などと連携させるか、少なくても、AWS KMSなどシークレットの管理サービスを利用すべきでしょう。
 
@@ -128,7 +128,7 @@ suji-toshi-mashoya: mark as default signing ke
 
 `notation key ls` や `notation cert ls` で署名キーや証明書を確認できます。
 
-# イメージに署名
+## イメージに署名
 
 適当なイメージをpullし、ローカル上のZotレジストリにpushします。
 
@@ -161,7 +161,7 @@ localhost:5000/suji-tootteruyo@sha256:7c0ffe5751238c8479f952f3fbc3b719d47bccac0e
     └── sha256:f42031db9c3000605abfefa753db67e7928c7a907bbf5160c994d4944919958a
 ```
 
-# 署名の検証
+## 署名の検証
 
 信頼ポリシーという、どの署名を信頼するか定義したJSONを作成します。
 
@@ -198,7 +198,7 @@ Successfully verified signature for localhost:5000/suji-tootteruyo@sha256:7c0ffe
 
 無事、成功しました。
 
-# 署名の検証が正しく失敗するか確かめる
+## 署名の検証が正しく失敗するか確かめる
 
 信頼ポリシーに登録されていない、不正な鍵で署名されたイメージがプッシュされた場合に、 `notation verify` による署名検証が失敗することを確かめます。
 
@@ -248,7 +248,7 @@ Error: signature verification failed: artifact "localhost:5000/suji-tooranaiyo@s
 
 想定通り、「署名の検証に失敗しました：アーティファクト localhost:5000/suji-tooranaiyo@sha256:... に適用可能な信頼ポリシーのルールが存在しません。」といったエラーがでて、検証が失敗しました。
 
-# さいごに
+## さいごに
 
 Notary v2 のCLI実装である、Notationを使ってコンテナイメージを署名と、検証を行いました。
 
