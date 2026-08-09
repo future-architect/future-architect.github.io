@@ -233,46 +233,44 @@ hexo.extend.helper.register('author_monthly_chart', function(name) {
 /*
  * 著者一覧ページ
  */
-// 四半期ごとの寄稿者数を 継続・新規・再開 に分けて返す (#2145)。
-// 新規 = その四半期が初投稿。
-// 再開 = 過去に投稿があるが、直前の活動四半期から1年より長くあいた。
-// 継続 = 直前の活動四半期から1年以内
-hexo.extend.helper.register('quarterly_author_types', function() {
-  const qOf = date => date.year() * 4 + Math.floor(date.month() / 3);
-  const activity = new Map(); // 著者 -> 活動した四半期の Set
-  let minQ = Infinity;
-  let maxQ = -Infinity;
+// 年ごとの寄稿者数を 継続・新規・再開 に分けて返す (#2145)。
+// 新規 = その年が初投稿。
+// 再開 = 過去に投稿があるが、前年には無い（2年以上あいた）。
+// 継続 = 前年にも投稿がある
+hexo.extend.helper.register('yearly_author_types', function() {
+  const activity = new Map(); // 著者 -> 活動した年の Set
+  let minY = Infinity;
+  let maxY = -Infinity;
   this.site.posts.forEach(post => {
-    const q = qOf(post.date);
-    if (q < minQ) minQ = q;
-    if (q > maxQ) maxQ = q;
+    const y = post.date.year();
+    if (y < minY) minY = y;
+    if (y > maxY) maxY = y;
     if (!activity.has(post.author)) activity.set(post.author, new Set());
-    activity.get(post.author).add(q);
+    activity.get(post.author).add(y);
   });
-  if (minQ === Infinity) {
-    return JSON.stringify({quarters: [], continuing: [], newcomers: [], returning: []});
+  if (minY === Infinity) {
+    return JSON.stringify({years: [], continuing: [], newcomers: [], returning: []});
   }
 
-  const size = maxQ - minQ + 1;
+  const size = maxY - minY + 1;
   const continuing = new Array(size).fill(0);
   const newcomers = new Array(size).fill(0);
   const returning = new Array(size).fill(0);
   activity.forEach(set => {
-    const qs = [...set].sort((a, b) => a - b);
-    qs.forEach((q, i) => {
+    const ys = [...set].sort((a, b) => a - b);
+    ys.forEach((y, i) => {
       if (i === 0) {
-        newcomers[q - minQ]++;
-      // 4四半期差はちょうど1年後の同じ四半期。それより長くあいたら再開
-      } else if (q - qs[i - 1] > 4) {
-        returning[q - minQ]++;
+        newcomers[y - minY]++;
+      } else if (y - ys[i - 1] > 1) {
+        returning[y - minY]++;
       } else {
-        continuing[q - minQ]++;
+        continuing[y - minY]++;
       }
     });
   });
-  const quarters = [];
-  for (let q = minQ; q <= maxQ; q++) {
-    quarters.push(`${Math.floor(q / 4)}-Q${(q % 4) + 1}`);
+  const years = [];
+  for (let y = minY; y <= maxY; y++) {
+    years.push(String(y));
   }
-  return JSON.stringify({quarters, continuing, newcomers, returning});
+  return JSON.stringify({years, continuing, newcomers, returning});
 });
