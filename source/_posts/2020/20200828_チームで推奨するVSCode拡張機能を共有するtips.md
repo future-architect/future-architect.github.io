@@ -23,11 +23,11 @@ TIG DXユニットの市川です。
 
 今回は、どのようにプロジェクト推奨の拡張機能を設定するのか、新規参画者がどのように拡張機能を導入するかについてご説明します。
 
-# 設定手順
+## 設定手順
 
 まず、どのようにプロジェクト推奨の拡張機能を設定するかについてご説明します。
 
-## .vscode/extensions.jsonの作成
+### .vscode/extensions.jsonの作成
 
 まず、VSCodeを起動してインストールを推奨したい拡張機能のページにアクセスします（今回はESLintを例に説明します）。
 
@@ -44,7 +44,7 @@ TIG DXユニットの市川です。
 
 この手順を繰り返し、プロジェクトに必要な拡張機能を`recommendations` に追加していきます。
 
-## 新規参画者の手順
+### 新規参画者の手順
 
 次に新規参画者が拡張機能をインストールする手順を記載します。
 
@@ -58,12 +58,12 @@ VSCode起動後、まず ctrl + O (Macの方は⌘ + O) を押下して、対象
 
 <img src="/images/2020/20200828/extension_install.png" class="img-middle-size" loading="lazy">
 
-# 最後に
+## 最後に
 
 今回は拡張機能に絞って説明しましたが、VSCodeでは様々な設定をjson形式でチームに共有することが可能です。
 チームで設定を共有し、開発効率を高めていきましょう！
 
-# 参考
+## 参考
 
 * [Extension Marketplace - Workspace recommended extensions](https://code.visualstudio.com/docs/editor/extension-gallery#_workspace-recommended-extensions)
 * [VSCode の Go extension でよく利用するコマンド 7選](/articles/20200707/)

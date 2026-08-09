@@ -14,7 +14,7 @@ lede: "私の使用するテキストエディタはVim一択でしたが、最�
 ---
 <img src="/images/2020/20201117/image.png" loading="lazy">
 
-# はじめに
+## はじめに
 
 こんにちは。TIG/DXユニットの富山です。
 
@@ -22,14 +22,14 @@ lede: "私の使用するテキストエディタはVim一択でしたが、最�
 
 今回はVSCodeでGo言語用のデバッグ環境をテーマします！
 
-# 環境構築
+## 環境構築
 
 前提条件:
 
 1. VSCodeがインストール済であること
 2. Goがインストール済であること
 
-## Step 1：プラグインのインストール
+### Step 1：プラグインのインストール
 
 Googleが公開しているVSCode用のGoプラグインである、[Go for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=golang.Go)をインストールします（2020年6月に開発管理がMicrosoftからGoogleのGo開発チームへ移管されました）。
 <img src="/images/2020/20201117/image_2.png" loading="lazy">
@@ -84,7 +84,7 @@ Installing golang.org/x/lint/golint (C:\Users\username\go\bin\golint.exe) SUCCEE
 All tools successfully installed. You are ready to Go :).
 ```
 
-### Step 2：デバッガツール `delve` のインストール
+#### Step 2：デバッガツール `delve` のインストール
 
 今回はGoのデバッグツールである、[delve](https://github.com/derekparker/delve) を使用します。
 
@@ -107,7 +107,7 @@ Version: 1.5.0
 Build: $Id: ca5318932770ca063fc9885b4764c30bfaf8a199 $
 ```
 
-# 使ってみた
+## 使ってみた
 
 それではVSCodeからデバッグを行ってみましょう。
 
@@ -124,9 +124,9 @@ func main() {
 }
 ```
 
-### デバッグのセットアップ
+#### デバッグのセットアップ
 
-#### `launch.json` の作成
+##### `launch.json` の作成
 
 1. VSCodeの `RUN` コンソール画面に移動
 2. `create a launch.json file.` を押下
@@ -174,7 +174,7 @@ func main() {
 
 今回は紹介しませんが、`launch.json` には他にも予約語の属性が存在するので、興味をお持ちの方は[こちら](https://code.visualstudio.com/docs/editor/debugging#_launchjson-attributes)をご参照ください。
 
-## いざ、デバッグ
+### いざ、デバッグ
 
 さぁ、実行してみましょう。
 
@@ -190,7 +190,7 @@ RUNコンソールの`VARIABLES`部分にて、ブレークポイントで設定
 <img src="/images/2020/20201117/image_6.png" loading="lazy">
 また、VSCode画面中央上部に表示されているパネルでContinueをはじめ、Restartなどの操作ができます。
 
-# 関連情報
+## 関連情報
 
 VSCodeのGo周りでは多賀さんの記事もオススメです。
 
@@ -200,7 +200,7 @@ VSCodeのGo周りでは多賀さんの記事もオススメです。
 
 * [チームで推奨するVSCode拡張機能を共有するtips術](/articles/20200828/)
 
-# おわりに
+## おわりに
 
 これでデバッグ用にPrint文を埋め込んだままcommitしてしまう自分にオサラバです👋
 

@@ -12,7 +12,7 @@ thumbnail: /images/2020/20201120/thumbnail.png
 author: 八巻達紀
 lede: "前回記事「CloudEndure Migration - 導入編」の続きです。今回は、実際にCloudEndure Migrationを使った移行を実践したいと思います。"
 ---
-# はじめに
+## はじめに
 
 こんにちは。
 2020年1月中途入社、TIGの八巻です。
@@ -22,7 +22,7 @@ lede: "前回記事「CloudEndure Migration - 導入編」の続きです。今�
 
 初期設定や用語等は、前回記事をご確認ください。
 
-# 今回の環境構成図
+## 今回の環境構成図
 
 CloudEndure Migrationを実施する環境は以下の通りです。
 <img src="/images/2020/20201120/CloudEndure-Diagram.png" loading="lazy">
@@ -42,7 +42,7 @@ AWSへ移行後、Wordpressにアクセスするまでを実践します。
 <img src="/images/2020/20201120/GCE-Info(Care).jpg" loading="lazy">
 <img src="/images/2020/20201120/GCE-WordPress画面.png" loading="lazy">
 
-# 作業の流れ
+## 作業の流れ
 
 以下の流れで作業を実施します。
 
@@ -59,11 +59,11 @@ AWSへ移行後、Wordpressにアクセスするまでを実践します。
         2. 起動後の設定修正(テストモードと同じ内容のため、省略)
 6. ターゲットマシンからエージェントのアンインストール
 
-# 要件確認
+## 要件確認
 
 CloudEndureを利用する要件を満たしているか確認します。
 
-## 共通の要件確認
+### 共通の要件確認
 
 全OS共通で、以下の要件を満たしている必要があります。
 
@@ -72,7 +72,7 @@ CloudEndureを利用する要件を満たしているか確認します。
 |仮想化タイプ|準仮想化タイプはサポート対象外||
 |EBSのマルチアタッチ|EBSマルチアタッチ機能を使ったEC2インスタンスは、移行元のサーバーとしてサポート対象外|AWSからAWSへの移行を行う場合、確認が必要です。
 
-### 仮想化タイプ
+#### 仮想化タイプ
 
 ```bash 実行結果
 [root@cloudendure-source ~]# lscpu | grep "Virtualization type"
@@ -81,11 +81,11 @@ Virtualization type:   full
 
 完全仮想化のため、OKです。
 
-### EBSのマルチアタッチ
+#### EBSのマルチアタッチ
 
 今回は、GCEのため対象外。
 
-## LinuxOS固有の要件確認
+### LinuxOS固有の要件確認
 
 LinuxOSは、以下の要件を満たしている必要があります。
 
@@ -96,7 +96,7 @@ LinuxOSは、以下の要件を満たしている必要があります。
 |ブートローダー|GRUBのみサポート||
 |ファイルシステム|root もしくは、bootがXFS5タイプのファイルシステムの場合、サポート対象外|xfsがNGなのか不明のため、今回検証してみようと思います。|
 
-### カーネルバージョン確認
+#### カーネルバージョン確認
 
 ```bash 実行結果
 [root@cloudendure-source ~]# uname -r
@@ -105,7 +105,7 @@ LinuxOSは、以下の要件を満たしている必要があります。
 
 2.6.18-164以降のため、OKです。
 
-### Pythonバージョン
+#### Pythonバージョン
 
 ```bash 実行結果
 [root@cloudendure-source ~]# python --version
@@ -114,7 +114,7 @@ Python 2.7.5
 
 2.4以上のため、OKです。
 
-### ブートローダーの確認
+#### ブートローダーの確認
 
 ```bash 実行結果
 [root@cloudendure-source ~]# ll /boot/grub2/grub.cfg
@@ -123,7 +123,7 @@ Python 2.7.5
 
 ブートローダーはgrubのため、OKです。
 
-### rootとbootのファイルシステム
+#### rootとbootのファイルシステム
 
 ```bash 実行結果
 [root@cloudendure-source ~]# df -T
@@ -141,7 +141,7 @@ tmpfs          tmpfs       101376       0    101376   0% /run/user/1000
 `/dev/sda2      xfs       20754432 3063128  17691304  15% /`
 Typeにxfsとありますが、NGとなるか検証したいと思います。
 
-## CentOS固有の要件・注意点確認
+### CentOS固有の要件・注意点確認
 
 最後に、CentOS固有の要件を確認します。
 <img src="/images/2020/20201120/CentOS-Note.png" loading="lazy">
@@ -169,18 +169,18 @@ RHEL8.0/CentOS8.0の場合、`sudo yum install elfutils-libelf-devel`の実行�
 事前確認は以上です。
 rootのファイルシステムがxfsなのが気になりますが、移行できるか検証してみたいと思います。
 
-# CloudEndureエージェントインストール
+## CloudEndureエージェントインストール
 
 実際にCloudEndure Migrationを利用した移行を開始します。
 
-## エージェントのインストール手順
+### エージェントのインストール手順
 
 マシンの登録がない初期は、CloudEndureコンソールの「Machines」に記載があります。
 また、画面上部にある「MACHINE ACTIONS...」の「Add Machines」からも確認が可能です。
 ※インストール用のTokenは、アカウント固有の情報のため伏せています。
 <img src="/images/2020/20201120/AgentInstall方法.jpg" loading="lazy">
 
-### エージェントのインストーラーを取得
+#### エージェントのインストーラーを取得
 
 以下のコマンドを実行して、CloudEndureエージェントのインストーラーを取得します。
 ※wgetは事前にインストールしておいてください。
@@ -205,7 +205,7 @@ IPアドレス「52.72.172.158」に接続しています。
 インストーラーが取得できない場合は、[導入編](/articles/20201021/)にも記載していますが、
 ネットワーク要件を満たしているか確認してください。
 
-### エージェントのインストーラーを実行
+#### エージェントのインストーラーを実行
 
 以下のコマンドを実行して、インストーラーを実行します。
 ※${インストール用Token}は、書き換えてください。
@@ -238,7 +238,7 @@ Installation finished successfully.
 レプリケーションを開始するには、「Machines」> 「MACHINE ACTIONS」メニューから、「Start/resume Data Replication」をクリックすることで実施可能です。
 <img src="/images/2020/20201120/DataReplicationStart.png" loading="lazy">
 
-# データのレプリケーション
+## データのレプリケーション
 
 エージェントのインストール完了後、CloudEndureコンソールの「Machines」に登録され、レプリケーションが開始します。
 <img src="/images/2020/20201120/Insrall直後.png" loading="lazy">
@@ -280,7 +280,7 @@ Installation finished successfully.
 移行元サーバーからレプリケーションサーバーへの通信速度とその間の帯域幅や
 ストレージのI/O速度等が影響するようです。
 
-# ターゲットマシンの設定
+## ターゲットマシンの設定
 
 データのレプリケーションが完了したら、ターゲットマシンの設定を行います。
 登録されたマシンのページにある「BLUE PRINT」から設定を行います。
@@ -326,17 +326,17 @@ EC2インスタンスを起動する際の設定項目と類似しているた�
 |Tags|Key:Name,Value:TargetMachine|この項目はオプションです。|
 |Disks|SSD|SSDの場合、gp2です、|
 
-# ターゲットマシン起動
+## ターゲットマシン起動
 
 ターゲットマシンの起動は、テストモードとカットオーバーの2種類あります。
 
-## テストモード
+### テストモード
 
 テストモードでは、AWS環境で適切に起動できるかの検証が可能です。
 少なくとも、本番切り替えの1週間前には、実施することが推奨されています。
 テストモードで起動後、SSHやRDPでログインし、正しく起動できているか検証します。
 
-### ターゲットマシン起動
+#### ターゲットマシン起動
 
 実際にテストモードでターゲットマシンを起動してみます。
 
@@ -407,7 +407,7 @@ lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
 SSHログインできました。
 rootのファイルシステムが「xfs」でも、問題ないようです。
 
-### 起動後の設定修正
+#### 起動後の設定修正
 
 SSHでログインできたので、WordPress接続に向けた設定修正を行います。
 
@@ -458,12 +458,12 @@ Apacheを再起動して、WordPressにアクセス/ログインしてみます�
 テストモードで起動後、実際にサーバーに入って設定の修正が可能です。
 本番切り替え前に、設定変更が必要な箇所の整理等に利用できます。
 
-## カットオーバー
+### カットオーバー
 
 テストが完了したら、カットオーバーを実施します。
 カットオーバーすると、テストモードで起動したインスタンスは終了されます。
 
-### ターゲットマシン起動
+#### ターゲットマシン起動
 
 テストモードのインスタンスを起動したまま、
 カットオーバーを実施してみます。
@@ -486,7 +486,7 @@ AWSのコンソールを確認すると、テストモードで起動したEC2�
 カットオーバーが完了しました。
 <img src="/images/2020/20201120/Launch_Target(CutOver)成功.png" loading="lazy">
 
-### 起動後の設定修正
+#### 起動後の設定修正
 
 テストモードと同じく、SSHでログインして、
 WordPressの設定を変更したあと、アクセスしてみます。
@@ -494,12 +494,12 @@ WordPressの設定を変更したあと、アクセスしてみます。
 <img src="/images/2020/20201120/EC2_WordPress(CutOver).png" loading="lazy">
 アクセスできました。
 
-# ターゲットマシンからエージェントのアンインストール
+## ターゲットマシンからエージェントのアンインストール
 
 カットオーバー完了後は、CloudEndureエージェントは不要となります。
 ターゲットマシンからアンインストールを行います。
 
-## エージェントの停止
+### エージェントの停止
 
 以下のコマンドをrootで実行して、エージェントを停止します。
 `/var/lib/cloudendure/stopAgent.sh`
@@ -529,7 +529,7 @@ Killing tail: 1691
 Killed tail
 ```
 
-## インストール時の設定削除
+### インストール時の設定削除
 
 以下のコマンドをrootで実行することで、起動設定などを削除できます。
 `/var/lib/cloudendure/install_agent --remove`
@@ -566,7 +566,7 @@ retcode: 0
 
 あとは、インストーラーやCloudEndureのログファイルなど、適宜削除してください。
 
-# まとめ
+## まとめ
 
 2回に分けて、CloudEndureについて、記述しました。
 移行元のサーバーを起動したまま、サーバーをまるごと移行できるのが
@@ -574,7 +574,7 @@ CloudEndure Migrationの強みです。
 
 CloudEndure自体の利用は無料のため、試してみてはいかがでしょうか。
 
-# 参考リンク
+## 参考リンク
 
 * [CloudEndureDocumentation](https://docs.cloudendure.com/CloudEndure%20Documentation.htm)
 * [[クラウド移行] CloudEndureを使ったEC2への移行を計画する前に考慮しておきたいポイント](https://dev.classmethod.jp/articles/planning-migration-cloudendure/)

@@ -15,14 +15,14 @@ author: 佐藤尚至
 lede: "Android Developerの佐藤です。モバイルアプリ品質強化の強い味方となってくれるFirebase Crashlyticsを紹介したいと思います！Firebaseとは、AndroidやiOSなどのモバイルアプリのバックエンド機能を提供してくれるサービスです。提供されているサービスは..."
 ---
 
-# はじめに
+## はじめに
 
 こんにちは、Android Developerの佐藤です。
 
 [サーバーレス連載](/articles/20200322/)の4回目を担当します！
 モバイルアプリ品質強化の強い味方となってくれるFirebase Crashlyticsを紹介したいと思います！
 
-# そもそもFirebaseとは
+## そもそもFirebaseとは
 
 Firebaseとは、AndroidやiOSなどのモバイルアプリのバックエンド機能を提供してくれるサービスです。
 [提供されているサービス](https://firebase.google.com/products?hl=ja)は、利用状況の解析、クラッシュの検知、認証、通知、ホスティングなど多種多様です。
@@ -31,7 +31,7 @@ Firebaseとは、AndroidやiOSなどのモバイルアプリのバックエン�
 
 ※ Firebaseはモバイルアプリだけでなく、Webアプリにも対応しています。サービスごとに、対応しているプラットフォームが異なる点に注意が必要です。
 
-# Firebase Crashlyticsとは
+## Firebase Crashlyticsとは
 
 どんなに気をつけていても、予期せずアプリがクラッシュしてしまうことはあります。
 クラッシュしないようなコーディングに努めることも重要ですが、クラッシュがあったという事実をいち早く検知し、その原因を突き止めることも同じくらい重要です。
@@ -47,7 +47,7 @@ Firebase Crashlyticsを導入することで、以下の情報を簡単に知る
 
 以下では、実際にFirebase Crashlyticsを使って、どのようにクラッシュ情報にアクセスできるようになるのかを見ていきます。
 
-# Firebase Crashlyticsを使ってみる
+## Firebase Crashlyticsを使ってみる
 
 簡単なサンプルアプリを用いて、
 
@@ -56,7 +56,7 @@ Firebase Crashlyticsを導入することで、以下の情報を簡単に知る
 
 を見ていきましょう。
 
-## サンプルアプリを用意する
+### サンプルアプリを用意する
 
 Android Studioで`Empty Activity`テンプレートをベースにした新規プロジェクトを作成します。
 ボタンを画像のように2つ追加します。
@@ -70,7 +70,7 @@ Android Studioで`Empty Activity`テンプレートをベースにした新規�
 
 意図的に例外が発生する状況を再現しています。
 
-## Firebaseをセットアップする
+### Firebaseをセットアップする
 
 Firebase公式ページを見ながらFirebaseのセットアップを行います。
 https://firebase.google.com/docs/android/setup
@@ -80,7 +80,7 @@ Firebaseコンソール画面も親切にナビゲートしてくれるので安
 
 <img src="/images/2020/20200330/2.png" loading="lazy">
 
-## Firebase Crashlyticsをセットアップする
+### Firebase Crashlyticsをセットアップする
 
 [Firebaseのセットアップ](https://firebase.google.com/docs/android/setup)が完了していれば、`build.gradle`にコードを数カ所追加するだけでCrashlyticsの最小限の設定は完了です。アプリが異常終了したとき、自動的にFirebaseにクラッシュレポートが送信されます。
 
@@ -119,7 +119,7 @@ dependencies {
 
 ※ 2020/3/30現在2つのCrashlytics SDKが存在します。"Fabric系譜のCrashlytics SDK"と"Firebase向けに新調されたSDK"です。後者は、2020/3/30現在beta版となっています。今回はGAになっている前者のSDKを使用しています。
 
-## アプリをクラッシュさせてみる
+### アプリをクラッシュさせてみる
 
 `MainActivity`の実装例はこちらです。`FATAL`ボタン、`NON FATAL`ボタンに`OnClickListener`をセットしています。
 
@@ -166,9 +166,9 @@ public class MainActivity extends AppCompatActivity {
 
 クラッシュが起きないようにエラーハンドリングはしているけれど、開発者目線で「この例外の発生は検知したい」というような場合がよくあります。そういった場合は、`Crashlytics.logException()`メソッドを利用します。発生した例外を「非致命的(Non-fatal)」な例外としてFirebaseに通知できます。
 
-## Firebaseコンソールでクラッシュレポートを確認する
+### Firebaseコンソールでクラッシュレポートを確認する
 
-### Overview
+#### Overview
 
 サイドナビの`品質`から`Crashlytics`を選択するとCrashlyticsの画面が開きます。
 こちらの画面からクラッシュ状況の概要がわかります。
@@ -178,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
 
 <img src="/images/2020/20200330/3.png" loading="lazy">
 
-### クラッシュレポート
+#### クラッシュレポート
 
 `Fatal`ボタンをクリックすることによって発生したクラッシュレポート(MainActivity.java - line 23)を見てみましょう。
 
@@ -197,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
 
 <img src="/images/2020/20200330/5.png" loading="lazy">
 
-### ユーザーIDでの検索
+#### ユーザーIDでの検索
 
 「ユーザーIDでの検索」も行うことができます。
 ユーザーから不具合の問い合わせがあった際に、ソースコードのどの箇所で異常があったがゆえにそのユーザーの端末で不具合が発生したのかを素早く知ることができます。
@@ -209,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
 Crashlytics.setUserIdentifier("user0001");
 ```
 
-# 最後に
+## 最後に
 
 Firebase Crashlyticsは本当にさくっと導入できます。
 ユーザーの端末に埋もれてしまいがちなクラッシュ情報に簡単にアクセスできるのが嬉しいポイントですね。

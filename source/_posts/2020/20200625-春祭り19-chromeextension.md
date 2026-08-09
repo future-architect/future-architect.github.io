@@ -18,7 +18,7 @@ lede: "現在業務では直接開発をする機会はないのですが、業�
 
 [春の入門祭り](/articles/20200529/)の第19弾です
 
-# はじめに
+## はじめに
 
 フューチャーに入社して約半年が経ちました。CSIGの谷田です。
 
@@ -26,7 +26,7 @@ lede: "現在業務では直接開発をする機会はないのですが、業�
 
 作成方法自体はとっても簡単なので、ぜひ皆様もやってみてください！
 
-# 拡張機能とは
+## 拡張機能とは
 
 Webページの閲覧や情報の検索に使用するブラウザに、自身で選んだ機能を追加することで、日常業務や作業を効率化して、便利にしてくれるものです。
 
@@ -37,7 +37,7 @@ Webページの閲覧や情報の検索に使用するブラウザに、自身�
 * What are extensions?: https://developer.chrome.com/extensions
 * 拡張機能とは何か？ : https://developer.mozilla.org/ja/docs/Mozilla/Add-ons/WebExtensions/What_are_WebExtensions
 
-# 用意する物
+## 用意する物
 
 以下のファイルは、manifest.jsonファイルへのパスの記載が楽なので同一フォルダに入れます（今回は/desktop/Myextension）。manifest.jsonとは、拡張機能の仕様を書くファイルのことです。
 
@@ -63,7 +63,7 @@ JavaScriptの基本から勉強するには、MDNのこちらのサイトがお�
 
 以上！！
 
-## manifest.json
+### manifest.json
 
 さて、ここで肝となるのがmanifest.jsonファイルですが、さっそくこちらの中身を見ていきましょう。
 
@@ -84,39 +84,39 @@ JavaScriptの基本から勉強するには、MDNのこちらのサイトがお�
 
 以下、今回記載した項目と簡単な説明です。
 
-### name（必須）
+#### name（必須）
 
 拡張機能の名前を書きます。
 ブラウザに追加した際に、拡張機能の管理画面にも名前として表示されます。
 
-### discription（推奨）
+#### discription（推奨）
 
 必要に応じて拡張機能の説明を記載します。
 なくても動作しますが、あったほうが分かりやすいです。
 
-### version（必須）
+#### version（必須）
 
 拡張機能自体のバージョンを記載します。
 最初なので1.0を記載しておきます。
 
-### manifest_version（必須）
+#### manifest_version（必須）
 
 拡張機能で使用される manifest.json のバージョンを指定します。
 現在のバージョンは2なので2を記載します。
 
-### browser_action
+#### browser_action
 
 ツールバーに拡張機能を追加します。
 
-#### - default_icon（推奨）
+##### - default_icon（推奨）
 
 拡張機能を有効化した際に、ブラウザのツールバーに表示するアイコンを指定できます。16は、16px×16pxの大きさという意味です。
 
-#### - default_popup
+##### - default_popup
 
 アイコンをクリックすると、指定したファイルがポップアップとして表示されます。
 
-### その他
+#### その他
 
 今回は、記載するのは上記だけです。
 
@@ -128,7 +128,7 @@ MDNにも詳しく載っています。
 
 * https://developer.mozilla.org/ja/docs/Mozilla/Add-ons/WebExtensions/manifest.json
 
-## Chrome拡張機能に追加
+### Chrome拡張機能に追加
 
 ここまでできたら、実際に自分のChromeの拡張機能に追加していきます。
 「右上のその他のアイコンを右クリック→その他のツール→拡張機能」を選択もしくは、URLバーに「chrome://extensions」と入力して拡張機能の管理画面を表示したら、右上のデベロッパーモードをオンにして、
@@ -154,7 +154,7 @@ MDNにも詳しく載っています。
 
 <img src="/images/2020/20200625/kuma.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
 
-## jQueryを用いた拡張
+### jQueryを用いた拡張
 
 次に、jQueryを使用して、指定した画面にカレンダーをが表示されるようにしてみました。
 https://jquery.com/
@@ -183,22 +183,22 @@ https://jquery.com/
 }
 ```
 
-### content_scripts
+#### content_scripts
 
 配列で記載し、特定のウェブページのコンテキストで実行される拡張機能の一部を指定します。
 
-#### - matches
+##### - matches
 
 動作対象のURLを記載します。
 今回はhttps://www.google.com/
 を開いたときに画面にカレンダーを表示する仕様です。
 カレンダーを表示したいサイトのURLを記載します。
 
-#### - css
+##### - css
 
 動作させるcssファイルを記載します。
 
-#### - js
+##### - js
 
 動作させるjsファイルを記載します。ここにjQuery.jsも記載します。
 

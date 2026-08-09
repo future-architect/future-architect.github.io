@@ -13,7 +13,7 @@ thumbnail: /images/2020/20201112/thumbnail.png
 author: 辻大志郎
 lede: "サーバーレスなアプリケーションを開発するときにAWS LambdaやCloud RunといったFaaSはとても重宝します。デプロイする関数のコードは1つの関数がモノリシックな大きな関数にならないように、小さな関数を組み合わせて実装するのが基本です。いくつかのユースケースでAWS LambdaからAWS Lambdaを同期的に呼び出したいケースがあったのですが、開発者が意識しておいたほうがいいようなハマりどころがいくつかありました。"
 ---
-# はじめに
+## はじめに
 
 TIGの辻です。サーバーレスなアプリケーションを開発するときにAWS LambdaやCloud RunといったFaaSはとても重宝します。デプロイする関数のコードは1つの関数がモノリシックな大きな関数にならないように、小さな関数を組み合わせて実装するのが基本です。いくつかのユースケースでAWS LambdaからAWS Lambdaを同期的に呼び出したいケースがあったのですが、開発者が意識しておいたほうがいいようなハマりどころがいくつかありました。
 
@@ -32,9 +32,9 @@ TIGの辻です。サーバーレスなアプリケーションを開発する�
 
 またAWSのリージョンは、アジアパシフィック(東京) `ap-northeast-1` です。Lambda関数のランタイムは `Go 1.x` を使っています。
 
-# ハマりどころ集
+## ハマりどころ集
 
-## 1. Lambda関数呼び出しのエラーハンドリング
+### 1. Lambda関数呼び出しのエラーハンドリング
 
 Lambda関数を呼び出す `InvokeWithContext` ですが `InvokeWithContext` は呼び出し先のLambda関数が正常に呼び出された場合は、以下の戻り値の `error` は常に `nil` になります。
 
@@ -58,7 +58,7 @@ Lambda関数を呼び出す `InvokeWithContext` ですが `InvokeWithContext` �
 
 <img src="/images/2020/20201112/image.png" loading="lazy">
 
-### 修正例
+#### 修正例
 
 **`InvokeOutput` の `FunctionError` が `nil` かどうかで呼び出し先のLambda関数でエラーが発生したかチェックする**
 
@@ -80,7 +80,7 @@ Lambda関数を呼び出す `InvokeWithContext` ですが `InvokeWithContext` �
 
 <img src="/images/2020/20201112/image_2.png" loading="lazy">
 
-## 2. Contextでは値を伝播できない
+### 2. Contextでは値を伝播できない
 
 GoではContextという、APIやプロセス間で、処理のデッドラインを設定やリクエストスコープ内に閉じた値を伝播する機能があります。Contextを用いて値を伝播するときは[context.WithValue](https://golang.org/pkg/context/#WithValue)を使って、キーとバリューのセットでコンテキストに値を格納します。
 
@@ -151,7 +151,7 @@ AWSが提供しているGoのSDK [`aws-sdk-go`](https://github.com/aws/aws-sdk-g
 
 `InvokeWithContext` は `Context` を引数に受け取るため、`context.WithValue` でセットした値を呼び出し先のLambda関数に伝播できるのでは？ と思うかもしれません。しかし、呼び出し元で `Context` に `context.WithValue` でセットしても値は呼び出し先のLambda関数に伝播されません。なぜなら `InvokeWithContext` における `Context` はリクエストのキャンセルするためのもので、値を伝播するためのものではないからです。
 
-### 解決策
+#### 解決策
 
 **`InvokeInput` 型の `Payload` フィールドを使う**
 
@@ -336,7 +336,7 @@ func Handler(ctx context.Context, r model.Reader) error {
 [DEBUG] 2020/10/11 03:05:17 hello invoked lambda!, model.Reader=model.Reader{Message:"hello world!"}
 ```
 
-## 3. VPC LambdaからVPC LambdaはInternalな通信では呼び出せない
+### 3. VPC LambdaからVPC LambdaはInternalな通信では呼び出せない
 
 Transit Gatewayなどを使ってオンプレとクラウドを接続する場合など、いくつかのユースケースでLambda関数をVPC Lambdaとして配置したい場合があります。VPC内にあるLambda関数から(VPC Lambda・非VPC Lambda問わず)別のLambda関数を呼び出す場合には~~Internalの通信で呼び出せないことに注意が必要です。(2020/10/13現在)~~ VPC Endpointを使ってInternalな通信で呼び出せるようになりました。
 
@@ -344,7 +344,7 @@ Transit Gatewayなどを使ってオンプレとクラウドを接続する場�
 
 <img src="/images/2020/20201112/LambdaからLambda-VPCLambda.png" loading="lazy">
 
-### VPCエンドポイントがなかった従来の場合
+#### VPCエンドポイントがなかった従来の場合
 
 同じVPCに含まれるLambda関数であるため、インターネットを経由せずにInternalな通信でLambda関数からLambda関数を呼び出せることを期待しますが、できません。`InvokeWithContext` で呼び出すと以下のようになります。
 
@@ -362,7 +362,7 @@ caused by: Post "https://lambda.ap-northeast-1.amazonaws.com/2015-03-31/function
 
 AWSのサービスをSDKで呼び出す場合は、リクエストのエンドポイントは各サービスで提供されているエンドポイントを使用します。Lambdaの場合は [AWS Lambda エンドポイントとクォータ](https://docs.aws.amazon.com/ja_jp/general/latest/gr/lambda-service.html) にあるように、`lambda.ap-northeast-1.amazonaws.com` となります(リージョンが `ap-northeast-1` の場合)。ログからも `lambda.ap-northeast-1.amazonaws.com` となっていることがわかります。VPC LambdaからVPC Lambdaを呼び出す場合においても、サービスが提供しているエンドポイントを経由する必要があるため、SDKでLambda関数を呼び出す場合はインターネットへ抜けるネットワーク経路が必要になります。
 
-### VPCエンドポイントを使う場合
+#### VPCエンドポイントを使う場合
 
 2020/10/20に公開されたブログにあるように、Lambda関数をVPCエンドポイント経由で呼び出せるようになりました。東京リージョン(`ap-northeast-1`)にも対応しています。待望のアップデートです。
 
@@ -401,7 +401,7 @@ func init() {
 
 といった回避策が必要でした。NAT Gatewayが構築できないインフラ構成の場合、どうしても複雑な構成を取らざるを得ませんでした。今回VPC EndpointがLambda関数に対応したことで、プライベートなネットワーク環境内でLambda関数を使うユースケースも増えていくのではないかと思います。
 
-### ~~解決策~~
+#### ~~解決策~~
 
 ~~**プライベートなサブネットからインターネットに抜ける経路を構築する**~~
 
@@ -411,7 +411,7 @@ func init() {
 
 2020/10/20現在、VPCエンドポイントがLambdaに対応したため、VPCエンドポイントを使う場合、上記の解決先は不要になりました。
 
-## 4. デフォルトでは同期呼び出し
+### 4. デフォルトでは同期呼び出し
 
 Lambda関数の呼び出しは2種類あります。1つは呼び出しのレスポンスを待つ同期型、もう1つは呼び出し時は即座に呼び出し元がレスポンスが返し、後で処理が実行される非同期型です。`InvokeWithContext` を使ってLambda関数を呼び出す場合はデフォルトだと同期型として呼び出します。呼び出し先のLambda関数が重い処理でレスポンスを返すまでに時間がかかる場合は非同期型を選択する場合もあるでしょう。呼び出し方法の選択は `InvokeInput` の `InvocationType` フィールドを用いて指定します。同期型の場合は `lambda.InvocationTypeRequestResponse` (`RequestResponse` の文字列)で非同期型の場合は `lambda.InvocationTypeEvent` (`Event`)となります。
 
@@ -427,7 +427,7 @@ Lambda関数の呼び出しは2種類あります。1つは呼び出しのレス
 	}
 ```
 
-## 5. 呼び出し先のLambdaの同時実行数以上の同期呼び出しは即座にエラーが返る
+### 5. 呼び出し先のLambdaの同時実行数以上の同期呼び出しは即座にエラーが返る
 
 Lambda関数は「[同時実行数](https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/configuration-concurrency.html)」という設定を使って、同時に実行できるLambda関数に制約を付与できます。非同期型の呼び出しの場合は、呼び出し元には成功のステータスが返されます。Lambda関数はキューイング後、遅延して実行されます。しかし、同期型として呼び出す場合、同時実行数以上の数を呼び出した場合は即座に呼び出し元に [`TooManyRequestsException`](https://pkg.go.dev/github.com/aws/aws-sdk-go@v1.35.7/service/lambda#TooManyRequestsException) のエラーが返ってきます。
 
@@ -462,7 +462,7 @@ null
 
 呼び出し先のLambda関数からのレスポンスが必要な場合は同期型として呼び出すことになりますが、即座にエラーになる点は注意が必要です。
 
-## 6. 呼び出し先のLambdaに設定されている環境変数は使える
+### 6. 呼び出し先のLambdaに設定されている環境変数は使える
 
 APIでLambda関数を呼び出した場合、呼び出し先の環境変数が使えなくなるのでは？ と思う方もいるかもしれませんが、実は環境変数もちゃんとセットされます。
 
@@ -493,6 +493,6 @@ func Handler(ctx context.Context) error {
 
 想定通り環境変数から設定される変数 `logLevel` の値がセットされていることがわかります。
 
-# まとめ
+## まとめ
 
 GoでLambda関数からLambda関数を同期的に呼び出すときのハマりどころやTipsを紹介しました。ドキュメントを隅々まで注意深く読んでいないと、はまりがちなポイントだと思いますので、きっと皆さんの役に立つのではないかなと思います。

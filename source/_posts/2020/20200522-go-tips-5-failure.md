@@ -16,13 +16,13 @@ lede: "今回は、errors package を一部利用して、エラーコードベ�
 
 <img src="/images/2020/20200522/top.png" loading="lazy">
 
-# 概要
+## 概要
 
 TIG DX所属の多賀です。最近は設計をしつつ Go も触れて引き続き楽しく仕事してます。
 
 今回は、[errors](https://pkg.go.dev/errors?tab=doc) package を一部利用して、エラーコードベースのエラーハンドリング処理を実装しました。また、morikuni/failure を利用した実装への書き換えも試してみています。
 
-# エラーコードベースの例外ハンドリングについて
+## エラーコードベースの例外ハンドリングについて
 
 前提としてGoで書かれた HTTP APIサーバーに対してのエラーハンドリングについて記載します。
 
@@ -41,7 +41,7 @@ TIG DX所属の多賀です。最近は設計をしつつ Go も触れて引き�
 
 エラーコードを利用した際に重要なことは、エラーコード外のエラーを発生させないことにあると考えています。エラーコード外のエラーが発生した際、何をどうしたらよいかが明文化されていないためです。エラーは、ログより発生を検知し対応するものとした際に、いかにアプリケーションから出力されるログに対して、適切にエラーコードを付与できるかが大事です。
 
-# errors package を利用した実装例
+## errors package を利用した実装例
 
 アプリケーション側での、コンパイルレベルでの制約は難しくコードレビューでの担保もふくまれますが、以下のようにしてエラーを出力しています。
 
@@ -54,7 +54,7 @@ TIG DX所属の多賀です。最近は設計をしつつ Go も触れて引き�
 └── infra      # DBや外部API等の外部リソースへアクセスする層
 ```
 
-## エラーコード別のエラーを定義
+### エラーコード別のエラーを定義
 
 ```go
 package apperror
@@ -84,7 +84,7 @@ func (e *ClientError) Unwrap() error {
 }
 ```
 
-## handler 層に返却される error を必ずエラーコード対応Error型とする
+### handler 層に返却される error を必ずエラーコード対応Error型とする
 
 各層のerror を wrappingして handler 層に返却します。ここは愚直にやらないといけないところです。(静的解析ツールを作ってチェックする機構を用意するほうがより良いですね。)
 
@@ -108,7 +108,7 @@ func (h User) Search(id string) (string, error) {
 }
 ```
 
-## エラーログを出力する箇所を集約
+### エラーログを出力する箇所を集約
 
 handler 層に集約させます。
 
@@ -141,7 +141,7 @@ func errorLog(err error) {
 
 ただ、独自エラーを定義して Wrapするところはもっと書きやすくできないか、検討の余地がありそうだと感じました。
 
-# morikuni/failure を利用できないか?
+## morikuni/failure を利用できないか?
 
 morikuni/failure は morikuni さんが作成されたエラーハンドリング向けのライブラリです。errors package 存在前より開発されているライブラリです。
 
@@ -157,11 +157,11 @@ morikuni/failure は morikuni さんが作成されたエラーハンドリン�
 
 参考: [https://speakerdeck.com/morikuni/designing-errors?slide=33](https://speakerdeck.com/morikuni/designing-errors?slide=33)
 
-## やってみた
+### やってみた
 
 morikuni/failure を利用して上記のコードを書き換えてみました。
 
-### エラーコード別のエラーを定義
+#### エラーコード別のエラーを定義
 
 とてもシンプルですね。追加も簡単になりそうです。
 
@@ -177,7 +177,7 @@ const (
 )
 ```
 
-### handler 層に返却される error を必ずエラーコードに対応させた独自エラーとする
+#### handler 層に返却される error を必ずエラーコードに対応させた独自エラーとする
 
 morikuni/failure でも、エラーコードへの変換 ( `failure.Translate`  ) や エラーコードの Wrap ( `failure.Wrap` ) は可能です。
 (ちなみに、failureで生成したエラーも errors package のインタフェースを満たしています。)
@@ -205,7 +205,7 @@ func (h User) Search(id string) (string, error) {
 }
 ```
 
-### エラーログを出力する箇所を集約
+#### エラーログを出力する箇所を集約
 
 README の sample を参考にハンドリング処理を実装してみました。
 
@@ -251,7 +251,7 @@ func httpStatus(err error) int {
 }
 ```
 
-# 感想
+## 感想
 
 エラーコードベースの例外ハンドリングのTipsについて記載しました。
 
@@ -263,7 +263,7 @@ failure を利用したほうがよりシンプルに書けて良いのではな
 
 failureは実戦で使えてないので、次回チャレンジしてみたいです。
 
-# 参考
+## 参考
 
 - [Working with Errors in Go 1.13 - The Go Blog](https://blog.golang.org/go1.13-errors)
 - [failure package · go.dev](https://pkg.go.dev/github.com/morikuni/failure?tab=doc)

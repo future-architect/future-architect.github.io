@@ -20,7 +20,7 @@ lede: "みなさん、Swagger使ってますか？本記事では実際にSwagge
 
  [^1]: Technology Innovation Groupの略で、フューチャーの中でも特にIT技術に特化した部隊です。その中でもDXチームは特にデジタルトランスフォーメーションに関わる仕事を推進していくチームです。
 
-# はじめに
+## はじめに
 
 <img src="/images/2020/20200409/1.png" style="border:solid 1px #000000" loading="lazy">
 
@@ -28,7 +28,7 @@ lede: "みなさん、Swagger使ってますか？本記事では実際にSwagge
 Swaggerや周辺ツールについては [某先輩の記事](/articles/20191008/) にて丁寧に解説されていますので、
 本記事では実際にSwaggerのスキーマ定義を設計していく上で取り決めた規約について書いてみたいと思います。
 
-# 前提
+## 前提
 
 私が在籍しているプロジェクトでは、REST APIは golang でフロントエンドを Vue.js + TypeScript で構築しています。
 短期間・高品質での構築を実現するためにSwaggerを設計ドキュメントとしてだけではなく、コード自動生成やモックサーバーに活用させることで徹底したスキーマファーストな開発を行ってきました。
@@ -41,16 +41,16 @@ Swaggerや周辺ツールについては [某先輩の記事](/articles/20191008
 
  [^2]: go-swaggerについては [WAFとして go-swagger を選択してみた](/articles/20190814/) で詳しく紹介されています。
 
-# 設計規約
+## 設計規約
 
-## バージョン
+### バージョン
 
 * [OpenAPI v2](https://swagger.io/docs/specification/2-0/basic-structure/)
   * 前述の`go-swagger`が3系に対応されていないため2系を利用
 
-## paths
+### paths
 
-### tags
+#### tags
 
 * 必須
 * 1URIで１つのタグのみ定義する
@@ -75,7 +75,7 @@ tag:
   - product
 ```
 
-### operationId
+#### operationId
 
 * 必須
 * `${HTTPメソッド}${機能物理名}`を記載する
@@ -95,7 +95,7 @@ operationId: putProduct
 operationId: deleteProduct
 ```
 
-### summary
+#### summary
 
 * 必須
 * `${機能ID} ${機能論理名}`で定義する
@@ -104,7 +104,7 @@ operationId: deleteProduct
 summary: XXX-0001 商品参照
 ```
 
-### security
+#### security
 
 * 必須
 * 認証の要否で以下のように定義する
@@ -130,7 +130,7 @@ securityDefinitions:
     tokenUrl: 'https://example.com/.well-known/jwks.json'
 ```
 
-### description
+#### description
 
 * 必須
 * APIの機能概要を記載する。
@@ -139,9 +139,9 @@ securityDefinitions:
 description: IDを指定して商品情報を取得する。
 ```
 
-### parameters
+#### parameters
 
-#### GET/DELETE API の場合
+##### GET/DELETE API の場合
 
 * in:          PATHパラメータ`in: path`またはクエリパラメータ`in: query`のみ利用可能
 * description: 必須
@@ -184,7 +184,7 @@ description: IDを指定して商品情報を取得する。
   description: 不良品フラグ
 ```
 
-#### POST/PUT API の場合
+##### POST/PUT API の場合
 
 * in:       リクエストボディ`in: body`のみ利用可能
 * name:     全て`name: body`とする
@@ -212,7 +212,7 @@ parameters:
           type: string
 ```
 
-#### バリデーション
+##### バリデーション
 
 * 必須
   * required: 必須パラメータのみ`required: true`を定義する
@@ -319,9 +319,9 @@ parameters:
 * その他
   * 正規表現で表現できる文字列は`pattern`を利用して定義すること
 
-## responses
+### responses
 
-### GET APIの場合
+#### GET APIの場合
 
 * description
   * 必須
@@ -386,7 +386,7 @@ parameters:
     $ref: '#/definitions/ErrorResponse'
 ```
 
-### POST/PUT/DELETE APIの場合
+#### POST/PUT/DELETE APIの場合
 
 * description
   * 必須
@@ -399,9 +399,9 @@ parameters:
   * ステータスコード：200の場合のみ`application/json`という命名で必須
   * 必須項目は必ず値を記載すること
 
-## models
+### models
 
-### リクエストモデル
+#### リクエストモデル
 
 * URI単位で1モデルを定義する
 * 命名規約
@@ -430,7 +430,7 @@ putProductRequest:
     - product_id
 ```
 
-### レスポンスモデル
+#### レスポンスモデル
 
 * URI単位で1モデルを定義する
 * リソースモデルをそのまま利用できる場合は不要
@@ -456,7 +456,7 @@ responses:
         $ref: "#/definitions/product" # リソースモデルをそのまま利用する場合は不要
 ```
 
-### リソースモデル
+#### リソースモデル
 
 * リソースや共通で利用するエンティティの単位で単数形で定義する
 * 命名規約
@@ -478,12 +478,12 @@ pagination:
     - limit
 ```
 
-## HTTPステータス
+### HTTPステータス
 
 * 原則として[RFC 7231](https://tools.ietf.org/html/rfc7231#section-6)で定義されているレスポンスステータスコードを利用します
 * 以下、設計者が特に意識すべきものを抜粋して記載します。
 
-### 共通
+#### 共通
 
 * バリデーションエラー：`400 Bad Request`
 * 業務エラー：`400 Bad Request`
@@ -491,31 +491,31 @@ pagination:
 * 認可エラー：`403 Forbidden`
 * システムエラー：`500 Internal Server Error`
 
-### GET
+#### GET
 
 * 正常系：`200 OK`
 * 検索系APIで結果0件：`200 OK`
 * キー検索系APIで対象リソースが存在しないエラー：`404 Not Found`
 
-### POST
+#### POST
 
 * 正常系（同期）：`201 Created`
 * 正常系（非同期）：`202 Accepted`
 * 一意制約違反エラー：`409 Conflict`
 * 親リソースが存在しないエラー：`404 Not Found`
 
-### PUT
+#### PUT
 
 * 正常系（同期）：`200 OK`
 * 正常系（非同期）：`202 Accepted`
 * 対象リソースが存在しないエラー：`404 Not Found`
 
-### DELETE
+#### DELETE
 
 * 正常系：`204 No Content`
 * 対象リソースが存在しないエラー：`404 Not Found`
 
-# さいごに
+## さいごに
 
 今回はSwaggerやREST APIの設計に慣れてないメンバーを含む複数人で設計していくことを踏まえて、Swaggerに精通している方には自明な内容を含めやや細かめに規約を設定してみました。
 

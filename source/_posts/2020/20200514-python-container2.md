@@ -36,7 +36,7 @@ Goではそこそこ実績も増えつつある気がするdistroless。シェ�
 
 https://github.com/GoogleContainerTools/distroless/tree/master/examples/python3
 
-# ベースイメージの組み合わせ
+## ベースイメージの組み合わせ
 
 多少のイメージサイズによるコスト削減幅よりも、社員がビルドで苦労しない、残業代が減らせる、という方が仕事上は圧倒的にバリューとして大切なことが多いので、Debian版を最初に紹介しましたし、そこの価値は変わりません。しかし、セキュリティ上もうれしいというのであれば使わない手はありませんが、残念ながらすべてのケースに使えるわけではなさそうです。ベースイメージの組み合わせ別の使える例を紹介します。
 
@@ -54,15 +54,15 @@ Pythonの場合、多くのパッケージがバイナリwheelを提供してく
 
 コンパイルが必要なパッケージをビルドしても、libpython3.7m.soが見つからない、みたいなエラーになってしまい、一筋縄ではいかなそうなのですよね（数日トライしたがいかなかった）。もし解決策を見つけた方はおしらせください。
 
-# 敵を知り己を知れば百戦殆うからず
+## 敵を知り己を知れば百戦殆うからず
 
 「前回のsite-packagesにコピーする方法を軽く試したところうまく動かなかった」と紹介しましたが、設定がもろもろ違うのですよね。このあたりを知っておかないと、いざdistrolessでトラブルが発生したときに解決に時間がかかると思うので（実際かかった）、どんな感じか調査結果をまとめておきます。
 
-## シェルがない
+### シェルがない
 
 まずシェルがないので、通常のDockerはENTRYPOINTがシェルで、CMDに実行されるコマンドを書く、というのが通例ですが、distrolessはCMDがpython3です。CMDにはPythonの処理系で処理できるコードを渡さなければなりません。イメージのlatest（デフォルト）ではなく、debugタグ（イメージ名の末尾に``:debug``をつける）と、busyboxのシェルが有効になりますが、あくまでもデバッグ用途ですね。
 
-## PythonのパスなどがDebian版と違う
+### PythonのパスなどがDebian版と違う
 
 通常、`sys.path`には`/usr/local/lib/python3.7/site-packages`といったパスがあり、pipでグローバルにインストールしたパッケージはそこに入ります。しかし、そもそもそのようなパスがなく、`sys.path`にも格納されていません。まず、Pythonの位置からして`/usr/local/lib`ではなく、`/usr/lib`でした。
 
@@ -88,7 +88,7 @@ Pythonのパッケージの置き場をsiteパッケージで確認したとこ�
 ['/usr/local/lib/python3.7/site-packages']
 ```
 
-## aptコマンドもない
+### aptコマンドもない
 
 シェルがないため、何か追加のパッケージを入れようとしても、Dockerの枠組みの中ではいろいろやるのが困難です。もともとdistrolessはDockerで作られたのではなく、Bazelで作られているイメージですし、aptでライブラリやツールを入れるなど、凝ったことをする必要がある場合はBazelでイメージをビルドする必要があります。
 
@@ -98,7 +98,7 @@ https://github.com/GoogleContainerTools/distroless/blob/master/examples/python3/
 
 ここまでわかったので、駒を進めます。
 
-# Pure Pythonなアプリを動かす
+## Pure Pythonなアプリを動かす
 
 前回のDjangoウェブアプリを題材にして進めます。uwsgiはうまくいかなかったので、Pure Pythonでこちらも人気の高いgunicornを使います。requirements.txtは次のようになります。
 
@@ -142,7 +142,7 @@ CMD ["gunicorn", "--workers=5", "--threads=2", "--capture-output", "--bind=0.0.0
 
 これでPure Pythonのパッケージも動きました。
 
-## manylinux1なwheelは動作するか？
+### manylinux1なwheelは動作するか？
 
 せっかくなのでこちらも試してみましたこれの有無でできることがかなり変わってきますので。画像処理パッケージのPillowを使ってみます。requirements.txtに一行追加して、reuirements.lockを更新します。
 
@@ -196,7 +196,7 @@ docker run -it --rm -p "8000:8000" pytest
 
 <img src="/images/2020/20200514/1.png" alt="フューチャーのロゴ画像を表示したブラウザ" widht="1684" height="1202" loading="lazy" class="img-middle-size">
 
-# まとめ
+## まとめ
 
 ちょっと癖があるけど、muslのような性能の劣化もなく、ビルド時間もDebian系と変わらず（一応Debian10なので）、Alpineよりも小さく、シェルがなくてセキュアなdistroless/python3を使う方法を紹介しました。
 

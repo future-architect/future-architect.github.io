@@ -18,7 +18,7 @@ lede: "ちょうど一年ぐらい前にGraalVMが商用利用可能な安定版
 
 GraalVMにはPython機能もあると宣伝されているものの、詳しい説明が行われることがなく、それが何者で、どのようなステータスで、どこを目指しているのか、きちんと答えられる人は（日本どころか世界でも）ほぼいないでしょう。GraalVMそのものの説明はちょくちょく出てくるようになってきたと思いますが、そのPythonの機能についてはあまり説明されていないため、Python部分にフォーカスして紹介します。
 
-# Graal.Pythonのインストール
+## Graal.Pythonのインストール
 
 [GraalVMのインストール](https://www.graalvm.org/getting-started/)をまず行い、次にGraal.Pythonをインストールします。
 
@@ -53,7 +53,7 @@ Pythonをインストールするので、次のようにタイプします。
 % gu install python
 ```
 
-# GraalVMとは何者か
+## GraalVMとは何者か
 
 先ほどグローバルにパスを通すのはやめておいた方がよい、とお伝えしました。Python以外にnative-imageもインストールした状態ですが、/binフォルダの中は次のようになっています。
 
@@ -70,7 +70,7 @@ java		jconsole	jhsdb		jmap		jshell		keytool		npx		rmid
 
 GraalVMですが、1つのVMの中で、JavaScriptやRといったさまざまな言語をサポートしています。Rでデータファイルを読み込んでPythonでデータ処理をして・・・など言語跨ぎで各言語の得意な部分を生かしたコーディングができるのを目指しているようです。
 
-# Graal.Pythonの状況
+## Graal.Pythonの状況
 
 Graal.Pythonの一次情報は[ここ](https://www.graalvm.org/docs/reference-manual/languages/python/)になります。
 
@@ -104,7 +104,7 @@ graalpython -m ginstall install numpy
 
 * [GraalVM (graalpython) で janome を無理矢理動かしてみたメモ](https://medium.com/@mocobeta/graalvm-graalpython-%E3%81%A7-janome-%E3%82%92%E7%84%A1%E7%90%86%E7%9F%A2%E7%90%86%E5%8B%95%E3%81%8B%E3%81%97%E3%81%A6%E3%81%BF%E3%81%9F%E3%83%A1%E3%83%A2-c07020f8193f)
 
-## polyglotサポート
+### polyglotサポート
 
 ``--polyglot``オプションをつけると、いろいろな言語ランタイムにアクセスできるようになります。次のサンプルはREADMEのサンプルですが、PythonからJavaScriptの正規表現のクラスを呼び出しています。これだけでは実用性はなさそうですが・・・
 
@@ -123,7 +123,7 @@ if not md:
 print("Here is what we found: '%s'" % md[1])
 ```
 
-## Jython
+### Jython
 
 Pythonの互換実装で有名なものはいくつかありますが、Javaで実装されたものがJythonです。RPAツールのSikuliXとかでもスクリプト言語として組み込まれていたりします。Jythonは2.7互換で実装されており、3系の実装は安定版が出ていません。Graal.PythonはJavaで実装された3.x系実装で、Jythonと出自は似ています。コマンドラインオプションでJythonをエミュレーションするモードも有効にできます。
 
@@ -154,13 +154,13 @@ Please note: This Python implementation is in the very early stages, and can run
 
 アプリへの組み込みの場合、Jythonで提供していたクラスをそのまま提供しているわけではないため、いろいろ変更を行う必要があります。[そのためのドキュメント](https://www.graalvm.org/docs/reference-manual/embed/#Function_Python)も公開されています。JythonでPythonをスクリプトとして提供していたアプリからすると、変更の手間は必要なものの、Python以外にもJavaScriptやRubyも動くようになるので、乗り換えるメリットはあります。Python 2系を止めることもできますし。
 
-## パフォーマンス
+### パフォーマンス
 
 細かい計算で繰り返し回数が多くなるものはCPythonよりも早くなるとのことです。
 
 * [Python標準実装より速い！？Oracleが作ったGraalPythonをJython・CPythonとベンチマークしてみた！！](https://qiita.com/kotauchisunsun/items/7b7eb1e759e3e4526e62)
 
-# ネイティブイメージ化
+## ネイティブイメージ化
 
 GraalVMといえばネイティブな実行バイナリ（ネイティブイメージ）作成なのでPythonでもチャレンジしてみました。まずはnative-imageの処理系をインストールします。
 
@@ -243,7 +243,7 @@ public class ExtListDir {
 
 なお、pure Javaな場合の使い勝手は悪くないな、と思いました。javac&javaでいつものように動作確認ができ、その後native-imageを使ってイメージ作成しても40秒かからず、サイズもJavaのランタイムが不要な6MBのバイナリになります。普段の開発はいつものようにjavacとjavaで高速にイテレーションを回し、最後にDocker化するときはnative-imageを使いつつ小さなDockerイメージを作成という流れで開発ができます。これはJavaにとってはとても良いものですね。
 
-# まとめ
+## まとめ
 
 GraalPythonを試しました。
 

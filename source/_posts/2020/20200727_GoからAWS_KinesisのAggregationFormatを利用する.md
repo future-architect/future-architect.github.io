@@ -17,13 +17,13 @@ lede: "ここ数年は産業向けのIoT（例えば工場IoTやモビリティI
 ---
 [サーバレス連載企画](/articles/20200322/)の8回目です。
 
-# はじめに
+## はじめに
 
 TIG DXユニットの真野です。ここ数年は産業向けのIoT（例えば工場IoTやモビリティIoT）を行っています。[工場をハックするための基本知識](/articles/20191023/)や[PyConJP 2019に登壇しました](/articles/20200422/) の記事を書いた栗田さんや、[SORACOM USBドングルの自動接続](/articles/20191201/) の記事を書いた棚井さんと同じチームに所属しています。
 
 [サーバレス連載企画](/articles/20200322/) の第8弾目として、Serverlessの代表格であるAWS LambdaでGoを用いてKinesisに対するKPL/KCL相当の処理についてまとめていきます。
 
-# 背景
+## 背景
 
 某IoTをテーマとした案件で、Kinesisを用いたストリーミングETLなパイプラインを構築するにあたって、下図のようにKinesisの後段はGoとLambdaを採用しました。Kinesisが多段になっているのは、Rawデータと加工済みデータを別システムで利用したかったためです。
 
@@ -35,14 +35,14 @@ TIG DXユニットの真野です。ここ数年は産業向けのIoT（例え�
 
 https://github.com/laqiiz/go-kinesis-aggr-example
 
-# Kineis Data Streamとは
+## Kineis Data Streamとは
 
 > Amazon Kinesis Data Streams (KDS) は、大規模にスケーラブルで持続的なリアルタイムのデータストリーミングサービスです。(中略) 収集データはミリ秒で入手でき、リアルタイム分析をリアルタイムダッシュボードやリアルタイム異常検知、ダイナミックな価格設定などの事例に利用可能です。
 > https://aws.amazon.com/jp/kinesis/data-streams/
 
 簡単に言うとAWS上でPub-Subメッセージングを行えるサービスです。Kinesisの文脈ではデータを送信するPublish側をProducer、データを受信するSubscribe側をConsumerと呼びます。SQSとはメッセージを非同期に連携する部分は同じですが、Consumer側をN個配置できるところなどが異なります。
 
-# Kinesis Record Aggregation & Deaggregation
+## Kinesis Record Aggregation & Deaggregation
 
 KinesisにはRecord Aggregation（レコードの集約）といった考え方があります。
 
@@ -98,11 +98,11 @@ message Record {
 
 細かく説明しましたが、KPL Aggregated Record Formatの構造を知らなくても既存のライブラリを活用すれば利用可能ですのでご安心ください。
 
-## Record Aggregation と PutRecordsの区別
+### Record Aggregation と PutRecordsの区別
 
 ちょっとややこしいのが、 Kinesisには複数RECORDを一度のリクエストで登録する[PutRecords](https://aws.amazon.com/jp/blogs/aws/kinesis-update-putrecords-api/)というAPIがありますが、 Record Aggregationはそれとは異なります（別の概念なので共存できます）。PutRecordsはあくまで複数のRECORDを1度のリクエストに束ねるものであって、Aggregated Formatは複数メッセージを1メッセージに集約する点が違いです。PutRecordsはHTTP Requestの発行を抑えられる分スループットの向上が期待できる点は、Aggregated Formatと同じですが、メッセージ数は変化ないので料金は同じです。当然別物なのでAggregated FormatのメッセージをPutRecordsもできます。
 
-# 実施方法
+## 実施方法
 
 [AWS SDK for Go](https://aws.amazon.com/jp/sdk-for-go/) でKinesisに対するProduce/Consumeはできますが、標準ではAggregation/DeAggregationはできません。そのため以下のライブラリを利用します。
 
@@ -111,13 +111,13 @@ message Record {
 
 DeAggregationに関してはAWSLabのリポジトリを利用できるのでちょっと安心できますね。利用方法は簡単かと言われると？ でしたのでここに利用方法を残していきます。
 
-# 利用方法
+## 利用方法
 
 それぞれのライブラリの利用手順を説明していきます。このエントリーで記載しているコードは以下のリポジトリに記載しています。
 
 https://github.com/laqiiz/go-kinesis-aggr-example
 
-## Aggregate（a8m/kinesis-producer）
+### Aggregate（a8m/kinesis-producer）
 
 最初にコードのサンプルを載せます。
 
@@ -181,7 +181,7 @@ func main() {
 
 これでGoでLambdaでもKinesisへRecord Aggregationが行えます。
 
-## DeAggregate(awslabs/kinesis-aggregation])
+### DeAggregate(awslabs/kinesis-aggregation])
 
 awslabs/kinesis-aggregationを利用します。この時、Lambdaの引数として渡される `events.KinesisEvent` の型と、deaggregatorが求める方が異なるため、自分で型の詰め替え作業が必要です（最初のループ分の部分）。そこが最大の山場で、それさえできてしまえば`deagg.DeaggregateRecords`を呼び出して、レコードの集約解除が行われます。
 
@@ -234,7 +234,7 @@ func main() {
 レコード集約の解除処理は、ことKinesisトリガーのLambdaに対しては常に実装しておいても良い気がします。
 理由ですが、`deagg.DeaggregateRecords` が集約済み**ではない** レコードに対して実行してもerrorが発生しないためと、最初は集約レコードじゃない入力だったとしても、途中で集約レコードに切り替わったときに急に動かなくなることを防ぐことも出来るからです（疎通の1件は通ったけど、結合テストで複数レコードを連携しだすと急に落ちた、みたいなことも回避できます）。特にJavaクライアントがKPLを利用している場合は、集約あり/集約無しはあまり意識しないことが多く、事前のすり合わせでは集約しないと行っていたものの、いざ結合テストをする場合に、集約済みメッセージを連携してきたこともありました。
 
-# 動作検証
+## 動作検証
 
 下図のような環境を構築して動かしてみます。デプロイ方法はリポジトリのREADMEを参考ください。
 
@@ -274,13 +274,13 @@ aws kinesis --profile my_profile put-record --stream-name aggregate --partition-
 
 簡単ではありますがAggregation/DeAggregationの動作確認が取れました。
 
-# まとめ
+## まとめ
 
 * KPL Aggregated Record Formatを利用することで、Kinesisの利用料金を下げることができる
 * GoでLambdaでも、KPL/KCL相当の集約・集約解除は実装できる
 * 特にDeAggregateする処理は、後々の予期せぬ連携に備えて防御的に実装しておくと良い
 
-# 参考
+## 参考
 
 * A deep-dive into lessons learned using Amazon Kinesis Streams at scale
   * https://read.acloud.guru/deep-dive-into-aws-kinesis-at-scale-2e131ffcfa08

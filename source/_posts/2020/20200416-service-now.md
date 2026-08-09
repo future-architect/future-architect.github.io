@@ -13,13 +13,13 @@ author: 西田好孝
 lede: "さて、皆さん、ServiceNow(以降：SNOW)というSaaSはご存知でしょうか？Salesforceと非常によく似ておりますが、米国発の SaaS, aPaaS サービスです。米国では割とポピュラーなサービスとして位置づけられていますが、日本ではまだまだです。が、伸び率は今年度は4割近くと、利用ユーザがすごい勢いで伸びています。そんな中、お客様内でSNOWを利用していて、それと関連する領域をFutureが担当するケースも増えてくるかと思いますので、今回は本ブログでSNOWについて少しだけ紹介したいと思います。"
 ---
 
-# はじめに
+## はじめに
 
 こんにちは、TIGのDXユニットの西田です。前職ではServiceNowというaPaaS上でのアプリケーション開発をしておりました。現在は、GCPインフラの設計・構築をTerraform, Ansibleを利用して開発しております。GCP, ServiceNow ともに資格を持っています。
 
 さて、皆さん、ServiceNow(以降：SNOW)というSaaSはご存知でしょうか？ Salesforceと非常によく似ておりますが、米国発の SaaS, aPaaS サービスです。米国では割とポピュラーなサービスとして位置づけられていますが、日本ではまだまだです。が、伸び率は今年度は4割近くと、利用ユーザがすごい勢いで伸びています。そんな中、お客様内でSNOWを利用していて、それと関連する領域をFutureが担当するケースも増えてくるかと思いますので、今回は本ブログでSNOWについて少しだけ紹介したいと思います。SNOW とは？ の説明は、言葉だけだと概念過ぎてわかりづらいので、現状、**私が直面している課題の解決案ベースで解説**していきたいと思います。
 
-# 課題設定
+## 課題設定
 
 - 課題（1）
   - 昨今、会社内でのITシステムの開発体制って、以下の様なケースが多くないですか？
@@ -32,7 +32,7 @@ lede: "さて、皆さん、ServiceNow(以降：SNOW)というSaaSはご存知�
   - **インフラ構築の依頼作業は単純作業が多く、6割方はコピー&ペーストして名前を変える**程度。
   - 設計が必要なインフラ構築だけにリソースを割きたい。
 
-# ソリューションの概要
+## ソリューションの概要
 
 上記のすべての問題を解決出来るわけではないですが、SNOW と Terraform を使った自動化の仕組みを例に取って、PoCレベルで組んでみます。各製品/ツールの役割分担は以下です。
 
@@ -42,7 +42,7 @@ lede: "さて、皆さん、ServiceNow(以降：SNOW)というSaaSはご存知�
 
 <img src="/images/2020/20200416/photo_20200416_01.png" loading="lazy">
 
-### 作るコンポーネント（上の図の番号と紐づいています）
+#### 作るコンポーネント（上の図の番号と紐づいています）
 
 1. SNOW の Service Catalog を利用し、準備するインフラをメニュー化する（簡単な＆頻繁なリクエストのみ）
 2. Terraform の各種実行と、承認を順番に実施するワークフローを実行するFlowDesignerを作る。
@@ -52,7 +52,7 @@ lede: "さて、皆さん、ServiceNow(以降：SNOW)というSaaSはご存知�
 4に関しては、**SNOW の API リファレンスのサンプルコードは基本 Python** なので、そっちの方がベターです。本記事では、単にGoを書きたかったので、Goを採用しています。
 また、最初に申し上げておきますが、分量の関係で全ての実装方法を画像やコードで丁寧に記載する事が難しいです。もちろん核となる箇所は極力丁寧に記載していきます。
 
-### 本記事で取り上げるインフラ構築のシチュエーション
+#### 本記事で取り上げるインフラ構築のシチュエーション
 
 **アプリチームからのインスタンス構築依頼を受けてGCEを用意** というシチュエーションを例にします。以下が前提です。
 
@@ -64,24 +64,24 @@ lede: "さて、皆さん、ServiceNow(以降：SNOW)というSaaSはご存知�
 実装方法にそこまで興味がない方は、[動作確認](/articles/20200416/#%E5%8B%95%E4%BD%9C%E7%A2%BA%E8%AA%8D) だけご覧になれば OK です。
 っていうかむしろ、先に [動作確認](/articles/20200416/#%E5%8B%95%E4%BD%9C%E7%A2%BA%E8%AA%8D) を見た方がゴールが明確化して読みやすくなるのでおススメです。
 
-# 1. インフラ構築のリクエストをメニュー化する @ SNOW
+## 1. インフラ構築のリクエストをメニュー化する @ SNOW
 
 本来ならこの**メニュー化する対象の作業は何か？ を決める**のが非常に大変ですよね。今回は GCE のリクエストを例にします。
 
-## SNOW の環境準備
+### SNOW の環境準備
 
 [developerサイト](https://developer.servicenow.com/) でインスタンスを準備。最新版のOrlando(出たばかり！ )を使ってます。
 払いだされたインスタンスに admin でログインしてください。
 少しだけ宣伝交じりですが、この developer インスタンスはアカウントを作れば誰でも発行できます。6時間触らないと sleep、10日触らないと消えます（でもリストア可）。本来はライセンス費用を払わなければならないあらゆる機能が全て無料で使えるので、とてもおススメです！
 
-## Service Catalog を作成する
+### Service Catalog を作成する
 
-### Category の作成
+#### Category の作成
 
 `Maintain Categories`をクリックし、Newを押下する。
 <img src="/images/2020/20200416/1.png"  class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
 
-### item の作成
+#### item の作成
 
 `Maintain Items` をクリックし、Newを押下する。
 前述の通り、プロジェクトとインスタンス名をvariablesに設定します。この例では、Projectはカスタムテーブルを作って参照形式にしました。
@@ -91,7 +91,7 @@ lede: "さて、皆さん、ServiceNow(以降：SNOW)というSaaSはご存知�
 
 ちなみに、色んなパトロールの方から『Application scopeは別で切るべきだ』と絶対に言われますが、本来なら私もそうします。今はそこは本質じゃないからGlobalのまま行きます。
 
-# 2. Terraform Server にリクエストを送り、各種承認を回すFlowDesigner @ SNOW
+## 2. Terraform Server にリクエストを送り、各種承認を回すFlowDesigner @ SNOW
 
 Flow Designer の前に、Terraform の実行結果を格納するテーブルを作っておきましょう。作ったのはこんな感じです。
 <img src="/images/2020/20200416/4.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
@@ -111,7 +111,7 @@ Terraform Server に送るためのアクションの定義は以下です。大
 
 これで SNOW の準備は終わりです。大した事はなかったです。
 
-# 3. Terraform のディレクトリとファイル構成 @ Terraform Server
+## 3. Terraform のディレクトリとファイル構成 @ Terraform Server
 
 さて、地味に一番苦労した Terraform の構成です。何が難しかったかというと...
 
@@ -234,7 +234,7 @@ cat *.tfvars > ../terraform.tfvars
 
 よって、Go は GCE, GCS のメニュー毎に対応する vars/ 配下の tfvars ファイルにだけ要素を追加し、filejoin.sh を叩けば Terraform 系のファイルは揃うという事になります。Go でファイル操作は頑張らない（笑）
 
-# 4. FlowDesigner からのリクエストを応じて Terraform を実行し、結果を返す @ Terraform Server
+## 4. FlowDesigner からのリクエストを応じて Terraform を実行し、結果を返す @ Terraform Server
 
 さて、SNOW と Terraform の間をつなぐ API-SV の Go です。
 処理を整理すると、以下です。
@@ -384,9 +384,9 @@ terraform apply -auto-approve -no-color
 
 また、わざわざshを作り、それをGoで実行する様にしたのは、複数の引数指定でos/execがうまく動作しなかったからです。[こちらの記事](https://qiita.com/tng527/items/c44b943da93041a8355b)の最後を参考にしました。
 
-# 動作確認
+## 動作確認
 
-### ユーザの操作
+#### ユーザの操作
 
 Service Catalog のダッシュボードに、GCP infra の ウィジェット を追加すると、以下の様になります。
 <img src="/images/2020/20200416/u1.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
@@ -400,7 +400,7 @@ Shoppingっぽくなっているのは、あんまり気にしないでくださ
 
 これだけでユーザのリクエストは完了です。本当にパラメータを2つ入れるだけ。
 
-### リクエストの状態を確認
+#### リクエストの状態を確認
 
 リクエストされたアイテムを見ると、自分の上司で止まっているのが確認できます。
 <img src="/images/2020/20200416/u5.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
@@ -413,7 +413,7 @@ Terraform の実行ログを見てみましょう。この結果からすると�
 <img src="/images/2020/20200416/u8.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
 <img src="/images/2020/20200416/u9.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
 
-### 承認を回す
+#### 承認を回す
 
 それじゃあ、上司のアカウントでログインして、承認しましょう。
 <img src="/images/2020/20200416/u10.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
@@ -426,7 +426,7 @@ Terraform の実行ログを見てみましょう。この結果からすると�
 
 なぜか名前に既視感がありますねぇ…不思議…
 
-### apply の結果を見てみる
+#### apply の結果を見てみる
 
 これで承認が回ったので GCE がデプロイ（アプリ-Tにデリバリー）されているはずです。早速関連リストからTerraformの実行ログを見てみましょう。
 <img src="/images/2020/20200416/u13.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
@@ -435,7 +435,7 @@ Terraform の実行ログを見てみましょう。この結果からすると�
 
 来ましたね！ 同時実行とか、変更・削除はどうするのかとか色々ありますが、とりあえずPoCとしては完成！
 
-# 結局 ServiceNow とは何か？
+## 結局 ServiceNow とは何か？
 
 ServiceNow社的には、以下をメッセージとして強く主張しています。
 
@@ -458,7 +458,7 @@ ServiceNow社的には、以下をメッセージとして強く主張してい�
 
 - DBのレコード変更をトリガに様々な処理を間に挟む処理を簡単に作れるプラットフォーム。最初のレコード変更がフロントエンドや API などで行われると、そこから他のテーブルへの CRUD や他の API を叩いて結果を導出するなどの仕組みを簡単に作れる。
 
-# 最後に
+## 最後に
 
 今回、私にとって最も実装が簡単だったのはSNOWでした。逆に一番大変だったのがGoでの実装です。ただ、こういう製品と製品の間に落ちる部分の処理って、どうしてもカスタム実装が必要になるんですよね。なので、実際のサービス連携を考えた際も同じ様な比率になるんじゃないかと考えています。
 

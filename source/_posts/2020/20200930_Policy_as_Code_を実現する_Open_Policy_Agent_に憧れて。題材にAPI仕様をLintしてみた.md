@@ -18,7 +18,7 @@ lede: "Open Policy Agent（OPA）は汎用的なポリシーエンジンで、Re
 ---
 <img src="/images/2020/20200930/opa-horizontal-color.png" loading="lazy">
 
-# はじめに
+## はじめに
 
 こんにちは、TIG DXユニット真野です。
 
@@ -26,7 +26,7 @@ lede: "Open Policy Agent（OPA）は汎用的なポリシーエンジンで、Re
 
 * https://www.openpolicyagent.org/
 
-# Open Policy Agentとは
+## Open Policy Agentとは
 
 Open Policy Agent（OPA）は汎用的なポリシーエンジンで、[Rego](https://www.openpolicyagent.org/docs/latest/policy-language/) と呼ばれるポリシー言語で定義されたルールに従って、入力がポリシーに沿っているか否かの判定を移譲させることができます。Regoで宣言的にポリシーを実装し、Policy as Code を実現できます。
 
@@ -43,7 +43,7 @@ OPAは汎用的というだけあって、Kubernetes上でしか動かせない�
 
 2020/09/27時点で CNCF projectsの `Incubating`、バージョンは `v0.23.2`が最新でした。
 
-# Policy as Code
+## Policy as Code
 
 Policy as Codeの先駆けは自分が知る限り HashiCorp の [Sentinel](https://www.hashicorp.com/sentinel)だと認識しています。Terraformは Infrastructure as Codeを実現しますが、Sentinelのような Policy as Codeなツールと組み合わせ、インフラ構成全体のアクセスポリシーを設定することで、より安全にインフラ作成を自動化したり、不用意な破壊を防ぐことできるとされています。古いイメージを使わないといったセキュリティの観点や、あまり高すぎるインスタンスを立ち上げすぎないと言ったクラウド破産を防ぐといった使い方もよく聞きますよね。
 
@@ -55,7 +55,7 @@ Sentinelと同様にOpen Policy AgentはPolicy as Codeを掲げています。�
 
 今回は後で記載している通り、コーディング規約も一種のポリシーとみなして、Open API Spec（Swagger）をLinter的にチェックするツールを題材に、OPAを用いて開発してみたいと思います。
 
-# Rego概要
+## Rego概要
 
 RegoはDatalogというクエリ言語にインスパイアされて開発された言語です。Datalogは聞き慣れないですが、Prologの流れを組む言語です。RegoはDatalogを拡張してJSONのような構造化モデルに対応させたようです。
 
@@ -78,7 +78,7 @@ PlaygroudのExamplesをクリックすると、他にも色々な例が載って
 
 <img src="/images/2020/20200930/image_2.png" loading="lazy">
 
-# Regoの文法さわり
+## Regoの文法さわり
 
 Prologをやってれば当たり前かもしれませんが、JavaやGoやJSくらいしか書いたことが無い私から見て、特徴的だなと思った[Regoの文法](https://www.openpolicyagent.org/docs/latest/policy-language/)のつかみを紹介します。かなり異次元だなと思いました。
 
@@ -185,7 +185,7 @@ allow {
 
 予約後は他にも `some`、`with`、`else` があります。使いこなせばSQLの自己結合みたいな表現もできるようですが、慣れないうちは道のりがとてつもなく長く感じます。パズルみたいで楽しいと思えた人は才能だなと思います。
 
-# GoからOPAを呼ぶ
+## GoからOPAを呼ぶ
 
 OPAは`github.com/open-policy-agent/opa/rego`パッケージを利用することで、Goから組み込みライブラリ形式で呼び出せます。
 
@@ -243,7 +243,7 @@ func main() {
 
 この構成を利用すれば、他の領域にも展開できそうです。
 
-# Open API Spec（Swagger）にポリシーを適用してみる
+## Open API Spec（Swagger）にポリシーを適用してみる
 
 Open API Specを用いてチームで開発する際、API定義の設定方法で揺れることは無いでしょうか？　以下のようなブログ記事が出るくらい、フューチャーでは設計の揺れを無くす努力をしています。
 
@@ -259,7 +259,7 @@ Open API Specを用いてチームで開発する際、API定義の設定方法�
   * {HTTPメソッド}{機能物理名}を記載する
   * キャメルケース
 
-## Rego設計
+### Rego設計
 
 tagsの数=1を実現するためには[ビルトイン関数](https://www.openpolicyagent.org/docs/latest/policy-reference/#built-in-functions)である `count` を利用します。
 
@@ -314,7 +314,7 @@ deny_opeId_startwith_http_method[msg] {
 
 これらを1つのファイルとしてまとめて、`policy.rego` に保存しておきます。
 
-## 入力とする Open API Spec
+### 入力とする Open API Spec
 
 OAIのexamplesを参考に入力となる違反した定義を作成します。
 
@@ -351,7 +351,7 @@ paths:
 
 これを先ほどのRegoモジュールを利用したOPA評価をGoから行います。
 
-## Go実装
+### Go実装
 
 先ほど定義したregoとYAMLは外部ファイルから読み込めるようにしておく。今回は雑にハードコードしています。
 
@@ -429,7 +429,7 @@ func readFile(path string) ([]byte, error) {
 全文はこちらにコミットしておきました。参考までに。
 https://github.com/laqiiz/openpolicyagent-example
 
-## 実行結果
+### 実行結果
 
 さきほどのGoのプログラムを動かすと以下のJSONが出力されます！
 
@@ -462,13 +462,13 @@ https://github.com/laqiiz/openpolicyagent-example
 }
 ```
 
-## その他
+### その他
 
 利用したのと同じRegoと入力を、PlaygroundでもPublishしておきました。お手軽に触ってみたい人はどうぞ。
 
 https://play.openpolicyagent.org/p/1ZhZasqT22
 
-# まとめ
+## まとめ
 
 * Open Policy Agent（OPA）は汎用的なポリシーエンジンで、Policy as Codeの実現を手伝ってくれる
 * OPAが利用するRego言語の文法は特徴的（だと大半の人は思うと思う）

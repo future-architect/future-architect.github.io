@@ -15,19 +15,19 @@ thumbnail: /images/2020/20200515/thumbnail.png
 author: 真野隼記
 lede: "AWS StepFunctionsとLambdaを活用してバッチ処理を行う記事です。"
 ---
-# はじめに
+## はじめに
 
 AWS StepFunctionsとLambdaを活用してバッチ処理を行う記事です。[サーバレス連載企画](/articles/20200322/)の6回目です。
 
 2020年はServerlessアーキテクチャが当たり前のように採用される時代になってきていると実感します。フロントエンドからアクセスされるBackendのAPIはAWS環境だと、AppsyncやAPI Gateway+Lambaの利用、IoTなどイベントドリブンなメッセージに対してはAWS IoT、その後続はKinesisを使い、さらにその後続でLambdaやKinesis AnalyticsでETL処理を行い、データストアとしてDynamoDBやS3に格納するといった一連の流れ全てフルマネージドなサービスに寄せて構築することも当たり前ですし、そういった事例も珍しく無くなってきました。
 
-# サーバレスのバッチ処理
+## サーバレスのバッチ処理
 
 そんな中で、バッチ処理（定時起動やユーザの非同期イベントで処理を行うジョブ）に関してはLambdaではなくECSなどを採用することが多いと思います。理由としてはやはり [LambdaのTimeout時間が最大で15分](https://aws.amazon.com/jp/blogs/news/aws-lambda-timeout-15min/)  [^1] であるためです。また、ECSも非同期タスク起動ではなく常駐にしてHTTPリクエストなどでイベントを待ち受けるタイプに関しては、[ALBであれば4000秒（約66分）](https://docs.aws.amazon.com/ja_jp/elasticloadbalancing/latest/application/application-load-balancers.html#connection-idle-timeout)  [^1]なため、1h超えの処理時間になりうる機能は採用できないでしょう。ALBではなくNLBを採用するとこの制約からは逃げられるので、SecurityGroupなどの考えがややALBと異なりますがこちらを採用するチームもいらっしゃると思います。もしくは次の [ecs-run-task](https://docs.aws.amazon.com/cli/latest/reference/ecs/run-task.html) で非同期にECSコンテナを呼び出している、という方式をとることも多いのでは無いでしょうか？ 定期実行であれば、ECS Scheduled Tasksを利用することもできるので便利ですよね。
 
  [^1]: 2020/04/26時点の話です。将来的に伸びる可能性が高いとは思っています。
 
-# ECS Run Taskについて
+## ECS Run Taskについて
 
 ecs-run-taskで非同期（または定期的）にECSを呼び出す方法を取るメリットは多く、、
 
@@ -48,7 +48,7 @@ ecs-run-taskで非同期（または定期的）にECSを呼び出す方法を�
 
 個人的にはジュニアなエンジニアがチームに多いのと、AWSに慣れていない新規参画者が多いという、「**他アプリがLambdaで完結している場合に、ECSという別のアプリランタイムを入れたくない**」 という技術スタックをなるべく増やしたくないという思いがあり、できる限りアプリ開発はLambdaでやりたいと思ってます（Dockerfileもなるべく書かせなく無ければ、 ECRやECSなどインフラ管理対象も増やしたくないし、CI/CDのバリエーションも下げて楽したいというのがあります）
 
-# Lambdaでバッチ処理をガンバル
+## Lambdaでバッチ処理をガンバル
 
 起動時間の制約があるもののLambdaでバッチ処理をガンバル前提で進めます。
 
@@ -61,13 +61,13 @@ ecs-run-taskで非同期（または定期的）にECSを呼び出す方法を�
 
 入力データを上手く分割実行できないものに関しては1でシーケンシャルに行う必要がありますが、そうでない場合は2のアプローチのほうが、後々並列実行したい場合にも転用できるので便利だと思いますので、2の方針で進めます。
 
-# コードについて
+## コードについて
 
 次からGoのコードをまじえながら進めていきます。記載するサンプルコードはimport文などを省略しています。全文は以下のリポジトリを参照ください。
 
 https://github.com/laqiiz/servlerless-batch-example
 
-# 入力がDynmaoDBの場合
+## 入力がDynmaoDBの場合
 
 DynamoDBはKVSという印象が強いですが、非常に多くの機能を持っています。いわゆるPK（HashKeyかHashKey＋SortKey）を指定せずにレコードを取得する方法には、次の1,2がありますがバッチ用途だとおそらく1を利用することが多いと思います。ちなみに、2はGSIに対しても実施できます。
 
@@ -113,11 +113,11 @@ func ScanSegment(ctx context.Context, total, seg int64, startKey map[string]*dyn
 
 この `ScanSegment` 関数を呼び出すと、指定されたSegment番号のレコードのみ読み取る事ができます。呼び出し方は後述します。次の**ページング**の考えと合わせて考慮する必要があります。
 
-## DynamoDBをバッチ処理で扱うときの注意
+### DynamoDBをバッチ処理で扱うときの注意
 
 いくつか補足して、DynamoDBで大きなデータサイズのデータを扱う場合の注意を記載します。
 
-### ページングについて
+#### ページングについて
 
 DynamoDBの1度のScanでの最大サイズは1MBという制約があります。それ以上のデータを読み取りる場合は、 ExclusiveStartKeyで指定しているような [ページング](https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/Scan.html#Scan.Pagination) を行う必要があります。上記の実装であれば `ExclusiveStartKey` がそれにあたります。
 
@@ -144,7 +144,7 @@ func ScanWithLogic(ctx context.Context, total, seg int64) error {
 
 Scanの結果をページングを駆使しつつ最後まで読み取る場合は、 Scan結果の `LastEvaluatedKey` が存在しなくなるまで繰り返して呼び出すことになります。上記で segments=0 のデータをすべて読み取る事ができました。
 
-### 単一プロセスでの分散実行
+#### 単一プロセスでの分散実行
 
 もし、ローカルで分散実行したい場合はGoであれば errgroupを用いると便利です。注意としてどれか1つのgoroutineが失敗した場合でも、それだけやり直すのではなく全てやり直すことになるので、アプリケーションを冪等に作って置く必要があります。
 
@@ -171,7 +171,7 @@ func main() {
 }
 ```
 
-### 出力先をDynamoDBにする場合のスロットリング対策
+#### 出力先をDynamoDBにする場合のスロットリング対策
 
 今回、出力先についてはテーマではないですが、DynamoDBに対して行う場合はクセがあるため追記しておきます。
 
@@ -225,7 +225,7 @@ func BatchPut(ctx context.Context, puts []Output) error {
 
 ちょっと大変ですが、上記によってバッチ未処理の取りこぼし無くDynamoDBにデータを登録できます。逆にUnprocessedItemsを考慮せずに実行した場合、 err が発生せず正常終了するけどデータが実は未登録だった、ということがありえるのでご注意ください。
 
-# 入力がS3の場合
+## 入力がS3の場合
 
 前提としてS3に巨大な1ファイルに対して何かしらの検証やETLなどの処理を行うこととします。もし複数ファイルであればAWS Athenaのパーティション機能を用いた方が効率的だと思います。Athenaの場合はクエリ結果が非同期で取得することになるので内部で結果をポーリングするなど少し作り込みが必要だと思いますので、その点の考慮はご注意ください。
 
@@ -291,11 +291,11 @@ if err := resp.EventStream.Err(); err != nil {
 
 これにより、S3 Selectレベルで分割されたレコードに対して何かしらの処理を行うことができます。今回はJSON Outputを用いましたが、入力がCSVの場合はCSVそのままで処理したほうが性能は良いかもしれません。
 
-## S3 Selectを使う上での注意
+### S3 Selectを使う上での注意
 
 バッチ処理に限らずですが、2020/04月時点ではAthenaのようにS3 Selectは外部スキーマを参照できないようなので、Structへのマッピングで数値項目が来た場合は、SQL側でCASTするのが手間でした。真面目にプロダクションで運用することを考えると、AWS Athenaを利用するほうが Schema on READ になるもの型の恩恵を受けられ良いかもしれません。
 
-# Step Functions
+## Step Functions
 
 [AWS Step Functions](https://aws.amazon.com/jp/step-functions/) はAWS の複数のサービスに対してワークフローを組むことができるサービスです。ワークフローはステートマシンとして表現することでLambdaの実行管理を任せることができます。
 
@@ -305,7 +305,7 @@ if err := resp.EventStream.Err(); err != nil {
 
 ※HelloWorldのStep Functionsの開発イメージ
 
-## Step Functions × Lambda
+### Step Functions × Lambda
 
 Lambdaの実行時間制約をStep Functionsで突破しようという試みです。実際には以下のようなイメージです。前提として、処理件数が事前にある程度分かっている場合においては、単純にN個にタスクを分割してStep FunctionsからLambdaを呼び出せば良いです。この分散したLambdaそれぞれでDynamoDBのあるSegmentだけを担当させるイメージです。
 
@@ -315,7 +315,7 @@ DynamoDBやLambdaの場合はスケールアウトさせやすいサービスの
 
 ただ、Parallelステートだと分散するタスク自体をJSONで定義する必要があり、同時実行数を増やすたびにStepFunctionsの定義を更新する必要があり手間です。次の動的並列の機能を今回は利用したいと思います。
 
-## 動的並列する場合
+### 動的並列する場合
 
 Step Functionsは [Amazon Web Services ブログ - 新機能 – Step Functions が動的並列処理をサポート](https://aws.amazon.com/jp/blogs/news/new-step-functions-support-for-dynamic-parallelism/) で紹介されているMap 状態を用い、ワークフローでスキャッターギャザーメッセージングパターン（分散して集約するようなパターン）を行うことができます。
 
@@ -325,13 +325,13 @@ Step Functionsは [Amazon Web Services ブログ - 新機能 – Step Functions 
 
 ※水色のオブジェクトが重なっているところが並列実行されるタスクです。この各LambdaでDynamoDBのあるSegment数だけ担当させるイメージです。
 
-## Lambdaの In/Out 設計
+### Lambdaの In/Out 設計
 
 3つのLambdaを利用しますが、概念的にそれぞれの入力・出力を示します。
 
 <img src="/images/2020/20200515/photo_20200515_06.png" loading="lazy">
 
-## 実装について
+### 実装について
 
 上図のような状態遷移図は、下記のJSONで表現できます。`ProcessAllSegments` の `Type: Map`と `Iterator` の部分がミソで、これによって動的に `tasklambda` 並列実行できます。
 
@@ -374,7 +374,7 @@ Step Functionsは [Amazon Web Services ブログ - 新機能 – Step Functions 
 
 Scatter, Task, GatherのLambdaはそれぞれ以下のような概要です。
 
-# Scatter部分
+## Scatter部分
 
 Scatterは入り口のLambdaで、`InEvent` を引数に持ちます。並列数を受け取ることができこれに応じたTask定義を作成して、後続の TaskLambda に渡します。
 
@@ -430,7 +430,7 @@ func HandleRequest(e InEvent) (*OutEvent, error) {
 
 このJSON配列  `task_definitions` の1要素ずつ後続のLambdaに渡します。
 
-## TaskLambad
+### TaskLambad
 
 TaskLambdaは実際にDynamoDBにアクセスして、バッチ処理を行うメイン処理です。今回はただScanして件数を計算するだけですが実際は、外部のAPIサーバに問い合わエンリッチしたり、集約して計算したり、他のデータストアに書き込むなどを行います。引数である `InEvent` が示す通り、ScattterのLambdaで生成されたDynamoDBのSegument情報を受け取り利用します。
 
@@ -493,7 +493,7 @@ func HandleRequest(e InEvent) (*OutEvent, error) {
 
 並列実行された全てLambdaが終わると、最後にGatherのLambdaが起動します。
 
-## GatherLambda
+### GatherLambda
 
 最後に集約するLambdaです。TaskLambdaではScanした件数を出力しているので、それを集約して総件数を計算だけすることにします。 引数の `InEvent`が配列になっているのは、今回Iterationで並列実行されたため複数のOutputがあるためです。
 
@@ -534,11 +534,11 @@ func HandleRequest(e InEvent) (*OutEvent, error) {
 
 今回はGatherのLambdaで終了なのですが、何かしら戻り値を定義しておくとStepFunctionsのコンソール画面から実行結果を確認できるので便利です。もし、集約処理が不要な場合はこのLambdaをなくしてそのままEndしてしまうのも手だと思います。その場合はScatter&Gatherというよりは、Fan-Outパターンと言うようです。
 
-## Deploy
+### Deploy
 
 それぞれ、それぞれのLambdaをデプロイして、StepFunctionsのJSONのARN部分を書き換えると実行可能です。ただし、TaskLambdaだけはDynamoDBにアクセスするためIAM RoleにDynamoDBのScan権限を付与してください。いくつかのコマンドは https://github.com/laqiiz/servlerless-batch-example にも記載しているので参考ください。
 
-# 性能検証
+## 性能検証
 
 作成したStepFunctionsがどれくらい処理性能がスケールするか検証しました。分散数を1, 2, 4, 8, 16 で計測しています。
 
@@ -548,7 +548,7 @@ func HandleRequest(e InEvent) (*OutEvent, error) {
 * 1ドキュメントあたりのフィールド数：15項目
 * 1ドキュメントあたりのデータ量：JSON表現で300[KB]弱
 
-## 実行結果
+### 実行結果
 
 処理時間と[ms]と分散数1との比率を表にしました。大体10万件のDynamoDBをScanするのに1並列だと30秒程度かかります。DynamoDBをScanするだけの処理では完全にリニアにスケールするというわけではないですが、本来はこの読み取ったレコードに対して、なにかしらの追加処理を行う時間が加算されるはずなのでほとんどのユースケースでは問題ないと思います。
 
@@ -562,7 +562,7 @@ func HandleRequest(e InEvent) (*OutEvent, error) {
 
 ちなみに、16並列では各実行数が6203~6577の間でScanできていたのでかなり件数は平準化できていました。
 
-# まとめ
+## まとめ
 
 長いエントリーを最後まで読んでいただきありがとうございます。
 

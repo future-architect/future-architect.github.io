@@ -15,17 +15,17 @@ thumbnail: /images/2020/20201113/thumbnail.png
 author: 棚井龍之介
 lede: "- ローカル環境に立ち上げた localstack に向けて、terraform plan/apply/destroy を実行するFutureの棚井龍之介ですTIGグループのDXユニットに所属しています"
 ---
-# はじめに
+## はじめに
 
 フューチャーの棚井龍之介です。TIGグループのDXユニットに所属しています。
 
 TerraformはLocalstackに対してもapplyできます。便利な方法なのに日本語のサイトが見当たらないので、技術ブログ化しました。
 
-# この記事を読むとできるようになること
+## この記事を読むとできるようになること
 
 - ローカル環境に立ち上げた localstack に向けて、terraform plan/apply/destroy を実行できる
 
-# LocalStackとTerraform
+## LocalStackとTerraform
 
 みなさんは、[Localstack](https://github.com/localstack/localstack) や [Terraform](https://www.terraform.io/) を使っていますか？
 
@@ -35,7 +35,7 @@ TerraformはLocalstackに対してもapplyできます。便利な方法なの�
 
 以降の内容では、localstackの立ち上げ → terraform plan/apply実行 までを説明します。
 
-# Localstackに向けて、Terraformを打つ
+## Localstackに向けて、Terraformを打つ
 
 以下の流れで説明します。
 
@@ -64,7 +64,7 @@ $ sw_vers -productName
 ProductName:	Mac OS X
 ```
 
-## 1. 今回のディレクトリ構造
+### 1. 今回のディレクトリ構造
 
 本記事は以下のディレクトリ構成での作業とします。
 
@@ -100,7 +100,7 @@ zip lambda.zip hello
 
 以上で、作業前の準備は完了です。
 
-## 2. docker-composeでLocalstack立ち上げ
+### 2. docker-composeでLocalstack立ち上げ
 
 docker-compose.ymlを編集して、Localstackの定義を追加します。
 
@@ -146,7 +146,7 @@ localstack_main   docker-entrypoint.sh   Up      127.0.0.1:4566->4566/tcp, 4567/
                                                  4597/tcp, 8080/tcp
 ```
 
-## 3. Terraformファイルを編集
+### 3. Terraformファイルを編集
 
 Terraform定義に、Localstackへplan,applyを打ち込むための設定を記入します。
 
@@ -190,7 +190,7 @@ providerは `aws` ですが、以下4つの引数をtrueに設定することで
 - access_key
 - secret_key
 
-### endpointsについて
+#### endpointsについて
 
 providerがawsの場合、各awsサービスのendpointsをカスタマイズ可能です。endpointsの向き先を調整することにより、ローカル完結のterraform環境が実現可能という訳です。
 
@@ -201,7 +201,7 @@ localstackは [2020-09-15リリース](https://github.com/localstack/localstack#
 
 各自でカスタマイズする場合は、terraform で apply 予定のリソース全てをendpoints定義に追加してください。利用可能なサービス一覧は、[こちら](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/guides/custom-service-endpoints#available-endpoint-customizations) に掲載されています。
 
-### 本記事でLocalstackに構築するもの
+#### 本記事でLocalstackに構築するもの
 
 backendとproviderの定義は完了したので、次は各種リソースを追加しましょう。本記事では、サーバレス構成でよくある「Kinesisでデータを受けて、Lambdaで取得し、S3に永続化」のインフラ環境を、Terraformを使ってLocalstack内に構築します。
 
@@ -305,9 +305,9 @@ resource "aws_s3_bucket" "local_archive" {
 
 以上により、plan/apply の準備は完了です
 
-## 3. Localstackにterraform plan/apply
+### 3. Localstackにterraform plan/apply
 
-### まずは terraform init から
+#### まずは terraform init から
 
 新しいディレクトリでterraformを使う場合は、まずは `$ terraform init` して、backend と provider を設定します
 
@@ -328,7 +328,7 @@ Terraform has been successfully initialized!
 
 terraform init が完了しました。
 
-## Localstackに向けて、terraform plan を実行
+### Localstackに向けて、terraform plan を実行
 
 Terraformの実行準備が完了したので、`$ terraform plan` を実行します。
 
@@ -363,7 +363,7 @@ can't guarantee that exactly these actions will be performed if
 
 planも正しく実行できました。
 
-## Localstackに向けて、terraform apply を実行
+### Localstackに向けて、terraform apply を実行
 
 `$ terraform apply`
 （なるべく短いログでapply状況を載せたかったので、--auto-approve を利用しています）
@@ -449,7 +449,7 @@ $ aws --endpoint-url http://localhost:4566 lambda list-functions
 
 これで、ローカルに閉じた環境で、Terraformを好き放題使えますね！
 
-## まとめ
+### まとめ
 
 本記事では、Localstackに向けてTerraformを実行する方法をご紹介しました。
 
@@ -463,7 +463,7 @@ $ aws --endpoint-url http://localhost:4566 lambda list-functions
 
 ここまで読んでいただいた皆様も、色々なリソースをterraformコマンドでLocalstackに構築してみてください！
 
-## 参照サイト
+### 参照サイト
 
 - [Terraform Registory Custom Service Endpoint Configuration](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/guides/custom-service-endpoints#available-endpoint-customizations)
 - [Testing Infrastructure as Code on Localhost](https://www.hashicorp.com/resources/testing-infrastructure-as-code-on-localhost)

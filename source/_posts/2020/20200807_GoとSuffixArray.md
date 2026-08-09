@@ -19,7 +19,7 @@ mathjax: true
 
 [フューチャー夏休みの自由研究連載](/articles/20200726/)の5回目です。
 
-# はじめに
+## はじめに
 
 TIG の辻です。
 
@@ -27,7 +27,7 @@ Go は標準ライブラリが充実しているとよく言われます。標�
 
 `suffixarray` パッケージは Suffix Array を扱うライブラリです。`suffixarray` パッケージの魅力を感じるには、まず Suffix Array とは何か？ を知る必要があるでしょう。
 
-## Suffix Arrayとは
+### Suffix Arrayとは
 
 Suffix Array はデータ構造の 1 つです。1990 年に Udi Manber, Gene Myers によって考案されました。Suffix Array を用いると、検索したい任意の文字列から、漏れなく高速に文字列を検索できます。全文検索やデータ圧縮といった応用があります。
 
@@ -64,7 +64,7 @@ Suffix Array は文字列のすべての suffix を辞書順でソートし、�
 
 よって、`banana` の文字列における Suffix Array とは [6, 4, 2, 1, 5, 3] という配列になります。suffix の開始位置があれば元の suffix を構成でき、開始位置から n 文字目までの部分文字列になります。`banana` における suffix の開始位置が 3 であれば元の suffix は 3 文字目から 6 文字目までの部分文字列であるため、`nana` という suffix であることがわかります。
 
-### 文字列のパターンマッチング
+#### 文字列のパターンマッチング
 
 Suffix Array がどのようなデータ構造であるか分かりました。次に Suffix Array を用いて、文字列をパターンマッチングすることを考えてみます。`banana` という文字列から `an` という文字列をパターンマッチングすることを考えてみます。b<font color="Red">an</font><font color="Blue">an</font>a ですから、赤文字である 2 文字目から 3 文字目の `an` と、青文字である 4 文字目から 5 文字目の `an` の 2 箇所でマッチします。文字列 T の任意の部分文字列は、その出現位置を開始位置とする T の suffix の prefix です。つまり `an` であれば suffix `ana` の prefix である `an` と suffix  `anana` の prefix である `an` です。このように文字列 P を prefix としてもつような、T の suffix を探索することによって、文字列のパターンマッチングができます。Suffix Array は文字列の suffix が辞書順でソートされた suffix の開始位置を保持しているため、二分探索を用いて、高速にパターンマッチングできます。
 
@@ -123,7 +123,7 @@ https://play.golang.org/p/JFNugaoB26N
 
 このパターンマッチングは元の文字列 T の長さを $n$ として、マッチングしたい文字列 P の長さを $m$ とすると $O(m \log n)$ 時間でマッチングできます。Go の [sort.Search](https://golang.org/pkg/sort/#Search) 関数はソートされた配列やスライスに対して条件を満たす最小の index を二分探索できます。上記の実装では、suffix における prefix の先頭 `len(p)` 文字目までの部分文字列とマッチングしたい文字列 `p` を [strings.Compare](https://golang.org/pkg/strings/#Compare) で比較し、結果が 0 以上と 1 となる最小の index  [^3]を探索しています。Suffix Array に対して二分探索を行うことによって、パターンマッチングするときは、元の文字列の長さに対して、対数時間でおさえることができます。
 
-## Suffix Array の構築
+### Suffix Array の構築
 
 Suffix Array を構築することを考えてみます。ナイーブに考えると、長さ $O(n)$ の文字列 $n$ つをソートすることになります。クイックソートの 1 回あたりの平均計算量 $O(n \log n)$ とあわせて $O(n^2 \log n)$ 時間になります。いかにして効率よく Suffix Array を構築できるかどうかがアルゴリズムのポイントになります。
 
@@ -313,7 +313,7 @@ PASS
 
 また Go で実装したライブラリは、国内のオンラインジャッジシステムの 1 つである [Aizu Online Judge](http://judge.u-aizu.ac.jp/onlinejudge/) の [Multiple String Matching](http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=ALDS1_14_D) という問題を用いて検証しました。~~[05_maximum_00.in](https://judgedat.u-aizu.ac.jp/testcases/ALDS1_14_D/17/in) (1 MB程度あるので注意)のテストケースでタイムリミット超過(TLE)していましたが...~~
 
-### `suffixarray` パッケージによる Suffix Array の構築
+#### `suffixarray` パッケージによる Suffix Array の構築
 
 さて、メインである本家の `suffixarray` パッケージを見てみましょう。Suffix Array の構築は [New](https://golang.org/pkg/index/suffixarray/#New) 関数を用いることができます。
 
@@ -346,7 +346,7 @@ func Example() {
 }
 ```
 
-### ベンチマーク
+#### ベンチマーク
 
 `suffixarray` パッケージの使い方が分かったところで蟻本ベースの  Manber と Myers のアルゴリズムを用いて Suffix Array を構築する実装と、標準ライブラリを用いて構築する 2 つの方法でベンチマークを取得してみましょう。(なおベンチマークの結果はローカルの環境に依存します)
 
@@ -395,11 +395,11 @@ ok      github.com/d-tsuji/go-sandbox      9.362s
 
 ベンチマークでは約 100 倍程度の処理時間の違いがありましたが、上記の Manber と Myers のアルゴリズムの計算量が $O(n (\log n)^2)$ で SAIS の計算量が $O(n)$ ですから、100 倍程度の差は自然です。SAIS を実装している Go の標準ライブラリが優秀であることが分かります。
 
-## まとめ
+### まとめ
 
 Go の標準ライブラリで私が面白いと思った `suffixarray` パッケージを紹介しました。`suffixarray` パッケージの構築アルゴリズムの計算量は $O(n)$ で非常に高速です。その他に Manber と Myers による計算量 $O(n (\log n)^2)$ の構築アルゴリズムを用いた Go による実装を紹介しました。
 
-## 参考
+### 参考
 
 - 岡野原大輔 (2012) 『高速文字列解析の世界』岩波書店
 

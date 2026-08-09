@@ -11,13 +11,13 @@ series: "GCP2020"
 author: 村瀬善則
 lede: "Google Cloud の Vision API は REST API や RPC API を使用して強力な事前トレーニング済みの機械学習モデルを提供します。画像にラベルを割り当てることで、事前定義済みの数百万のカテゴリに画像を高速で分類できます。オブジェクトや顔を検出し、印刷テキストや手書き入力を読み取り、有用なメタデータを画像カタログに作成します。Google Cloudの公式ページによりますと事前トレーニング済みの機械学習モデルを利用してラベルの割り当てやOCRとしてすぐに利用できるようですね。"
 ---
-# はじめに
+## はじめに
 
 こんにちは。TIG DXチームの村瀬です。
 
 今回は[GCP連載企画](/articles/20200202/)の9日目です。私個人としてはGCPはほとんど利用したことがないので、せっかくだから面白そうなことを試してみようと思い、画像AIのサービスであるVision APIについて試してみることにしました。
 
-# Vision APIとは
+## Vision APIとは
 
 > Google Cloud の Vision API は REST API や RPC API を使用して強力な事前トレーニング済みの機械学習モデルを提供します。画像にラベルを割り当てることで、事前定義済みの数百万のカテゴリに画像を高速で分類できます。オブジェクトや顔を検出し、印刷テキストや手書き入力を読み取り、有用なメタデータを画像カタログに作成します。
 > https://cloud.google.com/vision
@@ -43,29 +43,29 @@ Google Cloudの公式ページによりますと事前トレーニング済み�
 詳細は公式ページを参照ください。
 https://cloud.google.com/vision/docs/features-list?hl=ja
 
-## 料金
+### 料金
 
 無料枠があり、最初の1,000ユニット/月は無料。それを越した場合でも1,000ユニットあたり$1.50。なんと太っ腹！
 
 詳細は公式ページを参照ください。
 https://cloud.google.com/vision/pricing?hl=ja
 
-# 準備
+## 準備
 
-## プロジェクト作成
+### プロジェクト作成
 
 <img src="/images/2020/20200218/photo_20200218_01.png" class="img-middle-size" loading="lazy">
 
 プロジェクト名を入力し作成ボタンをクリック
 
-## Cloud Vision APIの有効化
+### Cloud Vision APIの有効化
 
 <img src="/images/2020/20200218/photo_20200218_02.png" class="img-middle-size" loading="lazy">
 
 Cloud Vision APIの画面に移動して有効にするボタンをクリック
 https://cloud.google.com/vision/docs/before-you-begin
 
-## APIキーを作成
+### APIキーを作成
 
 <img src="/images/2020/20200218/photo_20200218_03.png" class="img-middle-size" loading="lazy">
 
@@ -78,11 +78,11 @@ APIとサービスの画面に移動して認証情報を作成からAPIキー�
 
 事前準備はこれで完了です。
 
-# APIをコールしてみる
+## APIをコールしてみる
 
 バリエーション豊かな機能がありますが、今回はLabel detection(ラベル検出)とText detection(光学式文字認識（OCR）)を試してみます。
 
-## Label detection(ラベル検出)
+### Label detection(ラベル検出)
 
 まずは、Label detection。Futureの[キャリア採用ページ](https://www.future.co.jp/recruit/career/job/engineer/)にある、つよつよエンジニア渋川の[画像](https://www.future.co.jp/recruit/common/img/member/er_popup_14_pc.jpg)を利用してどのようなラベルが検出がされるか見てみましょう。今回の検証では改めて説明する必要はないと思いますがお手軽万能HTTPアクセスツールcURLを利用します。
 
@@ -211,7 +211,7 @@ descriptionだけ抜き出して整理すると
 当たり前と言えば当たり前なのですが、画像から連想される説明が返却されてます。
 サラリーマンが快適にソファーに座っていてほほえんでおり、首や腕、ソファーの繊維も映っていますね。
 
-## Text detection(光学式文字認識（OCR）)
+### Text detection(光学式文字認識（OCR）)
 
 続いてText detection。渋川の[スペックのレーダーチャート](https://www.future.co.jp/recruit/common/img/member/chart_14_pc.png)を解析してみましょう。
 
@@ -252,7 +252,7 @@ curl -H 'Content-Type:application/json' -d '{"requests":[{"image":{"source":{"im
 
 画像AIってすごいですね。
 
-# さいごに
+## さいごに
 
 機械学習と聞くと利用できるようにするのにトレーニングが必要で、ある種の車輪の再発明に近い作業が必要になり、コストと時間が掛かるものと思っていたのですが、事前トレーニング済みの機械学習モデルが安価にお手軽に利用できてとても便利ですね。様々な検出のタイプがあり、(当たり前ではありますが)適切なタイプを選ぶ必要があるのでそこさえ間違えなければ多種多様なニーズに応えられる素晴らしいAPIかと思います。Vision APIのすばらしさを実感できる検証となりました。
 

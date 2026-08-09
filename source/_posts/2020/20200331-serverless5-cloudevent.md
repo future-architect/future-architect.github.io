@@ -16,7 +16,7 @@ author: 村田靖拓
 lede: "サーバレス連載企画の第5回はCloudEvents(https://cloudevents.io/)を取り上げたいと思います。CloudEventsとは様々存在するイベントを統一的に扱いたいとの思いから登場した統一仕様です。2019.10.24にCNCF(https://www.cncf.io/)のIncubatorプロジェクトに昇格したらしく、同時にv1.0のSpecificationがリリースされています。"
 ---
 
-# はじめに
+## はじめに
 
 こんにちは、TIG所属の[村田](https://twitter.com/famipapamart)です。
 
@@ -24,7 +24,7 @@ lede: "サーバレス連載企画の第5回はCloudEvents(https://cloudevents.i
 
 ※本記事は2020.03.31時点の情報を元に執筆しています
 
-# CloudEventsとは？
+## CloudEventsとは？
 
 <img src="/images/2020/20200331/photo_20200331_01.png" loading="lazy">
 
@@ -39,7 +39,7 @@ https://speakerdeck.com/mura123yasu/cloudevents
 
 GitHubを見る限りではGoのSDKが一番開発進んでいるのかなと思ったのと個人的にGo書きたい思いが強いので、今回はGoのSDKを使っていきます。
 
-# 環境とターゲット
+## 環境とターゲット
 
 | 項目                | バージョン等           |
 |:-------------------|:---------------------|
@@ -54,7 +54,7 @@ GitHubを見る限りではGoのSDKが一番開発進んでいるのかなと思
 
 <img src="/images/2020/20200331/d1.png" loading="lazy">
 
-### SDKバージョンについての補足
+#### SDKバージョンについての補足
 
 現在v2は `work in progress` とのことで、今回は雰囲気を掴むためにLatest Releaseの `v1.1.2` のソースコードをいじってみます。
 
@@ -63,14 +63,14 @@ GitHubを見る限りではGoのSDKが一番開発進んでいるのかなと思
 
 https://github.com/cloudevents/sdk-go/blob/master/README_v1.md
 
-# やってみる
+## やってみる
 
 今回書いたソースコードはすべてGitHubにあげていますので必要に応じて参照して頂ければと思います。
 
 * https://github.com/mura123yasu/cloudevents-go-helloworld
 * https://github.com/mura123yasu/cloudevents-cloudpubsub-receiver
 
-## まずは、シンプルにローカルで繋げる
+### まずは、シンプルにローカルで繋げる
 
 まずはローカル端末内で完結する形で実装します。
 
@@ -168,7 +168,7 @@ Data,
 
 ちゃんと届きました！ 簡単ですね。
 
-## 次に、Cloud Pub/Sub経由の形に変えてみる
+### 次に、Cloud Pub/Sub経由の形に変えてみる
 
 実際にはイベントデータの受け渡しはキューを経由するなどして非同期なやりとりになるかと思います。
 というわけで、私が普段GCPを利用しているということもありGCPのCloud Pub/Subを経由する形で実装したいと思います。
@@ -379,7 +379,7 @@ GCPコンソールからもメッセージがしっかりPub/Subに届いてい�
 
 成功です。
 
-## 最後に、Cloud Pub/Subから先をCloud Functionsに切り替える
+### 最後に、Cloud Pub/Subから先をCloud Functionsに切り替える
 
 さて、Pub/SubキューはCloud Functionsに渡してあげたいと思うのは私だけでしょうか？（求ム、同志）。
 というわけでラストは先程Cloud Pub/Subに到達したメッセージをCloud Functionsで受け取りたいと思います。
@@ -432,7 +432,7 @@ func Receiver(ctx context.Context, msg *pubsub.Message) error {
 
 Cloud Pub/Subの `Message` 型で受け取った電文を、CloudEventsの `Message` 型に変換し、データの中身を `Model` 型へ変換しています。これにより `Sequence` および `Message` という個々の値を扱える状態にできました。
 
-### CloudEventsのメッセージの取り扱いについての考察
+#### CloudEventsのメッセージの取り扱いについての考察
 
 ReceiverとSenderで同一の `Model` を準備してデータをやりとりし合うこと自体は一般的な実装ですが、今回ひとつミソになるのは `pubsub.Message` ⇔ `cepubsub.Message` の変換だと思います。
 
@@ -538,7 +538,7 @@ https://github.com/cloudevents/sdk-go/blob/v1.1.2/pkg/cloudevents/transport/pubs
 
 v1.1.2のSDKでは `specversion` のみの実装ですが、同様の形で `Attributes` からいわゆるメタデータを取り出して処理を行うかあるいは後続にイベントを伝播させるために再度なにかしらのオブジェクトに詰めるかといったことを行うことになるかなと思います。
 
-### ということで動かしてみる
+#### ということで動かしてみる
 
 ちょこっと考察を挟みましたが、肝心のプログラム実行がまだでした。
 まずはReceiver関数をCloud Functionsにデプロイします。
@@ -559,7 +559,7 @@ Cloud Functionsのログにてメッセージが届いていることが確認�
 
 無事に『CloudEvents仕様のメッセージをローカル端末からCloud Pub/Sub経由でCloud Functionsに渡し、個々の値を取り出しプログラムで扱える形にすること』という目的を達成できました。
 
-# さいごに
+## さいごに
 
 今回は主にCloud Pub/Subにフォーカスする形でCloudEventsの実装について紹介させて頂きました。SDKは絶賛開発中なステータスですが、世に蔓延る様々なイベント形式に悩まされる実装者が幸せになれる未来が待っていると思うと非常に楽しみですし、CloudEventsの動向からますます目が離せませんね。
 

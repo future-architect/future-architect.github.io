@@ -15,13 +15,13 @@ author: 真野隼記
 lede: "サーバレス連載の第2弾はLambdaアプリをGoで開発する中で調べた内容や、Tipsを紹介します。"
 ---
 
-# はじめに
+## はじめに
 
 こんにちは、TIG/DXユニットの真野です。
 
 [サーバレス連載](/articles/20200322/)の第2弾は、典型的なAWSサービスであるLambdaアプリをGoで開発する中で調べた内容や、Tipsを紹介します。
 
-## Lambdaの利用コア数は？
+### Lambdaの利用コア数は？
 
 結論⇨ ~~全ての場合で"2"でした。~~
 
@@ -81,7 +81,7 @@ func main() {
 
 ちなみに、隣に座っている同僚が、つい最近メモリサイズごとの処理性能を計測していましたので大体どのくらいメモリを与えるとよいかの指標は近いうちに公開したいと思います。
 
-## Lambdaの初期処理のポイント
+### Lambdaの初期処理のポイント
 
 [ドキュメント](https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/golang-handler.html#golang-handler-state) に記載している通り、Lambda関数外に変数を宣言できますし、init関数を用いる事もできます。Lambda関数は同時に1つしか動かないのでスレッドセーフを気にせずフィールドにおけるそうです。
 
@@ -101,7 +101,7 @@ func main() {
 
 こうすると、Lambdaの実行時間を削減につながる≒課金額を減らせる可能性があるため、初期処理に寄せられるものはドンドン寄せたほうが良い使い方になります。
 
-## Lambdaの関数タイプ
+### Lambdaの関数タイプ
 
 Lambdaの関数として以下の8パターンが利用できます。`TIn`, `TOut` はencoding/json 標準ライブラリと互換性のある（≒Marshal, Unmarshalができるの意だと思います）必要があります。
 
@@ -145,7 +145,7 @@ func main() {
 
 個人的な考えですが、LambdaのHandler関数をテストする時に、戻り値があると色々と検証が捗るため、Kinesis Triggerであっても戻り値 `TOut`は指定するようにしています。
 
-## errorとLogging
+### errorとLogging
 
 これはLambdaに限らないかもですが、LambdaのHandler関数の中で、以下のようにログ出力とerror をreturnするコードがあり、重複してて嫌だなと思いつつ、気持ちを込めてダブルメンテしていました。そのまま errorをreturnするだけでLambdaサービス側でerrorの内容を出力してくれるのですが、 `ERROR` といった文字列などカスタマイズしたい場合は2度手間せざるおえなかったです。
 
@@ -184,7 +184,7 @@ lambda.Start(errLog(handle))
 
 この辺はガンバりすぎると一種のアプリケーションフレームワークのように進化を遂げて、いろいろな功罪を生みそうですが、機能をシンプルに保てる体制の見通しがあれば導入しても良いかなと最近考えています。
 
-## return errorした場合の errorString null対応
+### return errorした場合の errorString null対応
 
 以下のように任意のerrorをreturnしたときのCloudWatchLogs側のログ出力ですが...
 
@@ -239,7 +239,7 @@ panicということで予期せぬエラーの場合にはStackTraceを出し�
 
 アプリケーションとしてpanicでエラーハンドリングすると、少々Lambda関数のUnitTestが難しくなりそうなので、なかなか導入する気にはなれないですが、どうしてもStackTraceを出したい場合などは検討してみても良いかもしれません。
 
-# まとめ
+## まとめ
 
 * LambdaのGoから見た論理コア数⇨2固定
 * Lambdaのコードは初期処理に寄せる
