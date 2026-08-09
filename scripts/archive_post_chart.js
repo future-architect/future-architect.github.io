@@ -1,10 +1,13 @@
 'use strict';
 
-// 月の合計に合わせた上限。平日しか公開しないので机上は月20強
+// 上限はその年の実データに合わせる。年ごとに投稿ペースが違うため、
+// 固定にすると棒が潰れる年と余白だらけの年ができる。
+// 目盛が半端にならないよう 5 刻みに切り上げる
 hexo.extend.helper.register('max_posts', function(year) {
-  if (year) return 30;
-  const acc = generatePostsSeries(this.site.posts);
-  return Math.max(100, ...acc.map(item => item.count));
+  const acc = generatePostsSeries(this.site.posts, year);
+  const peak = Math.max(0, ...acc.map(item => item.count));
+  const step = year ? 5 : 10;
+  return Math.max(step * 2, Math.ceil(peak / step) * step);
 });
 
 hexo.extend.helper.register('generate_posts_series_x', function(year) {
@@ -62,24 +65,34 @@ const generatePostsSeries = (posts, year) => {
   return series;
 }
 
-// 月ごとの棒を、その月の第何週かで積み上げるためのデータ。
-// 週は「その月の何日目か」で決める（1〜7日 = 第1週）。ISO週にすると
+// 積み上げの内訳データ。年ページは月の棒を週で、全期間は四半期の棒を月で割る。
+//
+// 年ページの週は「その月の何日目か」で決める（1〜7日 = 第1週）。ISO週にすると
 // 月をまたぐ週が出て、棒の合計が月の投稿数と合わなくなる
-const WEEK_SLOTS = 5;
+hexo.extend.helper.register('posts_stack_series', function(year) {
+  const buckets = generatePostsSeries(this.site.posts, year).map(e => e.groupKey);
+  const index = new Map(buckets.map((b, i) => [b, i]));
 
-hexo.extend.helper.register('posts_month_week_series', function(year) {
-  const months = generatePostsSeries(this.site.posts, year).map(e => e.groupKey);
-  const index = new Map(months.map((m, i) => [m, i]));
-  const slots = Array.from({length: WEEK_SLOTS}, () => months.map(() => 0));
+  const quarterOf = date => `${date.format('YYYY')}年${Math.ceil(Number(date.format('MM')) / 3)}Q`;
+  const slotCount = year ? 5 : 3;
+  const labels = year
+    ? Array.from({length: 5}, (_, i) => `第${i + 1}週`)
+    : ['1か月目', '2か月目', '3か月目'];
 
-  this.site.posts
-    .filter(post => post.date.format('YYYY') === year.toString())
-    .forEach(post => {
-      const i = index.get(post.date.format('M月'));
-      if (i === undefined) return;
-      const slot = Math.min(WEEK_SLOTS, Math.ceil(Number(post.date.format('D')) / 7)) - 1;
-      slots[slot][i]++;
-    });
+  const slots = Array.from({length: slotCount}, () => buckets.map(() => 0));
+  const target = year
+    ? this.site.posts.filter(post => post.date.format('YYYY') === year.toString())
+    : this.site.posts;
 
-  return JSON.stringify({months, slots});
+  target.forEach(post => {
+    const key = year ? post.date.format('M月') : quarterOf(post.date);
+    const i = index.get(key);
+    if (i === undefined) return;
+    const slot = year
+      ? Math.min(slotCount, Math.ceil(Number(post.date.format('D')) / 7)) - 1
+      : (Number(post.date.format('MM')) - 1) % 3;
+    slots[slot][i]++;
+  });
+
+  return JSON.stringify({buckets, labels, slots});
 });
