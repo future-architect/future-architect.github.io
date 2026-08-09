@@ -160,11 +160,19 @@ hexo.extend.helper.register('author_stats', function(name) {
     });
   });
   const byCount = (a, b) => b.count - a.count;
+  // 使用が1本だけの項目は「よく使う」傾向とは言えないので省く (#2139)。
+  // ただし省いた結果が空になる著者（投稿1本や、投稿ごとにタグが全部違う著者）は
+  // 何も出せなくなるので、その場合だけ省かずに全部見せる
+  const pickTop = (entries, limit) => {
+    const sorted = entries.sort(byCount);
+    const repeated = sorted.filter(e => e.count >= 2);
+    return (repeated.length > 0 ? repeated : sorted).slice(0, limit);
+  };
   return {
     recent,
-    topCategories: [...catCount.values()].sort(byCount).slice(0, 3),
+    topCategories: pickTop([...catCount.values()], 3),
     // インデックスは連載索引の構造タグで、執筆傾向を表さない
-    topTags: [...tagCount.values()].filter(t => t.name !== 'インデックス').sort(byCount).slice(0, 10),
+    topTags: pickTop([...tagCount.values()].filter(t => t.name !== 'インデックス'), 10),
   };
 });
 
