@@ -9,6 +9,7 @@ tags:
   - DynamoDB
 categories:
   - Programming
+series: "DynamoDB×Go"
 author: 武田大輝
 lede: "DynamoDB×Go連載企画の第2弾の記事となります。本記事ではサードパーティ製のライブラリを利用せずaws-sdkを素で利用した場合のDynamoDBの基本操作について見ていきましょう。"
 ---

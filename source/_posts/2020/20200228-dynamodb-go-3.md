@@ -11,6 +11,7 @@ tags:
   - バッチ処理
 categories:
   - Programming
+series: "DynamoDB×Go"
 thumbnail: /images/2020/20200228/thumbnail.png
 author: 真野隼記
 lede: "DynamoDB×Go連載の第3弾目です。今までは AWS SDK Go やそれをラップしたguregu/dynamo について説明していましたが、 Go CDK（Go Cloud Development Kit） を用いたDynamoDB操作について説明します。"
