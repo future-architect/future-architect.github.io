@@ -13,7 +13,7 @@ thumbnail: /images/2021/20210318/thumbnail.jpg
 author: 関靖秀
 lede: "テーマは、2021年2月24日に公開されたGKE Autopilotです。この記事は、Kubernetesに触ったことがない方でもわかるように、最も簡単な構成で試してみました。Kubernetesを触ったことがない方にもみていただけるとありがたく思います。"
 ---
-# はじめに
+## はじめに
 
 こんにちは、TIGの関と申します。[GCP連載2021](/articles/20210307)第8弾です。
 
@@ -21,11 +21,11 @@ lede: "テーマは、2021年2月24日に公開されたGKE Autopilotです。�
 この記事は、Kubernetesに触ったことがない方でもわかるように、最も簡単な構成で試してみました。
 Kubernetesを触ったことがない方にもみていただけるとありがたく思います。
 
-# KubernetesとGKEのおさらい
+## KubernetesとGKEのおさらい
 
 まずは、GKEとKubernetesについて簡単に導入をしたいと思います。
 
-## Kubernetesとは？
+### Kubernetesとは？
 
 Kubernetesはコンテナオーケストレーションのためのツールで、数百〜数千といった膨大な数のコンテナを管理、協調させることができます。
 
@@ -38,20 +38,20 @@ Kubernetesへのデプロイは、1つ以上のコンテナをひとまとめに
 なので、「複数のコンテナで1つのサービスとして動作させたい」といったニーズにも答えることができます。
 基本的に、Kubernetesにのせるサービスの開発者は、Podの構成は自分たちで考えることになります。
 
-## GKEとは？
+### GKEとは？
 
 GKE(Google Kubernetes Engine)とは、GoogleがGCPのプロダクトの1つとして提供しているKubernetesのマネージドサービスです。
 
 これまでのGKEは上記で説明したコントロールプレーンについて、Googleが管理してくれていました。
 利用者は、ワーカノードの構成を考えてクラスタを作成することで、コントロールプレーンの管理をすることなくKubernetesを利用できます。
 
-# GKE Autopilot
+## GKE Autopilot
 
 <img src="/images/2021/20210318/aircraft.jpg" alt="" title="Ralph KleinによるPixabayからの画像" loading="lazy">
 
 さて、ここからが本題です。
 
-## GKE Autopilotとは？
+### GKE Autopilotとは？
 
 GKE AutopilotはGKEの新しい運用モードです。
 
@@ -76,12 +76,12 @@ Autopilotを使うことで、Googleがワーカーノードの管理、最適�
 - [Autopilotの概要](https://cloud.google.com/kubernetes-engine/docs/concepts/autopilot-overview?hl=ja)
 - [GKE Autopilot のご紹介: マネージド Kubernetes における革命](https://cloud.google.com/blog/ja/products/containers-kubernetes/introducing-gke-autopilot)
 
-# GKE Autopilotを触ってみる
+## GKE Autopilotを触ってみる
 
 公式でもチュートリアルがありますが、今回は初心者向けにもう少し簡単な構成を試してみようと思います。
 Kuberntesを触ったことがない方でも、なんとなく雰囲気は掴めるはずです。
 
-## クラスタの作成
+### クラスタの作成
 
 クラスタを作りましょう。Autopilotの設定はクラスタを作る際に行えます。
 新機能ですし、ここではGUIでどのように設定できるのかをみていきましょう。
@@ -100,12 +100,12 @@ Kuberntesを触ったことがない方でも、なんとなく雰囲気は掴�
 5min以上待つ必要があります。
 <img src="/images/2021/20210318/image_4.png" loading="lazy">
 
-## gcloudコマンドを導入する
+### gcloudコマンドを導入する
 
 [公式ドキュメント](https://cloud.google.com/sdk/docs/quickstart-macos?hl=ja)に沿って導入しましょう。
 この記事ではクラスタの情報を取得することだけに使うため、出番少なめです。
 
-## kubectlコマンドを導入する
+### kubectlコマンドを導入する
 
 macでHomebrewを使っているならコマンド一発です。
 
@@ -115,7 +115,7 @@ brew install kubectl
 
 Kubernetes公式のインストール方法は[こちら](https://kubernetes.io/ja/docs/tasks/tools/install-kubectl/)
 
-## kubectlにクラスタの情報を読み込ませる
+### kubectlにクラスタの情報を読み込ませる
 
 Kubernetesの操作はkubectlコマンドで行います。
 そのためには、kubectlコマンドにどのクラスタを対象にするのか教えてあげる必要があります。
@@ -141,7 +141,7 @@ GCPのコンソール に戻ります。
 gcloud container clusters get-credentials autopilot-cluster-1 --region us-central1 --project high-tribute-307823
 ```
 
-## クラスタの情報をみてみる
+### クラスタの情報をみてみる
 
 ひとまず、nodeの情報でもみてみましょう。
 node1つが1つのVMであり、これまでのGKEだとGCEインスタンスを作成してノードとして利用していました。
@@ -160,7 +160,7 @@ gk3-autopilot-cluster-1-default-pool-80d33c8f-xbzz   Ready    <none>   44m   v1.
 gk3-autopilot-cluster-1-default-pool-da3faeda-70qd   Ready    <none>   44m   v1.18.12-gke.1210   10.128.0.5    34.66.97.220   Container-Optimized OS from Google   5.4.49+          containerd://1.4.1
 ```
 
-## Depoloymentを作成してみる
+### Depoloymentを作成してみる
 
 さて、ようやくですが、Pod(コンテナ)をデプロイしてみましょう。
 
@@ -250,7 +250,7 @@ nginx-deployment-69c549b4bb-68lww   1/1     Running   0          26m
 nginx-deployment-69c549b4bb-fv7bx   1/1     Running   0          26m
 ```
 
-## LoadBalancer Serviceを作成してみる。
+### LoadBalancer Serviceを作成してみる。
 
 Podを作っただけだといまいち実感が沸かないという方のために、外部からアクセスできるようにしてみます。
 LoadBalancer Serviceリソースを作ることで、GCPのロードバランサーを構成し、それ経由で外部からのアクセスを受け付けることができます。
@@ -312,7 +312,7 @@ LoadBalancer Serviceを作成すると、コントロールプレーンでそれ
 
 できました！！！
 
-## リソースの削除
+### リソースの削除
 
 ここからはお片付けです。
 
@@ -323,18 +323,18 @@ kubectl delete -f deployment.yaml
 kubectl delete -f service.yaml
 ```
 
-## クラスタを破棄します
+### クラスタを破棄します
 
 クラスタの再構成がなされるので、完了まで待ちましょう。
 次のように、削除を選択し、しばらく待てばクラスタが削除できます。
 <img src="/images/2021/20210318/image_11.png" loading="lazy">
 
-## おまけ
+### おまけ
 
 これ以外にも、作成するPodの数を増やしてみたり、公式チュートリアルをやったり、いろいろ触ってみました。
 リソースが足りなくなると、新しくNodeを確保して、ちょっと待つとPodがスケジューリングされる様子をみることができ、まさしく"Autopilot"という名にふさわしい挙動でした。
 
-# 感想
+## 感想
 
 公式の説明通り、ノードの設定を特にせずとも使え、一度作ったあとの使い方には大きな差がなく普通に使いやすいと感じました。
 

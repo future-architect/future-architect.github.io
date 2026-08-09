@@ -22,7 +22,7 @@ AWS Certified Database - Specialtyに合格しました。
 
 全試験の振り返りや思い出話は[Qiitaアドベントカレンダー](https://qiita.com/advent-calendar/2021/future)のネタにしようかなと思います、お楽しみに(宣伝)。
 
-# AWS Certified Database - Specialtyとは
+## AWS Certified Database - Specialtyとは
 
 [AWS Certified Database - Specialty](https://aws.amazon.com/jp/certification/certified-database-specialty/)はその名の通りデータベースに関するテストです。
 
@@ -34,7 +34,7 @@ RDS for MySQL DBインスタンスのスナップショットをAurora MySQL DB 
 こういった知識の引き出しが増えていくのがAWS資格試験を受けるモチベーションに繋がります。
 少々寂しいですがデータベースエンジンレベルのパフォーマンスチューニング等はほぼ出題されません。
 
-# 学習方法
+## 学習方法
 
 私の記事では毎回出している[aws.koiwaclub.com](https://aws.koiwaclub.com/)は、執筆段階の2021年では試験問題が鋭意製作中であり、他のスペシャリティ資格と比べると半分程度の問題量が公開されています。
 当然これだけでは不安なので[udemyの教材](https://www.udemy.com/course/aws-certified-database-specialty-practice-exams-dbs-c01/)を購入しました。
@@ -45,7 +45,7 @@ RDS for MySQL DBインスタンスのスナップショットをAurora MySQL DB 
 出題傾向としては下記のような内容が出題されます。
 当然データベースと名の付くものはほぼ全てが出題されます、Amazon Neptuneあたりは唯一の出番かもしれません。
 
-## データベースの知識
+### データベースの知識
 
 * Amazon Aurora
 * Amazon DocumentDB (MongoDB 互換)
@@ -58,14 +58,14 @@ RDS for MySQL DBインスタンスのスナップショットをAurora MySQL DB 
 * Amazon Redshift
 * Amazon Timestream
 
-## データ移行
+### データ移行
 
 * AWS Database Migration Service (AWS DMS)
 * AWS DataSync
 * AWS Schema Conversion Tool
 * AWS Snow ファミリー
 
-## セキュリティ、コンプライアンス:
+### セキュリティ、コンプライアンス:
 
 * AWS CloudHSM
 * AWS Directory Service
@@ -73,7 +73,7 @@ RDS for MySQL DBインスタンスのスナップショットをAurora MySQL DB 
 * AWS Key Management Service (AWS KMS)
 * AWS Secrets Manager
 
-## その他基礎知識
+### その他基礎知識
 
 * Amazon Simple Notification Service (Amazon SNS)
 * Amazon Simple Queue Service (Amazon SQS)
@@ -91,7 +91,7 @@ RDS for MySQL DBインスタンスのスナップショットをAurora MySQL DB 
 * Amazon Elastic Block Store (Amazon EBS)
 * Amazon S3
 
-## 感想
+### 感想
 
 Data Analytics - Specialtyよりは安全な難易度でしたが、個人的な都合で勉強時間1週間で試験に臨んだ結果、少々受かるか不安な状態でした。
 こちらも一発合格できて良かったです。

@@ -16,7 +16,7 @@ TIGの伊藤真彦です。
 
 最近はFlutterの研究を進めており、一人Flutter連載のような動きをしています。
 
-# FlutterをElectronと組み合わせる
+## FlutterをElectronと組み合わせる
 
 * [入門記事](/articles/20211221a/): Flutterであればデスクトップアプリケーションを構築できることを説明しました
 * [Electronの入門記事](/articles/20210107/): これも私が書きましたが、Electronもクロスプラットフォームのデスクトップアプリケーションを開発できるライブラリです
@@ -28,7 +28,7 @@ ElectronはHTML、JavaScriptをアセットとして利用してデスクトッ�
 * Flutter on Desktop未対応の機能を使いたい
 * Electron向けの資産を活かしたい
 
-### Flutter on Desktop未対応の機能を使いたい
+#### Flutter on Desktop未対応の機能を使いたい
 
 Flutter on Desktopはまだまだリリースから間もないため、安心して利用できるか見極めながら開発していく必要があります。
 またFlutter向けパッケージのいくつかはFlutter on Desktopに対応していないものもあります。
@@ -43,13 +43,13 @@ Flutter on Desktopはまだまだリリースから間もないため、安心�
 
 Flutter on Desktopのエコシステムが充実するまでの繋ぎとしてこのような手法をとることができます。
 
-### Electron向けの資産を活かしたい
+#### Electron向けの資産を活かしたい
 
 ビジネス要件的にどうしても必要な、Electronに向け最適化されたJavaScript、TypeScript製モジュールがありました。これらの資産をDart向けに作り直す必要をなくす、という意味でFlutter on Electronという組み合わせが実現できないかな、という検証を行ったという背景もあります。
 
 あまり頼りすぎるとFlutter on Desktopに本格移行する難易度が跳ね上がりますが、この組み合わせであれば既存の資産や豊富なnpmモジュールを活用できます。
 
-# Flutter on Desktopのおさらい
+## Flutter on Desktopのおさらい
 
 Flutterアプリケーションをデスクトップアプリケーションとして動かすことはとても簡単にできます。
 
@@ -77,7 +77,7 @@ flutter create .
 
 この辺りの手軽さはやはり素晴らしいと感じますね。
 
-# FlutterアプリケーションをElectronと組み合わせる
+## FlutterアプリケーションをElectronと組み合わせる
 
 さて本題です。
 
@@ -95,7 +95,7 @@ project
 * package.jsonの編集
 * 必要なファイルの配置
 
-### 依存モジュールのインストール
+#### 依存モジュールのインストール
 
 `nodejs`フォルダで`npm init`コマンドを実行し、Electronを導入します。[electron-builder](https://www.electron.build/)が「Yarn is strongly recommended instead on npm」と強く訴えているので、Yarnを使って依存モジュールを導入します。
 
@@ -107,7 +107,7 @@ yarn add electron --dev
 yarn add electron-builder --dev
 ```
 
-### package.jsonの編集
+#### package.jsonの編集
 
 インストールが完了したら必要なファイルやコマンドを整備します。まずは`package.json`に下記の内容を追加します。
 
@@ -122,7 +122,7 @@ yarn add electron-builder --dev
 
 `start`コマンドはピュアにFlutterアプリとして動かしたい場合にいちいちフォルダを移動するのが面倒なのでオマケのようなノリで追加しています。
 
-### 必要なファイルの配置
+#### 必要なファイルの配置
 
 追加したコマンドはElectronアプリケーションを起動、またはビルドする前にFlutterのビルドコマンドを記載したシェルを叩く、という仕組みにしています。
 
@@ -259,7 +259,7 @@ Flutter on Desktopとして起動したものと比較すると、微妙にフ�
 
 デスクトップ対応は魅力的だけど、欲しい機能がまだ動かなかったので見送る、というパターンの時の選択肢としてはオススメできるかなと思います。
 
-# まとめ
+## まとめ
 
 * Flutter on Desktop未対応のパッケージはまだ存在する
 * Flutter on the WebとElectronの組み合わせは簡単に実現できる

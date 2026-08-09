@@ -12,7 +12,7 @@ thumbnail: /images/2021/20210712a/thumbnail.png
 author: 山上燦
 lede: "いきなりですが、みなさんはコミュニケーションツール（チャットツール）何を使っていますでしょうか。フューチャーでは2020年のはじめに社内公式のチャットツールとしてSlack Enterprise Gridを導入しました"
 ---
-# はじめに
+## はじめに
 
 TIGの山上・[村田](https://twitter.com/famipapamart)です。
 いきなりですが、みなさんはコミュニケーションツール（チャットツール）何を使っていますでしょうか。
@@ -33,18 +33,18 @@ TIGの山上・[村田](https://twitter.com/famipapamart)です。
 フューチャーでは2020年のはじめに社内公式のチャットツールとして[Slack Enterprise Grid](https://slack.com/intl/ja-jp/enterprise)を導入しました👏
 今回の記事では、**導入の経緯**や**現場での活用事例**を紹介します👆
 
-# Slack Enterprise Grid 導入前どうなっていたか？
+## Slack Enterprise Grid 導入前どうなっていたか？
 
 会社としてはGSuiteが標準だったためHangoutsやChatの利用が大半、TIGを中心とした一部でSlackを利用していました。
 <img src="/images/2021/20210712a/image.png" alt="社内チャットツールのタイムチャート図" width="720" height="405" loading="lazy">
 
-# Slack Enterprise Grid 導入経緯
+## Slack Enterprise Grid 導入経緯
 
 山上チーム（メディアユニット）では2つのワークスペースを併用しており、「一本化したいよね〜」という思いがありました。また、村田チーム（DXユニット）とsharedチャンネル作りたいよねと。
 
 他のチームで利用しているということもあり、xIG系組織全体（約300名程）でSlack Enterprise Gridの導入を上長に相談、即レスで👌
 
-# Slack Enterprise Grid 導入までの道のり
+## Slack Enterprise Grid 導入までの道のり
 
 <img src="/images/2021/20210712a/image_2.png" alt="今ワークスペースいくつあるんだろう" width="720" height="405" loading="lazy">
 
@@ -56,7 +56,7 @@ TIGの山上・[村田](https://twitter.com/famipapamart)です。
 
 <img src="/images/2021/20210712a/image_3.png" alt="コスト的にもEnterpriseGridの方がメリット大きいじゃん" width="720" height="405" loading="lazy">
 
-### 導入に向けて実施したこと
+#### 導入に向けて実施したこと
 
 移行に向けた準備:
 
@@ -68,14 +68,14 @@ TIGの山上・[村田](https://twitter.com/famipapamart)です。
 * ワークスペース移行準備：移行順番、スケジュールなど
 * [ワークスペースの移行](https://slack.com/intl/ja-jp/help/articles/115002532808-Enterprise-Grid-%E3%81%B8%E3%83%AF%E3%83%BC%E3%82%AF%E3%82%B9%E3%83%9A%E3%83%BC%E3%82%B9%E3%82%92%E7%A7%BB%E8%A1%8C%E3%81%99%E3%82%8B)：移行はSlack社と順番や日時調整して実施、細かなトラブルはあったが無事移行完了
 
-# Slack Enterprise Grid 導入後
+## Slack Enterprise Grid 導入後
 
 TIGを中心に、AIグループやセキュリティグループに展開。
 さらには会社全体のコミュニケーションツールとして認められ、利用範囲はみるみる拡大しました！！
 
 <img src="/images/2021/20210712a/スクリーンショット_2021-07-09_18.06.06.png" alt="Slackの社内展開イメージ" width="811" height="432" loading="lazy">
 
-### 導入後の利用状況
+#### 導入後の利用状況
 
 * 全社員（1,000人）の80％が利用
 * ゲスト700人程度
@@ -85,7 +85,7 @@ TIGを中心に、AIグループやセキュリティグループに展開。
   * Org外：20
 * 1日あたりのメッセージ数：10,000件〜12,000件
 
-# Slackを活用した社内コミュニケーション
+## Slackを活用した社内コミュニケーション
 
 Slack Enterprise Grid の導入以前から Slack は各プロジェクトで活用されていましたが、当社での Slack 活用は主に以下の3軸で行われています。
 
@@ -93,7 +93,7 @@ Slack Enterprise Grid の導入以前から Slack は各プロジェクトで活
 * ビジネスパートナーとの緻密な連携
 * チームビルディング
 
-## 開発・運用の効率化
+### 開発・運用の効率化
 
 Slack を開発フローに組み込み、 backlog の起票や新規 Pull Request の通知を Slack へ飛ばしたり、リソースのデプロイを通知したりしています。
 
@@ -107,7 +107,7 @@ Slack を開発フローに組み込み、 backlog の起票や新規 Pull Reque
 
 https://github.com/future-architect/gbilling2slack
 
-## ビジネスパートナーとの緻密な連携
+### ビジネスパートナーとの緻密な連携
 
 フューチャーはITコンサル会社なので、顧客企業との密なコミュニケーションが常に求められます。やはりメールよりもチャットプラットフォーム上での会話の方がスピード感早くかつ密にコミュニケーションできるなと感じています。
 
@@ -117,7 +117,7 @@ https://github.com/future-architect/gbilling2slack
 
 <img src="/images/2021/20210712a/スクリーンショット_2021-07-04_20.15.27.png" alt="ビジネスパートナーとの緻密な連携" width="1200" height="637" loading="lazy">
 
-## チームビルディング
+### チームビルディング
 
 フューチャーでは組織・プロジェクトごとに Slack のワークスペースを作成していますが、各ワークスペースごとに様々な文化が形成されています。
 
@@ -132,6 +132,6 @@ https://github.com/future-architect/gbilling2slack
 * [議事録をサッと準備する](https://future-architect.github.io/articles/20210327/)
 * [チケットごとにSlackスレッドを分けて通知するRedmineプラグインを作成しました！](https://future-architect.github.io/articles/20210413b/)
 
-# さいごに
+## さいごに
 
 今回は Slack の導入エピソードと、 Slack を活用した社内のコミュニケーションの実態をいくつかご紹介させて頂きました。Slack はカスタマイズ性に優れており、好みのアプリを実装したりすることでどんどん自分好みな使いやすいチャットツールへとどんどん進化してくれます。引き続き Slack を使い倒していきたいと思います。

@@ -17,7 +17,7 @@ lede: "今回は流行りの認証プロトコルであるOpenID ConnectとOAuth
 
 今回は流行りの認証プロトコルであるOpenID ConnectとOAuth2.0におけるAuthorizerについて話そうと思います。
 
-# Authorizerとは
+## Authorizerとは
 
 <img alt="カスタムオーソライザの動作フロー" src="/images/2021/20210610a/custom-auth-workflow.png" loading="lazy">
 
@@ -25,7 +25,7 @@ lede: "今回は流行りの認証プロトコルであるOpenID ConnectとOAuth
 
 OSSのAPIGatewayであるKongを触ったことがある方ならば、[JWT Plugin](https://docs.konghq.com/hub/kong-inc/jwt/)とほぼ同じ立ち位置のものと思って構いません。
 
-# なぜ使うのか
+## なぜ使うのか
 
 SinglePageApplicationやモバイルアプリなど、ClientになるFront-endがサーバと分離されたシステム構成の場合、`Client (RelyingParty)` と `APIサーバ (ResourceServer)` を両方セキュアにする必要があります。
 
@@ -35,31 +35,31 @@ SinglePageApplicationやモバイルアプリなど、ClientになるFront-end�
 
 この度はそのAuthorizerを実装するにあたって、いくつか考慮すべきポイントについて触れて行こうと思います。
 
-# Authorizer設定
+## Authorizer設定
 
-## タイプ
+### タイプ
 
 今回はCognitoではなく、KeycloakやAuth0など外部の認証基盤を想定しています。
 AuthorizerをLambda関数で実装することにより、認証認可制御をもっと自由にカスタムできます。
 
-## Lambdaイベントペイロード
+### Lambdaイベントペイロード
 
 Lambda関数の引数となるEventの入力値には2パターン存在します。
 
 - **Tokenタイプ**は簡単にTokenとmethodArnのみが取得可能で、Tokenを検証しその(JWTならば)PayloadとmethodArnのパスを対照するなどで認可を制御することが可能になります。
 - **Requestタイプ**はAPIGatewayのプロキシ統合のリクエストと同じものを引数として受けられます。TokenとmethodArnはもちろん、他のHeaderやクエリ文字列、Bodyなどすべてのリクエストの中身が取得できるため、もう少し自由な認可要件が必要なときに使うこともできます。
 
-## トークンの検証
+### トークンの検証
 
 Tokenの中身を検証する前に正規表現により簡単にチェックできます。一般的にTokenとしてJWTを使う場合は`^Bearer [-_0-9a-zA-Z.]+$`のように設定します。
 この正規表現にマッチしない場合、AuthorizerはLambdaまでリクエストを送らず401を返します。
 
-## 認可のキャッシュ
+### 認可のキャッシュ
 
 AuthorizerはAPIリクエストが送られるとき毎回必ずTokenを検証するので、その負荷を減らすためにキャッシングも可能です。
 しかし、この機能には大きな問題があり、キャシングの単位がTokenそのものではなく、Tokenのソースであるヘッダー名(`Authorization`など)になっています。あるユーザが一度認可したあとならば、他のユーザがそのキャッシュを使い回すことができてしまうため、基本無効にするしかないと思います。
 
-# Lambdaの実装
+## Lambdaの実装
 
 Lambda実装の流れは大きく分けて
 
@@ -68,7 +68,7 @@ Lambda実装の流れは大きく分けて
 
 の2つの段階になるかと思います。
 
-## 入出力
+### 入出力
 
 Goで実装する場合メインハンドラー関数は以下のような形になります。
 
@@ -85,7 +85,7 @@ func Handle(e events.APIGatewayCustomAuthorizerRequestTypeRequest) (*events.APIG
 [aws-lambda-go](https://github.com/aws/aws-lambda-go)には、すでにCustomAuthorizerのための入出力構造体が用意されているため大変便利です。
 出力の戻り値としてはAWS IAMのようなAWSPolicyDocumentを使い返します(詳細後述)。
 
-### 出力パターン
+#### 出力パターン
 
 Lambda関数の出力(戻り値)により、以下のようにAPIに送られてきたリクエストを制御できます。
 
@@ -98,16 +98,16 @@ Lambda関数の出力(戻り値)により、以下のようにAPIに送られて
 
 *特記事項として、エラーを返すにしてもエラーメッセージを`Unauthorized` (大文字`U`に注意)にすることにより401を返すことができます。*
 
-## Authentication
+### Authentication
 
 認可制御のために前提として、まずは認証が必要になります。一般的にはJWTを検証することになり、JWTのライブラリを使えば簡単ですが、検証のための**公開鍵取得方法**には2パターンがあるかと思われます。
 
-### 静的に公開鍵を保持する
+#### 静的に公開鍵を保持する
 
 公開鍵をLambdaの環境変数やDynamoDB、S3などを使い静的に保持する方法です。
 実装は簡単で構造もシンプルですが、鍵のローテションをどうするか考える必要が将来的に出てきます。
 
-### 公開鍵を動的に取得する
+#### 公開鍵を動的に取得する
 
 認証基盤が公開している公開鍵エンドポイントから鍵を取得する方法です。
 公開鍵エンドポイントは一般的に認証基盤側が[JSON Web Key(JWK)](https://openid-foundation-japan.github.io/rfc7517.ja.html)により定義し、以下のような形で公開しています。
@@ -117,7 +117,7 @@ Lambda関数の出力(戻り値)により、以下のようにAPIに送られて
 
 この方法は鍵のローテションを気にせずに済みますが、APIリクエストのたびに認証基盤への外部リクエストが発生するので、遅延・負荷を軽減するための効率的なキャッシング戦略を立てる必要があります。
 
-## Authorization
+### Authorization
 
 APIリクエストのToken検証が完了し認証ができたら、次はそのユーザーがリクエストしたエンドポイントにアクセス可能かをチェックする認可処理が必要になります。
 
@@ -128,7 +128,7 @@ APIリクエストのToken検証が完了し認証ができたら、次はその
 - [Keycloak Authorization Services Guide](https://keycloak-documentation.openstandia.jp/master/ja_JP/authorization_services/)
 - [Auth0 Authorization](https://auth0.com/docs/authorization)
 
-### 認可の出力
+#### 認可の出力
 
 認可ロジックによりユーザのアクセス可否が決まったら、Authorizerは以下のようなJSONで認可処理が完了したことをAPIGatewayに返します。
 
@@ -154,24 +154,24 @@ APIリクエストのToken検証が完了し認証ができたら、次はその
 }
 ```
 
-#### Policy Document
+##### Policy Document
 
 IAMのものと同じ形式で、アクセスを許可するか拒否するかを明示的に表現します。
 
 AuthorizerはAPIGateway上で動くものなので`"Action": "execute-api:Invoke"`は固定になります。
 `Resource`はLambda関数の引数で受けた`methodArn`をそのまま返すで問題ありません。
 
-#### Principal ID
+##### Principal ID
 
 APIリクエストしたユーザが誰なのかを表現します。リクエストしたユーザを一意に識別するための値であり、実際のAPIロジックを決める後続のLambda関数などに渡すことができ、ユーザによるレスポンスの出し分けなどを可能にします。
 
 一般的にはJWTの[`sub` (Subject) Claim](https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.2)をそのまま使うことになります。
 
-#### Authorizer Context
+##### Authorizer Context
 
 Principal IDと同じように後続のLambda関数などに渡すことができる任意の値です(Principal IDもContextの一部)。APIのレスポンスを出し分けするために必要な任意の情報をkey-value形式でセットすることが可能です。一見Mapオブジェクトにも見えますが、ValueとしてはNumber・String・BooleanのみでObjectやArrayなどの入れ子構造は使えません。
 
-# 最後に
+## 最後に
 
 Authorizerの実装、最初はわからないことだらけで難しく感じるかもしれませんが、単機能の関数であるため、一度実装してしまったらテンプレートのように様々なAPIに使い回すことも可能かと思います。
 

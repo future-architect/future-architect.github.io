@@ -11,13 +11,13 @@ thumbnail: /images/2021/20210525b/thumbnail.gif
 author: 山田勇一
 lede: "Draｗ.io（Diagrams.net）はとても便利ですが、VScodeやプラグインと組み合わせると更に便利になります。特に便利と感じた機能を紹介します。ここ数年、GitHubでドキュメント（Markdown）を管理するケースが増えており、Markdownに埋め込む編集可能な図として、Draｗ.ioのメタ情報を埋め込んだ画像を利用しています。"
 ---
-# 概要
+## 概要
 
 [Draｗ.io（Diagrams.net）](https://www.diagrams.net/)はとても便利ですが、VScodeやプラグインと組み合わせるとさらに便利になります。
 
 特に便利と感じた機能を紹介します。
 
-# VS Code プラグイン
+## VS Code プラグイン
 
 ここ数年、GitHubでドキュメント（Markdown）を管理するケースが増えており、Markdownに埋め込む編集可能な図として、Draｗ.ioのメタ情報を埋め込んだ画像を利用しています。
 
@@ -27,7 +27,7 @@ https://marketplace.visualstudio.com/items?itemName=hediet.vscode-drawio
 
 <img src="/images/2021/20210525b/vscode.gif" alt="VS Codeでdraw.ioを編集する動画" width="720" height="480" loading="lazy">
 
-# Draｗ.io プラグイン
+## Draｗ.io プラグイン
 
 [公式](https://drawio-app.com/?s=plugin)でもブログでサラッと紹介してあるのみですが、メニューから、`拡張 > プラグイン`で追加可能です。
 
@@ -35,7 +35,7 @@ https://marketplace.visualstudio.com/items?itemName=hediet.vscode-drawio
 
 <img src="/images/2021/20210525b/plugin.gif" alt="draw.ioのプラグインを追加する動画" width="720" height="480" loading="lazy">
 
-## SQL
+### SQL
 
 DDLからDraｗ.ioのERDを作れます。
 
@@ -43,19 +43,19 @@ DDLからDraｗ.ioのERDを作れます。
 
 https://drawio-app.com/sql-plugin/
 
-## Text
+### Text
 
 Draｗ.ioに含まれるTextを一括でExportできます。どこかで使えそうですね。
 
 https://drawio-app.com/text-plugin/
 
-## anim
+### anim
 
 オブジェクトにアニメーションを付けられます。巨大なオブジェクトにアニメーションをつけるのはかなり労力を使いそうです。
 
 <img src="/images/2021/20210525b/anim.gif" alt="draw.ioでオブジェクトにアニメーションを追加する動画" width="720" height="480" loading="lazy">
 
-## flow
+### flow
 
 こちらもアニメーションですが、線が動きます。面白いです。
 
@@ -63,18 +63,18 @@ https://drawio-app.com/connector-styles-and-animations-in-draw-io/
 
 <img src="/images/2021/20210525b/flow.gif" alt="draw.ioで矢印の線が流れるアニメーション" width="720" height="480" loading="lazy">
 
-## tags
+### tags
 
 オブジェクトにタグを付けて、表示非表示を切り替えられます。レイヤーでよいのではないでしょうか？
 
 <img src="/images/2021/20210525b/tags.gif" alt="draw.ioでタグでオブジェクトの表示制御する動画" width="720" height="480" loading="lazy">
 
-## props
+### props
 
 右上にオブジェクトのプロパティが表示されます。邪魔です。
 
 <img src="/images/2021/20210525b/props.gif" alt="draw.ioでオブジェクトの左上にプロパティが表示される動画" width="720" height="480" loading="lazy">
 
-# 所感
+## 所感
 
 Draｗ.io単品でも無料でここまで使えるものかと驚きます。改めて可能性を感じました。

@@ -13,7 +13,7 @@ thumbnail: /images/2021/20210517a/thumbnail.png
 author: 越島亮介
 lede: "MONETマーケットプレイスで購入したAPIとFlutterを使って簡単なスマホアプリを作ってみます。"
 ---
-# はじめに
+## はじめに
 
 こんにちは、TIGの越島と申します。
 
@@ -21,7 +21,7 @@ lede: "MONETマーケットプレイスで購入したAPIとFlutterを使って�
 
 MONETマーケットプレイスAPIを使ってみた連載の第1弾では[MONETマーケットプレイスAPIを使ってみた#1 ～概要説明と購入編～](/articles/20210404/)のとして、プラットフォームの概要やAPIを購入するまでの手順について書かれています。
 
-# MONETマーケットプレイスとは
+## MONETマーケットプレイスとは
 
 <img src="/images/2021/20210517a/top_page_20210316.png" alt="MONETマーケットプレイストップページ" width="1200" height="554" loading="lazy">
 
@@ -29,7 +29,7 @@ MONETマーケットプレイスAPIを使ってみた連載の[第1弾](/article
 
 [MONETマーケットプレイス](https://developer.monet-technologies.co.jp/)は、MaaSビジネスの実現に必要なソリューションをAPIとして提供しているサービスです。オンデマンドバスの配車システムをはじめ、多様な業界・業種の企業から提供されるデータやシステムのAPIを購入して、新たなサービスの開発に活用できます。
 
-# APIの利用
+## APIの利用
 
 MONETマーケットプレイスでは、APIを利用するために、APIキー（**X-MONET-APIKey**）を用いて認証を行う必要があります。MONETマーケットプレイスでは1つのキーを使って、提供されているAPIを横断的に利用できます。この特徴を生かして複数サービスを組み合わせた独自サービスの提供が容易に実現できるようになっています。
 
@@ -37,15 +37,15 @@ MONETマーケットプレイスでは、APIを利用するために、APIキー
 （APIの利用・認証の詳しい手順については、MONETマーケットプレイスの[ディベロッパーガイド](https://developer.monet-technologies.co.jp/docs?tab=service-2)を参照ください）。。
 <img src="/images/2021/20210517a/api_endpoint.png" alt="API定義画面" width="532" height="552" loading="lazy">
 
-# APIを使ってアプリを作成
+## APIを使ってアプリを作成
 
 今回はデモアプリとして、現在地周辺の観光地情報を検索して、そこまでのルート表示ができる**観光地図アプリ**を**Flutter**で作成しました。MONETマーケットプレイスで提供されているAPIは「**るるぶDATA 観光API**」と「**いつもNAVI API**」を利用し、地図データは「**OpenStreetMap**」を利用しています。
 
-## アプリデモ
+### アプリデモ
 
 <img src="/images/2021/20210517a/app_gif.gif" alt="アプリデモ" width="329" height="593" loading="lazy">
 
-## アプリ詳細
+### アプリ詳細
 
 <img src="/images/2021/20210517a/app_flow.png" alt="アプリ画面遷移図" width="1122" height="490" loading="lazy">
 
@@ -96,7 +96,7 @@ Future loadSights(SearchPageArgument args) async {
 }
 ```
 
-# まとめと感想
+## まとめと感想
 
 [Dart/Flutter連載](/articles/20210510a/)の6記事目　兼　[MONETマーケットプレイスAPIを使ってみた連載](/tags/MONET%E3%83%9E%E3%83%BC%E3%82%B1%E3%83%83%E3%83%88%E3%83%97%E3%83%AC%E3%82%A4%E3%82%B9/)の2記事目として、
 MONETマーケットプレイスで購入したAPIを使って簡単なスマホアプリを作ってみました。

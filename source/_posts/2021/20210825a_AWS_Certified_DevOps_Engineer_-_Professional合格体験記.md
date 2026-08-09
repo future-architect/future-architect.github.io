@@ -19,7 +19,7 @@ TIGの伊藤真彦です。
 
 <img src="/images/2021/20210825a/image.png" alt="合格バッチ" width="450" height="450" loading="lazy">
 
-# AWS Certified DevOps Engineer – Professionalとは
+## AWS Certified DevOps Engineer – Professionalとは
 
 その名の通りDevOpsに特化したテストで、Solutions Architect - Professionalと双璧をなすような存在です。下位資格にSysOps Administrator – AssociateとDeveloper – Associateが存在します。
 
@@ -39,7 +39,7 @@ TIGの伊藤真彦です。
 
 余談ですがデプロイ戦略としてBlue/Greenデプロイがとても推されている印象を感じました。
 
-# 勉強方法
+## 勉強方法
 
 今回はSAPでとても役に立った実績を信じ、[aws.koiwaclub.com](https://aws.koiwaclub.com/)一発で臨みました。
 
@@ -49,7 +49,7 @@ Solutions Architect – Professionalと比較すると試験の難易度はや�
 
 各種下位資格、Solutions Architect - Professionalを修めてから仕上げに受験するパターンで山を登っていくのが安全な印象です。
 
-# 最後に
+## 最後に
 
 実はDeveloper – AssociateはSolutions Architect - Professionalの後に一気に取得したのですが記事のネタにし損ねました。
 

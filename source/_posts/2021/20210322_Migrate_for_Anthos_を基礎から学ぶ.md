@@ -14,7 +14,7 @@ author: 村田靖拓
 lede: "前回は越島さんによる分かりやすい Anthos 概要紹介記事でしたが、今回も前回に続いての Anthos ネタです"
 ---
 
-# はじめに
+## はじめに
 
 こんにちは、TIGの[村田](https://twitter.com/famipapamart)です。
 
@@ -22,7 +22,7 @@ lede: "前回は越島さんによる分かりやすい Anthos 概要紹介記�
 
 ※本記事の情報は 2021.03.21 時点での情報であり、サービスの対応状況などは更新される可能性があります。
 
-# 前説
+## 前説
 
 さて、昨今 DX だとかなんだとか飛び交う単語は色々ありますが、個人的に思う今求められるポイントはズバリ「変更容易性」なんじゃないかなと日々思いながら仕事をしています（もちろん他にも大切な要素はたくさんありますし、文脈によって優先すべきポイントが変わるのというのは前提で）
 
@@ -30,21 +30,21 @@ lede: "前回は越島さんによる分かりやすい Anthos 概要紹介記�
 
 そんな悩みを解決してくれそうなサービスが最近私の視界の端っこでチラチラとサイドステップしているので、今回は皆さんに紹介したいと思います。
 
-# Migrate for Anthosとは
+## Migrate for Anthosとは
 
 Migrate for Anthos とは Google Cloud が提供するサービスのひとつで、端的に言えば **仮想マシン上で動くアプリケーションをまるごとコンテナ化** してくれます。
 
 より詳細に言えば、 VMware オンプレミス・AWS・Azure のいずれか、または GCP 上の Compute Engine に存在するワークロードを、 Google Kubernetes Engine（GKE）または Anthos 上で動作するコンテナに変換できます。
 
-# Migrate for Anthos の機能
+## Migrate for Anthos の機能
 
-## Migrate できるものとできないもの
+### Migrate できるものとできないもの
 
 まずは[互換性のある VM オペレーティングシステム](https://cloud.google.com/migrate/anthos/docs/compatible-os-versions)を公式サイトにて確認しておきましょう。Linux、Windows それぞれ対応している OS およびそのバージョンが記載されています。
 
 Linux については GCP・AWS・Azure 上の VM インスタンスもしくは VMware インスタンスが対象となっているのに対し、 Windows は GCE のみの対応でオンプレミスなどからの移行には現状対応していません。
 
-## Migrate に必要なもの
+### Migrate に必要なもの
 
 Migrate for Anthos のコンポーネントを実行するためには GKE あるいは Anthos クラスタが必要です。
 
@@ -54,7 +54,7 @@ Migrate for Anthos のコンポーネントを実行するためには GKE あ�
 
 前項で対応している VM ソースプラットフォームについて言及しましたが、おそらくこの仕様に引っ張られる形で対応するプラットフォームが決まってるのではと思います。つまり、 Anthos clusters の展開に合わせて対応する移行元プラットフォームが増えていくと期待され、 昨年GAとなった Anthos clusters on bare metal まで対応が進んでいけば Migrate 対象の自由度は今後もっと上がっていくのではないかと妄想しています。
 
-## Migrate の概要
+### Migrate の概要
 
 Migrate プロセスは大きく分けて3つのプロセスに分かれます。
 
@@ -64,9 +64,9 @@ Migrate プロセスは大きく分けて3つのプロセスに分かれます�
 
 各々について次項以降でそれぞれ説明していきます。
 
-# Migrate に向けた準備の具体的なステップ
+## Migrate に向けた準備の具体的なステップ
 
-## 移行元の特定
+### 移行元の特定
 
 ワークロードの移行元プラットフォームに応じて必要なものが変わってくるので、まずは移行元を確認することから始めます。
 
@@ -78,11 +78,11 @@ Migrate プロセスは大きく分けて3つのプロセスに分かれます�
 | Linux | AWS | Anthos clusters on AWS | Migrate for Anthos|
 | Windows | GCE以外 | GKE / Anthos on ◯◯ | Migrate for Compute Engineを使って一旦GCE化 |
 
-## ワークロードの Migrate 適正診断
+### ワークロードの Migrate 適正診断
 
 Migrate のために必須というわけでは無いのですが、事前にワークロードのコンテナ移行に対する適合性をセルフ診断できるツールが提供されています。ツールは Linux 向けと Windows 向けでそれぞれ用意されていますが、現状はそれぞれの動作が微妙に異なるようです。
 
-### Linux 向け診断ツール
+#### Linux 向け診断ツール
 
 Linux 向け診断ツールは以下の2フェーズに分かれています。
 
@@ -95,11 +95,11 @@ Linux 向け診断ツールは以下の2フェーズに分かれています。
 
 ※ちなみに、公式ドキュメントでは例えばスコアが 7~8 の場合に `手動での作業が若干必要になります` との記載がありましたが、これが移行前準備における手動作業を指すのか移行後の作業を指すのかが紐解ききれませんでした...分かる方いたらコメントくださいmm
 
-### Windows 向け診断ツール
+#### Windows 向け診断ツール
 
 Windows 向けの診断ツールは Linux 向けに比べて簡素に結果を判定してくれます。診断後は、その VM が移行に適しているかどうかを示す zip ファイルが出力されるのですが、不適合な VM の場合はファイル名に `NOFIT` と表記され、適正のある VM の場合にはその文字列はありません。
 
-## 移行処理クラスタの作成
+### 移行処理クラスタの作成
 
 Migrate for Anthos の実処理を行う GKE あるいは Anthos クラスタの設定を進めていきます。
 <img src="/images/2021/20210322/setting-up-workflow.png" loading="lazy">
@@ -112,13 +112,13 @@ Migrate for Anthos の実処理を行う GKE あるいは Anthos クラスタの
 
 [公式Doc](https://cloud.google.com/migrate/anthos/docs/setting-up-overview)では上記のような記載があり、GCP以外の環境から移行したい場合には Migrate for Compute Engine のセットアップが必要だと分かります。ただ、これは文字通りワークロードを GCE へ Migrate したい場合に使うものであり、Migrate が各プラットフォームの Anthos clusters 内で完結する場合には設定不要です。
 
-### 移行環境ごとの前提条件確認
+#### 移行環境ごとの前提条件確認
 
 OS および VM ソースプラットフォームがサポートされているものかどうか確認し、必要に応じて Migrate for Compute Engine を設定します。
 
 また、 GCP 以外のプラットフォームにて処理クラスタを構築する場合（Anthos clusters for ◯◯ を使う場合）はクラスタの構成に関していくつかの条件があるので要確認です。 Anthos clusters と Google Cloud を繋ぐ [Connect](https://cloud.google.com/anthos/multicluster-management/connect/overview) のインストールは必須ではないですが、インストールしておけば移行時に Cloud Console のロギングおよびモニタリング機能を使うことができます。
 
-### データリポジトリの準備
+#### データリポジトリの準備
 
 Migrate for Anthos は、移行に際して以下2種のデータリポジトリに対してデータ書き込みが発生します。
 
@@ -137,7 +137,7 @@ Docker イメージファイルレジストリには、移行された Linux VM 
 
 各データリポジトリの実体の作成は後述の migctl コマンド経由で行うので、この段階では何を使うかのみ決めておけばOKです。
 
-### Google サービス API の有効化とサービスアカウントの設定
+#### Google サービス API の有効化とサービスアカウントの設定
 
 Google Cloud のリソースへのアクセスが発生するパターンでの Migrate を実施する際には、 Google サービス API の有効化およびサービスアカウントの設定が必要です。
 
@@ -158,25 +158,25 @@ Google Cloud への Migrate を行う場合に有効化する Google サービ�
 * 移行元ソースとしてGCEを利用する場合
   * Compute Engine へのアクセスで使用するサービスアカウント
 
-### Migrate for Compute Engineの設定
+#### Migrate for Compute Engineの設定
 
 先述の通りですが、Google Cloud 以外のプラットフォームから Google Cloud への Migrate を実施したい場合には、この Migrate for Compute Engine の設定が必要になります。このパートでは細かい設定手順は割愛しますが、[公式Doc](https://cloud.google.com/migrate/compute-engine/docs/4.11/getting-started)に従って Migrate for Compute Engine Manager のインストールを完了させます。
 
-### 処理クラスタの作成
+#### 処理クラスタの作成
 
 利用するプラットフォームごとに必要な設定が異なるので、移行要件に沿って適切な手順を選択します。どの手順を選んだとしても、必要な設定を組み込んだ GKE クラスタあるいは Anthos クラスタを作成する流れとなります。
 
-#### Linux VM を移行する場合
+##### Linux VM を移行する場合
 
 * [処理クラスタとして **GKE または Anthos on Google Cloud** を使用する場合](https://cloud.google.com/migrate/anthos/docs/configuring-a-cluster)
 * [処理クラスタとして **Anthos clusters on VMware** を使用する場合](https://cloud.google.com/migrate/anthos/docs/configuring-onprem-cluster)
 * [処理クラスタとして **Anthos clusters on AWS** を使用する場合](https://cloud.google.com/migrate/anthos/docs/configuring-aws-cluster)
 
-#### Windows VM を移行する場合
+##### Windows VM を移行する場合
 
 * [処理クラスタとして GKE クラスタを使用する場合](https://cloud.google.com/migrate/anthos/docs/configuring-win-cluster)
 
-### Migrate for Anthos のインストール
+#### Migrate for Anthos のインストール
 
 migctl コマンドを使用して、作成済みの処理クラスタへ Migrate for Anthos コンポーネントをインストールします。
 
@@ -186,7 +186,7 @@ migctl コマンドを使用して、作成済みの処理クラスタへ Migrat
 | Anthos clusters on VMware | 管理ワークステーションにコマンドをインストールする |
 | Anthos clusters on AWS | 管理ワークステーションにコマンドをインストールする |
 
-#### migctl とは
+##### migctl とは
 
 migctl は Migrate for Anthos 移行環境の設定と管理を行うコマンドラインツールで、例えば以下のようなオペレーションを実行できます。
 
@@ -198,7 +198,7 @@ migctl は Migrate for Anthos 移行環境の設定と管理を行うコマン�
 | migration | 移行オペレーション |
 | setup | Migrate for Anthos のインストール / アンインストール |
 
-#### migctl のインストール
+##### migctl のインストール
 
 GCP 外の環境の場合にはまず以下コマンドで管理ワークステーションに migctl コマンドをインストールします。
 
@@ -211,7 +211,7 @@ sudo chmod +x /usr/local/bin/migctl
 
 GCP 環境では Cloud Shell にて migctl コマンドを実行可能なためこの手順はスキップできます。
 
-#### Migrate fot Anthos コンポーネントのインストール
+##### Migrate fot Anthos コンポーネントのインストール
 
 次に以下コマンドで処理クラスタにコンポーネントの実体をインストールします。
 
@@ -243,11 +243,11 @@ $ migctl doctor
   [!] Source Status
 ```
 
-# ワークロードの Migration とデプロイ
+## ワークロードの Migration とデプロイ
 
 ※本章では Linux VM の移行を前提として記載を進めます。
 
-## ワークロードの Migration
+### ワークロードの Migration
 
 <img src="/images/2021/20210322/image.png" loading="lazy">
 
@@ -291,7 +291,7 @@ migctl migration get-artifacts my-migration
 
 migration.yaml は migctl 上で管理される `migration` の設定が保存されており、このファイルを見ることでどのような `migration` を作成したか確認できます。 Dockerfile はイメージビルドに使用されたものです。 deployment_spec.yaml はデプロイ時に使用する manifest ファイルで、 `migration` の設定が反映された構成になっています。
 
-## ワークロードのデプロイ
+### ワークロードのデプロイ
 
 ここまで来ればデプロイまではあと一歩です。
 
@@ -303,7 +303,7 @@ kubectl apply -f deployment_spec.yaml
 
 ワークロードのデプロイ先は GKE もしくは Anthos なので、以降は通常の Kubernetes クラスタ上のアプリケーションと同様に kubectl コマンドを用いて操作・確認が可能となります。
 
-# おわりに
+## おわりに
 
 さて、ここまで Migrate for Anthos を基礎から学んで来ましたが、おそらく皆さんもお気づきの通り後はもう実際にやってみるに尽きます。理論上どのようなプロセスで実施可能かは分かりましたが、移行元および移行先のプラットフォームごとに勝手が異なり、また、移行対象が Linux か Windows かでも手順および使用するツールが変わってきます。
 

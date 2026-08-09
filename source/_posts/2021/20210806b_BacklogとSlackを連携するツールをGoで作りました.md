@@ -24,7 +24,7 @@ TIGの伊藤真彦です。
 
 さてチケット管理を行うとチケットを監視する仕事が産まれますが、それをある程度自動化するためのツールを作成しました。
 
-# backlogslackify
+## backlogslackify
 
 リポジトリはこちらです。
 
@@ -40,11 +40,11 @@ READMEに記載していますが、未完了のBacklogチケットのURL、リ�
 
 GoでBacklogチケットを取り扱うロジックは[公式ドキュメント](https://developer.nulab.com/ja/docs/backlog/libraries/#)にも紹介されている事から、[kenzo0107さんのライブラリ](https://github.com/kenzo0107/backlog)を安心して利用でき、仕事の片手間にササっと作ることができました、ありがとうございます。
 
-# 設定方法
+## 設定方法
 
 詳細な使用方法はREADMEに記載されていますので、補足資料として必要な情報を記載します。
 
-### Configについて
+#### Configについて
 
 ```go main.go
 // ClientOption is input options to build client
@@ -81,22 +81,22 @@ type SearchCondition struct {
 
 きちんと期限日を設定しないとどれだけ放置されても検知できませんのでご注意ください。設定の内容を整備したら、適宜手動で実行するか、任意のアーキテクチャで定時バッチとして実行する使い方を想定しています。
 
-### BacklogのAPIキーの取得方法
+#### BacklogのAPIキーの取得方法
 
 [公式のリファレンス](https://support-ja.backlog.com/hc/ja/articles/360035641754-API%E3%81%AE%E8%A8%AD%E5%AE%9A)を参照してください
 
-### Slackの連携URL
+#### Slackの連携URL
 
 Slackとの連携にはIncoming Webhooksを利用しています。公式ドキュメントは[こちら](https://api.slack.com/messaging/webhooks)です。
 
-### チケットの検索条件について
+#### チケットの検索条件について
 
 Backlogの課題取得APIを実行しています。
 
 APIリファレンスは[こちら](https://developer.nulab.com/ja/docs/backlog/api/2/get-issue-list/#)です。
 `ProjectIDs`、`CategoryIDs`あたりがあれば実用充分だとは思いますが、APIで使えるものは何でも絞り込みに利用できます。絞り込みたい`CategoryIDs`を知りたい場合は、実際にBacklogでチケットを検索するとブラウザのアドレスバーに表示されています。
 
-## 実際に使ってみての感想
+### 実際に使ってみての感想
 
 毎朝9時にbotを動かすようにしました。
 

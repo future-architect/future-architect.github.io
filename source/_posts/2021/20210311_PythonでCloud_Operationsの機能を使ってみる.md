@@ -20,7 +20,7 @@ lede: "DebuggerとProfilerを試してみます。本当は仕事で使ってい
 
 [GCP連載](/articles/20210307/)の第3回目はCloud Operationsの機能を試してみます。DebuggerとProfilerを試してみます。本当は仕事で使っているGoでやってみようと思ったのですが、Debuggerのドキュメントをみたら、現時点でGoはまだ実験的サポートで、Cloud Runは非対応、Goのバージョンも1.9以下という状況でしたので、サポートが手厚いPythonで試しました。
 
-# gcloudコマンドの設定
+## gcloudコマンドの設定
 
 まずGCPの環境で、gcloudコマンドを入れます。M1 macには入れていなかったので入れてみたのですが、[こちら](https://mager.co/posts/2021-01-21-gcloud-mac-m1/)に従ってやりました。普通のインストールでは途中でエラーになり、この紹介記事と同じく、最後にinstall.shを自分で叩く必要がありました。
 
@@ -32,7 +32,7 @@ $ gcloud auth login
 $ gcloud config set project [プロジェクトID]
 ```
 
-# プロジェクトを作る
+## プロジェクトを作る
 
 Cloud Runで試しで動かすプロジェクトを作ってみます。Poetryを使ってFastAPIなプロジェクトを作ってみましょう。作ったアプリケーションはCloud Runで実行します。
 
@@ -47,7 +47,7 @@ $ poetry new python-cloud-debug
 $ cd python-cloud-debug
 ```
 
-## 開発環境の設定
+### 開発環境の設定
 
 まず、ライブラリを追加します。なお、uvicornですが、最近になって、uvloopとhttptools、websocketといった依存ライブラリは明示的にインストールしないと実行時にエラーになるように変わったみたいです。
 
@@ -63,7 +63,7 @@ VSCodeは特になにもしなくてもよさそうです。開くだけで.venv
 
 <img src="/images/2021/20210311/スクリーンショット_2021-03-05_21.45.41.png" loading="lazy">
 
-## アプリケーションを作ってみる
+### アプリケーションを作ってみる
 
 FastAPIのサンプルを持ってきました。
 
@@ -92,7 +92,7 @@ def read_item(item_id: int, q: Optional[str] = None):
 poetry run uvicorn python_cloud_debug.main:app --reload
 ```
 
-## コンテナを作ってpushする
+### コンテナを作ってpushする
 
 Dockerfileは以下の通りです。ちょびっと工夫したのは以下の2点
 
@@ -136,7 +136,7 @@ $ docker push gcr.io/[プロジェクトID]/[プロジェクト名]:latest
 
 <img src="/images/2021/20210311/スクリーンショット_2021-03-06_9.38.35.png" loading="lazy">
 
-# デバッガーを使ってみる
+## デバッガーを使ってみる
 
 それでは本題のGCPのAPIを使ってみます。必要なライブラリを足しつつ、先程のコードの``app = FastAPI()``の前に次の内容を入れます。ローカルでは外部依存なく気軽にテストしたいので、poetryの依存に入れず、実行イメージの中でのみ追加して、LOCAL=trueという環境変数があればロードしないようにします。
 
@@ -163,7 +163,7 @@ if "LOCAL" not in os.environ:
 
 <img src="/images/2021/20210311/スクリーンショット_2021-03-06_0.24.24.png" loading="lazy">
 
-# プロファイラを使ってみる
+## プロファイラを使ってみる
 
 せっかくなのでプロファイラも使ってみます。こちらはPythonであっても、Cloud Runはまだサポートされていません。ドキュメントにはグーグルのサービスではCompute Engine、GKE、GAEのみが対象となっています。ただ、自分でクレデンシャルを設定したらGCP外からも使えるとは書かれていて、[この手順](https://cloud.google.com/profiler/docs/profiling-external)を試して成功したのですが、やっていることはプロファイラのエージェントのロールを付与しているだけなので、Cloud Run実行のサービスアカウントにプロファイラエージェントのロールをつければいけます。
 
@@ -201,7 +201,7 @@ CPU時間のグラフはこんな感じです。きっとプログラムがヘ�
 
 <img src="/images/2021/20210311/スクリーンショット_2021-03-06_10.26.38.png" loading="lazy">
 
-# まとめ
+## まとめ
 
 StackdriverあらためCloud OperationsのDebuggerとProfilerを試してみました。Goサポートがまだだったり、Cloud Run対応がまだだったりとかはありますが、OpenCensus/OpenTelemetryなみに頑張らなくてもちょっとmainのところにコードを足すだけで本番環境の中身を覗いたりプロファイルが取れるのは面白いですね。そのうち、ローカルのデバッグよりもリモートの方が簡単、みたいになってくれそうな気がしました。
 

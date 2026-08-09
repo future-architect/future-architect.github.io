@@ -20,7 +20,7 @@ TIGの伊藤真彦です。
 
 宣伝を挟みましたが、AWS Certified Advanced Networking - Specialtyに合格しましたので、今回も合格体験記を書きます。
 
-# AWS Certified Advanced Networking - Specialtyとは
+## AWS Certified Advanced Networking - Specialtyとは
 
 <img src="/images/2021/20211013b/image.png" alt="合格バッチ" width="600" height="600" loading="lazy">
 
@@ -31,34 +31,34 @@ AWS Certified Security - Specialtyと比べると、他の試験では出題さ�
 前提条件が複雑なため、問題の要点を読み解く難易度はいくつかSolutions Architect - Professionalに匹敵する問題があります。
 簡単な問題もこの試験でのみ出てくるものが多く、覚えればすぐに解けるものの、見覚えが無いと手も足も出ないような問題が出題される傾向がありました。
 
-# 学習方法
+## 学習方法
 
 今回も[aws.koiwaclub.com](https://aws.koiwaclub.com/)で合格できました。
 あまりにも初見の情報が多く、また初見の場合一切推測できないものが多いため保険としてudemyの教材も買ってみましたが、終わってみた所感としては必要なかったかなと感じました。
 
 下記の内容を一通り理解する必要があります。
 
-#### 複雑なネットワーキング
+##### 複雑なネットワーキング
 
 * AWS Direct Connect(様々な前提条件、観点での設問が沢山出ます)
 * VPN
 * VPCピアリング
 * AWS Transit Gateway
 
-#### セキュアな通信
+##### セキュアな通信
 
 * AWS WAF
 * 侵入防止システム (IPS)
 * DDoS 保護
 * VPCフローログ
 
-#### グローバル、低遅延なネットワーキング
+##### グローバル、低遅延なネットワーキング
 
 * Amazon Route 53
 * Amazon CloudFront
 * Lambda@Edge
 
-#### ハイパフォーマンスコンピューティング
+##### ハイパフォーマンスコンピューティング
 
 分散処理基板等の用途でEC2インスタンスを利用する際の下記のような前提知識が出題されます。
 
@@ -68,7 +68,7 @@ AWS Certified Security - Specialtyと比べると、他の試験では出題さ�
 * Elastic Network Interface
 * HVM AMI
 
-#### その他基礎知識
+##### その他基礎知識
 
 * パブリックサブネット、プライベートサブネット
 * NACL、セキュリティグループ
@@ -81,7 +81,7 @@ AWS Certified Security - Specialtyと比べると、他の試験では出題さ�
 
 参考: https://docs.aws.amazon.com/ja_jp/AWSEC2/latest/WindowsGuide/instancedata-data-retrieval.html
 
-# 感想
+## 感想
 
 一通り頭に詰め終わってからの本番は一時間かからない程度で済みましたが、初見の段階では問題の意味を理解する事すらできず、学習の辛さはトップレベルでした。
 

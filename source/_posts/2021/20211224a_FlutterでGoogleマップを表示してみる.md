@@ -16,22 +16,22 @@ TIGの伊藤真彦です
 
 先日[入門記事](/articles/20211221a/)を書いたFlutterですが、実践的なアプリケーションの作り込みも試してみました。
 
-# FlutterでGoogle Mapsを表示したい
+## FlutterでGoogle Mapsを表示したい
 
 FlutterではGoogle Mapsを表示するためのウィジェットが存在するため、どのくらい簡単に実現できるか検証してみました。
 
-# 実装の準備
+## 実装の準備
 
 [Google Maps Platform](https://developers.google.com/maps/documentation?hl=ja)を活用することで、任意のアプリケーションからGoogle Mapsの機能を利用できます。
 アプリケーションの実装の前に、GCPアカウントを用意し、`Maps JavaScript API`など必要な機能を有効化し、APIを実行するためのキーを払い出す必要があります。
 
-# google_maps_flutter
+## google_maps_flutter
 
 Flutterでは[google_maps_flutter](https://pub.dev/packages/google_maps_flutter)というパッケージが存在します。Flutterチームのオフィシャルプラグインで安心感が高いです。このプラグインの機能を試してみます。
 
 今回もFlutter on the Webで検証します。
 
-## パッケージの導入
+### パッケージの導入
 
 環境構築、Hello Worldアプリケーションの用意は[環境構築の記事](https://future-architect.github.io/articles/20211221a/)を参照してください。
 アプリケーションの用意ができたらパッケージをインストールします。
@@ -72,7 +72,7 @@ Flutter on the Webでは`index.html`のヘッダー部分にGoogle MapsのJavaSc
 </head>
 ```
 
-## ウィジェットを組み込む
+### ウィジェットを組み込む
 
 [公式example](https://pub.dev/packages/google_maps_flutter/example)は中々壮大な例となっており、最小限の機能を抜粋するのが逆に難しいくらいです.
 [GitHubのREADME](https://github.com/flutter/plugins/tree/master/packages/google_maps_flutter/google_maps_flutter)には比較的ミニマムな実装が用意されています。
@@ -151,7 +151,7 @@ class MapSampleState extends State<MapSample> {
 
 README記載のサンプルで表示される地図の場所はGoogle本社オフィスのようです、近くにゴルフ場やコンピュータ歴史博物館があるんですね、楽しそうです。
 
-# 地図のプロパティを変更する
+## 地図のプロパティを変更する
 
 Google Mapsウィジェットのプロパティを設定する事で地図の描画スタイルや機能の有無など様々な変更ができます。
 [ドキュメント](https://pub.dev/documentation/google_maps_flutter/latest/google_maps_flutter/GoogleMap-class.html)を参考に変更してみましょう。
@@ -167,7 +167,7 @@ GoogleMap(
 
 <img src="/images/2021/20211224a/image_3.png" alt="地図画像" width="1200" height="909" loading="lazy">
 
-# 地図にマーカーを表示する
+## 地図にマーカーを表示する
 
 独自のアプリケーションを作り込むからには、任意の地点を地図に表示したい要望が出てくるでしょう。Google Mapsウィジェットの[markersプロパティ](https://pub.dev/documentation/google_maps_flutter/latest/google_maps_flutter/GoogleMap/markers.html)に`Set<Marker>`の適切なデータを追加することでマーカーが表示されます。
 
@@ -192,7 +192,7 @@ GoogleMap(
 
 <img src="/images/2021/20211224a/image_4.png" alt="地図上にマーカー" width="1200" height="616" loading="lazy">
 
-# 地図に線を引く
+## 地図に線を引く
 
 Google Mapsウィジェットは[polylinesプロパティ](https://pub.dev/documentation/google_maps_flutter/latest/google_maps_flutter/GoogleMap/polylines.html)で２点間のルート情報を表示することもできます。
 
@@ -233,7 +233,7 @@ GoogleMap(
 
 しかしこれではスタートとゴールの間に山があろうと谷があろうと乗り越え直進するという無茶なルートしか表示できません。
 
-## Directions APIを活用する
+### Directions APIを活用する
 
 これまで紹介したGoogle MapsのAPIは地図の描画に専念して用意されたAPIです。経路探索や距離の計算は別のAPIとして公開されています。
 
@@ -308,7 +308,7 @@ CHROME_EXECUTABLE=`pwd`/google-chrome-unsafe.sh flutter run
 
 Flutter on the Webは、対象プラットフォームがモバイルアプリだけだった頃に作られたライブラリがCORS対策の問題などで上手く動かない、という可能性があるかもしれません。
 
-# アプリケーションとして整備する
+## アプリケーションとして整備する
 
 最低限やれることはわかってきました。ウィジェットとしてリファクタリングする、データの取得と画面描画をリファクタリングする、オンクリックイベントの実装などアプリケーションとして作り込んでいきます。サンプルアプリケーションを見るとGoogle MapsウィジェットはExpandウィジェットなどと組み合わせて利用されています。今回はColumnウィジェットの一要素としてGoogle Mapsウィジェットを読み込んでみるスタイルにしてみます。Columnウィジェットに積み込む他のウィジェットは適当にflutterロゴを出してみます。
 
@@ -595,7 +595,7 @@ class MapRoute {
 }
 ```
 
-# まとめ
+## まとめ
 
 * Flutterにはチーム公式のGoogle Mapsライブラリが存在する
 * ルートの計算を行うにはDirections APIを活用する

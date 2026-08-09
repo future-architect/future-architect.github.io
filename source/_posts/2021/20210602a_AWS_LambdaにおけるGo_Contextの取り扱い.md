@@ -21,7 +21,7 @@ TIGの伊藤真彦です。
 GoでLambdaにデプロイするコードを書くにあたり、[aws-lambda-go](https://github.com/aws/aws-lambda-go)を利用できます。
 その際のtips紹介記事です。
 
-# AWS LambdaにおけるGo Contextの取り扱い
+## AWS LambdaにおけるGo Contextの取り扱い
 
 <img src="/images/2021/20210602a/lambda-39473.png" alt="" title="Clker-Free-Vector-ImagesによるPixabayからの画像" width="300" height="310" loading="lazy">
 
@@ -60,7 +60,7 @@ func (context.Context, TIn) (TOut, error)
 
 引数として`context.Context`型を受け取るシグネチャの関数を用いることで、後続処理でcontextを受け取ることが可能です。
 
-## LambdaContext型を利用する
+### LambdaContext型を利用する
 
 contextというと後続のライブラリに受け渡すか、自前の実装によってタイムアウト等を管理するような用途が想定されます。
 公式ドキュメントのサンプル実装は[こちら](https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/golang-context.html)です。
@@ -80,7 +80,7 @@ type LambdaContext struct {
 
 この構造体は、フィールド名の通り`AwsLambda`が実行された際の情報を持たせることが可能です。
 
-## context.ContextからLambdaContext構造体を復元する
+### context.ContextからLambdaContext構造体を復元する
 
 ```go
 // FromContext returns the LambdaContext value stored in ctx, if any.
@@ -131,7 +131,7 @@ lambdaで開発したAPIの認証認可に`Amazon Cognito`を利用している�
 
 この機会に合わせてお読みいただければ幸いです。
 
-# まとめ
+## まとめ
 
 * AWS lambdaをgoで実装する際にcontext.Contextを受け取るコードを実装できる
 * contextにはリクエストID等の情報が含まれている

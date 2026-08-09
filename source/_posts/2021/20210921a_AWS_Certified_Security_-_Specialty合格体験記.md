@@ -18,7 +18,7 @@ TIGの伊藤真彦です。
 
 <img src="/images/2021/20210921a/image.png" alt="合格ロゴ" width="300" height="300" loading="lazy">
 
-# AWS Certified Security - Specialtyとは
+## AWS Certified Security - Specialtyとは
 
 暗号化や脆弱性対策、安全な通信の実現など、セキュリティに関するトピックを集めた試験です。
 
@@ -28,7 +28,7 @@ Solutions Architectをはじめ、各種試験にもセキュリティに関す�
 
 なおフューチャーで開発している[Future Vuls](https://vuls.biz/)で扱うような意味合いでのセキュリティについては試験の守備範囲外で、あくまでもクラウドサービスの運用に関する試験になっています。
 
-# 学習方法
+## 学習方法
 
 まずは他の試験を受験して基礎を固めることを推奨します。
 
@@ -38,24 +38,24 @@ Solutions Architectをはじめ、各種試験にもセキュリティに関す�
 
 下記の概要が一通り理解できるまでAWSの全体像を把握できていれば問題の内容自体が極めて難しいと感じる事はないと思います。
 
-#### ネットワーキング
+##### ネットワーキング
 
 * NACL、セキュリティグループ
 * NAT Gateway
 
-#### 攻撃対策
+##### 攻撃対策
 
 * AWS WAF
 * AWS Shield
 * Amazon CloudFront
 
-#### アクセス制御
+##### アクセス制御
 
 * AWS IAM、 SCP
 * Active Directory、 SSO
 * Amazon Cognito
 
-#### セキュリティ診断
+##### セキュリティ診断
 
 * Amazon Inspector
 * AWS Trusted Advisor
@@ -64,20 +64,20 @@ Solutions Architectをはじめ、各種試験にもセキュリティに関す�
 * Amazon GuardDuty
 * AWS Artifact
 
-#### ロギング
+##### ロギング
 
 * VPC フローログ
 * AWS CloudTrail
 * Amazon CloudWatch Logs
 * Amazon Athena
 
-#### アラート、対応の自動化
+##### アラート、対応の自動化
 
 * Amazon CloudWatch Events
 * Amazon Simple Notification Service
 * AWS Lambda
 
-#### 暗号化
+##### 暗号化
 
 * AWS Key Management Service (KMS)
 * AWS Secrets Manager
@@ -91,7 +91,7 @@ Amazon S3はVPC Endpointやバケットポリシーの扱い、暗号化、ロ�
 
 各サービスの目的、違いを意識して概要を理解することが重要であり、全てを実際に運用できるほど熟知する必要はありませんが、それでもこうして並べてみるとそこそこの量になりました。
 
-# 感想
+## 感想
 
 基礎部分の試験を全て勉強済みの状態であるため簡単に感じる部分もありましたが、難易度としては申し分ないものでした。
 

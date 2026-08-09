@@ -17,7 +17,7 @@ lede: "今回はAWSサービスのうちの一つAWS IoTを使用してRaspberry
 ---
 <img src="/images/2021/20210929a/サムネイル1.png" alt="Louis Reed on unsplash.com Unsplash" title="" width="1200" height="676" loading="lazy">
 
-# はじめに
+## はじめに
 
 こんにちは。TIG/DXユニット所属の宮永です。
 
@@ -39,7 +39,7 @@ AWS IoTを使用したMQTTのチュートリアルはAWS公式からも詳細な
 
 にて公開しています。
 
-# MQTTとは
+## MQTTとは
 
 MQTTはメッセージングプロトコルです。
 以下 [mqtt.org](https://mqtt.org/)より引用です。
@@ -55,7 +55,7 @@ Publisherはセンシングの情報（温度や湿度、速度など）をBroke
 
 <img src="/images/2021/20210929a/image_2.png" alt="image.png" width="1200" height="688" loading="lazy">
 
-# AWS IoTとは
+## AWS IoTとは
 >
 >*AWS IoT は、IoT デバイスを他のデバイスおよび AWS クラウドサービスに接続するクラウドサービスを提供します。AWS IoT は、IoT デバイスを AWS IoT ベースのソリューションに統合するのに役立つデバイスソフトウェアを提供します。デバイスが AWS IoT に接続できる場合、AWS IoT は AWS が提供するクラウドサービスにそれらのデバイスを接続できます。
 [AWS IoT とは \- AWS IoT Core](https://docs.aws.amazon.com/ja_jp/iot/latest/developerguide/what-is-aws-iot.html)*
@@ -63,7 +63,7 @@ Publisherはセンシングの情報（温度や湿度、速度など）をBroke
 AWSIoTは各種AWSサービスとIoTデバイスとを手軽に連携できるサービスを展開しています。
 今回はAWS IoT標準サービスで提供されているMQTTブローカーを利用してMQTT通信にトライします。
 
-# システム構成
+## システム構成
 
 今回作成するものは室内の温湿度を定期的にセンシングし、Slackに温湿度のプロット図を定期的に送信する仕組みです。
 
@@ -74,15 +74,15 @@ DHT22という温湿度センサをRaspberryPi3B+に取り付けて2時間ごと
 
 <img src="/images/2021/20210929a/image_3.png" alt="image.png" width="1200" height="849" loading="lazy">
 
-# 開発環境
+## 開発環境
 
-## ハードウェア
+### ハードウェア
 
 * Raspberrypi3B+
 * DHT22[(DSD TECH DHT22 温湿度センサーモジュール AM2302チップ付き)](https://aax-fe.amazon-adsystem.com/x/c/Qr8CAcIgUZEla94kNzcQWMkAAAF8AoohIgcAAAIAAZlrWxE/http://www.amazon.co.jp/gp/slredirect/picassoRedirect.html?ie=UTF8&adId=A3TSWYUGZXCE00&qualifier=1632130179&id=8652485946611051&widgetName=sd_onsite_desktop&url=%2Fdp%2FB06ZXXJL2B%2Fref%3Dsyn_sd_onsite_desktop_95%3Fpsc%3D1)
 * ジャンパワイヤー
 
-## ソフトウェア
+### ソフトウェア
 
 開発はWindows10環境、WSL2上で行いました。標準モジュール以外で使用したものを以下に列挙します。
 
@@ -103,7 +103,7 @@ DHT22という温湿度センサをRaspberryPi3B+に取り付けて2時間ごと
 *以下の記事に詳しく記載されているのでぜひ利用してみてください。*
 *[VSCodeのSSH接続機能で、RaspberryPi内のコードを編集してデバッグ \- Qiita](https://qiita.com/c60evaporator/items/26ab9cfb9cd36facc8fd)*
 
-# 実装
+## 実装
 
 実装は以下の手順で進めます。
 
@@ -115,7 +115,7 @@ DHT22という温湿度センサをRaspberryPi3B+に取り付けて2時間ごと
 6. 取得データをmatplotlibで可視化
 7. 作成したプロット図をSlack APIで画像投稿
 
-## 1. DHT22から温湿度情報を取得する。
+### 1. DHT22から温湿度情報を取得する。
 
 使用した温湿度センサはこちらです。
 [DSD TECH DHT22 温湿度センサーモジュール AM2302チップ付き](https://aax-fe.amazon-adsystem.com/x/c/Qr8CAcIgUZEla94kNzcQWMkAAAF8AoohIgcAAAIAAZlrWxE/http://www.amazon.co.jp/gp/slredirect/picassoRedirect.html?ie=UTF8&adId=A3TSWYUGZXCE00&qualifier=1632130179&id=8652485946611051&widgetName=sd_onsite_desktop&url=%2Fdp%2FB06ZXXJL2B%2Fref%3Dsyn_sd_onsite_desktop_95%3Fpsc%3D1)
@@ -234,7 +234,7 @@ func main() {
 
 ここで作成した`model.go`は後の工程でも使用するので削除しないようにしてください。
 
-## 2. AWS IoTを使用してPublishの動作確認
+### 2. AWS IoTを使用してPublishの動作確認
 
 AWS IoTとRaspberryPiの連携は、「ポリシーの作成」から始まります。
 「ポリシーの作成」から「モノの作成」までの工程はこちらのページに記載されている通りに行ってください。
@@ -341,12 +341,12 @@ func newTLSConfig() (*tls.Config, error) {
 
 メッセージの送受信が確認できたところで、次に先ほどの実装で取得した温湿度をpayloadとして配信します。
 
-## 3. DHT22の温湿度情報をPublish
+### 3. DHT22の温湿度情報をPublish
 
 **「2. AWS IoTを使用してPublishの動作確認」**にて取得した各種証明書と`main.go`を同階層に格納してください。
 同様に**「1. DHT22から温湿度情報を取得する」**にて実装した`model.go`を`dht22`サブディレクトリとして格納してください。
 
-### ディレクトリ構成
+#### ディレクトリ構成
 
 ```bash
 .
@@ -407,7 +407,7 @@ TimeStampに注目すると、2秒毎に新規データが蓄積されている�
 
 <img src="/images/2021/20210929a/mqttdemo2.gif" alt="mqttdemo2.gif" width="859" height="662" loading="lazy">
 
-# 前編まとめ
+## 前編まとめ
 
 前編では温湿度センサーDHT22より取得したデータをMQTTでAWS IoTにPublishするところまでを行いました。
 

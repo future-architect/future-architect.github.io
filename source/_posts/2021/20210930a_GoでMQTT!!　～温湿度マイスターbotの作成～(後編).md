@@ -19,7 +19,7 @@ mathjax: true
 
 <img src="/images/2021/20210930a/サムネイル2.png" alt="" title="Louis Reed on Unsplash" width="1200" height="675" loading="lazy">
 
-# はじめに
+## はじめに
 
 こんにちは。TIG/DXユニット所属の宮永です。
 
@@ -44,7 +44,7 @@ AWS IoTを使用したMQTTのチュートリアルはAWS公式からも詳細な
 
 にて公開しています。
 
-# 前回の振り返り
+## 前回の振り返り
 
 実装は以下の手順で進めます。
 前回の記事では**「3. DHT22の温湿度情報をAWS IoTへPublish」**までを行いました。
@@ -59,7 +59,7 @@ AWS IoTを使用したMQTTのチュートリアルはAWS公式からも詳細な
 
 本記事では**「4. AWS IoTで取得した温湿度情報をDynamoDBに連携」**から取り組みます。
 
-## 4. AWS IoTで取得した温湿度情報をDynamoDBに連携
+### 4. AWS IoTで取得した温湿度情報をDynamoDBに連携
 
 DynamoDBについては入門記事などが弊社ブログでも投稿されているため説明は割愛いたします。
 
@@ -71,12 +71,12 @@ AWS IoTで受信したデータをDynamoDBに登録する方法は公式に詳�
 
 公式のドキュメントは非常に丁寧にまとめられているため、本記事では要点のみ記載します。
 
-### テーブルの新規作成
+#### テーブルの新規作成
 
 まずはテーブルの作成です。テーブル名は任意ですが、今回は`mydht22`としました。Partition keyに`device_id`をSort keyに`timestamp`を定義しています。
 <img src="/images/2021/20210930a/image.png" alt="image.png" width="797" height="508" loading="lazy">
 
-### ルールの作成
+#### ルールの作成
 
 作成したテーブルにデータを送信するため、AWS IoT ルールの作成を行います。
 
@@ -100,7 +100,7 @@ FROM 'topic/to/publish'
 
 <img src="/images/2021/20210930a/image_3.png" alt="ロール作成" width="982" height="616" loading="lazy">
 
-### 疎通確認
+#### 疎通確認
 
 最後にDynamoDBにデータが正しく登録されているか確認します。
 DynamoDBコンソールにアクセスして、下図の様にデータが登録されていることを確認してください。
@@ -110,7 +110,7 @@ DynamoDBコンソールにアクセスして、下図の様にデータが登録
 作成したルールに従ってデータが登録されていますね！
 次の章では、Boto3を使用してDynamoDBからデータを取得したうえで、扱いやすいようにデータを整形します。
 
-## 5. Boto3を使用してDynamoDBからデータをQuery、データ整形
+### 5. Boto3を使用してDynamoDBからデータをQuery、データ整形
 
 PythonモジュールBoto3を使用してDynamoDBからデータをQuery、最新値15点ほどを抜き出してプロットします。
 
@@ -199,7 +199,7 @@ if __name__ == "__main__":
 
 それでは、次章で取得したデータをプロットしましょう。
 
-## 6. 取得データをmatplotlibで可視化
+### 6. 取得データをmatplotlibで可視化
 
 先ほど取得したデータを使用してプロットします。
 
@@ -328,11 +328,11 @@ def worker():
 
 ```
 
-### 出力結果
+#### 出力結果
 
 <img src="/images/2021/20210930a/室内温湿度.jpg" alt="室内温湿度" width="800" height="600" loading="lazy">
 
-## 7. 作成したプロット図をSlack APIで画像投稿
+### 7. 作成したプロット図をSlack APIで画像投稿
 
 それでは、上記で出力した画像をSlackに投稿します。
 
@@ -361,7 +361,7 @@ client = WebClient(
 
 >*注意点が一つあります。テキストメッセージの送信の際はchannel="#home"となっていますが、画像を投稿する際はchannels = "#home"です。*
 
-### 出力結果
+#### 出力結果
 
 <img src="/images/2021/20210930a/image_5.png" alt="出力結果グラフ" width="647" height="457" loading="lazy">
 
@@ -535,7 +535,7 @@ if __name__ == "__main__":
 
 ```
 
-## まとめ
+### まとめ
 
 GoとAWS IoTを使用してMQTT通信を行いました。
 

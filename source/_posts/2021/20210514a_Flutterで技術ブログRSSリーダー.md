@@ -12,7 +12,7 @@ thumbnail: /images/2021/20210514a/thumbnail.png
 author: 真野隼記
 lede: "FlutterでRSSを用いてフューチャー技術ブログリーダーを作ろうと思います。"
 ---
-# はじめに
+## はじめに
 
 TIG DXユニット [^1]真野です。
 
@@ -20,7 +20,7 @@ TIG DXユニット [^1]真野です。
 
 この記事ではFlutterでRSSを用いてフューチャー技術ブログリーダーを作ろうと思います。
 
-## RSSとは
+### RSSとは
 
 > RSS（RDF Site Summary/Rich Site Summary）はXMLを応用したデータ形式の一種で、Webサイト内の新着ページや更新ページのタイトルやURL、更新日時、要約などを一覧形式で記述することができる。
 >
@@ -30,7 +30,7 @@ TIG DXユニット [^1]真野です。
 
 さきほどのatom.xmlのリンクを開いた人はほとんどいないと思いますが、`Atom 1.0` という一般的な形式で、記事数は `20件` を上限にして生成しています。本ブログは静的サイトジェネレータに[Hexo](https://hexo.io/)を使っていて、atom.xmlの生成にはメジャーそうだった[hexo-generator-feed](https://github.com/hexojs/hexo-generator-feed)のデフォルトで出力しています。今の所この設定に運営の意思は働いていないので、要望/アドバイスがあればTwitterでコメント下さい。今回開発するリーダーではこれを入力に利用します。
 
-## インプットを怠けてしまう
+### インプットを怠けてしまう
 
 話は変わりますが、ITエンジニアにとってインプットを行わないと、`今までの知識や経験のみで判断することになり、新たな技術でより効率的なやり方を発想できなくなる` そうです。[究極のIT系最新技術情報収集用Slackチーム公開](https://qiita.com/kotakanbe@github/items/32cf4eb3de1741af26fb)の記事に書いてありました。インプット大事ですよね。
 
@@ -38,7 +38,7 @@ TIG DXユニット [^1]真野です。
 
 そのため個人的な様々な要求に耐えられるRSSリーダーを作ろうと思いました。今回は左右のスワイプでスキップ・既読の操作を行えると気持ちが良いと思ったので記事の表示＋スワイプ操作ができることまでを題材とします。
 
-## 環境
+### 環境
 
 [get-started/install](https://flutter.dev/docs/get-started/install) に従い構築します。
 
@@ -58,7 +58,7 @@ Doctor summary (to see all details, run flutter doctor -v):
 
 わたしの開発はIntelliJで行っていますが、VSCodeでも十分開発できるそうです。
 
-## ウィジェット開発
+### ウィジェット開発
 
 StatelessWidgetで作っていきます
 
@@ -91,7 +91,7 @@ class _TechBlogState extends State<TechBlog> {
 
 次章から `_TechBlogState` にメインのロジックを詰めていきます。
 
-## RSSフィードの取得
+### RSSフィードの取得
 
 まずはatom.xmlを取得しないと始まらないので、ファイルをダウンロードします。
 
@@ -132,7 +132,7 @@ class _TechBlogState extends State<TechBlog> {
 
 ここでXMLが問題なく表示できていれば、フィードの解析に進みます。
 
-## RSSフィード解析
+### RSSフィード解析
 
 atom.xml パース用の[webfeed](https://pub.dev/packages/webfeed)と呼ばれるパッケージを利用します。 `_articles`のリストに結果を追加します。
 
@@ -176,7 +176,7 @@ class AtomItem {
 
 ここの`id`が記事のURLになります。他には`title`、`published`のフィールドを利用します。
 
-## リストの作成
+### リストの作成
 
 先程取得した、_articleのリストをListViewに変換します。
 
@@ -221,7 +221,7 @@ Androidの場合はブラウザの起動に権限設定が必要です。
 
 <img src="/images/2021/20210514a/Animation.gif" alt="モバイルアプリで実行例" wight="469" height="842" loading="lazy">
 
-## スワイプでリストを閉じる
+### スワイプでリストを閉じる
 
 次はスワイプで既読を管理する機能です。
 
@@ -262,7 +262,7 @@ Androidの場合はブラウザの起動に権限設定が必要です。
 
 デモ上はタイトルだけで判断して捨てていますが、本来はクリックして記事を一読してからスワイプするイメージです。
 
-## 最後に
+### 最後に
 
 RSSを読み込んでスワイプで記事を管理できるシンプルなリーダーを作りました。
 

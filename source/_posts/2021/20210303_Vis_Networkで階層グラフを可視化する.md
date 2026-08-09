@@ -15,7 +15,7 @@ author: 山田修路
 lede: "業務で階層グラフを可視化する機会があったので、階層グラフの可視化について共有させていただこうと思います。グラフとは関係を抽象化したもので、線グラフや棒グラフなどのチャートとは異なる概念です。"
 ---
 
-# はじめに
+## はじめに
 
 はじめまして、TIG コアテクノロジーユニットの山田です。
 
@@ -38,15 +38,15 @@ Webアプリで利用しやすい、JavaScript製のライブラリの代表的�
 
 mxGraphについて[次の記事](/articles/20210304/)で紹介する予定ですのでお楽しみに。
 
-## Vis Networkとは
+### Vis Networkとは
 
 vis.jsという可視化ライブラリに含まれるグラフ可視化ライブラリです。その中でもVis Networkはグラフの可視化に特化したライブラリで、[Vis Network Examples](https://visjs.github.io/vis-network/examples/)にあるように様々なグラフを描画できます。Vis Networkはcanvasに描画するため描画が高速で、パフォーマンスが要求される場面に有用です。 [^1]
 
-# Vis Networkの使い方
+## Vis Networkの使い方
 
 Vis Networkでは表示するグラフの元となるノード、エッジ、オプションを定義する必要があります。
 
-## ノード定義
+### ノード定義
 
 下記のようにノードを定義できます。
 
@@ -69,7 +69,7 @@ const nodes = new vis.DataSet([
 
 ノードに設定可能な属性一覧は[vis\.js \- Nodes documentation\.](https://visjs.github.io/vis-network/docs/network/nodes.html)をご参照ください。
 
-## エッジ定義
+### エッジ定義
 
 `from`, `to`で指定したノードIDをつなぐエッジを作成します。
 
@@ -91,7 +91,7 @@ const edges = new vis.DataSet([
 
 エッジに設定可能な属性一覧は[vis\.js \- Edges documentation\.](https://almende.github.io/vis/docs/network/edges.html)をご参照ください。
 
-## オプション定義
+### オプション定義
 
 階層グラフを表示する場合、layoutオプションを指定する必要があります。その際、下記のように`sortMethod: 'directed'`を指定することでグラフの形状から各ノードのレベルを自動計算してくれるので、ライトに可視化したい場合にはこのオプションを使用することをおすすめします。
 
@@ -107,7 +107,7 @@ const options = {
 
 オプションに設定可能な属性一覧は[vis\.js \- Network documentation\.](https://almende.github.io/vis/docs/network/)をご参照ください。
 
-## 可視化
+### 可視化
 
 上記のノード定義、エッジ定義、オプション定義を元に可視化できます。実際に可視化した例です。
 
@@ -116,7 +116,7 @@ const options = {
 
 これだけでは寂しいので、少しグラフを加工していきましょう。
 
-## ノードの形状
+### ノードの形状
 
 ノード定義にshape属性を追加することで、ノードにラベルを表示することが出来ます。なお、ここでは紹介しませんでしたが`shape: image`を指定することで任意の画像を表示することもできます。
 
@@ -140,7 +140,7 @@ const nodes = new vis.DataSet([
 <img src="/images/2021/20210303/2021-01-19_14h31_46.png" loading="lazy">
 ソースコードは [Edit fiddle \- JSFiddle \- Code Playground](https://jsfiddle.net/3nkac917/) にて確認できます。
 
-## tooltip
+### tooltip
 
 > tooltip（ツールチップ）とは、マウスオーバーした際に表示される枠内の補足説明などのことです。詳細は[こちら](https://ja.wikipedia.org/wiki/%E3%83%84%E3%83%BC%E3%83%AB%E3%83%81%E3%83%83%E3%83%97)の記事などを参考ください。
 
@@ -168,7 +168,7 @@ const nodes = new vis.DataSet([
 <img src="/images/2021/20210303/2021-01-19_14h34_43.png" loading="lazy">
 ソースコードは [Edit fiddle \- JSFiddle \- Code Playground](https://jsfiddle.net/rg50c2jh/) にて確認できます。
 
-## イベント
+### イベント
 
 `on`メソッドで指定したイベントを処理するCallbackを登録することが出来ます。
 下記のサンプルではクリックしたノードの`color`属性を変更します。
@@ -179,7 +179,7 @@ const nodes = new vis.DataSet([
 イベント一覧は [vis\.js \- Network documentation\.](https://almende.github.io/vis/docs/network/#Events) に記載されています。
 イベント発生時に渡されるパラメータの中身を確認したり、実際にイベント発生させて試したい場合は [Vis Network \| Events \| Interaction events](https://visjs.github.io/vis-network/examples/network/events/interactionEvents.html) がおすすめです。
 
-## dot言語からのインポート
+### dot言語からのインポート
 
 Vis NetworkではGephiからエクスポートしたデータやdot言語をインポートできます。今回は私が先日Graphvizを用いて可視化したグラフ [^3]をVis Networkで表示してみます。
 
@@ -191,11 +191,11 @@ Graphvizほど洗練されたレイアウトにはなりませんが、非常に
 
 ※ 上記画像ではVis Networkのノードやエッジのラベルが読み取れない状態になっていますが、Canvas上で拡大することでラベルを読み取ることが出来ます
 
-# 注意
+## 注意
 
 開発中にバージョンアップしたときに何も表示されなくなる不具合 [^4]に遭遇したことがありました。このようなわかりやすい不具合ならまだいいですが、細かいところで挙動が変わってしまっている可能性もあるのでバージョンアップの際には十分な検証が必要かなと思います（どのソフトウェアにも言えることではありますが…）
 
-# 課題
+## 課題
 
 当初Vis Networkを使用していましたが、大きめの階層グラフを表示するとエッジの交差が非常に多くなってしまうことがわかりました。例えば下図はこれまでサンプルとして表示していたグラフにオレンジのエッジを一本追加しただけなのですが、エッジの交差が必要以上に多くなってしまっています。
 
@@ -213,7 +213,7 @@ Graphvizほど洗練されたレイアウトにはなりませんが、非常に
 
 階層グラフのレイアウト問題そのものに興味がある方は [階層グラフの可視化](http://www.orsj.or.jp/archive2/or63-1/or63_1_20.pdf) などを見ると楽しめるかなと思います。
 
-# まとめ
+## まとめ
 
 vis.jsを使い、ライトに階層グラフを表示・加工出来ることがわかりました。残念ながら私達の用途には合いませんでしたが、適切なシーンで使用すればとても有用なライブラリだと思います。
 

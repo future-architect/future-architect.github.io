@@ -25,7 +25,7 @@ Pythonでお仕事する前提で、現在のところで自分が最適と考�
 
 Pythonのasyncio周りで[@aodag](https://twitter.com/aodag)と[@moriyoshit](https://twitter.com/moriyoshit)にアドバイスをいただきました。
 
-# Poetryのインストール（1回で良い）
+## Poetryのインストール（1回で良い）
 
 https://python-poetry.org/docs/
 
@@ -39,7 +39,7 @@ curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poet
 
 ホームの.poetry/bin以下にコマンドが作成される。ここにパスを通すか、どうせpoetryコマンドだけなのでこれのシンボリックリンクをパスの通っているところに作る。
 
-# プロジェクト作成
+## プロジェクト作成
 
 プロジェクトフォルダはコマンドで一緒に作られるので、フォルダをおきたい親フォルダでコマンドを実行
 
@@ -69,7 +69,7 @@ poetry install
 poetry run pytest
 ```
 
-# ツールのインストール
+## ツールのインストール
 
 Poetryの標準テンプレートでpytest入りますが、linter (flake8, mypy)とフォーマッター (black)を入れていきます。
 
@@ -147,7 +147,7 @@ __pycache__
 
 これで一通り設定完了です。.vscode/settings.jsonを含めて各種ファイルを全部リポジトリに入れておけば、チェックアウトしたユーザーは``poetry install``を実行すれば環境が整います。
 
-# サーバーの開発
+## サーバーの開発
 
 必要なライブラリをインストールします。今回はasyncio対応ということで[FastAPI](https://fastapi.tiangolo.com/)を選びました。[Starlette](https://www.starlette.io/)でもいいと思います。
 
@@ -215,7 +215,7 @@ INFO:     Application startup complete.```
 
 <img src="/images/2021/20210611a/スクリーンショット_2021-06-11_12.35.24.png" alt="デバッガーでアプリの起動" loading="lazy">
 
-# サーバーのDocker化
+## サーバーのDocker化
 
 Dockerのイメージにするところまで作っておきましょう。まずはビルド時に不要なファイルを設定する.dockerignoreファイルを作ります。
 
@@ -288,7 +288,7 @@ docker build -t sample-server .
 docker run --rm -it -p 8000:8000 sample-server
 ```
 
-# Pythonネタで過去に書いた記事です
+## Pythonネタで過去に書いた記事です
 
 * [2021年版Pythonの型ヒントの書き方 (for Python 3.9)](/articles/20201223/)
 * [仕事でPythonコンテナをデプロイする人向けのDockerfile (1): オールマイティ編](/articles/20200513/)

@@ -15,7 +15,7 @@ lede: "認証情報を Lambda の環境変数に渡す要件が発生したた�
 ---
 <img src="/images/2021/20210413a/Screen_Shot_2021-03-24_at_2.18.57.png" alt="">
 
-# はじめに
+## はじめに
 
 フューチャーの棚井龍之介です。
 
@@ -29,7 +29,7 @@ lede: "認証情報を Lambda の環境変数に渡す要件が発生したた�
 
 認証情報のコード管理について、Terraform 作業とローカル作業を組み合わせて対応できたため、備忘録も兼ねて手順をブログ化しました。
 
-## KMS とは
+### KMS とは
 
 公式: [AWS Key Management Service (KMS)](https://aws.amazon.com/jp/kms/)
 
@@ -37,7 +37,7 @@ AWS の提供する、データの暗号化・復号化サービスです。共�
 
 KMS の仕組み自体は、Classmethod さんの書かれた「[10分でわかる！Key Management Serviceの仕組み](https://dev.classmethod.jp/articles/10minutes-kms/)」が詳しいのです。
 
-## Terraform とは
+### Terraform とは
 
 公式: [Terraform](https://www.terraform.io/)
 
@@ -50,7 +50,7 @@ Terraform やってみたいという方は、以下の記事がオススメで�
 - [はじめてのTerraform 0.12 ～環境構築～](/articles/20190816/)
 - [春の入門祭り🌸 #18 Terraform 101](/articles/20200624/)
 
-# 本記事の流れ
+## 本記事の流れ
 
 KMS の暗号化・復号化操作を、以下の流れで説明します。
 
@@ -60,7 +60,7 @@ KMS の暗号化・復号化操作を、以下の流れで説明します。
 
 また、本記事では一部 Terraform による操作を前提としていますが、基本的な Terraform 操作の説明は省略しています。
 
-# Terraform で KMS マスタキーの生成
+## Terraform で KMS マスタキーの生成
 
 Terraform で KMS リソースを作成します。
 
@@ -93,7 +93,7 @@ Terraform 定義パラメータ
 
 リソース定義を追加後、`$ terraform plan/apply` により KMS マスタキーと Alias を作成します。
 
-# AWS CLI で暗号化・復号化
+## AWS CLI で暗号化・復号化
 
 作成した Alias を用いて、テキスト情報の暗号化・復号化作業を実施してみます。
 
@@ -109,7 +109,7 @@ $ echo $KEYID
 arn:aws:kms:ap-northeast-1:{aws-account}:alias/demo-alias
 ```
 
-## 暗号化
+### 暗号化
 
 ローカルに `PlaintextFile` の名前でファイルを生成して、認証情報の平文を保存します。
 
@@ -136,7 +136,7 @@ $ aws kms encrypt \
 
 以上で「平文を暗号化して、暗号文を取得するまで」が完了です。
 
-## 復号化
+### 復号化
 
 暗号文 `CiphertextBlob` の値を復号化してみましょう。
 
@@ -163,7 +163,7 @@ Hello, World!
 
 以上で「暗号文の復号化」が完了しました。
 
-# Lambda で KMS 操作
+## Lambda で KMS 操作
 
 KMS で生成した暗号文を、Lambda の中で復号化します。
 
@@ -207,7 +207,7 @@ resource "aws_lambda_function" "kms_lambda" {
 手動で設定を行う場合は環境変数の設定から暗号化設定を有効化します。
 <img src="/images/2021/20210413a/lambda.png" alt="環境変数の編集画面" loading="lazy">
 
-## Lambda で復号化
+### Lambda で復号化
 
 以下のコードを Lambda にデプロイして、復号化結果を取得してみます。
 `encryptedKey` には、`CiphertextBlob` の値を直接代入しています。
@@ -279,7 +279,7 @@ $ cat outfile.txt
 
 暗号化されていた `CiphertextBlob` の値が、正しく復号化されたことを確認できました。
 
-# まとめ
+## まとめ
 
 本記事では、KMS のマスタキー生成を Terraform で行い、暗号化は AWS CLI で手動実施するというハイブリッド方式をご紹介しました。
 
@@ -287,6 +287,6 @@ $ cat outfile.txt
 
 以上、長文にお付き合いいただき、ありがとうございました。
 
-## 参照記事
+### 参照記事
 
 - [KMSで認証情報を暗号化しLambda実行時に復号化する](https://dev.classmethod.jp/articles/decrypt-sensitive-data-with-kms-on-lambda-invocation/)

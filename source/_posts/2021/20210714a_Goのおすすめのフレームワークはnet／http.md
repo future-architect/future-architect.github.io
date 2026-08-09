@@ -20,7 +20,7 @@ PythonとかRubyとかもそうですが、言語組み込みのウェブサー�
 
 <img src="/images/2021/20210714a/library-rate.png" alt="アプリケーションにおけるコードの比率" loading="lazy">
 
-# Goのウェブを語る上で重要な2つの型
+## Goのウェブを語る上で重要な2つの型
 
 Goのnet/httpでは2つのインタフェースを定義しています。
 
@@ -63,7 +63,7 @@ func (r Receiver) ServeHTTP(http.ResponseWriter, *http.Request) {
 
 ``net/http/httptest``といったテスト用パッケージも、``http.Handler``を受け取るローカルテスト用サーバーがいたりします。　猫も杓子も``http.Handler``です。
 
-# 他のフレームワークはどうか？
+## 他のフレームワークはどうか？
 
 まず、[Gorilla](https://www.gorillatoolkit.org/)と[chi](https://github.com/go-chi/chi)は、http.ServeMuxの置き換えて使うRouterを提供しています。置き換えなので、``http.Handler``を実装していますし、``http.HandlerFunc``も``http.Handler``も登録できます。サンプルを見てみるとお分かりのように、``http.Server``を使って、各ライブラリのRouterを起動するコードになっています。
 
@@ -75,7 +75,7 @@ Ginも同様に、[``http.Server``の上に構築されています](https://git
 
 一方で、違いとなっているのが、パスパラメータの切り出しだったり（標準ライブラリでは面倒）、各種ミドルウェアが最初からたくさんついてくるとかの差だったりします。echoは独自のインタフェースのミドルウェアですが、Gorillaはミドルウェアも他のフレームワークから利用できます。
 
-# 例外はあるのか？
+## 例外はあるのか？
 
 おそらく、[fasthttp](https://github.com/valyala/fasthttp)はnet/httpをラップしてないサーバーなんじゃないかと思います。
 
@@ -91,7 +91,7 @@ fasthttpはnet/httpではなし得ないパフォーマンスを発揮するた�
 
 こんな感じで特別な事情があれば別実装はありえます。が、ちょっとエクストリームな選択肢ではあると思います。
 
-# まとめ
+## まとめ
 
 Goでウェブのフレームワークを学ぶ場合、多少の機能差はあれど、どれも言語標準の共通の基盤の上に作られており、自由に組み合わせができることがわかります。``net/http``がある意味メタフレームワークとなっています。
 

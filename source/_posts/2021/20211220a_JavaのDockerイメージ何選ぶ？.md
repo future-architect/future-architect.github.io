@@ -22,7 +22,7 @@ Javaのイメージを作る上で、どのDockerイメージをベースに選�
 
 以前、[仕事でPythonコンテナをデプロイする人向けのDockerfile (1): オールマイティ編](/articles/20200513/)で書いたOS名とかは今回は紹介しませんので、busterとかalpineとかWindowsservercoreってなによ？ というお話はそちらの記事を参照してください。一点アップデートがあるのは、Debian 11がリリースされて、イメージとしてbullseyeというのが追加された点ですね。あとはfocal=Ubuntu 20.04LTSというのを覚えてもらえれば。
 
-# JDK周りのニュース
+## JDK周りのニュース
 
 Oracle JDKが無償配布をやめて、無償利用としてはOpenJDKを、という案内を出したのち、Java 17のときにまた無償配布を再開した、というのが大きなニュースですね。
 
@@ -34,7 +34,7 @@ OpenJDK回りのトピックといえば、[AdoptOpenJDKがEclipseに移管](htt
 
 OpenJDKでパッチも上流のプロジェクトで管理されているのでいまのところ大きな違いはなさそうです。独自にサポート期間を延ばしたりという違いがあったりします。
 
-# DockerのJDKディストリビューション
+## DockerのJDKディストリビューション
 
 今、きちんとメンテナンスされていそうな公式イメージ系は次の5つかと思います
 
@@ -58,7 +58,7 @@ GraalVMはGitHubのコンテナレジストリにありました。
 
 * https://github.com/graalvm/container/pkgs/container/graalvm-ce/versions
 
-## Eclipse Temurin
+### Eclipse Temurin
 
 Adoptiumがプロジェクト名で、Temurinがソフトウェア名ですかね？ Red Hat, IBM, Microsoftが母体となって作ったAdoptOpenJDKがEclipseに移管されたものがこれです。もともとはEclipse OpenJ9という別バージョンのJVMがあったりと細かくバリエーションがあったのは、少し整理されて減っているように思います。
 
@@ -66,7 +66,7 @@ Javaのバージョンとしては8, 11, 16, 17を提供しており、8と11の
 
 OS名をつけないデフォルトがWindowsServerCoreでサイズが圧縮されて6GBという富豪な感じです。ベースのOSはWindows系が充実していてNanoServerとかもあります。LinuxはUbuntuとAlpineでDebianはなし。
 
-## OpenJDK
+### OpenJDK
 
 Dockerコミュニティがメンテナンスしているイメージです。`https://hub.docker.com/_/java`というURLでアクセスしてもここにリダイレクトされます。12以降はOracleがビルドしたOpenJDKをバンドルと説明には書かれています。
 
@@ -74,13 +74,13 @@ Javaのバージョンとしては8から19(途中9とかLTSでないのはい�
 
 ベースのOSはDebian系で、OracleLinux7/8、WindowsServerCore、Alpineもあります。
 
-## Maven
+### Maven
 
 個人がメンテナーなオフィシャルイメージです。Mavenが主ですが、バンドルするJDKがOpenJDK/Amazon Corretto、　Eclipse　Temurin、IBM Javaと多様です。
 
 ベースのOSはDebian系で、Alpineもあります。
 
-## Amazon Corretto
+### Amazon Corretto
 
 Amazonが独自にサポート期間を延長してサポートしていることで話題になったのがAmazon Correttoです。
 
@@ -88,7 +88,7 @@ JavaのバージョンはLTSの8, 11, 17です。8だけJREも提供されてい
 
 OSはベースはAmazon Linuxで、Alpineも提供されています。
 
-## IBM Java
+### IBM Java
 
 昔からJavaでは名を馳せていたIBMです。OpenJ9はIBMの成果ですが、ここではなくてAdoptOpenJDK側での提供となっています（そちらはDeprecatedですが)。
 
@@ -96,7 +96,7 @@ Javaのバージョンは8, 9, 11で、なぜか9が入っています。それ�
 
 ベースのOSとしてはUbuntuとAlpineです。
 
-## Distroless
+### Distroless
 
 シェルがなくて中に入れないのでセキュアというのでお馴染みのDistrolessです。
 
@@ -104,11 +104,11 @@ Javaのバージョンは8, 9, 11で、なぜか9が入っています。それ�
 
 なお、:debugタグをつけるとBusyBoxによるシェルのログインできるようになりますが、JDKもインストールされるようになります。他のDistrolessだとBusyBoxの容量の違いしかないのに、なぜか容量が2倍違うという。
 
-## OracleJDK
+### OracleJDK
 
 ページを見るとタグ情報がなく、名前と連絡先を入れるContact Formに入力しないと詳しく知れない謎イメージです。説明を見ると、JDK 11の有料時代のものっぽいのですが、17になった後の更新は行われていない？ 詳しく見ていないです。
 
-## Microsoft OpenJDK
+### Microsoft OpenJDK
 
 Azul Zulu for Azureという、早口言葉？ というのが正式名称のMicrosoftのOpenJDKビルドです。イメージ自体はA独自のコンテナレジストリに登録されています。"Microsoft Azure, Azure Functions (anywhere), Azure Stack, or Microsoft SQL Server"で使う前提とのことです。
 
@@ -116,7 +116,7 @@ Javaバージョンが広く、7から17までサポートしており、それ�
 
 OSもWindowsServerCore、NanoServerは当然のこと、Linuxサポートが手厚く、Ubuntu 18.04, 20.04, Debian 8/9/10, CentOS、Alpineもサポートしています。DebianはSlimがいないのが残念。
 
-## GraalVM
+### GraalVM
 
 PolyglotなJVMかつネイティブ化をサポートしたGraalVMです。
 
@@ -124,7 +124,7 @@ PolyglotなJVMかつネイティブ化をサポートしたGraalVMです。
 
 OSとしてはOracle Linux7/8です。
 
-# どのイメージを使うか？
+## どのイメージを使うか？
 
 結構書き出してみたら特徴が色々だったので、ニーズが明確であれば選びやすいんじゃないか、と思いました。
 
@@ -147,6 +147,6 @@ GraalVMの場合はネイティブイメージになるのでその後はラン�
 | 17 (Azure用) | mcr.microsoft.com/java/jdk:17-zulu-debian10 |  mcr.microsoft.com/java/jre-headless:17-zulu-debian10 |
 | 17 distroless | oopenjdk:17-jdk-slim-bullseye  | gcr.io/distroless/java17-debian11 |
 
-# 参考
+## 参考
 
 * [仕事でPythonコンテナをデプロイする人向けのDockerfile (1): オールマイティ編](/articles/20200513/)

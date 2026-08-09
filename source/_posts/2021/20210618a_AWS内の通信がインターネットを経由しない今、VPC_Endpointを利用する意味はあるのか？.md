@@ -14,7 +14,7 @@ author: 村瀬善則
 lede: "AWS内の通信においてインターネットを経由しないことが最近になって公式ドキュメントに明記されたことを受け、改めてVPC Endpointの必要性について調べてみました。"
 ---
 
-# はじめに
+## はじめに
 
 こんにちは。TIG村瀬です。
 
@@ -31,7 +31,7 @@ lede: "AWS内の通信においてインターネットを経由しないこと�
 
 <blockquote class="twitter-tweet"><p lang="ja" dir="ltr">これがプライベートネットワークの通信と明示された意味は大きい<br><br>『Q:2つのインスタンスがパブリック IP アドレスを使用して通信する場合、またはインスタンスが AWS のサービスのパブリックエンドポイントと通信する場合、トラフィックはインターネットを経由しますか?』<a href="https://t.co/uy26KyCZKn">https://t.co/uy26KyCZKn</a></p>&mdash; Takuro SASAKI (@dkfj) <a href="https://twitter.com/dkfj/status/1385182566160891909?ref_src=twsrc%5Etfw">April 22, 2021</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
-# VPC Endpointとは
+## VPC Endpointとは
 
 こちらもAWSの公式サイトから抜粋
 
@@ -44,19 +44,19 @@ lede: "AWS内の通信においてインターネットを経由しないこと�
 
 多少語弊があるかもしれませんが、一言で言うならばVPC内からVPC外に存在するAWSサービスにインターネットを経由せずに接続できる仕組みです。
 
-# 疑問
+## 疑問
 
 以前はセキュリティを考慮しインターネットを経由しないようにするにはVPC Endpointが必須でしたが、今はVPC Endpointを利用しなくともインターネットを経由しない通信が可能です。
 
 はたして今でもVPC Endpointを利用するメリットはあるのでしょうか？ ケース別に確認してみます。
 
-# 確認
+## 確認
 
-## ケース1 NAT Gatewayが存在せずprivate subnetからAWSのサービスに接続する場合
+### ケース1 NAT Gatewayが存在せずprivate subnetからAWSのサービスに接続する場合
 
 この場合は明らかでNAT Gatewayを用意せずともprivate subnetからAWSのサービスに接続するためにVPC Endpointは必要ですね。 (NAT Gatewayが存在しないケースはあまりないと思いますが)
 
-## ケース2 NAT Gatewayが存在する場合
+### ケース2 NAT Gatewayが存在する場合
 
 この場合のメリットは何なのでしょうか？ すぐにわからなかったのでコストの面で確認してみます。
 
@@ -86,7 +86,7 @@ VPC Endpoint(ゲートウェイ型)に関しては、なんと無料！
 
 通信量が少ないとインタフェース自体の料金が掛かる分、メリットが無いですが通信量が増えれば増えるほどVPC Endpointのありがたみが実感できますね！
 
-# まとめ
+## まとめ
 
 VPC Endpointを利用せずともAWSサービスとのインターネットを経由しない通信は可能です。
 

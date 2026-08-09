@@ -15,7 +15,7 @@ author: 松井宇宙
 lede: "[CP連載2021も折り返しの6本目です！陽光麗らかなある春の日、ITコンサルタントのあなたの元に、ユーザーからの問い合わせが入りました。「すみません、モバイルアプリの調子が悪いので確認してもらえませんか。」"
 ---
 
-# はじめに
+## はじめに
 
 [GCP連載2021](/articles/20210307/)も折り返しの6本目です！
 
@@ -30,7 +30,7 @@ lede: "[CP連載2021も折り返しの6本目です！陽光麗らかなある�
 
 今回は、そんな悩みをFirebaseとBigQueryの合わせ技で解決していきます。
 
-# Firebaseとは
+## Firebaseとは
 
 **mBaaS (mobile Backend as a Service)** を提供するGCPサービスのひとつです。
 より一般的なBaaSのモバイルアプリ向けのイメージで、開発者はログ送信やDBアクセスなどのインフラ設定を気にする必要なく、アプリのコアな機能の開発に専念できます。
@@ -43,7 +43,7 @@ lede: "[CP連載2021も折り返しの6本目です！陽光麗らかなある�
 各機能はFirebase Consoleを介してGUIで閲覧、操作することが可能です。
 今回はその中の`Google Analytics for Firebase`を用いてAndroidアプリの操作ログを取得していきます。
 
-# Google Analytics for Firebaseとは
+## Google Analytics for Firebaseとは
 
 <img src="/images/2021/20210316/image.png" loading="lazy">
 
@@ -75,7 +75,7 @@ BigQueryの他にも、Crashlytics, FCM, Firebase Remote ConfigなどとGAを連
 * [GCP連載#4 Cloud Life Sciencesを見てみた](/articles/20200210/)
 * [GCP連載#7 GCPのData Transfer Serviceを使って簡単にS3からBigQueryにデータ転送をしてみる](/articles/20200214/)
 
-# 試してみる
+## 試してみる
 
 以下の手順を踏んで実際に手を動かしながら、Androidアプリにおけるユーザー操作のトラッキングを実現していきます。
 
@@ -85,7 +85,7 @@ BigQueryの他にも、Crashlytics, FCM, Firebase Remote ConfigなどとGAを連
 
 ※そもそもの、アプリへのFirebaseの追加は[公式ドキュメント](https://firebase.google.com/docs/android/setup?hl=en)を参照いただければと思います。
 
-## 1. Firebaseでログを取得する
+### 1. Firebaseでログを取得する
 
 Androidアプリのソースに必要なコードを追記していきます。
 まず、`Activity` ごとの下準備は以下の2点です。
@@ -153,7 +153,7 @@ paramやevent_nameは任意に指定することもできますし、Firebaseが
 <img src="/images/2021/20210316/image_2.png" loading="lazy">
 <img src="/images/2021/20210316/image_3.png" loading="lazy">
 
-## 2. BigQueryへログを連携する
+### 2. BigQueryへログを連携する
 
 [こちらのドキュメント](https://support.google.com/firebase/answer/6318765?hl=en)を参照しつつ、設定します。
 全てFirebase Consoleからの操作で可能です。
@@ -176,7 +176,7 @@ GCP Consoleから確認してみると、プロジェクトフォルダの配下
 「プレビュー」タブを参照すると、1つの`event_name`に紐付く`params`のkey/valueペアの形でデータが格納されていることが確認できます。
 ただしこのままではFirebaseデフォルトのログと入り混じって見にくい、かつ複数のユーザーのログが混じっている、のでクエリを作成して可読性を上げます。
 
-## 3. BigQueryでクエリを実行する
+### 3. BigQueryでクエリを実行する
 
 可読性を向上させてトラッキングを実現するため、クエリを作成します。
 
@@ -252,7 +252,7 @@ ORDER BY
 端末の戻るボタンが押されて遷移した場合も検知してくれます。
 <img src="/images/2021/20210316/image_7.png" loading="lazy">
 
-# おわりに
+## おわりに
 
 FirebaseとBigQueryの合わせ技で、モバイルアプリのユーザー操作のトラッキングを実現しました。
 これで障害やユーザー問い合わせにも安心して対応できます。
