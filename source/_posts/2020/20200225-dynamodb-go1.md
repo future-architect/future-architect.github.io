@@ -5,10 +5,10 @@ postid: ""
 tags:
   - Go
   - AWS
-  - DynamoDB×Go
   - DynamoDB
 categories:
   - Programming
+series: "DynamoDB×Go"
 author: 村田靖拓
 lede: "Go言語でWebサーバを実装していた際にDynamoDBを扱うライブラリとしてGregさんの https://github.com/guregu/dynamo を使っていました。当時Go初心者だった私は「go dynamo」とすぐさまGoogle先生に問い合わせ、「guregu/dynamoがオススメ」とのエントリーを多数発見しました。オブジェクトの取り回しが隠蔽化されていてとにかく実装が簡単だと記事にも書いてありましたし、私自身も実際そう感じました。"
 ---
