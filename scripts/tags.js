@@ -45,9 +45,37 @@ hexo.extend.helper.register('tag_stats', function(name) {
   return {recent, recentAuthorCount: recentAuthors.size};
 });
 
-hexo.extend.helper.register('median_tags_per_post', function() {
-  const counts = this.site.posts.map(p => (p.tags ? p.tags.length : 0)).sort((a, b) => a - b);
-  return counts[Math.floor(counts.length / 2)] || 0;
+const median = nums => {
+  const sorted = [...nums].sort((a, b) => a - b);
+  return sorted[Math.floor(sorted.length / 2)] || 0;
+};
+const mean = nums => (nums.length ? nums.reduce((a, b) => a + b, 0) / nums.length : 0);
+const round1 = n => Math.round(n * 10) / 10;
+
+// タグの付け方を示す統計。平均と中央値を並べるのは、少数の大きいタグに
+// 引っ張られて両者が倍以上ずれるため（1タグあたり 平均6.9 / 中央値3）
+hexo.extend.helper.register('tags_per_post', function() {
+  const counts = this.site.posts.map(p => (p.tags ? p.tags.length : 0));
+  return {mean: round1(mean(counts)), median: median(counts)};
+});
+
+hexo.extend.helper.register('posts_per_tag', function() {
+  const counts = this.site.tags.map(t => t.length);
+  return {mean: round1(mean(counts)), median: median(counts)};
+});
+
+// 年ごとに初めて使われたタグの数。タグがどれだけ増えてきたかを示す
+hexo.extend.helper.register('new_tags_by_year', function() {
+  const byYear = new Map();
+  this.site.tags.forEach(tag => {
+    const first = tag.posts.map(p => p.date.format('YYYY')).sort()[0];
+    byYear.set(first, (byYear.get(first) || 0) + 1);
+  });
+  const years = [...byYear.keys()].sort();
+  return JSON.stringify({
+    years,
+    counts: years.map(y => byYear.get(y))
+  });
 });
 
 hexo.extend.helper.register('ranking_tags', function() {
