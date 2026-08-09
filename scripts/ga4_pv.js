@@ -22,11 +22,18 @@ hexo.extend.helper.register("get_ga4_pv", url => {
 // 指定した記事の中から PV の多い順に取り出す。カテゴリ・タグの一覧ページで
 // 「よく読まれている記事」を出すのに使う（#2033 / #2034）
 hexo.extend.helper.register('popular_posts_in', function(posts, limit = 4) {
+  // PV は累積なので、古い記事ほど有利になる。経過年数で割って、
+  // 何年もかけて積んだ数字と最近読まれている数字を並べられるようにする。
+  // 分母を 1+年数 にしているのは、公開直後の記事で 0 除算にしないため
+  const YEAR = 365 * 24 * 60 * 60 * 1000;
+  const now = Date.now();
+  const score = post => getGA4PV('/' + post.path) / (1 + (now - post.date.valueOf()) / YEAR);
+
   const ranked = posts
-    .map(post => ({post, pv: getGA4PV('/' + post.path)}))
+    .map(post => ({post, pv: getGA4PV('/' + post.path), score: score(post)}))
     .filter(x => x.pv > 0)
     // 同点の決着が無いとビルドごとに並びが変わる
-    .sort((a, b) => b.pv - a.pv || (a.post.path < b.post.path ? -1 : 1))
+    .sort((a, b) => b.score - a.score || (a.post.path < b.post.path ? -1 : 1))
     .slice(0, limit);
 
   if (ranked.length === 0) return '';
