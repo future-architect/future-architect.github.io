@@ -119,13 +119,27 @@ function build(site) {
     });
   }
 
-  return series;
+  return {byPath: series, list: [...groups].map(([name, posts]) => {
+    const index = posts.find(p => p.tags && p.tags.some(t => t.name === 'インデックス'));
+    return {
+      name,
+      total: posts.length,
+      index: index || posts[0],
+      latest: posts[posts.length - 1].date
+    };
+  })};
 }
 
 /** 記事から見た連載。連載に属さない記事は null */
 function seriesOf(site, post) {
   if (!cache) cache = build(site);
-  return cache.get(post.path) || null;
+  return cache.byPath.get(post.path) || null;
+}
+
+/** 連載の一覧。更新が新しい順 */
+function allSeries(site) {
+  if (!cache) cache = build(site);
+  return cache.list.slice().sort((a, b) => b.latest - a.latest || (a.name < b.name ? -1 : 1));
 }
 
 const NONE = new Set();
@@ -142,4 +156,4 @@ function navLinkedPaths(site, post) {
   return s ? s.linked : NONE;
 }
 
-module.exports = {seriesOf, navLinkedPaths};
+module.exports = {seriesOf, navLinkedPaths, allSeries};
