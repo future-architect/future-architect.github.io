@@ -26,7 +26,7 @@ TIG DXユニット真野です。2022/04/06にGAになったと発表された�
 
 さて、ドキュメントにはLambda Function URLsで個別のタイムアウト制約があるという記載がないため、制約は通常のLambdaと同様に15分が上限であることは自明な気がしますが、せっかくなので検証します。また、GoでJSONを返すWeb APIを構築するときにどういった使い方になるかコードベースで試します。
 
-### タイムアウトについて
+## タイムアウトについて
 
 Lambdaについては「関数URLを有効化」し、cURLやブラウザなどで簡易的に疎通したかったので認証タイプは「NONE」を選択します。関数名は「my-function-url-lambda」とします。
 
@@ -107,7 +107,7 @@ deploy:
 
 これで、Lambda Function URLsは実行時間の面でかなり有用だと感じます。
 
-### WAFの制御
+## WAFの制御
 
 API Gatewayのようなリッチな制御は行えなくても、セキュリティ要件でWAF設置が必須な場合があります。Lambda Function URLsは2022.5.5時点ではAWS WAFの設定は不可のようです。AWS WAFの設定画面をみても、現状はAPI Gateway, ALB, AppSyncの3つに限られています。
 
@@ -115,7 +115,7 @@ API Gatewayのようなリッチな制御は行えなくても、セキュリテ
 
 そのためブラウザアクセスを許容したいけど、検証用のエンドポイントは送信元IPを絞りたいとかも現状はできないです。スロットリング、カスタムドメイン名などとともに、これらの要件が必要な場合はAPI Gatewayを利用しましょうということです（InboundのSecurity Groupが設定できれば最高なんですが..）
 
-### httpハンドラー対応
+## httpハンドラー対応
 
 AWS Lambdaですが、aws-sdk for Goのお作法にそのまま従うとGoのhttpハンドラーと微妙に使い勝手が異なります。このギャップを吸収するために用いるのが `github.com/awslabs/aws-lambda-go-api-proxy` で、API Gatewayリクエストをnet/httpのhandlerの形式に変換してくれ、アプリコードとしてはnet/http、Gin、Echoの形式で実装すれば良くなります。
 
@@ -161,7 +161,7 @@ aws labs http adapter response!!
 
 [AWS lambda's function URL without API Gateway in Go - Stack Over Flow](https://stackoverflow.com/questions/72795881/aws-lambdas-function-url-without-api-gateway-in-go) にあるように、aws-sdk-for-go における apigateway-requestとlambda-function-urlsの構造体が異なるようで、上記の例だとリクエストパラメータはうまく渡るものの、URLのマッピングがすべて `/` になってしまうというフィードバックが社内のチームから報告を受けました。そのままadaptorをつかうのではなく、 `events.LambdaFunctionURLRequest` に載せ替える一手間がひつようかもしれません。
 
-### まとめ
+## まとめ
 
 * Lambda Function URLsのタイムアウトは最長15分になり、API Gatewayを経由するときより伸びた
 * AWS WAFはつけられないので、ブラウザ経由のアクセス制御は個別に実施する必要がある

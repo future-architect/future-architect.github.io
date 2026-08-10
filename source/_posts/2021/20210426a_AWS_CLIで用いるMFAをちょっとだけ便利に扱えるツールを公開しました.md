@@ -51,12 +51,12 @@ aws sts get-session-token --serial-number arn-of-the-mfa-device --token-code cod
 
 [![future-architect/awsmfa - GitHub](https://gh-card.dev/repos/future-architect/awsmfa.svg)](https://github.com/future-architect/awsmfa)
 
-### 何ができるのか
+## 何ができるのか
 
 - AWSの `config` ファイルや `credential` ファイルにMFA用の名前付きプロファイルを生成
 - MFAに使用する値を、コマンド実行時に自動で更新
 
-### 使い方
+## 使い方
 
 `sts get-session-token` と同じ要領で `awsmfa` コマンドを実行するだけです。
 
@@ -89,7 +89,7 @@ aws_secret_access_key = wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY
 aws_session_token     = AQoEXAMPLEH4aoAH0gNCAPyJxz4BlCFFxWNE1OPTgk5TthT+FvwqnKwRcOIfrRh3c/LTo6UDdyJwOOvEVPvLXCrrrUtdnniCEXAMPLE/IvU1dYUg2RVAJBanLiHb4IgRmpRV3zrkuWJOgQs8IZZaIv2BXIa2R4OlgkBN9bkUDNCJiBeb/AXlzBBko7b15fjrBs2+cTQtpZ3CYWFXG8C5zqx37wnOE49mRl/+OtkIKGO7fAE
 ```
 
-### インストール
+## インストール
 
 Linuxの場合はシェルスクリプト一発でローカル環境にインストールできます。このコマンドラインツールはGoで書かれており、マルチプラットフォーム向けにシングルバイナリを簡単に提供できます。インストールが簡単に行えるのはとても良いですね。
 
@@ -99,7 +99,7 @@ curl -sfL https://raw.githubusercontent.com/future-architect/awsmfa/master/insta
 
 Windowsの場合は [Releases](https://github.com/future-architect/awsmfa/releases) から最新のバイナリを取得して、パスが通っているディレクトリにバイナリを配備してください。
 
-### まとめ
+## まとめ
 
 AWS CLIで用いるMFAの運用をちょっとだけ楽にするツールを作りました。
 

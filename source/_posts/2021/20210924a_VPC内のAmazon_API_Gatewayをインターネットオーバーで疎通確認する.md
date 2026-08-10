@@ -17,13 +17,13 @@ lede: "Gateway+Lambda という構成でWebAPI開発を行う際、ちょっと�
 
 TIG DXユニットの真野です。AWSのAPI Gateway+Lambda という構成でWeb API開発を行う際、ちょっと便利に使える疎通方法をまとめます。
 
-### 背景
+## 背景
 
 API GatewayですがPublicなエンドポイントがあれば `curl`コマンドや`Postman`を用いての動作検証も容易だと思います。
 
 一方でVPCエンドポイントを利用してプライベート APIとして構築されている場合は少し厄介です。そのセグメントにVPCなどで属することができればよいのですが、そのためだけに接続するのは煩わしい場面があります。踏み台サーバを作ってAWS Systems Manager(ssmコマンド）でログインするのも、開発環境でそこまでするのかという感覚がありました。また、AWS WAFなどで接続が絞られている時にはその条件を思い出す必要があり（覚えておけよって感じですが）、疎通確認すらちょっと面倒な場面があります。
 
-### aws apigateway test-invoke-methodコマンドが便利
+## aws apigateway test-invoke-methodコマンドが便利
 
 API Gatewayのマネジメントコンソールには動作確認用の[テスト呼び出し機能](https://docs.aws.amazon.com/ja_jp/apigateway/latest/developerguide/how-to-test-method.html)が存在します。
 
@@ -49,7 +49,7 @@ aws apigateway --profile <my_profile> test-invoke-method --rest-api-id <12341234
 
 --rest-api-id と --resource-idの取得方法は[Stackoverflowの回答](https://stackoverflow.com/questions/52446929/what-is-the-rest-api-id-and-resource-id-and-where-do-i-find-them)がシンプルでした。こちらを参考に取得すると良いかなと思います。
 
-### API GatewayにLambdaオーソライザーが設定されている場合
+## API GatewayにLambdaオーソライザーが設定されている場合
 
 API GatewayでLambdaオーソライザーが設定されている構成の場合があります。オーソライザー側についてはこのブログにも[AWS APIGateway Custom Authorizer入門](https://future-architect.github.io/articles/20210610a/)という記事がありますのでぜひ参照ください。
 
@@ -65,7 +65,7 @@ https://docs.aws.amazon.com/ja_jp/apigateway/latest/developerguide/apigateway-us
 
 私が利用したことがないため、今回は説明を割愛します。
 
-### AWS SDK for Goからテスト要求を呼び出してみる。
+## AWS SDK for Goからテスト要求を呼び出してみる。
 
 AWS SDK for Goを利用すればTest Invokeの呼び出しができます。
 
@@ -120,7 +120,7 @@ map[Content-Type:application/json Vary:Accept-Encoding X-Amzn-Trace-Id:Root=1-67
 awscli側のapigateway test-invoke-methodに慣れておけば、インターフェースで悩むことはほぼ無いと思います。
 取得結果のステータスコードや応答ボディなどは *int64や*string でポインタなので一瞬戸惑うくらいでしょうか。
 
-### まとめ
+## まとめ
 
 プライベートなAPI Gatewayだと開発環境の疎通レベルでも検証が面倒だと思ったときには、`test-invoke-method`コマンドを利用する選択もあるよという記事でした。
 

@@ -20,7 +20,7 @@ TIG DXユニット真野です。[電子工作/IoT連載](/articles/20220404a/)�
 
 接続ですが、Bluetooth（BLE: Bluetooth Low Energy）で接続可能。Hueブリッジと呼ばれるIoTゲートウェイ（Webサーバ的なもの）を経由してWeb API連携も可能という、いたせりつくせりです。Hueから各デバイスはZigBeeが用いられているということでいかした感じがします。Hueブリッジを経由する例は、Pythonを始め多くの自動化を試みる日本語記事も多く見かけます。今回は先週までブログ連載を開催していた[Flutter](/articles/20220315a/)を用いて、Hueブリッジを用いずBLEで直接LEDの操作をします。
 
-### FlutterでBLE
+## FlutterでBLE
 
 FlutterでBLEのライブラリはいくつか存在しますが、[PhilipsHue/flutter_reactive_ble](https://github.com/PhilipsHue/flutter_reactive_ble) を利用します。理由は以下の記事をパット見てメンテナンスがされていそうだからということです。
 
@@ -28,7 +28,7 @@ FlutterでBLEのライブラリはいくつか存在しますが、[PhilipsHue/f
 
 flutter_reactive_bleはPhilips社が開発元なので、Hue LEDとの接続性もバッチリかと思いましたが、特段それに特化しているわけではなくBLE全般をあつかうライブラリのようです。
 
-### Hue LEDのBLE仕様
+## Hue LEDのBLE仕様
 
 Hue LEDのBluetoothの仕様ですが公式は存在しないようです。そのため有志の人が調査した（？）gistや、Python製のライブラリの実装を参考にします。
 
@@ -41,7 +41,7 @@ Hue LEDのBluetoothの仕様ですが公式は存在しないようです。そ�
 
 さきほどのgistを確認すると、Service `932c32bd-0000-47a2-835a-a8d455b859dd` に、電源ON/OFFをする `932c32bd-0002-47a2-835a-a8d455b859dd` というCharacteristicがあり、そちらに 1/0 のバイナリを送信すると、LEDがついたり消えたりするわけです。何に使うかわからないCharacteristicもいくつかありますが、ライトの操作は大まかこのシートから推測して行うことができます。Python側のライブラリは補足情報としてあつかうと良いかなと思います。
 
-### Flutter実装
+## Flutter実装
 
 さきほど紹介したPhilipsHue/flutter_reactive_bleを用いてBLE通信を行います。`scanForDevices()` が周囲のBLE端末を検出するAPIです。デバイスの特定ですが、device名が `Hue Lamp` だったのでそれで特定しています。複数のLED操作を行う際はそれぞれ別名で管理するなど工夫すると良いでしょう。実際にデバイスに接続するためには`connectToDevice()` を用います。
 
@@ -107,22 +107,22 @@ Hue LEDのBluetoothの仕様ですが公式は存在しないようです。そ�
 
 https://github.com/ma91n/flutter-hue-led-sample
 
-### 動かしてみた
+## 動かしてみた
 
 さきほどのFlutterで作成したアプリから、LEDを操作してみます。
 
-#### ON/OFF
+### ON/OFF
 
 Lチカです。照明のON/OFFでカメラのフォーカスが変わってしまっていますが、ついたり消えたりしているのがわかります。手ブレですが、撮影中に飼い猫がじゃれついてきているためにいつもより多めに発生しています。
 
 <video src="/images/2022/20220404b/Lチカ.mp4" controls width="50%"></video>
 
-#### 色変更
+### 色変更
 
 適当にRGBで指定した色に変更するようにしてています。
 
 <video src="/images/2022/20220404b/色変更.mp4" controls width="50%"></video>
 
-### まとめ
+## まとめ
 
 BLEで操作する概念のとっかりが難しかったですが、Lチカが無事できて良かったです。BLEがたまにdisconnectになるなど、実用性はまだまだであるため、精度を上げるためには実験を繰り返しながらのトライが必要そうです。

@@ -25,7 +25,7 @@ Terraformにおける変数を、構築するインフラの要件に合わせ�
 
 Terraformにおける変数制御は、構築するインフラの要件を明確化させる上で重要です。そのため、どのような変数制御があるか、ユースケースを踏まえ見ていきます。
 
-### Terraformの変数制御
+## Terraformの変数制御
 
 Terraformには型による制約の他に、下記3種類の変数の制御方法があります。
 
@@ -43,7 +43,7 @@ Terraformには型による制約の他に、下記3種類の変数の制御方�
 
 具体的に1つずつ確認していきましょう。
 
-### validationについて
+## validationについて
 
 `validation`は3つの変数制御の中でも最もシンプルで簡単な制御の方法です
 
@@ -91,11 +91,11 @@ variable "ebs_encryption" {
 
 このように`condition`に条件式を書いておくことで、誤ってEBSの暗号化を無効にする事のないように事前にチェックをしてくれるのが`validation`の特徴です。
 
-#### validationのユースケース
+### validationのユースケース
 
 構築したいインフラに対して、あらかじめ変数の条件をハードコードすることで制約を課したい場合に`validation`ブロックが使えます。
 
-### preconditionについて
+## preconditionについて
 
 上述の`validation`で課すことのできる制約は静的な条件に限りました。つまり、全て条件式にハードコードして制御する必要があり、動的にAWSから情報を取得して条件を絞ることは不可能でした。
 
@@ -139,13 +139,13 @@ resource "aws_instance" "example" {
 
 このように`validation`と違って動的な変数の制御を可能にするのが`precondition`の特徴です。
 
-#### preconditionのユースケース
+### preconditionのユースケース
 
 `validation`でハードコーディングするのが難しい場合に使うのが良いでしょう。
 
 最新のAWSからの情報が常に反映されるため、より安定的なチェックが実施できます。
 
-### postconditionについて
+## postconditionについて
 
 `varidation`や`precondition`はapply前に変数をチェックする**事前チェック**でした。一方で`postcondition`は、**applyの後にエラーを追跡**する事後チェックが可能です。
 
@@ -243,13 +243,13 @@ Plan: 2 to add, 0 to change, 0 to destroy.
 
 これが`postcondition`の事後チェックというもので、apply後へのリソースの変数に対するチェックを実施することが可能になっています。
 
-#### postconditionのユースケース
+### postconditionのユースケース
 
 `validation`や`precondition`などの事前チェックのみで補足しきれない条件を課すのが良いでしょう。
 
 上記のような例だと、apply時にリソースが作成されてしまうので、事前チェックのようにリソース作成前に制限を課すような強い制約ができないことには注意が必要です。
 
-### おまけ
+## おまけ
 
 インスタンスタイプの選定で`precondition`を使いましたが、`precondition`→`postcondition`と単純に置き換えてみたらどうなるでしょうか？
 
@@ -345,12 +345,12 @@ Plan: 1 to add, 0 to change, 0 to destroy.
 
 こうなると `postcondition`で全部チェックしてしまっても良い気もしますが、事後チェックであるかを明示するため、`precondition`で制御できる箇所は`precondition`で制御するようにしましょう。
 
-### さいごに
+## さいごに
 
 多くの変数に対して制限を課すのはなかなか大変で工数を取る上、可読性にも影響します。
 
 修正の際にupdate in placeなどで気軽にアップデート出来ない変数(EBS暗号化の有無など)に対する制約から優先的に実施するのが個人的には良いと思います。
 
-### 参考
+## 参考
 
 - [詳解Terraform](https://www.oreilly.co.jp/books/9784814400522/)
