@@ -40,4 +40,20 @@ const postListItem = (post, itemClass, titleAttr) => {
     + `<span class="post-meta"><span class="post-meta-date">${post.date.format('YYYY.MM.DD')}</span>${snsLabel(post.permalink)}</span></li>`;
 };
 
-module.exports = {snsLabel, newLabel, postListItem};
+/**
+ * サムネ付きのカード1枚。row g-4 の中に並べる前提の col ごと返す。
+ * 「よく読まれている記事」系のセクション（ホームのランキング・
+ * カテゴリ / タグ / 著者 / 年ページ）で共用する。
+ * マークアップはホームの「連載から探す」と同じカード
+ */
+const postPanel = post => {
+  const thumb = post.thumbnail
+    ? `<a href="/${post.path}" title="${post.title}" class="img_wrap panel-thumb"><img src="${post.thumbnail}" alt="" width="200" height="135" loading="lazy"></a>`
+    : '';
+  return `<div class="col-12 col-md-6"><div class="article-card post-panel h-100">${thumb}`
+    + `<div class="panel-body"><a href="/${post.path}" class="panel-title">${post.title}</a>`
+    + `<div class="panel-meta">${post.date.format('YYYY.MM.DD')}${snsLabel(post.permalink)}</div>`
+    + `</div></div></div>`;
+};
+
+module.exports = {snsLabel, newLabel, postListItem, postPanel};

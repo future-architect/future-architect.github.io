@@ -1,7 +1,7 @@
 'use strict';
 
 const {getSNSCnt} = require('./lib/sns');
-const {postListItem} = require('./lib/post_list');
+const {postPanel} = require('./lib/post_list');
 
 const fs = require("fs");
 const gaCache = JSON.parse(fs.readFileSync("ga_cache.json", 'utf-8'));
@@ -73,16 +73,9 @@ hexo.extend.helper.register('popular_posts', function(term='weekly') {
     .sort(compareFunc)
     .slice(0, RANKING_DISPLAY_COUNT);
 
-  // マークアップは「関連記事」「この記事を参照している記事」と共通（lib/post_list.js）
-  const links = popularPosts.map(post => postListItem(post, 'featured-posts-item')).join("\n")
-
-  return `
-  <div class="widget">
-    <ul class="nav featured-post-link">
-      ${links}
-    </ul>
-  </div>
-  `
+  // カードの形は他ページの「よく読まれている記事」と共通（lib/post_list.js）。
+  // 同じ名前のセクションはどのページでも同じ見た目にする (#2230)
+  return `<div class="row g-4">${popularPosts.map(postPanel).join('')}</div>`;
 });
 
 hexo.extend.helper.register('sns_popular_posts', function() {
@@ -91,13 +84,5 @@ hexo.extend.helper.register('sns_popular_posts', function() {
   allPosts.sort((a, b) => getSNSCnt(b.permalink) - getSNSCnt(a.permalink))
   const popularPost = allPosts.slice(0, RANKING_DISPLAY_COUNT)
 
-  const links = popularPost.map(post => postListItem(post, 'featured-posts-item')).join("\n")
-
-  return `
-  <div class="widget">
-    <ul class="nav featured-post-link">
-      ${links}
-    </ul>
-  </div>
-  `
+  return `<div class="row g-4">${popularPost.map(postPanel).join('')}</div>`;
 });

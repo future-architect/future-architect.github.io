@@ -1,7 +1,7 @@
 'use strict';
 
 const fs = require("fs");
-const {snsLabel} = require("./lib/post_list");
+const {postPanel} = require("./lib/post_list");
 
 const load = JSON.parse(fs.readFileSync("ga4_pv.json", 'utf-8'));
 const map = new Map();
@@ -58,16 +58,8 @@ hexo.extend.helper.register('popular_posts_in', function(posts, limit) {
 
   if (ranked.length === 0) return '';
 
-  // マークアップはホームの「連載から探す」と同じカード。2列で並べる
-  const cards = ranked.map(({post}) => {
-    const thumb = post.thumbnail
-      ? `<a href="/${post.path}" title="${post.title}" class="img_wrap panel-thumb"><img src="${post.thumbnail}" alt="" width="200" height="135" loading="lazy"></a>`
-      : '';
-    return `<div class="col-12 col-md-6"><div class="article-card post-panel h-100">${thumb}`
-      + `<div class="panel-body"><a href="/${post.path}" class="panel-title">${post.title}</a>`
-      + `<div class="panel-meta">${post.date.format('YYYY.MM.DD')}${snsLabel(post.permalink)}</div>`
-      + `</div></div></div>`;
-  }).join('');
+  // カードの形は「よく読まれている記事」系の共通部品（lib/post_list.js）
+  const cards = ranked.map(({post}) => postPanel(post)).join('');
 
   return `<div class="row g-4">${cards}</div>`;
 });
