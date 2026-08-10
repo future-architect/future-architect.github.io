@@ -9,7 +9,7 @@ tags:
   - Policy-as-Code
   - カンファレンス
 categories:
-  - Infrastructure
+  - DevOps
 thumbnail: /images/2021/20210313/thumbnail.png
 author: 伊藤太斉
 lede: "今回は先日開催されました、CloudNative Days Spring 2021 ONLINEに登壇しましたので、その内容について書いていきます。はじめにイベントの概要について簡単に説明します。"
