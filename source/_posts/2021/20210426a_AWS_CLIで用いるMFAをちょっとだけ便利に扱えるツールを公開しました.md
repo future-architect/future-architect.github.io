@@ -47,7 +47,7 @@ aws sts get-session-token --serial-number arn-of-the-mfa-device --token-code cod
 
 そこで [future-architect/awsmfa](https://github.com/future-architect/awsmfa) というAWS CLIでMFAを扱うときにちょっとだけ便利にMFAを扱うコマンドラインツールを作りました。
 
-## `future-architect/awsmfa`
+## future-architect/awsmfa
 
 [![future-architect/awsmfa - GitHub](https://gh-card.dev/repos/future-architect/awsmfa.svg)](https://github.com/future-architect/awsmfa)
 

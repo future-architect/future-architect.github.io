@@ -25,7 +25,7 @@ Flutterでウィジェットを開発するとき、 `Stateless Widget` や `Sta
 
 簡単なサンプルを示してみましょう。
 
-### `Class Widge`
+### Class Widge
 
 ```dart
 class SampleWidget extends StatelessWidget {
@@ -40,7 +40,7 @@ class SampleWidget extends StatelessWidget {
 }
 ```
 
-### `Functional Widget`
+### Functional Widget
 
 ```dart
 Widget sampleWidget() {
@@ -65,7 +65,7 @@ Flutterが公式に公開している動画でも本件について触れられ�
 冒頭のサンプルで記述した`Class Widge`と`Functional Widget`をそれぞれ利用した場合、アプリケーションの見た目はどちらも変わりません。
 ２つの一番の違いは生成されるウィジェットツリーの構造です。それぞれのウィジェットツリーは次のようになります。
 
-### `Class Widge`
+### Class Widge
 
 ```sh
 ParentWidget
@@ -74,7 +74,7 @@ ParentWidget
 　　　　　　　　　　　　　　　　　　└─ Text
 ```
 
-### `Functional Widget`
+### Functional Widget
 
 ```
 ParentWidget
