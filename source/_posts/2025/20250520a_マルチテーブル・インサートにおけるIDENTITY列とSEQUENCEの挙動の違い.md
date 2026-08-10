@@ -85,7 +85,7 @@ INSERT INTO M_TEST(VALUE) VALUES ('data');
 
 ### マルチテーブル・インサート
 
-OracleDB特有の構文で、複数のテーブルに同時にデータを投入することができます。`INSERT ALL`を使う基本的な構文は以下のとおりです。
+OracleDB特有の構文で、複数のテーブルに同時にデータを投入できます。`INSERT ALL`を使う基本的な構文は以下のとおりです。
 
 ```sql
 INSERT ALL
