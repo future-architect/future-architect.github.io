@@ -45,7 +45,7 @@ SwiftZoomin#20の動画は、次のリンク先からYouTube上で視聴可能�
 
 #### actor
 
-`actor`というのは、一つの領域で隔離(Isolation)することでデータ競合を防いでいます。
+`actor`というのは、1つの領域で隔離(Isolation)することでデータ競合を防いでいます。
 
 最も馴染み深いのは、`MainActor`の`Isolation domain`であり、`actor`のインスタンスに紐づいたIsolation domainも存在します。
 
