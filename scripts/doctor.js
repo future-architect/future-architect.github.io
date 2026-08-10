@@ -102,11 +102,13 @@ hexo.extend.helper.register('doctor_checks', function() {
         if (candidate) {
           const [predName, predScore] = candidate;
           // 迷ったら数の少ない専門カテゴリへ寄せる、という運用ルールを写す。
-          // 大きいカテゴリから小さいカテゴリへの提案は現状と同票でも出し、
+          // 大きいカテゴリから小さいカテゴリへの提案でも、現状票を明確に
+          // （0.5票以上）上回るときだけ出す。同着・僅差の提案は
+          // 「どちらでも良い」と言っているだけで情報が無い。
           // 逆方向は2倍以上の票を要求する。緩めすぎると数百件になりレビューできない
           const toSmaller = (catSize.get(predName) || 0) < (catSize.get(actualCat.name) || 0);
           const pass = toSmaller
-            ? predScore >= actualScore && predScore >= 1.0
+            ? predScore >= actualScore + 0.5 && predScore >= 1.0
             : predScore >= 2 * actualScore && predScore >= 1.5;
           if (pass) {
             suggestions.push({
