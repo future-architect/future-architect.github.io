@@ -4,7 +4,7 @@ date: 2026/03/19 00:00:00
 postid: a
 tags:
   - ゲーム
-  - Network
+  - ネットワーク
   - オンプレミス
 categories:
   - Infrastructure

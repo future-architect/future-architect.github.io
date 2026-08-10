@@ -5,7 +5,7 @@ postid: ""
 tags:
   - GoogleCloud
   - 合格記
-  - Network
+  - ネットワーク
 categories:
   - Infrastructure
 thumbnail: /images/2020/20200902/thumbnail.png

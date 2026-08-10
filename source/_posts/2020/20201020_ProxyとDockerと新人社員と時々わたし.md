@@ -5,7 +5,7 @@ postid: ""
 tags:
   - プロキシ
   - Docker
-  - Network
+  - ネットワーク
   - DockerCompose
 categories:
   - DevOps

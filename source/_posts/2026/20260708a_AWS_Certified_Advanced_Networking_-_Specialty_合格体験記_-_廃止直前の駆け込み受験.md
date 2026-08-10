@@ -5,7 +5,7 @@ postid: a
 tags:
   - AWS
   - 合格記
-  - Network
+  - ネットワーク
 categories:
   - Infrastructure
 thumbnail: /images/2026/20260708a/thumbnail.png

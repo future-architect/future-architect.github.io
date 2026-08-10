@@ -4,7 +4,7 @@ date: 2020/08/13 00:00:00
 postid: ""
 tags:
   - GoogleCloud
-  - Network
+  - ネットワーク
   - Terraform
 categories:
   - Infrastructure

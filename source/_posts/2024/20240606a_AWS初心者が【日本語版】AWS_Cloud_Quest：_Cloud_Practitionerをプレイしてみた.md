@@ -5,7 +5,7 @@ postid: a
 tags:
   - AWS
   - 初心者向け
-  - Network
+  - ネットワーク
 categories:
   - Infrastructure
 thumbnail: /images/2024/20240606a/thumbnail.png

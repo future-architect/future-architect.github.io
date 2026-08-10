@@ -5,7 +5,7 @@ postid: a
 tags:
   - GoogleCloud
   - VPC
-  - Network
+  - ネットワーク
 categories:
   - Security
 thumbnail: /images/2023/20230119a/thumbnail.png
