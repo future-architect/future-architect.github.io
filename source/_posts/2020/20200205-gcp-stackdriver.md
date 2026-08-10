@@ -4,7 +4,7 @@ date: 2020/02/05 09:23:10
 postid: ""
 tags:
   - GoogleCloud
-  - OpenCensus
+  - OpenTelemetry
   - Go
   - CloudOperations
   - ログ
