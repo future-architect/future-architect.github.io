@@ -8,7 +8,7 @@ tags:
   - PostgreSQL
   - プロキシ
 categories:
-  - Programming
+  - DevOps
 thumbnail: /images/2026/20260213a/thumbnail.png
 author: 澁川喜規
 lede: "Dev Containers便利ですよね？使っていますか？便利なのですが、久々に新しい環境を作ろうとしてちょっとはまったので解決のメモを書いておきます。"
