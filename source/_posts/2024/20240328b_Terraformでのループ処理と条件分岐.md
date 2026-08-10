@@ -15,7 +15,7 @@ lede: "Terraformでは似たリソースを複数構築する際に、ループ�
 
 <img src="/images/2024/20240328b/top.png" alt="" width="800" height="527">
 
-### はじめに
+## はじめに
 
 はじめまして！ TIG DXチームの小林と申します。
 
@@ -23,9 +23,9 @@ Terraformでは似たリソースを複数構築する際に、ループ処理�
 
 私自身まだTerraform歴半年ですが、初心者目線で「Terraformのコードをスマートに書きたい！」というモチベーションのもと本記事を書きました。
 
-### サマリ
+## サマリ
 
-#### ループ処理
+### ループ処理
 
 | 方法    | 分類 | 主な用途（個人的なイメージ） |
 | --------- | -- | ------- |
@@ -34,14 +34,14 @@ Terraformでは似たリソースを複数構築する際に、ループ処理�
 | [for](https://developer.hashicorp.com/terraform/language/expressions/for) | 式 | ・フィルタリング機能を利用して条件によってリソース構築を制御したい場合 <br> ・既存の設定値や構築済リソースから任意のリストやマップを取得したい場合 <br> ・その他使ったら幸せになれる場合 |
 | [dynamic block](https://developer.hashicorp.com/terraform/language/expressions/dynamic-blocks) | 式 | ・resource block内で同一のブロックを複数定義する場合 <br> ・可読性や保守性が落ちないことが明確な場合 |
 
-#### 条件分岐
+### 条件分岐
 
 | 方法      | 分類 | 主な用途（個人的なイメージ） |
 | --------- | -- | --------- |
 | [三項演算子](https://developer.hashicorp.com/terraform/language/expressions/conditionals) | 式 | ・条件分岐を行いたい場合は基本こちら |
 | [for_each](https://developer.hashicorp.com/terraform/language/meta-arguments/for_each) と [for](https://developer.hashicorp.com/terraform/language/expressions/for) を併用 | - | ・forループ内の要素の特定条件でリソースを作り分ける場合 |
 
-### 構築するリソース（ベース）
+## 構築するリソース（ベース）
 
 本記事で構築するリソースはこちらです。
 
@@ -82,7 +82,7 @@ resource "aws_subnet" "private-2" {
 
 参考：[cidrsubnet](https://developer.hashicorp.com/terraform/language/functions/cidrsubnet)
 
-### ループ処理(count)
+## ループ処理(count)
 
 `count`を利用すると、このように書くことができます。
 
@@ -154,7 +154,7 @@ tfstateを覗いてみると、`index_key`というキーの値が0や1などの
 
 ここも`count`の不便なところで、将来的に数が増減するようなリソースを構築する際は向いていません。
 
-### ループ処理(for_each)
+## ループ処理(for_each)
 
 `count`の不便なところを解決したのが`for_each`だと思います。
 
@@ -198,13 +198,13 @@ resource "aws_subnet" "subnet" {
 
 また`for_each`は複数の属性をループで回せて便利なので、`az`もループに含めてマルチAZ構成も実現しています。
 
-### ループ処理(for)
+## ループ処理(for)
 
 後述する`dynamic block`も同様ですが、`count`や`for_each`と違って`for`は「式」です。誤解を恐れず簡単に言うと、そもそもリソースを複数作るためのものではないということです。
 
 具体的には、`for`は[list](https://developer.hashicorp.com/terraform/language/expressions/type-constraints#list), [set](https://developer.hashicorp.com/terraform/language/expressions/type-constraints#set), [tuple](https://developer.hashicorp.com/terraform/language/expressions/type-constraints#tuple), [map](https://developer.hashicorp.com/terraform/language/expressions/type-constraints#map), [object](https://developer.hashicorp.com/terraform/language/expressions/type-constraints#object)を入力として、[tuple](https://developer.hashicorp.com/terraform/language/expressions/type-constraints#tuple)もしくは[object](https://developer.hashicorp.com/terraform/language/expressions/type-constraints#object)を出力するものです。そのため使い方は多様ですが、個人的に嬉しい使い方を2つ記載します。
 
-#### 使い方（1） 特定条件でフィルタリングしてリソースを構築する
+### 使い方（1） 特定条件でフィルタリングしてリソースを構築する
 
 構築するリソースが増えてくると、tfファイルの数やコードの行数が多くなって管理が大変でしょう。
 
@@ -255,7 +255,7 @@ resource "aws_subnet" "private" {
 
 参考：[Local Values](https://developer.hashicorp.com/terraform/language/values/locals)
 
-#### 使い方（2） あるリソースの特定の設定値一覧を取得する
+### 使い方（2） あるリソースの特定の設定値一覧を取得する
 
 例えばprivateサブネットからのみアクセス可能としたいリソース（EC2など）を構築し、そのセキュリティグループを構築するような場合を考えます。
 
@@ -324,7 +324,7 @@ resource "aws_security_group" "private_resource" {
 }
 ```
 
-### ループ処理(dynamic block)
+## ループ処理(dynamic block)
 
 `count`や`for_each`がresource blockを複数作成するときに利用したのに対し、`dynamic block`はresource block内のブロックを複製するときに利用できます。
 
@@ -506,7 +506,7 @@ resource "aws_security_group" "ec2_b" {
 
 このため、`dynamic block`は可読性や保守性を考えて慎重に利用するのが良いと思われます。
 
-### 条件分岐(三項演算子)
+## 条件分岐(三項演算子)
 
 Terraformでは条件分岐を行いたい場合は基本1通りで、この三項演算子を利用します。
 
@@ -545,7 +545,7 @@ resource "aws_subnet" "private" {
 }
 ```
 
-### 条件分岐(for_each と for を併用)
+## 条件分岐(for_each と for を併用)
 
 こちらは、`for`の部分で記載したものの再掲となります。
 
