@@ -18,7 +18,7 @@ lede: "Google Go Coding Guideで紹介されていたgoogle/subcommandsについ
 
 TIG真野です。育休明けです。
 
-GoでCLI（コマンドラインインタフェース）の開発に役立つツールといえばいくつか選択肢があります。大きく分ければフラグのパースを支援するもの（[標準のflagパッケージ](https://pkg.go.dev/flag)、[alecthomas/kong/go-flags](https://github.com/jessevdk/go-flags)、[alecthomas/kong](https://github.com/alecthomas/kong)など）と、開発フレームワークと言っても良い包括的に支援するもの（[urfave/cli](https://github.com/urfave/cli)、[spf13/cobra](https://github.com/spf13/cobra)など）の2つに分けられるかなと思います（※概念的に分けてみただけで捉え方によっては全てパーサだしフレームワークとみなしても良いかもしれません。あくまで個人的なイメージです）。
+GoでCLI（コマンドラインインターフェース）の開発に役立つツールといえばいくつか選択肢があります。大きく分ければフラグのパースを支援するもの（[標準のflagパッケージ](https://pkg.go.dev/flag)、[alecthomas/kong/go-flags](https://github.com/jessevdk/go-flags)、[alecthomas/kong](https://github.com/alecthomas/kong)など）と、開発フレームワークと言っても良い包括的に支援するもの（[urfave/cli](https://github.com/urfave/cli)、[spf13/cobra](https://github.com/spf13/cobra)など）の2つに分けられるかなと思います（※概念的に分けてみただけで捉え方によっては全てパーサだしフレームワークとみなしても良いかもしれません。あくまで個人的なイメージです）。
 
 私は `urfave/cli` を利用することが多いのですが、`spf13/cobra` も人気ですよね。どちらも広く利用されていますが、支配的と言った感じではなく、例えば私がよく用いるterraformコマンドは[mitchellh/cli](https://github.com/mitchellh/cli)という[ライブラリが使われていました](https://github.com/hashicorp/terraform/blob/main/main.go#L29C3-L29C27)し、Go製のテンプレートエンジンで有名なHugoは、Hugoの要件にフィットするように[bep/simplecobra](https://github.com/bep/simplecobra)というライブラリを開発しているようでした。Protocol Bufferのprotocコマンドに至っては[標準パッケージのflag](https://github.com/golang/protobuf/blob/master/protoc-gen-go/main.go#L32)を使っています。気に入ったのを好きに使えば良いんだ感があります。
 

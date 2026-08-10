@@ -41,7 +41,7 @@ TIG の辻です。
 
 ファイルを読み込む際に [io.Reader](https://golang.org/pkg/io/#Reader) を受け取って処理するようにすると Testable なスクリプトになって安心です。簡単な処理とはいえやはりテストは書きたいですよね。
 
-例として、ファイルの中に「Copyright」という文字列が含まれるかどうか調べる処理を考えてみます。実装例として以下の hasCopyright のような実装が考えられます。ポイントは io.Reader のインタフェースを関数の引数として受け取ることです。
+例として、ファイルの中に「Copyright」という文字列が含まれるかどうか調べる処理を考えてみます。実装例として以下の hasCopyright のような実装が考えられます。ポイントは io.Reader のインターフェースを関数の引数として受け取ることです。
 
 ```go io.Readerの引数がポイント
 func hasCopyright(r io.Reader) (bool, error) {
@@ -84,7 +84,7 @@ func hasCopyright(f *os.File) (bool, error) {
 }
 ```
 
-インタフェースである io.Reader を受け取る関数にすることで io.Reader を満たす任意の構造体を関数に渡すことができます。つまりファイル記述子を示す os.File だけでなく [byte.Buffer](https://golang.org/pkg/bytes/#Buffer) や [strings.Reader](https://golang.org/pkg/strings/#Reader) といった構造体を渡すことができます。文字列の場合は [strings.NewReader](https://golang.org/pkg/strings/#NewReader) を用いて string から io.Reader を生成でき便利です。以下のようにテストすることが可能になります。
+インターフェースである io.Reader を受け取る関数にすることで io.Reader を満たす任意の構造体を関数に渡すことができます。つまりファイル記述子を示す os.File だけでなく [byte.Buffer](https://golang.org/pkg/bytes/#Buffer) や [strings.Reader](https://golang.org/pkg/strings/#Reader) といった構造体を渡すことができます。文字列の場合は [strings.NewReader](https://golang.org/pkg/strings/#NewReader) を用いて string から io.Reader を生成でき便利です。以下のようにテストすることが可能になります。
 
 ```go main_test.go
 package main
@@ -421,4 +421,4 @@ func main() {
 
 ## まとめ
 
-ファイル扱うようなスクリプトを Go で実装する上での Tips 5 選を紹介しました。io.Reader や io.Writer といったインタフェースを受け取ることでファイルを扱うスクリプトでも簡単にテストできます。エラーも明示的にハンドリングできていい感じです。ちょっとしたファイルを扱う処理を Go で書いてみてはいかがでしょうか。
+ファイル扱うようなスクリプトを Go で実装する上での Tips 5 選を紹介しました。io.Reader や io.Writer といったインターフェースを受け取ることでファイルを扱うスクリプトでも簡単にテストできます。エラーも明示的にハンドリングできていい感じです。ちょっとしたファイルを扱う処理を Go で書いてみてはいかがでしょうか。

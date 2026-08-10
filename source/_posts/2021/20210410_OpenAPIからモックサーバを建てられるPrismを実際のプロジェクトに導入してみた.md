@@ -28,7 +28,7 @@ lede: "参加しているプロジェクトで、OpenAPI定義ファイルから
 
 ## OpenAPI(Swagger)について
 
-**OpenAPI**とは、API構造を記述する**インタフェース記述言語**です。yamlもしくはjsonで記述することで、綺麗なAPIドキュメントを作成できたり、この記事で紹介するようにモックサーバを建てることができます。
+**OpenAPI**とは、API構造を記述する**インターフェース記述言語**です。yamlもしくはjsonで記述することで、綺麗なAPIドキュメントを作成できたり、この記事で紹介するようにモックサーバを建てることができます。
 
 OpenAPIは、もともとはSwaggerという名前で開発が進められていました。2015年に、もともとの開発元であったSmartBear Softwareから、OpenAPI Initiativeへ移されると同時に `Swagger Specification` から `OpenAPI Specification` (以下OASと記載) という名前に変わりました。なお、現在でも「Swagger UI」や「Swagger Editor」などのOpenAPIドキュメントを整備するツール群は `Swagger` の名前が使われています。
 

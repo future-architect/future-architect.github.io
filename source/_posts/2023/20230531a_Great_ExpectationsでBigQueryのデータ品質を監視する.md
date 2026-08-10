@@ -191,7 +191,7 @@ table_name = "<BigQueryのテーブル名>" # 監視対象データのテーブ�
 
 #### 補足
 
-`datasource_new.ipynb`では、GX全体の設定ファイルである`great_expectations.yml`のデータソースを定義する部分を編集しているだけで、Notebookはこれを編集するための分かりやすいインタフェースに過ぎません。
+`datasource_new.ipynb`では、GX全体の設定ファイルである`great_expectations.yml`のデータソースを定義する部分を編集しているだけで、Notebookはこれを編集するための分かりやすいインターフェースに過ぎません。
 
 従って、Notebookを使わずに`great_expectations.yml`のデータソース定義部分を直接編集するだけで設定が可能です。
 
@@ -371,7 +371,7 @@ GXの利用を検討しているさいはご参考ください。
 
 `great_expectations suite edit <編集したいExpectation Suite名>`コマンドにより編集できます。
 
-CLIコマンドによる対話形式で「2. Interactively, with a sample batch of data」の選択肢を選ぶと、Notebook形式のインタフェースでExpectationを一つ一つ編集できます。
+CLIコマンドによる対話形式で「2. Interactively, with a sample batch of data」の選択肢を選ぶと、Notebook形式のインターフェースでExpectationを一つ一つ編集できます。
 
 ```console
 $ great_expectations suite edit exp_suite_test --no-jupyter

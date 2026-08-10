@@ -52,7 +52,7 @@ lib/pqとpgxは[pgxの方がパフォーマンスが良い](https://devandchill.
 
 [lib/pq](https://pkg.go.dev/github.com/lib/pq#hdr-Bulk_imports)にもCopyを使ったバルクインポート機能がありますし、[pgxにもCOPYプロトコルサポート](https://pkg.go.dev/github.com/jackc/pgx/v4#hdr-Copy_Protocol)がありました。
 
-実現方法はちょっと違っていて、pgxは`database/sql`の`Conn`を拡張した独自`Conn`型を持っており（`database/sql`のインタフェースの上位互換になっている）、その`Conn`に[CopyFrom()メソッド](https://pkg.go.dev/github.com/jackc/pgx/v4#Conn.CopyFrom)が生えています。lib/pqはPrepare/Execの[標準インタフェースを活用する実装](https://pkg.go.dev/github.com/lib/pq#hdr-Bulk_imports)になっていました。
+実現方法はちょっと違っていて、pgxは`database/sql`の`Conn`を拡張した独自`Conn`型を持っており（`database/sql`のインターフェースの上位互換になっている）、その`Conn`に[CopyFrom()メソッド](https://pkg.go.dev/github.com/jackc/pgx/v4#Conn.CopyFrom)が生えています。lib/pqはPrepare/Execの[標準インターフェースを活用する実装](https://pkg.go.dev/github.com/lib/pq#hdr-Bulk_imports)になっていました。
 
 O/Rマッパーの中にはConnを完全にラップして、裏のConnを見せないようなライブラリもあったりする（gormとか？）のでその場合はlib/pqを使うとか、状況によって使い分けできそうですね。まあ、そもそもバッチでデータ一括で入れるなら本番コードとアーキテクチャを合わせたりO/Rマッパー使わなくてもいいと思うのでpgxをダイレクトに使う・・・とかでも良さそう。
 
@@ -189,7 +189,7 @@ func main() {
 
 ## pgxでの利用例
 
-pgxは`pgx.CopyFromSource`インタフェースをアプリ側で用意する必要があります。スライスなどからこのインタフェースを生成する便利関数もありますが、あらかじめ[全部メモリに載っける](https://pkg.go.dev/github.com/jackc/pgx/v4#CopyFromRows)か、[行数がわかっているか](https://pkg.go.dev/github.com/jackc/pgx/v4#CopyFromSlice)でないと使えないので、超大規模なデータ投入には向かない気がしました。なので、今回はcsv.Readerをラップしたインタフェースを自作してみました。内部的にもバイナリプロトコルで逐次で流していそうなので、全部がメモリに載せないで処理できそうな気がします(要追加検証)。
+pgxは`pgx.CopyFromSource`インターフェースをアプリ側で用意する必要があります。スライスなどからこのインターフェースを生成する便利関数もありますが、あらかじめ[全部メモリに載っける](https://pkg.go.dev/github.com/jackc/pgx/v4#CopyFromRows)か、[行数がわかっているか](https://pkg.go.dev/github.com/jackc/pgx/v4#CopyFromSlice)でないと使えないので、超大規模なデータ投入には向かない気がしました。なので、今回はcsv.Readerをラップしたインターフェースを自作してみました。内部的にもバイナリプロトコルで逐次で流していそうなので、全部がメモリに載せないで処理できそうな気がします(要追加検証)。
 
 ```go
 package main

@@ -249,7 +249,7 @@ generator:
 
 ただ認可側の実装はドキュメントの[Misc > Request lifecycle > security-handlers](https://ogen.dev/docs/misc/request_lifecycle/#security-handlers)に記載が少しある程度で少し推測が必要でした。
 
-生成コードを読んでいった方が早いかもしれません。ドキュメントと生成コードを見比べていくと、`api/SecurityHandler` インタフェースを満たす必要があるとわかります。Bearer認証とOAuth2.0認証ごとに呼ばれる関数が異なる作りのようです。さらに同じ認証方式だけど、あるエンドポイントだけで挙動を変えたい場合は、`operationName` （`openapi.yaml` で定義した `operationId` が入っていました）を用いて拡張可能な作りです。親切！
+生成コードを読んでいった方が早いかもしれません。ドキュメントと生成コードを見比べていくと、`api/SecurityHandler` インターフェースを満たす必要があるとわかります。Bearer認証とOAuth2.0認証ごとに呼ばれる関数が異なる作りのようです。さらに同じ認証方式だけど、あるエンドポイントだけで挙動を変えたい場合は、`operationName` （`openapi.yaml` で定義した `operationId` が入っていました）を用いて拡張可能な作りです。親切！
 
 ```go 満たすべきインターフェース security_handler.go
 type SecurityHandler interface { bn
@@ -377,7 +377,7 @@ $ curl -H "Authorization: Bearer <1文字シグネチャを書き換えた不正
 {"error_message":"operation HelloBearer: security \"Bearer\": token signature is invalid: crypto/ecdsa: verification error"}
 ```
 
-詳細は割愛しますが、JWTトークンにユーザーIDなどが含まれており、各Handlerアプリ側で利用したい場合も、`ctx` に詰めて連携可能であり、使いやすインタフェース（フレームワーク）だと感じました。
+詳細は割愛しますが、JWTトークンにユーザーIDなどが含まれており、各Handlerアプリ側で利用したい場合も、`ctx` に詰めて連携可能であり、使いやすインターフェース（フレームワーク）だと感じました。
 
 ogenのサーバサイドコード生成について、まとめると次のような所感です。
 
@@ -414,7 +414,7 @@ generate:
 output: api/gen.go
 ```
 
-各エンドポイントは `oapi-codegen` が生成した `api/gen.go` の `StrictServerInterface`インタフェースを実装する必要があります。全体像は [hello_handler.go](https://github.com/ma91n/summer2024/blob/main/oapicodegensample/hello_handler.go) を参照いただきたいですが、`ref` でオブエジェクト参照すると、`ogen`と比べ生成されたコードにネストが発生するところが、少しもどかしさを感じます。
+各エンドポイントは `oapi-codegen` が生成した `api/gen.go` の `StrictServerInterface`インターフェースを実装する必要があります。全体像は [hello_handler.go](https://github.com/ma91n/summer2024/blob/main/oapicodegensample/hello_handler.go) を参照いただきたいですが、`ref` でオブエジェクト参照すると、`ogen`と比べ生成されたコードにネストが発生するところが、少しもどかしさを感じます。
 
 ```go hello_handler.go（抜粋）
 type HelloServer struct{}
@@ -467,7 +467,7 @@ func main() {
 }
 ```
 
-ミドルウェアの実体としては次のようなインタフェースを実装します。現時点ではセキュリティスキーマごちゃまぜですので、入力値でスイッチして切り替えます。`openapi3filter.AuthenticationInput` は`openapi.yaml` の解析結果や `http.Request` も取れるため、やろうと思えばすべて判定できます。
+ミドルウェアの実体としては次のようなインターフェースを実装します。現時点ではセキュリティスキーマごちゃまぜですので、入力値でスイッチして切り替えます。`openapi3filter.AuthenticationInput` は`openapi.yaml` の解析結果や `http.Request` も取れるため、やろうと思えばすべて判定できます。
 
 ```go jwt_authenticator.go
 func NewAuthenticator() openapi3filter.AuthenticationFunc {
