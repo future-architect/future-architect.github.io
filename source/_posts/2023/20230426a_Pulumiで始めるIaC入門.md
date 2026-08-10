@@ -6,7 +6,7 @@ tags:
   - IaC
   - 入門
 categories:
-  - DevOps
+  - IaC
 series: "春の入門祭り2023"
 thumbnail: /images/2023/20230426a/thumbnail.png
 author: 渡邉光

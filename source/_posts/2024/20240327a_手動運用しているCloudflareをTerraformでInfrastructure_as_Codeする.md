@@ -8,7 +8,7 @@ tags:
   - IaC
   - tfstate
 categories:
-  - DevOps
+  - IaC
 series: "Terraform2024"
 thumbnail: /images/2024/20240327a/thumbnail.png
 author: 大岩潤矢

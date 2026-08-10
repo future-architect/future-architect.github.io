@@ -8,7 +8,7 @@ tags:
   - CLI
   - Go
 categories:
-  - DevOps
+  - IaC
 series: "Terraform2023"
 thumbnail: /images/2023/20230329a/thumbnail.jpg
 author: 宮永崇史

@@ -9,7 +9,7 @@ tags:
   - Ansible
   - 用語解説
 categories:
-  - DevOps
+  - IaC
 series: "Terraform2025"
 thumbnail: /images/2025/20250403a/thumbnail.png
 author:  森友雅

@@ -8,7 +8,7 @@ tags:
   - 登壇レポート
   - tfstate
 categories:
-  - DevOps
+  - IaC
 thumbnail: /images/2022/20220330a/thumbnail.png
 author: 棚井龍之介
 lede: "Terraform stateをテーマにした勉強会が開かれました。私は後半パートでクラウドリソース自体をdestroy/createdせずに、Terraformリソース定義の記述場所を変更する方法について話しました。"

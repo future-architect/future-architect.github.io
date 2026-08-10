@@ -7,7 +7,7 @@ tags:
   - 登壇レポート
   - IaC
 categories:
-  - DevOps
+  - IaC
 thumbnail: /images/2018/20180209/thumbnail_20180209.png
 author: 齋場俊太朗
 lede: "エンプラ&オンプレでもAnsible導入成功したのでユーザー会で発表してきた"

@@ -7,7 +7,7 @@ tags:
   - マルチリージョン
   - 海外展開
 categories:
-  - DevOps
+  - IaC
 series: "Terraform2024"
 thumbnail: /images/2024/20240315a/thumbnail.png
 author: 岸下優介

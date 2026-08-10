@@ -6,7 +6,7 @@ tags:
   - Terraform
   - Azure
 categories:
-  - DevOps
+  - IaC
 series: "Terraform2024"
 thumbnail: /images/2024/20240325a/thumbnail.png
 author: 真鍋優

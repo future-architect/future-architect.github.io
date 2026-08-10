@@ -6,7 +6,7 @@ tags:
   - Terraform
   - 初心者向け
 categories:
-  - DevOps
+  - IaC
 series: "Terraform2024"
 thumbnail: /images/2024/20240328b/thumbnail.png
 author: 小林弘樹

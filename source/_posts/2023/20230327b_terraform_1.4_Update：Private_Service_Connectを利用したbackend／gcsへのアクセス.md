@@ -8,7 +8,7 @@ tags:
   - Terraform1.4
   - GCS
 categories:
-  - DevOps
+  - IaC
 series: "Terraform2023"
 thumbnail: /images/2023/20230327b/thumbnail.png
 author: 渡邉光

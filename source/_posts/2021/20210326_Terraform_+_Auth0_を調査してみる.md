@@ -7,7 +7,7 @@ tags:
   - Terraform
   - tfstate
 categories:
-  - 認証認可
+  - IaC
 thumbnail: /images/2021/20210326/thumbnail.png
 author: 小林澪司
 lede: "アルバイトの小林です。案件で認証プラットフォームであるAuth0を利用しています。Auth0がHashiCorpとのパートナーシップを結び、TerraformでAuth0リソースの管理が可能となりました。"

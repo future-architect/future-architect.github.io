@@ -8,7 +8,7 @@ tags:
   - Go
   - Copilot
 categories:
-  - DevOps
+  - IaC
 series: "Terraform2024"
 thumbnail: /images/2024/20240326a/thumbnail.png
 author: 棚井龍之介

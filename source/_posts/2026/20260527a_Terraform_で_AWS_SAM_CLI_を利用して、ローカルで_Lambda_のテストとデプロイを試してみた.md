@@ -9,7 +9,7 @@ tags:
   - SAM
   - テスト
 categories:
-  - Infrastructure
+  - IaC
 series: "Terraform2026"
 thumbnail: /images/2026/20260527a/thumbnail.jpg
 author: 香村真紀

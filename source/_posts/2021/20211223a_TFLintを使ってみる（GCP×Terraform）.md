@@ -6,7 +6,7 @@ tags:
   - Terraform
   - GoogleCloud
 categories:
-  - DevOps
+  - IaC
 thumbnail: /images/2021/20211223a/thumbnail.png
 author: 川端一輝
 featured: false

@@ -6,7 +6,7 @@ tags:
   - Terraform
   - モック
 categories:
-  - Infrastructure
+  - IaC
 series: "Terraform2026"
 thumbnail: /images/2026/20260528a/thumbnail.png
 author: 市川裕也

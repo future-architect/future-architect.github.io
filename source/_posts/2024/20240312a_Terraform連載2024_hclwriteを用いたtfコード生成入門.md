@@ -7,7 +7,7 @@ tags:
   - コード生成
   - Go
 categories:
-  - DevOps
+  - IaC
 series: "Terraform2024"
 thumbnail: /images/2024/20240312a/thumbnail.png
 author: 真野隼記

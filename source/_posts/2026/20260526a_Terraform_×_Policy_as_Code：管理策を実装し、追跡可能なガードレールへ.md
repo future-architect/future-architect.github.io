@@ -6,7 +6,7 @@ tags:
   - Terraform
   - Policy-as-Code
 categories:
-  - Infrastructure
+  - IaC
 series: "Terraform2026"
 thumbnail: /images/2026/20260526a/thumbnail.jpg
 author: 棚井龍之介

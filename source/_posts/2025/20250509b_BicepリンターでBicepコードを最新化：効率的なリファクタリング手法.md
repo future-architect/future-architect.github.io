@@ -9,7 +9,7 @@ tags:
   - FutureOne
   - リファクタリング
 categories:
-  - Infrastructure
+  - IaC
 thumbnail: /images/2025/20250509b/thumbnail.png
 author: 三浦克之
 lede: "Azure Bicepは、Microsoft Azureのリソースを効率的に管理するために開発された宣言型の言語です。Azure上のインフラストラクチャをコードとして定義し、デプロイすることを可能にします。Azure Bicepは便利で強力なツールですが..."

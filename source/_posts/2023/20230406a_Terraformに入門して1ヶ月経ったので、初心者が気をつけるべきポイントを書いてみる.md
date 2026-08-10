@@ -7,7 +7,7 @@ tags:
   - 初心者向け
   - 入門
 categories:
-  - DevOps
+  - IaC
 series: "Terraform2023"
 thumbnail: /images/2023/20230406a/thumbnail.png
 author: 大岩潤矢
