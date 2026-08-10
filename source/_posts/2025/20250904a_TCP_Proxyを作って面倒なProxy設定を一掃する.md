@@ -8,6 +8,7 @@ tags:
   - Linux
   - WSL
   - 環境構築
+  - Rust
 categories:
   - Infrastructure
 series: "夏の自由研究2025"
