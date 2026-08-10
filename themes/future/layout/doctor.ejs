@@ -11,7 +11,10 @@
       <ul class="summary">
         <li><span class="summary-count"><%= checks.suggestions.length %></span><br><span class="summary-label">カテゴリ見直し候補</span></li>
         <li><span class="summary-count"><%= checks.untagged.length %></span><br><span class="summary-label">タグ無し</span></li>
+        <li><span class="summary-count"><%= checks.overTagged.length %></span><br><span class="summary-label">タグ付けすぎ</span></li>
         <li><span class="summary-count"><%= checks.missingTotal %></span><br><span class="summary-label">タグ付け漏れ候補</span></li>
+        <li><span class="summary-count"><%= checks.nearDuplicates.length %></span><br><span class="summary-label">統合候補のタグ</span></li>
+        <li><span class="summary-count"><%= checks.singleUse.length %></span><br><span class="summary-label">1記事タグ</span></li>
       </ul>
 
       <h2 class="bottom-content-header">カテゴリの見直し候補</h2>
@@ -39,6 +42,41 @@
       <% } else { %>
       <p>該当なし</p>
       <% } %>
+
+      <h2 class="bottom-content-header">タグが付きすぎている記事</h2>
+      ※記事あたりのタグ数の中央値は3。その倍を超える7本以上を見直し候補として出しています
+      <% if (checks.overTagged.length) { %>
+      <ul class="doctor-list">
+        <% checks.overTagged.forEach(function(p){ %>
+        <li><a href="<%- url_for(p.path) %>"><%= p.title %></a> <span class="doctor-note"><%= p.count %>タグ</span></li>
+        <% }) %>
+      </ul>
+      <% } else { %>
+      <p>該当なし</p>
+      <% } %>
+
+      <h2 class="bottom-content-header">ほぼ重なるタグ（統合候補）</h2>
+      ※片方の記事すべてがもう片方にも付いていて、差が2本以内のペア。実質同じ集合に2つの名前が付いています。Go1.27 ⊆ Go のような差の大きい健全な階層は出しません
+      <% if (checks.nearDuplicates.length) { %>
+      <ul class="doctor-list">
+        <% checks.nearDuplicates.forEach(function(d){ %>
+        <li>
+          <a href="<%- url_for(d.aPath) %>"><%= d.a %></a>（<%= d.aN %>本）<%= d.identical ? ' ＝ ' : ' ⊆ ' %><a href="<%- url_for(d.bPath) %>"><%= d.b %></a>（<%= d.bN %>本）
+          <% if (d.identical) { %><span class="doctor-note">記事集合が完全に一致</span><% } %>
+        </li>
+        <% }) %>
+      </ul>
+      <% } else { %>
+      <p>該当なし</p>
+      <% } %>
+
+      <h2 class="bottom-content-header">1記事にしか使われていないタグ</h2>
+      ※「同居」は、同じ記事に1記事タグ同士が付いているもの。その記事のタグ付けがまとめて薄い可能性が高い
+      <ul class="doctor-list">
+        <% checks.singleUse.forEach(function(t){ %>
+        <li><a href="<%- url_for(t.path) %>"><%= t.name %></a><% if (t.lonelyPair) { %> <span class="doctor-note">1記事タグ同士が同居</span><% } %></li>
+        <% }) %>
+      </ul>
 
       <h2 class="bottom-content-header">タイトルにタグ名を含むのに、そのタグが付いていない記事</h2>
       ※英数3文字・和文4文字未満のタグ名は一般語に当たりやすいので照合していません

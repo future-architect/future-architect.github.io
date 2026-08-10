@@ -50,7 +50,16 @@ hexo.extend.helper.register('doctor_checks', function() {
 
   const suggestions = [];
   const untagged = [];
+  const overTagged = [];
   const missingByTag = new Map(); // タグ名 -> {path, posts: []}
+
+  // タグ -> 記事IDの集合。ほぼ重なるタグ（統合候補）と1記事タグの検出に使う
+  const tagPostSets = new Map();
+  const tagPath = new Map();
+  this.site.tags.forEach(tag => {
+    tagPath.set(tag.name, tag.path);
+    tagPostSets.set(tag.name, new Set(tag.posts.map(p => p._id)));
+  });
 
   const allTagNames = [];
   this.site.tags.forEach(tag => {
@@ -65,6 +74,10 @@ hexo.extend.helper.register('doctor_checks', function() {
     // 1) タグ無し
     if (tagNames.length === 0) {
       untagged.push({title: post.title, path: post.path});
+    }
+    // タグの付けすぎ。記事あたりの中央値は3で、その倍を超えたら見直し候補
+    if (tagNames.length >= 7) {
+      overTagged.push({title: post.title, path: post.path, count: tagNames.length});
     }
 
     // 2) カテゴリ提案
@@ -131,10 +144,53 @@ hexo.extend.helper.register('doctor_checks', function() {
   });
 
   suggestions.sort((a, b) => b.predScore - a.predScore);
+  overTagged.sort((a, b) => b.count - a.count);
   const missing = [...missingByTag.entries()]
     .map(([name, v]) => ({name, path: v.path, posts: v.posts}))
     .sort((a, b) => b.posts.length - a.posts.length);
   const missingTotal = missing.reduce((acc, m) => acc + m.posts.length, 0);
 
-  return {suggestions, untagged, missing, missingTotal};
+  // 4) ほぼ重なるタグ（統合候補）。A の記事がすべて B にも付いていて、
+  //    B 側の差分も2本以内なら、実質同じ集合に2つの名前が付いている。
+  //    Go1.27 ⊆ Go のような健全な階層（差が大きい包含）はここでは出さない
+  const nearDuplicates = [];
+  const tagEntries = [...tagPostSets.entries()].filter(([, set]) => set.size >= 2);
+  for (const [a, A] of tagEntries) {
+    for (const [b, B] of tagEntries) {
+      if (a === b || B.size < A.size || B.size - A.size > 2) continue;
+      if (A.size === B.size && a > b) continue; // 完全一致ペアの重複を防ぐ
+      let subset = true;
+      for (const x of A) {
+        if (!B.has(x)) { subset = false; break; }
+      }
+      if (subset) {
+        nearDuplicates.push({
+          a, aPath: tagPath.get(a), aN: A.size,
+          b, bPath: tagPath.get(b), bN: B.size,
+          identical: A.size === B.size,
+        });
+      }
+    }
+  }
+  nearDuplicates.sort((x, y) => (x.bN - x.aN) - (y.bN - y.aN) || y.aN - x.aN);
+
+  // 5) 1記事タグ。同じ記事に1記事タグ同士が同居している場合は、その記事の
+  //    タグ付けがまとめて薄い可能性が高いので印を付ける
+  //    （タグクラウドで * / ** として出していた仕様の移設）
+  const singleUse = [];
+  for (const [name, set] of tagPostSets) {
+    if (set.size !== 1) continue;
+    const postId = [...set][0];
+    let lonelyPair = false;
+    for (const [other, otherSet] of tagPostSets) {
+      if (other !== name && otherSet.size === 1 && otherSet.has(postId)) {
+        lonelyPair = true;
+        break;
+      }
+    }
+    singleUse.push({name, path: tagPath.get(name), lonelyPair});
+  }
+  singleUse.sort((x, y) => (y.lonelyPair - x.lonelyPair) || (x.name < y.name ? -1 : 1));
+
+  return {suggestions, untagged, overTagged, missing, missingTotal, nearDuplicates, singleUse};
 });
