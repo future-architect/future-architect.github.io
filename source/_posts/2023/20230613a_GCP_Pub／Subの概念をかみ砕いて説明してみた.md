@@ -18,15 +18,6 @@ lede: "PubSubについて噛み砕いて説明していきます。今後PubSub�
 
 (Google Cloud Platform PubSubについての公式ドキュメントは[こちら](https://cloud.google.com/pubsub/docs/overview?hl=ja)です。)
 
-## 目次
-
-1. そもそもPubSubとは何か
-2. PubSubを理解する上で重要な単語の解説
-3. 実際の処理の流れの解説
-4. PubSubを使用したユースケース考えてみた
-5. まとめ
-6. 最後に
-
 ### 1. そもそもPubSubとは何か
 
 PubSubとは、非同期型のメッセージングサービスです。つまり、異なるコンポーネントやアプリケーション間でデータを非同期的に送受信するためのシステムになります。

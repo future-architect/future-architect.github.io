@@ -36,17 +36,6 @@ HealthCare Innovation Group(HIG)[^1]の橋本です。
 - Xcode: 15.3 (15E204a)
 - Swift: 5.10
 
-## 目次
-
-- SwiftDataとは
-- Save data
-  - Section 1~3(UI等のSwiftDataに直接関係のない事前準備)
-  - Section 4: Convert your structure to a SwiftData model
-  - Section 5: Connect SwiftData and SwiftUI
-  - Section 6: Use model data to fill out the UI
-- Wrap-up: Models and persistence
-- おわりに
-
 ## SwiftDataとは
 
 <img src="/images/2024/20240522a/image_2.png" alt="" width="1200" height="419" loading="lazy">

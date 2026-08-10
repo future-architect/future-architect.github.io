@@ -20,16 +20,6 @@ The Gopher character is based on the Go mascot designed by [Renée French](http:
 TIG DXチームの伊藤真彦です。
 今回はgo-swaggerの具体的な実装方法を紹介します。
 
-## 目次
-
-* はじめに
-* go-swaggerのインストール
-* swagger.yamlを準備する
-* ソースコードをビルドする
-* 試しにサーバーを立ち上げてみる
-* ハンドラを実装する
-* ついにhello world完了
-
 ## はじめに
 
 最近の私のメイン業務は[go-swagger](https://github.com/go-swagger/go-swagger)を用いたAPI開発です。
