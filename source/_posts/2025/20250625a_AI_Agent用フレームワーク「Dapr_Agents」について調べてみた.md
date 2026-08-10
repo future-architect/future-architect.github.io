@@ -7,7 +7,7 @@ tags:
   - Claude
   - OpenAPI
 categories:
-  - DataScience
+  - AIDD
 series: "CNCF2025"
 thumbnail: /images/2025/20250625a/thumbnail.png
 author: 原木翔

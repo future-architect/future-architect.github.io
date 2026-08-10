@@ -7,7 +7,7 @@ tags:
   - TensorFlow
   - クラスタリング
 categories:
-  - Infrastructure
+  - DataScience
 series: "地図・GIS・位置特定"
 thumbnail: /images/2022/20220720a/thumbnail.png
 author: 金子剛士
