@@ -75,7 +75,7 @@ ChatGPTなどの生成AIが大ヒットしている現在、その応用場面�
 
 ### 使ったライブラリ
 
-以下の2つのライブラリを使って実装しています。どれもシンプルなインタフェースを持って使いやすいと思います。
+以下の2つのライブラリを使って実装しています。どれもシンプルなインターフェースを持って使いやすいと思います。
 
 #### Sentence-Transformers
 
@@ -97,7 +97,7 @@ Sentence-Transformersのフレームワークが[huggingface](https://huggingfac
 
 https://simpleneighbors.readthedocs.io/en/latest/
 
-コーパスの項目に対して最近傍検索を実行するための簡単なインタフェースです。
+コーパスの項目に対して最近傍検索を実行するための簡単なインターフェースです。
 `Annoy`、`Sklearn`、`BruteForcePurePython`の3つのバックエンドをサポートしていますが、`Annoy`が推奨していますので、それも一緒にインストールします。
 
 ```sh

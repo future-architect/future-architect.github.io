@@ -46,7 +46,7 @@ TIG DXユニットの真野です。[夏休み自由研究連載](/articles/2022
 
 ### FUSEとは
 
-FUSEとはFilesystem in Userspaceの略で、ユーザーランドで手軽に動作するファイルシステムを作成するための仕組みです。FUSEではカーネルがファイルなどの操作のシステムコールを、ユーザーランド側で動作しているプロセスに転送する仕組みで、決められたインタフェースを実装すると、手軽にファイルシステムを実装できます。同僚の澁川さん著作な[Goならわかるシステムプログラミング 第2版](https://www.lambdanote.com/products/go-2) の10章にも触れられています。
+FUSEとはFilesystem in Userspaceの略で、ユーザーランドで手軽に動作するファイルシステムを作成するための仕組みです。FUSEではカーネルがファイルなどの操作のシステムコールを、ユーザーランド側で動作しているプロセスに転送する仕組みで、決められたインターフェースを実装すると、手軽にファイルシステムを実装できます。同僚の澁川さん著作な[Goならわかるシステムプログラミング 第2版](https://www.lambdanote.com/products/go-2) の10章にも触れられています。
 
 下図は[Wikipedia](https://ja.wikipedia.org/wiki/Filesystem_in_Userspace)より引用した動作イメージです。左上の `ls -l` をされると、カーネルにシステム要求が飛び、それをFUSEの仕組みを経由してユーザーランドのアプリケーションが応答するような流れです。
 
@@ -175,7 +175,7 @@ func (f *FileSystem) GetAttr(name string, ctx *fuse.Context) (*fuse.Attr, fuse.S
 }
 ```
 
-あと、`Open` など `nodefs.File` を返すのですが、こういったインタフェースです。実際にファイルへの追記・編集で使われます（例えばファイルを編集して保存するとWrite、Flush、Releaseが呼ばれます）。
+あと、`Open` など `nodefs.File` を返すのですが、こういったインターフェースです。実際にファイルへの追記・編集で使われます（例えばファイルを編集して保存するとWrite、Flush、Releaseが呼ばれます）。
 
 ```go
 type File interface {

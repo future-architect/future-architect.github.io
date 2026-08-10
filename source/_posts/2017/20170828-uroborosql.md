@@ -113,7 +113,7 @@ public abstract class BaseController {
 }
 ```
 
-本来は`DefaultSqlConfig#getConfig`に直接`DataSource`を渡したいところだったんですが、uroboroSQL v0.2ではそのインタフェースがなくて、`getConnection`することにしました。ちなみに、v0.3では`DataSource`を直接渡せるようにする予定です。
+本来は`DefaultSqlConfig#getConfig`に直接`DataSource`を渡したいところだったんですが、uroboroSQL v0.2ではそのインターフェースがなくて、`getConnection`することにしました。ちなみに、v0.3では`DataSource`を直接渡せるようにする予定です。
 
 ## 検索処理の実装
 

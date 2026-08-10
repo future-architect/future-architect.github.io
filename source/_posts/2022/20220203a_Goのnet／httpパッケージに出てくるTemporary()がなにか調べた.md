@@ -19,11 +19,11 @@ lede: "net/httpパッケージのコードを呼んでいると、Temporary() �
 
 TIG真野です。net/httpパッケージには非常にお世話になっています。Goの net/httpの内部にはサーバー/クライアントの両方が含まれていますが、今回はクライアントサイドの話です。
 
-[TCPレベルの接続エラーの調査](https://future-architect.github.io/articles/20211026a/)のために標準パッケージやサードパーティのライブラリのコードを読み込んでいくと、Temporary() 関数だけをもった temporary インタフェースが登場します。HTTP周りでtemporaryと聞くと、 307 Temporary Redirect のステータスコードのことかと思いますが、ちょっと違いそうです。どういったものでどういった場合に出てくるのか、調べました。
+[TCPレベルの接続エラーの調査](https://future-architect.github.io/articles/20211026a/)のために標準パッケージやサードパーティのライブラリのコードを読み込んでいくと、Temporary() 関数だけをもった temporary インターフェースが登場します。HTTP周りでtemporaryと聞くと、 307 Temporary Redirect のステータスコードのことかと思いますが、ちょっと違いそうです。どういったものでどういった場合に出てくるのか、調べました。
 
 ## Temporary()とは
 
-Temporary()はnet/http パッケージなどのコードを見ていると出てくる関数です。プライベートなインタフェースがあちこちのパッケージや呼び出し元のライブラリでつくられています。
+Temporary()はnet/http パッケージなどのコードを見ていると出てくる関数です。プライベートなインターフェースがあちこちのパッケージや呼び出し元のライブラリでつくられています。
 
 ```go
 type temporary interface {
@@ -31,7 +31,7 @@ type temporary interface {
 }
 ```
 
-例えば次のhttpErrorはtemporaryインタフェースを満たし、常にtrueを返すように実装されています。
+例えば次のhttpErrorはtemporaryインターフェースを満たし、常にtrueを返すように実装されています。
 
 ```go transport.go
 type httpError struct {
@@ -44,7 +44,7 @@ func (e *httpError) Timeout() bool   { return e.timeout }
 func (e *httpError) Temporary() bool { return true }  //  常に true を返しているが..？
 ```
 
-netパッケージのOpErrorもtemporaryインタフェースを満たし、Temporary()関数にはロジックが結構が入っています。
+netパッケージのOpErrorもtemporaryインターフェースを満たし、Temporary()関数にはロジックが結構が入っています。
 
 ```go net.go
 func (e *OpError) Temporary() bool {
@@ -63,7 +63,7 @@ func (e *OpError) Temporary() bool {
 }
 ```
 
-AWS SDK for GoにもorigiErrがtemporaryインタフェース(Temporary() boolの関数)を満たしていて、かつTemporary()の結果がtrueの場合はリトライする、みたいな実装がよくあります。
+AWS SDK for GoにもorigiErrがtemporaryインターフェース(Temporary() boolの関数)を満たしていて、かつTemporary()の結果がtrueの場合はリトライする、みたいな実装がよくあります。
 
 ```go retryer.go
 // AWS SDK for Goのretyer.goの例

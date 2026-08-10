@@ -21,7 +21,7 @@ lede: "ここ最近、Goには基本となる言語機能やパッケージに�
 * Go 1.18でジェネリクスが入る
 * Go 1.21で[slices](https://pkg.go.dev/slices)パッケージと[maps](https://pkg.go.dev/maps)パッケージが追加されスライスとマップに使える関数が追加される
 * Go 1.23でrange over funcがオプションなしで使えるようになる
-* Go 1.23でイテレータインタフェースの[iter](https://pkg.go.dev/iter)パッケージが追加され、 [slices](https://pkg.go.dev/slices)と[maps](https://pkg.go.dev/maps)にスライスやマップに対するイテレーションを行うための関数が追加される
+* Go 1.23でイテレータインターフェースの[iter](https://pkg.go.dev/iter)パッケージが追加され、 [slices](https://pkg.go.dev/slices)と[maps](https://pkg.go.dev/maps)にスライスやマップに対するイテレーションを行うための関数が追加される
 
 ## range over func
 

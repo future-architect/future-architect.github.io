@@ -36,7 +36,7 @@ Swaggerや周辺ツールについては [某先輩の記事](/articles/20191008
 というわけで、今回は下記のツールを利用することを前提として規約を作成しています。
 
 * [go-swagger](https://github.com/go-swagger/go-swagger): Goアプリケーションのハンドラ、リクエスト/レスポンスのドメインモデル、バリデーションフレームワーク [^2]
-* [openapi-generator/typescript-axios](https://github.com/OpenAPITools/openapi-generator): フロントエンドのHTTPクライアント、リクエスト/レスポンスのインタフェース
+* [openapi-generator/typescript-axios](https://github.com/OpenAPITools/openapi-generator): フロントエンドのHTTPクライアント、リクエスト/レスポンスのインターフェース
 * [Prism](https://stoplight.io/open-source/prism): フロントエンド開発時に利用するモックサーバー
 
  [^2]: go-swaggerについては [WAFとして go-swagger を選択してみた](/articles/20190814/) で詳しく紹介されています。

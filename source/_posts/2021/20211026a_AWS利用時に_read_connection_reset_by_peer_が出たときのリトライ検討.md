@@ -141,7 +141,7 @@ func (r CustomRetryer) ShouldRetry(req *request.Request) bool {
 
 今回私が実装したいのは、**read: connection reset** の時も **リトライを行いたい** ということなのでその条件のときに `return true` という、ほぼ同じ考えが適用できるステキなサンプルでした。
 
-次に実装をあげますが、元のDefaultRetryerがtemporaryというインタフェースでスイッチしていた実装なのでそれを切り貼りしています。
+次に実装をあげますが、元のDefaultRetryerがtemporaryというインターフェースでスイッチしていた実装なのでそれを切り貼りしています。
 
 ```go read_connection_resetの時もリトライする
 type CustomRetryer struct {

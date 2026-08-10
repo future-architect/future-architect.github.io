@@ -383,7 +383,7 @@ kubeletは各Pod内の管理・仲介者と考えておくとよさそうです�
 
 参考：[kubectlの概要](https://kubernetes.io/ja/docs/reference/kubectl/overview/)
 
-kubectlはKubernetesクラスターを制御するためのコマンドラインインタフェース（CLI）です。ターミナルからKubernetesクラスターを制御するのに使われます。
+kubectlはKubernetesクラスターを制御するためのコマンドラインインターフェース（CLI）です。ターミナルからKubernetesクラスターを制御するのに使われます。
 
 #### cgroupでmemoryの有効化（ラズパイ3台共通）
 
@@ -452,7 +452,7 @@ sudo kubeadm init --apiserver-advertise-address=192.168.1.101 --pod-network-cidr
 
 - `apiserver-advertise-address`
   - このオプションを利用して明示的にAPIサーバーのadvertise addressを設定します。
-  - 明示的に指定しない場合はデフォルトゲートウェイに関連付けられたネットワークインタフェースを使用して設定されます。
+  - 明示的に指定しない場合はデフォルトゲートウェイに関連付けられたネットワークインターフェースを使用して設定されます。
 - `pod-network-cidr`
   - Flannelを使用する場合、こちらを指定する必要があります。
   - Flannelはノード間をつなぐネットワークに仮想的なトンネルを構成することで、クラスター内のPod同士の通信を実現しています。
