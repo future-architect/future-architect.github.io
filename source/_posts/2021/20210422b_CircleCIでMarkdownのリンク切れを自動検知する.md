@@ -168,7 +168,7 @@ Success!
 
 この方法が、読んでいただいた方の役に立てたら幸いです。
 
-### 参照記事
+## 参照記事
 
 - [markdown-link-check](https://github.com/tcort/markdown-link-check#config-file-format)
 - [今さらながらfindパイセンについてまとめてみた](/articles/20210331/)

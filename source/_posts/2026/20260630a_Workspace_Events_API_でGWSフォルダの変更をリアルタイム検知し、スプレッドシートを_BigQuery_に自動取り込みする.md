@@ -653,7 +653,7 @@ Google Workspace Events API（プレビュー）を使うことで、従来の W
 - サブスクリプションの 7日間有効期限に注意（要定期更新）
 
 
-### 参考リンク
+## 参考リンク
 
 - [Google Workspace Events API ドキュメント](https://developers.google.com/workspace/events)
 - [Workspace Events API - Drive イベント](https://developers.google.com/workspace/events/guides/events-drive)
