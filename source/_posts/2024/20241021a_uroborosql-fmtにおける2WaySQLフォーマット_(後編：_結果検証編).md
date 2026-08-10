@@ -6,6 +6,7 @@ tags:
   - uroboroSQL
   - フォーマッター
   - Rust
+  - 2WaySQL
 categories:
   - Programming
 thumbnail: /images/2024/20241021a/thumbnail.png

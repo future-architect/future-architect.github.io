@@ -5,6 +5,7 @@ postid: ""
 tags:
   - インフラ入門
   - 要件定義
+  - デザインパターン
 categories:
   - Infrastructure
 author: 二木秀之

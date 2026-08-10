@@ -5,6 +5,7 @@ postid: a
 tags:
   - Terraform
   - Terraform1.4
+  - リリースノート
 categories:
   - DevOps
 series: "Terraform2023"

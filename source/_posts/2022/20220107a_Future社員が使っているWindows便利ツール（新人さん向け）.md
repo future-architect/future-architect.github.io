@@ -7,6 +7,7 @@ tags:
   - 新人向け
   - 初心者向け
   - 環境構築
+  - Windows
 categories:
   - Business
 thumbnail: /images/2022/20220107a/thumbnail.gif

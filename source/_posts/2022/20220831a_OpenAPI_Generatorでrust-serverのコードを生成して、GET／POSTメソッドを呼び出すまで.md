@@ -5,6 +5,7 @@ postid: a
 tags:
   - OpenAPIGenerator
   - Rust
+  - OpenAPI
 categories:
   - Programming
 series: "夏の自由研究2022"

@@ -5,6 +5,7 @@ postid: a
 tags:
   - OSS
   - Vuls
+  - Windows
 categories:
   - Security
 thumbnail: /images/2023/20230508a/vuls.png

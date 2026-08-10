@@ -7,6 +7,8 @@ tags:
   - Mac
   - ショートカット
   - 環境構築
+  - Linux
+  - Windows
 categories:
   - DevOps
 thumbnail: /images/2024/20240222a/thumbnail.jpg

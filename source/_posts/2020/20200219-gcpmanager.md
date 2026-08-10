@@ -5,6 +5,7 @@ postid: ""
 tags:
   - GoogleCloud
   - IaC
+  - Terraform
 categories:
   - DevOps
 series: "GCP2020"

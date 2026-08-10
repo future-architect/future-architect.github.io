@@ -6,6 +6,7 @@ tags:
   - GitLab
   - コードレビュー
   - 生成AI
+  - オンプレミス
 categories:
   - AIDD
 series: "CI/CD"

@@ -6,6 +6,7 @@ tags:
   - BigQuery
   - GoogleCloud
   - Gemini
+  - ハンズオン
 categories:
   - DataScience
 series: "春の入門祭り2026"

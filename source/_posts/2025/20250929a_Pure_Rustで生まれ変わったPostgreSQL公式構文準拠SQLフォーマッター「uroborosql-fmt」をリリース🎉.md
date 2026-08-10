@@ -7,6 +7,7 @@ tags:
   - uroboroSQL
   - Rust
   - WebAssembly
+  - PostgreSQL
 categories:
   - DB
 thumbnail: /images/2025/20250929a/thumbnail.png

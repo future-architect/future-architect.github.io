@@ -5,6 +5,7 @@ postid: a
 tags:
   - Terraform
   - TerraformCloud
+  - サーバーレス
 categories:
   - Infrastructure
 series: "Terraform2026"

@@ -6,6 +6,7 @@ tags:
   - Cypress
   - SoftwareDesign
   - 出版
+  - E2Eテスト
 categories:
   - Frontend
 thumbnail: /images/2021/20211218a/thumbnail.png

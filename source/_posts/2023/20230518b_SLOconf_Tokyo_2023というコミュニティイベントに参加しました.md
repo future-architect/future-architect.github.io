@@ -7,6 +7,7 @@ tags:
   - SLO
   - 参加レポート
   - 心理的安全性
+  - コミュニティ
 categories:
   - DevOps
 thumbnail: /images/2023/20230518b/thumbnail.png

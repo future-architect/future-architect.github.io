@@ -6,6 +6,8 @@ tags:
   - 競技プログラミング
   - 新人研修
   - 社内勉強会
+  - コンテスト
+  - 初心者向け
 categories:
   - Culture
 thumbnail: /images/2020/20200715/thumbnail.png

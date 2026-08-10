@@ -6,6 +6,8 @@ tags:
   - WebAPI
   - AWS
   - Docker
+  - Python
+  - Lambda
 categories:
   - DevOps
 thumbnail: /images/2023/20230105a/thumbnail.png

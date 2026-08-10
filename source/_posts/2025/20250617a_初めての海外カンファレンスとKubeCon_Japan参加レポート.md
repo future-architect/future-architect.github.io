@@ -6,6 +6,7 @@ tags:
   - KubeCon
   - CNCF
   - 参加レポート
+  - カンファレンス
 categories:
   - DevOps
 series: "CNCF2025"

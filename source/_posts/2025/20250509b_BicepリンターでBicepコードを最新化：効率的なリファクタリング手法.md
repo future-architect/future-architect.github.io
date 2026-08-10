@@ -7,6 +7,7 @@ tags:
   - IaC
   - Linter
   - FutureOne
+  - リファクタリング
 categories:
   - Infrastructure
 thumbnail: /images/2025/20250509b/thumbnail.png

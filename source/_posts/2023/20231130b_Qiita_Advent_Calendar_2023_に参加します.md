@@ -5,6 +5,7 @@ postid: b
 tags:
   - アドベントカレンダー
   - インデックス
+  - Qiita
 categories:
   - Culture
 thumbnail: /images/2023/20231130b/thumbnail.JPG
