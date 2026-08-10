@@ -75,7 +75,7 @@ https://metabase.com/start/jar.html
 
 最終的には下記のようなフォルダ構成になります。
 
-```
+```text
 c:\metabase
 └ metabase.jar
 ```

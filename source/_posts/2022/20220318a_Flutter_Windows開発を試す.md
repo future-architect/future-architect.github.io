@@ -78,7 +78,7 @@ Android Studioでプロジェクトを作ります。New Flutter Pojectでプロ
 
 Qt(Widgets)だとランタイム入れて50MBぐらいになったと思うのですが、``build/Release/runner``だと21MBですね。フォントが1.5MB、アイコンが280KB、ランタイムが14MB、app.soというDartコードをビルドして作られたモジュールらしきものが4MB。ランチャーが75KB。zip圧縮すると8MBぐらいなので配布も楽勝ですね。Electronだと展開後は数100MB、圧縮しても1環境ごとに50MB（macOSのユニバーサルバイナリとかWindowsの32/64ビット両対応をやると2倍）なので1/10ぐらい。
 
-```
+```console
 $ du -h
 1.9M    ./data/flutter_assets
 6.5M    ./data

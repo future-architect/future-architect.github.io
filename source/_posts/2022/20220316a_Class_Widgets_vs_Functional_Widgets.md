@@ -76,7 +76,7 @@ ParentWidget
 
 ### Functional Widget
 
-```
+```text
 ParentWidget
 　　└─ Container
 　　　　　　　　　　└─ Text

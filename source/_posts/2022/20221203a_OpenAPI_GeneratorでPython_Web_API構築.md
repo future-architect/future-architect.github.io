@@ -299,7 +299,7 @@ paths:
 
 ちなみに手動で新規作成したファイルはそのまま残るため、ここに追加する必要はありません。
 
-```
+```text
 openapi_server/controllers/*
 openapi_server/test/*
 ```

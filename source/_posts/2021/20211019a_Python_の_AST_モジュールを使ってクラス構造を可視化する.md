@@ -55,7 +55,7 @@ with open("target.py", "r", encoding="utf-8") as f:
   <summary>出力結果（長いので折り畳み）</summary>
   <div>
 
-  ```
+  ```text
 Module(
     body=[
         ClassDef(

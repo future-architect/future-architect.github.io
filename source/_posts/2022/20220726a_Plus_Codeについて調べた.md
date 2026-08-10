@@ -130,7 +130,7 @@ Open Location Codeは[google/open-location-code](https://github.com/google/open-
 オフラインでも使えるライブリが公開されていますが、まずplus.codes のWeb APIを使ってみます。
 [ドキュメント](https://github.com/google/open-location-code/wiki/Plus-codes-API)から、Google APIキーなしだと以下。
 
-```
+```text
 https://plus.codes/api?address=35.62253406128506,139.72745939860533&email=YOUR_EMAIL_HERE
 https://plus.codes/api?address=8Q7XJPCG%2BXX&email=YOUR_EMAIL_HERE
 ```
@@ -217,7 +217,7 @@ func main() {
 
 実行結果です。
 
-```
+```text
 >go run main.go
 緯度経度->ロケーションコード: 8Q7XJPCG+XX
 ロケーションコード->緯度経度: {35.622375 139.727375 35.6225 139.7275 10}

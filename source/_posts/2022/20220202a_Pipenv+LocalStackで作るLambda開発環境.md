@@ -432,7 +432,7 @@ pipenv run mypy
 
 型付けに問題がなければ以下の結果を得られるはずです。
 
-```
+```text
 Success: no issues found in 2 source files
 ```
 
@@ -673,7 +673,7 @@ zip:clean
 
 開発に使用するpytestとmypyはLambdaの機能として不要です。そこでまずは`Pipfile`から`requirements.txt`を作成します。
 
-```
+```sh
 pipenv lock -r -> requirements.txt
 ```
 
@@ -827,7 +827,7 @@ mimesisはダミーデータを作成するパッケージ、fireはPythonスク
 
 今回は100行のダミーデータを作成しました。
 
-```
+```sh
 python utils.py 100
 ```
 
@@ -835,7 +835,7 @@ python utils.py 100
 
 それではデプロイしたLambdaを呼び出します。AWS CLIのinvoke実行時に`--payload '{ "input_obj": "test.json" }'`を付与することでLambdaに`test.json`の場所を渡します。
 
-```
+```sh
 make invoke
 ```
 

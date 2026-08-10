@@ -192,7 +192,7 @@ VSCode では AutoHotkey 専用の拡張機能 [AutoHotkey Plus Plus](https://ma
 
 キーバインドの設定は
 
-```
+```text
 ::<入力する文字列>::<出力する文字列>
 ```
 
@@ -270,7 +270,7 @@ F13 への配置換えが完了したら .ahk ファイルに追記していき�
 
 caps lock は F13 に変更済みなので、F13 にキーバインドを設定します。
 
-```
+```text
 ;文字の削除
 F13 & H::Send "{Blind}{Backspace}"
 
@@ -287,7 +287,7 @@ F13 & E::Send "{Blind}{End}"
 
 Send の文法詳細や各 Keys の解説は [こちらのドキュメント](https://www.autohotkey.com/docs/v2/lib/Send.htm) に記載があります。
 
-```
+```text
 Send Keys
 <入力コマンド>::Send "<操作内容>"
 ```

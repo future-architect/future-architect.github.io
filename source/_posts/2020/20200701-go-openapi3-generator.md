@@ -48,7 +48,7 @@ https://github.com/deepmap/oapi-codegen/blob/master/examples/petstore-expanded/p
 
 ざっくり以下のAPI が定義されています。
 
-```
+```text
 GET /pets
 POST /pets
 GET /pets/{id}

@@ -287,7 +287,7 @@ postgres=# SELECT flex_timestamp();
 
 `application_name` ですが、次のようにコネクション接続時に指定できます（[参考](https://www.postgresql.jp/docs/9.2/libpq-connect.html)）
 
-```
+```text
 postgresql://user@localhost:5432/postgres?connect_timeout=10&application_name=myapp
 ```
 

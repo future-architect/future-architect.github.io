@@ -72,7 +72,7 @@ plugins:
 
 生成されるファイルはこんな感じです。少ないですね。``greet.pb.go``は``protoc-gen-go``が生成するファイルで、Protobuf純正です。``greet.connect.go``がConnectのツールが生成するツールです。
 
-```
+```text
 ├── gen
 │   └── greet
 │       └── v1

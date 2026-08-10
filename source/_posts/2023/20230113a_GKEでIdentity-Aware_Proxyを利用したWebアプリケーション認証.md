@@ -235,7 +235,7 @@ APIとサービスタブの「認証情報」をクリックします。
 
 作成したOAuthクライアントを再度クリックし、承認済みリダイレクトURIをダウンロードしたOAuthクライアントID(CLIENT_ID)に修正して保存します。
 
-```
+```text
 https://iap.googleapis.com/v1/oauth/clientIds/CLIENT_ID:handleRedirect
 ```
 

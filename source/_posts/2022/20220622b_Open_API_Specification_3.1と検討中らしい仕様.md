@@ -100,7 +100,7 @@ Swaggerから Open API Specificationへの切り替えですが、 2015年にSwa
 * https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/OPTIONS#identifying_allowed_request_methods にもSyntaxでかかれれていました。
   * サーバー全体に対して指定するときに用いるようです
 
-```
+```text
 Syntax
 OPTIONS /index.html HTTP/1.1
 OPTIONS * HTTP/1.1

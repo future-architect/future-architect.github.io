@@ -176,7 +176,7 @@ Flyway は通常、空のスキーマに対して V1 から順にマイグレー
 
 Flyway の `baselineOnMigrate` は **「V1 の内容は既にスキーマに反映済みである」** という前提で動作します。したがって、V1 には**現在のスキーマ状態を再現する全DDL**（CREATE TABLE 等）を記述するのが正しい設計です。
 
-```
+```text
 db/migration/common/
 ├── V1__initial_schema.sql       ← 既存スキーマの全DDL（既存環境ではスキップされる）
 ├── V2__add_is_default.sql       ← ここから実際の差分マイグレーション
@@ -197,7 +197,7 @@ V1 に全DDLを書いておくことで、**環境によって2つの動作**が
 
 上記のことが理解できてなかったため、V1 に差分DDL（ALTER TABLE）を書いてしまいました・・・
 
-```
+```text
 V1__add_column.sql  ← ALTER TABLE（差分DDL）を記述 → ベースラインでスキップされた
 ```
 
@@ -205,7 +205,7 @@ V1__add_column.sql  ← ALTER TABLE（差分DDL）を記述 → ベースライ�
 
 ### 修正後のマイグレーション構成
 
-```
+```text
 db/migration/common/
 ├── V1__initial_schema.sql       ← 全DDL（新規環境構築用に配置）
 └── V2__add_is_default.sql       ← 差分マイグレーション（V1 からリネーム）
@@ -277,7 +277,7 @@ ALTER TABLE LLM ADD IS_DEFAULT VARCHAR(1) DEFAULT '0' NOT NULL;
 
 Flyway の `locations` 設定で共通と DB 固有のディレクトリを分けて管理します。
 
-```
+```text
 db/migration/
 ├── common/                         ... Oracle/PostgreSQL 共通
 │   ├── V2__add_is_default.sql

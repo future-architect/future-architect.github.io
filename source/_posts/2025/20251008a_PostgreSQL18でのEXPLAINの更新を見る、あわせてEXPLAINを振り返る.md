@@ -65,7 +65,7 @@ EXPLAIN ANALYZE
 SELECT * FROM orders WHERE customer_id = 42;
 ```
 
-```
+```text
                                                             QUERY PLAN
 -----------------------------------------------------------------------------------------------------------------------------------
  Bitmap Heap Scan on orders  (cost=5.28..70.90 rows=129 width=18) (actual time=0.018..0.071 rows=129.00 loops=1)
@@ -94,7 +94,7 @@ EXPLAIN (ANALYZE, WAL, BUFFERS)
 UPDATE wal_test SET data = md5(data);
 ```
 
-```
+```text
  Update on wal_test  (cost=0.00..217.35 rows=0 width=0) (actual time=48.481..48.482 rows=0.00 loops=1)
    Buffers: shared hit=60412 dirtied=110 written=117
    WAL: records=30135 bytes=2413984 buffers full=268
@@ -118,7 +118,7 @@ PostgreSQL 18から、1行未満の推定値も小数点で正確に表現され
 
 例えば、Nested Loop Joinの内側でフィルタ条件により平均0.15行が返される場合、これまでは`rows=0`または`rows=1`と丸められていましたが、PostgreSQL 18では`rows=0.15`と正確に表示されます。
 
-```
+```text
 ->  Index Scan using customers_pkey on customers c  (cost=0.27..0.35 rows=1 width=16) (actual time=0.001..0.001 rows=0.15 loops=438)
       Index Cond: (id = o.customer_id)
       Filter: (city = 'Tokyo'::text)
@@ -143,7 +143,7 @@ FROM sales
 ORDER BY category, rank;
 ```
 
-```
+```text
                                                                QUERY PLAN
 -----------------------------------------------------------------------------------------------------------------------------------------
  Incremental Sort  (cost=102.22..158.29 rows=1000 width=64) (actual time=1.589..2.132 rows=1000.00 loops=1)
@@ -203,7 +203,7 @@ EXPLAINは、PostgreSQLのクエリプランナーが生成する実行計画を
 EXPLAIN SELECT * FROM users WHERE age > 30;
 ```
 
-```
+```text
                         QUERY PLAN
 -----------------------------------------------------------
  Seq Scan on users  (cost=0.00..199.00 rows=8247 width=23)
@@ -219,7 +219,7 @@ EXPLAIN SELECT * FROM users WHERE age > 30;
 EXPLAIN ANALYZE SELECT * FROM users WHERE age > 30;
 ```
 
-```
+```text
                                                 QUERY PLAN
 -----------------------------------------------------------------------------------------------------------
  Seq Scan on users  (cost=0.00..199.00 rows=8247 width=23) (actual time=0.006..1.146 rows=8247.00 loops=1)
@@ -241,7 +241,7 @@ EXPLAINの出力は、慣れるまで複雑に見えます。基本的な見方�
 
 実行計画はツリー構造で表現されます。一番下にあるのがスキャンノードで、テーブルから実際にデータを読み取る部分です。その上に、結合やソート、集約などの処理ノードが積み重なっていきます。
 
-```
+```text
 QUERY PLAN
 ---------------------------------------------------------
 Seq Scan on users  (cost=0.00..155.00 rows=10000 width=64)
@@ -295,7 +295,7 @@ EXPLAIN ANALYZE SELECT * FROM orders WHERE order_date = '2024-01-15';
 
 実行結果には、推定値に加えて実際の実行時間（actual time）と実際の行数（actual rows）が表示されます。
 
-```
+```text
 Index Scan using orders_date_idx on orders  (cost=0.14..8.16 rows=1 width=26) (actual time=0.014..0.040 rows=150.00 loops=1)
    Index Cond: (order_date = '2024-01-15'::date)
    Index Searches: 1
@@ -329,7 +329,7 @@ VERBOSEオプションは、実行計画の追加情報を表示します。
 EXPLAIN VERBOSE SELECT name, age FROM users WHERE city = 'Tokyo';
 ```
 
-```
+```text
                             QUERY PLAN
 ------------------------------------------------------------------
  Seq Scan on public.users  (cost=0.00..199.00 rows=1697 width=13)
@@ -351,7 +351,7 @@ EXPLAIN (ANALYZE, BUFFERS)
 SELECT * FROM test_data WHERE value > 500;
 ```
 
-```
+```text
                                                   QUERY PLAN
 ---------------------------------------------------------------------------------------------------------------
  Seq Scan on test_data  (cost=0.00..189.00 rows=5021 width=17) (actual time=0.122..2.451 rows=5013.00 loops=1)
@@ -382,7 +382,7 @@ EXPLAIN (ANALYZE, BUFFERS)
 SELECT * FROM large_table WHERE id < 1000;
 ```
 
-```
+```text
                                                               QUERY PLAN
 ---------------------------------------------------------------------------------------------------------------------------------------
  Index Scan using large_table_pkey on large_table  (cost=0.29..38.07 rows=959 width=14) (actual time=0.022..0.183 rows=999.00 loops=1)
@@ -409,7 +409,7 @@ EXPLAIN (ANALYZE, WAL)
 UPDATE products SET price = price * 1.05;
 ```
 
-```
+```text
                                                    QUERY PLAN
 ----------------------------------------------------------------------------------------------------------------
  Update on products  (cost=0.00..2.50 rows=0 width=0) (actual time=0.522..0.523 rows=0.00 loops=1)
@@ -433,7 +433,7 @@ EXPLAIN (ANALYZE, WAL, BUFFERS)
 UPDATE wal_test SET data = md5(data);
 ```
 
-```
+```text
                                                       QUERY PLAN
 -----------------------------------------------------------------------------------------------------------------------
  Update on wal_test  (cost=0.00..217.35 rows=0 width=0) (actual time=48.481..48.482 rows=0.00 loops=1)
@@ -459,7 +459,7 @@ EXPLAIN (ANALYZE, TIMING FALSE)
 SELECT COUNT(*) FROM huge_table;
 ```
 
-```
+```text
                                             QUERY PLAN
 --------------------------------------------------------------------------------------------------
  Aggregate  (cost=18.50..18.51 rows=1 width=8) (actual rows=1.00 loops=1)
@@ -486,7 +486,7 @@ EXPLAIN (COSTS FALSE)
 SELECT * FROM users WHERE age > 30;
 ```
 
-```
+```text
       QUERY PLAN
 ----------------------
  Seq Scan on users
@@ -507,7 +507,7 @@ EXPLAIN (SETTINGS)
 SELECT * FROM orders JOIN customers ON orders.customer_id = customers.id;
 ```
 
-```
+```text
                                QUERY PLAN
 -------------------------------------------------------------------------
  Hash Join  (cost=16.25..36.90 rows=1000 width=69)
@@ -565,7 +565,7 @@ EXPLAIN (ANALYZE, SUMMARY)
 SELECT * FROM large_table;
 ```
 
-```
+```text
                                                       QUERY PLAN
 ----------------------------------------------------------------------------------------------------------------------
  Seq Scan on large_table  (cost=0.00..1541.00 rows=100000 width=14) (actual time=0.013..9.698 rows=100000.00 loops=1)
@@ -588,7 +588,7 @@ EXPLAIN (MEMORY)
 SELECT * FROM complex_view;
 ```
 
-```
+```text
                          QUERY PLAN
 -------------------------------------------------------------
  Seq Scan on users u  (cost=0.00..199.00 rows=9108 width=23)
@@ -609,7 +609,7 @@ EXPLAIN (ANALYZE, SERIALIZE TEXT)
 SELECT * FROM large_table;
 ```
 
-```
+```text
                                                   QUERY PLAN
 ---------------------------------------------------------------------------------------------------------------
  Seq Scan on large_table  (cost=0.00..189.00 rows=10000 width=18) (actual time=0.004..0.708 rows=10000.00 loops=1)
@@ -637,7 +637,7 @@ EXPLAIN (GENERIC_PLAN)
 SELECT * FROM orders WHERE customer_id = $1 AND order_date > $2;
 ```
 
-```
+```text
                        QUERY PLAN
 --------------------------------------------------------
  Seq Scan on orders  (cost=0.00..23.00 rows=1 width=27)
@@ -677,7 +677,7 @@ WHERE句でフィルタ条件がある場合、Filter行として表示されま
 EXPLAIN ANALYZE SELECT * FROM users WHERE age > 30;
 ```
 
-```
+```text
                                                 QUERY PLAN
 -----------------------------------------------------------------------------------------------------------
  Seq Scan on users  (cost=0.00..199.00 rows=8247 width=23) (actual time=0.254..2.636 rows=8247.00 loops=1)
@@ -701,7 +701,7 @@ EXPLAIN ANALYZE SELECT * FROM users WHERE age > 30;
 EXPLAIN ANALYZE SELECT * FROM users WHERE user_id = 123;
 ```
 
-```
+```text
                                                          QUERY PLAN
 -----------------------------------------------------------------------------------------------------------------------------
  Index Scan using users_user_id_idx on users  (cost=0.29..8.30 rows=1 width=27) (actual time=0.031..0.031 rows=1.00 loops=1)
@@ -741,7 +741,7 @@ PostgreSQL 18では、Index Scans行にインデックスルックアップの�
 EXPLAIN ANALYZE SELECT user_id FROM users WHERE user_id BETWEEN 100 AND 200;
 ```
 
-```
+```text
                                                              QUERY PLAN
 -------------------------------------------------------------------------------------------------------------------------------------
  Index Only Scan using users_user_id_idx on users  (cost=0.29..6.30 rows=101 width=4) (actual time=0.014..0.110 rows=101.00 loops=1)
@@ -762,7 +762,7 @@ PostgreSQLのMVCC（Multi-Version Concurrency Control）により、インデッ
 
 VACUUMを実行すると、Heap Fetchesが減少します。
 
-```
+```text
 -- VACUUM実行後
                                                               QUERY PLAN
 --------------------------------------------------------------------------------------------------------------------------------------
@@ -790,7 +790,7 @@ Heap Fetchesは、Visibility Mapで確認できず、実際にテーブルにア
 EXPLAIN ANALYZE SELECT * FROM users WHERE age BETWEEN 20 AND 30;
 ```
 
-```
+```text
                                                            QUERY PLAN
 --------------------------------------------------------------------------------------------------------------------------------
  Bitmap Heap Scan on users  (cost=26.22..199.47 rows=1750 width=27) (actual time=0.130..0.587 rows=1750.00 loops=1)
@@ -818,7 +818,7 @@ EXPLAIN ANALYZE SELECT * FROM users WHERE age BETWEEN 20 AND 30;
 EXPLAIN ANALYZE SELECT * FROM users WHERE age > 20 AND status = 'active';
 ```
 
-```
+```text
                                                             QUERY PLAN
 -----------------------------------------------------------------------------------------------------------------------------------
  Bitmap Heap Scan on users  (cost=42.04..253.90 rows=3301 width=35) (actual time=0.099..0.634 rows=3302.00 loops=1)
@@ -848,7 +848,7 @@ TID Scanは、行のタプルID（ctid）を直接指定して取得する方法
 EXPLAIN ANALYZE SELECT * FROM users WHERE ctid = '(0,102)';
 ```
 
-```
+```text
                                             QUERY PLAN
 ---------------------------------------------------------------------------------------------------
  Tid Scan on users  (cost=0.00..4.01 rows=1 width=35) (actual time=0.011..0.011 rows=1.00 loops=1)
@@ -867,7 +867,7 @@ VALUES Scanは、VALUES句から直接データを生成します。
 EXPLAIN ANALYZE SELECT * FROM (VALUES (1, 'Alice'), (2, 'Bob'), (3, 'Charlie')) AS t(id, name);
 ```
 
-```
+```text
                                                 QUERY PLAN
 -----------------------------------------------------------------------------------------------------------
  Values Scan on "*VALUES*"  (cost=0.00..0.04 rows=3 width=36) (actual time=0.014..0.015 rows=3.00 loops=1)
@@ -884,7 +884,7 @@ Function Scanは、セット返却関数からデータを取得します。
 EXPLAIN ANALYZE SELECT * FROM generate_series(1, 100);
 ```
 
-```
+```text
                                                      QUERY PLAN
 ---------------------------------------------------------------------------------------------------------------------
  Function Scan on generate_series  (cost=0.00..1.00 rows=100 width=4) (actual time=0.017..0.022 rows=100.00 loops=1)
@@ -902,7 +902,7 @@ EXPLAIN ANALYZE WITH active_users AS (
 SELECT * FROM active_users WHERE age > 30;
 ```
 
-```
+```text
                                                              QUERY PLAN
 -----------------------------------------------------------------------------------------------------------------------------------
  Bitmap Heap Scan on users  (cost=41.90..253.76 rows=2742 width=35) (actual time=0.107..0.636 rows=2744.00 loops=1)
@@ -943,7 +943,7 @@ WHERE c.city = 'Tokyo'
 GROUP BY c.name;
 ```
 
-```
+```text
                                                                      QUERY PLAN
 ----------------------------------------------------------------------------------------------------------------------------------------------------
  HashAggregate  (cost=198.56..199.44 rows=71 width=52) (actual time=1.263..1.280 rows=65.00 loops=1)
@@ -991,7 +991,7 @@ JOIN customers c ON o.customer_id = c.id
 GROUP BY c.name;
 ```
 
-```
+```text
                                                            QUERY PLAN
 --------------------------------------------------------------------------------------------------------------------------------
  HashAggregate  (cost=49.40..55.65 rows=500 width=52) (actual time=0.983..1.101 rows=438.00 loops=1)
@@ -1045,7 +1045,7 @@ JOIN customers c ON o.customer_id = c.id
 GROUP BY c.name;
 ```
 
-```
+```text
                                                                        QUERY PLAN
 --------------------------------------------------------------------------------------------------------------------------------------------------------
  HashAggregate  (cost=905.06..967.56 rows=5000 width=53) (actual time=14.043..15.897 rows=4327.00 loops=1)
@@ -1070,7 +1070,7 @@ GROUP BY c.name;
 
 ソート済みでない場合、Sortノードが追加されます。
 
-```
+```text
                                                                QUERY PLAN
 -----------------------------------------------------------------------------------------------------------------------------------------
  Merge Join  (cost=828.67..891.62 rows=198 width=21) (actual time=2.418..2.497 rows=189.00 loops=1)
@@ -1108,7 +1108,7 @@ SET enable_hashjoin = off;
 EXPLAIN SELECT * FROM orders o JOIN customers c ON o.customer_id = c.id;
 ```
 
-```
+```text
                                            QUERY PLAN
 -------------------------------------------------------------------------------------------------
  Merge Join  (cost=0.57..830.06 rows=10000 width=67)
@@ -1153,7 +1153,7 @@ LIMIT 10;
 EXPLAIN ANALYZE SELECT * FROM orders WHERE customer_id = 123;
 ```
 
-```
+```text
                                                 QUERY PLAN
 ----------------------------------------------------------------------------------------------------------
  Seq Scan on orders  (cost=0.00..1887.00 rows=99 width=18) (actual time=0.037..5.005 rows=104.00 loops=1)
@@ -1175,7 +1175,7 @@ CREATE INDEX orders_customer_idx ON orders(customer_id);
 EXPLAIN ANALYZE SELECT * FROM orders WHERE customer_id = 123;
 ```
 
-```
+```text
                                                             QUERY PLAN
 ----------------------------------------------------------------------------------------------------------------------------------
  Bitmap Heap Scan on orders  (cost=5.06..269.41 rows=99 width=18) (actual time=0.049..0.118 rows=104.00 loops=1)
@@ -1211,7 +1211,7 @@ CREATE INDEX orders_customer_date_idx ON orders(customer_id, order_date);
 EXPLAIN ANALYZE SELECT * FROM products WHERE category = 'electronics';
 ```
 
-```
+```text
                                                 QUERY PLAN
 -----------------------------------------------------------------------------------------------------------
  Seq Scan on products  (cost=0.00..99.74 rows=8 width=356) (actual time=0.012..1.251 rows=5100.00 loops=1)
@@ -1265,7 +1265,7 @@ work_memは、ソートやハッシュテーブルなどの作業用メモリで
 EXPLAIN ANALYZE SELECT * FROM large_table ORDER BY data;
 ```
 
-```
+```text
                                                        QUERY PLAN
 -------------------------------------------------------------------------------------------------------------------------
  Sort  (cost=848.39..873.39 rows=10000 width=37) (actual time=10.893..11.284 rows=10000.00 loops=1)

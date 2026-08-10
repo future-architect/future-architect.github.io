@@ -162,14 +162,14 @@ npm install -D @zeit/ncc
 
 npmのサイズを小さくするという目標を体現しているツールで、それ自身もTypeScript内臓だけど、インストールは一瞬で終わります。他への依存もなく、パッケージがとても小さい。
 
-```
+```console
 $ du -h
 9.8M	./node_modules/@zeit
 ```
 
 コマンド体系はGoを目指していて、ncc build [script]でビルドができます。ncc run [script]で実行ができます。
 
-```
+```console
 % npx ncc run -q test.ts
 ncc: Using typescript@3.7.5 (ncc built-in)
 hello world

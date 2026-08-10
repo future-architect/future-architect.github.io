@@ -114,7 +114,7 @@ func min(a, b int) int {
 
 - 出力結果
 
-```
+```text
 suffix: ana, match: an
 suffix: anana, match: an
 ```
@@ -170,7 +170,7 @@ type data struct {
 
 - 出力結果
 
-```
+```text
 index: 5, suffix: a
 index: 3, suffix: ana
 index: 1, suffix: anana

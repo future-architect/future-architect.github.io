@@ -36,7 +36,7 @@ Azure が提供している、大規模データを貯めて配信すること�
 Publisher からメッセージを受けて、 Subscriber(Consumer) へ配信する役割をします。
 Event Hubs 構成としては、以下階層構造となっています。
 
-```
+```text
 namespace
 └── event hub
 	└── partition
@@ -176,7 +176,7 @@ AMQP 利用時は、ポート 5671 と 5672 を開く必要があります。
 Azure Active Directory 利用と 共有アクセス署名-SAS(Shared Access Signatures) 利用の 2パターンを使用可能です。
 Connection String を払い出して接続する方式は、SAS 利用のパターンの理解です。
 
-```
+```text
 Endpoint=sb://<namespace>/;SharedAccessKeyName=<KeyName>;SharedAccessKey=<KeyValue>;EntityPath=<event hub>
 ```
 

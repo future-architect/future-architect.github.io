@@ -48,7 +48,7 @@ Airflow Breeze の環境を整備することで、Airflow が依存する外部
 
 `getopt` と `gstat` が必要なため、インストールします。
 
-```
+```sh
 brew install gnu-getopt coreutils
 ```
 

@@ -15,7 +15,7 @@ Flutterで環境を一度作ってしまえば、Android StudiからAndroidエ�
 
 出発点はこちらです。
 
-```
+```sh
 flutter create dgsample
 ```
 

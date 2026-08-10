@@ -496,7 +496,7 @@ func main() {
 
 ```
 
-```
+```console
 $ go run crud/main.go
 2021/07/28 08:42:07 driver.Tx(20461e97-29a3-4362-a077-1debb7aa7c96): started
 2021/07/28 08:42:07 Tx(20461e97-29a3-4362-a077-1debb7aa7c96).Query: query=INSERT INTO "companies" ("name") VALUES ($1) RETURNING "id" args=[companyA]

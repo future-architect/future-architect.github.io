@@ -125,7 +125,7 @@ httpプロキシを経由する場合やコンテキストルートを独自に�
 リバースプロキシでURLがエンコードされることがあり、下記のように設定変更が必要な場合があります。
 リバースプロキシがApacheの場合の例を記載します。
 
-```
+```text
 AllowEncodedSlashes NoDecode
 ProxyPass /gitlab http://gitlab.local:80/gitlab nocanon
 ```

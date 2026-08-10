@@ -146,7 +146,7 @@ export CLOUDFLARE_API_TOKEN=xxxxxxxxxxxxxxx
 
 任意の場所にCloudflareのTerraform管理用のディレクトリを作成します。これをgit管理とし、その配下のディレクトリ構造・ファイル構成は以下の形とします。
 
-```
+```text
 .
 ├── domains
 │   └── 920oj-net

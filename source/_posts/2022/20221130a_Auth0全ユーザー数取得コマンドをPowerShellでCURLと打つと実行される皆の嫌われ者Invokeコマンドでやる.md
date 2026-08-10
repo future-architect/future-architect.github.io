@@ -238,7 +238,7 @@ Retrieve details of users. It is possible to:
 
 **パラメータ**:include_totalsをオンにすると**APIのレスポンスにトータルを含められる**と書いています。
 
-```
+```text
 include_totals
 Return results inside an object that contains the total result count (true) or as a direct array of results (false, default).
 ```

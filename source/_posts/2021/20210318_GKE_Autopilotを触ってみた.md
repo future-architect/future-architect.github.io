@@ -109,7 +109,7 @@ Kuberntesを触ったことがない方でも、なんとなく雰囲気は掴�
 
 macでHomebrewを使っているならコマンド一発です。
 
-```
+```sh
 brew install kubectl
 ```
 
@@ -124,7 +124,7 @@ Kubernetesの操作はkubectlコマンドで行います。
 `gcloud auth login`だとエラーが出たので、その表示に従い下記のコマンドを実行。
 画面の指示に従いログイン完了まで行います。
 
-```
+```sh
 gcloud auth login --no-launch-browser
 ```
 
@@ -137,7 +137,7 @@ GCPのコンソール に戻ります。
 
 今回の場合、こんな感じ。実行すると、kubectlコマンドの対象クラスタがこのクラスタに切り替わってくれます。
 
-```
+```sh
 gcloud container clusters get-credentials autopilot-cluster-1 --region us-central1 --project high-tribute-307823
 ```
 
@@ -147,14 +147,14 @@ gcloud container clusters get-credentials autopilot-cluster-1 --region us-centra
 node1つが1つのVMであり、これまでのGKEだとGCEインスタンスを作成してノードとして利用していました。
 nodeの情報をみるには`kubectl get node`コマンドを使います。`-o wide`すると詳細情報含めて表示してくれます。
 
-```
+```sh
 kubectl get node -o wide
 ```
 
 実行結果
 Autopilotでは利用者側で管理することはないですが、nodeの情報を取得するのは通常通りできるようです。
 
-```
+```text
 NAME                                                 STATUS   ROLES    AGE   VERSION             INTERNAL-IP   EXTERNAL-IP    OS-IMAGE                             KERNEL-VERSION   CONTAINER-RUNTIME
 gk3-autopilot-cluster-1-default-pool-80d33c8f-xbzz   Ready    <none>   44m   v1.18.12-gke.1210   10.128.0.4    34.71.253.60   Container-Optimized OS from Google   5.4.49+          containerd://1.4.1
 gk3-autopilot-cluster-1-default-pool-da3faeda-70qd   Ready    <none>   44m   v1.18.12-gke.1210   10.128.0.5    34.66.97.220   Container-Optimized OS from Google   5.4.49+          containerd://1.4.1
@@ -173,7 +173,7 @@ Kubernetesを実運用する際には、マニフェストファイルと呼ば�
 
 こちらは[Kubernetesの公式](https://kubernetes.io/ja/docs/concepts/workloads/controllers/deployment/#creating-a-deployment)から拝借しています。
 
-```
+```yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -205,7 +205,7 @@ spec:
 次に、マニフェストファイルをもとに、Kubernetesリソースを作成します。
 `kubectl apply`コマンドを使います。`kubectl create`コマンドもありますが、マニフェストを更新した時などで想定外の挙動をすることがあるのでこちらが推奨です。
 
-```
+```text
 # -f {path}　で対象のマニフェストを指定する。
 kubectl apply -f deployment.yaml
 ```
@@ -221,7 +221,7 @@ GCPコンソールで、サイドメニューのワークロードを選択す�
 おもむろに`kubectl get node`します。なんと、nodeが増えていました。
 自動でリソースを拡充してくれているようです。これは期待できる。。。
 
-```
+```text
 NAME                                                 STATUS   ROLES    AGE     VERSION             INTERNAL-IP   EXTERNAL-IP     OS-IMAGE                             KERNEL-VERSION   CONTAINER-RUNTIME
 gk3-autopilot-cluster-1-default-pool-80d33c8f-03kr   Ready    <none>   3m53s   v1.18.12-gke.1210   10.128.0.8    35.224.63.159   Container-Optimized OS from Google   5.4.49+          containerd://1.4.1
 gk3-autopilot-cluster-1-default-pool-80d33c8f-xbzz   Ready    <none>   69m     v1.18.12-gke.1210   10.128.0.4    34.71.253.60    Container-Optimized OS from Google   5.4.49+          containerd://1.4.1
@@ -237,13 +237,13 @@ gk3-autopilot-cluster-1-default-pool-da3faeda-ndl1   Ready    <none>   3m49s   v
 
 ちなみに、`kubectl get pod`コマンドでもPodの情報をみることができます。
 
-```
+```sh
 kubectl get pod
 ```
 
 実行結果
 
-```
+```text
 NAME                                READY   STATUS    RESTARTS   AGE
 nginx-deployment-69c549b4bb-4r8hs   1/1     Running   0          26m
 nginx-deployment-69c549b4bb-68lww   1/1     Running   0          26m
@@ -257,7 +257,7 @@ LoadBalancer Serviceリソースを作ることで、GCPのロードバランサ
 
 まずはマニフェストファイルを作成します。`service.yaml`という名前で保存します。
 
-```
+```yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -278,19 +278,19 @@ spec:
 
 次に、マニフェストファイルをもとに、kubectlコマンドでリソースを作成します。
 
-```
+```sh
 kubectl apply -f service.yaml
 ```
 
 作成されたサービスの情報をみてみましょう。
 
-```
+```sh
 kubectl get service
 ```
 
 実行結果
 
-```
+```text
 NAME         TYPE           CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE
 kubernetes   ClusterIP      10.8.128.1     <none>        443/TCP        109m
 sample-lb    LoadBalancer   10.8.130.152   34.70.67.75   80:31465/TCP   88s
@@ -318,7 +318,7 @@ LoadBalancer Serviceを作成すると、コントロールプレーンでそれ
 
 次のようにして、`kubectl delete`コマンドで削除できます。特に、LoadBalancer Serviceの削除をサボると自動生成されたLoadBalancerが削除されないままになるので注意が必要です。
 
-```
+```sh
 kubectl delete -f deployment.yaml
 kubectl delete -f service.yaml
 ```

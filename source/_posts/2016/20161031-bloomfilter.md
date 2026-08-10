@@ -231,7 +231,7 @@ PLAN_TABLE_OUTPUT
 
 最後に、パーティション内のデータ件数を確認します。
 
-```
+```sql
 select to_char(a.TIME_ID,'YYYY') time_id_year,count(*)
 from sales a
 group by to_char(a.TIME_ID,'YYYY');

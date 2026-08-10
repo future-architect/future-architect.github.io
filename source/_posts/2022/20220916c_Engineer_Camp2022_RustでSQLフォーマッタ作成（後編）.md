@@ -75,7 +75,7 @@ pub(crate) struct Clause {
 
 `Clause`構造体は句(e.g., SELECT句、FROM句)に対応した構造体です。現状対応している構文に現れる句は、いずれも以下のような構造をしています。
 
-```
+```text
 Keyword
     Body
 ```

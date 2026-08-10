@@ -236,7 +236,7 @@ $ curl -s \
 
 webページ本文の情報は `hierarchy_lvl0` ～ `hierarchy_lvl6` 及び `content` 属性に入ります。これらの属性の利用イメージは [こちら](https://github.com/meilisearch/docs-scraper?tab=readme-ov-file#the-levels-) です。これらの属性値で検索するため、値がうまく入るように設定するのがキモです。これらの属性と設定は以下の通り対応します。
 
-```
+```text
 hierarchy_lvl0 ← selectors.lvl0
 hierarchy_lvl1 ← selectors.lvl1
 hierarchy_lvl2 ← selectors.lvl2

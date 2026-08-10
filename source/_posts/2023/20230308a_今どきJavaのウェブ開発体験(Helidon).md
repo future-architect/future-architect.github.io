@@ -77,7 +77,7 @@ $ helidon build
 
 出来上がったコードは、全部が1カ所にまとまっています。パッケージを細かく分けるとか、レイヤードアーキテクチャのレイヤーをパッケージとして分ける、というのはもう今時ではないみたいですね。
 
-```
+```text
 src/main/java/me/shibu/mp/quickstart
   GreetResource.java
   GreetingProvider.java
