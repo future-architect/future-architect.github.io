@@ -9,7 +9,7 @@ tags:
   - Googleカレンダー
   - TypeScript
 categories:
-  - DataScience
+  - AIDD
 series: "春の入門祭り2025"
 thumbnail: /images/2025/20250421a/thumbnail.png
 author: 市川裕也
