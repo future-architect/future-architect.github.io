@@ -41,8 +41,9 @@ function getQuarterlyCategoryData() {
     });
   });
 
-  // 2. サイトの全カテゴリを取得し、「合計記事数」で降順にソートする
-  const sortedCategoryObjects = this.site.categories.toArray().sort((a, b) => b.length - a.length);
+  // 2. サイトの全カテゴリを取得し、「合計記事数」で降順にソートする。
+  //    同点の決着が無いとビルドごとに並びが変わる
+  const sortedCategoryObjects = this.site.categories.toArray().sort((a, b) => b.length - a.length || (a.name < b.name ? -1 : 1));
   const sortedCategoryNames = sortedCategoryObjects.map(cat => cat.name);
 
   // 3. X軸のラベル（時間軸）を生成し、ソートする
@@ -113,20 +114,22 @@ hexo.extend.helper.register('category_colors', function() {
 // 指定年の月別 × カテゴリ別の投稿数 (#2171)
 hexo.extend.helper.register('get_monthly_category_data', function(year) {
   const byCat = new Map(); // カテゴリ -> 12ヶ月分の配列
-  const catTotal = new Map();
   this.site.posts.forEach(post => {
     if (String(post.date.year()) !== String(year)) return;
     const cat = post.categories.first();
     if (!cat) return;
     if (!byCat.has(cat.name)) byCat.set(cat.name, new Array(12).fill(0));
     byCat.get(cat.name)[post.date.month()]++;
-    catTotal.set(cat.name, (catTotal.get(cat.name) || 0) + 1);
   });
   const months = [];
   for (let m = 1; m <= 12; m++) months.push(`${m}月`);
-  const series = [...catTotal.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .map(([name]) => ({name, data: byCat.get(name)}));
+  // 並びはその年の多い順ではなく、全期間ページと同じサイト累計の多い順で
+  // 固定する。年ごとに入れ替わると、年を移動したとき凡例と積み上げの
+  // 色の位置が動いて比較しにくい (#2201)
+  const series = this.site.categories.toArray()
+    .sort((a, b) => b.length - a.length || (a.name < b.name ? -1 : 1))
+    .filter(c => byCat.has(c.name))
+    .map(c => ({name: c.name, data: byCat.get(c.name)}));
   return JSON.stringify({months, series});
 });
 
