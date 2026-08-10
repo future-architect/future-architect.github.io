@@ -28,13 +28,13 @@ lede: "作成したフォーマッタの実装について説明します。前�
 
 フォーマッタの実装にはRustを使用し、構文解析にはtree-sitter-sqlを使用しました。
 
-#### Rust
+### Rust
 
 <img src="/images/2022/20220916c/rustacean.png" alt="" width="400" height="266" loading="lazy">
 
 高速で、かつwasm-packなどのライブラリを用いてWebAssembly化できることから、様々なプラットフォームで動作するため、Rustを採用しました。
 
-#### [tree-sitter-sql](https://github.com/m-novikov/tree-sitter-sql)
+### [tree-sitter-sql](https://github.com/m-novikov/tree-sitter-sql)
 
 [tree-sitter](https://tree-sitter.github.io/tree-sitter/)で出力されたSQLパーサです。tree-sitterとは作成した文法ファイルからパーサを自動生成するパーサジェネレータの1つです。一般的なパーサライブラリは抽象構文木(AST)を出力するのに対して、tree-sitter-sqlは具象構文木(CST)を出力します。ASTが意味のない情報(例: コメントや多重括弧など)を保持しないのに対して、CSTはそのような情報も保持します。
 
@@ -62,7 +62,7 @@ pub(crate) enum Expr { /* ... */ }
 
 実装した構造体について、一部抜粋して説明します。
 
-#### Clause構造体
+### Clause構造体
 
 ```rust  Clause構造体
 // 句
@@ -93,7 +93,7 @@ SELECT /* キーワード */
 そのため、フィールドにはキーワードと本体(`Body`)を保持させています。
 詳細は割愛しますが、`Body`に後述する`AlignedExpr`を複数保持させることで、複数行の式の縦揃えを実現しています。
 
-#### AlignedExpr構造体
+### AlignedExpr構造体
 
 ```rust AlignedExpr
 // エイリアス式、演算式、行末コメントを含む式

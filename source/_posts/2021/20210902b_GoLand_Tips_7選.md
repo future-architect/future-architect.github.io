@@ -41,7 +41,7 @@ https://www.jetbrains.com/ja-jp/go/
 
 <img src="/images/2021/20210902b/gif2.gif" alt="gif2.gif" width="600" height="258" loading="lazy">
 
-#### 元の場所に戻る
+### 元の場所に戻る
 
 `⌘ + [`で1つ前のタイミングでカーソルがあった位置へ戻ることができます（連打も可能）
 

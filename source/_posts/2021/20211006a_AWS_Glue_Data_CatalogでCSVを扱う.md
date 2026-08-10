@@ -36,13 +36,13 @@ Glueといっても大きく下記の３種類、処理系をいれると4種類
 
 ## CSVを利用する上での困りごと
 
-#### 1. crawlerが利用できない
+### 1. crawlerが利用できない
 
 AWSが推奨する[ベストプラクティス](https://docs.aws.amazon.com/ja_jp/athena/latest/ug/glue-best-practices.html)では、「crawlerを利用することでデータをCatalog化し、多様や処理系で利用できる」とされていますが、’”’ダブルクォーテーションで囲まれたフィールドを持つCSV（TSVも同様）の場合、正しく読み込まれず（※）、AWS上の[ドキュメント](https://docs.aws.amazon.com/ja_jp/athena/latest/ug/csv-serde.html)でも対応が必要とされています。
 
 <img src="/images/2021/20211006a/名称未設定ファイル.drawio_(3).png" alt="クローラが利用できないイメージ図" width="689" height="209" loading="lazy">
 
-#### 2. テーブルのデータ型を全てStringに設定する必要がある
+### 2. テーブルのデータ型を全てStringに設定する必要がある
 
 crawlerを利用できないこともシステム運用上の困りごとになりますが、それ以上にデータ型に問題があります。
 
@@ -50,9 +50,9 @@ OpenCSVSerDeを利用したCatalogでは、データ型をStringに固定する�
 
 ## CSVへの対応方法
 
-#### 利用するCSVファイル
+### 利用するCSVファイル
 
-###### データ
+#### データ
 
 ```csv sample.csv
 "ID","NAME","FLG","NUM","DATE","DATE TIME"
@@ -61,7 +61,7 @@ OpenCSVSerDeを利用したCatalogでは、データ型をStringに固定する�
 "3","さしすせそ","1","100000000.00000000","2021-10-01","2021-10-03 20:30:13.271231"
 ```
 
-###### crawlerで読み込んだ直後の状態
+#### crawlerで読み込んだ直後の状態
 
 crawlerで読み込んだデータをAthenaより表示すると以下の状態となります。
 データが欠損して表示されている事がわかります。
@@ -71,7 +71,7 @@ crawlerで読み込んだデータをAthenaより表示すると以下の状態�
 定義的には一見正しく見えますが、前述の通り正しく動かない状態になります。
 <img src="/images/2021/20211006a/スクリーンショット_2021-10-05_8.44.23.png" alt="Athenaのメニューより見たテーブル定義" width="519" height="261" loading="lazy">
 
-#### 対応方法１：OpenCSVSerDeを利用する
+### 対応方法１：OpenCSVSerDeを利用する
 
 crawlerでCSVを読み込み、DDL化します。
 このDDLを修正ます。
@@ -126,7 +126,7 @@ TBLPROPERTIES (
 
 ---
 
-#### 対応方法２：crawlerのカスタム分類子（Grok）を利用する
+### 対応方法２：crawlerのカスタム分類子（Grok）を利用する
 
 正規表現を元にした、パーサーを自分で用意する形になります。
 詳細は、AWSをの[公式](https://docs.aws.amazon.com/ja_jp/glue/latest/dg/custom-classifier.html#classifier-builtin-patterns)を見るのが良いと思いますが、抜粋、要約すると、フィールド単位にマッピング定義を作る方法となります。
@@ -155,7 +155,7 @@ TBLPROPERTIES (
 - 画面の入力例
   - <img src="/images/2021/20211006a/スクリーンショット_2021-10-05_14.54.17.png" alt="Grok入力例" width="755" height="1120" loading="lazy">
 
-#### 対応方法３：CSVをparquestに変換して利用する
+### 対応方法３：CSVをparquestに変換して利用する
 
 システムとの親和性が最も高いparquestに変換後、crawlerでCatalog化します。
 parquestへの変換では、元データに何も手を入れない形にします。
@@ -182,15 +182,15 @@ s3.meta.client.upload_file('/tmp/sample.parquet', '${バケット}', 'work/sampl
 
 全ての成功を確認後、Athenaからデータを見てると、余計な一手間がいらずデータを参照でき、データ型もCatalogの範囲内でハンドリングされています。
 
-#### 実行結果
+### 実行結果
 
 <img src="/images/2021/20211006a/スクリーンショット_2021-10-05_18.59.15.png" alt="実行結果" width="1200" height="395" loading="lazy">
 
-#### データプレビュー
+### データプレビュー
 
 <img src="/images/2021/20211006a/スクリーンショット_2021-10-05_18.58.52.png" alt="データプレビュー" width="1200" height="209" loading="lazy">
 
-#### テーブル定義
+### テーブル定義
 
 <img src="/images/2021/20211006a/スクリーンショット_2021-10-05_18.58.58.png" alt="テーブル定義" width="384" height="212" loading="lazy">
 

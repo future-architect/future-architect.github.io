@@ -38,27 +38,27 @@ AWS Certified Security - Specialtyと比べると、他の試験では出題さ�
 
 下記の内容を一通り理解する必要があります。
 
-##### 複雑なネットワーキング
+### 複雑なネットワーキング
 
 * AWS Direct Connect(様々な前提条件、観点での設問が沢山出ます)
 * VPN
 * VPCピアリング
 * AWS Transit Gateway
 
-##### セキュアな通信
+### セキュアな通信
 
 * AWS WAF
 * 侵入防止システム (IPS)
 * DDoS 保護
 * VPCフローログ
 
-##### グローバル、低遅延なネットワーキング
+### グローバル、低遅延なネットワーキング
 
 * Amazon Route 53
 * Amazon CloudFront
 * Lambda@Edge
 
-##### ハイパフォーマンスコンピューティング
+### ハイパフォーマンスコンピューティング
 
 分散処理基板等の用途でEC2インスタンスを利用する際の下記のような前提知識が出題されます。
 
@@ -68,7 +68,7 @@ AWS Certified Security - Specialtyと比べると、他の試験では出題さ�
 * Elastic Network Interface
 * HVM AMI
 
-##### その他基礎知識
+### その他基礎知識
 
 * パブリックサブネット、プライベートサブネット
 * NACL、セキュリティグループ

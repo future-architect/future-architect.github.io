@@ -299,7 +299,7 @@ An internal error occurred
     └── server
 ```
 
-#### db.rsの実装
+### db.rsの実装
 
 今回はRustのO/RマッパとしてメジャーなDieselを使用するため、`cargo add`をします。
 DieselでPostgresSQLと日時を扱いたいので`--features "postgres chrono"`を引数としています。
@@ -432,7 +432,7 @@ pub fn update_last_checked_at(conn: &PgConnection, target_id: &i32) -> Ipv4Recor
 
 ```
 
-#### usecase.rsの実装
+### usecase.rsの実装
 
 GET、POSTメソッドで呼び出すロジックを記載しています。ここから`db.rs`にある関数を呼び出します。
 
@@ -479,7 +479,7 @@ pub fn post_ip4_address(ipv4_address: &str) -> Result<(), String> {
 }
 ```
 
-#### api.rsの実装
+### api.rsの実装
 
 リクエストをハンドリングする部分です。
 ※ファイル上部には生成されたコードがあるため、自分で記述したファイル下部のみ記載しています。
@@ -549,7 +549,7 @@ use regex::Regex;
 }
 ```
 
-#### ビルド
+### ビルド
 
 上記実装をして`cargo build`をすると不足しているcrateがあるはずです。以下のように追加します。
 

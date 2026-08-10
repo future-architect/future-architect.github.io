@@ -73,14 +73,14 @@ Embededed Swiftでは、以下のSwiftが提供する動的機能を制限する
 推奨: Embedded Swiftを試す前に、[Raspberry Pi公式のチュートリアル](https://datasheets.raspberrypi.com/pico/getting-started-with-pico.pdf)を参考にRaspberry Pi Pico WでLチカさせることをおすすめします。Embedded Swiftのドキュメンテーションでも、推奨されています。
 :::
 
-#### 実行環境
+### 実行環境
 
 - macOS: 15.4（24E248）
 - Swift: Apple Swift version 6.2-dev (LLVM 3f3fde0d5f85709, Swift 0c5fd6a3017961d)
 - MacBookPro 13-inch M1(2020)
 - Raspberry Pi Pico W
 
-#### 事前準備
+### 事前準備
 
 次のドキュメントに沿って事前準備行います。
 - [apple/swift-embedded-examples](https://github.com/apple/swift-embedded-examples/tree/main?tab=readme-ov-file#building-the-examples)

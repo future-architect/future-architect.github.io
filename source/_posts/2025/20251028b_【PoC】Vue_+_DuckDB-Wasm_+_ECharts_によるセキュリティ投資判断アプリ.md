@@ -74,20 +74,20 @@ lede: "経営者がセキュリティ投資判断をしやすくする簡易ダ�
 
 個人の即席アプリ開発ということで、技術選定を行いました。
 
-#### 要件
+### 要件
 
 - 素早い開発環境構築
 - 高速処理
 - インタラクティブなUI
 - 拡張性
 
-#### 仕様
+### 仕様
 
 - [Vite](https://vite.dev/guide/) + vue：高速な開発環境とUI構築
 - [DuckDB-WASM](https://duckdb.org/docs/stable/clients/wasm/overview)：ブラウザ内蔵の超高性能データベースエンジン
 - [Echarts](https://echarts.apache.org/examples/en/index.html)：インタラクティブ性の高い豊富なグラフ描画ライブラリ
 
-#### 関連用語
+### 関連用語
 
 - **SPA（Single Page Application）**
 処理の多くをサーバーと通信せずにブラウザ内（クライアントサイド）で完結させ、ページ遷移なしの高速なUIレスポンスを実現するアプリケーション全般を指します。

@@ -53,7 +53,7 @@ LSPがない場合は各IDEに対応した言語、仕様で言語サーバを�
 
 まずVSCodeの公式で配布されている[LSPのサンプルコード](https://github.com/microsoft/vscode-extension-samples/tree/main/lsp-sample)を動かしてみます。
 
-#### 1. サンプルリポジトリのダウンロード
+### 1. サンプルリポジトリのダウンロード
 
 まず適当なディレクトリで以下のコマンドを実行してVSCode拡張機能サンプルリポジトリをダウンロードします。
 
@@ -61,7 +61,7 @@ LSPがない場合は各IDEに対応した言語、仕様で言語サーバを�
 git clone https://github.com/microsoft/vscode-extension-samples.git
 ```
 
-#### 2. 必要なパッケージのインストール
+### 2. 必要なパッケージのインストール
 
 次にnpmを用いて必要なパッケージをインストールします。
 
@@ -72,7 +72,7 @@ git clone https://github.com/microsoft/vscode-extension-samples.git
 npm install
 ```
 
-#### 3. コンパイルと実行
+### 3. コンパイルと実行
 
 1. Ctrl+Shift+Bでクライアントとサーバをコンパイル
 1. Ctrl+Shift+Dで「実行とデバッグ」を開き、Launch Clientを選択する
@@ -87,7 +87,7 @@ npm install
     * 全て大文字、かつ長さが2以上の単語には警告が表示される<br>
 	<img src="/images/2022/20221124a/image_4.png" alt="" width="491" height="202" loading="lazy">
 
-#### 4. サーバのデバッグ
+### 4. サーバのデバッグ
 
 1. Launch Clientしている状態で「実行とデバッグ」のAttach to Serverを選択
 1. <font color="MediumSeaGreen">▷</font>をクリック

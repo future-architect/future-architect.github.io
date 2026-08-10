@@ -33,19 +33,19 @@ https://docs.aws.amazon.com/ja_jp/systems-manager/latest/userguide/session-manag
 
 ## 利用方法
 
-#### 手順1　サービスメニューからSystems Managerをクリック
+### 手順1　サービスメニューからSystems Managerをクリック
 
 <img src="/images/2019/20191009/1-a.png" style="border:solid 1px #000000"  loading="lazy">
 
-#### 手順2　セッションマネージャーをクリック
+### 手順2　セッションマネージャーをクリック
 
 <img src="/images/2019/20191009/2-a.png" style="border:solid 1px #000000"  loading="lazy">
 
-#### 手順3　セッションの開始をクリック
+### 手順3　セッションの開始をクリック
 
 <img src="/images/2019/20191009/3.png" style="border:solid 1px #000000"  loading="lazy">
 
-#### 手順4　似たような画面で同名のボタンですがインスタンスを選択してセッションの開始をクリック
+### 手順4　似たような画面で同名のボタンですがインスタンスを選択してセッションの開始をクリック
 
 <img src="/images/2019/20191009/5.png" style="border:solid 1px #000000"  loading="lazy">
 

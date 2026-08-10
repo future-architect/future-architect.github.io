@@ -124,9 +124,9 @@ func main() {
 }
 ```
 
-#### デバッグのセットアップ
+### デバッグのセットアップ
 
-##### `launch.json` の作成
+#### `launch.json` の作成
 
 1. VSCodeの `RUN` コンソール画面に移動
 2. `create a launch.json file.` を押下

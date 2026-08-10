@@ -15,7 +15,7 @@ lede: "「Airflow Breeze を使ったローカル環境構築」について発�
 
 <img src="/images/2021/20210706a/top.png" alt="" width="660" height="270" loading="lazy">
 
-### 概要
+## 概要
 
 [株式会社ナウキャスト](https://nowcast.co.jp/) さん主催の Airflow Only の勉強会「[Airflow Study #1](https://finatext.connpass.com/event/214704/?fbclid=IwAR2yQ_AcVB9lMctnT5M-J-AQvESqX86GMtBbn5k59unYFEMf1N0xs7pNz7g)」 にご招待いただき「Airflow Breeze を使ったローカル環境構築」について発表してきました。
 
@@ -23,7 +23,7 @@ lede: "「Airflow Breeze を使ったローカル環境構築」について発�
 
 https://finatext.connpass.com/event/214704/?fbclid=IwAR2yQ_AcVB9lMctnT5M-J-AQvESqX86GMtBbn5k59unYFEMf1N0xs7pNz7g
 
-### 資料
+## 資料
 
 <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vQyRMJEMqTOZWoeurqVJA6VSaqNTpqpBCjvA_r8SfGFuNjwLsQjMyt-VZDL5zLPm7Wwtzz5Zms5TPvO/embed?start=false&loop=false&delayms=3000" frameborder="0" width="95%" height="569" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
 
@@ -31,7 +31,7 @@ https://finatext.connpass.com/event/214704/?fbclid=IwAR2yQ_AcVB9lMctnT5M-J-AQvES
 
 ブログでは、テスト実行周りを手厚く記載しましたが、発表資料ではよりローカル開発環境として利用するにはという視点でまとめています。どちらも見ていただけると嬉しいです。
 
-### 感想
+## 感想
 
 Airflow 単独の勉強会で、参加人数が60人を超えるという予想外の盛況ぶりで正直驚きと共に、日本でも色々な会社さんで Airflow が活用されていることを伺い知ることができました。Airflow 1.10 系が EOL になり、Airflow 2.0 系が主流になるとのことで、今までの 1 系の情報をアップデートして、2.0 系での知見を今後はアウトプットしていきたいです。
 

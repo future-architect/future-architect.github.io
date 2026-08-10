@@ -84,7 +84,7 @@ MVVMパターンは、画面表示している項目（View）で使いたいデ
 
 ※シートからのタスク追加とタスクリストの変更は追加で実装が必要になり、主題からもそれていくので今回は割愛しました。
 
-#### View Model
+### View Model
 
 Googleが公表している[GoogleTasksのREST Resourceの形式](https://developers.google.com/tasks/reference/rest/v1/tasks?hl=ja)と、スプレッドシートに表示しているタスクリストの各列の項目を連携（擬似的に双方向バインディング）させました。
 
@@ -99,7 +99,7 @@ Googleが公表している[GoogleTasksのREST Resourceの形式](https://develo
 
 <img src="/images/2024/20240426b/構成図.png" alt="" width="842" height="552" loading="lazy">
 
-#### View
+### View
 
 スプレッドシートのタスクリスト表の各項目は以下の通り。
 
@@ -107,7 +107,7 @@ Googleが公表している[GoogleTasksのREST Resourceの形式](https://develo
 |:-----------|:------------|:------------|:------------|:------------|:------------|:------------|:------------|
 | abc... | マイリスト  | タスク名 | completed | 2024/04/01　 | 2024/04/01 | 2024/04/01 | 説明　|
 
-#### Model
+### Model
 
 GoogleTasksを利用。みなさんご存知のGoogleカレンダーとの連動だけでなく、最近はGoogleドキュメントやGmail、Googleチャットなどいろんなツールと連携して利用できて便利です。
 

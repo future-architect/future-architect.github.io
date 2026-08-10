@@ -38,7 +38,7 @@ Amazon EMRはソリューションアーキテクトでも出題されるサー�
 
 全体感としては主に下記のカテゴリが出題されます。
 
-#### データ分析
+### データ分析
 
 * AWS Lake Formation
 * Amazon EMR
@@ -46,18 +46,18 @@ Amazon EMRはソリューションアーキテクトでも出題されるサー�
 * Amazon Athena
 * AWS Batch
 
-#### データ収集
+### データ収集
 
 * Amazon Kinesis
 * Amazon Managed Streaming for Apache Kafka
 各ユースケースにおいてData StreamsとData Firehoseどちらが適切かを理解する事が特に重要です
 
-#### データ活用
+### データ活用
 
 * Amazon QuickSight
 * Amazon Elasticsearch Service
 
-#### データ保管
+### データ保管
 
 * Amazon Redshift
 * Amazon DynamoDB
@@ -66,12 +66,12 @@ Amazon EMRはソリューションアーキテクトでも出題されるサー�
 
 こちらもどのDBが適切か、はたまたS3を活用するのが適切かが様々なケースで問われます。
 
-#### データ移行
+### データ移行
 
 * AWS Database Migration Service (AWS DMS)
 * AWS Snowball
 
-#### データアナリティクスにおける基礎知識
+### データアナリティクスにおける基礎知識
 
 * Spark、Hive、Hadoop、HBaseなどApache製品への理解
 * Jupyter Notebook、Kibana、Logstashなどデータ分析で用いる各種プロダクトの理解

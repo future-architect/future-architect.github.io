@@ -54,7 +54,7 @@ GitHubを見る限りではGoのSDKが一番開発進んでいるのかなと思
 
 <img src="/images/2020/20200331/d1.png" loading="lazy">
 
-#### SDKバージョンについての補足
+### SDKバージョンについての補足
 
 現在v2は `work in progress` とのことで、今回は雰囲気を掴むためにLatest Releaseの `v1.1.2` のソースコードをいじってみます。
 

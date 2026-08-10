@@ -54,7 +54,7 @@ Auth0 Deploy CLIには、`dry-run`がサポートされておらず [^8]、**実
 
 Auth0環境の構成をAuth0 Deploy CLIで行う場合とTerraformで行う場合について、それぞれの強みと弱みについて調査しました。
 
-#### Auth0 Deploy CLIの強み
+### Auth0 Deploy CLIの強み
 
 - テナントの構成をまるっとエクスポートすることが出来ます。
   - rules,hooksもディレクトリに区切ってファイルを作成してくれるなど、親切です。
@@ -62,18 +62,18 @@ Auth0環境の構成をAuth0 Deploy CLIで行う場合とTerraformで行う場�
   - [auth0-deploy-cli/README.md:AUTH0_KEYWORD_REPLACE_MAPPINGS· auth0/auth0-deploy-cli](https://github.com/auth0/auth0-deploy-cli/blob/master/examples/yaml/README.md#environment-variables-and-auth0_keyword_replace_mappings)
   - そのため単一のyamlファイルを複数の環境に転用させて、検証環境と本番環境の設定の同一化が比較的容易に実現出来ます。
 
-#### Auth0 Deploy CLIの弱み
+### Auth0 Deploy CLIの弱み
 
 - Auth0専用のツールなのでこのツールの操作方法を独自で覚える必要があります。
 - `dry-run`機能が無いため**意図していない設定変更が生じうる**可能性があります [^9]。
 
-#### Terraformの強み
+### Terraformの強み
 
 - 独自ツール無しでTerraformだけで済むため、いままでAWSなどでTerraformを使っている場合、学習コストほぼ0で利用出来ます。
 - Terraformには`plan`と呼ばれる現在の状態と変更後の状態の差分を表示させる、`dry-run`に該当する機能があります。
 - Terraform workspaceを利用することで同一のリソースブロックを複数環境で利用することが可能になります。これにより検証環境と本番環境の設定の同一化が比較的容易に実現出来ます。
 
-#### Terraformの弱み
+### Terraformの弱み
 
 - 一括で全リソースをインポートする手段が無いためテナント設定が膨大の場合、Terraformで管理出来る状態に持っていくまでが大変です。
   - terraformのimportをAuth0プロパイダで利用する際、IDの特定方法が複雑([**後述**](#既存のauth0リソースをterraformに移行する際の流れ))です。

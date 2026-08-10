@@ -173,7 +173,7 @@ No violations found
 サンプルポリシーは、先ほど利用した [forseti-security/policy-library](https://github.com/forseti-security/policy-library/tree/master/samples) にあります。これらのyamlファイルを `POLICY_PATH` で定義した `/<your_work_space>/policy-library` の中の `policies/constraints/` 配下に配置すればOKです。Policy as codeが簡単に実現できます。
 以下に、サンプルから一部をピックアップしてご紹介します。セキュリティポリシーを定義できるほかにも、リソースの命名規則の制限ができたりするのは地味に嬉しいですね。
 
-##### ポリシー定義のサンプル
+### ポリシー定義のサンプル
 
 * 一般的な制限
   * リソースの命名規則(正規表現で指定)

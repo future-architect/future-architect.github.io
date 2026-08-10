@@ -385,7 +385,7 @@ func main() {
 
 ### ステータスコードのエラーハンドリング
 
-##### olivere/elasticの実装
+#### olivere/elasticの実装
 
 ```go
 package main
@@ -412,7 +412,7 @@ func main() {
 }
 ```
 
-##### opensearch-goの実装
+#### opensearch-goの実装
 
 ```go
 package main

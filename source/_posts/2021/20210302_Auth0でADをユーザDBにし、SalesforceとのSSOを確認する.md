@@ -31,7 +31,7 @@ lede: "エンタープライズの領域ではAD認証が多く利用されて�
 
 ## Auth0に「Active Directory / LDAP」Connectorを追加
 
-#### 設定追加
+### 設定追加
 
 `メニュー　-> Connections -> Enterprise -> Active Directory / LDAP -> CREATE CONNECTION`
 メニューからConnectorを追加し、今回は2つのオプションを有効にしています
@@ -45,19 +45,19 @@ Auth0はWindows統合認証（Kerberos認証）に対応しており、Windows�
 
 ## ADサーバーの設定
 
-#### Connector設定確認
+### Connector設定確認
 
 追加済みのConnectorより、「Setup」タブを確認し `Ticket Url` を控えておきます。
 **この`Ticket Url`がADサーバーの設定に必要となります。**
 
 <img src="/images/2021/20210302/スクリーンショット_2021-02-24_10.06.35.png"  style="border:solid 1px #000000" loading="lazy">
 
-#### ADサーバーにAD LDAP Connectorをインストール
+### ADサーバーにAD LDAP Connectorをインストール
 
 [インストール手順](https://auth0.com/docs/extensions/ad-ldap-connector/install-configure-ad-ldap-connector)を参考に、ウィザードに従ってインストールしてください。
 インストール時に前述の手順で控えた`Ticket Url`が必要になります。
 
-#### AD LDAP Connectorの設定を変更
+### AD LDAP Connectorの設定を変更
 
 Auht0らしく、AD LDAP Connectorの設定をスクリプトで変更できる部分があります。
 ProfileMapper（ADのユーザプロファイルとAuth0のユーザプロファイルのマッピング）のタブが、スクリプトで記載できる設定になっており、今回は詰められる情報を最大まで詰めてみました。
@@ -65,7 +65,7 @@ ProfileMapper（ADのユーザプロファイルとAuth0のユーザプロファ
 
 <img src="/images/2021/20210302/スクリーンショット_2020-09-11_17.49.51.png"  style="border:solid 1px #000000" loading="lazy">
 
-#### ADとAuth0が接続できていることを確認
+### ADとAuth0が接続できていることを確認
 
 Auth0側の`Connections`の表示が、`Offline`から`Online`に変化します。
 
@@ -73,22 +73,22 @@ Auth0側の`Connections`の表示が、`Offline`から`Online`に変化します
 
 ## Applicationsでログイン確認
 
-#### Applicationsの設定変更
+### Applicationsの設定変更
 
-#### Applicationsで`Connections`を有効化
+### Applicationsで`Connections`を有効化
 
 Applicationsの設定で`Connections`タブを開き、設定済みのADを有効化します。
 
 <img src="/images/2021/20210302/スクリーンショット_2021-02-22_18.59.51.png"  style="border:solid 1px #000000" loading="lazy">
 
-#### ログインを確認
+### ログインを確認
 
 サンプルアプリケーションを利用し、ログイン後のプロファイルを確認します。
 ここで、ADで設定済みのプロファイルが見えれば連携成功です。
 
 <img src="/images/2021/20210302/スクリーンショット_2020-09-11_15.33.11.png"  style="border:solid 1px #000000" loading="lazy">
 
-#### プロファイルが取れるか確認
+### プロファイルが取れるか確認
 
 Auth0のRulesでプロファイルの取得を入れ込み、結果を見ます。
 
@@ -104,11 +104,11 @@ ADサーバーのAD LDAP Connectorで指定した情報が取れていること�
 
 ## Salesforceの外部認証にAuth0を設定
 
-#### Salesforceのアカウント準備
+### Salesforceのアカウント準備
 
 SSOの前提として、Auth0のドメイン設定を行う必要があります。
 
-#### Salesforce側にADとSSOさせたいユーザを作成
+### Salesforce側にADとSSOさせたいユーザを作成
 
 **SalesforceのSSOでは、Salesforce側に事前にSSOしたユーザの登録が必要です。**
 また、SSOさせる場合にSalesforceのユーザとADのユーザで、SSOに利用する属性情報を一致させる必要があります。
@@ -117,12 +117,12 @@ SSOの前提として、Auth0のドメイン設定を行う必要があります
 
 <img src="/images/2021/20210302/スクリーンショット_2021-02-22_19.33.57.png"  style="border:solid 1px #000000" loading="lazy">
 
-#### Saleforceのドメイン設定
+### Saleforceのドメイン設定
 
 [SSOにはドメイン設定が必要になるため、設定しておきます。](https://help.salesforce.com/articleView?id=sf.domain_name_overview.htm&type=5)
 ここでAuth0に移ります。
 
-#### auth0にSalesforce用のSSO設定を追加
+### auth0にSalesforce用のSSO設定を追加
 
 `SSO Integrations`から`CREATE SSO INTEGRATION`を選択し、SalesforceのSSO設定を追加します
 Salesforce側のドメインが必要になるので、[Auth0の設定ページ](https://auth0.com/docs/protocols/saml-configuration-options/configure-salesforce-as-saml-identity-provider)を確認しつつSalesforceから情報を取得してください。
@@ -139,7 +139,7 @@ Salesforceのドメインに`https://`をつけたものが`Entity ID`になり�
 
 ここで、Salesforceに移ります。
 
-#### SaleforceのSSO設定追加
+### SaleforceのSSO設定追加
 
 メニューの`ID->シングルサインオン設定`を選択し、`新規`から接続設定を作ります。
 
@@ -151,7 +151,7 @@ Auth0のSalesforce設定ページにチュートリアルページあるので�
 
 <img src="/images/2021/20210302/スクリーンショット_2021-02-22_19.44.06.png"  style="border:solid 1px #000000" loading="lazy">
 
-#### SSOの確認
+### SSOの確認
 
 これでようやく設定完了です。
 追加したSSOのログインボタンが現れますので、自ドメインの認証画面からSSOユーザでログインしてください。
