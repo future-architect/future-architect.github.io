@@ -48,24 +48,15 @@ function getQuarterlyCategoryData() {
   // 3. X軸のラベル（時間軸）を生成し、ソートする
   const sortedTimeKeys = Array.from(dataByTimeBucket.keys()).sort();
 
-  // 4. EChartsのseries形式にデータを整形
+  // 4. カテゴリごとの時系列に整形する。チャートの種類（棒・折れ線）や色は
+  //    表示側の関心なので、ここでは名前とデータだけを返す
   const series = sortedCategoryObjects.map(category => {
     const catName = category.name;
     const data = sortedTimeKeys.map(timeKey => {
       const bucketData = dataByTimeBucket.get(timeKey);
       return bucketData.get(catName) || 0; // その期間に投稿がなければ0
     });
-
-    return {
-      name: catName,
-      type: 'line',
-      stack: 'Total',
-      areaStyle: {},
-      emphasis: {
-        focus: 'series'
-      },
-      data: data
-    };
+    return {name: catName, data: data};
   });
 
   return {
@@ -77,6 +68,67 @@ function getQuarterlyCategoryData() {
 
 // ヘルパーとして登録
 hexo.extend.helper.register('get_quarterly_category_data', getQuarterlyCategoryData);
+
+// カテゴリの色は名前で固定する (#2170)。系列順に既定パレットを当てると、
+// 著者やページごとにカテゴリの並びが違うため、同じ Programming が青だったり
+// 緑だったりして色が手がかりにならない。記事数の多いカテゴリから
+// 判別しやすい色を割り当てている（ECharts 既定9色 + 旧パレット7色）
+const CATEGORY_COLORS = {
+  'Programming': '#5470c6',
+  'DevOps': '#91cc75',
+  'Infrastructure': '#fac858',
+  'Frontend': '#ee6666',
+  'Culture': '#73c0de',
+  'DataScience': '#3ba272',
+  'DB': '#fc8452',
+  'Mobile': '#9a60b4',
+  'IoT': '#ea7ccc',
+  'Business': '#c23531',
+  'DataEngineering': '#2f4554',
+  'Security': '#61a0a8',
+  'Management': '#d48265',
+  'AIDD': '#749f83',
+  '認証認可': '#ca8622',
+  'VR': '#bda29a',
+};
+
+// 上の対応表に無いカテゴリが増設されたときの予備色。固定16色と被らない色を
+// 名前順に決定的に割り当てるので、ページごとに色が変わることはない。
+// ただし暫定なので、ビルドログの警告を見たら対応表に追記する
+const SPARE_COLORS = ['#6e7074', '#59c4e6', '#edafda', '#93b7e3', '#546570', '#c4ccd3'];
+
+hexo.extend.helper.register('category_colors', function() {
+  const colors = Object.assign({}, CATEGORY_COLORS);
+  let spare = 0;
+  this.site.categories.map(c => c.name).sort().forEach(name => {
+    if (!colors[name]) {
+      colors[name] = SPARE_COLORS[spare % SPARE_COLORS.length];
+      spare++;
+      hexo.log.warn(`CATEGORY_COLORS に「${name}」の色がありません。暫定色 ${colors[name]} で描画します。scripts/category_chart_helpers.js に追記してください`);
+    }
+  });
+  return JSON.stringify(colors);
+});
+
+// 指定年の月別 × カテゴリ別の投稿数 (#2171)
+hexo.extend.helper.register('get_monthly_category_data', function(year) {
+  const byCat = new Map(); // カテゴリ -> 12ヶ月分の配列
+  const catTotal = new Map();
+  this.site.posts.forEach(post => {
+    if (String(post.date.year()) !== String(year)) return;
+    const cat = post.categories.first();
+    if (!cat) return;
+    if (!byCat.has(cat.name)) byCat.set(cat.name, new Array(12).fill(0));
+    byCat.get(cat.name)[post.date.month()]++;
+    catTotal.set(cat.name, (catTotal.get(cat.name) || 0) + 1);
+  });
+  const months = [];
+  for (let m = 1; m <= 12; m++) months.push(`${m}月`);
+  const series = [...catTotal.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .map(([name]) => ({name, data: byCat.get(name)}));
+  return JSON.stringify({months, series});
+});
 
 /**
  * カテゴリ1つ分の統計。件数・寄稿者数（累計・直近1年）と
