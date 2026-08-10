@@ -22,7 +22,7 @@ TIGの伊藤真彦です。
 
 <img src="/images/2021/20210616a/image.png" alt="Vue.jsアイコン" width="400" height="400" loading="lazy">
 
-# はじめに
+## はじめに
 
 プログラムを実装する上で、コードの書き方は絶対的な正解のないトピックとして存在します。
 
@@ -38,7 +38,7 @@ TIGの伊藤真彦です。
 
 憧れのあの人と一緒に働いてみたい、そんな転職の応募はいつでもお待ちしていますよ...!)
 
-# Linterとは
+## Linterとは
 
 Linterとは、ソースコードを静的解析し、問題点を指摘、または自動でフォーマットするツールのことです。各種言語、プラットフォームで公式、ないしサードパーティー製のLinterが存在します。
 
@@ -46,7 +46,7 @@ Linterとは、ソースコードを静的解析し、問題点を指摘、ま�
 
 Vue.js、Reactなど、Node.jsを用いたアプリケーションの開発では、[ESLint](https://eslint.org/)が利用できます。
 
-# Linterの設定
+## Linterの設定
 
 Linterを導入すると、ルールに違反しているコードを検知することが可能になります。
 
@@ -60,7 +60,7 @@ Linterを導入すると、ルールに違反しているコードを検知す�
 
 本記事ではVue.jsのアプリケーションを高速で開発できる[Vue CLI](https://cli.vuejs.org/)が生成するデフォルト状態を比較する事で、詳細なLinterの設定がどのように行われているのかを比較検証してみます。
 
-# Vue CLIとは
+## Vue CLIとは
 
 連載初日の記事[Jest + TypeScript + Vue 3環境で Vue Testing Library(@testing-library／vue) を動かす](https://future-architect.github.io/articles/20210614b/)でも紹介がありましたね。
 
@@ -77,7 +77,7 @@ npm run serve
 
 最近バンドルに依存しない軽量なビルドツールとして[Vite](https://vitejs.dev/guide/)が台頭するなど動きがありましたが、私はまだまだVue CLIを愛用しています。
 
-# Vue CLIのアプリケーション生成結果を、Linterの設定別に比較してみた
+## Vue CLIのアプリケーション生成結果を、Linterの設定別に比較してみた
 
 前置きが長くなりましたが、Vue CLIでアプリケーションを自動生成する際に、詳細な設定を対話的に選択する事が可能です。
 
@@ -91,7 +91,7 @@ npm run serve
 
 <img src="/images/2021/20210616a/image_3.png" alt="Linter設定" width="642" height="529" loading="lazy">
 
-## ESLint with errpr prevention only
+### ESLint with errpr prevention only
 
 <img src="/images/2021/20210616a/image_4.png" alt="VueCLIではESLint設定" width="1200" height="506" loading="lazy">
 
@@ -135,7 +135,7 @@ module.exports = {
 
 このファイルによって、ESLintの設定が記述されています。
 
-## ESLint + Prettier
+### ESLint + Prettier
 
 <img src="/images/2021/20210616a/image_6.png" alt="" width="" height="" loading="lazy">
 
@@ -180,7 +180,7 @@ module.exports = {
 
 デフォルトの設定では1行に収めることができる文字数が80文字であるため、個人的には若干過剰に改行される傾向があるなと感じます。
 
-## ESLint + Airbnb config
+### ESLint + Airbnb config
 
 <img src="/images/2021/20210616a/image_9.png" alt="Airbnb Config" width="1200" height="399" loading="lazy">
 
@@ -238,7 +238,7 @@ max_line_length = 100
 
 eslintそのもののオプションは`eslint:recommended`と比較すると厳しめです。
 
-# 既存のプロジェクトにESLint、Prettierを追加する
+## 既存のプロジェクトにESLint、Prettierを追加する
 
 上記の設定変更で確認できた差分は、Vue CLIでアプリケーションを作り直さなくても追加可能です。
 またESLint、PrettierはVue.js以外のフレームワークを利用したプロジェクトでも利用可能です。
@@ -265,7 +265,7 @@ npm install @typescript-eslint/eslint-plugin
 古くなってしまった情報が検索結果に出てくる可能性がありますのでお気を付けください。
 具体的には[eslint-plugin-prettier](https://github.com/prettier/eslint-plugin-prettier)が非推奨となっています。
 
-# 個人的なお勧め
+## 個人的なお勧め
 
 HTML、CSSの細かいインデント修正等はツールが行ってくれるに越したことはないので、`ESLint + Prettier`を軸に、`.editorconfig`を適宜追加して好みの状態に持っていくのが良いかなと個人的には考えています。
 
@@ -302,7 +302,7 @@ HTML、CSSの細かいインデント修正等はツールが行ってくれる�
 
 前述しましたが、個人的には`printWidth`(1行に書くことができる文字数)は150文字くらいあっても良いかなと感じます。
 
-# まとめ
+## まとめ
 
 JavaScript、TypeScriptはESLintでフォーマットできる。HTML、CSSはPrettierでフォーマットできる。
 

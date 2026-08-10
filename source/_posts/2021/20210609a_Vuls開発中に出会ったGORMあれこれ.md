@@ -13,7 +13,7 @@ thumbnail: /images/2021/20210609a/thumbnail.png
 author: MaineK00n
 lede: "VulsでDebianをスキャンしたとき、CVE情報のベースをOVALからDebian Security Trackerへ変更しようというものです。実装してみると、変更前はスキャン時間の90％ileが3.37sだったのですが、変更後は11.15sまで増加してしまいました。"
 ---
-# Vuls開発中に出会ったGORMあれこれ
+## Vuls開発中に出会ったGORMあれこれ
 
 はじめまして、中岡([@MaineK00n](https://twitter.com/MaineK00n))と申します。
 
@@ -21,12 +21,12 @@ lede: "VulsでDebianをスキャンしたとき、CVE情報のベースをOVAL�
 
 [^1]: CSIG(CyberSecurityInnovationGroup)は、セキュリティ関連のコンサルティングや実装などを行っています
 
-# TL;DR
+## TL;DR
 
 - O/Rマッパ(Object-relational mapping)を触るときは発行されるクエリが意図したものか確認する
 - 推測するな、計測せよ
 
-# GORMを触る、Vuls#1202
+## GORMを触る、Vuls#1202
 
 本題に入る前に、Vulsのスキャンについて簡単に説明します。
 
@@ -48,12 +48,12 @@ Reference: [future-architect/vuls](https://github.com/future-architect/vuls)
 
 まず、私はGORM v2をサポートして、どれくらい改善するかを検証することにしました([gost#60](https://github.com/knqyf263/gost/pull/60))。
 
-## 期待のGORM v2、そのパフォーマンス
+### 期待のGORM v2、そのパフォーマンス
 
 GORMをv1からv2にしたところ、発行されるクエリは大きく変わっていませんでした。
 それでは、簡易なパフォーマンス測定をやってみることにします。
 
-### 検証(Package: expat)
+#### 検証(Package: expat)
 
 Debian busterのPackage: expatに関するunfixed/fixedなCVE情報を検索することを100回繰り返して、レスポンスにかかる時間の90％ileを取ってみました。
 
@@ -71,7 +71,7 @@ Debian busterのPackage: expatに関するunfixed/fixedなCVE情報を検索す�
 | GORM v1 |     46    | 0.023047 |
 | GORM v2 |     46    | 0.015868 |
 
-### 検証(Package: linux)
+#### 検証(Package: linux)
 
 もしかして発行されるクエリ数が少なすぎるかなと思って、Package: linuxに関するunfixed/fixedなCVE情報でも検証してみました。
 
@@ -94,7 +94,7 @@ Debian busterのPackage: expatに関するunfixed/fixedなCVE情報を検索す�
 ちなみに、GORM v2をサポートした状態でのVulsによるスキャン時間は11.5sから9.17sになりました。
 まだまだ高速化が必要です😢
 
-## さらなる高速化に向けて
+### さらなる高速化に向けて
 
 発行されるクエリのうち、ボトルネックになっていたのはJOIN句が入ったこのクエリです。
 
@@ -133,7 +133,7 @@ SELECT
 +     package_name = "expat";
 ```
 
-### 検証(クエリチューニング)
+#### 検証(クエリチューニング)
 
 先程と同様に、Debian busterにあるPackage: expat、linuxに関するunfixed/fixedなCVE情報を検索することを100回繰り返して、レスポンスにかかる時間の90％ileでクエリチューニングの効果を評価したいと思います。
 
@@ -186,7 +186,7 @@ SELECT
 |:-----------------------:|:-------:|:-------:|:----------------------:|
 |           3.37          |   11.5  |   9.17  |          2.49          |
 
-# Gost、Ubuntuサポートをする
+## Gost、Ubuntuサポートをする
 
 gostはUbuntuをサポートしていなかったので(TODOにはあった)、ついでと思ってUbuntuのサポートをしました([gost#62](https://github.com/knqyf263/gost/pull/62))。
 
@@ -208,7 +208,7 @@ gostはUbuntuをサポートしていなかったので(TODOにはあった)、�
 
 約48倍も速くなった要因は、スキャン先にインストールされているパッケージ数がDebianの場合よりも多く、GORM v2にアップデートすることによるパフォーマンスの向上が顕著に現れたと考えています。
 
-## GORM v1とGORM v2におけるPreloadの挙動
+### GORM v1とGORM v2におけるPreloadの挙動
 
 さて、GORM v1で実装していて、テストをしていると、Debianの場合はRDBとRedisでレスポンスを比較して、差分は出ないのですが、UbuntuではあるパッケージにGETリクエストを投げたときのレスポンスがRDBとRedisで異なることに気が付きました。
 
@@ -299,7 +299,7 @@ AND (
     );
 ```
 
-# まとめ
+## まとめ
 
 自戒の念を込めて。
 

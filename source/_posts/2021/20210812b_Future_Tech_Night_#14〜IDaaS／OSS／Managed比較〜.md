@@ -17,7 +17,7 @@ lede: "2021年7月21日にFuture Tech Night #14～認証認可（IDaaS）勉強�
 
 <img src="/images/2021/20210812b/key-2114046_1280.jpg" alt="" title="Arek SochaによるPixabayからの画像" width="640" height="408" loading="lazy">
 
-# はじめに
+## はじめに
 
 Technology Innovation Group所属の山田です。2021年7月21日に [Future Tech Night #14～認証認可（IDaaS）勉強会～](https://future.connpass.com/event/218520/)で発表させてもらいました。
 
@@ -27,15 +27,15 @@ Technology Innovation Group所属の山田です。2021年7月21日に [Future T
 
 * [Future Tech Night #14「生体認証・デバイス認証を活用するパスワードレスな認証規格「WebAuthn」を体験！」](/articles/20210811b/)
 
-# 資料
+## 資料
 
 発表資料はこちらです。
 
 <script async class="speakerdeck-embed" data-id="a6797af79a054b808d099e7f53f1d430" data-ratio="1.77777777777778" src="//speakerdeck.com/assets/embed.js"></script>
 
-# 概要
+## 概要
 
-### ハンズオン
+#### ハンズオン
 
 全てのプロダクトをまっさらな状態からハンズオンし、要した時間と、利用できるまでの工程をまとめてみました。
 アプリケーションはVueで統一しています。
@@ -49,14 +49,14 @@ keycloakの初期設定、vueを利用したハンズオン
 * Cognito
 Cognitoの初期設定、Amplify＋Vueを利用したハンズオン、hosted UI＋Vueを利用したハンズオン
 
-### 比較
+#### 比較
 
 * プラン
 HPに掲載されている内容で、プランと価格を比較
 * 機能
 各プロダクトのダッシュボード画面、トップレベルメニューまでの機能比較
 
-# 当日頂いたQA
+## 当日頂いたQA
 
 時間の関係で頂いたQAに返答できなかったため、改めてこの場で返答させて頂きます。
 
@@ -83,7 +83,7 @@ Customize性（Rules/Hooks）、SDKの充実度などはAuth0が有利に見え�
 **A.** プロジェクトによって、優先すべき内容が異なるため、決まった選定基準はありません。
 基本的にはプロジェクト単位に定められた機能、非機能の要件で選定軸を作り、第三者レビューも通した上で採用プロダクトを決めています。
 
-# 最後に
+## 最後に
 
 次の機会があれば、追加で他のプロダクトも比較してみたいです。
 

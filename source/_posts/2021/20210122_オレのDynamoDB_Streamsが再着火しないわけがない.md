@@ -16,7 +16,7 @@ lede: "DynamoDB Streamsは、DynamoDBに対する項目の追加、変更、削�
 ---
 
 
-# はじめに
+## はじめに
 
 こんにちは、TIG DXユニット真野です。
 
@@ -30,7 +30,7 @@ lede: "DynamoDB Streamsは、DynamoDBに対する項目の追加、変更、削�
 
 興味がある方向けに説明を続けます。
 
-## DynamoDB Streamsとは
+### DynamoDB Streamsとは
 
 <img src="/images/2021/20210122/1_isSK76wQioKx8k3dXrDrZA.png" loading="lazy">
 
@@ -40,7 +40,7 @@ DynamoDB Streamsは、DynamoDBに対する項目の追加、変更、削除を�
 
 この手のAWSサービスに珍しくAt Least Onceだったり、順序制御がされていたりと何かと助かるサービスです。ストリームレコードは 24 時間後に自動的に削除されるので、ストリームのコンシューマ側のアプリの処理が追いつかない場合はデータロストする可能性があるので注意すべき、ってところが見落としやすいポイントでしょうか。
 
-## DynamoDB Streamsをリラン（再実行）したい時
+### DynamoDB Streamsをリラン（再実行）したい時
 
 DynamoDB StreamsはAWSのサービスだと珍しく `Exactly Once`  [^1] の実行保証で、通常は後続にLambdaを呼び出します。
 
@@ -54,7 +54,7 @@ DynamoDB StreamsはKinesis Data Streamsのように、ストリームの開始�
 
 そのため、ある日時から再度DynamoDB Streamsを再実行したい場合は、自前のスクリプトで対応する必要があります。
 
-## イベントが再着火しない
+### イベントが再着火しない
 
 しかし、以下1~2のようなスクリプトを作っても上手くDynamoDB Streamsが起動せず、後続のLambdaが動いてくれませんでした😭
 
@@ -63,7 +63,7 @@ DynamoDB StreamsはKinesis Data Streamsのように、ストリームの開始�
 
 ScanもPutも正しく成功しているのでなんでだろうって思ってましたが、ドキュメントを見返すと答えが出ていました。
 
-## 解決策
+### 解決策
 
 原因はドキュメントに書いてあるとおり、そのままでした。
 
@@ -181,13 +181,13 @@ export DynamoTable=<Hash Key Value fo Your Table>
 go run main.go
 ```
 
-## 注意
+### 注意
 
 DynamoDB StreamsからLambdaにわたす項目には、編集前の`OldImage`と 編集後の`NewImage` が存在します。
 
 今回のリラン方法だと、OldImageは初回実行時と差分が生じるので、OldImageを利用したLambdaのリランは上手く行えません。DynamoDB Streamsで渡される項目については、Goであれば https://github.com/aws/aws-lambda-go/blob/master/events/dynamodb.go#L78 あたりを確認ください。
 
-## 指定した日付のみをリランしたい場合のインデックス設計
+### 指定した日付のみをリランしたい場合のインデックス設計
 
 ある日付からといった指定がすでにハッシュキー・ソートキーの構造で可能であれば良いですが、そうでない限りはGSIでcreated_ymdといった日付を示す項目をもたせることが多いのではないでしょうか？
 
@@ -195,7 +195,7 @@ DynamoDB StreamsからLambdaにわたす項目には、編集前の`OldImage`と
 
 DynamoDB Streamsを利用したシステム設計を行う場合は、リランのしやすさも意識して、予めGSIを追加しておくのも良いかも知れません（費用とのトレードオフになりますが、いざという時に構えておくと良いかなと思います）
 
-## まとめ
+### まとめ
 
 * DynamoDB Streamsを同じデータで再実行させたい場合は、何かしらの項目を**編集して**再度Putする必要がある
 * リランのしやすさも設計時に織り込んでおき、必要に応じてGSIに日付項目などを追加しておくと良い

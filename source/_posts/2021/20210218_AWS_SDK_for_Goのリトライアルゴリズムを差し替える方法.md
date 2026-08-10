@@ -13,11 +13,11 @@ thumbnail: /images/2021/20210218/thumbnail.png
 author: 辻大志郎
 lede: "AWS SDK for Goを使ってAWSのAPIをコールする場合のリトライアルゴリズムを差し替える方法を紹介します。"
 ---
-# はじめに
+## はじめに
 
 本記事では[AWS SDK for Go](https://github.com/aws/aws-sdk-go)を使ってAWSのAPIをコールする場合のリトライアルゴリズムを差し替える方法を紹介します。
 
-# `AWS SDK for Go` のリトライ
+## `AWS SDK for Go` のリトライ
 
 <img src="/images/2021/20210218/awsgo.png" class="img-middle-size" loading="lazy">
 
@@ -95,7 +95,7 @@ func (d DefaultRetryer) RetryRules(r *request.Request) time.Duration {
 
 https://github.com/aws/aws-sdk-go/blob/d8a5a9febe5602f134648c18e9f83546284cda35/aws/client/default_retryer.go#L77-L123
 
-### デフォルトの設定
+#### デフォルトの設定
 
 デフォルトのリトライの設定は以下のようになっています。
 
@@ -109,11 +109,11 @@ https://github.com/aws/aws-sdk-go/blob/d8a5a9febe5602f134648c18e9f83546284cda35/
 
  [^3]: リトライスロットリングが何かという説明は[Introducing Retry Throttling](https://aws.amazon.com/jp/blogs/developer/introducing-retry-throttling/)や[スロットリングとの付き合い方](/articles/20200121/)を参照
 
-# `RetryRules` を差し替える
+## `RetryRules` を差し替える
 
 基本的にはSDKが提供するデフォルトのリトライを実施することで問題ないでしょう。差し替えたくなるケースの1つは、リトライ回数を増やしてリトライエラーを発生させたくないケースです。(ただし、リトライ回数を増やすことでリトライエラーを速やかに解消できる場合に限ります。)リトライ回数が増えると待ち時間が大きくなり、デフォルトの設定の場合最大で300秒です。特定のケースではなるべく早くリトライを試行したい場合があるでしょう。このような場合にリトライアルゴリズムを差し替える方法が役に立ちます。
 
-## 差し替える方法
+### 差し替える方法
 
 `Config` の `Retryer` フィールドに値をセットすることで差し替えることができます。
 

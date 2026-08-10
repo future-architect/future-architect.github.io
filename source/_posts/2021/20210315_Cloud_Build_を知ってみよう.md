@@ -14,7 +14,7 @@ thumbnail: /images/2021/20210315/thumbnail.png
 author: 前原応光
 lede: "ゆるふわエンジニアの前原です。本記事では、ビルド周りをよしなにやってくれるCloud Build について紹介したいと思います。"
 ---
-# はじめに
+## はじめに
 
 こんにちは、ゆるふわエンジニアの前原です。
 
@@ -22,7 +22,7 @@ lede: "ゆるふわエンジニアの前原です。本記事では、ビルド�
 
 本記事では、ビルド周りをよしなにやってくれるCloud Build について紹介したいと思います。
 
-# CI/CD ツールの選択
+## CI/CD ツールの選択
 
 CI/CD 環境作るときに何を使うか迷う時があると思うんですよね（これに限らずですが）
 
@@ -46,20 +46,20 @@ CI/CD 環境作るときに何を使うか迷う時があると思うんです�
 
 例えば、GCP を利用していてCircleCI などの他サービスを利用する場合は、サービスアカウントの発行や、キーの管理などが必要となります。個人的には、ノックアウト要件がない限りは、クラウドサービスに寄せて良いと思っています。
 
-## Cloud Build とは
+### Cloud Build とは
 
 Cloud Build は、GCP が提供するビルドを行うサービスです。
 
 様々なサービスからソースコードを取得し、ビルドを行い、アーティファクトを生成します。
 
-# 構成について
+## 構成について
 
 以下の図のようにCloud Build は、ソース、ビルド、デプロイから構成されています。
 ソースやデプロイは、例として記載しています。
 
 <img src="/images/2021/20210315/image.png" loading="lazy">
 
-## ソース
+### ソース
 
 例えば、ソースは、以下から選択することが可能です。
 
@@ -69,7 +69,7 @@ Cloud Build は、GCP が提供するビルドを行うサービスです。
 * Bitbucket + Cloud Source Repositories
 * GitHub + Cloud Source Repositories
 
-## ビルド
+### ビルド
 
 ビルドは、ユーザが自由にビルドステップを作成して実行することも可能ですし、Cloud Build やコミュニティが提供するビルドステップを利用できます。
 
@@ -78,7 +78,7 @@ Cloud Build は、GCP が提供するビルドを行うサービスです。
 
 ビルドの構成ファイルは、YAML またはJSON で記述できます。
 
-### ビルドステップ
+#### ビルドステップ
 
 ビルドステップは、Cloud Build に実行させたいアクションを定義します。
 構成ファイル名は、デフォルト`cloudbuild.yaml`ですが、ビルドコマンド実行時にオプション`-config`で任意のファイル名を指定することも可能です。
@@ -104,7 +104,7 @@ steps:
 
 他のフィールドを知りたい場合は、[ビルド構成ファイルの構造](https://cloud.google.com/build/docs/build-config?hl=ja#structure_of_a_build_config_file)を参照してください。
 
-### 高速ビルドの実現
+#### 高速ビルドの実現
 
 Cloud Build は、キャッシュ機能を備えています。
 ちなみに、AWS のCode Build にもローカルキャッシュ、S3 キャッシュがありますね。
@@ -127,7 +127,7 @@ steps:
 * --cache=true: Kaniko キャッシュの有効化
 * --cache-ttl=XXh: キャッシュの有効期間の設定
 
-### Docker Hub のRate Limit の回避
+#### Docker Hub のRate Limit の回避
 
 ビルドする際に、Docker Hub のRate Limit に引っかかったことはありますか？
 
@@ -141,7 +141,7 @@ Code Build が利用しているIP = 不特定多数の人が利用している�
 * 有料のDocker Hub にアップグレード
 * Container Registry への切り替え
 
-#### 有料のDocker Hub にアップグレード
+##### 有料のDocker Hub にアップグレード
 
 主なやることをザックリ記載すると以下です。
 
@@ -149,7 +149,7 @@ Code Build が利用しているIP = 不特定多数の人が利用している�
 * Docker Hub にログインするための認証情報をSecret Manger に保存
 * ビルド構成ファイルにDocker Hub へのログインステップを記述
 
-#### Container Registry への切り替え
+##### Container Registry への切り替え
 
 以下を参考にDocker Hub からContainer Registry に移行する必要があります。
 個人的には、移行コストなどや運用コストを考えるとDocker Hub のアップグレードが良いと思ってます。
@@ -158,7 +158,7 @@ Code Build が利用しているIP = 不特定多数の人が利用している�
 
 Rate Limit に困っている場合は、どちらがベストな対応かを検討し、導入してみてはいかがでしょうか。
 
-## デプロイ
+### デプロイ
 
 Cloud Build は、以下のサービスに対してデプロイを行うことができます。
 
@@ -168,14 +168,14 @@ Cloud Build は、以下のサービスに対してデプロイを行うこと�
 * [Cloud Functions](https://cloud.google.com/build/docs/deploying-builds/deploy-functions?hl=ja)
 * [Firebase](https://cloud.google.com/build/docs/deploying-builds/deploy-firebase?hl=ja)
 
-## 構成パターン
+### 構成パターン
 
 ここではGKE へのデプロイをベースに以下の２つのパターンを例に紹介します。
 
 * CIOps パターン
 * GitOpsパターン
 
-### CIOps パターン
+#### CIOps パターン
 
 Cloud Build のトリガは、GitHub トリガによる自動実行で行われます。
 
@@ -183,7 +183,7 @@ Cloud Build は、GitHub からソースを取得し、ビルドを実行し、�
 
 <img src="/images/2021/20210315/image_2.png" loading="lazy">
 
-### GitOps パターン
+#### GitOps パターン
 
 CIOps と同様にビルドを実行し、Container Registry にコンテナイメージにPush するところは同様の流れです。アプリのリポジトリの変更を検知して、マニフェストリポジトリにプルリクを行います。
 
@@ -191,7 +191,7 @@ Argo CD は、ポーリングもしくはWebhook により、反映を行いま�
 
 <img src="/images/2021/20210315/image_3.png" loading="lazy">
 
-## さいごに
+### さいごに
 
 いかがでしたでしょうか？
 

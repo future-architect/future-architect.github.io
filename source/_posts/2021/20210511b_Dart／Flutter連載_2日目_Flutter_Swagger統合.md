@@ -15,7 +15,7 @@ thumbnail: /images/2021/20210511b/thumbnail.png
 author: 宮崎将太
 lede: "突然ですがみなさん、Swagger使いたいですよね。"
 ---
-# はじめに
+## はじめに
 
 [Dart/Flutter連載](/articles/20210510a/)の2記事目です。
 
@@ -25,7 +25,7 @@ lede: "突然ですがみなさん、Swagger使いたいですよね。"
 
 たまたま Flutter+Rails でアプリケーション構築をする機会があったので、今回Flutterのみに着目してSwagger(OpenAPISpec)を使用する方法をコード付きで解説していきます。(Railsは需要があったら書こうと思いますので、SNSでリアクションもらえるとです！ )
 
-# Swaggerとは？
+## Swaggerとは？
 
 Swagger(OpenAPISpec)とはREST API仕様をyamlやjsonベースで定義できるフォーマットを定めたツールで、定義書を書くとAPI仕様書やサーバ、クライアントコードを生成できちゃう優れものです。
 
@@ -35,7 +35,7 @@ Swaggerの詳しい説明は、敬愛する武田さんが以前記載してく�
 
 https://future-architect.github.io/articles/20191008/
 
-# 0からクライアントコード実装までやってみる
+## 0からクライアントコード実装までやってみる
 
 百聞は一見に如かず。
 
@@ -50,7 +50,7 @@ https://future-architect.github.io/articles/20191008/
 * Dart: 2.12.2
 * Swagger: 2.0
 
-## openapi-generatorインストール
+### openapi-generatorインストール
 
 後ほどSwaggerからコードを生成するので、まずは生成ツールである`openapi-generator`をインストールします。
 
@@ -63,7 +63,7 @@ brew install openapi-generator
 その他の形式については下記参考に導入してください。
 https://openapi-generator.tech/docs/installation/
 
-## Flutterプロジェクト作成
+### Flutterプロジェクト作成
 
 ツール導入が完了したので、プロジェクトを作成。
 `flutter_swagger`という名称でプロジェクトを作成します。
@@ -80,7 +80,7 @@ flutter create flutter_swagger
 
 <img src="/images/2021/20210511b/image.png" alt="ディレクトリ構成" width="580" height="758" loading="lazy">
 
-## swagger.yaml配置
+### swagger.yaml配置
 
 プロジェクト作成が完了したので、プロジェクトルートに`swagger.yaml`を作成します。
 swaggerはヘルスチェックに対して200OKを返すのみの簡単なもの。
@@ -118,7 +118,7 @@ definitions:
 
 ```
 
-## APIクライアントコード生成
+### APIクライアントコード生成
 
 `swagger.yaml`の配置が終わったので`openapi-generator`でAPIクライアントコードを生成します。
 
@@ -150,7 +150,7 @@ openapi-generator generate -i ./swagger.yaml -g dart -o ./client
 * `lib/model/xxx.dart`: swaggerの`definition`ディレクティブで定義するAPIリクエスト/レスポンスがモデルクラスとして生成されます。
 * `lib/api_client.dart`: APIクライアントが定義されます。
 
-## openapiパッケージの導入
+### openapiパッケージの導入
 
 生成されたコードは`openapi`という名称のパッケージになっているので、プロジェクトルートの`pubspec.yaml`にて依存定義を記載します。
 
@@ -171,7 +171,7 @@ dependencies:
     path: ./client/
 ```
 
-## APIリクエスト実行
+### APIリクエスト実行
 
 ここまででようやくAPIリクエストを実行する準備が整いました。
 
@@ -214,7 +214,7 @@ dependencies:
   （3）のメソッドではHTTPヘッダ情報が取得できなかったり、HTTPステータスが400以上の場合には例外をthrowしてしまうので、この挙動が嫌な場合は`${パス名+HTTPメッソド名}WithHttpInfo`をcallします（例の場合は`healthGetWithHttpInfo`）。
   ただし、返り値は`http/http.dart`パッケージの`Response`インスタンスとなるので、レスポンスボディのモデルバインドは自前で実装する必要がある点に注意してください。生成コード的には（3）の中で（4）をcallするような構造になっています。
 
-# さいごに
+## さいごに
 
 お手軽にSwaggerからAPIクライアントコードの生成&実装ができました。
 
@@ -222,7 +222,7 @@ dependencies:
 
 Flutterに関しては他にもいろいろ知見を深めることができたので、別の機会があれば記事にできればと。m(__)m
 
-# おまけ
+## おまけ
 
 需要があるかわかりませんが、サンプルとして載せたSwaggerから生成されたコードを載せておきます。
 コード見てみたいけど手元に環境がない、なんて方の参考になればと。

@@ -13,7 +13,7 @@ author: 木村拓海
 lede: "「オンコール通知も全自動で! AWS + Datadog + PagerDuty で作る運用監視基盤」 というテーマでお話しました。監視 に関連するOSSやSaaSが乱立する昨今、Futureではとある案件で DatadogとPagerDutyをフル活用した運用監視基盤を一から構築しました。運用監視基盤に求められた要件とその設計、システムからDatadog/PagerDutyへの具体的な連携アーキテクチャ、運用してみての嬉しみ/辛み等を惜しみなくお話しました。"
 ---
 
-# はじめに
+## はじめに
 
 こんにちは、TIGの木村です。先日2021/4/21(水)に [Future Tech Night #9 ～運用で後悔しないためのAWS設計術～](https://future.connpass.com/event/209778/) を開催しました。
 
@@ -21,13 +21,13 @@ lede: "「オンコール通知も全自動で! AWS + Datadog + PagerDuty で作
 
 同イベントにて発表された村瀬さんの [レポートはこちら](/articles/20210527a/) になります。
 
-# 概要
+## 概要
 
 監視 に関連するOSSやSaaSが乱立する昨今、Futureではとある案件で DatadogとPagerDutyをフル活用した運用監視基盤を一から構築しました。運用監視基盤に求められた要件とその設計、システム(AWS)からDatadog/PagerDutyへの具体的な連携アーキテクチャ、運用してみての嬉しみ/辛み等を惜しみなくお話しました。
 
 その中から発表内容を一部抜粋して紹介いたします。
 
-## 監視基盤要件と設計
+### 監視基盤要件と設計
 
 <img src="/images/2021/20210608a/image.png" alt="運用監視基盤要件" width="1200" height="402" loading="lazy">
 
@@ -35,7 +35,7 @@ lede: "「オンコール通知も全自動で! AWS + Datadog + PagerDuty で作
 
 <img src="/images/2021/20210608a/image_3.png" alt="Why PagerDurty" width="1200" height="586" loading="lazy">
 
-## システム構成
+### システム構成
 
 <img src="/images/2021/20210608a/image_4.png" alt="Metrics -> Datadog" width="1200" height="639" loading="lazy">
 
@@ -43,13 +43,13 @@ lede: "「オンコール通知も全自動で! AWS + Datadog + PagerDuty で作
 
 <img src="/images/2021/20210608a/image_6.png" alt="Datadog -> 通知先サービス" width="1200" height="491" loading="lazy">
 
-## ここが素敵/辛い Datadog/PagerDuty
+### ここが素敵/辛い Datadog/PagerDuty
 
 <img src="/images/2021/20210608a/image_7.png" alt="Datadog" width="1200" height="492" loading="lazy">
 
 <img src="/images/2021/20210608a/image_8.png" alt="PagerDuty" width="120" height="285" loading="lazy">
 
-# まとめ
+## まとめ
 
 ご参加いただいた方々、ありがとうございました。
 

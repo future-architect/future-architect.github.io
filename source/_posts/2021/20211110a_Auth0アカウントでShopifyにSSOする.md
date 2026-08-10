@@ -14,32 +14,32 @@ lede: "私が参画した案件で、Auth0に登録されているエンドユ�
 ---
 <img src="/images/2021/20211110a/サムネイル.png" alt="サムネイル.png" width="462" height="288" loading="lazy">
 
-# はじめに
+## はじめに
 
 はじめまして。2021年4月新卒入社、TIGの武田です。入社して早半年、最近開発の面白さに気付かされ、巷の[エンジニアあるある](https://www.salarymanz.com/entry/se-aruaru)にも3割くらい共感できるようになりました。
 
 私が参画した案件で、Auth0に登録されているエンドユーザ向けのアカウントを用いてShopifyにSSOする検証を行ったので、今回はその方法をご紹介します。
 
-## SSOとは？
+### SSOとは？
 
 **一度のユーザ認証**を行うと、以後そのユーザ認証に紐づけられているサービスを、追加の認証なしで利用できる機能です。
 これにより、**ユーザはパスワードの記憶や管理の負担が減り、システム管理者はセキュリティ上の弱点を削減できます。
 
-## Auth0とは？
+### Auth0とは？
 
 [Auth0導入編](/articles/20200122/)をご参照ください。他にも[Auth0関連の記事](/tags/Auth0/)があります。
 
-## Shopifyとは？
+### Shopifyとは？
 
 本格的なネットショップが開設できるECプラットフォームで、世界NO. 1のシェアを誇っています。詳しくは[公式サイト](https://www.shopify.jp/online/ecommerce-solutions)をご覧ください。
 
-# 前提条件
+## 前提条件
 
 実環境でSSO機能を利用するためには、ShopifyPlusのサブスクリプションが必要となります。また、Shopifyには無料の開発者向けの環境が用意されており、様々な機能をテストできます。今回は、開発者用ストアを使ってSSOを実装していきます。
 
 Auth0のアカウントも必要になります。こちらも無料のものが提供されているので、今回はそちらを使います。
 
-# サンプル実装
+## サンプル実装
 
 マルチパスを利用して、Auth0アカウントでShopifyにSSOできるよう実装していきます。
 
@@ -53,7 +53,7 @@ Auth0のアカウントも必要になります。こちらも無料のものが
 
 [4. ShopifyテーマにAuth0リンクを設定する](https://future-architect.github.io/articles/20211110a/#Shopify%E3%83%86%E3%83%BC%E3%83%9E%E3%81%ABAuth0%E3%83%AA%E3%83%B3%E3%82%AF%E3%82%92%E8%A8%AD%E5%AE%9A%E3%81%99%E3%82%8B)
 
-## Shopifyアカウントでマルチパスを有効にする
+### Shopifyアカウントでマルチパスを有効にする
 
 Shopifyストアにログインし、 `設定`に移動して `チェックアウト`ウィンドウをクリックします。顧客アカウントを、任意または必須に設定することで、ストアでマルチパスを有効にできます。
 
@@ -61,7 +61,7 @@ Shopifyストアにログインし、 `設定`に移動して `チェックア�
 
 このシークレットキーはマルチパスリクエストが正当であることを確認するための暗号を作成するために使用されます。シークレットキーを再発行したい場合、マルチパスを無効にしてから再度有効にすることで、新たなシークレットキーが生成され、以前のものは無効化されます（上記画像のシークレットキーは既に無効化済みです）。
 
-## Auth0アプリケーションを作成し、URIを設定する
+### Auth0アプリケーションを作成し、URIを設定する
 
 Auth0ダッシュボード内で`Applications`に移動し、`Create Application`をクリックして適当な名前を付け（「Shopify Store」など）、`Regular Web Applications`を選択し、`CREATE`します。
 <img src="/images/2021/20211110a/技術ブログ②.png" alt="技術ブログ②.png" width="782" height="689" loading="lazy">
@@ -82,7 +82,7 @@ Application URIsを以下のように設定します。
 - **Key**：shopify_multipass_secret ; **Value**：{multipass-secret}
 <img src="/images/2021/20211110a/技術ブログ③.png" alt="技術ブログ③.png" width="969" height="648" loading="lazy">
 
-## Auth0ルールを追加して、マルチパストークンを作成する
+### Auth0ルールを追加して、マルチパストークンを作成する
 
 Auth0ダッシュボードの`Auth Pipeline`の`Rules`に移動して、`Create`を選択、templateは`Empty rule`を選択します。
 わかりやすい名前（「ShopifyMultipass」など）を付け、次のコードを貼り付けます。
@@ -137,7 +137,7 @@ function (user, context, callback) {
 
 <img src="/images/2021/20211110a/技術ブログ⑤.png" alt="技術ブログ⑤.png" width="1059" height="856" loading="lazy">
 
-## ShopifyテーマにAuth0リンクを設定する
+### ShopifyテーマにAuth0リンクを設定する
 
 Shopifyテーマを編集してログイン/ログアウトするためのリンクを追加していきます。
 Shopifyストアの現在のテーマの`コードを編集`をクリックします。
@@ -213,7 +213,7 @@ Shopifyストアの現在のテーマの`コードを編集`をクリックし�
 
 以上で実装完了です！
 
-# 実際の画面遷移
+## 実際の画面遷移
 
 ログインページにて、`Log in with Auth0`をクリックする。
 <img src="/images/2021/20211110a/技術ブログ⑫.png" alt="技術ブログ⑫.png" width="1200" height="707" loading="lazy">
@@ -224,13 +224,13 @@ Shopifyストアの現在のテーマの`コードを編集`をクリックし�
 ログインに成功！
 <img src="/images/2021/20211110a/技術ブログ⑭.png" alt="技術ブログ⑭.png" width="1200" height="643" loading="lazy">
 
-# さいごに
+## さいごに
 
 最近ではSSOを利用できるサービスがかなり増えてきたなという印象ですが、実際使ってみると本当に便利ですよね。他のアプリケーションでもこのような方法でSSOを導入できると思いますので、導入を検討する際にはこちらの記事を参考にしていただけますと幸いです。
 
 最後まで読んでいただきありがとうございました！
 
-# 参考リンク
+## 参考リンク
 
 - [Authenticate Shopify Customers with Auth0 – Rovani in C#](https://rovani.net/Shopify-Auth0-Multipass/)
 - [Authenticate Shopify Customers with Auth0 - Shopify - Pavilion](https://thepavilion.io/t/authenticate-shopify-customers-with-auth0/4040)

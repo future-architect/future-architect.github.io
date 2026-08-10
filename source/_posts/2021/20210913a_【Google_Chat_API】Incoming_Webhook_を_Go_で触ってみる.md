@@ -13,7 +13,7 @@ thumbnail: /images/2021/20210913a/thumbnail.png
 author: 山本雄樹
 lede: "Google Chat APIに関しての記事となります。業務でGoogle Chat上で通知システムを作成する必要があったのですが、実装するにあたりいくつかのハードルがありました。"
 ---
-# はじめに
+## はじめに
 
 こんにちは、[Engineer Camp](https://note.com/future_event/n/n76e7e7d4beef)インターン中の山本です。
 
@@ -21,7 +21,7 @@ lede: "Google Chat APIに関しての記事となります。業務でGoogle Cha
 
 今回はGoogle Chat APIに関しての記事です。
 
-## 背景
+### 背景
 
 業務でGoogle Chat上で通知システムを作成する必要があったのですが、実装するにあたりいくつかのハードルがありました。
 
@@ -36,7 +36,7 @@ lede: "Google Chat APIに関しての記事となります。業務でGoogle Cha
 
 <img src="/images/2021/20210913a/スクリーンショット_2021-09-07_17.18.14.png" alt="カード型メッセージ投稿例" width="476" height="598" loading="lazy">
 
-# Google Chat API とは
+## Google Chat API とは
 
 具体的な説明の前に、[Google Chat API](https://developers.google.com/chat) について軽く説明いたします。
 
@@ -55,7 +55,7 @@ Google Hangoutsとの関連は以下のようになっています（[Wikipedia�
 
 今回はその中から、非同期メッセージの送信機能を持つIncoming Webhookを使用し、Goでメッセージを送信するアプリケーションの実装を行います。
 
-# 1. Google ChatでWebhookの設定をする
+## 1. Google ChatでWebhookの設定をする
 
 それでは始めていきます。
 
@@ -78,7 +78,7 @@ Webhookの名前とアバターURLを入力し、保存を押します。
 
 <img src="/images/2021/20210913a/screenshot_setup4.png" alt="設定完了画面" width="1200" height="469" loading="lazy" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px;">
 
-# 2. Goでメッセージを送る
+## 2. Goでメッセージを送る
 
 Webhookの設定は完了したので、次にGoアプリケーションの実装について説明します。
 以下はWebhookで簡単なメッセージを送信するGoのプログラムです。
@@ -122,7 +122,7 @@ func main() {
 
 <img src="/images/2021/20210913a/screenshot_simple_message.png" alt="screenshot_simple_message" width="1066" height="224" loading="lazy">
 
-# （付録１）投稿を一つのスレッドにまとめる
+## （付録１）投稿を一つのスレッドにまとめる
 
 投稿に対して返信をしない場合など、スレッドをいちいち作成する必要がないケースについては、同一スレッドにメッセージを投稿した方が見た目がスッキリする場合もあります。
 
@@ -135,7 +135,7 @@ const webhook = "<任意のWebhookURL>&threadKey=<適当な文字列>"
 以下のように、同じスレッドにメッセージが投稿されるようになります。
 <img src="/images/2021/20210913a/screenshot_thread.png" alt="screenshot_thread" width="1056" height="222" loading="lazy">
 
-# （付録２）Card型メッセージ
+## （付録２）Card型メッセージ
 
 シンプルなメッセージでは表現しきれない場合の手段としてカード型のメッセージが用意されています。
 以下は[公式ドキュメント](https://developers.google.com/chat/reference/message-formats/cards)で紹介されていた表現をほとんど網羅したカード型のメッセージを送信するプログラムです。
@@ -320,13 +320,13 @@ Cardの中には1つ以上のSectionが、Sectionの中には1つ以上のウィ
 出力結果がこちらです。
 <img src="/images/2021/20210913a/screenshot_card_message_2.png" alt="screenshot_card_message" width="425" height="455" loading="lazy" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px;">
 
-# 実際に使ってみた感想
+## 実際に使ってみた感想
 
 今回はIncoming Webhookを使用して一方的な通知メッセージを送信する、といった用途に使用しました。
 
 慣れれば、Webhookの設定 → コード書いてメッセージを投げるまでがスピーディにできるため、簡単な機能を載せたボットを使いたい場合などにはお勧めできると思います。
 
-# 参考
+## 参考
 
 - https://developers.google.com/chat
 - https://mikan.github.io/2018/03/15/writing-hangouts-chat-incoming-webhook-with-go/

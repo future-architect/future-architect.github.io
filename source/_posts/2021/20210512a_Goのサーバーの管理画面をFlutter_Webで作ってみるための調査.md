@@ -23,7 +23,7 @@ Flutter for Webは標準のHTMLにするHTMLレンダラーと、CanvasKitレン
 
 現状では明示的に指定しなければauto（モバイルはHTMLレンダラー、PCはCanvasKitレンダラー）になりますが、明示的に指定もできます。これらの違いはまた後で触れますが、せっかくウェブが出せるようになったので、ウェブフロントエンドをFlutterで作ってみるための色々調査をしてみました。React/Vue/Angularを一通り業務で使ってみましたし、フロントエンド開発周りもここ5-6年ぐらい、書き方が違うぐらいでやっていることはあんまり変わらなくて個人的に飽きてきたこともあります。
 
-# ウェブアプリといえばRouter
+## ウェブアプリといえばRouter
 
 SPAで管理画面を作っていく上で、最低限必要なことはRouterと呼ばれる機能です。VueやAngularだと標準で用意されています。Reactは標準はないですが、使うときはだいたい何かしら入れるでしょう。
 
@@ -46,7 +46,7 @@ https://medium.com/flutter/learning-flutters-new-navigation-and-routing-system-7
 * builderという言葉はVueのslot的な、特定のライフサイクルで呼ばれてビューの一部を返す何か←某握力王の人に教えてもらいました
 * debug(）関数でconsole.logに出力できる
 
-## 最小のRouter
+### 最小のRouter
 
 次のコードが↑に書いてあるnamed navigator routesを使った最小のコードです。2つの画面の間の遷移をします。まず、ルートのMaterialAppに、routesの引数でURLとページのマップを定義します。あとは、Navigatorクラスを使って、pushNamed()メソッドや、pop()メソッドを使ってページ遷移ができます。よくあるSPAと変わらないですね。
 
@@ -116,7 +116,7 @@ class DetailScreen extends StatelessWidget {
 
 なお、URLの一部がエンティティのIDとしてパスパラメータとして使いたい場合は、RouteInformationParserを継承したクラスを作ってアプリに渡す必要があります。上記のmediumのページの中でRouteInformationParserで検索して見てみれば書き方がわかりますが、面倒です。ここはそのうち改善されるのでは、ということを期待しています。
 
-## ハッシュがURLに入ってしまうのをやめる
+### ハッシュがURLに入ってしまうのをやめる
 
 PathLocationStrategy相当への切り替え方法については次のページで説明されています。
 
@@ -146,7 +146,7 @@ void main() {
 
 <img src="/images/2021/20210512a/スクリーンショット_2021-05-11_8.56.50.png" alt="URLにハッシュが入っていないデモ画面" width="1006" height="260"  loading="lazy">
 
-# Goのアプリケーションに組み込む
+## Goのアプリケーションに組み込む
 
 Goで作ったサーバーの管理画面をFlutterで作る前提で、go:embedでアプリにバンドルしてみます。以前、本技術ブログでVueで行ったことをFlutterでもやってみます。
 
@@ -217,7 +217,7 @@ NotFoundHandlerハンドラーは[前回の記事のファイルの配信のハ�
     └── manifest.json
 ```
 
-# サーバーへのHTTPアクセス
+## サーバーへのHTTPアクセス
 
 静的HTMLを表示するだけでは管理画面にはなりませんので、HTTPアクセスを行ってみます。より高度なサービスになると、昨日のエントリーの[Swaggerを使ったサーバーアクセス](/articles/20210511b/)や、GraphQLやgRPCを使いたくなるかもしれません。今時なプロトコルはどれでも利用できるのも、Flutterの良いところですが、今回はシンプルなHTTPアクセスをします。
 
@@ -227,7 +227,7 @@ NotFoundHandlerハンドラーは[前回の記事のファイルの配信のハ�
 
 ケンオールはアカウント登録するとAPIキーが発行され、これを使ってアクセスします。サンプルと言えど、APIキーはフロントエンドに置きたくないので、サーバー側で中継することとします。
 
-## サーバー側の実装
+### サーバー側の実装
 
 ``/api/postal/{code}``にアクセスしたら、住所情報を返すAPIをGoで実装しました。APIキーは環境変数で渡します。Vue.jsのときのサンプルの差分だけ表示します。
 
@@ -289,7 +289,7 @@ func main() {
 }
 ```
 
-## フロント側の実装
+### フロント側の実装
 
 フロント側からはサーバーアクセスをさせたいと思います。状態をもつのでstatefulなウィジェットとします。
 
@@ -433,7 +433,7 @@ import 'package:http/http.dart' as http;
 
 <img src="/images/2021/20210512a/スクリーンショット_2021-05-11_22.32.50.png" alt="ケンオールAPIを利用したFlutter画面" width="1200" height="1371"  loading="lazy">
 
-# まとめ
+## まとめ
 
 そろそろReact/Vue/Angularに飽きてきたかも？ な人の新たなおもちゃとしてFlutter Webの紹介をしました。機能的には以下の3つを紹介しました
 

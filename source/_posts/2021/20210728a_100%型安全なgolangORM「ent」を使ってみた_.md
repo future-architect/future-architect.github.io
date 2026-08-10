@@ -12,7 +12,7 @@ thumbnail: /images/2021/20210728a/thumbnail.png
 author: 宮崎将太
 lede: "golang ORM連載の2記事目となります。はじめまして、TIGの宮崎将太です。突然ですがみなさん、ORMは何を使用していますか？"
 ---
-# はじめに
+## はじめに
 
 [golang ORM連載](/articles/20210726a/)の3記事目となります。TIGの宮崎将太です。
 
@@ -22,7 +22,7 @@ golangだとGORMがデファクトスタンダードの位置を勝ち取りつ�
 
 今回は新たな可能性としてFacebook社謹製の[ent/ent](https://github.com/ent/ent)を検証します。個人的なO/Rマッパ経験としてはRuby on RailsのActiveRecordから始まり、当社謹製の[UroboroSQL](https://future-architect.github.io/uroborosql-doc/)というO/RマッパからGORMまで割と多めに触れているので、大体どのO/Rマッパでも気になる機能を中心に作りながら検証します。
 
-# entとは
+## entとは
 
 <img src="/images/2021/20210728a/ent_doc_top.png" alt="entドキュメントトップページ" width="1200" height="583" loading="lazy">
 
@@ -38,9 +38,9 @@ golangだとGORMがデファクトスタンダードの位置を勝ち取りつ�
 
 この辺りの考え方はswaggerの自動生成とも似ていますね。仕様を知らなくて重大なバグを引き起こしがちなGORMから解放される選択肢としてはとても良さそうです。
 
-# 作りながら検証してみる
+## 作りながら検証してみる
 
-## 前提
+### 前提
 
 以下環境にて準備を始めます。
 
@@ -50,7 +50,7 @@ golangだとGORMがデファクトスタンダードの位置を勝ち取りつ�
 
 PostgreSQLはDocker containerをローカルに立てています。
 
-## 環境準備
+### 環境準備
 
 適当にworkspaceを作ります。
 
@@ -60,7 +60,7 @@ cd ent-sample
 go mod init  ent-sample
 ```
 
-### CLIインストール
+#### CLIインストール
 
 前述した通り、entはコード生成ツールを備え付けているので、まずはCLIツールをインストールします。
 
@@ -70,7 +70,7 @@ go get entgo.io/ent/cmd/ent
 
 ※過去の記事を見ていると`entc`をインストールしているものもありますが、2021年7月の[公式チュートリアル](https://entgo.io/ja/docs/getting-started)を見ると`ent`と記載があるので名称が変更されたようです。
 
-## DB接続
+### DB接続
 
 何はともあれDB接続からです。main関数を実装します。
 ※PostgreSQLドライバをインストールしていない場合は`go get github.com/lib/pq`で導入してください。
@@ -108,7 +108,7 @@ $ go run main.go
 ここまでは特殊な記法はありませんね。
 PostgreSQL以外のDB接続は[こちら](https://entgo.io/ja/docs/crud/#%E6%96%B0%E3%81%97%E3%81%84%E3%82%AF%E3%83%A9%E3%82%A4%E3%82%A2%E3%83%B3%E3%83%88%E3%82%92%E4%BD%9C%E6%88%90%E3%81%99%E3%82%8B)を参考にしてください。
 
-## DBテーブル&モデル定義
+### DBテーブル&モデル定義
 
 ここからがGORMにはないent独特な操作。
 スキーマをDSLで定義します。Ruby on Railでいうところのmigrationファイルですね。
@@ -121,7 +121,7 @@ PostgreSQL以外のDB接続は[こちら](https://entgo.io/ja/docs/crud/#%E6%96%
 
 今回はオーソドックスに会社と会社に属するユーザを定義してみます。
 
-### スキーマ定義雛形生成
+#### スキーマ定義雛形生成
 
 以下コマンドでスキーマ定義の雛形を生成します。
 
@@ -144,7 +144,7 @@ schema配下のファイルを実装していくことでスキーマ定義を�
 └── main.go
 ```
 
-### スキーマ定義記述
+#### スキーマ定義記述
 
 `ent/schema`配下のファイルを記述していきます。
 
@@ -284,7 +284,7 @@ func (User) Indexes() []ent.Index {
 
 とはいえ99％くらいは意図した通りに定義ができたので、コード生成をやってみます。
 
-### `go generate`で物理定義とモデルを作成
+#### `go generate`で物理定義とモデルを作成
 
 下記コマンドを実行してコード生成をしてみます。
 
@@ -340,7 +340,7 @@ $ tree ./ent
 
 特段エラーが起きていないので、テーブル定義を出力してみたいと思います。
 
-### migration
+#### migration
 
 entでは自動migrationの他、ddl出力もサポートしています。
 
@@ -441,11 +441,11 @@ $ go run main.go
 migrationはフックも作成できるので、実行タイミングで共通りソースを作ったり、定義の微修正をしたりと細かな調整はできそうです。
 ドキュメントは[こちら](https://entgo.io/ja/docs/migrate#%E3%83%9E%E3%82%A4%E3%82%B0%E3%83%AC%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%E3%83%95%E3%83%83%E3%82%AF)です。
 
-## CRUD
+### CRUD
 
 DB定義とモデルの生成までできたのでCRUD操作を試してみます。
 
-### Create
+#### Create
 
 CRUD全般通して、DB操作実行はCRUDビルダーの構築を介して実施します。
 以下は単純に会社と会社に属するユーザを作成するコードです。
@@ -512,7 +512,7 @@ $ go run crud/main.go
 
 また、DB反映メソッドは`Save`となっていますが、これとは別に`SaveX`というAPIも存在し、こちらは実行エラーの場合に`panic`を起こすようです。
 
-### Update
+#### Update
 
 Updateの例は以下です。
 
@@ -551,7 +551,7 @@ $ go run crud/main.go
 条件句に相当する構造体まで生成されており、流れるようにコーディングできます。
 他にも`Or`やモデルを指定した条件指定も可能です。
 
-### Read
+#### Read
 
 以下、条件句を指定したQueryの例です。
 
@@ -571,7 +571,7 @@ $ go run crud/main.go
 
 他にもリレーションを持つデータを全てselectしたり、特定のフィールドのみのselect、別構造体へのscanなど、一般的な機能は全て備わっています。
 
-### Delete
+#### Delete
 
 deleteは以下の通りです。
 
@@ -593,7 +593,7 @@ $ go run crud/main.go
 
 Updateと同じように条件指定可能です。
 
-# 所感
+## 所感
 
 一通り読み書きしてみて、慣れれば特に他のO/Rマッパに劣るということはなさそうでした（トランザクション、型カスタマイズ、ロギング、登録・更新フック、システムカラム等）
 

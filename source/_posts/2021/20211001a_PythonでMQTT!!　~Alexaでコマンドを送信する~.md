@@ -17,7 +17,7 @@ lede: "この記事は温度と湿度、不快指数を定期投稿するbotの�
 
 <img src="/images/2021/20211001a/volodymyr-hryshchenko-V5vqWC9gyEU-unsplash.jpg" alt="" title="Volodymyr Hryshchenko on Unsplash" width="1200" height="800" loading="lazy">
 
-# はじめに
+## はじめに
 
 こんにちは。TIG/DXユニット所属の宮永です。
 
@@ -48,7 +48,7 @@ MQTTを使用して、室内温度を定点観測するだけならば以上の�
 * [orangekame3/lambda\-alexa](https://github.com/orangekame3/lambda-alexa)
 * [orangekame3/py\-subscriber](https://github.com/orangekame3/py-subscriber)
 
-# 本記事で作成するもの
+## 本記事で作成するもの
 
 本記事と以下2つの記事
 
@@ -59,7 +59,7 @@ MQTTを使用して、室内温度を定点観測するだけならば以上の�
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/YfbDl6xolV8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
-# システム構成
+## システム構成
 
 * [GoでMQTT\!\!　～温湿度マイスターbotの作成～\(前編\) \| フューチャー技術ブログ](/articles/20210929a/)
 
@@ -71,15 +71,15 @@ AWS IoTからMQTTでコマンドを送信し、Subscriberではコマンド受�
 
 <img src="/images/2021/20211001a/image_2.png" alt="image.png" width="1200" height="528" loading="lazy">
 
-# 開発環境
+## 開発環境
 
 開発はWindows10環境、WSL2上で行いました。標準モジュール以外で使用したものを以下に列挙します。(※前回記事との差分です)
 
-## ハードウェア
+### ハードウェア
 
 * Amazon Echo Dot第3世代
 
-## ソフトウェア
+### ソフトウェア
 
 * Python 3.8.10
   * [eclipse/paho\.mqtt\.python: paho\.mqtt\.python](https://github.com/eclipse/paho.mqtt.python)
@@ -87,7 +87,7 @@ AWS IoTからMQTTでコマンドを送信し、Subscriberではコマンド受�
 * Alexa Smart Home Skill
 * AWS Lambda
 
-# 実装
+## 実装
 
 以下の手順で実装します。
 
@@ -101,7 +101,7 @@ AWS IoTからMQTTでコマンドを送信し、Subscriberではコマンド受�
 
 まずは、PythonのMQTTモジュールである[eclipse/paho\.mqtt\.python: paho\.mqtt\.python](https://github.com/eclipse/paho.mqtt.python)に触ってAWS IoTからのテスト送信をSubscribeしましょう。
 
-## 1. PythonでSubscribe、AWS IoTからPublishする
+### 1. PythonでSubscribe、AWS IoTからPublishする
 
 PythonでAWS IoTをSubscribeします。使用するPythonモジュールは[eclipse/paho\.mqtt\.python: paho\.mqtt\.python](https://github.com/eclipse/paho.mqtt.python)です。
 
@@ -151,7 +151,7 @@ if __name__ == '__main__':
 
 <img src="/images/2021/20211001a/pymqtt.gif" alt="pymqtt.gif" width="1200" height="432" loading="lazy">
 
-## 2. AWS LambdaからAWS IoT経由でPublishする
+### 2. AWS LambdaからAWS IoT経由でPublishする
 
 次に、AWS LambdaからAWS IoT経由でメッセージをPublishしましょう。
 
@@ -167,7 +167,7 @@ if __name__ == '__main__':
 
 * [IAM Management Console](https://console.aws.amazon.com/iamv2/home#/roles)
 
-### ポリシーの作成
+#### ポリシーの作成
 
 JSON タブを選択して以下を入力してください。
 
@@ -190,7 +190,7 @@ JSON タブを選択して以下を入力してください。
 
 以上の設定を行うことでAWS Lambda作成時に「既存のロール」から作成したロールを付与することが可能となります。(今回は「my」という名前のロールを作成しています。)
 
-### AWS Lambdaの作成
+#### AWS Lambdaの作成
 
 以下の様スクリプトをlambda_function.pyに張り付けてください。Lambdaのリージョンが「オレゴン」`iot = boto3.client('iot-data','ap-northeast-1')`の設定に東京('ap-northeast-1')が選択されていることに注意してください。AWS IoTが「オレゴン」で設定されている場合は'ap-northeast-1'は不要です。
 
@@ -229,7 +229,7 @@ def lambda_handler(event, context):
 
 次の章でAlexa Home Skillを作成します。
 
-## 3. Alexa Home Skillでスキルを作成する
+### 3. Alexa Home Skillでスキルを作成する
 
 Alexa Home Skillを作成する前にAmazon　Developerアカウントを作成します。Amazon DeveloperアカウントやAlexa Developerコンソールを使用した経験がある方も本章の内容確認は必ず行ってください。**特に、amazon.comでの購入経験がある方は要注意です。**ここで手順を誤ってしまうと無限に時間を溶かします。
 （私は溶かしました）。
@@ -255,7 +255,7 @@ Alexa Home Skillを作成する前にAmazon　Developerアカウントを作成�
 
 スキルの作成は以上で完了です。次にAlexa Home SkillとAWS Lambdaの連携を行います。
 
-## 4. Alexa Home SkillとAWS Lambda、 AWS IoTを連携する
+### 4. Alexa Home SkillとAWS Lambda、 AWS IoTを連携する
 
 本章で説明する内容は以下のWikiに記載されています。不明瞭なことがある場合は参照してください。
 
@@ -314,7 +314,7 @@ Alexaのリダイレクト先のURLには3つのURLが記載されていると�
 <img src="/images/2021/20211001a/skill4.png" alt="skill4.png" width="1200" height="719" loading="lazy">
 「アプリケーションID」の部分に先ほどメモした「スキルID」を設定すれば完了です。
 
-## 5. Alexa Home Skillを開発する
+### 5. Alexa Home Skillを開発する
 
 スクラッチで開発するのは大変ですので、こちらのリポジトリを転用します。
 
@@ -403,7 +403,7 @@ def send_command() :
 
 サンプルコードのPythonディレクトリをzip化してAWS Lambdaにアップロードしてください。この時handler関数の設定は`lambda.lambda_handler`としてください。
 
-## 6. Alexaアプリと連携する
+### 6. Alexaアプリと連携する
 
 Alexaアプリを起動し、「デバイス>スマートホームスキル」と進むと先ほど作成したスキルが表示されます。スキルを有効化し、デバイスの探索を行ってください。Lambad関数が正しく記述できている場合はデバイスの探索が無事完了し、「温湿度マイスター」が登録されているはずです。
 
@@ -413,7 +413,7 @@ Alexaアプリを起動し、「デバイス>スマートホームスキル」�
 
 続く章ではローカルで実行するワーカーの実装を行います。
 
-## 7. ローカルのスクリプトを実行し、Alexaをしゃべらせる
+### 7. ローカルのスクリプトを実行し、Alexaをしゃべらせる
 
 本章のスクリプトは以下で公開していますので、参考にしてください。
 [orangekame3/py\-subscriber](https://github.com/orangekame3/py-subscriber)
@@ -619,7 +619,7 @@ alexaの音声操作にはこちらのシェルスクリプトを使用してい
 
 それでは`main.py`を実行してAWS IoTをSubscribeしましょう。
 
-# Alexaに話しかける
+## Alexaに話しかける
 
 それではAlexaに話しかけましょう。
 

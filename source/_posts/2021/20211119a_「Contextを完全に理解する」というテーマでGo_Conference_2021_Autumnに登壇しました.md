@@ -25,7 +25,7 @@ TIGの伊藤真彦です
 
 <iframe src="//www.slideshare.net/slideshow/embed_code/key/4pZJNIRQud0Iy0" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/ssuserebd24d1/go-conference-2021-autumn" title="Go conference 2021 autumn" target="_blank">Go conference 2021 autumn</a> </strong> from <strong><a href="https://www.slideshare.net/ssuserebd24d1" target="_blank">masahiko ito</a></strong> </div>
 
-# contextを発表資料に選定した意義
+## contextを発表資料に選定した意義
 
 [context](https://github.com/golang/go/blob/master/src/context/context.go)はGoでアプリケーションを実装する上でお世話にならない方が少ないくらいのパッケージだと思います。
 
@@ -35,7 +35,7 @@ TIGの伊藤真彦です
 
 contextの基礎的な利用方法も発表の前半に組み込むつもりでしたが、[zennの無料書籍](https://zenn.dev/hsaki/books/golang-context)が登場したため、発表はコードの読み取りとそこから得られる知見にフォーカスしました。
 
-# contextのコードリーディングから得られる知見
+## contextのコードリーディングから得られる知見
 
 600行以下のcontextを読むだけで、以下の内容が学べます。
 
@@ -49,7 +49,7 @@ contextの基礎的な利用方法も発表の前半に組み込むつもりで�
 
 これらにな馴染みが無い方は是非contextの実装を読み込んでみていただければと思います。
 
-# 感想
+## 感想
 
 勉強になる、contextを教材として採用したい、といった反響を頂けました、目的が達成できたという手ごたえを感じることができました。
 

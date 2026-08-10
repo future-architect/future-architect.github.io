@@ -19,7 +19,7 @@ Flutterで環境を一度作ってしまえば、Android StudiからAndroidエ�
 flutter create dgsample
 ```
 
-# まずはアプリの設定を修正
+## まずはアプリの設定を修正
 
 createで作成すると、Androidアプリのパッケージ名や、iOSアプリのバンドルIDが``com.example.dgsample``の形式でそこら中に埋め込まれます。ここでは所属する組織のドメイン名の入った重複しない名前にします。とりあえず、Find in Pathでデフォルトのパッケージ名が書かれているところを見つけ、新しい名前（ここでは``io.github.future_architect.dgsample``）に置き換えていきます。
 
@@ -96,7 +96,7 @@ Android Studio上で実行すると、Androidエミュレータ上にインス�
 
 <img src="/images/2021/20210721b/スクリーンショット_2021-07-19_19.24.19.png" alt="起動画面" loading="lazy">
 
-# DeployGate用のSDKの追加
+## DeployGate用のSDKの追加
 
 DeployGate用のSDKを入れると、ログやら何やらが見れるようになるとのことですので入れてみます。
 
@@ -148,7 +148,7 @@ import Flutter
 
 こちらで完了です。
 
-# ビルド
+## ビルド
 
 ビルドはAndroidは一発なのですが、iOSの方はDeployGateが必要とするipaファイルをflutterコマンドだけでは作れません。一度ビルドした後に、xcodebuildコマンドを使って生成します。
 

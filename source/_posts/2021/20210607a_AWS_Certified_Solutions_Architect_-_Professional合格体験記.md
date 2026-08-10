@@ -20,7 +20,7 @@ TIGの伊藤真彦です。
 
 <img src="/images/2021/20210607a/image.png" alt="aws certified solutions architect icon" width="600" height="600">
 
-# AWS Certified Solutions Architect - Professionalとは
+## AWS Certified Solutions Architect - Professionalとは
 
 AWSには資格試験が11種類存在します(AWS 認定 Alexa スキルビルダー – 専門知識が2021年3月をもって終了したため11種類になりました)
 
@@ -32,7 +32,7 @@ AWSには資格試験が11種類存在します(AWS 認定 Alexa スキルビル
 
 上位資格だけあって、問題文の意味を理解する事すら苦労するようなレベルの問題が多く集まっています。
 
-# 合格までの道筋
+## 合格までの道筋
 
 [試験ガイド](https://d1.awsstatic.com/ja_JP/training-and-certification/docs-sa-pro/AWS-Certified-Solutions-Architect-Professional_Exam-Guide.pdf)に従いホワイトペーパーを読み進めていくのが正攻法ですが、私は有料コンテンツをひたすら購入して消化していく方針で勉強しました。
 
@@ -40,7 +40,7 @@ AWSには資格試験が11種類存在します(AWS 認定 Alexa スキルビル
 
 以降はコンテンツのレビューになります。
 
-# 書籍AWS認定ソリューションアーキテクト‐プロフェッショナル
+## 書籍AWS認定ソリューションアーキテクト‐プロフェッショナル
 
 リックテレコムから[書籍](https://books.google.co.jp/books/about/AWS%E8%AA%8D%E5%AE%9A%E3%82%BD%E3%83%AA%E3%83%A5%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%E3%82%A2%E3%83%BC%E3%82%AD.html?id=gqOWzQEACAAJ&source=kp_book_description&redir_esc=y)が出ています。
 
@@ -52,7 +52,7 @@ AWSには資格試験が11種類存在します(AWS 認定 Alexa スキルビル
 
 今思えば各章の内容を隅々まで丸暗記すればこれ一冊で合格できたかもしれません。
 
-# Udemy教材
+## Udemy教材
 
 資格試験の問題集を学習サイトのUdemyで購入することが可能です。
 
@@ -66,7 +66,7 @@ AWSには資格試験が11種類存在します(AWS 認定 Alexa スキルビル
 
 細かい言い回しが変わっても根拠をもって正解を選べるようしっかりインプットすることが重要です。
 
-# 学習サイト aws.koiwaclub.com
+## 学習サイト aws.koiwaclub.com
 
 [AWS WEB問題集で学習しよう](https://aws.koiwaclub.com/)というタイトルのページです。
 
@@ -78,7 +78,7 @@ AWSには資格試験が11種類存在します(AWS 認定 Alexa スキルビル
 
 元々750点のボーダーラインに対し680点までは取れていたのですが、詰めの甘い部分をこのサイトで補う事で合格できました。最終的なスコアは840点でした。
 
-# 3つの教材比較
+## 3つの教材比較
 
 いずれの教材も質が高く、とにかく圧倒的な試験の難易度に敗北する印象でした。
 
@@ -88,7 +88,7 @@ AWSには資格試験が11種類存在します(AWS 認定 Alexa スキルビル
 
 合格した今振り返ると書籍とaws.koiwaclub.comだけで良かったかなと感じています。
 
-# 今なら落ちても安心
+## 今なら落ちても安心
 
 2021年5月1日から2021年7月31日まで、オンラインでの受験で、1回落ちても無料で再受験できるキャンペーンが実施されています。
 

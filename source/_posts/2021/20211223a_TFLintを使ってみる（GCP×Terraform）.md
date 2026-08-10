@@ -15,17 +15,17 @@ lede: "terraform validateやterraform planでは検知できないエラーを�
 
 <img src="/images/2021/20211223a/top.png" alt="" width="800" height="431">
 
-# はじめに
+## はじめに
 
 `terraform validate`や`terraform plan`では検知できないエラーを見つけるために、TFLintを利用してみました。TFLintを用いれば、例えばインスタンスタイプの誤りや命名規約違反を検知できます。
 
 本記事では、インストールから利用方法までを記載しています。
 
-# TFLintとは？
+## TFLintとは？
 
 いわゆるTerraformのためのLinter。JavaScriptでいうと、ESLintのようなものです。構文やパラメータがルールに違反していないかをチェックしてくれるツールです。
 
-# 環境やバージョン
+## 環境やバージョン
 
 今回利用した環境です。
 
@@ -36,7 +36,7 @@ lede: "terraform validateやterraform planでは検知できないエラーを�
   - ※Terraformがなくてもtflintは動作するので、Terraformは必須ではない
 - Google Cloud
 
-# tflintをインストール
+## tflintをインストール
 
 1. [tflint/releases](https://github.com/terraform-linters/tflint/releases)から`tflint_windows_amd64.zip`をダウンロード
 2. `tflint_windows_amd64.zip`を解凍
@@ -53,7 +53,7 @@ TFLint version 0.34.0
 
 - [tflint installation](https://github.com/terraform-linters/tflint#installation)
 
-# .tflint.hclの作成
+## .tflint.hclの作成
 
 `.tflint.hcl` とは、Pluginをインストールするための設定ファイルです。
 
@@ -75,7 +75,7 @@ plugin "google" {
 - [Configuring TFLint](https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/config.md)
 - [tflint-ruleset-google installation](https://github.com/terraform-linters/tflint-ruleset-google#installation)
 
-# tflint --initの実施
+## tflint --initの実施
 
 `.tflint.hcl` を記載したあとに、Pluginをインストールするために、以下のコマンドを実行します。初回のみ実施で問題ないです。
 
@@ -83,7 +83,7 @@ plugin "google" {
 tflint --init
 ```
 
-# tflintの動作確認をしてみる
+## tflintの動作確認をしてみる
 
 1. `google_compute_instance`の`machine_type`に存在しないインスタンスタイプを記載してみます。
 
@@ -111,7 +111,7 @@ Error: "n2-standard-200" is an invalid as machine type (google_compute_instance_
    6:   machine_type = "n2-standard-200"
 ```
 
-# 応用：moduleも対象とする
+## 応用：moduleも対象とする
 
 Terraformにはmoduleと呼ばれるカスタムリソースを作る機能があります。詳しくは[Terraformerとしてコードを書いて思うこと](/articles/20211029a/)を参照ください。
 
@@ -130,7 +130,7 @@ plugin "google" {
 }
 ```
 
-# 応用：ルールを有効化する
+## 応用：ルールを有効化する
 
 TFLintに多くのチェックルールが予め用意されています。どんなルールがあって、どれがデフォルトで有効になっているかは以下に記載があるので確認すると良いでしょう。
 
@@ -181,11 +181,11 @@ Warning: local.unused is declared but not used (terraform_unused_declarations)
 Reference: https://github.com/terraform-linters/tflint/blob/v0.34.0/docs/rules/terraform_unused_declarations.md
 ```
 
-# 利用上の注意点
+## 利用上の注意点
 
 TFLintを使っていくなかで、注意しなければと思ったものをあげていきます。
 
-## 1. Local Valuesは評価されない
+### 1. Local Valuesは評価されない
 
 [TFLint skips expressions that reference static local values #571](https://github.com/terraform-linters/tflint/issues/571)にも記載があります。以下のように不正なインスタンスタイプをlocalsで定義してもエラーにならないです。
 
@@ -208,7 +208,7 @@ $ tflint
 # ルール違反を検知できない
 ```
 
-## 2. 利用しているTerraformのバージョンとTFLintを揃える必要がある
+### 2. 利用しているTerraformのバージョンとTFLintを揃える必要がある
 
 [Compatibility with Terraform](https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/compatibility.md)のドキュメントに記載がある通り、TFLintはTerraformを内蔵しています。そのため、利用しているTerraformのバージョンに合わせて、該当バージョンのTFLintを利用する必要がある
 
@@ -226,7 +226,7 @@ $ tflint
 
 - [Version固定でTFLintをインストールする](https://dev.classmethod.jp/articles/install-tflint-with-fixed-version/)
 
-## 3. Deep Checkingを利用する場合の注意事項
+### 3. Deep Checkingを利用する場合の注意事項
 
 [Deep Checking](https://github.com/terraform-linters/tflint-ruleset-google/blob/master/docs/deep_checking.md)は、GCPのAPIを利用してより厳密なチェックを行うことができるオプションです。
 
@@ -250,7 +250,7 @@ provider "google" {
 }
 ```
 
-# .tflint.hcl のサンプルを用意したので、TFLintを動かしてみよう
+## .tflint.hcl のサンプルを用意したので、TFLintを動かしてみよう
 
 全ルールをenableにした`.tflint.hcl` をサンプルとして用意しました。全ルールとは以下に記載のあるルールです。
 
@@ -377,7 +377,7 @@ rule "google_project_iam_policy_invalid_member" {
 
 実運用上は利用しないルールを、個別にdisableにし、検知結果に対して運用が回るように調整していくことが重要かなと思います。
 
-# まとめ
+## まとめ
 
 TFLintを使うことで、`terraform validate`や`terraform plan`で検知できないエラーを見つけることができました。
 

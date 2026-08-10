@@ -15,7 +15,7 @@ lede: "私のチームでは、「システムの設計情報」や「実装に�
 
 <img src="/images/2021/20210422b/chain-312403_640.png" class="img-small-size" alt="" title="Clker-Free-Vector-ImagesによるPixabayからの画像">
 
-# はじめに
+## はじめに
 
 フューチャー棚井龍之介です。
 
@@ -27,13 +27,13 @@ lede: "私のチームでは、「システムの設計情報」や「実装に�
 
 こういった状況への対応として「**リンク切れを自動検知する**」ために、CircleCI で Markdown ファイルのリンク切れを検知できるようにしました。
 
-## 完成版コード
+### 完成版コード
 
 <img src="https://github-link-card.s3.ap-northeast-1.amazonaws.com/r-ryu/markdown-link-checker.png" width="460px"loading="lazy">
 
 https://github.com/r-ryu/markdown-link-checker
 
-# 使うツール
+## 使うツール
 
 Markdown チェックのために、[markdown-link-check](https://github.com/tcort/markdown-link-check) を利用します。
 Markdown テキストからリンクを抽出し、各リンクが生きている（200 OK）か死んでいるかをチェックします。
@@ -56,7 +56,7 @@ Options:
   -h, --help             display help for command
 ```
 
-# CircleCIへの記述
+## CircleCIへの記述
 
 CircleCI の jobs 内で、markdown-link-check を呼び出します。
 
@@ -107,7 +107,7 @@ workflows:
 
 あとは CircleCI を回せば、リポジトリ内のリンク切れを全て検知してくれます。
 
-## 大量のリンク切れを検知したときは
+### 大量のリンク切れを検知したときは
 
 長期間メンテナンスされていないリポジトリの場合、markdown-link-check が大量のリンク切れを検知します。
 `.circleci/config.yml` に定義ファイルが追加された時点で、CircleCI が落ち続けてしまうので、まずはローカル実行でリンク切れ状況をチェックしましょう。
@@ -133,7 +133,7 @@ Error: task failed
 Success!
 ```
 
-## 特定のリンクは対象外にしたいとき
+### 特定のリンクは対象外にしたいとき
 
 正規表現で `ignorePatterns` を設定すれば、特定のリンクをチェック対象外に指定できます。
 
@@ -160,7 +160,7 @@ Success!
 その他、config.json の設定次第で様々な動作調整が可能です。
 詳細は [Config file format](https://github.com/tcort/markdown-link-check#config-file-format) をご参照ください。
 
-# おわりに
+## おわりに
 
 ドキュメントの増加やメンバーの入れ替えなどにより、徐々に資料の陳腐化が進んでしまうのはあるあるだと思います。資料パスのリンク切れは自動検知可能なので、こういった作業は自動化・仕組み化して、エンジニアは開発に集中しましょう。
 
@@ -168,7 +168,7 @@ Success!
 
 この方法が、読んでいただいた方の役に立てたら幸いです。
 
-## 参照記事
+### 参照記事
 
 - [markdown-link-check](https://github.com/tcort/markdown-link-check#config-file-format)
 - [今さらながらfindパイセンについてまとめてみた](/articles/20210331/)

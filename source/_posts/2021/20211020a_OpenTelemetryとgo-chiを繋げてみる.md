@@ -30,7 +30,7 @@ OpenTelemetryのGoのTraceがstableになり、1.0がリリースされました
 
 PHP/Rust/Swift/Erlangあたりはコミットチャンス？
 
-# 2年前からアップデートされていると感じたポイント
+## 2年前からアップデートされていると感じたポイント
 
 OpenTelemtryと、その前身のOpenCensusについてはこのブログでも取り上げました。
 
@@ -48,7 +48,7 @@ stdoutは地味でデバッグ用途っぽさが前のOpenCensusにはありま�
 
 で、stdoutに出すとなると、トレース以外の情報とかと混ざってしまいがちなので、アプリケーションログ出力とかも一緒に出せる仕組みが整備されるといいな、というところでアプリケーションログ機能もOpenTelemetryが備えるのはうれしいですね。ただ出すだけではなくて、[トレースとリンクできるようにトレースIDを持つ](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/data-model.md#trace-context-fields)ことが検討されてるようですね。実装は[Go製のFluentd的なStanza](https://github.com/observIQ/stanza)をベースにするとかなんとか。
 
-# OpenTelemetryは分散しない人にも注目
+## OpenTelemetryは分散しない人にも注目
 
 OpenTelemtryはその名の通り「テレメトリー」のためのソフトウェア群です。テレメトリーは一般用語です。次の解説がわかりやすいです。
 
@@ -65,7 +65,7 @@ OpenTelemtryはその名の通り「テレメトリー」のためのソフト�
 
 以前、[Future Tech Nightでローカルで動くログビューア](https://future-architect.github.io/articles/20210427b/)を試しに作って発表しました。これも構造化ロギングを前提としたものですが、アプリケーションログ出力が平準化されるなら、少ない設定でいい感じに動くビューアーとかも開発しやすくなりますね。
 
-# OpenTelemetryの始め方
+## OpenTelemetryの始め方
 
 アプリケーションに組み込む方法を紹介します。スタートするにはまずOpenTelemetryのサイトのRegisteryを見ると良さそうです。生のAPIを叩いてもいいのですが、アプリケーションの特定のミドルウェアやフレームワークとのインタフェースがinstrumentationとして提供されています。アプリケーション側のトレース情報を取り出す便利ライブラリがいくつもあります。
 
@@ -89,7 +89,7 @@ defer span.End()
 
 AWSはコレクター向けのものがあるので、アプリのエクスポーターとしてはコレクターを選択してコレクターの設定をするとX-Rayに出せるようです。
 
-# go-chiと繋ぐ
+## go-chiと繋ぐ
 
 で、ここを見るとお気に入りのgo-chiがありません。go-chiに繋いでみます。gorilla/muxもgo-chiも、ミドルウェアとしては言語標準的なインタフェースを共有しているため、gorilla/muxが使えないか試してみましたが、スパン名がUnknownとなってしまいます。
 
@@ -158,7 +158,7 @@ r.Use(otelchi.Middleware("hello-world"))
 
 https://gitlab.com/osaki-lab/otelchi
 
-# まとめ
+## まとめ
 
 OpenTelemetryの概要と、個人的に気になっているアップデートの方向性、実際にアプリに組み込む方法、go-chiに繋いでみる方法などを紹介しました。
 
@@ -166,7 +166,7 @@ OpenTelemetryは単に便利なライブラリというだけでなく新しい�
 
 本記事を書くにあたって[@ymotongpoo氏](https://twitter.com/ymotongpoo)と[@katzchang](https://twitter.com/katzchang)氏にアドバイスをいただきました。ありがとうございました。
 
-# 参考
+## 参考
 
 * [OpenTelemetry公式サイト](https://opentelemetry.io/)
 * [OpenTelemetry仕様リポジトリ](https://github.com/open-telemetry/opentelemetry-specification)

@@ -12,7 +12,7 @@ thumbnail: /images/2021/20211218a/thumbnail.png
 author: 木戸俊輔
 lede: "Software Design 2022年1月号に短期連載「Cypressで作る消耗しないE2Eテスト環境」を寄稿しました！"
 ---
-# はじめに
+## はじめに
 
 こんにちは。CSIG所属、踊るエンジニア木戸です。
 12/18発売の、[Software Design 2022年1月号](https://gihyo.jp/magazine/SD/archive/2022/202201)に短期連載「Cypressで作る"消耗しない"E2Eテスト環境」を寄稿しました！
@@ -21,7 +21,7 @@ lede: "Software Design 2022年1月号に短期連載「Cypressで作る消耗し
 
 連載は1月号から3月号に渡って計3回掲載予定であり、1月号は木戸、2月号はCSIG枇榔さん、3月号はTIG渋川さんが、テストツールCypressについて詳しく紹介します。1月号発売に伴って、簡単に宣伝させていただきます。
 
-# コンテンツ
+## コンテンツ
 
 連載では、E2Eテストのフレームワークである「[Cypress](https://www.cypress.io/)」の基本的な使い方やその特徴、さらにはよりアドバンスドな使い方までを紹介します。
 
