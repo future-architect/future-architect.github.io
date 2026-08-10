@@ -113,7 +113,7 @@ https://cloud.google.com/sdk/gcloud/reference/storage/rsync
 
 ### Airflow CLIを使う
 
-AirflowにはCLIが用意されており、例えばAirflow UI内での操作権限を制御（`Admin`や`Op`の付与）するためにコマンド操作が必要となります。これらのコマンド操作は`gcloud`コマンド経由でAirflowのCLIにアクセスすることができます。
+AirflowにはCLIが用意されており、例えばAirflow UI内での操作権限を制御（`Admin`や`Op`の付与）するためにコマンド操作が必要となります。これらのコマンド操作は`gcloud`コマンド経由でAirflowのCLIにアクセスできます。
 
 https://cloud.google.com/composer/docs/composer-2/access-airflow-cli?hl=ja
 
