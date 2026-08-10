@@ -4,7 +4,7 @@ date: 2026/05/25 00:00:00
 postid: a
 tags:
   - AWS
-  - ClaudeCode
+  - Claude
   - IAM
   - MCP
 categories:

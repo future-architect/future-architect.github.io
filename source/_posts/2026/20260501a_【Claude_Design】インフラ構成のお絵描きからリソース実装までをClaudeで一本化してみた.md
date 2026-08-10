@@ -3,7 +3,7 @@ title: "【Claude Design】インフラ構成のお絵描きからリソース�
 date: 2026/05/01 00:00:00
 postid: a
 tags:
-  - ClaudeCode
+  - Claude
   - Terraform
   - AWS
 categories:
