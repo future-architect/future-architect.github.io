@@ -71,7 +71,6 @@ https://docs.aws.amazon.com/ja_jp/cli/latest/userguide/cli-services-iam-create-c
 AWS環境の準備が完了したら次はGCP環境の準備です。まずは[DataTransfer APIの有効化](https://cloud.google.com/bigquery-transfer/docs/enable-transfer-service?hl=ja)にしましょう。
 
 コンソールタブの「APIとサービス」からライブラリを選択し、「BigQuery Data Transfer API」と入力して検索してください。
-<img src="/images/2020/20200214/photo_20200214_03.png" loading="lazy">
 
 検索したAPIを選択して、有効にするをクリックするとAPIが有効化されます。
 <img src="/images/2020/20200214/photo_20200214_04.png" loading="lazy">
