@@ -133,7 +133,7 @@ DeepLに日本語訳してもらいます。
 
 `terraform` コマンドでよく使うのは、 `plan` 、 `apply` 、 `destroy` の3つだと思います。それぞれのコマンドには多数のオプションがあることをご存知でしょうか？ ここでは、私が1ヶ月間の間に非常にお世話になったコマンド・オプションを3つピックアップして紹介します。
 
-#### `terraform apply -target=(リソース名)`
+#### terraform apply -target=(リソース名)
 
 https://developer.hashicorp.com/terraform/tutorials/state/resource-targeting
 
@@ -153,13 +153,13 @@ https://developer.hashicorp.com/terraform/tutorials/state/resource-targeting
 
 - [tftarget:Terraformターゲットを選択的に実行するためのGo製CLIツール](https://future-architect.github.io/articles/20230329a/)
 
-#### `terraform apply -parallelism=(並列実行数)`
+#### terraform apply -parallelism=(並列実行数)
 
 https://developer.hashicorp.com/terraform/cli/commands/apply#parallelism-n
 
 リソースを構築する際の実行を並列にするオプションです。デフォルトは `10` のため、この数字を増やすことで、applyやdestroyの速度を上げる事ができます。とはいえ、apply完了までの時間はリソース同士の依存関係やリソースの構築時間にもよるので、よっぽど大量のリソースを構築する場合でなければ、そこまで恩恵は得られないと思います。
 
-#### `terraform fmt -recursive`
+#### terraform fmt -recursive
 
 https://developer.hashicorp.com/terraform/cli/commands/fmt#usage
 

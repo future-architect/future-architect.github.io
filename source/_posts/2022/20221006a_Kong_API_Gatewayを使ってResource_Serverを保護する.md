@@ -140,19 +140,19 @@ curl -X POST http://localhost:8001/consumers/authorized_user/jwt \
      "rsa_public_key": "-----BEGIN PUBLIC KEY-----\nMIIBI...QIDAQAB\n-----END PUBLIC KEY-----"}'
 ```
 
-#### `key`
+#### key
 
 JWTのペイロード`iss`と同じ値を設定します。
 このAPIにアクセスできるユーザ(`authorized_user`)は、みんな同じ認可サーバ(`Issuer`)から発行されたトークンを持ってる(`Bearer`)ことを意味します。
 
 JWTプラグインのデフォルト設定で`config.key_claim_name=iss`となるので、別のClaimの値にしたい場合(例えば`aud`か`azp`など)はAdminAPIの`/plugins/{jwt plug-in ID}`をPATCHなどして変更も可能です。
 
-#### `algorithm`
+#### algorithm
 
 Keycloakでデフォルトで発行するAccessToken(JWT)のアルゴリズムである`RS256`を指定します。
 注意するところは、もしこの設定のリクエストで下記の`rsa_public_key`のPEM形式が正しくない場合でも、このフィールドのエラーメッセージが出ます。
 
-#### `rsa_public_key`
+#### rsa_public_key
 
 Keycloakは同じRealmのユーザには同じ公開鍵でJWTを署名しているので、AdminConsoleの`Realm Settings > Keys`から`RS256`の公開鍵をPEM形式でセットします。
 一般的にRS256のJWT検証に使われるJWKs Endpointの証明書(`x5c`)と違い、公開鍵であることに注意しましょう。
