@@ -334,7 +334,7 @@ toolの使用を許可すると、 `shouldGetToken` を叩き、結果を受け�
 
 <img src="/images/2025/20250421a/image_10.png" alt="" width="753" height="888" loading="lazy">
 
-#### おわりに
+## おわりに
 
 MCPサーバを自作してAIエージェントに繋いでみることで、MCPサーバの嬉しさや仕組みについて理解を深めることができました。
 

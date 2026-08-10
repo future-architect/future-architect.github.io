@@ -252,7 +252,7 @@ report.show(mode='inline') # Notebookのセル出力で結果を表示する
 * 金銭的コスト
   * Evidently AIを動かすサーバ・関数等のコストが掛かります
 
-### 6. まとめ
+## 6. まとめ
 
 本記事ではVertex AIとEvidently AIを用いたOutput Metrics監視の検証を行いました。\
 検証の結果を以下の表にまとめます。様々な観点で両者を比較しているので、ご参考になれば幸いです。

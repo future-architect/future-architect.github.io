@@ -449,7 +449,7 @@ $ aws --endpoint-url http://localhost:4566 lambda list-functions
 
 これで、ローカルに閉じた環境で、Terraformを好き放題使えますね！
 
-### まとめ
+## まとめ
 
 本記事では、Localstackに向けてTerraformを実行する方法をご紹介しました。
 
@@ -463,7 +463,7 @@ $ aws --endpoint-url http://localhost:4566 lambda list-functions
 
 ここまで読んでいただいた皆様も、色々なリソースをterraformコマンドでLocalstackに構築してみてください！
 
-### 参考
+## 参考
 
 - [Terraform Registory Custom Service Endpoint Configuration](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/guides/custom-service-endpoints#available-endpoint-customizations)
 - [Testing Infrastructure as Code on Localhost](https://www.hashicorp.com/resources/testing-infrastructure-as-code-on-localhost)
