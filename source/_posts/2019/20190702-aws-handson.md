@@ -11,9 +11,6 @@ categories:
 author: 柳澤隆太郎
 lede: "あるプロジェクトでデータ分析基盤を開発することになり、データレイクを中心としたソリューションについて学ぶためにAWS Datalake Hands-onに参加してきました"
 ---
-
-## AWS Datalake Hands-on(2019 May)メモ
-
 2019/05/29にAWS Japanで行われたDataLakeについてのHands-onメモです。
 
 ### 目次
