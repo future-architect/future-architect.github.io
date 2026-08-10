@@ -49,12 +49,12 @@ hexo.extend.helper.register('tag_stats', function(name) {
     [].concat(post.author || []).forEach(a => recentAuthors.add(a));
   });
   // そのタグの記事がどのカテゴリに属するか。カテゴリページの topTags の対で、
-  // 件数も同じ上位5件。ただし 20本に1本（5%）に満たないカテゴリは
-  // タグの傾向とは言えないので切る（Go 261本中の Security 7本など）。
-  // 切る強さはこの一点だけで、効きが弱ければ1割に倒す。連続的な調整はしない。
+  // 件数も同じ上位5件。ただし 10本に1本（10%）に満たないカテゴリは
+  // 見出しの「よく使われる」とは言えないので切る。2番手カテゴリのシェアは
+  // 10%以上に集中していて、これより下で拾えるのはほぼ2〜3本のノイズだった。
   // 1本きりのカテゴリは割合によらず傾向と言えないので数えない (#2139)
   const topCategories = [...catCount.values()]
-    .filter(c => c.count >= 2 && c.count / tag.posts.length >= 0.05)
+    .filter(c => c.count >= 2 && c.count / tag.posts.length >= 0.10)
     // 同点の決着が無いとビルドごとに並びが変わる
     .sort((a, b) => b.count - a.count || (a.name < b.name ? -1 : 1))
     .slice(0, 5);
