@@ -21,11 +21,12 @@ hexo.extend.helper.register("get_ga4_pv", url => {
 
 // 推薦の件数は記事数から決める。推薦が全記事の半分を超えると
 // 一覧の並べ替えにしかならず、新着とほぼ同じ顔ぶれになるため、
-// 2件には4本以上、4件には8本以上を要求する (#2173)
+// 2件には4本以上、4件には8本以上、6件には12本以上を要求する (#2173 / #2272)
 function recommendLimit(count) {
   if (count <= 3) return 0;
   if (count <= 7) return 2;
-  return 4;
+  if (count <= 11) return 4;
+  return 6;
 }
 
 // 指定した記事の中から PV の多い順に取り出す。カテゴリ・タグの一覧ページで
