@@ -68,7 +68,7 @@ https://cloud.google.com/about/locations?hl=ja#network
 
 ## GCP の全 Region 間のレイテンシを計測する
 
-#### 計測対象
+### 計測対象
 
 こちらの [Compute Engine リージョンとゾーン](https://cloud.google.com/compute/docs/regions-zones?hl=ja) に記載の全Region を対象にします。
 ※すいません、ムンバイだけ、QuotaがデフォルトでCPUS:0となっており、上げるリクエストを出したんですが、拒否されてしまいました。その関係で、ムンバイだけ計測が出来ませんでした🙇‍♂️
@@ -82,7 +82,7 @@ https://cloud.google.com/about/locations?hl=ja#network
 ※インスタンス構築のための `Terraform` コード、計測のためのスクリプトはAppendixに載せておきます。
 　スクリプトは並列処理をするべきでした。そこはちょっと作り足りない感があります。
 
-#### 計測結果
+### 計測結果
 
 計測結果は以下です。
 

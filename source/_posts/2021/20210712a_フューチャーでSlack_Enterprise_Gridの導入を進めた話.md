@@ -56,7 +56,7 @@ TIGの山上・[村田](https://twitter.com/famipapamart)です。
 
 <img src="/images/2021/20210712a/image_3.png" alt="コスト的にもEnterpriseGridの方がメリット大きいじゃん" width="720" height="405" loading="lazy">
 
-#### 導入に向けて実施したこと
+### 導入に向けて実施したこと
 
 移行に向けた準備:
 
@@ -75,7 +75,7 @@ TIGを中心に、AIグループやセキュリティグループに展開。
 
 <img src="/images/2021/20210712a/スクリーンショット_2021-07-09_18.06.06.png" alt="Slackの社内展開イメージ" width="811" height="432" loading="lazy">
 
-#### 導入後の利用状況
+### 導入後の利用状況
 
 * 全社員（1,000人）の80％が利用
 * ゲスト700人程度

@@ -57,7 +57,7 @@ SQLフォーマッタとはSQLを統一された体裁にフォーマットし�
 
 インターン中に作成したフォーマッタの機能を紹介します。
 
-#### インデント揃え
+### インデント揃え
 
 このように、行の初めのインデントを揃えます。
 
@@ -79,7 +79,7 @@ AND	STD.SPORTID	=	(
 
 ```
 
-#### 縦揃え
+### 縦揃え
 
 このように、`AS`の位置や行末に現れるコメントが、各ブロックで縦揃えされます！
 
@@ -91,7 +91,7 @@ FROM
     STUDENT STD -- 学生
 ```
 
-#### エイリアス補完
+### エイリアス補完
 
 [フューチャー株式会社が提供するSQLのコーディング規約](/coding-standards/documents/forSQL/SQL%E3%82%B3%E3%83%BC%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E8%A6%8F%E7%B4%84%EF%BC%88Oracle%EF%BC%89.html#exists-%E5%8F%A5)ではエイリアスについて以下のように定められています。
 
@@ -130,7 +130,7 @@ FROM
 
 <blockquote class="twitter-tweet"><p lang="ja" dir="ltr">フューチャーSQL規約だとasの省略ダメだった<a href="https://t.co/WuTcLmeGAB">https://t.co/WuTcLmeGAB</a></p>&mdash; Junki Mano (@ma91n) <a href="https://twitter.com/ma91n/status/1570043822742319106?ref_src=twsrc%5Etfw">September 14, 2022</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
-#### 冗長な括弧の除去
+### 冗長な括弧の除去
 
 余分な括弧がある場合は自動的に取り除きます。
 
@@ -172,11 +172,11 @@ OR	(
 
 ## 今後の課題
 
-#### 1. 利用しやすさの向上
+### 1. 利用しやすさの向上
 
 現状はCLI上でしか動作しませんが、今後はVSCodeの拡張機能化、Web上で動作できるようにWebAssembly化をしたいと考えています。
 
-#### 2. 機能面の向上
+### 2. 機能面の向上
 
 現状は基本的なSQLの構文にしか対応していませんが、今後はその他の構文へも対応したいと考えています。
 

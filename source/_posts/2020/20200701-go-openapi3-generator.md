@@ -80,7 +80,7 @@ oapi-codegen openapi.yml > openapi.gen.go
 コマンドのパラメータで制御できるようでしたので、それぞれ別にコード生成し中身を確認していきます。
 (生成コードは長くなるため一部抜粋しています。)
 
-#### 型定義
+### 型定義
 
 - OpenAPI の `components` から struct を生成
 - リクエスト Bodyの定義も同様に生成
@@ -108,7 +108,7 @@ type NewPet struct {
 
 ```
 
-#### http client
+### http client
 
 - API仕様が interface として出力
 - 2種類の interface が定義
@@ -186,7 +186,7 @@ params := openapi.FindPetsParams{Tags: []string{"dog"}}
 res, err := c.FindPets(context.Background(),  params)
 ```
 
-#### http server
+### http server
 
 - API仕様が interface として定義
 - interface を実装する形で Server側のコードを実装していく
@@ -292,7 +292,7 @@ func main() {
 oapi-codegen -generate "chi-server" openapi.yml > openapi_chi_server.gen.go
 ```
 
-#### OpenAPI spec
+### OpenAPI spec
 
 - base64形式で `openapi.yaml` を保持
 

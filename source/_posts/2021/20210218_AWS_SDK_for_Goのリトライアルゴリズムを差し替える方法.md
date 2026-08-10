@@ -95,7 +95,7 @@ func (d DefaultRetryer) RetryRules(r *request.Request) time.Duration {
 
 https://github.com/aws/aws-sdk-go/blob/d8a5a9febe5602f134648c18e9f83546284cda35/aws/client/default_retryer.go#L77-L123
 
-#### デフォルトの設定
+### デフォルトの設定
 
 デフォルトのリトライの設定は以下のようになっています。
 

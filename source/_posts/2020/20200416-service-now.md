@@ -42,7 +42,7 @@ lede: "さて、皆さん、ServiceNow(以降：SNOW)というSaaSはご存知�
 
 <img src="/images/2020/20200416/photo_20200416_01.png" loading="lazy">
 
-#### 作るコンポーネント（上の図の番号と紐づいています）
+### 作るコンポーネント（上の図の番号と紐づいています）
 
 1. SNOW の Service Catalog を利用し、準備するインフラをメニュー化する（簡単な＆頻繁なリクエストのみ）
 2. Terraform の各種実行と、承認を順番に実施するワークフローを実行するFlowDesignerを作る。
@@ -52,7 +52,7 @@ lede: "さて、皆さん、ServiceNow(以降：SNOW)というSaaSはご存知�
 4に関しては、**SNOW の API リファレンスのサンプルコードは基本 Python** なので、そっちの方がベターです。本記事では、単にGoを書きたかったので、Goを採用しています。
 また、最初に申し上げておきますが、分量の関係で全ての実装方法を画像やコードで丁寧に記載する事が難しいです。もちろん核となる箇所は極力丁寧に記載していきます。
 
-#### 本記事で取り上げるインフラ構築のシチュエーション
+### 本記事で取り上げるインフラ構築のシチュエーション
 
 **アプリチームからのインスタンス構築依頼を受けてGCEを用意** というシチュエーションを例にします。以下が前提です。
 
@@ -386,7 +386,7 @@ terraform apply -auto-approve -no-color
 
 ## 動作確認
 
-#### ユーザの操作
+### ユーザの操作
 
 Service Catalog のダッシュボードに、GCP infra の ウィジェット を追加すると、以下の様になります。
 <img src="/images/2020/20200416/u1.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
@@ -400,7 +400,7 @@ Shoppingっぽくなっているのは、あんまり気にしないでくださ
 
 これだけでユーザのリクエストは完了です。本当にパラメータを2つ入れるだけ。
 
-#### リクエストの状態を確認
+### リクエストの状態を確認
 
 リクエストされたアイテムを見ると、自分の上司で止まっているのが確認できます。
 <img src="/images/2020/20200416/u5.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
@@ -413,7 +413,7 @@ Terraform の実行ログを見てみましょう。この結果からすると�
 <img src="/images/2020/20200416/u8.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
 <img src="/images/2020/20200416/u9.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
 
-#### 承認を回す
+### 承認を回す
 
 それじゃあ、上司のアカウントでログインして、承認しましょう。
 <img src="/images/2020/20200416/u10.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
@@ -426,7 +426,7 @@ Terraform の実行ログを見てみましょう。この結果からすると�
 
 なぜか名前に既視感がありますねぇ…不思議…
 
-#### apply の結果を見てみる
+### apply の結果を見てみる
 
 これで承認が回ったので GCE がデプロイ（アプリ-Tにデリバリー）されているはずです。早速関連リストからTerraformの実行ログを見てみましょう。
 <img src="/images/2020/20200416/u13.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">

@@ -229,7 +229,7 @@ npm run test
 [公式ページ](https://testing-library.com/docs/vue-testing-library/examples)にある例を使用します。
 今回は上のページの例をここまでの設定で生成されたスタイルに合わせて少し改変して使用します。
 
-#### テスト用パッケージのインストール
+### テスト用パッケージのインストール
 
 vue-jestと記事の主役である`@testing-library/vue@next`をインストールします。
 
@@ -243,7 +243,7 @@ npm install --save-dev vue-jest@next
 npm install --save-dev @testing-library/vue@next
 ```
 
-#### テスト用コンポーネント&テストコード配置
+### テスト用コンポーネント&テストコード配置
 
 ```html src/components/Counter.vue
 <template>
@@ -292,7 +292,7 @@ test("increments value on click", async () => {
 });
 ```
 
-#### jest.config.js の"transform"に追記
+### jest.config.js の"transform"に追記
 
 "transform"には以下のように、vueファイルに対してvue-jestを使うよう指示します。
 
@@ -303,7 +303,7 @@ test("increments value on click", async () => {
 },
 ```
 
-#### jestのバージョンに気を付けよう
+### jestのバージョンに気を付けよう
 
 ここまでの設定を追えて`npm run test`を実行すると、以下のようにエラーが発生します。
 
@@ -328,7 +328,7 @@ jest, ts-jestの27系でバグがあるようです。jestとts-jestは26系に�
 npm install --save-dev jest@26 ts-jest@26
 ```
 
-#### babalの設定をする
+### babalの設定をする
 
 これでもまだ`npm run test`を実行すると、以下のようにエラーが発生します。
 

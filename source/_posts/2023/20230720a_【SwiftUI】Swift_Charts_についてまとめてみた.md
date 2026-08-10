@@ -321,7 +321,7 @@ https://developer.apple.com/videos/play/wwdc2023/10037/
 
 最後に、学習してきた知識を活用して、iPhoneアプリなどに標準で搭載されているスクリーンタイムのグラフを模倣してみました。
 
-#### 環境
+### 環境
 
 - macOS: Ventura 13.4.1
 - Xcode: Version 14.3.1 (14E300c)

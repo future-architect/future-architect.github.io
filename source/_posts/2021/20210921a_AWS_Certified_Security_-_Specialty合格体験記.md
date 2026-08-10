@@ -38,24 +38,24 @@ Solutions Architectをはじめ、各種試験にもセキュリティに関す�
 
 下記の概要が一通り理解できるまでAWSの全体像を把握できていれば問題の内容自体が極めて難しいと感じる事はないと思います。
 
-##### ネットワーキング
+### ネットワーキング
 
 * NACL、セキュリティグループ
 * NAT Gateway
 
-##### 攻撃対策
+### 攻撃対策
 
 * AWS WAF
 * AWS Shield
 * Amazon CloudFront
 
-##### アクセス制御
+### アクセス制御
 
 * AWS IAM、 SCP
 * Active Directory、 SSO
 * Amazon Cognito
 
-##### セキュリティ診断
+### セキュリティ診断
 
 * Amazon Inspector
 * AWS Trusted Advisor
@@ -64,20 +64,20 @@ Solutions Architectをはじめ、各種試験にもセキュリティに関す�
 * Amazon GuardDuty
 * AWS Artifact
 
-##### ロギング
+### ロギング
 
 * VPC フローログ
 * AWS CloudTrail
 * Amazon CloudWatch Logs
 * Amazon Athena
 
-##### アラート、対応の自動化
+### アラート、対応の自動化
 
 * Amazon CloudWatch Events
 * Amazon Simple Notification Service
 * AWS Lambda
 
-##### 暗号化
+### 暗号化
 
 * AWS Key Management Service (KMS)
 * AWS Secrets Manager

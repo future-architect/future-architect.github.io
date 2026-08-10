@@ -134,7 +134,7 @@ BLE通信を用いて身近にいるのに気付いていない、「優秀な�
 ・・・・・・
 ・・・・・・
 
-#### <Font color="red">**最優秀賞**</Font>を頂きました！！
+### <Font color="red">**最優秀賞**</Font>を頂きました！！
 
 （SPAJAM予選結果ページは[こちら](https://spajam.jp/entry/tokyo-a/)）
 

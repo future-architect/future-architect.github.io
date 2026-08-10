@@ -44,7 +44,7 @@ GoでBacklogチケットを取り扱うロジックは[公式ドキュメント]
 
 詳細な使用方法はREADMEに記載されていますので、補足資料として必要な情報を記載します。
 
-#### Configについて
+### Configについて
 
 ```go main.go
 // ClientOption is input options to build client
@@ -81,15 +81,15 @@ type SearchCondition struct {
 
 きちんと期限日を設定しないとどれだけ放置されても検知できませんのでご注意ください。設定の内容を整備したら、適宜手動で実行するか、任意のアーキテクチャで定時バッチとして実行する使い方を想定しています。
 
-#### BacklogのAPIキーの取得方法
+### BacklogのAPIキーの取得方法
 
 [公式のリファレンス](https://support-ja.backlog.com/hc/ja/articles/360035641754-API%E3%81%AE%E8%A8%AD%E5%AE%9A)を参照してください
 
-#### Slackの連携URL
+### Slackの連携URL
 
 Slackとの連携にはIncoming Webhooksを利用しています。公式ドキュメントは[こちら](https://api.slack.com/messaging/webhooks)です。
 
-#### チケットの検索条件について
+### チケットの検索条件について
 
 Backlogの課題取得APIを実行しています。
 

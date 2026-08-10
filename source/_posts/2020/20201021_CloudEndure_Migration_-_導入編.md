@@ -64,40 +64,40 @@ CloudEndure Migrationの仕様と利用開始まで、以下の順番で説明�
 
 主要なアクターは以下の通りです。
 
-#### Corporate Data Center / Any Cloud
+### Corporate Data Center / Any Cloud
 
 移行元のサーバーが存在する環境を指します。
 
-#### CloudEndure Agent
+### CloudEndure Agent
 
 移行元サーバーにインストールして利用します。
 後述するレプリケーションサーバーに対して、移行元サーバーのデータをバックグラウンドで送信する役割を担います。
 
-#### AWS Cloud
+### AWS Cloud
 
 移行先のAWS環境を指します。
 
-#### Staging Area Replication Servers
+### Staging Area Replication Servers
 
 移行元のサーバーにインストールしたエージェントから継続的にデータを受け取り、EBSへ受け取ったデータを複製する、軽量のEC2インスタンスを指します。
 (以降、レプリケーションサーバーと呼ぶ。)
 
-#### Staging Area VPC Subnet
+### Staging Area VPC Subnet
 
 レプリケーションサーバーが起動されるサブネットです。
 こちらのサブネットは、移行元のサーバーと通信が可能である必要があります。
 
-#### Launched Target EC2 instance
+### Launched Target EC2 instance
 
 レプリケーションサーバーから複製されたEBSを基に起動される、EC2インスタンスを指します。
 このEC2インスタンスが、移行完了時のサーバーです。
 (以降、ターゲットマシンと呼ぶ。)
 
-#### Target VPC Subnet
+### Target VPC Subnet
 
 ターゲットマシンが起動されるサブネットです。
 
-#### CloudEndure User Console (CloudEndure Service Manager)
+### CloudEndure User Console (CloudEndure Service Manager)
 
 移行元サーバーの登録や管理、レプリケーション(複製)状態の監視、ターゲットマシンの起動などを行う管理コンソールです。
 
@@ -117,15 +117,15 @@ CloudEndure Migrationを利用するための、ネットワーク要件は以�
 
 ### TCPポート443での通信
 
-##### 移行元のサーバーとCloudEndure Service Manager間の通信
+#### 移行元のサーバーとCloudEndure Service Manager間の通信
 
 移行元サーバへエージェントをインストールする際に使用するAPIや、エージェントの監視に使用されます。
 
-##### レプリケーションサーバーとCloudEndure Service Manager間の通信
+#### レプリケーションサーバーとCloudEndure Service Manager間の通信
 
 レプリケーションサーバーのログや、API実行時に使用されます。
 
-##### 注意事項
+#### 注意事項
 
 CloudEndure Service ManagerのIPアドレスは、以下2つが公開されています。
 移行元環境のファイアウォール等で制御している場合は、通信を許可する必要があります。
@@ -137,7 +137,7 @@ CloudEndure Service ManagerのIPアドレスは、以下2つが公開されて�
 
 ### TCPポート1500での通信
 
-##### 移行元のサーバーとレプリケーションサーバー間の通信
+#### 移行元のサーバーとレプリケーションサーバー間の通信
 
 移行元サーバーのデータ転送に使用されます。
 
@@ -147,13 +147,13 @@ OS、バージョンごとに、必要な要件および制約が異なります
 
 以下の要件については、OSのバージョンに関係なく要件を満たしておく必要があります。
 
-#### Windows
+### Windows
 
 * 利用可能なWindowsUpdateは、全てインストールしておくこと推奨
 * 移行後のサーバーが正常に起動するには、移行元のサーバーに少なくとも2GBの空き容量が必要
 * GPTパーティションを持つWindowsのディスクはサポートしていない
 
-#### Linux
+### Linux
 
 * エージェントのインストールには、Python2.4以降、または、Python3.0以降が必要
 * GRUBブートローダーを使用するマシンのみサポート

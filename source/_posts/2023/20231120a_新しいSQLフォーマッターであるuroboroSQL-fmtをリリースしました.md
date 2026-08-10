@@ -21,7 +21,7 @@ lede: "新しいSQLフォーマッターであるuroboroSQL-fmtをリリース�
 先日、新しいSQLフォーマッターである[uroboroSQL-fmt](https://github.com/future-architect/uroborosql-fmt)をリリースしました 🎉
 このツールは弊社が公開している[PostgreSQL向けのSQLコーディング規約](https://future-architect.github.io/coding-standards/documents/forSQL/SQL%E3%82%B3%E3%83%BC%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E8%A6%8F%E7%B4%84%EF%BC%88PostgreSQL%EF%BC%89.html)に基づき、SQL文をフォーマットするツールです。  
 
-### 弊社でのSQLフォーマッター開発の取り組み
+## 弊社でのSQLフォーマッター開発の取り組み
 
 元々弊社では[uroboroSQL Formatter](/articles/20170228/)（以下uroboroSQL Formatterを旧版、uroboroSQL-fmtを新版と呼ぶ）というSQLフォーマッターを公開していました。旧版は
 
@@ -30,7 +30,7 @@ lede: "新しいSQLフォーマッターであるuroboroSQL-fmtをリリース�
 
 という課題を抱えており、それを解消するため新たなSQLフォーマッターを開発していました。
 
-#### ANTLR+TypeScriptによるSQLフォーマッターの開発
+### ANTLR+TypeScriptによるSQLフォーマッターの開発
 
 [Engineer Camp2020](/articles/20200606/)でANTLRとTypeScriptによるSQLフォーマッターを開発しました。インターンシップ中にSQLがフォーマットできるようになり、この方向性で旧版が抱えていた課題は解決できそうに思えましたが、SQLの構文解析が著しく遅いという問題点がありました。弊社太田が[ANTLRのJavaScript runtimeの不具合を発見](https://github.com/antlr/antlr4/issues/2902)し、かなり高速化されたものの実用的な速さにはならなかったこともありANTLRを用いたSQLフォーマッターの開発はストップしました。
 
@@ -38,7 +38,7 @@ lede: "新しいSQLフォーマッターであるuroboroSQL-fmtをリリース�
 
 - [Engineer Camp2020でSQLフォーマッタを開発しました](/articles/20200919/)
 
-#### RustによるSQLフォーマッターの開発
+### RustによるSQLフォーマッターの開発
 
 旧版の課題を解決しつつ十分な速さでフォーマット可能なSQLフォーマッターを開発するため、[Engineer Camp2022](https://future-architect.github.io/articles/20220606b/)でRustによるSQLフォーマッターの開発を開始しました。インターンシップ終了時点で簡単なSQLのフォーマットが可能になり、その後もアルバイトとしてSQLフォーマッター開発に参画していただき、旧版のフォーマッターでは実現できなかったSELECT句のエイリアス補完等の機能、[vscode拡張化](https://marketplace.visualstudio.com/items?itemName=Future.uroborosql-fmt)、[wasm化](https://future-architect.github.io/uroborosql-fmt/)を実現しリリースに至りました。
 
@@ -51,9 +51,9 @@ lede: "新しいSQLフォーマッターであるuroboroSQL-fmtをリリース�
 - [Rust製SQLフォーマッタをnapi-rsを利用してVSCode拡張機能化](/articles/20221228a/)
 - [C/C++を呼び出しているRustのWASM化](/articles/20230605a/)
 
-### 旧版と新版の比較
+## 旧版と新版の比較
 
-#### 処理時間比較
+### 処理時間比較
 
 新しく開発したSQLフォーマッターでは処理時間が大幅に向上しています！
 巨大なSQLファイルと小さなSQLファイルをフォーマットしたときの処理時間を比較しました。
@@ -64,13 +64,13 @@ lede: "新しいSQLフォーマッターであるuroboroSQL-fmtをリリース�
 |3985行のINSERT-SELECT文|1m53.651s|0m0.194s|
 |[6行のSELECT文](https://github.com/future-architect/uroborosql-fmt/blob/main/crates/uroborosql-fmt/testfiles/dst/select/asterisk.sql)|0m0.357s|0m0.054s|
 
-#### 機能比較
+### 機能比較
 
 字句解析ベースから構文解析ベースになったことで、下記のような構文を意識した補完やauto fixができるようになっています。
 
-##### カラムのAS補完
+#### カラムのAS補完
 
-###### フォーマット前
+##### フォーマット前
 
 ```sql
 SELECT
@@ -79,7 +79,7 @@ FROM
 	TBL
 ```
 
-###### フォーマット後
+##### フォーマット後
 
 ```sql
 SELECT
@@ -88,9 +88,9 @@ FROM
 	TBL
 ```
 
-##### カラムエイリアス補完
+#### カラムエイリアス補完
 
-###### フォーマット前
+##### フォーマット前
 
 ```sql
 SELECT
@@ -99,7 +99,7 @@ FROM
 	TAB1
 ```
 
-###### フォーマット後
+##### フォーマット後
 
 ```sql
 SELECT
@@ -108,9 +108,9 @@ FROM
 	TAB1
 ```
 
-##### 長い関数呼出の折返し
+#### 長い関数呼出の折返し
 
-###### フォーマット前
+##### フォーマット前
 
 ```sql
 select
@@ -128,7 +128,7 @@ where
 longlonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglong(param1,param2) = case when t.col2 = 1 then 'pattern1' else 'default' end
 ```
 
-###### フォーマット後
+##### フォーマット後
 
 [max_char_per_line](https://github.com/future-architect/uroborosql-fmt/blob/main/docs/options/max_char_per_line.md)の設定は関数呼出の長さの上限を表し、デフォルトが50になっています。
 
@@ -164,7 +164,7 @@ where
 		end
 ```
 
-##### 新旧の機能比較
+#### 新旧の機能比較
 
 その他新旧の機能比較は下記です。
 
@@ -199,18 +199,18 @@ where
 - PostgreSQL以外のSQLには対応していないため、PostgreSQL以外のSQLのフォーマットには旧版の使用をお勧めしています。
 - Eclipse pluginとexe版は現在は用意できていないのですが、将来的には作成する予定です！
 
-### 使い方
+## 使い方
 
-#### 方法1：wasm版を試してみる
+### 方法1：wasm版を試してみる
 
 wasm版は[こちらのデモ](https://future-architect.github.io/uroborosql-fmt/)でお試しできます。
 使い方についてはデモページ内の説明をご参照ください。
 
-##### wasm版の実行イメージ
+#### wasm版の実行イメージ
 
 <img src="/images/2023/20231120a/wasm版フォーマットデモ.gif" alt="wasm版フォーマットデモ.gif" width="1200" height="618" loading="lazy">
 
-#### 方法2：vscode拡張として使用する
+### 方法2：vscode拡張として使用する
 
 1. まず、他の拡張機能と同様に[uroborosql\-fmt \- Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=Future.uroborosql-fmt)をvscodeにインストールしてください。
 1. settings.jsonに以下の設定を入れてください
@@ -226,7 +226,7 @@ wasm版は[こちらのデモ](https://future-architect.github.io/uroborosql-fmt
 1. SQLファイルを開き、コマンドパレットから`Format Document`か、`format sql`を実行してください
   `format sql`では選択範囲のフォーマットをサポートしています
 
-##### フォーマットの設定方法
+#### フォーマットの設定方法
 
 フォーマットの各種設定を記載したファイルのパスを指定できます。
 指定されなかった場合にはデフォルトのパスにある `./.uroborosqlfmtrc.json` を読み込みます。
@@ -255,17 +255,17 @@ wasm版は[こちらのデモ](https://future-architect.github.io/uroborosql-fmt
 }
 ```
 
-##### vscode拡張版の実行イメージ
+#### vscode拡張版の実行イメージ
 
 <img src="/images/2023/20231120a/vscode版フォーマットデモ.gif" alt="vscode版フォーマットデモ.gif" width="817" height="585" loading="lazy">
 
-#### 方法3：cliで使用する
+### 方法3：cliで使用する
 
 1. Rustの環境を構築
 1. `cargo install --git https://github.com/future-architect/uroborosql-fmt` で `uroborosql-fmt-cli` をインストール
 1. `uroborosql-fmt-cli input.sql` で `input.sql` をフォーマットした結果が標準出力に出力されます。`uroborosql-fmt-cli input.sql result.sql` のように第2引数を渡すと、第2引数で指定したファイルにフォーマット結果が格納されます
 
-### チーム開発で使用する場合
+## チーム開発で使用する場合
 
 1. `.vscode/settings.json` を作成し、以下のように`uroborosql-fmt.configurationFilePath`の設定を記載してください
 
@@ -277,7 +277,7 @@ wasm版は[こちらのデモ](https://future-architect.github.io/uroborosql-fmt
 
 1. チームで使用したいフォーマットの設定を`.uroborosqlfmtrc.json`に記載し、リポジトリ直下に配置してください
 
-### 最後に
+## 最後に
 
 まだまだ枯れておらずフォーマットできないことも多いです。元のSQLを壊していないか検証するロジックは入っていますが、意図しない変更が入っていないか確認お願いします。不具合や要望等ございましたらお気軽にissueやPRいただければと思います。
 

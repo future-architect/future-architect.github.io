@@ -78,11 +78,11 @@ CircleCIからChangeLogを生成するため、 `.circleci/config.yml` に実装
 3. .circleci/config.yml　を編集する
 ```
 
-##### 1. GitHubの個人アクセストークンを取得する
+#### 1. GitHubの個人アクセストークンを取得する
 
 GitHubから取得する方法については、[個人アクセストークンを使用する](https://docs.github.com/ja/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token)をご参照ください。
 
-##### 2. CircleCIの環境変数にGitHubの個人アクセストークンを設定する
+#### 2. CircleCIの環境変数にGitHubの個人アクセストークンを設定する
 
 CircleCIの環境変数の設定方法は、[コンテキストの使用](https://circleci.com/docs/ja/2.0/contexts/)をご参照ください。
 
@@ -90,7 +90,7 @@ CircleCIの環境変数の設定方法は、[コンテキストの使用](https:
 
 <img src="/images/2021/20210708a/スクリーンショット_2021-06-27_8.19.12.png" alt="アクセストークンの設定" width="853" height="471">
 
-##### 3. `.circleci/config.yml` を編集する
+#### 3. `.circleci/config.yml` を編集する
 
 該当部分のソースコードは下記です。
 tagがリモートリポジトリにpushされた場合のみ、 `release`ジョブが発火するようにしています。
@@ -160,7 +160,7 @@ github-release release \
 
 Tipsを載せておきます。
 
-#### ローカルからChangeLogを更新したい
+### ローカルからChangeLogを更新したい
 
 ローカルにGoが入っている方は以下コマンドでインストール、入っていない方はバイナリをインストールしてください。
 
@@ -187,7 +187,7 @@ $ github-release release \
   --description "$(ghch --format=markdown --latest)"
 ```
 
-#### 最新バージョンの「ChangeLog」は生成できたけど、過去分のバージョンにもChangeLogを作成したい
+### 最新バージョンの「ChangeLog」は生成できたけど、過去分のバージョンにもChangeLogを作成したい
 
 `ghch` にはタグを明示的に指定することで、過去分のタグのChangeLogも生成できるので、ローカルから下記コマンドを参考に実行してください。
 
