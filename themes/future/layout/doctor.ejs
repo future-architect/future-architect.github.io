@@ -72,20 +72,25 @@
 
       <h2 class="bottom-content-header">1記事にしか使われていないタグ</h2>
       ※「同居」は、同じ記事に1記事タグ同士が付いているもの。その記事のタグ付けがまとめて薄い可能性が高い
-      <%# 300件超を1タグ1行で並べると縦に長すぎる。同居あり／英数字／日本語の
-          3ブロックに分けて、ブロックの中は読点区切りで流し込む (#2259) %>
+      <%# 1タグ1行で並べると縦に長すぎる。先頭の1文字（英字は大文字に寄せる）が
+          同じタグを同じ行にまとめて、辞書の索引のように引けるようにする (#2259)。
+          同居ありは意味の違う印なので別枠のまま %>
       <%
-        const singleGroups = [
-          ['同居あり', checks.singleUse.filter(t => t.lonelyPair)],
-          ['英数字', checks.singleUse.filter(t => !t.lonelyPair && /^[\x20-\x7e]/.test(t.name))],
-          ['日本語', checks.singleUse.filter(t => !t.lonelyPair && !/^[\x20-\x7e]/.test(t.name))],
-        ];
+        const singleGroups = [];
+        const lonely = checks.singleUse.filter(t => t.lonelyPair);
+        if (lonely.length) singleGroups.push(['同居あり', lonely]);
+        const byInitial = new Map();
+        checks.singleUse.filter(t => !t.lonelyPair).forEach(t => {
+          const c = t.name[0].toUpperCase();
+          if (!byInitial.has(c)) byInitial.set(c, []);
+          byInitial.get(c).push(t);
+        });
+        // 小文字始まりのタグがあると出現順が乱れるので、行は字順に並べ直す
+        [...byInitial.entries()].sort((a, b) => (a[0] < b[0] ? -1 : 1)).forEach(g => singleGroups.push(g));
       %>
       <ul class="doctor-list">
         <% singleGroups.forEach(function(g){ %>
-        <% if (g[1].length) { %>
-        <li><span class="doctor-note"><%= g[0] %>（<%= g[1].length %>タグ）</span><% g[1].forEach(function(t, i){ %><a href="<%- url_for(t.path) %>"><%= t.name %></a><%= i < g[1].length - 1 ? '、' : '' %><% }) %></li>
-        <% } %>
+        <li><span class="doctor-note"><%= g[0] %></span><% g[1].forEach(function(t, i){ %><a href="<%- url_for(t.path) %>"><%= t.name %></a><%= i < g[1].length - 1 ? '、' : '' %><% }) %></li>
         <% }) %>
       </ul>
 
