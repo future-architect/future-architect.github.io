@@ -782,7 +782,7 @@ planフェーズでジョブが一時停止し、Apply Plan？ と表示され�
 Google Cloudのコンソール画面を確認すると、Terraform Applyを実行したときに作成されたGCSバケットが確認できました。
 <img src="/images/2023/20230330a/image_11.png" alt="png" width="1200" height="846" loading="lazy">
 
-## 最後に
+## さいごに
 
 JenkinsでのTerraform CI/CDの記事を書きました。Jenkinsの設定や、Jenkinsfileを書くことも初めてだったので、Jenkins自体やJenkinsfileの文法などいろいろ勉強になりました。
 

@@ -293,7 +293,7 @@ postgresql://user@localhost:5432/postgres?connect_timeout=10&application_name=my
 
 ただ、こういった多段の設定はデータ削除が難しい（気軽に`flex_time` テーブルを `TRUNCATE` しにくくなる）ため、やるならapplication_nameは `NOT NULL` にした運用にしたほうが良いかもしれません。要件に応じて調整ですが、できる限り最初の実装のシンプルモデルの利用に留めるという、用法用量が良い塩梅かと感じます。
 
-## 最後に
+## さいごに
 
 PostgreSQLに、何も指定がなければ `current_timestamp`を、何か設定されていればその値を返す`flex_timestamp`関数 を定義して、使ってはどうかという記事でした。
 

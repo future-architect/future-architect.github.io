@@ -209,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
 Crashlytics.setUserIdentifier("user0001");
 ```
 
-## 最後に
+## さいごに
 
 Firebase Crashlyticsは本当にさくっと導入できます。
 ユーザーの端末に埋もれてしまいがちなクラッシュ情報に簡単にアクセスできるのが嬉しいポイントですね。

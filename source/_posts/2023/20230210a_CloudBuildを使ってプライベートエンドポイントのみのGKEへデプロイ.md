@@ -616,7 +616,7 @@ hello-go-deployment-78b555bdf6-z5rk8   0/1     Terminating         0          7m
 hello-go-deployment-78b555bdf6-z5rk8   0/1     Terminating         0          7m13s
 ```
 
-## 最後に
+## さいごに
 
 今回はCloudBuildを利用したGKEへの継続デプロイ基盤について記載しました。GKEは限定公開クラスタでControl Planeへのアクセスがプライベートエンドポイントのみの「パブリックエンドポイントアクセスが無効」構築しているため、Cloud BuildからGKEのControl Planeへのアクセスを成功させるためのネットワーク構成が複雑になってしまいましたが、限定公開クラスタで「パブリック エンドポイント アクセスが有効、承認済みネットワークが無効」で構築すればCloudBuildでPrivate PoolやHA VPNで作成することもなくパブリックエンドポイント経由でControl Planeへアクセスができます。セキュリティ要件次第でデプロイフローやアーキテクチャなどは変更してください。
 

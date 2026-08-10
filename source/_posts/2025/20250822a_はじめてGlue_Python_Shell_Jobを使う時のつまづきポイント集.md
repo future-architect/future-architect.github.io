@@ -208,7 +208,7 @@ resource "aws_glue_job" "sample" {
 
 - [aws_glue_job](https://registry.terraform.io/providers/hashicorp/aws/6.3.0/docs/resources/glue_job)
 
-## 最後に
+## さいごに
 
 Python Shellをはじめて使う時に戸惑いそうな仕様について共有しました。
 

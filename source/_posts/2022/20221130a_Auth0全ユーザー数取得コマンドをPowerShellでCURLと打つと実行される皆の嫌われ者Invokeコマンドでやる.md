@@ -303,7 +303,7 @@ total  : xxx
 
 無事totalの数字が取得できました！
 
-## 最後に
+## さいごに
 
 curlコマンドの代替として、PowerShell標準の `Invoke-webRequest`だったり`Invoke-RestMethod` を用いてAuth0のAPIを操作する例をまとめました。
 

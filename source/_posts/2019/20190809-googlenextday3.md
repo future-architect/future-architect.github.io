@@ -333,7 +333,7 @@ k8sとIstioを使っていかにカナリアデプロイを実現するか、デ
 * TEKTONやSpinnakerを使って自動化することはとても重要
 * Spinnakerを使ったDEMOを行った[サンフランシスコでのセッション動画](https://youtu.be/CmZWau04ZS4)をぜひみてください！
 
-## 最後に
+## さいごに
 
 [Day2のレポート](/articles/20190804/)でも書きましたが、Anthos含めKubernetesに関連するセッションが非常に充実していました。AnthosのセッションはまさにGoogle Cloudがどこに向かっていくかをありのまま伝えてくれたように思います。
 

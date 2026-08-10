@@ -176,7 +176,7 @@ WITH filtered_snp_calls AS (
 
 [GCP連載](/articles/20200202/)の4日目でした。次は市川さんの[【もう鍵なくさない】GCPのSecret ManagerとBerglasで幸せになる](/articles/20200212/)です。
 
-## 最後に
+## さいごに
 
 先日、GCPのProfessional Cloud Architectに合格しました！ 結果が出力される瞬間はなかなかドキドキでしたが、なんとか合格できました。私も参考にしましたが、本技術ブログでも合格体験記を出しておりますので、そちらもぜひご覧ください！
 

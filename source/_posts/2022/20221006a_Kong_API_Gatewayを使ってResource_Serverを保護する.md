@@ -181,7 +181,7 @@ curl http://localhost:8000/mock/requests -H "Authorization: Bearer eyJhbGciOiJS.
 
 そうするとMockbinが受け取ったHeaderを上記のようなレスポンスとして返してくれます。
 
-## 最後に
+## さいごに
 
 といった感じで簡単に触ってみましたが、いかがだったでしょうか。
 

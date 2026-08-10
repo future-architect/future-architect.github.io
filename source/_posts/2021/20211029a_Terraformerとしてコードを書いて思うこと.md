@@ -344,7 +344,7 @@ dynamicブロックを使う前であれば。`from_port`向けの変数、`to_p
 
 一方、dynamicブロックの入れ子も可能であるため、3つ以上ネストさせてdynamicを使わない、過剰に使いすぎないなども[公式](https://www.terraform.io/docs/language/expressions/dynamic-blocks.html#best-practices-for-dynamic-blocks)で言及されているので、用法・用量は塩梅をみながら使いましょう。
 
-## 最後に
+## さいごに
 
 いかがだったでしょうか？ 常日頃Terraformに慣れ親しんでいて、想いの丈を書いてみました。
 

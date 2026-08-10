@@ -175,7 +175,7 @@ class ImagePredictor {
 
 <img src="/images/2023/20230831a/beatle_app_2.gif" alt="" width="177" height="384" loading="lazy">
 
-## 最後に
+## さいごに
 
 今回は、CreateMLをつかって機械学習モデルを作ってみることができました。しかし、分類精度はあまり良くなかったため、細部までチューニングができるCreate ML Componentsを使用してモデル作成を行ってみたい思います。
 

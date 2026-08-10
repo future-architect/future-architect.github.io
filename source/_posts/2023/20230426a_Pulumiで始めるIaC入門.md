@@ -984,7 +984,7 @@ Google Cloudのマネジメントコンソールから「VMインスタンス」
 
 <img src="/images/2023/20230426a/image.jpg" alt="image.jpg" width="1200" height="841" loading="lazy">
 
-## 最後に
+## さいごに
 
 今回は、PulumiでのIaC入門について記載しました。
 

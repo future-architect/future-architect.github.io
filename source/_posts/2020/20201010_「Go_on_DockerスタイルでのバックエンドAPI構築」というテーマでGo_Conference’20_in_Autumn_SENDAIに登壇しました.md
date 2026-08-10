@@ -133,7 +133,7 @@ RUN apk add --update \
     chromium-chromedriver \
 ```
 
-## 最後に
+## さいごに
 
 株式会社Fusic清家史郎様、株式会社Gunosy平田智子様にもフューチャー技術ブログの存在について触れて頂けました。
 

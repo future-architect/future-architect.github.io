@@ -248,7 +248,7 @@ curl -X GET https://api.cloudflare.com/client/v4/zones/$ZONE_ID/rulesets/$RULESE
     -H "Content-Type:application/json"
 ```
 
-## 最後に
+## さいごに
 
 Cloudflare R2とリダイレクトルールを利用してメンテナンスイン/アウトを実装できました。
 
