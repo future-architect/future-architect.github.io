@@ -73,8 +73,9 @@ hexo.extend.helper.register('popular_posts', function(term='weekly') {
     .sort(compareFunc)
     .slice(0, RANKING_DISPLAY_COUNT);
 
-  // マークアップは「関連記事」「この記事を参照している記事」と共通（lib/post_list.js）
-  const links = popularPosts.map(post => postListItem(post, 'featured-posts-item')).join("\n")
+  // マークアップは「関連記事」「この記事を参照している記事」と共通（lib/post_list.js）。
+  // ランキングだけタイトルの手がかりに小さいサムネを添える (#2230)
+  const links = popularPosts.map(post => postListItem(post, 'featured-posts-item', undefined, true)).join("\n")
 
   return `
   <div class="widget">
@@ -91,7 +92,7 @@ hexo.extend.helper.register('sns_popular_posts', function() {
   allPosts.sort((a, b) => getSNSCnt(b.permalink) - getSNSCnt(a.permalink))
   const popularPost = allPosts.slice(0, RANKING_DISPLAY_COUNT)
 
-  const links = popularPost.map(post => postListItem(post, 'featured-posts-item')).join("\n")
+  const links = popularPost.map(post => postListItem(post, 'featured-posts-item', undefined, true)).join("\n")
 
   return `
   <div class="widget">

@@ -32,12 +32,22 @@ const newLabel = date => {
  * @param {object} post          Hexo の post
  * @param {string} itemClass     li に付けるクラス
  * @param {string} [titleAttr]   a の title 属性。省略時は lede
+ * @param {boolean} [withThumb]  タイトルの左に小さいサムネを添える (#2230)
  */
-const postListItem = (post, itemClass, titleAttr) => {
+const postListItem = (post, itemClass, titleAttr, withThumb = false) => {
   const attr = (titleAttr === undefined ? post.lede : titleAttr) || '';
-  return `<li class="${itemClass}"><a href="/${post.path}" title="${attr}">${post.title}</a>`
+  const body = `<a href="/${post.path}" title="${attr}">${post.title}</a>`
     + `${newLabel(post.date)}`
-    + `<span class="post-meta"><span class="post-meta-date">${post.date.format('YYYY.MM.DD')}</span>${snsLabel(post.permalink)}</span></li>`;
+    + `<span class="post-meta"><span class="post-meta-date">${post.date.format('YYYY.MM.DD')}</span>${snsLabel(post.permalink)}</span>`;
+  if (!withThumb) {
+    return `<li class="${itemClass}">${body}</li>`;
+  }
+  // タイトルと重複するリンクなので、タブ移動と読み上げからは外す。
+  // サムネの無い記事は同じ大きさの空き枠を置いて行頭を揃える
+  const thumb = post.thumbnail
+    ? `<a href="/${post.path}" class="post-list-icon" tabindex="-1" aria-hidden="true"><img src="${post.thumbnail}" alt="" width="48" height="32" loading="lazy"></a>`
+    : `<span class="post-list-icon post-list-icon-empty"></span>`;
+  return `<li class="${itemClass} post-list-item-thumb">${thumb}<div class="post-list-body">${body}</div></li>`;
 };
 
 module.exports = {snsLabel, newLabel, postListItem};
