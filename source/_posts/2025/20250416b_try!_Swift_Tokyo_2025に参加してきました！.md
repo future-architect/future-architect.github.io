@@ -150,9 +150,9 @@ SwiftとJavaを相互に利用する方法について紹介がありました�
 [swiftlang/swift-java](https://github.com/swiftlang/swift-java)では、SwiftとJavaを相互運用するために次の２つのアプローチがあります。
 
 - `JavaKit`
- - JavaのAPIを直接呼ぶことが可能にするSwiftライブラリ
+- JavaのAPIを直接呼ぶことが可能にするSwiftライブラリ
 - `jextract-swift`
- - `jextract`と類似したSwiftからJavaを効率的に呼び出すために使用するJavaソースを抽出するツール
+- `jextract`と類似したSwiftからJavaを効率的に呼び出すために使用するJavaソースを抽出するツール
 
 内容は私には理解が難しい部分が多々あったが、弊社ではJavaを使う案件が多いので、該当レポジトリの内容とセッションを見直したいと思いました。セッションの中で、UIをSwiftUIで残りの内部ロジック等をJavaに寄せることができるようなお話もあり、とても興味深いものでした。
 

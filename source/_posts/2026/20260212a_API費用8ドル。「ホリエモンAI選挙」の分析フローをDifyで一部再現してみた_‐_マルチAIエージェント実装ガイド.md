@@ -321,11 +321,11 @@ def main() -> dict:
 
 出力は`from_date`と`to_date`の2つの文字列です。UTCベースで生成しているのは、Dify Cloudのサーバのタイムゾーンに依存しないようにするためです。
 
-* 入力変数
-  * （なし）
-* 出力変数
-  * from_date: String
-  * to_date: String
+- 入力変数
+  - （なし）
+- 出力変数
+  - from_date: String
+  - to_date: String
 
 **ノードの完成形**
 

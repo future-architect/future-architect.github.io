@@ -18,7 +18,6 @@ lede: ".NET MAUIでiOS向けアプリを開発中、WebアプリからiOSアプ�
 この記事はグループ会社であるFutureOneの Qiita Organizationで公開された [記事](https://qiita.com/onigiripudding/items/9ee95b84335ea9794a0b) をクロスポストで公開しています。
 :::
 
-
 ## はじめに
 
 .NET MAUIでiOS向けアプリを開発中、WebアプリからiOSアプリを呼び出す必要がでてきたため、ユニバーサルリンクを実装しました。WebサーバーはAzure Blob Storageの静的サイトを利用します。

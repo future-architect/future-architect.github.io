@@ -27,6 +27,7 @@ lede: "Salesforce ApexというJava5に似た構文を持つ言語のパーサ�
 **目標**: 自作Java製Apexパーサーをブラウザで動かし、ApexソースコードのAST[^ast]をインタラクティブに可視化すること
 
 **技術スタック**:
+
 - **[TeaVM 0.13.0](https://teavm.org/)**: JavaバイトコードをJavaScript/WebAssemblyにコンパイルするツール
   - 2026年2月頭時点で最新の[0.13.0](https://teavm.org/docs/release-notes/0.13.0.html)を使用
   - Mavenのpom.xmlには、以下の依存関係（dependency）を記述しました
@@ -44,6 +45,7 @@ lede: "Salesforce ApexというJava5に似た構文を持つ言語のパーサ�
 **成果物**:
 
 2バージョンのカーソル位置連動ハイライト機能付きAST Viewer
+
 - JavaScript版
 - WebAssembly版
 
@@ -74,7 +76,6 @@ Javaコードをブラウザで動かす選択肢はいくつかあります。
 | **DOM/ブラウザAPI** | ◎（`teavm-jso`） | ○（限定的） | ○（JNI風） | △（外部JS必要） | ◎（JSNI/JsInterop） |
 | **成熟度/コミュニティ** | ○（中規模、活発） | △（発展途上） | △（商用中心） | △（実験的） | ○（大規模だが停滞気味） |
 | **パーサー向き** | ◎ | ◎ | △ | ○ | ○ |
-
 
 TeaVMを選んだ理由は以下の通りです：
 
@@ -107,7 +108,7 @@ TeaVMを選んだ理由は以下の通りです：
 
 ### ビルドフロー
 
-* JsMain/WasmMainはそれぞれJavaScript版とWebAssembly版のエントリーポイントとなる(ソースコード文字列を引数とする)mainクラスです。
+- JsMain/WasmMainはそれぞれJavaScript版とWebAssembly版のエントリーポイントとなる(ソースコード文字列を引数とする)mainクラスです。
 
 ```
 mvn clean package
@@ -434,17 +435,20 @@ WebAssembly版はJavaScript版の約2倍速い結果が出ました。
 ### 考察
 
 **WebAssemblyの利点**:
+
 - 実行速度が**2倍高速**
 - 大規模解析で真価を発揮する可能性
 - 連続処理でも安定
 
 **WebAssemblyの欠点**:
+
 - ファイルサイズが3倍
 - 初回読み込みがやや遅い
 - 文字列変換のオーバーヘッド
 - ブラウザサポートがChrome 88+, Firefox 89+, Edge 88+に限定
 
 **JavaScript版の利点**:
+
 - ファイルサイズが小さい
 - ブラウザ互換性が高い
 - 文字列操作が容易
@@ -565,6 +569,7 @@ WebAssembly版はJavaScript版の約2倍速い結果が出ました。
 ```
 
 これにより：
+
 - ビルド時間が短縮（FULL: 45秒 → SIMPLE: 20秒）
 - エラーメッセージが読みやすい
 - ブラウザDevToolsでのデバッグが容易
@@ -646,12 +651,12 @@ JavaからWebAssemblyへのコンパイルは、思ったより実用的でし�
 
 コアテクノロジーグループの私のチームでは下記のような記事を書いています。
 
-* [Pure Rustで生まれ変わったPostgreSQL公式構文準拠SQLフォーマッター「uroborosql-fmt」をリリース🎉 | フューチャー技術ブログ](https://future-architect.github.io/articles/20250929a/)
-  * Pure Rustでpostgresqlの構文準拠のcst-parserを実装しています
-* [ANTLRを業務で活用した話 | フューチャー技術ブログ](https://future-architect.github.io/articles/20200903/)
-  * ANTLRのようなパーサージェネレーターを利用することもあります
-* [Pyright を LSP サーバとした自作 LSP クライアント（実装編） | フューチャー技術ブログ](https://future-architect.github.io/articles/20220303a/)
-  * PyrightというPythonの型チェッカーを言語解析エンジンとして利用した事例
+- [Pure Rustで生まれ変わったPostgreSQL公式構文準拠SQLフォーマッター「uroborosql-fmt」をリリース🎉 | フューチャー技術ブログ](https://future-architect.github.io/articles/20250929a/)
+  - Pure Rustでpostgresqlの構文準拠のcst-parserを実装しています
+- [ANTLRを業務で活用した話 | フューチャー技術ブログ](https://future-architect.github.io/articles/20200903/)
+  - ANTLRのようなパーサージェネレーターを利用することもあります
+- [Pyright を LSP サーバとした自作 LSP クライアント（実装編） | フューチャー技術ブログ](https://future-architect.github.io/articles/20220303a/)
+  - PyrightというPythonの型チェッカーを言語解析エンジンとして利用した事例
 
 コアテクノロジーグループでは、現在チームメンバーを募集しています。言語処理やコンパイラー技術が好きな方、グラフ理論、グラフ可視化、アルゴリズム好きな方、ソフトウェア工学の知識を使って仕事をしたい方を歓迎します。
 

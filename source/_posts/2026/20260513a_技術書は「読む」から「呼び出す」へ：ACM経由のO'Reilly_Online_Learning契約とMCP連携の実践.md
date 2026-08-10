@@ -383,4 +383,3 @@ ACM経由で O'Reilly Online Learning を契約する手順、加入後の運用
 
 - ACM: <https://www.acm.org>
 - O'Reilly Online Learning: <https://www.oreilly.com>
-

@@ -13,6 +13,7 @@ author: 逆瀬川滉大
 lede: "Google Cloud 資格試験の全冠が完了したので、体験記の記載です"
 ---
 ## はじめに
+
 TIG(Technology Innovation Group) 所属、逆瀬川です。
 
 Google Cloud 資格試験の全冠が完了しましたという、体験記です。

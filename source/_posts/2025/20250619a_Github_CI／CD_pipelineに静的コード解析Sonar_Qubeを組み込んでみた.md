@@ -157,6 +157,7 @@ GitHubリポジトリに移動。[Settings] > [Secrets and variables] > [Actions
 それでは、具体的に設定ファイルの作成および設定に移ります！
 
 ### GitHub Actions CI pipeline & SonarCloud による解析
+
 先にこちらを構築します。
 
 #### １．github/workflows ディレクトリの作成

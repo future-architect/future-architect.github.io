@@ -75,10 +75,10 @@ Engineer Camp最大の魅力は、実際のプロジェクトに深く入り込�
 **運営担当者が語る！Engineer Campの裏側**
 
 企画担当したITコンサルタントの小倉さんの記事です。コンサルタント目線でこだわったコンテンツ秘話をぜひご覧ください。
--  [ITコンサルタントがインターンシップやってみた｜未来報](https://note.future.co.jp/n/n6e3ee9e916b4)
+
+- [ITコンサルタントがインターンシップやってみた｜未来報](https://note.future.co.jp/n/n6e3ee9e916b4)
 
 :::
-
 
 ::: note tip
 **「アドバンスト採用」で入社した若手社員が語る！「技術×ビジネス」のリアル（随時更新！）**
@@ -92,6 +92,7 @@ Engineer Camp最大の魅力は、実際のプロジェクトに深く入り込�
 :::
 
 ### 募集コースの詳細やエントリーについてはこちら
-フューチャーのEngineer Campは、技術を学ぶだけでなく、プロフェッショナルの思考プロセスを間近で体感できる場所です。 圧倒的な成長を求めるみなさんのご応募を、心よりお待ちしています！
-- [https://www.future.co.jp/recruit/summer\_intern/2026/](https://www.future.co.jp/recruit/summer_intern/2026/)
 
+フューチャーのEngineer Campは、技術を学ぶだけでなく、プロフェッショナルの思考プロセスを間近で体感できる場所です。 圧倒的な成長を求めるみなさんのご応募を、心よりお待ちしています！
+
+- [https://www.future.co.jp/recruit/summer\_intern/2026/](https://www.future.co.jp/recruit/summer_intern/2026/)

@@ -1311,4 +1311,3 @@ EXPLAINは、データベースのパフォーマンスを理解し、最適化�
 - Crunchy Data: Get Excited About Postgres 18 - https://www.crunchydata.com/blog/get-excited-about-postgres-18
 - Going down the rabbit hole of Postgres 18 features - https://xata.io/blog/going-down-the-rabbit-hole-of-postgres-18-features
 - Waiting for PostgreSQL 18 – Enable BUFFERS with EXPLAIN ANALYZE by default - https://www.depesz.com/2025/01/15/waiting-for-postgresql-18-enable-buffers-with-explain-analyze-by-default/
-

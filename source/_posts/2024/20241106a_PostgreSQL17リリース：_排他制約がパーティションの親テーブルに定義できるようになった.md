@@ -175,7 +175,6 @@ Partitions: reservations_20241101 FOR VALUES FROM ('2024-11-01') TO ('2024-11-02
             reservations_20241102 FOR VALUES FROM ('2024-11-02') TO ('2024-11-03')
 ````
 
-
 実際にデータを登録してみます。
 
 ```sql psqlでの実行例
@@ -286,5 +285,3 @@ postgres=# select * from reservations;
 ## まとめ
 
 PostgreSQLの排他制約を試しました。17のアップデートで、パーティションテーブルでより排他制約を利用しやすくなりました。
-
-

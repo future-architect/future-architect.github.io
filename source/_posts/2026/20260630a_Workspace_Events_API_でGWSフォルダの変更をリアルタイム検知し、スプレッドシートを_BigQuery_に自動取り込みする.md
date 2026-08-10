@@ -387,6 +387,7 @@ def handle_drive_event(cloud_event: CloudEvent) -> None:
         print(f"Write Error: {e}")
         print(traceback.format_exc())
 ```
+
 </details>
 
 ### 2-3. Cloud Function のデプロイ
@@ -618,7 +619,6 @@ FROM `<project_id>.gws_drive_events.INFORMATION_SCHEMA.TABLES`;
 | イベント配信保証 | at-least-once（重複ありだが今回は実装で対処） |
 | プレビュー状態 | 本番利用は自己責任 |
 
-
 ### Cloud Function のサービスアカウント権限
 
 Cloud Function のサービスアカウントに以下の権限が必要です:
@@ -651,7 +651,6 @@ Google Workspace Events API（プレビュー）を使うことで、従来の W
 - Workspace Events API が Drive → Pub/Sub の橋渡しをしてくれる
 - Cloud Function でサーバーレスに処理
 - サブスクリプションの 7日間有効期限に注意（要定期更新）
-
 
 ## 参考
 

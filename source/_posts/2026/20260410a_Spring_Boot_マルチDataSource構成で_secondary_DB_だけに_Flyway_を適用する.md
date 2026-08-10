@@ -160,12 +160,12 @@ Flyway は通常、空のスキーマに対して V1 から順にマイグレー
 私たちのような既存スキーマに途中からflywayを導入する場合はこんな流れになります。
 
 1. 既存スキーマ(初期状態)
-    * flyway_schema_historyテーブルなし
+    - flyway_schema_historyテーブルなし
 1. flywayがbaselineOnMigrate=true で初回実行
-    * flyway_schema_historyテーブル作成
-    * V1をベースラインとして記録
-        * `TYPE=BASELINE` のレコードが作成されるのみ
-        * この段階ではマイグレーションSQLは実行されない
+    - flyway_schema_historyテーブル作成
+    - V1をベースラインとして記録
+        - `TYPE=BASELINE` のレコードが作成されるのみ
+        - この段階ではマイグレーションSQLは実行されない
 1. flywayがV2以降のマイグレーションを実行
 
 実際に `flyway_schema_history` を見ると、V1 が `TYPE=BASELINE` として記録されていることが確認できます。`execution_time` は 0、つまり SQL は実行されていません。
@@ -456,4 +456,3 @@ public class ManagerSqlConfig {
 | `locations` | マイグレーション SQL の配置先ディレクトリ | [Flyway Locations Setting](https://documentation.red-gate.com/fd/flyway-locations-setting-277579008.html) |
 | Baselines（概念説明） | ベースラインの仕組みと使い方の概要 | [Baselines](https://documentation.red-gate.com/fd/baselines-273973441.html) |
 | Configuration（全体） | Flyway の全設定項目一覧 | [Configuration](https://documentation.red-gate.com/flyway/reference/configuration) |
-

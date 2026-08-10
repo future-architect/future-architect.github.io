@@ -149,6 +149,7 @@ embeddingの評価としてデータごとに近傍を取得し、precision@16 (
 |haversine distance| 0.8946|0.9160|
 
 でしたが、上記の3つのタスクを解くことにより以下のようなembeddingを得られました。
+
 |近傍の取得方法|precision@16|precision@32|
 |---------------|--------|--------|
 |name embedding|0.7738|0.8061|

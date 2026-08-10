@@ -231,7 +231,6 @@ resource "aws_s3_bucket_notification" "to_sqs" {
 }
 ```
 
-
 ```tf SQS
 resource "aws_sqs_queue" "main" {
   name                       = "${var.env}-queue"
