@@ -79,7 +79,7 @@ Providers required by state:
 ### Terraform 実行中にロックがかかった場合
 
 Terraform 実行中に異常終了するとバックエンド（S3 やGCS など）のState ファイルが`ロック`される時があります。
-`terraform force-unlock`を利用することで、強制的にロックを解除することができます。
+`terraform force-unlock`を利用することで、強制的にロックを解除できます。
 
 例えば、以下のように`terraform plan`を実行しましたが、ロックがかかっているメッセージが出てきます。
 
