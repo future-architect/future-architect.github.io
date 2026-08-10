@@ -80,7 +80,7 @@ berglas bootstrap --project $PROJECT_ID --bucket $BUCKET_ID
 
 成功すると下記のような出力が確認できます！ 最近のCLIツールってこれでもかってくらい優しくできていますよね。
 
-```
+```text
 Successfully created berglas environment:
 
   Bucket: my-secrets-bucket-123

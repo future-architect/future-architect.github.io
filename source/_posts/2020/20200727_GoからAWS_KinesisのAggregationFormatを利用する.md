@@ -66,7 +66,7 @@ https://github.com/awslabs/amazon-kinesis-producer/blob/master/aggregation-forma
 * プロトコルバッファ（proto2）を利用したバイナリフォーマット
 * 最後に16バイトのMD5チェックサム
 
-```
+```text
 0               4                  N          N+15
 +---+---+---+---+==================+---+...+---+
 |  MAGIC NUMBER | PROTOBUF MESSAGE |    MD5    |

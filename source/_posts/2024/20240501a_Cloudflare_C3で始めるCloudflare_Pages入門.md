@@ -241,13 +241,13 @@ Vue.js - The Progressive JavaScript Framework
 
 ページの更新をPagesへデプロイするには、本来[Wrangler](https://developers.cloudflare.com/workers/wrangler/)というCloudflareのCLIツールを利用するのが一般的です。一方で、Cloudflare C3を利用して構築したプロジェクトでは、npm scriptsにデプロイ用のコマンドが追加されているため、以下のコマンドだけで反映できます。
 
-```
+```sh
 npm run deploy
 ```
 
 仕組みを紹介すると、以下のコマンドを実行しているようです。ビルド後に、 `dist` ディレクトリの中身をPagesへデプロイする形になっていますね。
 
-```
+```sh
 npm run build && wrangler pages deploy ./dist
 ```
 

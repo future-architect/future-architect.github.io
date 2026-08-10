@@ -59,7 +59,7 @@ func main() {
 
 例えば、メモリを1024MB与えて、実際に起動すると以下のようなログがCloudWatchLogsに出力されます。メモリなど設定を変更するたびに、LogStreamが変わるのでご注意ください。
 
-```
+```text
 2020-03-26T03:10:39.194+09:00 START RequestId: 65078a85-9db0-45b0-bbf2-81a4eb19a08a Version: $LATEST
 2020-03-26T03:10:39.195+09:00 2
 2020-03-26T03:10:39.195+09:00 END RequestId: 65078a85-9db0-45b0-bbf2-81a4eb19a08a
@@ -135,7 +135,7 @@ func main() {
 同じようにKinesisトリガーにし実行すると以下のようなログが出力されました。
 特にResponseの内容は出力されませんし、エラーにもなっていませんでした。
 
-```
+```text
 2020-03-26T03:52:06.697+09:00 START RequestId: 27bc00f8-d7de-48d1-8c05-1f69c2c3ab07 Version: $LATEST
 2020-03-26T03:52:06.698+09:00 END RequestId: 27bc00f8-d7de-48d1-8c05-1f69c2c3ab07
 2020-03-26T03:52:06.698+09:00 REPORT RequestId: 27bc00f8-d7de-48d1-8c05-1f69c2c3ab07 Duration: 0.77 ms Billed Duration: 100 ms Memory Size: 3008 MB Max Memory U

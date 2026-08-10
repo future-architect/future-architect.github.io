@@ -387,7 +387,7 @@ build: build-batch build-send build-receive build-job build-webapi
 
 実行する場合には、`-j` オプションで並列度を指定します。
 
-```
+```sh
 make build -j 4
 ```
 

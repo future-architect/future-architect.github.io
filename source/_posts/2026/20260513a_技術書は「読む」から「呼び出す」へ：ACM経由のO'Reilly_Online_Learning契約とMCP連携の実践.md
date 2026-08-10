@@ -107,7 +107,7 @@ ACM Professional Membershipの 25%オフキャンペーンは、初年度限定�
 
 前節で示した25%オフURLからフォームを開きます。ACM公式トップページから普通に進むとこのページには到達しませんので、URLは必ず控えておいてください。
 
-```
+```text
 https://services.acm.org/public/qj/keep_inventing/qjprofm_control.cfm?promo=DA5MAA
 ```
 
@@ -197,7 +197,7 @@ ACMからアクティベーション確認メールが届きます（件名 `Con
 
 ACM経由のO'Reilly Online Learning には、**ACM会員専用のSSO URL** からアクセスします。
 
-```
+```text
 https://go.oreilly.com/acm
 ```
 
@@ -243,7 +243,7 @@ ACM Professional Membership は、初年度のみ 25%オフが適用され $150�
 
 更新ON/OFFの現在状態は、以下の画面フローで確認・変更できます。
 
-```
+```text
 ACM ログイン
   └ myACM
       └ Go to myACM

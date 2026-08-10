@@ -98,7 +98,7 @@ PWAはウェブマニフェストファイルとServiceWorkerのファイルか�
 
 まずはプラグインをインストールします。
 
-```
+```sh
 npm install -D vite-plugin-pwa
 ```
 
@@ -138,7 +138,7 @@ export default defineConfig({
 
 そこで、Vite PWA にはアセットを自動生成してくれるツールが用意されています。
 
-```
+```sh
 npm i @vite-pwa/assets-generator -D
 ```
 
@@ -244,7 +244,7 @@ Vite PWAでは内部的にこの `workbox-build` を呼んでおり、`vite.conf
 
  Vite PWAでは、 `globePatterns` オプションを変更することでVueアプリのキャッシュに必要なファイルをプリキャッシュできます。一度この設定をしないままビルドをしてみて、書き出されたファイルの拡張子を指定するとやりやすいと思います。
 
-```
+```console
 $ find . -type f -name "*.*" | sed 's/.*\.//' | sort -u
 css
 html
@@ -272,7 +272,7 @@ VitePWA({
 
 この状態でビルドすると、ターミナルにVite PWAが書き出されたファイルをVite PWAが探して、プリキャッシュに含めてくれます。
 
-```
+```text
 PWA v0.21.0
 mode      generateSW
 precache  22 entries (195.30 KiB)

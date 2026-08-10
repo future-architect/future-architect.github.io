@@ -48,7 +48,7 @@ Slackに実際に投稿されるものは、各サービスの利用料金を箇
 
 #### AWS利用料金箇条書き
 
-```
+```text
 Monthly Report
 AWS Account: 111111111111
 Start: 2021-08-01, End: 2021-08-31

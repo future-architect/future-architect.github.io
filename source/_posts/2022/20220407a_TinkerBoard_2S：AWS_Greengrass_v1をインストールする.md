@@ -216,7 +216,7 @@ tar -zxvf aws-greengrass-docker-1.11.0.tar.gz
 
 次に証明書の圧縮ファイルを解凍したフォルダの中に解凍します。
 
-```
+```sh
 tar -xzvf xxxxxxx-setup.tar.gz -C aws-greengrass-docker-1.11.0/
 ```
 
@@ -299,7 +299,7 @@ Helloフォルダにgreengrasssdkをコピーしてzipファイルに圧縮し�
 [ここから](https://github.com/aws/aws-greengrass-core-sdk-python/)ダウンロードしたファイルのexamplesにHelloフォルダがあるので以下の構成で
 圧縮ファイルを作成します。
 
-```
+```console
 ~/Downloads/aws-greengrass-core-sdk-python-master/examples/HelloWorld
 ❯❯❯ tree
 .

@@ -30,7 +30,7 @@ Technogoly Innovation Group 辻です。
 
 [^1]: 文字コード 0 番の制御文字のことです。データや文字列の終端を示す特殊な文字として使用されることがあります。 https://e-words.jp/w/%E7%A9%BA%E6%96%87%E5%AD%97.html
 
-```
+```text
 ERROR: invalid byte sequence for encoding "UTF8": 0x00 (SQLSTATE 22021)
 ```
 
@@ -108,7 +108,7 @@ func main() {
 
 バイト列で確認すると、たしかに `CompanyName` の終端にヌル文字（バイトが 0）が含まれています。
 
-```
+```text
 ID = [49], CompanyName = [102 117 116 117 114 101 0]
 ```
 
@@ -146,7 +146,7 @@ func main() {
 
 出力結果を見ると、ヌル文字が削除されています。
 
-```
+```text
 ID = [49], CompanyName = [102 117 116 117 114 101]
 ```
 
@@ -256,7 +256,7 @@ func main() {
 
 このような方法でヌル文字を除外できました。
 
-```
+```text
 ID = [49], CompanyName = [102 117 116 117 114 101]
 ```
 

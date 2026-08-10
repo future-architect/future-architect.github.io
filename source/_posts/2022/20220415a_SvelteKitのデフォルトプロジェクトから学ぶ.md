@@ -51,7 +51,7 @@ $ npm run dev -- --open
 
 ページ周りのコードを抜き出してきたのがこれです。
 
-```
+```text
 ├── src
 │   ├── app.css
 │   ├── app.html
@@ -109,7 +109,7 @@ SvelteじゃなくてSvelteKitを選びたいニーズとしては主にサー�
 
 API周りは以下のコードのようですね。src/routes/todos/index.svelteは``/todos``でアクセスしたときに表示されるページのコンテンツなので、`index.ts`がハンドラー定義のファイルみたいですね。``_api.ts``は名前からして共通コード置き場でrouterからは無視されそうな雰囲気。
 
-```
+```text
 ├── src
 │   └── routes
 │       └── todos
@@ -198,7 +198,7 @@ export function api(method: string, resource: string, data?: Record<string, unkn
 
 ソースフォルダの中にhooks.tsという気になるファイルがありました。中を見ると、CookieからユーザーIDを取り出し、なければUUIDを生成して`event.locals.userid`に格納しています。ウェブアプリケーションフレームワークに頻出するミドルウェアと近そうです。
 
-```
+```text
 ├── src
 │   └── hooks.ts
 ```

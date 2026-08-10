@@ -60,7 +60,7 @@ Go以外の他のルールとしては、GitHubがGitHub pagesのウェブサイ
 
 必要であれば、`/docs`（ドキュメント）、`/testdata`などを足しましょう。
 
-```
+```text
 <projectroot> (projectrootパッケージ)
  + cmd
  | + <application1> (mainパッケージ)

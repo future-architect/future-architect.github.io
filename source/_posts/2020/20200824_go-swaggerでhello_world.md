@@ -233,7 +233,7 @@ import (
 
 先ほど書いた内容と同じ手順でサーバーを立ち上げます。
 
-```
+```sh
 go run gen/cmd/factory-server/main.go --host 0.0.0.0 --port 3000
 ```
 

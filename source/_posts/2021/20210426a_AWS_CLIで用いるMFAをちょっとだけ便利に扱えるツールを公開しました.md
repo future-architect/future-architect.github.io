@@ -94,7 +94,7 @@ aws_session_token     = AQoEXAMPLEH4aoAH0gNCAPyJxz4BlCFFxWNE1OPTgk5TthT+FvwqnKwR
 
 Linuxの場合はシェルスクリプト一発でローカル環境にインストールできます。このコマンドラインツールはGoで書かれており、マルチプラットフォーム向けにシングルバイナリを簡単に提供できます。インストールが簡単に行えるのはとても良いですね。
 
-```
+```sh
 curl -sfL https://raw.githubusercontent.com/future-architect/awsmfa/master/install.sh | sudo sh -s -- -b /usr/local/bin
 ```
 

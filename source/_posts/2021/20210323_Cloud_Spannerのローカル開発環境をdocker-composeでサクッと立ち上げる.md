@@ -80,7 +80,7 @@ gcloud CLIとdockerイメージでの提供がありますが、今回はdocker-
 さっそくcliで接続してみましょう。
 ※ インスタンス、データベースが作成されるまで十数秒待つ必要があります
 
-```
+```console
 $ docker-compose exec spanner-cli spanner-cli -p test-project -i test-instance -d test-database
 Connected.
 spanner>

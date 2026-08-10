@@ -180,7 +180,7 @@ OpenAPI (Swagger) 準拠のスキーマが必要になります。上の例で�
 
 「手順」はチュートリアル2の内容に1行追加し、ツールを使うように指示します。変数 `{{DDL}}` `{{DataModelDescriptions}}` は前回同様「段落」に変更するのをお忘れなく。
 
-````
+````text
 You can behave as an expert of database expert. Provide a clear answer to the main purpose of the order. Omit preamble, phase, and repeating the order.
 
 DDL:

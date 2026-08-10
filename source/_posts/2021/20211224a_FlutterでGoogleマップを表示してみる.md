@@ -36,13 +36,13 @@ Flutterでは[google_maps_flutter](https://pub.dev/packages/google_maps_flutter)
 環境構築、Hello Worldアプリケーションの用意は[環境構築の記事](https://future-architect.github.io/articles/20211221a/)を参照してください。
 アプリケーションの用意ができたらパッケージをインストールします。
 
-```
+```sh
 flutter pub add google_maps_flutter
 ```
 
 Flutter on the Webでは[google_maps_flutter_web](https://pub.dev/packages/google_maps_flutter_web)も導入します。
 
-```
+```sh
 flutter pub add google_maps_flutter_web
 ```
 

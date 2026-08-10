@@ -135,7 +135,7 @@ func main() {
 
 このとき `$ go vet ./...` とすると以下のように出力されます。第2引数がポインタではないことを教えてくれます。
 
-```
+```text
 .\main.go:17:26: call of Unmarshal passes non-pointer as second argument
 ```
 

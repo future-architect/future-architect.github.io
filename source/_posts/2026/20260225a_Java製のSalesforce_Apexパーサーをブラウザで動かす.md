@@ -110,7 +110,7 @@ TeaVMを選んだ理由は以下の通りです：
 
 - JsMain/WasmMainはそれぞれJavaScript版とWebAssembly版のエントリーポイントとなる(ソースコード文字列を引数とする)mainクラスです。
 
-```
+```console
 mvn clean package
   ↓
 [Maven Compiler Plugin]
@@ -214,7 +214,7 @@ public class WasmMain {
 
 テストビルドが通り、Webサーバーを起動し、いざブラウザで動かしてみると...
 
-```
+```text
 Error: parseApex function not found in WASM exports
 ```
 

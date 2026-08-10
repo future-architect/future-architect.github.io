@@ -50,7 +50,7 @@ https://github.com/future-architect/vuls/releases
 
 今回作成するChangeLogに含ませる情報は以下の2つとします。
 
-```
+```text
 1. バージョン（git tag情報）
 2. リリースまでにマージされたタグ間のPullRequestの①タイトル ②実装者名 ③IDとリンク
 ```
@@ -72,7 +72,7 @@ CircleCIからChangeLogを生成するため、 `.circleci/config.yml` に実装
 
 以下の3ステップで進めていきます。
 
-```
+```text
 1. GitHubの個人アクセストークンを取得する
 2. CircleCIの環境変数にGitHubの個人アクセストークンを設定する
 3. .circleci/config.yml　を編集する
@@ -133,7 +133,7 @@ workflows:
 
 ソースコード上の以下3点をご自身のものに置き換えてください。
 
-```
+```text
 1. {YOUR_WORKING_DIRECTORY} -> CI上のワーキングディレクトリ
 2. {YOUR_GITHUB_USER} 　　-> GitHubユーザーネーム
 3. {YOUR_REPOSITORY} 　　-> ChangeLogを生成するリポジトリ名

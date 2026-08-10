@@ -671,7 +671,7 @@ vsceコマンドが実行できるようになれば成功です。
 
 先程作成した拡張機能のディレクトリで以下のコマンドを実行します。
 
-```
+```sh
 vsce package
 ```
 
@@ -679,7 +679,7 @@ vsce package
 
 そして、以下のコマンドでインストールします。
 
-```
+```sh
 code --install-extension .\uroborosql-fmt-1.0.0.vsix
 ```
 

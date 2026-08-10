@@ -83,7 +83,7 @@ export default {
 
 ［Ctrl］＋［Shift］＋［R］キーでリロードすると、下記のエラーが出てVue.jsからService Workerへのメッセージ送信が失敗するという事象が起きました。
 
-```
+```text
 Uncaught TypeError: Cannot read property 'postMessage' of null
 ```
 
@@ -91,7 +91,7 @@ Uncaught TypeError: Cannot read property 'postMessage' of null
 
 ［Ctrl］＋［Shift］＋［R］キーでリロードすると、Service Workerが解除され、下記の`controller`が`null`になったことが原因でした。
 
-```
+```text
 navigator.serviceWorker.controller.postMessage({ msg })
 ```
 

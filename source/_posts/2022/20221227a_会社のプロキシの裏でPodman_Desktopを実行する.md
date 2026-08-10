@@ -55,7 +55,7 @@ generateResolvConf = false
 
 その後は一度WSL2を再起動します（そうしないとresolve.confが再生してしまった）。
 
-```
+```sh
 wsl --shutdown
 ```
 
@@ -77,7 +77,7 @@ nameserver プロキシのIPアドレス
 
 最後にpodmanのサーバーを再起動してからプロキシ越しにイメージをとってきて実行できるか確認します。`docker`を`podman`に読み替えるだけで使えます。
 
-```
+```console
 $ podman machine stop
 $ podman machine start
 $ podman run --rm hello-world
@@ -105,7 +105,7 @@ Twitter:   @Podman_io
 
 dockerのものを使うにはレジストリを変更します。
 
-```
+```console
 $ wsl -d podman-machine-default
 
 (wsl2起動)
@@ -125,7 +125,7 @@ short-name-mode="enforcing"
 
 それではまたpodmanを再起動してから、今度はnginxを起動してみます。`http://localhost:8888/`で起動したら完了です。
 
-```
+```sh
 podman machine stop
 podman machine start
 podman run --rm -it -p 8888:80 nginx

@@ -52,7 +52,7 @@ lede: "シェルスクリプト連載の第一弾です。シェルスクリプ�
 echo $1
 ```
 
-```
+```console
 $ shellcheck a.sh
 
 In a.sh line 3:
@@ -72,7 +72,7 @@ echo "$1"
 
 例えば以下で、`work` ディレクトリが存在しない場合に `cd work` し、`rm -f *.txt` をするとしましょう。
 
-```
+```console
 $ tree
 .
 ├── b.sh
@@ -88,7 +88,7 @@ rm -r ./*.txt
 
 `b.sh` を実行したときに `work` ディレクトリへの `cd` が失敗したときに意図しないファイル(`important.txt`)が削除されてしまいます。
 
-```
+```console
 $ ./b.sh
 b.sh: 3: cd: can't cd to work
 $ tree
@@ -98,7 +98,7 @@ $ tree
 
 `ShellCheck` は上記のような実装を指摘してくれます。
 
-```
+```console
 $ shellcheck b.sh
 
 In b.sh line 3:
@@ -115,7 +115,7 @@ rm -r ./*.txt
 
 `set` オプションの `-e` を用いて、エラーが有った場合に終了して、後続の処理が実行されないようにする、
 
-```
+```sh
 set -e
 
 cd work
@@ -143,7 +143,7 @@ fi
 
 上記のようなよくある実装ミスも `ShellChell` で検知できます。
 
-```
+```console
 $ shellcheck c.sh
 
 In c.sh line 5:

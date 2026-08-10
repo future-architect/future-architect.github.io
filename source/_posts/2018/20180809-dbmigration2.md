@@ -86,7 +86,7 @@ TYPEで指定できるキーワードとしては大きく3つの種類に分け
 
 スキーマコンバージョンのレポートは以下のようなコマンドとなります。
 
-```
+```sh
 /usr/local/bin/ora2pg -c /etc/ora2pg/ora2pg.conf -t SHOW_REPORT --estimate_cost --dump_as_html > report.html
 ```
 

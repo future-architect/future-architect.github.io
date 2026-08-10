@@ -156,7 +156,7 @@ Terraformで管理出来るリソースの一覧(リソースタイプ)は↓で
 
 Terraformで定義されているimportコマンドの書式はこのようになっています。
 
-```
+```sh
 terraform import [options] ADDRESS ID
 ```
 

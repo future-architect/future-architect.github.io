@@ -252,7 +252,7 @@ main();
 
 実装が上手くいっていれば、DidChangeWorkspaceFolders Notification を送信したタイミングで、`window/logMessage` メソッドのメッセージが大量に受信できると思います。主に解析対象のファイルや、仮想環境の情報を通知してくれています。
 
-```
+```text
 Assuming Python platform Windows
 Searching for source files
 Auto-excluding \path\to\.venv

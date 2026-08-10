@@ -194,7 +194,7 @@ Airflow UI にAWS コンソールからでなく、トークンのみでログ�
 
 取得したトークンを `#` 以降に指定して、URLアクセスすることでログインできます。
 
-```
+```text
 https://${WebServerHostname}/aws_mwaa/aws-console-sso?login=true#${WebTokenを指定}
 ```
 

@@ -279,7 +279,7 @@ my-migration    GenerateArtifacts       [1/1]           ExtractImage    Complete
 
 作成されたアーティファクトは以下コマンドでダウンロードできます。
 
-```
+```sh
 migctl migration get-artifacts my-migration
 ```
 

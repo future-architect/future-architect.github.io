@@ -56,7 +56,7 @@ AWS上に構築するインフラはこんな感じです。シンプル。
 
 ローカル開発にはDockerを使ってLocalStackを動かしていきます。LocalStackはバージョン `0.11.0` からすべてのサービスに `4566` ポートを使います。`0.10.x` 以下のバージョンと使用するポートが異なるため、古いバージョンを利用している方は注意してください。
 
-```
+```sh
 docker run -it -p 4566:4566 -e SERVICES=dynamodb -e DEFAULT_REGION=ap-northeast-1 localstack/localstack:0.11.5
 ```
 
@@ -66,14 +66,14 @@ docker run -it -p 4566:4566 -e SERVICES=dynamodb -e DEFAULT_REGION=ap-northeast-
 
 以下のように出力されれば成功です。(以下はWindowsの例)
 
-```
+```console
 $ aws --version
 aws-cli/2.0.48 Python/3.7.7 Windows/10 exe/AMD64
 ```
 
 CLIでAWSのリソースにアクセスできるように設定しておきましょう。デフォルトのプロファイルとして設定しています。必要に応じてプロファイル名を指定できます。
 
-```
+```console
 $ aws configure
 AWS Access Key ID [None]: access-key-ID
 AWS Secret Access Key [None]: secret-access-key
@@ -83,7 +83,7 @@ Default output format [None]: json
 
 テスト用にダミー用の `local` プロファイルも設定しておきましょう。
 
-```
+```console
 $ aws configure --profile local
 AWS Access Key ID [None]: dummy
 AWS Secret Access Key [None]: dummy
@@ -108,7 +108,7 @@ Terraformに関しては
 
 Terraformは[Install Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli)を参考に2020年9月にリリースしたv0.13.2をインストールしておきます。v0.12.xでも問題ないです。
 
-```
+```console
 $ terraform -v
 Terraform v0.13.2
 ```
@@ -117,7 +117,7 @@ Terraform v0.13.2
 
 最終的なファイル構成は以下のようになります。
 
-```
+```text
 .
 ├── api_gateway_deployment.tf
 ├── api_gateway_integration.tf
@@ -149,7 +149,7 @@ provider "aws" {
 
 `provider.tf` を記述したら `terraform init` をしましょう。
 
-```
+```console
 $ terraform init
 Initializing the backend...
 
@@ -386,7 +386,7 @@ Web API開発です。今回はサンプルアプリケーションなのでGET�
 
 それでは `go mod init` として開発を始めていきましょう。
 
-```
+```sh
 go mod init example
 ```
 
@@ -971,7 +971,7 @@ func configureAPI(api *operations.ExampleAppAPI) http.Handler {
 
 go-swaggerで実装したWebアプリケーションサーバをLambda関数として動かすようにします。GoのLambda関数として有効なシグネチャは以下の通りです。
 
-```
+```text
 - func ()
 - func () error
 - func (TIn), error

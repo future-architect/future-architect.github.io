@@ -39,7 +39,7 @@ RUN dd if=/dev/zero of=dummy1 bs=1M count=10 \
 
 結果を見てみると、サイズは同じです。「Aを足す」「Bを足す」というレイヤーと、「AとBを足す」というレイヤー、どちらであっても差はありません。
 
-```
+```text
 <none>        <none>        cc9f228f6862   5 seconds ago    89.1MB
 <none>        <none>        1c3789ba70ca   11 seconds ago   89.1MB
 ```
@@ -65,7 +65,7 @@ RUN dd if=/dev/zero of=dummy1 bs=1M count=10 \
 
 今度は違いが出ました。最初のRUNを混ぜない方法では、途中のレイヤーの状態としてはdummy1ファイルが存在しています。そのため、その分サイズが大きくなってしまうのです。
 
-```
+```text
 <none>        <none>        7594cc6c4f07   About a minute ago   89.1MB
 <none>        <none>        1a6c1daf8eb5   About a minute ago   78.6MB
 ```
@@ -85,7 +85,7 @@ COPY --from=builder dummy2 .
 
 RUNを連結してrmしたのと同じイメージサイズになりましたね。
 
-```
+```text
 <none>        <none>        5398e862d3db   2 seconds ago   78.6MB
 ```
 

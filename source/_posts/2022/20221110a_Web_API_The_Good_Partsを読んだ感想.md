@@ -91,7 +91,7 @@ HTTPのキャッシュにはExpiration Model (期限切れモデル)とValidatio
 いつ期限が切れるかをサーバからのレスポンスに含めて返すことで実現できます。
 方法としては2つあり、Cache-Controlレスポンスヘッダを使い現在時刻からの秒数を表す方法とExpiresレスポンスヘッダを使い期限が切れる絶対時間を表す方法があります。
 
-```
+```text
 Expires: Fri, 01 Jan 2016 00:00:00 GMT
 Cache-Control: max-age=3600
 ```
@@ -104,7 +104,7 @@ Cache-Control: max-age=3600
 保持しているキャッシュが最新かを問い合わせて、データが更新されていた場合にのみ取得を行います。
 更新の確認には最終更新日付とエンティティタグのどちらか使います。
 
-```
+```text
 Last-Modified: Tue, 01 Jul 2014 00:00:00 GMT
 ETag: "16ddf21b3f21fcb2433e28cd2e3b33d8"
 ```

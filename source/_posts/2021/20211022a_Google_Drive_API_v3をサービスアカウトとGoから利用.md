@@ -221,7 +221,7 @@ func download(ctx context.Context, srv *drive.Service, name, id string) error {
 
 例えば、以下のようにネストした構造を保つ場合に、targetFolderのファイルIDを指定しても取得できるのは folder1, folder2までです。
 
-```
+```text
 targetFolder
   └ folder1
   |   └ file1.xlsx

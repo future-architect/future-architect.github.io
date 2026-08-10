@@ -24,7 +24,7 @@ SpringBootは、アプリケーションの骨格となるクラス（``@SpringB
 
 こういうパッケージ構成だったとします。
 
-```
+```text
  ├─jp.co.future.app        // アプリケーション
  │ ├─MyApplication.java
  │ └─MyController.java
@@ -105,7 +105,7 @@ public class DemoApplication {
 
 コンポーネントスキャンを設定しないでHTTPのエンドポイントに登録してもらうには、``@RestController``アノテーションだけはアプリ側において、ライブラリは中の実装だけに集中するという2段階に分ける方法が使えます。
 
-```
+```text
  ├─jp.co.future.app        // アプリケーション
  │ ├─MyApplication.java
  │ ├─MyController.java

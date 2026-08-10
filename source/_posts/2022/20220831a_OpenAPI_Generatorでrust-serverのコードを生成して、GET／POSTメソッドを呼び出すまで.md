@@ -246,7 +246,7 @@ api::create(addr, matches.is_present("https")).await;
 
 この状態で`cargo run`をすると以下のようなエラーになります。`cargo add`で追加しましょう。
 
-```
+```text
 error[E0433]: failed to resolve: use of undeclared crate or module `tokio`
 ```
 
@@ -266,7 +266,7 @@ curl localhost:8080/ip
 
 処理が実装されていないため以下のレスポンスが返ってきます。
 
-```
+```text
 An internal error occurred
 ```
 
@@ -281,7 +281,7 @@ An internal error occurred
 - `usecase.rs`(新規): DBとのI/Oを呼び出すロジック
 - `api.rs`(追記): リクエストのハンドリング
 
-```
+```text
 └── src
     ├── api.rs
     ├── client

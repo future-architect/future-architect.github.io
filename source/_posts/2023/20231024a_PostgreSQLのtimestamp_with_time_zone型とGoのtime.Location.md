@@ -329,7 +329,7 @@ func main() {
 
 実行します。
 
-```
+```console
 $ TZ=UTC go run .
 0001 2023-10-21T12:04:20Z Asia/Singapore
 0002 2023-10-21T12:04:20Z Asia/Singapore

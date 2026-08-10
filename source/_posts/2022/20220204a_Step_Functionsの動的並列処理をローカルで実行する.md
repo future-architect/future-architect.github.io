@@ -926,7 +926,7 @@ make json
 それではStep Functiionsを実行します。
 プロジェクトルートで以下のコマンドを実行してください。
 
-```
+```sh
 make stepfunctions
 ```
 
