@@ -151,7 +151,7 @@ Internal AからVPC Peeringに対するルーティング設定が不足して�
 なぜ、今回はInternal AのSecurity Groupの設定を操作せずに済んだのかというと、もともと外向きの通信が許可されていたためです。
 <img src="/images/2021/20210831a/sg_a_outbound.png" alt="sg_a_outbound.png" width="1090" height="245" loading="lazy">
 
-### まとめ
+## まとめ
 
 今回のNW構成を簡単に図化すると以下です。
 
