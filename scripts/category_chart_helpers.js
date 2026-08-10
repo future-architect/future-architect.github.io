@@ -92,8 +92,22 @@ const CATEGORY_COLORS = {
   'VR': '#bda29a',
 };
 
+// 上の対応表に無いカテゴリが増設されたときの予備色。固定16色と被らない色を
+// 名前順に決定的に割り当てるので、ページごとに色が変わることはない。
+// ただし暫定なので、ビルドログの警告を見たら対応表に追記する
+const SPARE_COLORS = ['#6e7074', '#59c4e6', '#edafda', '#93b7e3', '#546570', '#c4ccd3'];
+
 hexo.extend.helper.register('category_colors', function() {
-  return JSON.stringify(CATEGORY_COLORS);
+  const colors = Object.assign({}, CATEGORY_COLORS);
+  let spare = 0;
+  this.site.categories.map(c => c.name).sort().forEach(name => {
+    if (!colors[name]) {
+      colors[name] = SPARE_COLORS[spare % SPARE_COLORS.length];
+      spare++;
+      hexo.log.warn(`CATEGORY_COLORS に「${name}」の色がありません。暫定色 ${colors[name]} で描画します。scripts/category_chart_helpers.js に追記してください`);
+    }
+  });
+  return JSON.stringify(colors);
 });
 
 // 指定年の月別 × カテゴリ別の投稿数 (#2171)
