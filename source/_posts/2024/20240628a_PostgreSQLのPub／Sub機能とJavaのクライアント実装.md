@@ -15,7 +15,7 @@ lede: "Pub/Sub型のメッセージングアーキテクチャを採用するに
 
 本記事は[「珠玉のアドベントカレンダー記事をリバイバル公開します」](/articles/20240617a/)企画のために、[以前Qiitaに投稿した記事](https://qiita.com/ksky/items/8933348de5af00e45ffe)を改訂したものです。
 
-### はじめに
+## はじめに
 
 Pub/Sub型のメッセージングアーキテクチャを採用するにあたっては、kafkaなどのブローカーミドルウェアや、Amazon SNS、Google Cloud Pub/Subなどのマネージドサービスを利用するケースが多いかと思います。ところでPostgreSQLでも実はPub/Subができます。
 

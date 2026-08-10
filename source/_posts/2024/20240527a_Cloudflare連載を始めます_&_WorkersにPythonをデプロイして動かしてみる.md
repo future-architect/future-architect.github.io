@@ -22,11 +22,11 @@ lede: "Cloudflareは、インターネット上で運営されている最大の
 
 Cloudflare連載の第1日目とインデックス記事です。
 
-### Cloudflare連載を始めます
+## Cloudflare連載を始めます
 
 CDNやインターネットセキュリティを中心としたサービスプロバイダーであるCloudflareを題材とした連載を開催します。Cloudflareについては技術ブログではこれまで、個人の寄稿で数記事上がっていましたが、連載という形にするのは今回が初めてです。
 
-### Cloudflareとは
+## Cloudflareとは
 
 Cloudflareは、[公式](https://www.cloudflare.com/ja-jp/learning/what-is-cloudflare/)では以下の様に書かれていました。
 
@@ -35,7 +35,7 @@ Cloudflareは、[公式](https://www.cloudflare.com/ja-jp/learning/what-is-cloud
 上記の様にCloudflare自体でもサービスを持ちつつ、既存のシステムのセキュリティ、パフォーマンスを向上することを目的としているサービス群です。
 AWSなどのパブリッククラウドではリージョン、ゾーンという概念がありますが、Cloudflareでは全てエッジネットワークにて構築されており、ユーザが接続する時は一番近い接続点に繋ぎにいき、Cloudflareのサービス、その裏の他のクラウドに接続などをしています。
 
-### 連載日程
+## 連載日程
 
 今回は初めての連載ということもあり、5人が参加してくれました。内容は初めて触った系の記事もありますが、わずかながら社内の知見も公開されるようなので、ぜひ楽しみにお待ちください。
 
