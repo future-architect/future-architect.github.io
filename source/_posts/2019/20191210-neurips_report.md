@@ -82,7 +82,7 @@ Belona Mary SONNA MOMO (AIMS)」
 
 <img src="/images/2019/20191210/WiML.jpg" class="img-middle-size" loading="lazy">
 
-## 最後に
+## さいごに
 
 明日からは論文の発表が本格的に始まります。
 バンクーバーを満喫しながら、最新の研究を肌で感じてきたいと思います！

@@ -19,7 +19,8 @@ const VOCAB = Object.assign(Object.create(null), {
   // 冒頭と締め。漢字を開く (#2175)
   '初めに': 'はじめに',
   '始めに': 'はじめに',
-  '終わりに': 'おわりに'
+  '終わりに': 'おわりに',
+  '最後に': 'さいごに'
 });
 
 module.exports = {

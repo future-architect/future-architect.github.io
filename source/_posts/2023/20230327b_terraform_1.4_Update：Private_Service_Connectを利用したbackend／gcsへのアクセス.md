@@ -411,7 +411,7 @@ d3rdzqodp6w8cx.cloudfront.net. 60 IN    A       18.65.202.87　★該当IPアド
 
 このことからTerraform 1.4.0で追加されたPrivate Service Connectを利用したbackend/gcsへのアクセスの機能を利用してもbackendのGCSへの通信のみプライベート接続され、Terraformのgoogle providerなどを利用するためにregistry.terraform.ioへのインターネットアクセスは避けられず完全プライベートではterraformは利用できないことが分かりました（当たり前か...）
 
-## 最後に
+## さいごに
 
 今回はTerraform 1.4で追加されたPrivate Service Connectエンドポイント経由でbackendに指定したGCSへアクセスできることができる機能を検証しました。
 

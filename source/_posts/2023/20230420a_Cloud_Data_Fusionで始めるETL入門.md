@@ -206,7 +206,7 @@ Cloud Data Fusionの画面から実行した際のログを確認したい時が
 
 <img src="/images/2023/20230420a/image_17.png" alt="" width="1200" height="471" loading="lazy">
 
-## 最後に
+## さいごに
 
 今回はCloud Data Fusionを利用して、簡単に使用感を確認してみました。
 

@@ -59,7 +59,7 @@ VSCode起動後、まず ctrl + O (Macの方は⌘ + O) を押下して、対象
 
 <img src="/images/2020/20200828/extension_install.png" class="img-middle-size" loading="lazy">
 
-## 最後に
+## さいごに
 
 今回は拡張機能に絞って説明しましたが、VSCodeでは様々な設定をjson形式でチームに共有することが可能です。
 チームで設定を共有し、開発効率を高めていきましょう！

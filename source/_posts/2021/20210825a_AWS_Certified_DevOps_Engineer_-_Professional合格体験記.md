@@ -49,7 +49,7 @@ Solutions Architect – Professionalと比較すると試験の難易度はや�
 
 各種下位資格、Solutions Architect - Professionalを修めてから仕上げに受験するパターンで山を登っていくのが安全な印象です。
 
-## 最後に
+## さいごに
 
 実はDeveloper – AssociateはSolutions Architect - Professionalの後に一気に取得したのですが記事のネタにし損ねました。
 

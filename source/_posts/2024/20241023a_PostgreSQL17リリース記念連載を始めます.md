@@ -59,6 +59,6 @@ Technology Innovation Group真野です。
 - インデックスのバキューム進行状況をpg_stat_progress_vacuumで確認できるようになった
 - pg_wait_events システムビューが追加され、アクティブなセッションの待機を分析できるようになった
 
-## 最後に
+## さいごに
 
 フューチャーではPostgreSQLは大人気で、おそらく一番利用が多いDBMSです。今回はリリース記念という名目ですが、業務で得たPostgreSQLの知見を引き続き発信していきます。

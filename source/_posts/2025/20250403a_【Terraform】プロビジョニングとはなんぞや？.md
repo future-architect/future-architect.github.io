@@ -109,7 +109,7 @@ IT領域におけるプロビジョニングとは、ハードウェアやネッ
 
 Terraformは「プロビジョニングツール」、[Ansible](https://www.redhat.com/en/ansible-collaborative)は「構成管理ツール」と認識していたのですが、Terraformでパラメータを調整することは可能ですし、Ansibleでシステムを新規追加することも可能なので、TerraformとAnsibleともに「プロビジョニングツール」であり「構成管理ツール」でもあると感じました。（TerraformとAnsibleの違いの説明は「[Ansible vs. Terraform: What's the difference?](https://mediacenter.ibm.com/media/Ansible+vs.+Terraform%3A+Whats+the+difference/1_uhhi903l)」がわかりやすかったです。Terraformでは宣言型で記述し、状態を管理するためのライフサイクルを持っているようです。対してAnsibleでは宣言型と手続き型のハイブリッド(本質的には手続き型)で記述し、ライフサイクルを持たないようです。）
 
-## 最後に
+## さいごに
 
 「プロビジョニング」について理解が深まったかなと思ってます。
 

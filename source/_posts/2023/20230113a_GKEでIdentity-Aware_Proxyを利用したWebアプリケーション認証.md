@@ -368,7 +368,7 @@ Load Balancerに設定したドメインに対してアクセスを行うと、C
 本GoogleアカウントはCloud IAPのアクセスできる権限(**IAP で保護されたウェブアプリ ユーザー**)を持っているため、画面にアクセスできました。
 <img src="/images/2023/20230113a/6-IAPアクセスあり②.png" alt="6-IAPアクセスあり②.png" width="908" height="299" loading="lazy">
 
-## 最後に
+## さいごに
 
 今回はGKE (Google Kubernetes Engine)でCloud IAP (Identity-Aware Proxy)を利用したGoogleアカウント認証について記事を書きました。
 Google Cloudを利用していて、特定のGoogleアカウントにのみアクセスを許可したいケースはあるかと思いますので、その時にでも参考にしていただければ幸いです。

@@ -311,7 +311,7 @@ UniversalLinkを使うにはApple上のアプリに使用を許可する必要�
 
 <img src="/images/2025/20250527b/image_14.png" alt="image.png" width="600" height="1300" loading="lazy">
 
-## 最後に
+## さいごに
 
 Azure Blob Storageの静的サイト機能で簡単にUniversalLink用のWebサーバを立ち上げられました。
 

@@ -281,7 +281,7 @@ func (repo *BaseRepository) attributes(domain interface{}, condition func(tag re
 もちろんより複雑なことをやろうとするとコードも煩雑になり、それこそ `dynamodb/guregu` 相当のものを再開発することになりかねません。
 ある程度の制約を設けるなどしてDynamoDBの利用シーンをシンプルにできるのであるのであれば、筆者はaws-sdkのみの利用を推奨します。
 
-## 最後に
+## さいごに
 
 第2段の記事はいかがだったでしょうか。
 gureguなどサードパーティ製のライブラリの利用と迷っている方の参考になれば幸いです。
