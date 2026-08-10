@@ -182,3 +182,43 @@ hexo.extend.helper.register('category_stats', function(name) {
   const category = this.site.categories.findOne({name});
   return category ? buildCategoryStats.call(this, category) : null;
 });
+
+// 関連カテゴリ (#2200)。独自の採点は持ち込まず、ページに出ている2つの規則の
+// 合成で定める: このカテゴリの「よく使われるタグ」（上位5）が、他に
+// 「よく使われているカテゴリ」（タグページと同じ 2本以上かつ10%以上）。
+// 読者がカテゴリ→タグ→カテゴリとリンクを辿っても同じ結論になる。
+// 登壇レポート・初心者向けのような形式タグ経由の関連もあえて除外しない。
+// 根拠タグを注記で名乗るので、関連の質は読者が判断できる
+hexo.extend.helper.register('related_categories', function(name) {
+  const category = this.site.categories.findOne({name});
+  if (!category) return [];
+  const {topTags} = buildCategoryStats.call(this, category);
+  const related = new Map();
+  topTags.forEach(t => {
+    const tag = this.site.tags.findOne({name: t.name});
+    if (!tag) return;
+    const total = tag.posts.length;
+    const byCat = new Map();
+    tag.posts.forEach(post => {
+      post.categories.forEach(c => {
+        if (c.name === name) return;
+        byCat.set(c.name, (byCat.get(c.name) || 0) + 1);
+      });
+    });
+    byCat.forEach((count, catName) => {
+      if (count < 2 || count / total < 0.10) return;
+      if (!related.has(catName)) {
+        const c = this.site.categories.findOne({name: catName});
+        related.set(catName, {name: catName, path: c ? c.path : `categories/${catName}/`, tags: [], strength: 0});
+      }
+      const e = related.get(catName);
+      e.tags.push(t.name);
+      e.strength += count;
+    });
+  });
+  // 共有タグが多い順。同数なら相手カテゴリ側の本数合計が多い方が関連が濃い。
+  // 同点の決着が無いとビルドごとに並びが変わる
+  return [...related.values()]
+    .sort((a, b) => b.tags.length - a.tags.length || b.strength - a.strength || (a.name < b.name ? -1 : 1))
+    .slice(0, 5);
+});
