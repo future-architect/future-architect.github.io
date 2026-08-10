@@ -14,7 +14,9 @@ const RANKING_DISPLAY_COUNT = 10;
 const RANKING_MAX_COUNT = 25;
 
 const rankingList = posts => {
-  const items = list => list.map(post => postListItem(post, 'featured-posts-item', undefined, true)).join("\n");
+  // 順位はマークアップ側で振る。CSS カウンタだと「10件で畳む」定数と
+  // 二重管理になる。畳んだ側は11位から続く
+  const items = (list, offset) => list.map((post, i) => postListItem(post, 'featured-posts-item', undefined, true, offset + i + 1)).join("\n");
   // 残りが1件だけなら畳む意味がないので、そのまま出す
   const collapses = posts.length > RANKING_DISPLAY_COUNT + 1;
   const shown = collapses ? posts.slice(0, RANKING_DISPLAY_COUNT) : posts;
@@ -22,11 +24,11 @@ const rankingList = posts => {
   const more = hidden.length === 0 ? '' : `
     <details class="ranking-more">
       <summary>残り ${hidden.length}本を表示</summary>
-      <ul class="nav featured-post-link">${items(hidden)}</ul>
+      <ul class="nav featured-post-link">${items(hidden, shown.length)}</ul>
     </details>`;
   return `
   <div class="widget">
-    <ul class="nav featured-post-link">${items(shown)}</ul>${more}
+    <ul class="nav featured-post-link">${items(shown, 0)}</ul>${more}
   </div>
   `;
 };
