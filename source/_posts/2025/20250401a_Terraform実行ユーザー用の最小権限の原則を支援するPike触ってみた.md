@@ -13,13 +13,13 @@ thumbnail: /images/2025/20250401a/thumbnail.png
 author: 真野隼記
 lede: "Pikeを触ってみた記事です。"
 ---
-# はじめに
+## はじめに
 
 TIG 真野です。[Terraform連載2025](/articles/20250331a/)の2日目です。
 
 Pikeを触ってみた記事です。
 
-## Pikeとは
+### Pikeとは
 
 [Pike](https://github.com/JamesWoolfenden/pike) は James Woolfendenさんによって開発されたTerraformのコードを静的解析し、その `terraform apply` に必要な最小権限の原則に則ったIAMポリシーを生成するツールです。直接 `.tf` のコードをスキャンするというところが、良さそうと思ったポイントです。
 
@@ -29,7 +29,7 @@ Terraformを用いてインフラ構築する際には、強めの権限（本�
 
 さっそく触ってみます。
 
-## インストール
+### インストール
 
 [README](https://github.com/JamesWoolfenden/pike?tab=readme-ov-file#install) に環境別の手順があります。私はGo言語環境があったので、以下でインストールします。
 
@@ -71,7 +71,7 @@ GLOBAL OPTIONS:
 
 pike経由で直接、IAMポリシーを直接AWS上にデプロイできるなど多くのコマンドがありますが、今回は `scan` だけ用います。
 
-## 対象リソースの準備
+### 対象リソースの準備
 
 以下のような API Gateway + Lambda + DynamoDB（図にはないですがCloudWatchメトリクスやアラーム）を含んだリソースを持つTerraformコードを用意します。なお、図はinframapで生成したものを簡単に加筆したものです。
 
@@ -338,7 +338,7 @@ output "dynamodb_table_name" {
 
 </details>
 
-## Pikeの実行
+### Pikeの実行
 
 同一ディレクトリ上で、pikeコマンドを実行します。応答速度は一瞬でした。早い。
 
@@ -678,7 +678,7 @@ lambda_function_name = "pile-test-function"
 
 まさかの一発成功でした🎉🎉🎉
 
-## 本当に最小権限になっているか？権限を外してみる
+### 本当に最小権限になっているか？権限を外してみる
 
 作成するLambdaはVPC外で動作する定義になっています。そのため以下のEC2のネットワークインターフェースの権限は不要に見えましたので、外してみます。
 
@@ -704,7 +704,7 @@ lambda_function_name = "pile-test-function"
 
 完全に厳格なツールという訳では無いようです。
 
-## Pikeには絶対に無視されるであろうリソースを追加してみる
+### Pikeには絶対に無視されるであろうリソースを追加してみる
 
 以下のように、`local-exec` 経由でS3バケットを作成してみるコードを追加します。
 
@@ -793,7 +793,7 @@ terraform_data.s3_bucket_via_cli (local-exec): An error occurred (AccessDenied) 
 ╵
 ```
 
-## 使ってみての所感
+### 使ってみての所感
 
 簡易的な構成であれば、割と成功確立が高い可能性のかもしれない、と好意的に印象を持ちました。
 
@@ -808,7 +808,7 @@ terraform_data.s3_bucket_via_cli (local-exec): An error occurred (AccessDenied) 
 - 基本的にはリソースタイプに対するアクション（`ec2:RunInstances`など）に基づいていて、リソース名を制限したより細かい粒度では生成しないようです。これは予め理解して利用すると良いかなと思います（まぁ、これは許容しても良い気がします）
 - Terraform実行に必要な権限の一覧が出ると、どのようなサービスを利用しているかざっと分かるので、キャッチアップには良いかもなとは思いました（これは構成図をちゃんとメンテナンスした方が良いとは思いますが）
 
-## さいごに
+### さいごに
 
 Pikeを使ってみました。シンプルなTerraformコードでも微妙に不要な権限がついてたりしましたが、概ね想定通りの権限のみのポリシーを生成してくれました。
 

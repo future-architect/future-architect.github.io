@@ -15,13 +15,13 @@ lede: "私は Java の経験が長いのですが、JVM やバイトコードと
 
 <img src="/images/2025/20250529a/24527d79-8d12-4202-a59a-c6bc4f31173c.png" alt="" width="300" height="377" loading="lazy">
 
-# はじめに
+## はじめに
 
 こんにちは、TIGの岸本卓也です。 [春の入門祭り2025](/articles/20250413a/) シリーズです。
 
 私は Java の経験が長いのですが、JVM やバイトコードといった Java で処理が実行される根本的な仕組みへの理解が薄かったため改めて向き合うことにしました。本稿では理解の足がかりとなる調査方法を提示します。
 
-# 環境
+## 環境
 
 この検証は JDK 24 を使用し Windows 環境で実施しました。JDK の詳細なバージョンは次のとおりです。
 
@@ -31,7 +31,7 @@ OpenJDK Runtime Environment Temurin-24+36 (build 24+36)
 OpenJDK 64-Bit Server VM Temurin-24+36 (build 24+36, mixed mode, sharing)
 ```
 
-# "Hello World!" サンプルソース
+## "Hello World!" サンプルソース
 
 シンプルな処理の例として、 [Java Tutorials](https://docs.oracle.com/javase/tutorial/getStarted/cupojava/win32.html) で提示されている以下の "Hello World!" ソースを題材にします。
 
@@ -57,7 +57,7 @@ void main() {
 
 これはまだプレビューかつ入門用の側面が強い機能のため、本稿ではこれまで通りクラス定義のある "Hello World!" ソースで試します。
 
-# コンパイル
+## コンパイル
 
 Java ソースを実行するにはコンパイルが必要です。Java コンパイラ ([`javac` コマンド](https://docs.oracle.com/en/java/javase/24/docs/specs/man/javac.html)) ではネイティブアプリにコンパイルするのではなく Java 仮想マシン (JVM) 用のバイナリにコンパイルします。JVM 用のバイナリはバイトコードと呼ばれ、たいていは拡張子が `.class` のクラスファイル形式で出力します。JVM は以下のように OS 上で動作しコンピューターの CPU アーキテクチャーや OS の違いを吸収してバイトコードを実行する役割を担っています。
 
@@ -184,7 +184,7 @@ JVM ではメソッド起動時に新たな [フレーム](https://docs.oracle.c
 - 命令インデックス5 (`invokevirtual #15`): 定数プール #15 (`java.io.PrintStream#println(String)` メソッドの参照) が示すメソッドを起動する。今回の場合、命令インデックス3でプッシュした値をスタックからポップし、新たなフレームを作成してそのフレームでメソッドの命令を実行していく。
 - 命令インデックス8 (`return`): 呼び出し元に `void` を返却する
 
-# プログラムの実行
+## プログラムの実行
 
 コンパイルしたバイトコードは [`java` コマンド](https://docs.oracle.com/en/java/javase/24/docs/specs/man/java.html) を使って以下のように実行できます。
 
@@ -222,7 +222,7 @@ JVM ログを概観した結果、JVM 起動の各処理は以下のタグまた
 - シンボル参照の解決: `class+resolve`
 - クラスの初期化: `class+init`
 
-# さいごに
+## さいごに
 
 本稿では Java で "Hello World!" の処理が実行される仕組みをバイトコードや JVM を交えて説明し、調査に使える機能を紹介しました。調査にあたっては以下のページを参考にしました。
 

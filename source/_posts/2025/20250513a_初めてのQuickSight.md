@@ -16,7 +16,7 @@ lede: "Amazon QuickSightの入門記事です。最近、業務で触れる機�
 ---
 <img src="/images/2025/20250513a/thumnail.png" alt="thumnail.png" width="1200" height="500" loading="lazy">
 
-# はじめに
+## はじめに
 
 初めまして、製造エネルギー事業部の板垣です。先日アコギを購入し学生時代ぶりにギター再燃中です。
 
@@ -24,7 +24,7 @@ lede: "Amazon QuickSightの入門記事です。最近、業務で触れる機�
 
 Amazon QuickSightの入門記事です。最近、業務で触れる機会があったので、これから入門される方々の取っ掛かりとなるような内容になるようまとめます。
 
-# QuickSightとは
+## QuickSightとは
 
 QuickSightは、AWSが提供しているBI（Business Intelligence）サービスです。
 
@@ -44,7 +44,7 @@ QuickSightには様々なユーザを追加できます。AWSのルートユー�
 [^1]: QuickSightでサポートされているデータ接続先（データソース）は[こちら](https://docs.aws.amazon.com/ja_jp/quicksight/latest/user/supported-data-sources.html)から確認できます。
 [^2]: 詳しい料金体系は[こちら](https://aws.amazon.com/jp/quicksight/pricing/)から確認できます。
 
-# さっそく触ってみる
+## さっそく触ってみる
 
 データを「収集／整形／可視化」する部分のみに注目すると、QuickSightは以下のような要素で構成されています。
 
@@ -64,7 +64,7 @@ QuickSightには様々なユーザを追加できます。AWSのルートユー�
 
 なお、作業するには作成者または管理者相当のロール権限が必要になりますのでご注意ください。ちなみに今回は、管理者ロールで実施しています。
 
-## 0. アカウントの作成とユーザの登録
+### 0. アカウントの作成とユーザの登録
 
 ダッシュボード作成の前に、QuickSightアカウントとユーザの登録が必要です（既に完了していればこちらの手順はスキップ可能です）。
 
@@ -90,7 +90,7 @@ Lambdaのような他のAWSリソースと異なり、QuickSightアカウント�
 
 また前述の通り外部のユーザも管理者からの招待を受けることでログイン可能です。いずれも初回のログイン以降、ユーザロールに応じて前述したような料金が発生しますのでユーザの管理は気を付ける必要があります。
 
-## 1. データソース／データセットを準備する
+### 1. データソース／データセットを準備する
 
 自身のユーザでQuickSightにログインした後、以下の画面に遷移するので画面左側のデータセット項目を選択した後、右上にある「新しいデータセット」を押します。
 
@@ -128,7 +128,7 @@ parseDate(concat(toString({年}), "/", toString({月}), "/", toString({日})), "
 
 <img src="/images/2025/20250513a/データセットの準備4.png" alt="データセットの準備4" width="1200" height="736" loading="lazy">
 
-## 2. 分析を作成する
+### 2. 分析を作成する
 
 用意したデータセットを元に分析を作成します。
 
@@ -152,7 +152,7 @@ parseDate(concat(toString({年}), "/", toString({月}), "/", toString({日})), "
 
 <img src="/images/2025/20250513a/分析の作成4.png" alt="分析の作成4" width="1200" height="982" loading="lazy">
 
-## 3. ダッシュボードを公開する
+### 3. ダッシュボードを公開する
 
 ダッシュボードの公開は簡単です。先ほど作成した分析の画面から右上にある「公開」ボタンからダッシュボードを公開できます。
 
@@ -164,7 +164,7 @@ parseDate(concat(toString({年}), "/", toString({月}), "/", toString({日})), "
 
 分析なども同じですが、作成したダッシュボードは、QuickSightの他ユーザやグループなどへ共有できます。
 
-# もう少し踏み込んでみる
+## もう少し踏み込んでみる
 
 他のAWSサービスと同様に[QuickSightではいくつかのAPI](https://docs.aws.amazon.com/ja_jp/quicksight/latest/APIReference/API_Operations.html)が提供されており、付随してCLI（Command Line Interface）や各種SDKも整備されています。
 
@@ -179,7 +179,7 @@ $ aws --version
 aws-cli/2.17.33 Python/3.11.9 Linux/5.15.153.1-microsoft-standard-WSL2 exe/x86_64.ubuntu.22
 ```
 
-## 例：テンプレートで同じ見た目のダッシュボードを作成する
+### 例：テンプレートで同じ見た目のダッシュボードを作成する
 
 QuickSightには[テンプレート](https://docs.aws.amazon.com/ja_jp/quicksight/latest/developerguide/template-operations.html)という仕組みがあり、これを利用することで既存の分析やダッシュボードの雛形を同一のQuickSightアカウント内や別のQuickSightアカウントに共有できます（公式ではカプセル化／抽象化するなどと表現されていました）。
 
@@ -292,7 +292,7 @@ QuickSightの画面を見ると作成したダッシュボードが追加され�
 
 <img src="/images/2025/20250513a/別地点のダッシュボードを作成2.png" alt="別地点のダッシュボードを作成2" width="1200" height="838" loading="lazy">
 
-# まとめ
+## まとめ
 
 QuickSightを入門しようと検討されている方向けの内容をまとめました。後半はやや難しくなりましたが、これからQuickSightを使いこなす上でも必要な内容かと思っています。
 
@@ -300,7 +300,7 @@ QuickSightを入門しようと検討されている方向けの内容をまと�
 
 初めての寄稿でうまく書けたか不安ではありますが良い経験となりました。これからも機会があれば挑戦していきたいなと思っています。
 
-# 参考資料
+## 参考資料
 
 * [ワークショップ :: Amazon QuickSight ハンズオン](https://awsj-assets-qs.s3.ap-northeast-1.amazonaws.com/workshop/public/jp/03-workshop.html)
 * [QuickSightで作成した分析を、テンプレート機能を使って別アカウントへ配布してみる](https://dev.classmethod.jp/articles/quicksight-analysis-template/)

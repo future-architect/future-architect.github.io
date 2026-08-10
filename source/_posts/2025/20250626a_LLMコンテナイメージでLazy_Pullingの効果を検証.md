@@ -16,7 +16,7 @@ thumbnail: /images/2025/20250626a/thumbnail.png
 author: 鈴木崇史
 lede: "ECSなどでコンテナの起動を高速化することを目標に、イメージを遅延して読み込むLazy-pullingな技術に目を向け、LLMコンテナに対し効果があるのかどうかを検証していきます。"
 ---
-# はじめに
+## はじめに
 
 最近仕事でLLMサーバーを構築することになりました。
 
@@ -72,7 +72,7 @@ huggingface/transformers-pytorch-gpu    latest    f0a0db1c2168    23 minutes ago
 
 [CNCF連載](/articles/20250626a/) ということで取り上げるのはGraduatedなプロダクトである[containerd](https://containerd.io/)です。
 
-# containerdとSnapshotter
+## containerdとSnapshotter
 
 `docker run`したときの処理の流れをざっくりおさらいすると、
 
@@ -90,7 +90,7 @@ containerdの機能はpluggableです。例えば 下半分くらいを担当す
 
 Snapshotterはデーモンとして起動させunix domain socketごしにcontainerdと通信します。
 
-# Lazy Pullingとは
+## Lazy Pullingとは
 
 通常のコンテナ起動では、イメージ全体をダウンロードしてから展開・プロセス起動という流れですが、コンテナ起動時に全てのファイルが必要なわけじゃないよね、という観察があります。
 
@@ -117,7 +117,7 @@ Snapshotterはデーモンとして起動させunix domain socketごしにcontai
 - AWSが提供していてECS・Fargateで使えます
 - AWSのブログは[こちら](https://aws.amazon.com/jp/blogs/news/under-the-hood-lazy-loading-container-images-with-seekable-oci-and-aws-fargate/)
 
-# 実験してみた
+## 実験してみた
 
 LLMで文を生成するスクリプトをコンテナ化し、レジストリにpushしておき、以下の3パターンのsnapshotterで`docker run`の時間を計測しました。
 
@@ -125,7 +125,7 @@ LLMで文を生成するスクリプトをコンテナ化し、レジストリ�
 - stargz-snapshotter
 - soci-snapshotter
 
-## 検証環境構築
+### 検証環境構築
 
 今回の検証環境はこんな感じです。
 
@@ -177,7 +177,7 @@ systemctl restart containerd
 
 soci-snapshotterも大体同様です。
 
-## 実験用のコード
+### 実験用のコード
 
 LLMのモデルをロードし、文を生成させるだけのスクリプトを用意します。
 
@@ -240,7 +240,7 @@ nerdctl image convert --estargz --oci foobar.dkr.ecr.ap-northeast-1.amazonaws.co
 nerdctl push foobar.dkr.ecr.ap-northeast-1.amazonaws.com/foobar:estargz
 ```
 
-## 計測項目
+### 計測項目
 
 以下を計測します。
 
@@ -263,7 +263,7 @@ time nerdctl --snapshotter=soci run --rm \
   foobar.dkr.ecr.ap-northeast-1.amazonaws.com/foobar:soci
 ```
 
-# 結果
+## 結果
 
 結果はこんな感じでした。
 
@@ -287,7 +287,7 @@ time nerdctl --snapshotter=stargz run --rm \
   foobar.dkr.ecr.ap-northeast-1.amazonaws.com/foobar:stargz echo hello
 ```
 
-# おわりに
+## おわりに
 
 LLMサーバーをホストするにあたって、コンテナ起動を高速化するLazy-pulling技術について検証しました。sociはAWSで導入しやすいし効果もありそうなのでいいなと思いました。
 

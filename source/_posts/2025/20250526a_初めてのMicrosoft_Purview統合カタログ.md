@@ -16,7 +16,7 @@ lede: "データカタログを調査することになり、その一つとし�
 
 [春の入門祭り2025](/articles/20250413a/)の23本目の記事です。
 
-# はじめに
+## はじめに
 
 はじめまして、佐々木です。
 
@@ -24,7 +24,7 @@ lede: "データカタログを調査することになり、その一つとし�
 
 その際に前もって知っていれば理解が早かったなと思ったことや触ってみて気になった箇所をまとめておきます。
 
-# データカタログ とは
+## データカタログ とは
 
 まず前提となるデータカタログについて説明します。
 
@@ -36,7 +36,7 @@ Collibra, Atlan, AlationといったSaaS、OpenMetadata, DataHubといったOSS�
 
 その中でAzureの提供するものがMicrosoft Purviewになります。
 
-# Microsoft Purviewとは
+## Microsoft Purviewとは
 
 Microsoft PurviewとはData Security, Data Governance, Risk & Complianceにおけるソリューションを統合したサービスです。
 
@@ -71,7 +71,7 @@ Purviewを調べる際、最初に「[5分でわかるMicrosoft Purview](https:/
 
 引用: [価格 - Azure Purview | Microsoft Azure](https://azure.microsoft.com/ja-jp/pricing/details/purview/)
 
-# Azure のデータカタログの歴史
+## Azure のデータカタログの歴史
 
 Microsoft Purviewのデータカタログを調べると、Azure Purviewという名前が見受けられます（上記で記載した料金のリンクもタイトルタグがAzure Purviewになっています）。
 
@@ -94,9 +94,9 @@ Azure PurviewがGAされたのは2021年となっており、ここ数年でも�
 
 また検索から入ってくるとクラシックに関する記載だったということもよくあるので、注意が必要です。
 
-# 触ってみて気になったこと
+## 触ってみて気になったこと
 
-## 機能の改廃
+### 機能の改廃
 
 Purviewは進化途中のサービスであり、機能の入れ替えも行われています。
 
@@ -113,7 +113,7 @@ Purviewは進化途中のサービスであり、機能の入れ替えも行わ�
 
 今後このクラシックの機能がどうなるかはわかりませんが、使用していた機能が非推奨となる、廃止されるといったことはこれからも起きることが予想されます。
 
-## マネージド属性における制限
+### マネージド属性における制限
 
 先の章で言及したマネージド属性も気になる点がありました。
 
@@ -131,13 +131,13 @@ Purviewは進化途中のサービスであり、機能の入れ替えも行わ�
 
 - [Microsoft Purview データ マップのマネージド属性 | Microsoft Learn](https://learn.microsoft.com/ja-jp/purview/legacy/how-to-managed-attributes#known-limitations)
 
-## ロールが複雑
+### ロールが複雑
 
 Purviewの中でもPurviewソリューションレベルのロール、データマップのドメイン・コレクションレベルのロール、統合カタログのガバナンスドメインレベルのロールと様々なロールがあり、かなり柔軟に権限を設定できます。
 
 設定可能箇所が多いため各チームで必要な権限を明確にし、必要な権限のみを与えるよう設計を丁寧に行う必要があると思いました。
 
-# まとめ
+## まとめ
 
 Microsoft Purviewにおけるデータカタログについて概要と歴史、また気になったことを説明してきました。
 
@@ -153,7 +153,7 @@ Microsoft Purviewにおけるデータカタログについて概要と歴史、
 
 ではでは。
 
-# 参考資料
+## 参考資料
 
 - [Microsoft Purview の詳細 | Microsoft Learn](https://learn.microsoft.com/ja-jp/purview/purview()
 - [Azure 統合カタログ (ADC) Gen 2、Azure Information Protection、Microsoft Purview (旧称 Azure Purview) はどのように関連していますか? | Microsoft Purview データ ガバナンス ソリューションについてよく寄せられる質問 | Microsoft Learn](https://learn.microsoft.com/ja-jp/purview/data-governance-faq#azure---------adc--gen-2-azure-information-protection-microsoft-purview-----azure-purview-----------------)

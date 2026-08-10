@@ -17,13 +17,13 @@ lede: "業務でGlue Python Shell Job（以降、Python Shell）を利用する�
 
 <img src="/images/2025/20250822a/top.jpg" alt="" width="700  " height="700">
 
-# はじめに
+## はじめに
 
 TIGの八木雅斗です。
 
 業務でGlue Python Shell Job（以降、Python Shell）を利用する機会があったのですが、「Lambdaとかだと簡単にできるのに、Python Shellだとできないんか～」とか、ドキュメント上でPySparkジョブ or Python Shellのどちらについて記載しているのか分かりにくかったりと、戸惑うことがありました。それらの悩みポイントをまとめます。
 
-# ログ出力先のCloudWatch Logsのロググループを選択できない
+## ログ出力先のCloudWatch Logsのロググループを選択できない
 
 PySparkジョブでは、`--continuous-log-logGroup`でロギング先のロググループを選択可能です。
 
@@ -76,7 +76,7 @@ root_logger.addHandler(handler)
 - [How to use a CloudWatch custom log group with Python Shell Glue job?](https://stackoverflow.com/questions/61625190/how-to-use-a-cloudwatch-custom-log-group-with-python-shell-glue-job)
 - [Logging HOWTO](https://docs.python.org/ja/3/howto/logging.html)
 
-# 自動でメトリクスが取れない
+## 自動でメトリクスが取れない
 
 下記の設定もPySpark用の設定であるため、有効化してもメトリクスは取得できません。
 
@@ -106,7 +106,7 @@ monitor_thread.start()
 # ～メインの処理～
 ```
 
-# 選択できるPythonのパッチバージョンが古い
+## 選択できるPythonのパッチバージョンが古い
 
 2025.08現在、Python Shell ジョブでは、Pythonのバージョンにv3.6またはv3.9を利用できます。
 
@@ -123,7 +123,7 @@ print(sys.version)
 
 - [AWS Glue での Python シェルジョブに関するジョブプロパティの設定](https://docs.aws.amazon.com/ja_jp/glue/latest/dg/add-job-python.html)
 
-# デフォルトで利用できるライブラリのバージョンが古い
+## デフォルトで利用できるライブラリのバージョンが古い
 
 Python Shellの実行環境では、boto3などのライブラリがサポートされており、追加の設定なしに利用できます。
 ただし、いずれのライブラリも微妙に古いため、ものによっては使えない機能がある可能性があります。
@@ -140,7 +140,7 @@ print(boto3.__version__) # =>1.21.21
 
 - [サポートされている Python シェルジョブのライブラリ](https://docs.aws.amazon.com/ja_jp/glue/latest/dg/add-job-python.html#python-shell-supported-library)
 
-# 存在しない実行パラメータにアクセスするとSystemExitエラーで落ちる
+## 存在しない実行パラメータにアクセスするとSystemExitエラーで落ちる
 
 Python ShellではgetResolvedOptionsを利用して実行パラメータにアクセスできます。
 
@@ -169,7 +169,7 @@ except BaseException:
 
 - [例外のクラス階層](https://docs.python.org/ja/3.9/library/exceptions.html#exception-hierarchy)
 
-## マネジメントコンソール上での変更で想定外の差分が発生する
+### マネジメントコンソール上での変更で想定外の差分が発生する
 
 原因は不明ですが、マネジメントコンソール上から設定変更を行うと、下記の実行パラメータがPython Shellのデフォルト値に勝手に変更されてしまうことがあります。
 
@@ -207,7 +207,7 @@ resource "aws_glue_job" "sample" {
 
 - [aws_glue_job](https://registry.terraform.io/providers/hashicorp/aws/6.3.0/docs/resources/glue_job)
 
-# 最後に
+## 最後に
 
 Python Shellをはじめて使う時に戸惑いそうな仕様について共有しました。
 

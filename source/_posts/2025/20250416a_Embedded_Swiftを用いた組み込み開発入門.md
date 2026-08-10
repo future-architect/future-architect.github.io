@@ -18,7 +18,7 @@ lede: "Embedded Swiftを用いてRaspberry Pi Pico WをLチカさせてみまし
 
 本記事は、[春の入門祭り2025](/articles/20250413a/)の3本目です。
 
-# はじめに
+## はじめに
 
 昨年のWWDC2024のセッション[Embedded Swiftでサイズを縮小](https://developer.apple.com/jp/videos/play/wwdc2024/10197/)でSwiftで組み込み開発ができることを知り、今回実際にEmbedded Swiftを用いてRaspberry Pi Pico WをLチカさせてみました！
 
@@ -28,7 +28,7 @@ lede: "Embedded Swiftを用いてRaspberry Pi Pico WをLチカさせてみまし
 注意: Embedded Swiftはまだ試験的な段階のため、この記事の情報は古くなっている可能性があります。
 :::
 
-## Embedded Swiftとは
+### Embedded Swiftとは
 
 Embedded Swiftとは、メモリやストレージに制約のある環境でも使えるように、Swiftの柔軟性を保ちつつ、動的機能を制限してサイズを小さくしたSwiftのサブセット言語です。
 
@@ -59,7 +59,7 @@ Embededed Swiftでは、以下のSwiftが提供する動的機能を制限する
 
 [swift/docs/EmbeddedSwift/EmbeddedSwiftStatus.md](https://github.com/swiftlang/swift/blob/main/docs/EmbeddedSwift/EmbeddedSwiftStatus.md)
 
-# Embedded Swiftを用いてRaspberry Pi Pico WをLチカさせる
+## Embedded Swiftを用いてRaspberry Pi Pico WをLチカさせる
 
 レポジトリ[apple/swift-embedded-examples](https://github.com/apple/swift-embedded-examples)にいくつかのサンプルプロジェクトがあるなかで、今後色々電子工作で楽しめそう、かつ情報も豊富そうなRaspberry Pi Pico Wに関するプロジェクトを実際に試して見ることにしました。
 
@@ -73,14 +73,14 @@ Embededed Swiftでは、以下のSwiftが提供する動的機能を制限する
 推奨: Embedded Swiftを試す前に、[Raspberry Pi公式のチュートリアル](https://datasheets.raspberrypi.com/pico/getting-started-with-pico.pdf)を参考にRaspberry Pi Pico WでLチカさせることをおすすめします。Embedded Swiftのドキュメンテーションでも、推奨されています。
 :::
 
-### 実行環境
+#### 実行環境
 
 - macOS: 15.4（24E248）
 - Swift: Apple Swift version 6.2-dev (LLVM 3f3fde0d5f85709, Swift 0c5fd6a3017961d)
 - MacBookPro 13-inch M1(2020)
 - Raspberry Pi Pico W
 
-### 事前準備
+#### 事前準備
 
 次のドキュメントに沿って事前準備行います。
 - [apple/swift-embedded-examples](https://github.com/apple/swift-embedded-examples/tree/main?tab=readme-ov-file#building-the-examples)
@@ -89,7 +89,7 @@ Embededed Swiftでは、以下のSwiftが提供する動的機能を制限する
 
 - [apple/swift-embedded-examples/pico-w-blink-sdk](https://github.com/apple/swift-embedded-examples/tree/main/pico-w-blink-sdk)
 
-## 最新のdevelopment snapshotのToolchainをインストール
+### 最新のdevelopment snapshotのToolchainをインストール
 
 次のサイトから、最新のdevelopment snapshotのToolchainをインストールします。
 https://www.swift.org/install/macos/#development-snapshots
@@ -122,7 +122,7 @@ Target: arm64-apple-macosx15.0
 Build config: +assertions
 ```
 
-## Raspberry Pi Pico SDK（pico-sdk）の準備
+### Raspberry Pi Pico SDK（pico-sdk）の準備
 
 続いて、pico-sdkの準備をします。
 
@@ -153,7 +153,7 @@ HomeBrewを使ってそれぞれインストールします。
 注意: Homebrewのcore tapではなく、ARMmbedが管理するtapの`arm-none-eabi-gcc`をインストールしてください。
 :::
 
-## 環境変数の設定
+### 環境変数の設定
 
 次のように設定します。
 
@@ -165,7 +165,7 @@ export PICO_SDK_PATH={任意のディレクトリ}/pico-sdk
 export PICO_TOOLCHAIN_PATH=/opt/homebrew/opt/arm-none-eabi-gcc/lib/
 ```
 
-# ビルドラン
+## ビルドラン
 
 準備が完了したので、サンプルプロジェクト([apple/swift-embedded-examples/pico-w-blink-sdk](https://github.com/apple/swift-embedded-examples/tree/main/pico-w-blink-sdk))をビルドランしたいと思います。
 
@@ -243,7 +243,7 @@ struct Main {
 }
 ```
 
-# ビルド時詰まった箇所とその解決策
+## ビルド時詰まった箇所とその解決策
 
 `cmake --build build`を実行したときに、以下のエラーに遭遇したので、その原因と解決策について記載します。
 
@@ -253,7 +253,7 @@ error: failed to emit precompiled header '.../BridgingHeader.pch' for bridging h
 error: 'inttypes.h' file not found
 ```
 
-## 1. arm-none-eabi-gcc の nosys.specs が見つからない
+### 1. arm-none-eabi-gcc の nosys.specs が見つからない
 
 `arm-none-eabi-gcc: fatal error: cannot read spec file 'nosys.specs': No such file or directory`というエラーは、はじめに、次のコマンドでHomeBrew版arm-none-eabi-gccをインストールしてしまったが良くありませんでした。
 
@@ -274,7 +274,7 @@ brew install armmbed/formulae/arm-none-eabi-gcc
 
 これでARM Toolchainのリンカを使ってバイナリファイルが無事生成できるはずです。
 
-## 2. C言語の標準ヘッダが見つからない
+### 2. C言語の標準ヘッダが見つからない
 
 次のエラーは、`sysroot`を認識しないことが一つの要因だと考えました。
 
@@ -391,13 +391,13 @@ pico_add_extra_outputs(swift-blinky)
 
 </details>
 
-# おわりに
+## おわりに
 
 Embedded Swiftを用いてLaspberry Pi Pico WをLチカさせることができました。
 
 Laspberry Pi Pico Wを買うときに、電子工作のスターターキットで購入していたので、Embedded Swiftを使って様々な電子工作にもチャレンジしてみたいと思います。
 
-# 参考
+## 参考
 
 - [Embedded Swiftでサイズを縮小-WWDC24-ビデオ-Apple Developer](https://developer.apple.com/jp/videos/play/wwdc2024/10197/)
 - https://github.com/swiftlang/swift-evolution/blob/main/visions/embedded-swift.md

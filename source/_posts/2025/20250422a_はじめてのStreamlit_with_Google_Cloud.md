@@ -24,20 +24,20 @@ lede: "Streamlitは、Pythonを使って簡単にインタラクティブなWeb�
 
 Streamlitは、Pythonを使って簡単にインタラクティブなWebアプリケーションとして共有できるライブラリで多くの採用実績があり、Snowflakeが買収したため今後の発展も期待できます。本記事では、Google CloudのVertex AI Workbenchを活用してStreamlitアプリを開発し、Google Cloud Runにデプロイするまでの手順を詳しく解説します。ローカル環境のセットアップは不要です。
 
-# 前提条件
+## 前提条件
 
 - Google Cloudアカウントを用意していること
 - Google Cloud プロジェクトが作成済みであること
 
-# 全体の流れ
+## 全体の流れ
 
 - Webアプリを作成する
 - DockerイメージをArtifact Registryにプッシュする
 - Artifact RegistryにプッシュしたDockerイメージをCloud Runにデプロイする
 
-# Webアプリの作成
+## Webアプリの作成
 
-## Google Cloud Notebooks インスタンスの作成
+### Google Cloud Notebooks インスタンスの作成
 
 まずはStreamlitアプリを開発するためのGoogle Cloud Notebooksインスタンスを作成します
 
@@ -50,7 +50,7 @@ Viewで「インスタンス」を指定し、「新規作成」をクリック�
 3. ノートブックを開く
 インスタンスが作成され、準備が完了したら、「JupyterLab を開く」をクリックします
 
-## Streamlit アプリの開発
+### Streamlit アプリの開発
 
 JupyterLabが開いたら、新しいPythonファイルを作成し、Streamlitアプリのコードを記述します
 
@@ -79,9 +79,9 @@ JupyterLabが開いたら、新しいPythonファイルを作成し、Streamlit�
 4. Python ファイルとして保存
   「ファイル」>「名前を付けて保存」を選択し、ファイル名を `app.py` として保存します
 
-# Dockerイメージをプッシュ
+## Dockerイメージをプッシュ
 
-## Dockerfile の作成
+### Dockerfile の作成
 
 Google Cloud Runにデプロイするために、Dockerコンテナを作成します。JupyterLabのファイルブラウザで、`app.py` と同じディレクトリに `Dockerfile` という名前の新しいテキストファイルを作成し、以下の内容を記述します。
 
@@ -103,7 +103,7 @@ HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
 ENTRYPOINT ["streamlit", "run", "app.py", "--server.enableCORS=false", "--server.port=8501"]
 ```
 
-### requirements.txt の作成
+#### requirements.txt の作成
 
 `app.py` と同じディレクトリに `requirements.txt` という名前の新しいテキストファイルを作成し、アプリに必要なPythonパッケージを記述します。今回はstreamlit以外を使用していないため以下でOKです。
 
@@ -111,15 +111,15 @@ ENTRYPOINT ["streamlit", "run", "app.py", "--server.enableCORS=false", "--server
 streamlit
 ```
 
-## Docker イメージのビルドと Artifact Registry へのプッシュ
+### Docker イメージのビルドと Artifact Registry へのプッシュ
 
 Cloud Notebooksインスタンス内でDockerイメージをビルドし、Artifact Registryにプッシュします。
 
-### Artifact Registry API の有効化
+#### Artifact Registry API の有効化
 
 まだ有効にしていない場合は、Google Cloud Console で Artifact Registry API を有効にします
 
-### Artifact Registry リポジトリの作成
+#### Artifact Registry リポジトリの作成
 
 Google Cloud Console または `gcloud` コマンドを使用して、Docker イメージを保存する Artifact Registry リポジトリを作成します。リージョン（例: `asia-northeast1`）とリポジトリ形式（`Docker`）を指定します
 
@@ -138,7 +138,7 @@ gcloud artifacts repositories create test-repository \
 このようにArtifact RegistryにDocker形式のリポジトリができていればOKです
 <img src="/images/2025/20250422a/image.png" alt="" width="1200" height="69" loading="lazy">
 
-#### Docker イメージのビルド
+##### Docker イメージのビルド
 
 ターミナルで、`Dockerfile` があるディレクトリに移動し、以下のコマンドを実行して Docker イメージをビルドします。`<your-gcp-region>` と `<repository-name>`、`<image-name>` は適切に置き換えてください。
 
@@ -150,7 +150,7 @@ docker build -t <your-gcp-region>-docker.pkg.dev/<your-gcp-project-id>/<reposito
 docker build -t asia-northeast1-docker.pkg.dev/sample-project/test-repository/myapp .
 ```
 
-### Docker に Artifact Registry の認証を設定
+#### Docker に Artifact Registry の認証を設定
 
 以下のコマンドを実行して、Docker が Artifact Registry にプッシュできるように認証します。
 
@@ -164,7 +164,7 @@ gcloud auth configure-docker <hostname-list>
 gcloud auth configure-docker asia-northeast1-docker.pkg.dev
 ```
 
-### Docker イメージのプッシュ
+#### Docker イメージのプッシュ
 
 ビルドした Docker イメージを Artifact Registry にプッシュします。先ほどビルドした際のタグを使用します。
 
@@ -180,11 +180,11 @@ docker push asia-northeast1-docker.pkg.dev/grassroot-ck/test-repository/myapp
 
 <img src="/images/2025/20250422a/image_2.png" alt="" width="533" height="318" loading="lazy">
 
-# Google Cloud Run へのデプロイ
+## Google Cloud Run へのデプロイ
 
 プッシュしたDockerイメージをGoogle Cloud Runにデプロイします。
 
-## Cloud Run へのデプロイコマンド実行
+### Cloud Run へのデプロイコマンド実行
 
 ターミナルで以下のコマンドを実行します。`<your-gcp-project-id>` と `<your-gcp-region>` はご自身のGCPプロジェクトIDとリージョンに置き換えてください（例: `asia-northeast1`）
 
@@ -219,7 +219,7 @@ Cloud Runにデプロイされました。
 
 <img src="/images/2025/20250422a/image_3.png" alt="" width="1200" height="77" loading="lazy">
 
-## デプロイの確認
+### デプロイの確認
 
 デプロイが完了すると、Cloud RunサービスへのURLが表示されます。このURLをブラウザで開くと、デプロイしたStreamlitアプリにアクセスできます。もしアクセスできなければセキュリティタブで、未認証の呼び出しを許可するように設定してください。
 
@@ -229,7 +229,7 @@ Cloud Runにデプロイされました。
 
 <img src="/images/2025/20250422a/sample_tool.avif" width="1400" height="927" loading="lazy">
 
-# まとめ
+## まとめ
 
 Google Cloud Notebooksを利用することで、ローカル環境をセットアップすることなく、GCP上でStreamlitアプリを開発からデプロイまで一貫して行うことができます。Cloud Runのサーバーレスな環境により、Streamlitアプリを簡単に公開し、共有できます。
 
@@ -237,7 +237,7 @@ Google Cloud Notebooksを利用することで、ローカル環境をセット�
 
 この手順を参考に、ぜひGoogle Cloud Notebooksを活用してStreamlitアプリの開発とデプロイを試してみてください。
 
-# 参考資料
+## 参考資料
 
 - [Artifact Registry for Docker への認証を構成する](https://cloud.google.com/artifact-registry/docs/docker/authentication?hl=ja)
 - [イメージを push および pull する](https://cloud.google.com/artifact-registry/docs/docker/pushing-and-pulling?hl=ja)

@@ -18,13 +18,13 @@ lede: １か月前、情報安全確保支援士を受験してきまして、�
 
 [CI/CD連載](/articles/20250603a/) 5本目の記事です。
 
-# はじめに
+## はじめに
 
 １か月前、情報安全確保支援士を受験してきまして、問題の選択肢にあった "SonarQube" という初耳ワードがどんなOSSなのか気になりました。タイミングよくこの『CI/CD pipeline』企画を目にしたので、これは私に書けと言っている！と思い、このブログ記事の題材にすることに決め、ミニマム版を実装構築してみました(/・ω・)/
 
 ちなみに今回（令和7年春）の問題には、弊社セキュリティプロダクトの Future Vuls の得意分野である脆弱性管理の大問がそっくり出ていて、「これを機に [Future Vuls](https://vuls.biz/) の導入を検討してみては？」と回答に書いても丸もらえるのか試したかったです（さすがに試していない。
 
-# SonarQubeとは？
+## SonarQubeとは？
 
 SonarQubeとは、SonarSourceが開発したオープンソースプラットフォームで、29のプログラミング言語（2025年5月現在）において、コードの静的解析による自動レビューと継続的なコード品質検査を行い、バグやコードスメルを観測することができます。具体的には、重複コード、コーディング規約、単体テスト、コードカバレッジ、コードの複雑さ、コメント、バグ、セキュリティ推奨事項に関するレポートを提供してくれるソフトウェアです。
 
@@ -32,7 +32,7 @@ SonarQubeとは、SonarSourceが開発したオープンソースプラットフ
 
 ※無料で使う場合、制限として解析できるのは公開リポジトリのみに限られます。プライベートリポジトリは解析できません。
 
-# SonarQube Cloud
+## SonarQube Cloud
 
 - [SonarQube Cloud Online Code Review as a Service Tool  | Sonar](https://www.sonarsource.com/products/sonarcloud/)
 
@@ -42,7 +42,7 @@ SonarQubeとは、SonarSourceが開発したオープンソースプラットフ
 
 - [Getting started with GitHub | SonarQube Cloud Documentation](https://docs.sonarsource.com/sonarqube-cloud/getting-started/github/\)
 
-# 基本構想
+## 基本構想
 
 基本的に、解析対象コードとテストコードは以下の理由から **同一言語** で書いた方がよいです。
 
@@ -52,7 +52,7 @@ SonarQubeとは、SonarSourceが開発したオープンソースプラットフ
 
 今回はPythonで進めていきます。
 
-## 最低限必要なファイル群
+### 最低限必要なファイル群
 
 必須のファイル
 
@@ -65,7 +65,7 @@ SonarQubeとは、SonarSourceが開発したオープンソースプラットフ
 
 このファイルには、リポジトリのチェックアウト、Python環境のセットアップ、依存関係のインストール（オプション）、テストとカバレッジレポートの生成（推奨）、そしてSonarCloudスキャナの実行といったステップを記述します。
 
-### 強く推奨されるファイル（解析の品質と有用性を大幅に向上させるため）
+#### 強く推奨されるファイル（解析の品質と有用性を大幅に向上させるため）
 
 - テストコードファイル (`test_*.py` など)
 ユニットテストやインテグレーションテストのコードのこと。コードの品質を保証し、カバレッジを測定できる。 （例） `tests/test_main.py` `tests/test_utils.py`
@@ -75,7 +75,7 @@ SonarQubeとは、SonarSourceが開発したオープンソースプラットフ
 - `.gitignore` ファイル
 Gitが追跡すべきでないファイルやディレクトリ（例: `__pycache__` `.venv` `*.pyc` `coverage.xml` など）を指定する。これにより、不要なファイルがSonarCloudによって解析されるのを防ぎ、解析のノイズを減らす。
 
-### オプションだが有用なファイル
+#### オプションだが有用なファイル
 
 - 依存関係定義ファイル
 プロジェクトが依存しているライブラリとそのバージョンをリスト化したファイル。(例) `requirements.txt` `pyproject.toml` (PoetryやPDMを使用している場合)
@@ -83,7 +83,7 @@ SonarCloudがプロジェクトの構成をより深く理解するのに役立�
 - `sonar-project.properties` ファイル (オプション)
 リポジトリのルートディレクトリにこのファイルを置くことで、SonarCloudのプロジェクト設定（プロジェクトキー、ソースディレクトリ、エンコーディング、除外設定など）をCI/CDワークフローファイルとは別に管理可能。設定項目が多い場合や、複数のCI/CD環境で同じ設定を使いたい場合に便利である。これがなくても、CI/CDワークフローファイル内のSonarScannerの引数で設定を指定することは可能であるが、ファイルとして記載しておくのが無難である。（※今回も配置済み）
 
-## 全体ファイル構成
+### 全体ファイル構成
 
 今回は下記のように作成しました。ミニマム構成でシンプルですね！
 
@@ -108,15 +108,15 @@ PJ_ROUTE/
 └── README.md                    # プロジェクトの説明ファイル
 ```
 
-# 使用するソフトウェアアカウントの登録
+## 使用するソフトウェアアカウントの登録
 
-## Github account のサインイン
+### Github account のサインイン
 
 新規開設方法については割愛します。
 
-## SonarCloud account のサインイン
+### SonarCloud account のサインイン
 
-### １．SonarCloudのアカウント作成とプロジェクト設定
+#### １．SonarCloudのアカウント作成とプロジェクト設定
 
 SonarCloud のウェブサイトにアクセスし、[Log in] or [Sign up] > [GitHub] を選択してGitHubアカウントで連携・登録を行う。
 
@@ -126,7 +126,7 @@ SonarCloud のウェブサイトにアクセスし、[Log in] or [Sign up] > [Gi
   <img src="/images/2025/20250619a/sonarqube_05.png" alt="sonarqube_05.png" width="529" height="939" loading="lazy">
 </div>
 
-### ２．解析対象リポジトリの選択
+#### ２．解析対象リポジトリの選択
 
 SonarCloudのダッシュボードで [Analyze new project] (または[+]メニュー > [Analyze new project]) をクリックし、GitHub Organizationを選択後、解析したいリポジトリを選択して [Set Up] をクリック。通常は「With GitHub Actions」が推奨されるので、それを選択する。
 
@@ -139,31 +139,31 @@ SonarCloudのダッシュボードで [Analyze new project] (または[+]メニ�
 | Organization Key | SonarCloudの組織名（通常はGitHubの組織名やユーザー名）|
 | Project Key | SonarCloudがリポジトリに対して自動生成したキー（通常は GitHubユーザー名\_リポジトリ名 のような形式） |
 
-### ３．SonarCloudトークンの生成とGitHub Secretsへの登録
+#### ３．SonarCloudトークンの生成とGitHub Secretsへの登録
 
 SonarCloudの画面右上の自分のアイコン > [My Account] > [Security] に移動。[Generate Tokens] セクションで、トークン名（例: GITHUB_ACTIONS_TOKEN）を入力し、[Generate] をクリックする。生成されたトークンが表示されるので、必ずコピーして安全な場所に一時保管してください。
 ※この画面を閉じると二度と表示されません!!
 
 <img src="/images/2025/20250619a/sonarqube_10.png" alt="sonarqube_10.png" width="1200" height="562" loading="lazy">
 
-### ４．TOKENの登録
+#### ４．TOKENの登録
 
 GitHubリポジトリに移動。[Settings] > [Secrets and variables] > [Actions] を選択する。[New repository secret] ボタンをクリックし、Name に 今回使用した名称 "SONAR_TOKEN" を入力する。Secret または Value に、先ほどSonarCloudで生成・コピーしたトークンを貼り付け、[Add secret] ボタンをクリックする。
 
 <img src="/images/2025/20250619a/sonarqube_11.png" alt="sonarqube_11.png" width="1200" height="614" loading="lazy">
 
-# 構築手順
+## 構築手順
 
 それでは、具体的に設定ファイルの作成および設定に移ります！
 
-## GitHub Actions CI pipeline & SonarCloud による解析
+### GitHub Actions CI pipeline & SonarCloud による解析
 先にこちらを構築します。
 
-### １．github/workflows ディレクトリの作成
+#### １．github/workflows ディレクトリの作成
 
 CI/CDを設定したいGitHubリポジトリのルート（一番上の階層）に、 `.github` という名前のディレクトリを作成します。さらにその中に `workflows` という名前のディレクトリを作成します。最終的なパスは `.github/workflows/` となります。GitHub Actionsはこのディレクトリ内のYAMLファイルを自動的に認識します。
 
-### ２．ワークフローファイルの作成
+#### ２．ワークフローファイルの作成
 
 yamlの書き方など参考にすべく、初心者は GitHub Actions のテンプレートを使用するのが分かりやすいです。下記、 [Actions] > [Simple workflow] > [Configure] から作成できます。
 
@@ -267,7 +267,7 @@ jobs:
 トリガー (on:): どのブランチへの push や pull_request で実行したいか、または特定のタグが作成されたときなど、実行条件を細かく設定できます。
 :::
 
-### ３．sonar-project.properties ファイルの作成
+#### ３．sonar-project.properties ファイルの作成
 
 SonarCloud (または SonarQube) が対象プロジェクトをどのようにスキャン（解析）すべきかを指示するための設定ファイルです。SonarScanner（コードをスキャンして SonarCloud に結果を送るツール）が実行される際に、このファイルを読み込み、プロジェクトの基本的な情報や解析のパラメータを取得します。
 
@@ -323,14 +323,14 @@ sonar.python.coverage.reportPaths=coverage.xml
 特に `sonar.tests=tests # ...` のようにプロパティ値の直後に # でコメントを続けている場合、# がパスの一部として解釈されたり、あるいはその前のスペースと合わせて問題を引き起こすことがあるようです。最も安全なのは、プロパティ定義の行には値のみを記述し、コメントは独立した行に記述することです。
 :::
 
-### ４．解析対象レポジトリの準備
+#### ４．解析対象レポジトリの準備
 
 今回は、外部通信のないスタンドアロンのソースコード（Python）を解析対象とします。SonarCloud は、テストカバレッジの結果やビルド情報を利用してより詳細な解析を行います。
 
 - ビルドスクリプト： プロジェクトをビルドするためのスクリプト ( `package.json` の `scripts` `Makefile` `pom.xml` など) がリポジトリに含まれていることを確認します。
 - テストスクリプト： ユニットテストやインテグレーションテストを実行し、カバレッジレポートを生成するスクリプトを準備します。言語毎にカバレッジレポートを作成するためのライブラリが存在するため、それが出力されるように設定します。
 
-### ５．ブランチ保護ルールの設定 (推奨)
+#### ５．ブランチ保護ルールの設定 (推奨)
 
 コードの品質を確保し、main ブランチにマージする前に CI チェックがパスするように設定します。[GitHub リポジトリ] > [Settings] > [Branches] に移動し、[Require status checks to pass before merging]を有効化し、main ブランチに対するブランチ保護ルールを追加します。今回は下記のようにしました。
 
@@ -338,7 +338,7 @@ sonar.python.coverage.reportPaths=coverage.xml
 
 CI パイプラインから 該当ジョブ を選択し、Require pull request reviews before merging (マージ前にプルリクエストレビューを必須にする) も有効にします。
 
-### ６．ワークフローファイルのコミット＆プッシュと結果確認
+#### ６．ワークフローファイルのコミット＆プッシュと結果確認
 
 作成・編集したワークフローファイル (.github/workflows/ci.yml など) をリポジトリにコミットし、GitHubにプッシュします。
 
@@ -352,18 +352,18 @@ CI パイプラインから 該当ジョブ を選択し、Require pull request 
 
 <img src="/images/2025/20250619a/github-cicd_03.png" alt="github-cicd_03.png" width="1134" height="258" loading="lazy">
 
-### ７．SonarQube Cloud ルールセットの設定について
+#### ７．SonarQube Cloud ルールセットの設定について
 
 上記工程までで、Github ActionsとSonarQube Cloudの連携は完了ですが、SonarQube側でコード解析を全く行っていない状態（=SASTとしての機能を果たしていない）のため、別途ルールセットの設定が必要です。
 
-## QualityProfile と QualityGate の違い
+### QualityProfile と QualityGate の違い
 
 - **Quality Profile：ルールブックそのもの**
 静的コード解析を行う際に、「どのような観点でコードを検査し、どんな問題を検出対象とするか」という具体的なルールセットを定義（=ルールブック）します。プロジェクトや組織のコーディング標準、品質基準に基づいて、コードの潜在的な問題点を網羅的に洗い出すための「検査項目リスト」を作成する際に使用する機能です。通常、プログラミング言語ごとに設定します。
 - **Quality Gate：ルールブック結果の品質管理**
 クオリティプロファイルに基づいて行われたコード解析の結果が、「プロジェクトとしてリリース（またはマージ）して良い品質基準を満たしているか」を判定するための条件セットです。プロジェクトが定める品質基準をクリアしているかどうかを自動的に判断し、基準を満たさない場合、ビルドを成功/失敗させてコードが本番環境にデプロイされたり、メインブランチにマージされたりするのを防ぐ際に使用する機能です。通常、プロジェクトごと、または組織全体で共通のゲートを設定できます。
 
-## Quality Profileの設定
+### Quality Profileの設定
 
 ルールセット の設定は、主にWeb UIから行います。SonarQube Cloudのプラットフォーム上で直接 Quality Profile を作成・編集し、プロジェクトに適用します。新しいルールを有効化したり、既存のルールの重要度を変更したりできます。下図のように、右上部から [Account page] > [ADMIN] > [Quality Profiles] へ移動します。
 
@@ -375,25 +375,25 @@ CI パイプラインから 該当ジョブ を選択し、Require pull request 
 
 <img src="/images/2025/20250619a/sonarqube_24_ruleset.png" alt="sonarqube_24_ruleset.png" width="1027" height="423" loading="lazy">
 
-### １．Quality Profile の選択または作成
+#### １．Quality Profile の選択または作成
 
 各プログラミング言語ごとに定義されているQuality Profileの一覧が表示されており、デフォルトで「Sonar way」という推奨ルールセットが用意および設定されています。
 
 「Sonar way」のような組み込みプロファイルは直接編集できません。編集するためには、コピーを作成する必要があります。（無料枠ではこれはできなさそう...）
 
-#### 新しいプロファイルを作成する
+##### 新しいプロファイルを作成する
 
 Quality Profilesページの右上にある「Create」ボタンをクリックし、下記を入力していきます。Parentに指定すると、指定したQualityGateの内容を引き継いでProfileを作成してくれます。
 
 <img src="/images/2025/20250619a/image_5.png" alt="image.png" width="1200" height="465" loading="lazy">
 
-#### 設定したプロファイルをactivateする
+##### 設定したプロファイルをactivateする
 
 今回は、セキュリティ面での解析をしてみたいので➀で設定したルールの中で security に関わる項目を有効化してみました！→ 設定自体はできそうですが、無料枠内だとデプロイまで行きつかないので結局ここでの設定は反映できなかったです。
 
 <img src="/images/2025/20250619a/image_6.png" alt="image.png" width="1200" height="507" loading="lazy">
 
-#### Quality Profileをプロジェクトに割り当てる
+##### Quality Profileをプロジェクトに割り当てる
 
 Quality Profileをカスタマイズしたら、それを解析対象のプロジェクトに割り当てる必要があります。
 
@@ -407,7 +407,7 @@ SonarCloudで対象のプロジェクトページに移動します。
 
 <img src="/images/2025/20250619a/image_7.png" alt="image.png" width="1003" height="946" loading="lazy">
 
-### ２．Quality Gate の設定
+#### ２．Quality Gate の設定
 
 無料枠内では default: Sonarway 以外のプロジェクトに対する **適用はできない** ようですが、**QualityGateの作成自体はできる** ようなので興味のある方は是非手を動かしてみるとよいかもしれません。
 
@@ -415,17 +415,17 @@ SonarCloudで対象のプロジェクトページに移動します。
 
 <img src="/images/2025/20250619a/image_9.png" alt="image.png" width="791" height="477" loading="lazy">
 
-## GitHub Actions CD パイプライン構築手順
+### GitHub Actions CD パイプライン構築手順
 
 CI（ビルドとテスト）が成功したら、自動的にアプリケーションをサーバーやクラウドサービスにデプロイするCDパイプラインも構築できます。CIジョブの後続としてデプロイ用のCDジョブを追加します。
 
-### １．デプロイに際し必要な認証情報の設定
+#### １．デプロイに際し必要な認証情報の設定
 
 デプロイ先（ex. GitHub Pages, AWS S3/EC2/ECS, Azure App Service, Google Cloud Run, Heroku）に応じた GitHub Actions (例: `actions/deploy-pages` `aws-actions/configure-aws-credentials` `azure/webapps-deploy`) や、デプロイ用のコマンド (`scp` `rsync` `docker push` など) をワークフローに追加します。
 
 デプロイに必要なAPIキーやパスワードなどの認証情報は、セキュリティ上の理由からワークフローファイルに直接書き込まず、リポジトリの [Settings] > [Secrets and variables] > [Actions] で Secrets として安全に登録し、ワークフロー内から `${{ secrets.YOUR_SECRET_NAME }}` のように参照します。（一般的なやり方）
 
-### ２．ワークフローファイルの作成
+#### ２．ワークフローファイルの作成
 
 ```yaml
 name: CD - Deploy Application
@@ -475,7 +475,7 @@ jobs:
         run: echo "Deploying application..." # Replace with your actual deployment commands
 ```
 
-### ３．ワークフローのコミット＆プッシュと結果確認
+#### ３．ワークフローのコミット＆プッシュと結果確認
 
 作成・編集したワークフローファイル (cd_pipeline.yml) をリポジトリにコミット＆プッシュします。GitHubリポジトリの [Actions] タブを開き、ワークフローが実行されていることを確認し、ワークフローがエラーなく完了したことを確認してください。
 
@@ -491,7 +491,7 @@ jobs:
 
 <img src="/images/2025/20250619a/image_12.png" alt="image.png" width="1200" height="394" loading="lazy">
 
-# Sonar Qubeの各評価項目
+## Sonar Qubeの各評価項目
 
 SonarCloudでは、主に以下のような項目でコードの品質を評価します。分析結果の解読に役立ててください。
 
@@ -510,11 +510,11 @@ SonarCloudでは、主に以下のような項目でコードの品質を評価�
 - **Duplications (重複)**
 意味: 同じようなコードが複数箇所にコピー＆ペーストされている割合（パーセンテージ）や行数
 
-# おわりに
+## おわりに
 
 コンサルとして日々業務にあたっていると様々な事情により、テスト自動化やpipelineの構築などまだまだ自動化できていない企業が多いのかなと思います。しかし、ソフトウェアのセキュリティ対策は後付けでは対応しきれない部分も多く、DevSecOpsが昨今開発の主流となりつつあります。是非これを機に "CI/CD pipelineの構築" と "SonarQubeの組み込み" をマスターし、社内でも一目置かれる人材になってみてはいかがでしょうか！？
 
-# 参考資料
+## 参考資料
 
 - [「入門】GitHub Actionsとは？概要やメリット、使用例まとめ - カゴヤのサーバー研究室](https://www.kagoya.jp/howto/it-glossary/develop/githubactions/)
 - [【入門】GitHubの使い方｜設定や基本操作など - カゴヤのサーバー研究室](https://www.kagoya.jp/howto/it-glossary/develop/howtousegithub/)

@@ -14,24 +14,24 @@ author: 森友雅
 lede: "Transformerを知っていて、その理解を深めたい人、大規模言語モデル がどのようにして推論しているのかを知りたい人向けに..."
 mathjax: true
 ---
-# 本記事の前提
+## 本記事の前提
 
-## 読んでほしい人
+### 読んでほしい人
 
 - [Transformer](https://arxiv.org/abs/1706.03762)を知っていて、その理解を深めたい人
 - 大規模言語モデル (LLM: Large Language Model) がどのようにして推論しているのかを知りたい人
 
-## 触れている内容
+### 触れている内容
 
 - ユーザが質問をして、Transformerが回答を生成するまでの一連(end-to-end)の処理
 - Transformerの仕組みについて広く浅く
 
-## 触れていない内容
+### 触れていない内容
 
 - 学習時に行われる処理（MaskやDropoutなど）
 - Pythonなどのプログラミング言語を用いたTransformerの実装方法
 
-# 最初に「構成図」で理解する
+## 最初に「構成図」で理解する
 
 まずは元論文「Attention Is All You Need」から引用したTransformerの構成図を図1に示します。
 
@@ -45,7 +45,7 @@ mathjax: true
 
 図 2．私が作った、元論文の構成図を具体化させたTransformerの構成図
 
-# 次に「処理フロー」で理解する
+## 次に「処理フロー」で理解する
 
 前章で示した構成図だけでは説明が不十分であるため、次は処理フローの側面から理解を深めていただこうと思います。図2と照らし合わせながら読み進めていただくと理解しやすい気がします。
 
@@ -101,7 +101,7 @@ mathjax: true
 7.生成の終了を表す文字（EOS: End of Sequence）が生成されるか、生成Token数が上限になるまで「4」~「6」を繰り返す。
 ```
 
-# 最後に「各処理の深掘り」で理解する
+## 最後に「各処理の深掘り」で理解する
 
 これまで「構成図」と「処理フロー」で見てきましたが各段階の処理を深ぼる説明がありませんでした。そのため、最後にTransformerで利用されている処理を軽く解説します。本章で触れるのは以下の処理です。
 
@@ -122,7 +122,7 @@ mathjax: true
 - 出力関数(Output Function)
   - Softmax
 
-## [トークナイザ(Tokenizer)](https://paperswithcode.com/methods/category/tokenizers)
+### [トークナイザ(Tokenizer)](https://paperswithcode.com/methods/category/tokenizers)
 
 Transformerは入力された文章（自然言語）のまま扱うことができません。
 
@@ -132,17 +132,17 @@ Transformerは入力された文章（自然言語）のまま扱うことがで
 
 このサイトのTokenizerはBPEベースの「[Tiktoken](https://github.com/openai/tiktoken)」というモデルを利用しています。
 
-## [埋め込み(Embedding)](https://pytorch.org/docs/stable/generated/torch.nn.Embedding.html)
+### [埋め込み(Embedding)](https://pytorch.org/docs/stable/generated/torch.nn.Embedding.html)
 
 Tokenizerで得たTokenの潜在表現を抽出します。例えば「`[1234, 654, 58295, 219, 179]`」のようなTokenを「`[[1.0, 0.2, ..., 0.3], [0.4, 0.2, ..., 1.0], [0.2, 0.2, ..., 0.1], [0.5, 0.3, ..., 0.7], [0.9, 0.2, ..., 0.1]]`」のように、各Tokenの値をD次元に拡張します。そうすることで、類似した意味を持つTokenを同じ方向や、同じ大きさのベクトルとして表現することができます。
 
 Embeddingは事前に学習された重みを利用することもあります。
 
-## [線形/全結合(Linear/Fully Connected)](https://pytorch.org/docs/stable/generated/torch.nn.Linear.html)
+### [線形/全結合(Linear/Fully Connected)](https://pytorch.org/docs/stable/generated/torch.nn.Linear.html)
 
 学習可能なパラメータを利用して入力した潜在表現を変換します。学習可能なパラメータの数は調整することができ、この調整次第で変換後の次元数を増減させることができます。
 
-## 位置符号化(Positional Encoding)
+### 位置符号化(Positional Encoding)
 
 Embeddingで得られた潜在表現には 時系列情報がありません。これは「`[日本, の, 首都, は, ？]`」と「`[の, 首都, ？, 日本, は]`」が同じ文章と言っているようなものです。そのため、時系列の意味合いを持つ値を各潜在表現に加算することで時系列情報を付与します。
 
@@ -157,7 +157,7 @@ cos(pos/10000^{i/D})　(i=odd)
 \right.
 $$
 
-## [マルチヘッド注意機構(Multi-Head Attention)](https://paperswithcode.com/method/multi-head-attention)
+### [マルチヘッド注意機構(Multi-Head Attention)](https://paperswithcode.com/method/multi-head-attention)
 
 次で説明する「Scaled Dot-Product Attention」をN個に分割して処理するための機構です。
 
@@ -169,7 +169,7 @@ Embeddingで各TokenをD次元に拡張しますが、分割がない場合、1�
 
 図 4．元論文から引用したMulti-Head Attentionの構成図
 
-## [スケール化内積注意機構(Scaled Dot-Product Attention)](https://paperswithcode.com/method/scaled)
+### [スケール化内積注意機構(Scaled Dot-Product Attention)](https://paperswithcode.com/method/scaled)
 
 トークン間の類似度を内積で求めます。はじめに、QとKで行列積をとり、Dの平方根で除算します。Dの平方根を除算している理由はQとKの行列積の値を標準化するためです。
 
@@ -187,15 +187,15 @@ $$
 
 Transformerでは「自己注意(Self-Attention)」と「相互注意(Cross-Attention)」が登場します。Self-AttentionとはEncoderとDecoderで登場し、「Q」と「K」と「V」に同じ行列を与える方法です。Cross-AttentionとはDecoderでのみ登場する「Q」と「KとV」で異なる行列を与える方法です。
 
-## [レイヤー正規化(LN:Layer Normalization)](https://paperswithcode.com/method/layer-normalization)
+### [レイヤー正規化(LN:Layer Normalization)](https://paperswithcode.com/method/layer-normalization)
 
 各Tokenのベクトル方向に正規化行う手法です。正規化手法には他にもBatch NormalizationやInstance Normalizationなどありますが、入力長が可変のTransformerではInstance Normalizationが有効です。
 
-## [ReLU:Rectified Linear Unit](https://paperswithcode.com/method/relu)
+### [ReLU:Rectified Linear Unit](https://paperswithcode.com/method/relu)
 
 非線形変換を行う関数です。0以下の入力を0にするだけのシンプルな関数です。ReLUの傾きは0か1なので、層を増やしても勾配を消失させにくい特性があります。（最近は活性化関数として使われることが少なくなりましたが、[Sigmoid](https://paperswithcode.com/method/sigmoid-activation)関数は傾きの範囲が0~0.25で、層が増えると勾配が0になってしまう「勾配消失問題」が発生します。）
 
-## [Softmax](https://paperswithcode.com/method/softmax)
+### [Softmax](https://paperswithcode.com/method/softmax)
 
 行列の和が1.0(100%)になるように確率分布に変換します。Transformerではvocab size分の単語が生成対象として存在しています。eで計算している理由は、出力がマイナスにならないことや微分してもeのままであること、値の強調（＝非線形な変化）が可能なことがあります。
 
@@ -203,6 +203,6 @@ $$
 \text{Softmax}(x_i) = \frac{e^{x_i}}{\sum_{j=1}^{vocab size} e^{x_j}}
 $$
 
-# おわりに
+## おわりに
 
 Transformerの仕組みを「構成図」「処理フロー」「各処理の深掘り」で解説してきました。今回は推論の処理の理解を深めることができましたが、学習時の理解はまだできておりません。今後は学習時の理解も深め、続編を出したいなと思っています。少しでも皆様のTransformerの理解を深めることへの手助けになれば幸いです。

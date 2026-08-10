@@ -18,7 +18,7 @@ lede: "OracleDBにおける主要な採番方法であるSEQUENCEとIDENTITY列�
 
 [春の入門祭り2025](/articles/20250413a/)の19本目の記事です。
 
-# はじめに
+## はじめに
 
 こんにちは、Cyber Security Innovation Group（以降CSIG）の姫路康太郎です。2025年2月から新卒としてプロジェクトに配属され、認可整理のチームでアジャイル開発を行っています。
 
@@ -26,19 +26,19 @@ lede: "OracleDBにおける主要な採番方法であるSEQUENCEとIDENTITY列�
 
 OracleDBでの開発に携わる方や、効率的な採番方法に関心のある方にとって、本記事が少しでもお役に立てれば幸いです。
 
-# OracleDBにおける採番方法の紹介
+## OracleDBにおける採番方法の紹介
 
 初めに、軽くIDENTITY列とSEQUENCEについて紹介します。
 
-## SEQUENCE
+### SEQUENCE
 
-SEQUENCEは一意の整数値を生成するために使用されるスキーマオブジェクトであり、特定のテーブルとは独立したデータベースオブジェクトです。それにより、複数のテーブルで共有したり、SEQUENCEオブジェクト単体を操作することができます。この点で後述するIDENTITY列とは異なり、IDENTITY列よりも柔軟性があると言えます。
+SEQUENCEは一意の整数値を生成するために使用されるスキーマオブジェクトであり、特定のテーブルとは独立したデータベースオブジェクトです。それにより、複数のテーブルで共有したり、SEQUENCEオブジェクト単体を操作できます。この点で後述するIDENTITY列とは異なり、IDENTITY列よりも柔軟性があると言えます。
 
-## IDENTITY列
+### IDENTITY列
 
 IDENTITY列は、テーブルの特定の列に対して自動的に一意な数値を生成する機能です。内部的にSEQUENCEオブジェクトを利用して実現されており、IDENTITY列を定義すると対応するシーケンスを暗黙的に作成し、そのシーケンスから値を取得して列に自動的に設定します。そのため、SEQUENCEよりシンプルに使うことができます。
 
-## SEQUENCEの使い方
+### SEQUENCEの使い方
 
 SEQUENCEオブジェクトは独立したオブジェクトとして作成します。
 
@@ -52,7 +52,7 @@ INSERTをする際に、作成しておいたSEQUENCEオブジェクトを明示
 INSERT INTO M_TEST(ID,VALUE) VALUES(TEST_SEQ.nextval,'data');
 ```
 
-## IDENTITY列の使い方
+### IDENTITY列の使い方
 
 IDENTITY列は、特定のテーブルの特定のカラムに定義します。
 
@@ -69,7 +69,7 @@ INSERTをする際に、採番列の値を明示的に示さなくても暗黙�
 INSERT INTO M_TEST(VALUE) VALUES ('data');
 ```
 
-# ２つのテーブルに共通の番号を採番をする
+## ２つのテーブルに共通の番号を採番をする
 
 いくつか方法はあると思いますが、本記事では、採番にSEQUENCE / IDENTITY列を利用し、２つのテーブル同時の`INSERT`に、マルチテーブル・インサート構文`INSERT ALL`を利用して投入することを考えます。投入するデータは`M_TEST`の様に`ID`と`VALUE`のカラムを持った複数レコードからなるテーブルを想定しています。
 
@@ -83,9 +83,9 @@ INSERT INTO M_TEST(VALUE) VALUES ('data');
      3  data3
 ```
 
-## マルチテーブル・インサート
+### マルチテーブル・インサート
 
-OracleDB特有の構文で、複数のテーブルに同時にデータを投入することができます。`INSERT ALL`を使う基本的な構文は以下のとおりです。
+OracleDB特有の構文で、複数のテーブルに同時にデータを投入できます。`INSERT ALL`を使う基本的な構文は以下のとおりです。
 
 ```sql
 INSERT ALL
@@ -100,7 +100,7 @@ SELECT文;
 - [【Oracle】複数のデータをまとめてINSERTする方法を解説！](https://nankurunikki.com/%E3%83%87%E3%83%BC%E3%82%BF%E3%83%99%E3%83%BC%E3%82%B9/oracle/884/)
 - [マルチテーブル・インサートで同一テーブルに複数データ挿入してみる](https://kagamihoge.hatenablog.com/entry/20130330/1364618946)
 
-## SEQUENCEを使ったマルチテーブル・インサート
+### SEQUENCEを使ったマルチテーブル・インサート
 
 SEQUENCEオブジェクトを利用した場合、同じSEQUENCEオブジェクトから番号を呼び出すことで、共通の番号を採番できます。そのため、2つのテーブル間でIDは正しく保たれることとなります。
 
@@ -111,7 +111,7 @@ INTO M_TEST_SEQ2 (ID, VALUE) VALUES (TEST_SEQ.nextval, VALUE)
 SELECT VALUE FROM M_TEST;
 ```
 
-### SEQUENCEを使ったマルチテーブル・インサートの落とし穴
+#### SEQUENCEを使ったマルチテーブル・インサートの落とし穴
 
 `INSERT ALL`でSEQUENCEを使って複数のテーブルに採番を行う際には、採番するテーブルに対して **すべてに** `nextval`（SEQUENCEを増加させて次の値を返す）を使用します。公式によるとこれが**正規の方法**のようです。この`nextval`を使用するという点が、私の直感と異なっていたので、共有しようと思いました。
 
@@ -119,7 +119,7 @@ SELECT VALUE FROM M_TEST;
 
 実際に`currval`で実行したみたところ、1つの環境では成功したものの、別の環境では失敗したので、安全のためにも[公式の説明](https://docs.oracle.com/cd/E16338_01/server.112/b56299/pseudocolumns002.htm#:~:text=%E3%81%8C%E3%81%82%E3%82%8A%E3%81%BE%E3%81%99%E3%80%82-,%E9%A0%86%E5%BA%8F%E5%80%A4%E3%81%AE%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95,-%E9%A0%86%E5%BA%8F%E3%82%92%E4%BD%9C%E6%88%90)から読み取れる`nextval`を推奨します。
 
-## IDENTITYを使ったマルチテーブル・インサート
+### IDENTITYを使ったマルチテーブル・インサート
 
 IDENTITY列を利用した場合、データ投入先の２つのテーブルに、それぞれにIDENTITY列を定義することになります。つまり、２つのテーブルがそれぞれ固有のSEQUENCEオブジェクトを持つことになります。そのため、2つのテーブル間で`ID`の対応を正しく保つためには採番をずらさないための設計や、採番のずれを許容することが必要となります。`ID`がずれる可能性を考慮すると、IDENTITY列の利用はあまりいい手段ではなさそうです。
 
@@ -139,7 +139,7 @@ SELECT VALUE FROM M_TEST;
 
 - [PostgreSQLで連番を自動生成するIDENTITY列。SERIALとどちらを使うべきか](/articles/20241113a/)
 
-# おわりに
+## おわりに
 
 マルチテーブル・インサートにおける採番方法について触れ、マルチテーブル・インサート構文でIDENTITY列とSEQUENCEはどちらとも利用できることが分かりました。そのうえで、採番にずれが生じないSEQUENCEを利用することが良いと考えましたが、皆さんはどのように考えられますか？
 

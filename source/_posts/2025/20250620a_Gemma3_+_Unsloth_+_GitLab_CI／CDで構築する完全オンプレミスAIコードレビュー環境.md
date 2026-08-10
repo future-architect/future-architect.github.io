@@ -16,7 +16,7 @@ lede: "Gemma3とUnslothを組み合わせて、完全オンプレミス環境で
 
 本記事は、[CI/CD連載](/articles/20250603a/)の6本目の記事となります。
 
-# はじめに
+## はじめに
 
 こんにちは。HealthCare Innovation Group(HIG)の山本竜玄です。
 
@@ -32,9 +32,9 @@ lede: "Gemma3とUnslothを組み合わせて、完全オンプレミス環境で
 PR-Agentや外部APIを活用したアプローチについては、弊社SATの高橋さんの[GitLabのレビューにPR-Agentを組み込んでみた](/articles/20250417a/) 記事もご参照ください
 :::
 
-# 背景
+## 背景
 
-## オンプレミス環境でのAI活用の難しさ
+### オンプレミス環境でのAI活用の難しさ
 
 最近、GitHub Copilot Agent ModeやClaude Code ActionなどのワークフローレベルのAIエージェントが注目される中、企業のオンプレミス環境では以下のような側面があるのではないでしょうか？
 
@@ -50,9 +50,9 @@ PR-Agentや外部APIを活用したアプローチについては、弊社SATの
 
 これにより、ワークフローレベルのAIエージェントについても自前のオンプレミス環境へ導入が現実的になってきたとも感じます。
 
-## 技術選定
+### 技術選定
 
-### Gemma3
+#### Gemma3
 
 Gemma3は、Googleが2025年に発表した最新のオープンソース大規模言語モデルです。
 
@@ -68,7 +68,7 @@ Gemma3の主な特徴:
 
 商用利用も可能なApache2.0ライセンスで提供されていることや、Unslothとの公式サポートによる安定性、あとは公開されてまもなかったので触って見たかったというのが今回の選択理由です。
 
-### Unsloth
+#### Unsloth
 
 [Unsloth](https://github.com/unslothai/unsloth)、大規模言語モデルのファインチューニングを効率化するオープンソースライブラリです。名前は「Un-sloth（ナマケモノではない）」に由来します。
 
@@ -83,7 +83,7 @@ Unslothの主な特徴:
 
 ローカルPCのGPUリソース（RTX 3060 12GB）でもGemma3-4Bモデルの学習が現実的な時間で完了しそうであったため、今回利用しました。
 
-### GitLab環境
+#### GitLab環境
 
 GitLabには以下のように複数の提供形態があり、それぞれ異なる特徴を持ちます。
 
@@ -117,7 +117,7 @@ GitLabには以下のように複数の提供形態があり、それぞれ異�
 | Premium | $29/user/month | 10,000分のCI/CD、コード品質ツール、限定サポート | Chat & Code Suggestions含む（制限あり） |
 | Ultimate | $99/user/month | 50,000分のCI/CD、高度セキュリティ、コンプライアンス | Chat & Code Suggestions含む（制限あり） |
 
-### GitLab Duo AI機能の詳細
+#### GitLab Duo AI機能の詳細
 
 GitLab Duoは2023年6月にローンチされたAI支援機能スイートで、Code Suggestions（20以上の言語でのコード補完・生成）、Duo Chat（自然言語での対話式AI支援）、セキュリティ支援（脆弱性の詳細説明と自動的なマージリクエスト生成）、プロジェクト管理（イシューやエピックの大量テキスト解析・要約）などの機能を提供します。
 
@@ -136,7 +136,7 @@ GitLab Duo Self-Hosted（Premium/Ultimate + Duo Enterprise）がとても魅力�
 - セキュリティ要件: データが完全にオンプレミス環境内に留まる
 - 既存資産活用: 既存のCI/CDパイプライン、MR連動、セキュリティポリシーをそのまま活用可能
 
-# 環境構築
+## 環境構築
 
 ここからは、実際にGitLab環境の構築から、Gemma3の組み込みなどを行っていきます。
 
@@ -147,7 +147,7 @@ GitLab Duo Self-Hosted（Premium/Ultimate + Duo Enterprise）がとても魅力�
 また、文字数の関係上記事の上では記載しきれなかった部分もあり、実装例として記載しているものもあるため、ご認識ください。
 :::
 
-## 検証環境（ローカルPC）
+### 検証環境（ローカルPC）
 
 今回検証に使用した環境は以下の通りです。プライベートのローカルPC上に構築してみました。自作PCとしては、おおよそ15万円程度のものです。
 
@@ -158,7 +158,7 @@ GitLab Duo Self-Hosted（Premium/Ultimate + Duo Enterprise）がとても魅力�
 | メモリ | 94GB |
 | GPU | NVIDIA GeForce RTX 3060 (12GB) |
 
-### 実際の運用環境
+#### 実際の運用環境
 
 本格的な運用では、AWS、GCP、Azureなどのクラウド環境でのGPUインスタンス使用をすることが想定されます。
 
@@ -172,11 +172,11 @@ GitLab Duo Self-Hosted（Premium/Ultimate + Duo Enterprise）がとても魅力�
 
 これは会社によって異なるでしょうが、APIキーを使用した従量課金でコストが読めないことやセキュリティ懸念の検討をするよりは、説明がしやすい場合もあるのではないかと思っています。
 
-## 実際の環境構築
+### 実際の環境構築
 
 ここから実際に手を動かして環境構築をしていきます。
 
-### GitLab Community Edition (CE) のインストール
+#### GitLab Community Edition (CE) のインストール
 
 GitLabのセルフホスト版であるCommunity Editionをインストールします。
 
@@ -209,7 +209,7 @@ sudo cat /etc/gitlab/initial_root_password
 
 これで出力されたパスワードによってログインができ、実際のリポジトリ操作などができるようになりました。
 
-### GitLab Runnerの登録
+#### GitLab Runnerの登録
 
 次に、CI/CDパイプラインを実行するために、GitLab Runnerをセットアップします。
 
@@ -249,7 +249,7 @@ sudo gitlab-runner register \
   --description "GPU Runner for AI Training"
 ```
 
-### Docker Executorの追加設定
+#### Docker Executorの追加設定
 
 次に、GPUを使用するため、GitLab Runnerの設定ファイルを編集します：
 
@@ -279,11 +279,11 @@ sudo gitlab-runner restart
 <img src="/images/2025/20250620a/Screenshot_from_2025-06-11_13-35-30.png" alt="Screenshot_from_2025-06-11_13-35-30.png" width="1200" height="490" loading="lazy">
 </div>
 
-## Docker + NVIDIA Container Toolkitの設定
+### Docker + NVIDIA Container Toolkitの設定
 
 GPU対応のCI/CDパイプラインを実行するために、NVIDIA Container Toolkitをセットアップします。
 
-### Dockerのインストール
+#### Dockerのインストール
 
 ```bash
 # Dockerのインストール
@@ -296,7 +296,7 @@ sudo systemctl start docker
 sudo usermod -aG docker $USER
 ```
 
-### NVIDIA Container Toolkit のインストール（Ubuntu 24.04）
+#### NVIDIA Container Toolkit のインストール（Ubuntu 24.04）
 
 ```bash
 # 1. GPGキーのダウンロードと配置
@@ -324,11 +324,11 @@ sudo systemctl restart docker
 本記事では割愛しますが、Bot用のユーザー発行やAccess Tokenの作成、CI/CDの環境変数への設定なども追加で行っています。
 :::
 
-## プロジェクトの作成と学習データ準備
+### プロジェクトの作成と学習データ準備
 
 GitLabの新規構築からやっているため、記事用のサンプルを配置していきます。
 
-### プロジェクト構成
+#### プロジェクト構成
 
 今回の記事用の構成ですが、以下のようにしてプロジェクトを作成しています。
 
@@ -363,7 +363,7 @@ sample-project/
 
 これらのソースコード、wiki、PRへのコメントなどをうまくできれば、リポジトリに特化したソースレビューができそうですよね。
 
-### GitLab APIを活用したデータ収集
+#### GitLab APIを活用したデータ収集
 
 プロジェクト固有のコードレビューAIを構築するため、GitLab APIを使用して以下のデータを自動収集します。
 
@@ -694,7 +694,7 @@ if __name__ == "__main__":
 
 </details>
 
-### 収集したデータの加工
+#### 収集したデータの加工
 
 収集されたデータを、Unslothで学習させるためのJSONL形式に変換します。
 レビューコメントであれば以下のような形式ですね。
@@ -709,7 +709,7 @@ if __name__ == "__main__":
 
 これらで加工したデータを学習させることで、プロジェクト固有のコーディング規約やレビュー観点を学習させることができます。
 
-## Gemma3のファインチューニング実装
+### Gemma3のファインチューニング実装
 
 収集したプロジェクトデータを使用して、Gemma3をファインチューニングします。UnslothライブラリとLoRA（Low-Rank Adaptation）技術を組み合わせることで、限られたGPUリソースでも効率的な学習を実現します。
 
@@ -1117,7 +1117,7 @@ if __name__ == "__main__":
 
 </details>
 
-### 学習パラメータ
+#### 学習パラメータ
 
 | パラメータ | 設定値 | 説明 |
 |-----------|--------|------|
@@ -1131,11 +1131,11 @@ if __name__ == "__main__":
 
 実際には、プロジェクトの規模やマシンスペックに応じたチューニングが必要になるとは思います。
 
-## AIコードレビューシステムの実装
+### AIコードレビューシステムの実装
 
 ファインチューニング済みのGemma3を使用して、実際のコードレビューを自動実行するようにしていきます。GitLab CI/CD環境でMerge Request作成時に自動レビューを行い、結果をアーティファクトとして保存します。
 
-### 推論最適化による高速化
+#### 推論最適化による高速化
 
 学習済みモデルを推論用に最適化するため、`FastLanguageModel.for_inference()`を使用します。これにより、以下のメリットが得られます。
 
@@ -1143,7 +1143,7 @@ if __name__ == "__main__":
 - 推論速度向上: KVキャッシュ最適化により生成速度を向上
 - GPU効率化: 推論専用の最適化でGPU使用率を改善
 
-### git diffとの連携による自動レビュー
+#### git diffとの連携による自動レビュー
 
 GitLab CI環境では、`git diff`コマンドでコード変更差分を取得し、AIレビューを実行します。
 
@@ -1155,7 +1155,7 @@ git diff HEAD~1 HEAD > code_diff.txt
 python scripts/code_reviewer.py code_diff.txt
 ```
 
-### 生成パラメータの調整
+#### 生成パラメータの調整
 
 | パラメータ | 設定値 | 効果 |
 |-----------|--------|------|
@@ -1168,7 +1168,7 @@ python scripts/code_reviewer.py code_diff.txt
 
 実際には、プロジェクトの規模やマシンスペックに応じたチューニングが必要になるとは思います。
 
-### 実行例
+#### 実行例
 
 ```bash
 # 手動実行（差分ファイル指定）
@@ -1298,11 +1298,11 @@ if __name__ == "__main__":
 
 </details>
 
-## CI/CDパイプラインの構築
+### CI/CDパイプラインの構築
 
 GitLab CI/CDパイプラインを使用して、データ収集からモデル学習、自動レビューまでの全工程を自動化します。パイプラインは5つのステージ、それぞれが独立して実行可能な形にしています。
 
-### パイプライン全体設計
+#### パイプライン全体設計
 
 パイプラインの各ステージと実行タイミングは以下です。
 
@@ -1544,7 +1544,7 @@ ai_code_review:
 
 </details>
 
-## 実際にやってみる
+### 実際にやってみる
 
 これでようやく一連の設定や実装が完了しました。
 
@@ -1616,9 +1616,9 @@ Unsloth: Gemma3 does not support SDPA - switching to eager!
 イメージとしては、このような形式でレビューコメントが投稿されます。
 <img src="/images/2025/20250620a/Screenshot_from_2025-06-13_17-59-37.png" alt="Screenshot_from_2025-06-13_17-59-37.png" width="1200" height="1088" loading="lazy">
 
-# 実際に動かしてみて分かったこと
+## 実際に動かしてみて分かったこと
 
-## パフォーマンス
+### パフォーマンス
 
 実際に動作確認してみた結果、以下のような数値が得られました。
 
@@ -1635,7 +1635,7 @@ Unsloth: Gemma3 does not support SDPA - switching to eager!
 
 また、チューニングによってもまだまだ改善の余地があると感じています。
 
-# まとめ
+## まとめ
 
 本記事では、Gemma3 + Unsloth + GitLab CI/CDの組み合わせにより、外部依存なしで実用的なAIコードレビュー環境を構築してみました。
 
@@ -1645,7 +1645,7 @@ Unsloth: Gemma3 does not support SDPA - switching to eager!
 
 技術の進歩は早いので、より良いアプローチがあれば積極的に取り入れていきたいと思います。
 
-# 参考リンク
+## 参考リンク
 
 - [Google AI for Developers - Gemma 3](https://ai.google.dev/gemma/docs/core?hl=ja)
 - [Unsloth公式サイト](https://unsloth.ai/)

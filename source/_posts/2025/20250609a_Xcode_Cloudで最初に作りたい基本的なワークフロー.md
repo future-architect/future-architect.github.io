@@ -15,7 +15,7 @@ lede: "Apple 純正のCI/CDサービスである Xcode Cloud を初めて導入�
 ---
 <img src="/images/2025/20250609a/image.png" alt="" width="868" height="518" loading="lazy">
 
-# はじめに
+## はじめに
 
 [CI/CD連載](/articles/20250603a/) 4本目です。
 
@@ -29,7 +29,7 @@ Apple 純正のCI/CDサービスである Xcode Cloud を初めて導入する�
 1. Git タグのPushをトリガーとし、ビルド、テスト、TestFlight へアプリを配信する`TestFlight Release Workflow`
 1. 成功・失敗を Slack へ通知する手順
 
-# Xcode Cloud 概要
+## Xcode Cloud 概要
 
 Xcode Cloud は、Xcode に組み込まれた継続的インテグレーションおよびデリバリーサービスで、Apple デベロッパーのために設計された CI/CD サービスです。署名まわりの煩雑な設定が不要になる点が最大の特徴です。これにより開発者はワークフロー最適化といった本質的な作業に集中でき、結果として開発体験が向上します。
 
@@ -54,13 +54,13 @@ Xcode Cloud は、Xcode に組み込まれた継続的インテグレーショ�
 Xcode Cloud の毎月25時間分無料枠は、2025年6月時点の情報になります。今後変更される可能性があります。最新情報は Apple 公式ページをご確認ください。
 :::
 
-# Pull Request Workflow
+## Pull Request Workflow
 
 リモートリポジトリへのプッシュをトリガーにCIを実行し、ビルドとテストを行う`Pull Request Workflow`を作成します。
 
 - [Getting started with Xcode Cloud: Pull Request (PR) Workflow](https://medium.com/kinandcartacreated/getting-started-with-xcode-cloud-pull-request-pr-workflow-ce02bb83f9e5#b73f)
 
-## ワークフローの設定
+### ワークフローの設定
 
 ワークフローで設定できる各種項目は次のとおりです。
 
@@ -74,19 +74,19 @@ Xcode Cloud の毎月25時間分無料枠は、2025年6月時点の情報にな�
 
 以下では、Xcode での設定例を示します。
 
-### General
+#### General
 
 ワークフローの名前や説明を記載し、リポジトリ、プロジェクトを設定します。
 
 <img src="/images/2025/20250609a/スクリーンショット_2025-06-09_12.26.21.png" alt="スクリーンショット_2025-06-09_12.26.21.png" width="1200" height="793" loading="lazy">
 
-### Environment
+#### Environment
 
 Xcode Version, macOS Version を最新に設定します（自身のプロジェクトに合わせて対象バージョンを修正してください）。
 
 <img src="/images/2025/20250609a/スクリーンショット_2025-06-09_12.26.35.png" alt="スクリーンショット_2025-06-09_12.26.35.png" width="1200" height="790" loading="lazy">
 
-### Start Conditions (Pull Request Changes)
+#### Start Conditions (Pull Request Changes)
 
 feature ブランチで変更をコミットし、リモートブランチに Push したことをトリガーに CI が動作するように設定します。
 
@@ -95,7 +95,7 @@ feature ブランチで変更をコミットし、リモートブランチに Pu
 
 <img src="/images/2025/20250609a/スクリーンショット_2025-06-09_12.26.47.png" alt="スクリーンショット_2025-06-09_12.26.47.png" width="1200" height="791" loading="lazy">
 
-### Actions
+#### Actions
 
 トリガーを検知したときに、実行する内容をここで決めます。本ワークフローではビルドとテストを追加します。
 
@@ -104,13 +104,13 @@ feature ブランチで変更をコミットし、リモートブランチに Pu
 2. Test - iOS
   <img src="/images/2025/20250609a/スクリーンショット_2025-06-09_12.27.14.png" alt="スクリーンショット_2025-06-09_12.27.14.png" width="1200" height="793" loading="lazy">
 
-### Post-Actions
+#### Post-Actions
 
 Actions の実行完了後の処理を定義します。ここでは、指定の Slack チャンネルへ成功・失敗の通知が届くように設定します。
 
 <img src="/images/2025/20250609a/スクリーンショット_2025-06-09_12.27.48.png" alt="スクリーンショット_2025-06-09_12.27.48.png" width="1200" height="790" loading="lazy">
 
-## 動作イメージ
+### 動作イメージ
 
 feature ブランチで改修し、develop ブランチへのPRを作成したときの CI 動作イメージを示します。
 
@@ -147,35 +147,35 @@ GitHub の PR 上で次のように、Pull Request Workflow が成功してい�
 
 <img src="/images/2025/20250609a/スクリーンショット_2025-06-09_12.50.53.png" alt="スクリーンショット_2025-06-09_12.50.53.png" width="1200" height="359" loading="lazy">
 
-# TestFlight Release Workflow
+## TestFlight Release Workflow
 
 シンプルなGitタグのPushをトリガーとする、ビルド、テスト、アーカイブ、TestFlightリリースする `TestFlight Release Workflow`を作成します。
 
-## ワークフローの設定
+### ワークフローの設定
 
 ワークフローを次のように設定します。ここでは、Xcode 上から設定する例を示します。
 重要な点としては、TestFlight リリースするために、Actions に Archive を必ず追加します。
 
-### General
+#### General
 
 ワークフローの名前を`TestFlight Release Workflow`とします。
 
 <img src="/images/2025/20250609a/image_3.png" alt="image.png" width="1200" height="792" loading="lazy">
 
-### Environment
+#### Environment
 
 Xcode Version, macOS Version を最新に設定します（自身のプロジェクトに合わせて対象バージョンを修正してください）。
 
 <img src="/images/2025/20250609a/image_4.png" alt="image.png" width="1200" height="792" loading="lazy">
 
-### Start Conditions (Tag Changes)
+#### Start Conditions (Tag Changes)
 
 Git タグの Push をトリガーとするため、Tag Changes を選択します。
 ここでは、TagはAny Tag としています（Tag の命名ルールがある場合は、Custom Tags から指定できます）。
 
 <img src="/images/2025/20250609a/image_5.png" alt="image.png" width="1200" height="788" loading="lazy">
 
-### Actions
+#### Actions
 
 TestFlight リリースを行う本ワークフローではビルドとテストに加えて、アーカイブも追加します。
 1. Build - iOS
@@ -185,7 +185,7 @@ TestFlight リリースを行う本ワークフローではビルドとテスト
 3. Archive - iOS
   <img src="/images/2025/20250609a/image_8.png" alt="image.png" width="1200" height="787" loading="lazy">
 
-### Post-Actions
+#### Post-Actions
 
 Slack への通知するNotify、内部テスター向けTest Flight リリースする TestFlight Internal Testing を追加します。
 
@@ -195,7 +195,7 @@ Slack への通知するNotify、内部テスター向けTest Flight リリー�
   内部テスターグループを選択します。（事前に、App Store Connect上で内部テスターの登録が必要です。）
   <img src="/images/2025/20250609a/image_10.png" alt="image.png" width="1200" height="789" loading="lazy">
 
-### 動作イメージ
+#### 動作イメージ
 
 `release`ブランチにチェックアウトし、タグを作成して`Push`します。
 
@@ -235,7 +235,7 @@ App Store Connect の TestFlight タブに新しいビルドが作成され、�
 
 これで TestFlight リリースしたいブランチにタグを Push するだけで、簡単に TestFlight リリースができるようになりました。
 
-#### Tips
+##### Tips
 
 検証中、Archive は正常に完了しても TestFlight への配信が一向に進まない事象に遭遇しましたが、以下の記事で紹介されている手順で解消できました。
 
@@ -247,7 +247,7 @@ App Store Connect の TestFlight タブに新しいビルドが作成され、�
 解決策：
 > アプリが暗号化を使用していない場合は、`Info.plist`ファイルに`ITSAppUsesNonExemptEncryption`キーを追加し、値を`NO`に設定します。
 
-## 成功・失敗をSlackへ通知する設定手順
+### 成功・失敗をSlackへ通知する設定手順
 
 次の Apple 公式ドキュメントを参考に、成功・失敗を Slack へ通知するように設定してみます。
 
@@ -285,7 +285,7 @@ Xcode に戻り、アクセス権限を付与したワークスペースのチ�
 とても簡単に設定ができました。
 この通知から、App Store Connect の Xcode Cloud のページを直接開いたり、該当の PR を開いたり出来るのもとても便利です。
 
-# 最後に
+## 最後に
 
 Xcode Cloud でまず作りたい基本的な CI ワークフローとして、2種類のワークフローを作成してみました。
 
@@ -293,7 +293,7 @@ Xcode Cloud でまず作りたい基本的な CI ワークフローとして、2
 
 Xcode Cloud でできることはまだたくさんあるので、知見がたまり次第また記事にしたいと思います。
 
-# 参考
+## 参考
 
 - [Xcode Cloud - Apple Developer](https://developer.apple.com/jp/xcode-cloud/)
 - [Configuring your first Xcode Cloud workflow | Apple Developer Documentation](https://developer.apple.com/documentation/xcode/configuring-your-first-xcode-cloud-workflow)
