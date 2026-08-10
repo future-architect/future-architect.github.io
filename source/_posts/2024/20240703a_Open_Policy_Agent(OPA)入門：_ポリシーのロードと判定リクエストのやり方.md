@@ -441,6 +441,6 @@ opa_1            | }
 
 [Policy API](https://www.openpolicyagent.org/docs/latest/rest-api/#policy-api)を使うことで、ポリシーを動的にCRUDできます。また、[Data API](https://www.openpolicyagent.org/docs/latest/rest-api/#data-api)を使うことで、DataをCRUDできます。Data APIは、判定リクエストを送る際に利用するAPIと共通です。普通のREST APIで、特に難しくないので詳細は公式ドキュメントを見てもらえたらと思います。
 
-## 終わりに
+## おわりに
 
 OPAの入門編ということで、簡単なユースケースを題材にして、OPAに判定リクエストを行う方法と、ポリシーやDataをロードする方法についてまとめました。この記事が誰かの役に立てば幸いです。

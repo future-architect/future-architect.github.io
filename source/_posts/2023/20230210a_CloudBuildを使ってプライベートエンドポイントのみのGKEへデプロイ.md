@@ -13,7 +13,7 @@ thumbnail: /images/2023/20230210a/thumbnail.png
 author: 渡邉光
 lede: "筋肉エンジニアの渡邉です。最近はGCP/GKEについて勉強しています。今回はGitHubへのPushをトリガーにCloudBuildを起動し、プライベートエンドポイントのみのGKEへデプロイする基盤を作りましたので、共有したいと思います。GCPリソースはTerraformで作成しています。"
 ---
-## 初めに
+## はじめに
 
 こんにちは！ 筋肉エンジニアの渡邉です。最近はGCP/GKEについて勉強しています。
 

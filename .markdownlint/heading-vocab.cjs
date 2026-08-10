@@ -1,11 +1,12 @@
 'use strict';
 
-// 出典を示す節の見出しを「参考」「参考文献」に寄せる (#2239)。
+// 節の見出しの表記を寄せる。
 // prh では書けない。prh に渡るのは `## ` を除いたテキストなので、
 // 見出しと地の文を区別できず「参考資料を以下に載せます」まで書き換わる
 // プロトタイプを持たせない。持たせると `### toString` のような見出しが
 // Object.prototype のメンバーに当たって誤検出する
 const VOCAB = Object.assign(Object.create(null), {
+  // 出典 (#2239)
   '参考リンク': '参考',
   '参考資料': '参考',
   '参考記事': '参考',
@@ -14,12 +15,16 @@ const VOCAB = Object.assign(Object.create(null), {
   '参考情報': '参考',
   '参考サイト': '参考',
   '参考書籍': '参考文献',
-  'Appendix：参考文献の紹介': '参考文献'
+  'Appendix：参考文献の紹介': '参考文献',
+  // 冒頭と締め。漢字を開く (#2175)
+  '初めに': 'はじめに',
+  '始めに': 'はじめに',
+  '終わりに': 'おわりに'
 });
 
 module.exports = {
   names: ['heading-vocab'],
-  description: '出典の見出しの表記を統一する',
+  description: '見出しの表記を統一する',
   tags: ['headings'],
   parser: 'markdownit',
   function: (params, onError) => {
