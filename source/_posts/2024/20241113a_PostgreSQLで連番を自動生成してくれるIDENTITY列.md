@@ -565,7 +565,7 @@ postgres=# CREATE TABLE color (
 ERROR:  both default and identity specified for column "color_id" of table "color"
 ```
 
-2つIDENTITYが指定されているね、というエラーメッセージです。（当然のことながら）手堅くブロックしてくれています。助かりますね。
+2つIDENTITYが指定されているね、というエラーメッセージです（当然のことながら）手堅くブロックしてくれています。助かりますね。
 
 ### まとめ
 
