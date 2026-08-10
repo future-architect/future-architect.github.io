@@ -7,7 +7,7 @@ tags:
   - TypeScript
   - JavaScript
 categories:
-  - Programming
+  - Frontend
 thumbnail: /images/2025/20251128b/thumbnail.jpg
 author: 澁川喜規
 lede: "プロによる本気の攻略本『JavaScript/TypeScript実力強化書』 - FL#115というForkwellを運営するGroovesさんのイベントで登壇してきました。"
