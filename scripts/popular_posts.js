@@ -6,9 +6,32 @@ const {postListItem} = require('./lib/post_list');
 const fs = require("fs");
 const gaCache = JSON.parse(fs.readFileSync("ga_cache.json", 'utf-8'));
 
-// ランキング（トレンド・年間人気・SNS人気）の表示件数
-// 記事が長文化する傾向にあるため、トップページのスクロール量を抑える目的で絞っている
+// ランキング（トレンド・年間人気・SNS人気）の表示件数。
+// 記事が長文化する傾向にあるため、トップページのスクロール量を抑える目的で絞り、
+// 11位以下は details で畳んで25位まで辿れるようにする (#2249)。
+// details ならJSを足さずに済む（参照記事の畳みと同じ作り）
 const RANKING_DISPLAY_COUNT = 10;
+const RANKING_MAX_COUNT = 25;
+
+const rankingList = posts => {
+  // 順位はマークアップ側で振る。CSS カウンタだと「10件で畳む」定数と
+  // 二重管理になる。畳んだ側は11位から続く
+  const items = (list, offset) => list.map((post, i) => postListItem(post, 'featured-posts-item', undefined, true, offset + i + 1)).join("\n");
+  // 残りが1件だけなら畳む意味がないので、そのまま出す
+  const collapses = posts.length > RANKING_DISPLAY_COUNT + 1;
+  const shown = collapses ? posts.slice(0, RANKING_DISPLAY_COUNT) : posts;
+  const hidden = collapses ? posts.slice(RANKING_DISPLAY_COUNT) : [];
+  const more = hidden.length === 0 ? '' : `
+    <details class="ranking-more">
+      <summary>残り ${hidden.length}本を表示</summary>
+      <ul class="nav featured-post-link">${items(hidden, shown.length)}</ul>
+    </details>`;
+  return `
+  <div class="widget">
+    <ul class="nav featured-post-link">${items(shown, 0)}</ul>${more}
+  </div>
+  `;
+};
 
 hexo.extend.helper.register('popular_posts', function(term='weekly') {
   const yearAgo = new Date();
@@ -71,33 +94,16 @@ hexo.extend.helper.register('popular_posts', function(term='weekly') {
     })
     .filter(post => post.pv >= 0)
     .sort(compareFunc)
-    .slice(0, RANKING_DISPLAY_COUNT);
+    .slice(0, RANKING_MAX_COUNT);
 
-  // マークアップは「関連記事」「この記事を参照している記事」と共通（lib/post_list.js）
-  const links = popularPosts.map(post => postListItem(post, 'featured-posts-item', undefined, true)).join("\n")
-
-  return `
-  <div class="widget">
-    <ul class="nav featured-post-link">
-      ${links}
-    </ul>
-  </div>
-  `
+  return rankingList(popularPosts);
 });
 
 hexo.extend.helper.register('sns_popular_posts', function() {
 
   const allPosts = this.site.posts.data;
   allPosts.sort((a, b) => getSNSCnt(b.permalink) - getSNSCnt(a.permalink))
-  const popularPost = allPosts.slice(0, RANKING_DISPLAY_COUNT)
+  const popularPost = allPosts.slice(0, RANKING_MAX_COUNT)
 
-  const links = popularPost.map(post => postListItem(post, 'featured-posts-item', undefined, true)).join("\n")
-
-  return `
-  <div class="widget">
-    <ul class="nav featured-post-link">
-      ${links}
-    </ul>
-  </div>
-  `
+  return rankingList(popularPost);
 });
