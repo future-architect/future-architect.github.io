@@ -9,14 +9,14 @@ tags:
   - ProtocolBuffers
 categories:
   - Programming
-series: "サービス間通信とIDL（インタフェース記述言語）"
+series: "サービス間通信とIDL（インターフェース記述言語）"
 thumbnail: /images/2022/20220624a/thumbnail.png
 author:  関靖秀
-lede: "昨日に続き、gRPCネタです。この記事では次のネタを扱います。- gRPCの概観- gRPCとWebブラウザの関係性"
+lede: "昨日に続き、gRPCネタです。この記事では次のネタを扱います。- gRPCの概観- gRPCとブラウザの関係性"
 ---
 ## はじめに
 
-TIGの関です。[サービス間通信とIDL（インタフェース記述言語）連載](/articles/20220622a/)の3本目です。
+TIGの関です。[サービス間通信とIDL（インターフェース記述言語）連載](/articles/20220622a/)の3本目です。
 
 昨日に続き、gRPCネタです。この記事では次のネタを扱います。
 
@@ -76,7 +76,7 @@ HTTP APIにマッピングする方法はさらに2つに分けられ、RPC定�
 
 前述の通り、protoファイルに記述されたgRPCのRPC定義をHTTP APIにマッピングするためのprotocのプラグインです。
 
-次の図のように、protoファイルよりproxy用のコードを生成し、それを利用したリバースプロキシを実装することで、gRPCサーバにREST APIとしてのインタフェースを設けることが可能です。
+次の図のように、protoファイルよりproxy用のコードを生成し、それを利用したリバースプロキシを実装することで、gRPCサーバにREST APIとしてのインターフェースを設けることが可能です。
 
 <img src="/images/2022/20220624a/image.png" alt="image.png" width="1200" height="813" loading="lazy">
 
@@ -368,7 +368,7 @@ type ExampleAPIServer struct {
 }
 ```
 
-また、生成先packageに、`ExampleApiServer`のようなサーバのインタフェースがあるので、これを実装します。
+また、生成先packageに、`ExampleApiServer`のようなサーバのインターフェースがあるので、これを実装します。
 Getメソッドだけ示すと↓のようになります。
 
 ```go

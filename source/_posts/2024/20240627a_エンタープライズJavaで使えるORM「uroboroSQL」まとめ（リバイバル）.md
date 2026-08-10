@@ -143,7 +143,7 @@ try (SqlAgent agent = config.agent()) {
 }
 ```
 
-### SQLファイルインタフェース（2way-SQL）
+### SQLファイルインターフェース（2way-SQL）
 
 ```sql department/select_department.sql
 SELECT /* _SQL_ID_ */
@@ -338,7 +338,7 @@ try (SqlAgent agent = config.agent()) {
 }
 ```
 
-### DAOインタフェース
+### DAOインターフェース
 
 下記のようなモデルクラスがある前提とします。
 

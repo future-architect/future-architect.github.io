@@ -23,7 +23,7 @@ TIGの辻 ([@d_tutuz](https://twitter.com/d_tutuz)) です。
 
 ### グラフとして考えるGoの `context` パッケージ
 
-Goの `context` パッケージは `Context` インタフェース(コンテキスト)を提供しています。コンテキストはAPIサーバ/クライアント、バッチ処理などGoのプログラムの中で多く使われており、主な機能として
+Goの `context` パッケージは `Context` インターフェース(コンテキスト)を提供しています。コンテキストはAPIサーバ/クライアント、バッチ処理などGoのプログラムの中で多く使われており、主な機能として
 
 * 処理のキャンセル(タイムアウト/デッドライン)シグナルの伝達
 * (リクエストスコープの)値の伝播
@@ -77,7 +77,7 @@ func WithValue(parent Context, key, val interface{}) Context {
 }
 ```
 
-`context` パッケージの実装の詳細としては `valueCtx` という構造体が値をkey-valueを保持します。`Context` のインタフェースが `valueCtx` に埋め込みされています。
+`context` パッケージの実装の詳細としては `valueCtx` という構造体が値をkey-valueを保持します。`Context` のインターフェースが `valueCtx` に埋め込みされています。
 
 ```go
 type valueCtx struct {

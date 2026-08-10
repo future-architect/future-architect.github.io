@@ -8,20 +8,20 @@ tags:
   - Swagger
 categories:
   - Programming
-series: "サービス間通信とIDL（インタフェース記述言語）"
+series: "サービス間通信とIDL（インターフェース記述言語）"
 thumbnail: /images/2022/20220622b/thumbnail.png
 author: 真野隼記
 lede: "Open APIは2022.6.21時点では3.1.0が最新です。これまでリリースノートすらウォッチしていなかったので気になったことを調べてまとめました。"
 ---
 ## はじめに
 
-TIG DXユニット真野です。[サービス間通信とIDL（インタフェース記述言語）](/articles/20220622a/)連載の1本目です。
+TIG DXユニット真野です。[サービス間通信とIDL（インターフェース記述言語）](/articles/20220622a/)連載の1本目です。
 
 Open APIは[go-swaggerを用いたWebアプリケーション開発Tips19選](/articles/20200630/)という記事を過去に書いたこともあり、バージョン2（Swagger）をよく使っていましたしまだ継続してそれらを用いた開発もしています。2022.6.21時点では3.1.0が最新です。これまでリリースノートすらウォッチしていなかったので気になったことを調べてまとめました。
 
 ### Open API Specificationとは
 
-[Open API Specification](https://github.com/OAI/OpenAPI-Specification)（公式でもOASと略されます）は、HTTP APIのIDL（インタフェース記述言語）です。HTTP APIということで、いわゆるRESTishなAPIも含みます。エンドポイント（URLのパス）、パラメーター（リクエスト、レスポンスのヘッダ・ボディ）、認証フローなどを標準的に定義でき、そこからコードやAPIドキュメントを生成できて便利です。
+[Open API Specification](https://github.com/OAI/OpenAPI-Specification)（公式でもOASと略されます）は、HTTP APIのIDL（インターフェース記述言語）です。HTTP APIということで、いわゆるRESTishなAPIも含みます。エンドポイント（URLのパス）、パラメーター（リクエスト、レスポンスのヘッダ・ボディ）、認証フローなどを標準的に定義でき、そこからコードやAPIドキュメントを生成できて便利です。
 
 今のコミュニティの方向性としてはJSONスキーマの最新Draftバージョンと互換性を保つように設計されています。
 

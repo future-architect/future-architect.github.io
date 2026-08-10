@@ -38,7 +38,7 @@ lede: "さて、皆さん、ServiceNow(以降：SNOW)というSaaSはご存知�
 
 - SNOW：人の動き（リクエスト、承認フロー）を自動化する
 - Terraform：インフラの構築を自動化する
-- Go：インタフェース役
+- Go：インターフェース役
 
 <img src="/images/2020/20200416/photo_20200416_01.png" loading="lazy">
 

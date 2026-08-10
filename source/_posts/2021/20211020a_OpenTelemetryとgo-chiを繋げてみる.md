@@ -67,7 +67,7 @@ OpenTelemtryはその名の通り「テレメトリー」のためのソフト�
 
 ## OpenTelemetryの始め方
 
-アプリケーションに組み込む方法を紹介します。スタートするにはまずOpenTelemetryのサイトのRegisteryを見ると良さそうです。生のAPIを叩いてもいいのですが、アプリケーションの特定のミドルウェアやフレームワークとのインタフェースがinstrumentationとして提供されています。アプリケーション側のトレース情報を取り出す便利ライブラリがいくつもあります。
+アプリケーションに組み込む方法を紹介します。スタートするにはまずOpenTelemetryのサイトのRegisteryを見ると良さそうです。生のAPIを叩いてもいいのですが、アプリケーションの特定のミドルウェアやフレームワークとのインターフェースがinstrumentationとして提供されています。アプリケーション側のトレース情報を取り出す便利ライブラリがいくつもあります。
 
 <img src="/images/2021/20211020a/スクリーンショット_2021-10-02_11.52.04.png" alt="スクリーンショット_2021-10-02_11.52.04.png" width="1200" height="725" loading="lazy">
 
@@ -85,15 +85,15 @@ _, span := tracer.Start(ctx, "getUser", oteltrace.WithAttributes(attribute.Strin
 defer span.End()
 ```
 
-このサンプルもstdoutエクスポーターがが最初から設定されているので、まずはこの状態で動かしてみて、欲しい情報が出ているか確認します。確認できたら、エクスポーター側も変更して、実際の出力先へのインタフェースを追加していきます。GCPとか、OSSのJaegerとかZipkinとかもありますし、SaaSのSplunkとかNew Relicとかありますね。
+このサンプルもstdoutエクスポーターがが最初から設定されているので、まずはこの状態で動かしてみて、欲しい情報が出ているか確認します。確認できたら、エクスポーター側も変更して、実際の出力先へのインターフェースを追加していきます。GCPとか、OSSのJaegerとかZipkinとかもありますし、SaaSのSplunkとかNew Relicとかありますね。
 
 AWSはコレクター向けのものがあるので、アプリのエクスポーターとしてはコレクターを選択してコレクターの設定をするとX-Rayに出せるようです。
 
 ## go-chiと繋ぐ
 
-で、ここを見るとお気に入りのgo-chiがありません。go-chiに繋いでみます。gorilla/muxもgo-chiも、ミドルウェアとしては言語標準的なインタフェースを共有しているため、gorilla/muxが使えないか試してみましたが、スパン名がUnknownとなってしまいます。
+で、ここを見るとお気に入りのgo-chiがありません。go-chiに繋いでみます。gorilla/muxもgo-chiも、ミドルウェアとしては言語標準的なインターフェースを共有しているため、gorilla/muxが使えないか試してみましたが、スパン名がUnknownとなってしまいます。
 
-というのも、インタフェースは同じであっても、[gorilla/mux](https://github.com/open-telemetry/opentelemetry-go-contrib/blob/main/instrumentation/github.com/gorilla/mux/otelmux/mux.go#L120-L130)のエクスポーターは、contextに入っているgorilla/mux専用のデータにアクセスしてパス情報をとってきているからです。
+というのも、インターフェースは同じであっても、[gorilla/mux](https://github.com/open-telemetry/opentelemetry-go-contrib/blob/main/instrumentation/github.com/gorilla/mux/otelmux/mux.go#L120-L130)のエクスポーターは、contextに入っているgorilla/mux専用のデータにアクセスしてパス情報をとってきているからです。
 
 では標準ライブラリの[net/http向けのエクスポータ](https://github.com/open-telemetry/opentelemetry-go-contrib/tree/main/instrumentation/net/http)が使えるかというと、これもそのままでは使えません。net/httpのエクスポータはスパン名をミドルウェア作成時に固定値（ここでは``"Hello"``)で渡す必要があります。
 
@@ -113,7 +113,7 @@ r.With(otel("bye").Get("/bye", byeHandler)
 :
 ```
 
-高機能なRouterと繋ぐには新しいinstrumentationを実装する必要があることがわかりました。ただ、インタフェースも含めてgorilla/muxのものがほぼ近いのでこれを改造すれば良さそうです。gorilla/muxから情報をもらってくるところを書き換えれば良さそうです。
+高機能なRouterと繋ぐには新しいinstrumentationを実装する必要があることがわかりました。ただ、インターフェースも含めてgorilla/muxのものがほぼ近いのでこれを改造すれば良さそうです。gorilla/muxから情報をもらってくるところを書き換えれば良さそうです。
 
 ```go
 // 変更前

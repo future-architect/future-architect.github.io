@@ -22,7 +22,7 @@ PythonとかRubyとかもそうですが、言語組み込みのウェブサー�
 
 ## Goのウェブを語る上で重要な2つの型
 
-Goのnet/httpでは2つのインタフェースを定義しています。
+Goのnet/httpでは2つのインターフェースを定義しています。
 
 * ``http.HandlerFunc``
 * ``http.Handler``
@@ -53,7 +53,7 @@ func (r Receiver) ServeHTTP(http.ResponseWriter, *http.Request) {
 
 リクエストを受け取ってヘッダーを解析したり、HTTP/2対応だったり、TLSだったりの下回り部分は標準ライブラリで用がすみます。
 
-この``ServeMux``は他の``http.Handler``も子供にできるのでネストできます。一部のパスを別のRouterに渡せます。このインタフェースを提供している静的ファイル配信の[http.FileServer](https://golang.org/pkg/net/http/#FileServer)とか[http.RedirectHandler](https://golang.org/pkg/net/http/#RedirectHandler)とか柔軟に組み合わせられます。
+この``ServeMux``は他の``http.Handler``も子供にできるのでネストできます。一部のパスを別のRouterに渡せます。このインターフェースを提供している静的ファイル配信の[http.FileServer](https://golang.org/pkg/net/http/#FileServer)とか[http.RedirectHandler](https://golang.org/pkg/net/http/#RedirectHandler)とか柔軟に組み合わせられます。
 
 <img src="/images/2021/20210714a/nested-servemux-ページ3.png" alt="ネストしたルーター" loading="lazy">
 
@@ -67,13 +67,13 @@ func (r Receiver) ServeHTTP(http.ResponseWriter, *http.Request) {
 
 まず、[Gorilla](https://www.gorillatoolkit.org/)と[chi](https://github.com/go-chi/chi)は、http.ServeMuxの置き換えて使うRouterを提供しています。置き換えなので、``http.Handler``を実装していますし、``http.HandlerFunc``も``http.Handler``も登録できます。サンプルを見てみるとお分かりのように、``http.Server``を使って、各ライブラリのRouterを起動するコードになっています。
 
-ハンドラの形式がちょっと特殊っぽい[echo](https://echo.labstack.com/)はというと、[内部では``http.Server``を使っています](https://github.com/labstack/echo/blob/f20820c0030a0d8c8aa20f63996092faa329fe03/echo.go#L82)。また、[``http.Handler``インタフェースは実装](https://pkg.go.dev/github.com/labstack/echo/v4#Echo.ServeHTTP)しているし、標準ライブラリの``http.Handler``を[ラップしてechoの中に持ち込むこともできる](https://pkg.go.dev/github.com/labstack/echo/v4#WrapHandler)ので、やろうと思えば標準のサーバーの下の一部だけをEchoにしたり、他のライブラリのハンドラをぶら下げることもできます。
+ハンドラの形式がちょっと特殊っぽい[echo](https://echo.labstack.com/)はというと、[内部では``http.Server``を使っています](https://github.com/labstack/echo/blob/f20820c0030a0d8c8aa20f63996092faa329fe03/echo.go#L82)。また、[``http.Handler``インターフェースは実装](https://pkg.go.dev/github.com/labstack/echo/v4#Echo.ServeHTTP)しているし、標準ライブラリの``http.Handler``を[ラップしてechoの中に持ち込むこともできる](https://pkg.go.dev/github.com/labstack/echo/v4#WrapHandler)ので、やろうと思えば標準のサーバーの下の一部だけをEchoにしたり、他のライブラリのハンドラをぶら下げることもできます。
 
-Ginも同様に、[``http.Server``の上に構築されています](https://github.com/gin-gonic/gin/blob/v1.7.2/gin.go#L336)し、それ自身が[``http.Handler``インタフェースを満たしていますし](https://pkg.go.dev/github.com/gin-gonic/gin#Engine.ServeHTTP)、[``http.HandlerFunc``などのラッパー](https://pkg.go.dev/github.com/gin-gonic/gin#WrapF)で標準形式のハンドラーもかけます。
+Ginも同様に、[``http.Server``の上に構築されています](https://github.com/gin-gonic/gin/blob/v1.7.2/gin.go#L336)し、それ自身が[``http.Handler``インターフェースを満たしていますし](https://pkg.go.dev/github.com/gin-gonic/gin#Engine.ServeHTTP)、[``http.HandlerFunc``などのラッパー](https://pkg.go.dev/github.com/gin-gonic/gin#WrapF)で標準形式のハンドラーもかけます。
 
-この``http.Handler``は他の言語でいうWSGI/Rackとかのような、重要なインタフェースであることがお分かりいただけると思いますし、その上で標準のサーバーが利用上もスタンダードとなっていることがわかるでしょう。
+この``http.Handler``は他の言語でいうWSGI/Rackとかのような、重要なインターフェースであることがお分かりいただけると思いますし、その上で標準のサーバーが利用上もスタンダードとなっていることがわかるでしょう。
 
-一方で、違いとなっているのが、パスパラメータの切り出しだったり（標準ライブラリでは面倒）、各種ミドルウェアが最初からたくさんついてくるとかの差だったりします。echoは独自のインタフェースのミドルウェアですが、Gorillaはミドルウェアも他のフレームワークから利用できます。
+一方で、違いとなっているのが、パスパラメータの切り出しだったり（標準ライブラリでは面倒）、各種ミドルウェアが最初からたくさんついてくるとかの差だったりします。echoは独自のインターフェースのミドルウェアですが、Gorillaはミドルウェアも他のフレームワークから利用できます。
 
 ## 例外はあるのか？
 

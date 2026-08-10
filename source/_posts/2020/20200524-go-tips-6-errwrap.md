@@ -78,7 +78,7 @@ func AnyFunc() error {
 
 ## Handling Errors in the AWS SDK for Go
 
-[ドキュメント](https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/handling-errors.html)を読むと例えば、AWSのErorrハンドリングは以下のように、`awserr.Error` というインタフェースで表現されており、一度errを型アサーションしてから内部的なエラーコードに応じてハンドリングすることになっています。
+[ドキュメント](https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/handling-errors.html)を読むと例えば、AWSのErorrハンドリングは以下のように、`awserr.Error` というインターフェースで表現されており、一度errを型アサーションしてから内部的なエラーコードに応じてハンドリングすることになっています。
 
 ```go AWS-SDKの通常版エラーハンドリング
 if err != nil {
