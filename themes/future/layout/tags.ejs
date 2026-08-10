@@ -21,18 +21,58 @@
           機会が無いだけで交絡するため、新規数だけを出す %>
       <%# 見出しは他のチャートと同じ「◯別 △の推移」の型 (#2212) %>
       <%- partial('_partial/section-heading', {id: 'newtagstrend', text: '年別 新規タグ数の推移'}) %>
-      <div id="chart" style="width:100%;min-height:250px"></div>
+      <%# 内訳（カテゴリ・定着）は別の軸で同時に積めないため、タブで切り替える。
+          期間ページの投稿数の推移と同じ chart-tabs (#2171)。
+          タブ名は積み上げの内訳を名乗る (#2222) %>
+      <div class="nav tabs chart-tabs">
+        <input id="tags-tab-category" type="radio" name="tags_chart_tab" checked>
+        <label tabindex="0" class="tab_item" for="tags-tab-category">カテゴリ別</label>
+        <div class="tab_content">
+          ※色は、そのタグが最も多く使われているカテゴリ
+          <div id="chart-tag-category" style="width:100%;min-height:250px"></div>
+        </div>
+        <input id="tags-tab-retention" type="radio" name="tags_chart_tab">
+        <label tabindex="0" class="tab_item" for="tags-tab-retention">定着別</label>
+        <div class="tab_content">
+          ※定着 = 初出から1年以内に2本目の記事が付いたタグ（初出から1年未満のタグは判定途中）
+          <div id="chart-tag-retention" style="width:100%;min-height:250px"></div>
+        </div>
+      </div>
       <script src="https://cdn.jsdelivr.net/npm/echarts@5.1.2/dist/echarts.min.js" integrity="sha384-QqZssazD9IzPiEJz2lyFewTMgYObqDWxBfCX5k5E4n4fH7ygMIqp6A6Ek8HIrRyQ" crossorigin="anonymous"></script>
       <script type="text/javascript">
         const chartData = <%- new_tags_by_year() %>;
-        const myChart = echarts.init(document.getElementById('chart'));
-        myChart.setOption({
+        const catColors = <%- category_colors() %>;
+        echarts.init(document.getElementById('chart-tag-category')).setOption({
           tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-          grid: { left: 0, right: '2%', containLabel: true },
+          legend: { bottom: 0, type: 'scroll' },
+          grid: { left: 0, right: '2%', bottom: 32, containLabel: true },
           xAxis: { type: 'category', data: chartData.years },
-          yAxis: { type: 'value', min: 0 },
-          color: ['#337ab7'],
-          series: [{ name: '新規タグ', type: 'bar', data: chartData.counts }]
+          yAxis: { type: 'value', min: 0, minInterval: 1 },
+          <%# 色はカテゴリ名で固定 (#2170) %>
+          series: chartData.series.map(s => ({
+            name: s.name,
+            type: 'bar',
+            stack: 'tags',
+            itemStyle: { color: catColors[s.name] },
+            data: s.data
+          }))
+        });
+
+        const retentionData = <%- new_tags_retention() %>;
+        echarts.init(document.getElementById('chart-tag-retention')).setOption({
+          tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+          legend: { bottom: 0 },
+          grid: { left: 0, right: '2%', bottom: 32, containLabel: true },
+          xAxis: { type: 'category', data: retentionData.years },
+          yAxis: { type: 'value', min: 0, minInterval: 1 },
+          <%# 土台が定着、上が定着せず。定着はページャ現在地と同じ #337ab7 %>
+          color: ['#337ab7', '#d2e2ef'],
+          series: retentionData.series.map(s => ({
+            name: s.name,
+            type: 'bar',
+            stack: 'tags',
+            data: s.data
+          }))
         });
       </script>
 
