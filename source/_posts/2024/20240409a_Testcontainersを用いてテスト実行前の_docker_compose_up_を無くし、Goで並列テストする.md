@@ -5,6 +5,8 @@ postid: a
 tags:
   - テスト
   - Go
+  - テスト
+  - Docker
 categories:
   - Programming
 series: "春の入門祭り2024"
