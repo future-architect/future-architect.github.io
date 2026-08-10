@@ -463,7 +463,7 @@ AWS MCP Server を Claude Code に組み込む手順、11 ツールの動作、I
 
 最初の一歩としては、`--read-only` フラグ付き・サンドボックスアカウントで `call_aws` から始めると手軽に試せます。[AWS Security Blog](https://aws.amazon.com/jp/blogs/security/understanding-iam-for-managed-aws-mcp-servers/) で VPC endpoint 対応（two-stage authorization）等の機能拡充も予告されているため、ガバナンス要件が厳しい環境では機能が揃ってからの本格採用も選択肢になります。
 
-## 参考リンク
+## 参考
 
 - [AWS What's New: AWS MCP Server is now generally available](https://aws.amazon.com/about-aws/whats-new/2026/05/aws-mcp-server/)
 - [AWS News Blog: The AWS MCP Server is now generally available](https://aws.amazon.com/blogs/aws/the-aws-mcp-server-is-now-generally-available/)

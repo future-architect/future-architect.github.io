@@ -105,7 +105,7 @@ https://github.com/ml-explore/mlx-swift-examples/tree/main/Applications/LLMEval
 
 より詳細な情報については、次の参考リンクでリストアップしていますので、そちらを参照してみてください。
 
-## 参考リンク
+## 参考
 
 - ML & AI
   - [WWDC25: Discover machine learning & AI frameworks on Apple platforms](https://developer.apple.com/videos/play/wwdc2025/360/)

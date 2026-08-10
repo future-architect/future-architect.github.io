@@ -335,7 +335,7 @@ DuckDB-WASMは **Parquet形式** の読み込みに最適化されています�
 
 ※今回利用しているデータは一般公開情報を元にしたサンプルデータとなります。
 
-### 参考資料
+### 参考
 
 https://duckdb.org/docs/stable/clients/wasm/instantiation
 https://duckdb.org/docs/stable/clients/wasm/data_ingestion

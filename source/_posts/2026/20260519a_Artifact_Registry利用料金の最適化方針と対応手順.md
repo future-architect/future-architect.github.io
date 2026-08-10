@@ -134,6 +134,6 @@ protoPayload.methodName="google.devtools.artifactregistry.v1.ArtifactRegistry.Ba
 
 この記事が、同じように「イメージが消えない！」と悩む方の助けになれば幸いです。
 
-## 参考リンク
+## 参考
 
 - [Artifact Registry のクリーンアップ ポリシーの管理](https://docs.cloud.google.com/artifact-registry/docs/repositories/cleanup-policy?hl=ja)

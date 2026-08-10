@@ -402,7 +402,7 @@ struct ScreenTimeWidgetView: View {
 
 今後もSwift周りで学習した内容を投稿していきたいと思いますので、その際もお読みいただけると嬉しいです。
 
-## 参考リンク
+## 参考
 
 https://developer.apple.com/documentation/charts/areamark
 

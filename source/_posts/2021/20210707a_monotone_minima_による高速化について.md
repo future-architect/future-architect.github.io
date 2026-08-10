@@ -131,7 +131,7 @@ monotone minima はシンプルながら強力な手法で、動的計画法へ�
 
 いずれ他の記事でそちらにも触れていけたらと思います。ありがとうございました！
 
-## 参考リンク
+## 参考
 
 [週刊 spaghetti_source / Totally Monotone Matrix Searching (SMAWK algorithm)](https://topcoder-g-hatena-ne-jp.jag-icpc.org/spaghetti_source/20120923/1348327542.html)
 [Kyopro Encyclopedia of Algorithms / Monotone minima](https://dic.kimiyuki.net/monotone-minima)

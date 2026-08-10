@@ -347,6 +347,6 @@ CloudEndureによって作成されたリソースに付与するタグを設定
 CloudEndureのセットアップは以上となります。
 次回、CloudEndure Migrationを利用した移行を試していきます。
 
-## 参考リンク
+## 参考
 
 [CloudEndureDocumentation](https://docs.cloudendure.com/CloudEndure%20Documentation.htm)

@@ -1645,7 +1645,7 @@ Unsloth: Gemma3 does not support SDPA - switching to eager!
 
 技術の進歩は早いので、より良いアプローチがあれば積極的に取り入れていきたいと思います。
 
-## 参考リンク
+## 参考
 
 - [Google AI for Developers - Gemma 3](https://ai.google.dev/gemma/docs/core?hl=ja)
 - [Unsloth公式サイト](https://unsloth.ai/)

@@ -206,7 +206,7 @@ GPUイベントについては、画面Overlayグラフからもわかるよう�
   - 実機（ユーザーが使用し得る一番遅いデバイス）での確認
 - パフォーマンス改善については、[公式ページ](https://docs.flutter.dev/perf)も参考に、今回紹介できなかった機能も活用していきたいところです。
 
-## 参考リンク
+## 参考
 
 - [Improving rendering performance](https://docs.flutter.dev/perf/rendering)
   - Flutter公式サイトにおける、レンダリングパフォーマンスのページ。

@@ -237,7 +237,7 @@ Google Cloud Notebooksを利用することで、ローカル環境をセット�
 
 この手順を参考に、ぜひGoogle Cloud Notebooksを活用してStreamlitアプリの開発とデプロイを試してみてください。
 
-## 参考資料
+## 参考
 
 - [Artifact Registry for Docker への認証を構成する](https://cloud.google.com/artifact-registry/docs/docker/authentication?hl=ja)
 - [イメージを push および pull する](https://cloud.google.com/artifact-registry/docs/docker/pushing-and-pulling?hl=ja)

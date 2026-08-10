@@ -221,7 +221,7 @@ kind (Kubernetes IN Docker) もminikubeと同様にローカルでKubernatesク�
 
 一言でいうと、MLflowが「実験とモデル」の管理ツールであるのに対し、Kubeflowは「ML全体のワークフロー」をKubernates上で動かすための基盤です。 今回の構成では、Kubernates上でモデルをサービングする部分にKServeを使い、モデル管理の部分でMLflowの思想を取り入れています。
 
-## 参考記事
+## 参考
 
 - [Develop ML model with MLflow and deploy to Kubernetes | MLflow](https://mlflow.org/docs/latest/ml/deployment/deploy-model-to-kubernetes/tutorial#step-6-test-model-serving-locally)
 - [Kubeflow: How to Install and Launch Kubeflow on your Local Machine | Towards Data Science](https://towardsdatascience.com/kubeflow-how-to-install-and-launch-kubeflow-on-your-local-machine-e0d7b4f7508f/)

@@ -537,6 +537,6 @@ class ParentWidget extends StatelessWidget {
 原則`Class Widge`の利用が推奨されるべきであり、開発時のルールとして`Functional Widget`は禁止にして問題ないと思います。
 ただ最後に記述したとおり、`Functional Widget`を使いたくなるようなシーンがいくつかあるような気がしており、（筆者もうまく明文化ができていないですが）そのようなケースが他にもあればコメントいただけますと幸いです。
 
-## 参考記事
+## 参考
 
 * https://stackoverflow.com/questions/53234825/what-is-the-difference-between-functions-and-classes-to-create-reusable-widgets
