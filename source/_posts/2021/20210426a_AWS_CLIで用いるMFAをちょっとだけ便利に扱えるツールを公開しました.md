@@ -7,6 +7,7 @@ tags:
   - IAM
   - OSS
   - Go
+  - CLI
 categories:
   - Security
 thumbnail: /images/2021/20210426a/thumbnail.jpg

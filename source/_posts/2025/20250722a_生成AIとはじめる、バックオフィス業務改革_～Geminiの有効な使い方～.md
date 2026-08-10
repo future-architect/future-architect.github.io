@@ -5,7 +5,6 @@ postid: a
 tags:
   - 生成AI
   - Gemini
-  - Gems
 categories:
   - Business
 series: "AI Tips"
