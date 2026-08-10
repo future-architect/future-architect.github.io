@@ -19,9 +19,21 @@ hexo.extend.helper.register("get_ga4_pv", url => {
   return pv > 0 ? pv.toLocaleString() : '';
 });
 
+// 推薦の件数は記事数から決める。推薦が全記事の半分を超えると
+// 一覧の並べ替えにしかならず、新着とほぼ同じ顔ぶれになるため、
+// 2件には4本以上、4件には8本以上を要求する (#2173)
+function recommendLimit(count) {
+  if (count <= 3) return 0;
+  if (count <= 7) return 2;
+  return 4;
+}
+
 // 指定した記事の中から PV の多い順に取り出す。カテゴリ・タグの一覧ページで
-// 「よく読まれている記事」を出すのに使う（#2033 / #2034）
-hexo.extend.helper.register('popular_posts_in', function(posts, limit = 4) {
+// 「よく読まれている記事」を出すのに使う（#2033 / #2034）。
+// limit を省略すると記事数に応じた件数になる
+hexo.extend.helper.register('popular_posts_in', function(posts, limit) {
+  if (limit === undefined) limit = recommendLimit(posts.length);
+  if (limit === 0) return '';
   // PV は累積なので、古い記事ほど有利になる。経過年数で割って、
   // 何年もかけて積んだ数字と最近読まれている数字を並べられるようにする。
   // 分母を 1+年数 にしているのは、公開直後の記事で 0 除算にしないため
