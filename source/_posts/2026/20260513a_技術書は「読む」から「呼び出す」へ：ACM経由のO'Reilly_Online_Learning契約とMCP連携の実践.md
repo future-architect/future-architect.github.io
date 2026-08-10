@@ -4,7 +4,7 @@ date: 2026/05/13 00:00:00
 postid: a
 tags:
   - O'Reilly
-  - ClaudeCode
+  - Claude
   - MCP
 categories:
   - AIDD

@@ -4,7 +4,6 @@ date: 2025/08/25 00:00:01
 postid: b
 tags:
   - Grafana
-  - Grafana Alloy
   - EKS
   - 初心者向け
   - Docker
