@@ -19,9 +19,43 @@
   <div id="main" class="margin-top-30">
     <% if(is_month()) { %>
     <h1 class="list-page"><%= page.year%>年<%= page.month %>月<span class="list-sub-text">のすべての記事</span></h1>
+    <%# 統計は年ページと同じ構成 (#2227)。「平均投稿/月」に当たる軸は
+        月の中では意味が薄いので置かない %>
     <ul class="summary">
+      <% const summary = summary_monthly_term(page.year, page.month); %>
       <li><span class="summary-count"><%= count_articles_month(page.year, page.month) %></span><br><span class="summary-label">投稿</span></li>
+      <li><span class="summary-count"><%= summary.total %></span><br><span class="summary-label">総シェア数</span></li>
+      <li class="summary-sub"><span class="summary-count"><%= summary.twitter %></span><br><span class="summary-label">X</span></li>
+      <li class="summary-sub"><span class="summary-count"><%= summary.facebook %></span><br><span class="summary-label">Facebook</span></li>
+      <li class="summary-sub"><span class="summary-count"><%= summary.hatebu %></span><br><span class="summary-label">はてブ</span></li>
+      <li class="summary-sub"><span class="summary-count"><%= summary.pocket %></span><br><span class="summary-label">Pocket</span></li>
     </ul>
+    <%# 週別 × カテゴリ別の積み上げ。年ページの「投稿数の推移」の月スコープ版。
+        月の中はデータ量が少ないのでタブは設けず1枚にする (#2227) %>
+    <h2 class="bottom-content-header">投稿数の推移</h2>
+    <div id="chart-week" style="width:100%;min-height:250px"></div>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.1.2/dist/echarts.min.js" integrity="sha384-QqZssazD9IzPiEJz2lyFewTMgYObqDWxBfCX5k5E4n4fH7ygMIqp6A6Ek8HIrRyQ" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      const weekData = <%- get_weekly_category_data(page.year, page.month) %>;
+      const catColors = <%- category_colors() %>;
+      echarts.init(document.getElementById('chart-week')).setOption({
+        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+        legend: { bottom: 0, type: 'scroll' },
+        grid: { left: 0, right: '2%', bottom: 32, containLabel: true },
+        xAxis: { type: 'category', data: weekData.weeks },
+        <%# 投稿数は整数。上限は最低3で、少ない月でも棒が天井に張り付かない
+            ようにする（著者ページのグラフと同じ規則） %>
+        yAxis: { type: 'value', min: 0, minInterval: 1, max: value => Math.max(3, value.max) },
+        <%# 色はカテゴリ名で固定 (#2170) %>
+        series: weekData.series.map(s => ({
+          name: s.name,
+          type: 'bar',
+          stack: 'categories',
+          itemStyle: { color: catColors[s.name] },
+          data: s.data
+        }))
+      });
+    </script>
     <%# その月の中でよく読まれている記事 (#2214)。カテゴリ・タグ・著者の
         詳細ページと同じく新着一覧の前。件数は記事数からヘルパーが決める %>
     <% if (page.current === 1) { %>
