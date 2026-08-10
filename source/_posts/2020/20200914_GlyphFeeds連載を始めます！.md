@@ -59,7 +59,7 @@ GlyphFeedsは、[毎日新聞社プロジェクト](https://prtimes.jp/main/html
 
 ※正確なタイトルは直前で変更するかも知れませんが、ご了承ください！
 
-## 参考リンク
+## 参考
 
 GlyphFeedsで採用している技術要素たち。
 

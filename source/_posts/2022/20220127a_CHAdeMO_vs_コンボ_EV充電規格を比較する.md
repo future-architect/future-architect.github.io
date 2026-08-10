@@ -135,7 +135,7 @@ CHAdeMOとコンボを比較した表が以下になります。
 
 EV市場の今後の動向には目が離せませんね。
 
-## 参考資料
+## 参考
 
 * https://monoist.itmedia.co.jp/mn/articles/1409/03/news003_2.html
 * https://car.watch.impress.co.jp/docs/series/tech/554577.html

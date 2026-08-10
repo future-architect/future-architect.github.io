@@ -218,7 +218,7 @@ STRUCT(
 
 これからのデータエンジニアリングにとっても、AIを組み込むことが必須になっていますので、その助力になれば幸いです。
 
-## 参考リンク
+## 参考
 
 - BIqQueryでのAI実行方法
   https://docs.cloud.google.com/bigquery/docs/generate-text?hl=ja

@@ -463,7 +463,7 @@ $ aws --endpoint-url http://localhost:4566 lambda list-functions
 
 ここまで読んでいただいた皆様も、色々なリソースをterraformコマンドでLocalstackに構築してみてください！
 
-### 参照サイト
+### 参考
 
 - [Terraform Registory Custom Service Endpoint Configuration](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/guides/custom-service-endpoints#available-endpoint-customizations)
 - [Testing Infrastructure as Code on Localhost](https://www.hashicorp.com/resources/testing-infrastructure-as-code-on-localhost)

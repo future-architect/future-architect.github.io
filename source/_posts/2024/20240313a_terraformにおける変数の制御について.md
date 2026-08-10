@@ -351,6 +351,6 @@ Plan: 1 to add, 0 to change, 0 to destroy.
 
 修正の際にupdate in placeなどで気軽にアップデート出来ない変数(EBS暗号化の有無など)に対する制約から優先的に実施するのが個人的には良いと思います。
 
-### 参考リンク
+### 参考
 
 - [詳解Terraform](https://www.oreilly.co.jp/books/9784814400522/)

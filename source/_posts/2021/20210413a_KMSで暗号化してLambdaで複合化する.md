@@ -287,6 +287,6 @@ $ cat outfile.txt
 
 以上、長文にお付き合いいただき、ありがとうございました。
 
-## 参照記事
+## 参考
 
 - [KMSで認証情報を暗号化しLambda実行時に復号化する](https://dev.classmethod.jp/articles/decrypt-sensitive-data-with-kms-on-lambda-invocation/)

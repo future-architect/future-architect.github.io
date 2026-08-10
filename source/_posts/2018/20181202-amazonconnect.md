@@ -589,7 +589,7 @@ AmazonConnectならではの強みを活かしてEC2インスタンスの再起�
 この実習での作品が発想勝ちだったのか、AmazonConnectサンプルコールセンター対決で優勝をいただきましてechospotをもらえました！（ありがとうございます！）。
 <img src="/images/2018/20181202/photo_20181202_23.jpeg" loading="lazy">
 
-### 参考資料
+### 参考
 
 - [Amazon Connect Contact Center Blog Channel](https://aws.amazon.com/blogs/contact-center/)
 - [Salesforce Connector information](https://aws.amazon.com/jp/blogs/contact-center/building-an-automated-ai-experience-with-amazon-connect-and-salesforce-service-cloud/)

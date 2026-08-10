@@ -475,7 +475,7 @@ Terraform + AWS SAM CLI を使うことで、AWS へデプロイせずに Lambda
 コードを他のコードと同じリポジトリで一元管理できるようになり、EOL や脆弱性管理のフローにも乗せやすくなります。
 Terraform で Lambda を管理している方の参考になれば幸いです。
 
-## 参考リンク
+## 参考
 
 - [AWS SAM CLI とは（公式）](https://docs.aws.amazon.com/ja_jp/serverless-application-model/latest/developerguide/what-is-sam-overview.html)
 - [AWS SAM CLI Terraform サポート（公式）](https://docs.aws.amazon.com/ja_jp/serverless-application-model/latest/developerguide/terraform-support.html)

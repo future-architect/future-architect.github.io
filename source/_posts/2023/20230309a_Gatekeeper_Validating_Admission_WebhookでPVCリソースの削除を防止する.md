@@ -327,7 +327,7 @@ GatekeeperのValidating Admission Webhookを用いてPVCリソースの削除リ
 
 最後に、この検証を始めたときはKubernetesのAPIリクエストのことを全く理解しておらず、Rego言語も初めて知りました。何も知らない状態から調べていったので、少々時間がかかりましたが、Kubernetesへの理解が深まり、ポリシーを自分の手で作成できるようになったので、とても良い勉強になりました。
 
-## 参考記事
+## 参考
 
 - OPA/Gatekeeper
   - https://www.openpolicyagent.org/docs/latest/

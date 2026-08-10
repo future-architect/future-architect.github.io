@@ -164,6 +164,6 @@ def func(flg: bool, i: int, j: str):  # Type of "func" is "(flg: bool, i: int, j
 
 Mypy と Pyright では型情報の用途が違う印象を受けます。Pyright は Python の挙動を極力トレースした上で、入力補完など利便性を高める機能に必要な情報を、型ヒントや型推論を用いて特定しているように見えます。対照的に、Mypy はヒントなしでの型の異なる代入を禁止するなど、Python とは異なる型システムを導入し、その中で厳密なコーディングを求めるような設計になっていそうです。個人的には、両者に優劣があるわけではなく、ユースケースによって使い分けが存在するという言い方がしっくりきています。
 
-## 参考リンク
+## 参考
 
 https://blog.abarabakuhatsu.com/changed_python_type_checking_tool_from_mypy

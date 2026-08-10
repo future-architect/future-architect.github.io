@@ -282,7 +282,7 @@ microCMSはすべて日本語で書かれており，チュートリアルやブ
 
 ありがとうございました！
 
-## 参考記事
+## 参考
 
 https://qiita.com/to4-yanagi/items/4e431b99b78401ef65ca
 https://webkikaku.co.jp/homepage/blog/hpseisaku/htmlcss/headless-cms/

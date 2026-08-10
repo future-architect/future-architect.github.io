@@ -139,7 +139,7 @@ AWSネイティブなS3のイベント機構は利用せず、代わりにマネ
 例えば、CSP ロックインを回避するために、OSS互換のサービスを積極的に採用したとしてもプロダクトロックインを回避できているわけではありません。
 RDB の世界では ANSI SQL 標準に準拠することで、DBプロダクトの移植性を高めるといった工夫が考えられますが、各ロックインの次元において、ロックインされることによるリスクを適切に評価した上で、どこまで対応するかの判断を行うことが求められます。
 
-## 参考資料
+## 参考
 
 * [Don't get locked up into avoiding lock-in](https://martinfowler.com/articles/oss-lockin.html)
 * [Modern cloud applications: Do they lock you in?](https://d1.awsstatic.com/events/Summits/reinvent2022/ARC207_Modern-cloud-applications-Do-they-lock-you-in.pdf)

@@ -133,7 +133,7 @@ Google Cloud Next 2025に参加し、AIエージェントへの注目の高ま�
 
 最後に重要なことです。AIエージェントに100点満点を求めることは難しいですが、そこですぐに幻滅して「やっぱり使えない」という判断をしないでください。そういった場合を考慮した運用設計や、受け入れて業務遂行する覚悟がAIエージェントの業務活用には必要不可欠です。
 
-## 参考資料
+## 参考
 
 - [セッション 2：質問するだけ！AI エージェントとデータ分析の新潮流](https://services.google.com/fh/files/events/gcdais-25s-t3-session2.pdf)
 - [Agent Development Kit > Tool](https://google.github.io/adk-docs/tools/)

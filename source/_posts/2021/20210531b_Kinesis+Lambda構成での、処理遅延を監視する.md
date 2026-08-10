@@ -106,7 +106,7 @@ Kinesis+Lambda構成の場合、[最低でも以下のメトリクス](https://d
 
 [サーバレス連載](/articles/20210531a/)の第1日目でした。次は真野さんの「15分の壁を超えるLambda分散実行術」です
 
-## 参照記事
+## 参考
 
 - [サーバーレスって何が便利なの ? AWS でサーバーレスを構築するためのサービスをグラレコで解説](https://aws.amazon.com/jp/builders-flash/202003/awsgeek-serverless/?awsf.filter-name=*all)
 - [形で考えるサーバーレス設計](https://aws.amazon.com/jp/serverless/patterns/serverless-pattern/)

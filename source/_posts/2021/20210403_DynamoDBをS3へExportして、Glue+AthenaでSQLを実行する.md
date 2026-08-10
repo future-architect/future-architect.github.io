@@ -213,7 +213,7 @@ DynamoDBのS3 Export機能が搭載されたことにより、データ集計コ
 
 みなさんもDynamoDB集計に疲弊されていたら、是非とも `DynamoDB Export S3` を使ってみてください！
 
-## 参照サイト
+## 参考
 
 - [New – Export Amazon DynamoDB Table Data to Your Data Lake in Amazon S3, No Code Writing Required](https://aws.amazon.com/jp/blogs/aws/new-export-amazon-dynamodb-table-data-to-data-lake-amazon-s3/)
 - [Exporting DynamoDB table data to Amazon S3](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DataExport.html)

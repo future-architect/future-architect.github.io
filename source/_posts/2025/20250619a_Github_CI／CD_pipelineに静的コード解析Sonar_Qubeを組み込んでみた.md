@@ -514,7 +514,7 @@ SonarCloudでは、主に以下のような項目でコードの品質を評価�
 
 コンサルとして日々業務にあたっていると様々な事情により、テスト自動化やpipelineの構築などまだまだ自動化できていない企業が多いのかなと思います。しかし、ソフトウェアのセキュリティ対策は後付けでは対応しきれない部分も多く、DevSecOpsが昨今開発の主流となりつつあります。是非これを機に "CI/CD pipelineの構築" と "SonarQubeの組み込み" をマスターし、社内でも一目置かれる人材になってみてはいかがでしょうか！？
 
-## 参考資料
+## 参考
 
 - [「入門】GitHub Actionsとは？概要やメリット、使用例まとめ - カゴヤのサーバー研究室](https://www.kagoya.jp/howto/it-glossary/develop/githubactions/)
 - [【入門】GitHubの使い方｜設定や基本操作など - カゴヤのサーバー研究室](https://www.kagoya.jp/howto/it-glossary/develop/howtousegithub/)

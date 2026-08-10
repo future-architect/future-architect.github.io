@@ -300,7 +300,7 @@ QuickSightを入門しようと検討されている方向けの内容をまと�
 
 初めての寄稿でうまく書けたか不安ではありますが良い経験となりました。これからも機会があれば挑戦していきたいなと思っています。
 
-## 参考資料
+## 参考
 
 * [ワークショップ :: Amazon QuickSight ハンズオン](https://awsj-assets-qs.s3.ap-northeast-1.amazonaws.com/workshop/public/jp/03-workshop.html)
 * [QuickSightで作成した分析を、テンプレート機能を使って別アカウントへ配布してみる](https://dev.classmethod.jp/articles/quicksight-analysis-template/)

@@ -267,6 +267,6 @@ content ← selectors.text
 
 今回は試すに至りませんでしたが、より良い検索結果を得るにはインデックスの作り方や [フィルター](https://www.meilisearch.com/docs/learn/what_is_meilisearch/overview#features:~:text=Filtering%20and%20faceted%20search%3A%20Enhance%20user%20search%20experience%20with%20custom%20filters%20and%20build%20a%20faceted%20search%20interface%20in%20a%20few%20lines%20of%20code) など使える種々の機能があるようなので、折を見て試していこうと考えています。
 
-## 参考リンク
+## 参考
 
 * [Meilisearch Documentation](https://www.meilisearch.com/docs)

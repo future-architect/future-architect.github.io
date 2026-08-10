@@ -574,7 +574,7 @@ CloudEndure Migrationの強みです。
 
 CloudEndure自体の利用は無料のため、試してみてはいかがでしょうか。
 
-## 参考リンク
+## 参考
 
 * [CloudEndureDocumentation](https://docs.cloudendure.com/CloudEndure%20Documentation.htm)
 * [[クラウド移行] CloudEndureを使ったEC2への移行を計画する前に考慮しておきたいポイント](https://dev.classmethod.jp/articles/planning-migration-cloudendure/)

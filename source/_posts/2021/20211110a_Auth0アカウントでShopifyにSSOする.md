@@ -230,7 +230,7 @@ Shopifyストアの現在のテーマの`コードを編集`をクリックし�
 
 最後まで読んでいただきありがとうございました！
 
-## 参考リンク
+## 参考
 
 - [Authenticate Shopify Customers with Auth0 – Rovani in C#](https://rovani.net/Shopify-Auth0-Multipass/)
 - [Authenticate Shopify Customers with Auth0 - Shopify - Pavilion](https://thepavilion.io/t/authenticate-shopify-customers-with-auth0/4040)

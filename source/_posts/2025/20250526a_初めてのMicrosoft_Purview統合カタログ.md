@@ -153,7 +153,7 @@ Microsoft Purviewにおけるデータカタログについて概要と歴史、
 
 ではでは。
 
-## 参考資料
+## 参考
 
 - [Microsoft Purview の詳細 | Microsoft Learn](https://learn.microsoft.com/ja-jp/purview/purview()
 - [Azure 統合カタログ (ADC) Gen 2、Azure Information Protection、Microsoft Purview (旧称 Azure Purview) はどのように関連していますか? | Microsoft Purview データ ガバナンス ソリューションについてよく寄せられる質問 | Microsoft Learn](https://learn.microsoft.com/ja-jp/purview/data-governance-faq#azure---------adc--gen-2-azure-information-protection-microsoft-purview-----azure-purview-----------------)
