@@ -44,7 +44,7 @@
       <% } %>
 
       <h2 class="bottom-content-header">タグが付きすぎている記事</h2>
-      ※記事あたりのタグ数の中央値は3。その倍を超える7本以上を見直し候補として出しています
+      ※10タグ以上を見直し候補として出しています（記事あたりのタグ数の中央値は3）
       <% if (checks.overTagged.length) { %>
       <ul class="doctor-list">
         <% checks.overTagged.forEach(function(p){ %>
@@ -72,9 +72,20 @@
 
       <h2 class="bottom-content-header">1記事にしか使われていないタグ</h2>
       ※「同居」は、同じ記事に1記事タグ同士が付いているもの。その記事のタグ付けがまとめて薄い可能性が高い
+      <%# 300件超を1タグ1行で並べると縦に長すぎる。同居あり／英数字／日本語の
+          3ブロックに分けて、ブロックの中は読点区切りで流し込む (#2259) %>
+      <%
+        const singleGroups = [
+          ['同居あり', checks.singleUse.filter(t => t.lonelyPair)],
+          ['英数字', checks.singleUse.filter(t => !t.lonelyPair && /^[\x20-\x7e]/.test(t.name))],
+          ['日本語', checks.singleUse.filter(t => !t.lonelyPair && !/^[\x20-\x7e]/.test(t.name))],
+        ];
+      %>
       <ul class="doctor-list">
-        <% checks.singleUse.forEach(function(t){ %>
-        <li><a href="<%- url_for(t.path) %>"><%= t.name %></a><% if (t.lonelyPair) { %> <span class="doctor-note">1記事タグ同士が同居</span><% } %></li>
+        <% singleGroups.forEach(function(g){ %>
+        <% if (g[1].length) { %>
+        <li><span class="doctor-note"><%= g[0] %>（<%= g[1].length %>タグ）</span><% g[1].forEach(function(t, i){ %><a href="<%- url_for(t.path) %>"><%= t.name %></a><%= i < g[1].length - 1 ? '、' : '' %><% }) %></li>
+        <% } %>
         <% }) %>
       </ul>
 

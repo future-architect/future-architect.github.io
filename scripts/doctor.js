@@ -75,8 +75,9 @@ hexo.extend.helper.register('doctor_checks', function() {
     if (tagNames.length === 0) {
       untagged.push({title: post.title, path: post.path});
     }
-    // タグの付けすぎ。記事あたりの中央値は3で、その倍を超えたら見直し候補
-    if (tagNames.length >= 7) {
+    // タグの付けすぎ。10タグ以上を見直し候補にする。
+    // 中央値3の倍（7タグ）で拾うと件数が多すぎて手が付かない (#2259)
+    if (tagNames.length >= 10) {
       overTagged.push({title: post.title, path: post.path, count: tagNames.length});
     }
 
