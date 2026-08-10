@@ -14,17 +14,17 @@ thumbnail: /images/2022/20220302a/thumbnail.png
 author: 空閑康太
 lede: "Language Server Protocol の理解として、Pyright を LSP サーバとした自作クライアントの作成を行いました。その際、Pyright に解析を行わせるための初期化方法がドキュメントには書かれていなかったので、VSCode 拡張用のクライアントをトレースして調査することにしました"
 ---
-# はじめに
+## はじめに
 
 Language Server Protocol の理解として、Pyright を LSP サーバとした自作クライアントの作成を行いました（[Pyright を LSP サーバとした自作 LSP クライアント（実装編）](/articles/20220303a/)）。その際、Pyright に解析を行わせるための初期化方法がドキュメントには書かれていなかったので、VSCode 拡張用のクライアントをトレースして調査することにしました。
 
-# 調査方法
+## 調査方法
 
 Pyright のリポジトリには言語サーバ（[`packages/pyright`](https://github.com/microsoft/pyright/tree/main/packages/pyright)）だけでなく、VSCode 拡張用のクライアント（[`packages/vscode-pyright`](https://github.com/microsoft/pyright/tree/main/packages/vscode-pyright)）が存在します。今回はこの2つをデバッガで実行して調査します。
 
 https://github.com/microsoft/pyright
 
-## 1. インストール
+### 1. インストール
 
 https://github.com/microsoft/pyright/blob/main/docs/build-debug.md
 
@@ -36,7 +36,7 @@ https://github.com/microsoft/pyright/blob/main/docs/build-debug.md
 
 また、拡張機能として Pyright および Pylance を導入している場合には無効にします。
 
-## 2. デバッグ実行
+### 2. デバッグ実行
 
 Pyright を VSCode 拡張としてデバッグ実行します。VSCode のサイドバーから「実行とデバッグ」を選択し、プルダウンメニューから "Pyright extension" を選択、実行します。なお、実行時のオプションについてはプルダウンメニュー横の歯車、あるいは [`.vscode/launch.json`](https://github.com/microsoft/pyright/blob/main/.vscode/launch.json) から確認できます。
 
@@ -51,7 +51,7 @@ Pyright を VSCode 拡張としてデバッグ実行します。VSCode のサイ
 
 <img src="/images/2022/20220302a/スクリーンショット_(10).png" alt="ブレークポイントが機能している" width="1200" height="499" loading="lazy">
 
-## 3. デバッガのアタッチ
+### 3. デバッガのアタッチ
 
 2 までの手順では、クライアントのみがデバッガで実行されます。しかし、メッセージを受信した後の処理はサーバ側で行われるため、調査のためにはこちらもデバッガで実行したくなります。[`extension.ts:66`](https://github.com/microsoft/pyright/blob/06e9f626f4388bc9b894daf4239a9e4a8e3ffb11/packages/vscode-pyright/src/extension.ts#L66) では、サーバがポート 6600 で建てられているので、ここにデバッガをアタッチします。
 <img src="/images/2022/20220302a/スクリーンショット_(12).png" alt="スクリーンショット_(12).png" width="1074" height="367" loading="lazy">
@@ -65,9 +65,9 @@ Pyright を VSCode 拡張としてデバッグ実行します。VSCode のサイ
 アタッチできていない場合には、下の画像のように Unbound breakpoint となり一時停止しません。
 <img src="/images/2022/20220302a/スクリーンショット_(14).png" alt=".vscode/launch.json" width="909" height="224" loading="lazy">
 
-# 調査内容
+## 調査内容
 
-## 1. Initialize Request
+### 1. Initialize Request
 
 [初期化関連の仕様](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#initialize)を見ると、メソッド `initialize` は送信する必要がありそうです。そこでまず次の2つを順に送信してみます。
 
@@ -84,7 +84,7 @@ Pyright を VSCode 拡張としてデバッグ実行します。VSCode のサイ
 > 2. ???：ワークスペースを初期化
 > 3. 適当な解析メソッド
 
-## 2. DidChangeWorkspaceFolders Notification
+### 2. DidChangeWorkspaceFolders Notification
 
 調べると、`workspace.isInitialized` はメソッド [`updateSettingsForWorkspace`](https://github.com/microsoft/pyright/blob/844f7cb98987955dc617cd97b1372325e76a4530/packages/pyright-internal/src/languageServerBase.ts#L1265) が実行されて `true` となります。
 
@@ -102,7 +102,7 @@ Pyright を VSCode 拡張としてデバッグ実行します。VSCode のサイ
 
 ただし、`onDidChangeWorkspaceFolders` は特定の条件で有効化されることに注意します。
 
-## 3. Initialized Notification
+### 3. Initialized Notification
 
 [`onDidChangeWorkspaceFolders`の前後](https://github.com/microsoft/pyright/blob/844f7cb98987955dc617cd97b1372325e76a4530/packages/pyright-internal/src/languageServerBase.ts#L579
 ) を確認すると、有効化には以下の2つの条件を満たす必要があります。
@@ -118,7 +118,7 @@ Pyright を VSCode 拡張としてデバッグ実行します。VSCode のサイ
 > 3. `workspace/didChangeWorkspaceFolders` メソッド：ワークスペースフォルダの変更を通知
 > 4. 適当な解析メソッド
 
-# まとめ
+## まとめ
 
 以上から、Pyright の初期化は下図のようにして行われることがわかりました。実装は[Pyright を LSP サーバとした自作 LSP クライアント（実装編）](/articles/20220303a/)で扱っていますので、合わせて読んでいただければと思います。
 

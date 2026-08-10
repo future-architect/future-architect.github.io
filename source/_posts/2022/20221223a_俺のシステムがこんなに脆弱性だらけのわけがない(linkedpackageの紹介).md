@@ -22,7 +22,7 @@ lede: "セキュリティに対して、きちんとお金をかけて対応す�
 
 開発中のアプリケーションのスキャナーというと、Node.jsのnpmコマンドが脆弱なパッケージの検知機能（auditサブコマンド）を内蔵していますし、Goも[公式脆弱性管理データベース](https://vuln.go.dev/)のページを作り、新しい仕組みを構築しようとしています([ドキュメント](https://go.dev/security/vuln/)、[準標準のチェックコマンド](https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck))。言語をまたいで使えるものには[snyk](https://snyk.io/)もありますね。
 
-# フォールスポジティブ（偽陽性）を減らす
+## フォールスポジティブ（偽陽性）を減らす
 
 Node.jsでの開発は4桁ぐらいパッケージに依存することがありえます。npm auditで少しでも古いパッケージを使うと大量の脆弱性が報告されることがあります。でも、よくよく見てみると実は関係ないのかな？ とも思えるような脆弱性もたくさん出てきますが、なかなか判定を1つ1つ行うのは大変です。
 
@@ -34,7 +34,7 @@ https://github.com/future-architect/linkedpackage
 
 神戸さんからメッセージもらうまでは、作ったことをすっかり忘れていて、とりあえず公開だけしたのが上のリポジトリです。ライセンスはひとまずVulsにあわせてGPLにしています。とりあえず公開だけしたのでREADMEもないですが
 
-# 処理の方法
+## 処理の方法
 
 現時点ではJavaScriptのプロジェクトに限定した機能になっています。ソースマップをざっとスキャンして、実行ファイルに含まれるソース片を提供しているパッケージを取り出します。コマンドとしても動かせるようにしてあり、linkedpackage auditコマンドを使うと、npm auditの結果を、利用パッケージに限定してフィルタリングして表示、みたいなことができます。
 
@@ -44,7 +44,7 @@ https://github.com/future-architect/linkedpackage
 * `../webpack:/ncc-project/node_modules/trim/index.js`
 * `webpack://_N_E/ignored|/prj/node_modules/next/dist/shared/lib/router|./utils/resolve-rewrites`
 
-# 今後
+## 今後
 
 Goも[debugパッケージ](https://pkg.go.dev/debug/buildinfo@go1.19.4#Read)使えば実行ファイルから、利用しているモジュール一覧が取れるので行けそうですね。そのうち作ろうかな。
 

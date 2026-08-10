@@ -15,7 +15,7 @@ lede: "フューチャーのインターンEngineer Campに参加した平野と
 
 <img src="/images/2022/20220920a/dataflow_top1.png" alt="" width="1000" height="655">
 
-# はじめに
+## はじめに
 
 はじめまして、フューチャーのインターン"Engineer Camp"に参加した平野と申します。
 
@@ -36,7 +36,7 @@ lede: "フューチャーのインターンEngineer Campに参加した平野と
 
 という構成になっています。[後編](/articles/20220920b/)も公開しています。
 
-# Dataflowとは
+## Dataflowとは
 
 Dataflowは様々なデータの分散処理を簡単に実現できるプラットフォームです。
 
@@ -55,7 +55,7 @@ Apache Beam を使って Cloud Dataflow で処理するようにしています�
 
 Dataflowでは、データ処理パイプラインの中に機械学習モデルの推論を組み込むことも可能で、ストリーム処理と組み合わせるとリアルタイム推論もできるようになります。今回はそのようなMLシステムへの応用を見据えて基本から整理しました。
 
-# Apache Beamとは
+## Apache Beamとは
 
 Dataflow上で実行するデータ処理の内容はApache Beamを用いて記述します。
 
@@ -67,7 +67,7 @@ Apache Beamの特徴としては、パイプライン処理を実行するWorker
 
 また、バッチ処理・ストリーム処理の両方のデータ処理を同じようなコードで記述できるというのも大きな特徴の1つで、バッチ処理⇄ストリーム処理の切り替えが簡単にできます。ちなみにBeamという名前は __B__ atch + st __eam__ から来ています。
 
-## Apache Beamの構成要素
+### Apache Beamの構成要素
 
 Apache Beamでは以下の図のような構成となっています。
 <img src="/images/2022/20220920a/Apache_Beam_flow_2.png" alt="Apache_Beam_flow.png" width="1200" height="241" loading="lazy">
@@ -81,12 +81,12 @@ Apache Beamでは以下の図のような構成となっています。
 * I/O transforms:
 外部ソースからのデータの読み取り、外部ソースへのデータの書き出しを行う際に用いるPTransform。
 
-## Apache Beamの仕組み
+### Apache Beamの仕組み
 
 ここでは、Apache Beamがどのようにして分散処理を行っているのかについて、[公式ドキュメント](https://beam.apache.org/documentation/runtime/model/)の内容をもとに説明します。
 以下の説明で用いている図は[公式ドキュメント](https://beam.apache.org/documentation/runtime/model/)から引用しています。
 
-### Transform並列化の仕組み
+#### Transform並列化の仕組み
 
 1. Runnerは入力されたPCollectionをいくつかのBundleに分ける。
 2. 各BundleをWorkerが並列に処理する。
@@ -105,7 +105,7 @@ PCollectionに含まれるelementよりも小さく分割することはでき�
 
 _※Splittable ParDoを使えば、1つのelementを複数のBundleで処理できるらしい。この機能は開発中とのこと。_
 
-### Transform間に従属関係がある場合の挙動
+#### Transform間に従属関係がある場合の挙動
 
 以下の例では、入力に対してParDo1を適用した後に、ParDo2を適用します。
 
@@ -119,7 +119,7 @@ RunnerがParDo1を適用前と後でBundleの再構成を行わない場合、�
 
 こうすることで、Worker間の通信を省くことができ、他のWorkerの処理を待つ必要がなくなります。
 
-### 1つのTransformに失敗した場合の挙動
+#### 1つのTransformに失敗した場合の挙動
 
 Bundle内のあるelementの処理に失敗した場合、そのelementが属するBundle全体に対して処理を再度実行する必要があります。
 
@@ -127,7 +127,7 @@ Bundle内のあるelementの処理に失敗した場合、そのelementが属す
 
 <img src="/images/2022/20220920a/1つのTransformに失敗した時.svg" alt="1つのTransformに失敗した時" loading="lazy">
 
-### 従属関係にあるTransformに失敗した場合の挙動
+#### 従属関係にあるTransformに失敗した場合の挙動
 
 2つのTransform間に従属関係があり、後続のTransformの処理に失敗した場合、Bundleは再度最初からTransformを適用される必要があります。
 
@@ -135,7 +135,7 @@ Bundle内のあるelementの処理に失敗した場合、そのelementが属す
 
 _このような挙動となっている理由は、Transform間のelementを保持しておくとメモリを圧迫してしまうため？公式DocにはPersistence costを節約するためとあった。ラージスケールなデータを処理することを念頭においた設計となっている？_
 
-## Apache Beamのコードの書き方
+### Apache Beamのコードの書き方
 
 Apache Beamでは、以下のような流れでコードを書いていきます。
 
@@ -213,7 +213,7 @@ p
 | beam.Map(print)  # この場合は"Map(print)"がラベルとなる。
 ```
 
-## パイプラインの分岐・合流
+### パイプラインの分岐・合流
 
 Apache Beamは一直線のパイプラインだけでなく、分岐や合流を含む複雑なパイプラインを構成できます。
 パイプラインを分岐させたい場合には、分岐の直前までを変数に代入することで、その変数をスタートとしてパイプラインの分岐させることができます。
@@ -300,11 +300,11 @@ if __name__ == "__main__":
 この場合、パイプラインのグラフは次のようになります。
 <img src="/images/2022/20220920a/bd3c7575-0cd5-a2a6-6f31-b6914a43bf50.png" alt="" width="870" height="1438" loading="lazy">
 
-# 最後に
+## 最後に
 
 ここまでお読みいただきありがとうございます。稚拙な文章で読みづらい箇所が多々あったかと思います。よければ[後編](/articles/20220920b/)もお読みいただければと思います。
 
-# 参考
+## 参考
 
 * [Apache Beam (Dataflow) 実践入門【Python】](https://qiita.com/esakik/items/3c5c18d4a645db7a8634)
 * [How Beam executes a pipeline (公式ドキュメント)](https://beam.apache.org/documentation/runtime/model/)

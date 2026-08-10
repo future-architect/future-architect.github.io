@@ -15,7 +15,7 @@ thumbnail: /images/2022/20221124a/thumbnail.png
 author: 川渕皓太
 lede: "SQLフォーマッタをVSCodeの拡張機能にする作業を行っており、そのための方法を学んでいます。本記事ではLanguage Server Protocolを用いたVSCode拡張機能開発について説明します。。"
 ---
-# はじめに
+## はじめに
 
 こんにちは、Futureでアルバイトをしている川渕です。アルバイトの前はFutureのインターンシップでRust製SQLフォーマッタの作成を行っていました(その時の記事は[こちら](/articles/20220916b/))。現在はそのSQLフォーマッタをVSCodeの拡張機能にする作業を行っており、そのための方法を学んでいます。
 
@@ -25,11 +25,11 @@ lede: "SQLフォーマッタをVSCodeの拡張機能にする作業を行って�
 
 [後編](/articles/20221125a/)ではサンプルコードに機能を追加する方法を説明します。
 
-# Language Serverとは
+## Language Serverとは
 
 Language Serverとは、自動補完、エラーチェック、型チェックなどの様々な言語機能をIDEに提供するものです。
 
-# Language Server Protocol (LSP)とは
+## Language Server Protocol (LSP)とは
 
 [LSP](https://microsoft.github.io/language-server-protocol/)とは2016年6月にMicrosoftが発表したプロトコルで、IDEとLanguage Server間の通信を標準化するものです。
 
@@ -39,21 +39,21 @@ LSPがない場合は各IDEに対応した言語、仕様で言語サーバを�
 
 <img src="/images/2022/20221124a/lsp-languages-editors.png" alt="lsp-languages-editors.png" width="1162" height="538" loading="lazy">
 
-# 本記事で説明すること
+## 本記事で説明すること
 
 * LSPを用いたVSCodeの拡張機能開発チュートリアル
 * チュートリアルコードの解説
 
-# 本記事で説明しないこと
+## 本記事で説明しないこと
 
 * VSCode以外で使用する方法
 * 拡張機能の公開方法
 
-# LSPチュートリアル
+## LSPチュートリアル
 
 まずVSCodeの公式で配布されている[LSPのサンプルコード](https://github.com/microsoft/vscode-extension-samples/tree/main/lsp-sample)を動かしてみます。
 
-### 1. サンプルリポジトリのダウンロード
+#### 1. サンプルリポジトリのダウンロード
 
 まず適当なディレクトリで以下のコマンドを実行してVSCode拡張機能サンプルリポジトリをダウンロードします。
 
@@ -61,7 +61,7 @@ LSPがない場合は各IDEに対応した言語、仕様で言語サーバを�
 git clone https://github.com/microsoft/vscode-extension-samples.git
 ```
 
-### 2. 必要なパッケージのインストール
+#### 2. 必要なパッケージのインストール
 
 次にnpmを用いて必要なパッケージをインストールします。
 
@@ -72,7 +72,7 @@ git clone https://github.com/microsoft/vscode-extension-samples.git
 npm install
 ```
 
-### 3. コンパイルと実行
+#### 3. コンパイルと実行
 
 1. Ctrl+Shift+Bでクライアントとサーバをコンパイル
 1. Ctrl+Shift+Dで「実行とデバッグ」を開き、Launch Clientを選択する
@@ -87,7 +87,7 @@ npm install
     * 全て大文字、かつ長さが2以上の単語には警告が表示される<br>
 	<img src="/images/2022/20221124a/image_4.png" alt="" width="491" height="202" loading="lazy">
 
-### 4. サーバのデバッグ
+#### 4. サーバのデバッグ
 
 1. Launch Clientしている状態で「実行とデバッグ」のAttach to Serverを選択
 1. <font color="MediumSeaGreen">▷</font>をクリック
@@ -95,11 +95,11 @@ npm install
 1. サーバのブレークポイントが効くようになる
 <img src="/images/2022/20221124a/image_6.png" alt="" width="1200" height="650" loading="lazy">
 
-# サンプルコードの解説
+## サンプルコードの解説
 
 先程実行したlsp-sampleの実装について詳しく解説します。
 
-## ファイル構成
+### ファイル構成
 
 ファイル構成は以下の通りです。
 extension.tsにクライアントサイドの処理、server.tsにサーバサイドの処理を記述しています。
@@ -116,7 +116,7 @@ extension.tsにクライアントサイドの処理、server.tsにサーバサ�
         └── server.ts # サーバサイドの実装
 ```
 
-## pakcage.json
+### pakcage.json
 
 クライアントの機能について記述しています。詳しい情報は以下に記載されています。
 
@@ -124,12 +124,12 @@ extension.tsにクライアントサイドの処理、server.tsにサーバサ�
 
 この中から一部のフィールドを説明します。
 
-### name
+#### name
 
 拡張機能の名前で、今回のサンプルコードではlsp-sampleとなっています。
 マーケットプレースでの表示名はdisplayNameで別に設定できます。
 
-### publisher
+#### publisher
 
 拡張機能を公開する際に使用するフィールドです。
 [vsce](https://github.com/microsoft/vscode-vsce)というVSCode拡張機能用コマンドラインツールで作成したpublisherIDをこのフィールドに入力します。
@@ -138,7 +138,7 @@ extension.tsにクライアントサイドの処理、server.tsにサーバサ�
 
 * [Publishing Extensions | Visual Studio Code Extension API](https://code.visualstudio.com/api/working-with-extensions/publishing-extension)
 
-### categories
+#### categories
 
 拡張機能のカテゴリを入力します。
 
@@ -165,7 +165,7 @@ extension.tsにクライアントサイドの処理、server.tsにサーバサ�
 
 </details>
 
-### activateEvents
+#### activateEvents
 
 activateEventsに記述したイベントが発生すると、拡張機能が有効になります。
 lsp-sampleでのactivateEventsは以下のようになっています。
@@ -183,18 +183,18 @@ lsp-sampleでのactivateEventsは以下のようになっています。
 
 * [Activation Events | Visual Studio Code Extension API](https://code.visualstudio.com/api/references/activation-events)
 
-### contributes
+#### contributes
 
 拡張機能の機能についての情報を記述します。
 詳しい情報は以下に記載されています。
 
 * [Contribution Points | Visual Studio Code Extension API](https://code.visualstudio.com/api/references/contribution-points)
 
-## extension.ts
+### extension.ts
 
 extension.tsにはクライアント側の処理を記述します。
 
-### 拡張機能の起動時の処理
+#### 拡張機能の起動時の処理
 
 拡張機能の起動時に関数`activate()`が実行されます。
 
@@ -264,7 +264,7 @@ export function activate(context: ExtensionContext) {
 
 <img src="/images/2022/20221124a/untitled.drawio.png" alt="untitled.drawio.png" width="1200" height="215" loading="lazy">
 
-### 拡張機能の終了時の処理
+#### 拡張機能の終了時の処理
 
 拡張機能の終了時に関数`deactive()`が実行されます。
 
@@ -280,11 +280,11 @@ export function deactivate(): Thenable<void> | undefined {
 }
 ```
 
-## server.ts
+### server.ts
 
 server.tsにはサーバ側の処理を記述します。
 
-### サーバの接続を作成
+#### サーバの接続を作成
 
 サーバの接続を作成し、その接続を監視することで拡張機能を提供します。
 
@@ -302,7 +302,7 @@ const connection = createConnection(ProposedFeatures.all);
 connection.listen();
 ```
 
-### ドキュメントマネージャの作成
+#### ドキュメントマネージャの作成
 
 ドキュメントマネージャとはサーバとクライアントのドキュメントを同期するものです。
 ドキュメントマネージャを作成し、ドキュメントの監視を行います。
@@ -323,7 +323,7 @@ documents.listen(connection);
 
 ドキュメントマネージャはドキュメントを開くイベント、閉じるイベント、変更イベントを検知します。
 
-### 初期化
+#### 初期化
 
 最初のリクエスト受信時に実行されます。ここでサーバの設定を初期化します。
 
@@ -361,7 +361,7 @@ connection.onInitialize((params: InitializeParams) => {
 });
 ```
 
-### 警告表示機能の実装
+#### 警告表示機能の実装
 
 lsp-sampleではテキストドキュメントの変更時に全て大文字で、かつ長さが2以上の単語を特定し、その箇所に警告を表示します。
 この機能の実装方法について説明します。
@@ -437,7 +437,7 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 診断メッセージ、診断の発行元、関連情報は以下のように表示されます。
 <img src="/images/2022/20221124a/warning.drawio.png" alt="warning.drawio.png" width="644" height="268" loading="lazy">
 
-### 補完機能の実装
+#### 補完機能の実装
 
 lsp-sampleでは"TypeScript"、"JavaScript"という2つの単語の補完を提供します。
 
@@ -484,13 +484,13 @@ connection.onCompletionResolve((item: CompletionItem): CompletionItem => {
 補完、追加情報は以下のように表示されます。
 <img src="/images/2022/20221124a/hokan.drawio_(1).png" alt="" width="816" height="205" loading="lazy">
 
-# まとめ
+## まとめ
 
 LSPを用いたVSCodeの拡張機能開発チュートリアルとチュートリアルコードの解説を行いました。
 
 [後編](/articles/20221125a/) ではlsp-sampleに機能を追加する方法を説明しています。
 
-# 参考文献
+## 参考文献
 
 * [Language Server Protocol開発チュートリアル - Qiita](https://qiita.com/Ikuyadeu/items/98458f9ab760d09660ff)
 * [Language Server Extension Guide | Visual Studio Code Extension API](https://code.visualstudio.com/api/language-extensions/language-server-extension-guide)

@@ -17,7 +17,7 @@ lede: "AWS Step Functionsの動的並列処理をローカルで実行する方�
 ---
 <img src="/images/2022/20220204a/eyecatch_stepfunctions.png" alt="" width="1003" height="498" loading="lazy">
 
-# はじめに
+## はじめに
 
 こんにちは、TIG/DXユニット所属の宮永です。
 
@@ -27,7 +27,7 @@ https://github.com/orangekame3/stepfunctions-demo
 
 >本記事は[Pipenv+LocalStackで作るLambda開発環境](/articles/20220202a/)で作成したLambda関数をベースに実装しています。本記事の実装に取り組まれる方はこちらの記事が参考になると思います。
 
-# Step Functionsとは
+## Step Functionsとは
 
 Step FunctionsとはAWSの各種リソースをオーケストレーションするサービスです。
 
@@ -40,17 +40,17 @@ Step Functionsについては技術ブログでもこれまで取り扱ってい
 
 今回は[Serverless連載6: AWSのStep FunctionsとLambdaでServelessなBatch処理を実現する](/articles/20200515/)を参考にPythonとLocalStack(Docker)で動的並列処理を実装します。
 
-# モチベーション
+## モチベーション
 
 今回想定しているユースケースは「大規模データの集計作業をLambdaで実装する」というものです。
 
 Lambdaの実行制限時間である15分を超えるであろう処理をStep Functionsを使ってうまく突破したいというのがモチベーションです。先程紹介した[Serverless連載6: AWSのStep FunctionsとLambdaでServelessなBatch処理を実現する](/articles/20200515/)には動的並列処理以外にもStep Functionsを応用したバッチ処理について幅広く言及しているため、一読されると良いかと思います。
 
-# ハンズオンで構築するシステム
+## ハンズオンで構築するシステム
 
 全体のシステム概要を記載した後に機能詳細を紹介します。
 
-## システム構成図
+### システム構成図
 
 今回構築するシステム構成図を以下に記載します。
 
@@ -64,7 +64,7 @@ S3バケットからJSONを取得し、後続のLambdaでETL処理をします�
 
 <img src="/images/2022/20220204a/image.png" alt="ビジュアルワークフロー" width="1200" height="881" loading="lazy">
 
-## 実装するアプリの機能詳細
+### 実装するアプリの機能詳細
 
 [こちらの記事](https://qiita.com/orangekame3/private/9abed652b26dd4eb1afd)で実装しているLambda関数と同等の機能をもつシステムを実装します。
 Scatter→Gatherに注目するとJSON→ExcelのETL処理を行っています。
@@ -96,13 +96,13 @@ S3バケットには予め以下の構造をもつJSONファイルを配置し�
 ]
 ```
 
-## ScatterLambda
+### ScatterLambda
 
 ScatterLambdaでは上記のJSONファイルを取り込み、DataFrameに変換します。その後、DataFrameをSegmentLamdaが15分以内に処理できる単位に分割します。
 
 分割したファイルはpickleファイルでS3バケットに格納します。
 
-## SegmentLambda
+### SegmentLambda
 
 SegmentLambdaではScatterLambdaで分割されたpickleファイルを取り込みETL処理を行います。
 今回行うETL処理を以下記載します。
@@ -134,12 +134,12 @@ SegmentLambdaではScatterLambdaで分割されたpickleファイルを取り込
 |001|般若 竜門|2|75|2021-07-19|75|
 |002|十河 アンナ|2|57|2021-09-06|57|
 
-## GatherLambda
+### GatherLambda
 
 GatherLambdaではSegmentLambdaでETL処理をされた各pickleファイルを取り込み、ひとつのExcelファイルを作成します。
 作成したExcelファイルはS3バケットにアップロードして処理を終了します。
 
-# 開発環境
+## 開発環境
 
 開発に取り組む前に筆者の開発環境を記載します。記事中Linuxコマンドを使用している箇所があります。Windowsで開発される方はWSLを使用することをおすすめいたします。
 
@@ -150,7 +150,7 @@ GatherLambdaではSegmentLambdaでETL処理をされた各pickleファイルを�
 - docker compose v2
 - AWS CLI v2
 
-# LocalStackの準備
+## LocalStackの準備
 
 実装対象が決まったので早速開発環境の準備に取り掛かります。
 
@@ -214,7 +214,7 @@ docker compose up --build
 
 次にAWS CLIの設定を行います。
 
-# AWS CLIの設定
+## AWS CLIの設定
 
 AWS CLIでは認証情報などをプロファイルとして保存できます。
 AWS CLIをインストールされた方はご自身が使用しているOSのhomeディレクトリに`.aws`の隠しファルダがあります。(エクスプローラーなどで確認する場合は隠しフォルダを表示するように設定してください。)`.aws`フォルダ配下には.`config`と
@@ -238,7 +238,7 @@ aws_secret_access_key = test
 
 次にLambdaの実装を行います。
 
-# Lambdaの実装
+## Lambdaの実装
 
 このあと、複数のファイルを作成するため、最終的なディレクトリ構造を先に記載します。
 適宜参考にしてください。
@@ -309,7 +309,7 @@ aws_secret_access_key = test
 
 </div></details>
 
-## 前提
+### 前提
 
 ローカルマシンにPython3の環境が構築されていることを前提としています。
 今回Lambdaの実装にはPythonを使用します。Pipenvを使用して各Lambda関数毎にプロジェクトを作成します。
@@ -368,7 +368,7 @@ pipenv install pytest mypy --dev
 
 それではScatterLambdaからロジックの実装をします。
 
-## ScatterLambda
+### ScatterLambda
 
 demo-scatter配下に以下2つのファイルを作成します。
 
@@ -476,7 +476,7 @@ class ScatterHandler(object):
 test-bucketに格納されたsample.jsonを取得して、pandasでDataFrameに変換します。変換後はpickleファイルで保存することでSegmentLambdaでの読み込み処理を高速化しています。
 関数の戻り値はS3のオブジェクトキーの一覧です。`segment_definitions`をキーとした辞書にリストして格納しています。
 
-## SegmentLambda
+### SegmentLambda
 
 SegmentLambdaでETL処理を行います。ETL処理時の条件を再度記載します。
 
@@ -574,7 +574,7 @@ def lambda_handler(event, context) -> str:
     return handler.main()
 ```
 
-## GatherLambda
+### GatherLambda
 
 最後にSegmentLambdaでETL処理をしたDataFrameを取り込み、1つのExcelファイルにまとめるGatherLambdaを実装します。
 こちらもScatterLambda、SegmentLamdaと同様にハンドラを記載したgather.pyとハンドラを呼ぶlambda.pyを作成します。
@@ -658,7 +658,7 @@ def lambda_handler(event, context) -> str:
     return handler.main()
 ```
 
-# LocalStackへのデプロイ
+## LocalStackへのデプロイ
 
 それでは作成したそれぞれのLambda関数をLocalStackにデプロイします。
 デプロイの方法は先程紹介した[こちらの記事](https://future-architect.github.io/articles/20220202a/)にまとめた方法を採用します。各Lambda関数のディレクトリ内に以下のようなMakefileを作成します。
@@ -784,9 +784,9 @@ make zip
 
 zip化が完了していれば各ファルダのbinフォルダにlambda.zipが生成されているはずです。
 
-# Step Functionsの準備
+## Step Functionsの準備
 
-## Amazonステートメント言語
+### Amazonステートメント言語
 
 Step Functionsでは各種リソースのオーケストレーション（状態管理）JSON形式のファイルで行います。
 今回採用したスキャッターギャザーメッセージングパターン（分散して集約するようなパターン）は冒頭に紹介した[記事](/articles/20200515/)をほぼそのまま転用させていただきました。
@@ -837,7 +837,7 @@ ScatterLambdaの`event`に引数を渡すため一部追加しています。
 
 そのため、ScatterLambdaでの返り値はSegmentLambdaに渡したい配列のキーを`segment_definitions`とし、Gatherでは`segment_results`をキーに持つ要素を参照します。返り値はJSONにdumpする必要はなく、辞書型で値を渡します。
 
-## テストデータの準備
+### テストデータの準備
 
 各Lambda関数のデプロイが完了し、ステートマシンの定義も完成しました。あとはStep Functionsの生成と実行をするだけです。
 ステートマシンをLocalStackに作成する前に今回使用するテストデータを生成します。
@@ -921,7 +921,7 @@ make json
 
 これでLocalStackのS3バケット上にtest.jsonが作成されました。
 
-# Step Functionsの実行
+## Step Functionsの実行
 
 それではStep Functiionsを実行します。
 プロジェクトルートで以下のコマンドを実行してください。
@@ -959,7 +959,7 @@ downloadに成功していればプロジェクトプロジェクトルート直
 
 https://github.com/orangekame3/stepfunctions-demo
 
-# さいごに
+## さいごに
 
 いかがでしたでしょうか、Step Functionsでは性質上、複数のリソースを連動させて処理を行います。デバッグの都度リソースをデプロイをするのはかなりの労力を伴うのでローカル環境で動作確認を行えるのはとても良いですね。
 

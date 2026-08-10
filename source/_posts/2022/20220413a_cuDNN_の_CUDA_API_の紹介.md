@@ -11,7 +11,7 @@ thumbnail: /images/2022/20220413a/thumbnail.png
 author: 松崎功也
 lede: "NVIDIA 社が提供するディープラーニング用の GPGPU ライブラリ「cuDNN」の CUDA API を紹介したいと思います。cuDNN は TensorFlow や Keras で学習や推論を高速化するためのバックエンドとしてよく使われていますが、CUDA API を直接たたいたことがある方は少ないのではないでしょうか？個人的に作成したアプリケーションで CUDA API を叩く機会があり、社内の技術勉強会で紹介したところ好評だったため、こちらにも寄稿することにしました。"
 ---
-# はじめに
+## はじめに
 
 こんにちは、2021年新卒入社の SAIG 松崎功也です。Tech Blog 初投稿です。
 
@@ -23,7 +23,7 @@ cuDNN は TensorFlow や Keras で学習や推論を高速化するためのバ�
 
 <img src="/images/2022/20220413a/ファイル名.png" alt="システム概念図" width="1200" height="591" loading="lazy">
 
-# cuDNN を叩くことになったきっかけ
+## cuDNN を叩くことになったきっかけ
 
 私はレトロゲームを遊ぶことが多いのですが、解像度が低いため 4K ディスプレイだと拡大した際に非常に粗が目立ってしまいます。これをなんとかしたかったのがきっかけです。
 最終的には以下の手法で解決することにしました。
@@ -36,7 +36,7 @@ cuDNN は TensorFlow や Keras で学習や推論を高速化するためのバ�
 
 この記事では、1., 3. の部分の説明は行いません。3. において使用した cuDNN API にのみ焦点を当てて紹介します。
 
-# cuDNN で畳込みを行う流れ
+## cuDNN で畳込みを行う流れ
 
 流れは以下の通りです。
 
@@ -53,7 +53,7 @@ cuDNN は TensorFlow や Keras で学習や推論を高速化するためのバ�
 1. 拡大したい画像データをRAM（ホスト）→ VRAM へ転送
 1. 畳込みを行う
 
-## 1. cuDNN ライブラリの初期化
+### 1. cuDNN ライブラリの初期化
 
 ライブラリの初期化は以下のように行います。
 
@@ -64,7 +64,7 @@ cudnnHandle_t cudnn_handle = nullptr;
 cudnnCreate(&cudnn_handle);
 ```
 
-## 2. モデルのフィルタの重みをRAM（ホスト）に読み込む
+### 2. モデルのフィルタの重みをRAM（ホスト）に読み込む
 
 今回は JSON 形式で保存されているモデルのフィルタの重みを、[picojson]("https://github.com/kazuho/picojson") で読込みました。
 
@@ -92,7 +92,7 @@ for (int i = 0; i < layer.nOutputPlane_; i++) {
 }
 ```
 
-## 3. RAM（ホスト）に読み込んだフィルタの重みを VRAM へ転送する
+### 3. RAM（ホスト）に読み込んだフィルタの重みを VRAM へ転送する
 
 VRAM のメモリを確保して、読み込んだモデルのフィルタを VRAM へ転送します。
 メモリ管理はスマートポインタで行っているので、それに合わせたラッパーを自作し使用しています（cuda_memory_allocate）。
@@ -126,7 +126,7 @@ device_unique_ptr cuda_memory_allocate(size_t n) {
 }
 ```
 
-## 4. フィルタ記述子（フィルターのサイズなどを定義）の準備
+### 4. フィルタ記述子（フィルターのサイズなどを定義）の準備
 
 フィルタ記述子では、フィルタの枚数やサイズなどを設定します。
 <img src="/images/2022/20220413a/ファイル名_3.png" alt="フィルタ記述子" width="1200" height="577" loading="lazy">
@@ -143,7 +143,7 @@ filter_desc_.reset(temp_filter_desc);
 cudnnSetFilter4dDescriptor(filter_desc_.get(), CUDNN_DATA_FLOAT, CUDNN_TENSOR_NCHW, nOutputPlane_, nInputPlane_, kH_, kW_);
 ```
 
-## 5. バイアス記述子の準備
+### 5. バイアス記述子の準備
 
 畳込み処理後に加算するバイアスの準備を行います。バイアスは1次元ベクトルなので、テンソルの記述子を流用します。
 
@@ -161,7 +161,7 @@ bias_desc_.reset(temp_bias_desc);
 cudnnSetTensor4dDescriptor(bias_desc_.get(), CUDNN_TENSOR_NCHW, CUDNN_DATA_FLOAT, 1, nOutputPlane, 1, 1);
 ```
 
-## 6. 畳込み記述子（パディング、ストライドなどを定義）の準備
+### 6. 畳込み記述子（パディング、ストライドなどを定義）の準備
 
 畳込み記述子では、フィルタの動かし方（パディング、ストライド、ディレーションなど）を設定します。
 
@@ -177,7 +177,7 @@ conv_desc_.reset(temp_conv_desc);
 cudnnSetConvolution2dDescriptor(conv_desc_.get(), padH, padW, dH, dW, 1, 1, cudnnConvolutionMode_t::CUDNN_CONVOLUTION, cudnnDataType_t::CUDNN_DATA_FLOAT);
 ```
 
-## 7. 活性化関数の記述子の準備
+### 7. 活性化関数の記述子の準備
 
 cuDNN ではデフォルトで ReLU や Swish などの活性化関数が準備されています（[提供されている活性化関数の一覧]("https://docs.nvidia.com/deeplearning/cudnn/api/index.html#cudnnActivationMode_t")）。
 
@@ -207,7 +207,7 @@ __global__ void leakyRelu_(float* vec, int n) {
 }
 ```
 
-## 8. 畳込みの内部アルゴリズムを設定する
+### 8. 畳込みの内部アルゴリズムを設定する
 
 cuDNN では畳込みの内部アルゴリズムがいくつか用意されていて、それぞれメモリ使用量や計算速度にトレードオフがあります（[提供されている内部アルゴリズムの一覧]("https://docs.nvidia.com/deeplearning/cudnn/api/index.html#cudnnConvolutionFwdAlgo_t")）。
 
@@ -226,7 +226,7 @@ forward_algo_.algo = cudnnConvolutionFwdAlgo_t::CUDNN_CONVOLUTION_FWD_ALGO_IMPLI
 cudnnGetConvolutionForwardWorkspaceSize(handle, src, filter_desc_.get(), conv_desc_.get(), dst, forward_algo_.algo, &workspace_size);
 ```
 
-## 9. 拡大したい画像データをRAM（ホスト）→ VRAM へ転送
+### 9. 拡大したい画像データをRAM（ホスト）→ VRAM へ転送
 
 あともう一息です。
 
@@ -240,7 +240,7 @@ auto image0 = cuda_memory_allocate(image_size);
 cudaMemcpy(image0.get(), image_float.data(), sizeof(float) * image_float.size(), cudaMemcpyKind::cudaMemcpyHostToDevice);
 ```
 
-## 10. 畳込みを行う
+### 10. 畳込みを行う
 
 最後にここまで設定してきた記述子を元に、VRAM へコピーした画像データに畳込み処理を行います。
 関数名から分かるように、畳込み、バイアスの加算、活性化関数の適用を一気に行います。
@@ -259,7 +259,7 @@ cudnnConvolutionBiasActivationForward(
         );
 ```
 
-# さいごに
+## さいごに
 
 cuDNN の CUDA API による畳込みの流れを紹介しました。
 

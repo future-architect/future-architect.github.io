@@ -13,13 +13,13 @@ thumbnail: /images/2022/20220622b/thumbnail.png
 author: 真野隼記
 lede: "Open APIは2022.6.21時点では3.1.0が最新です。これまでリリースノートすらウォッチしていなかったので気になったことを調べてまとめました。"
 ---
-# はじめに
+## はじめに
 
 TIG DXユニット真野です。[サービス間通信とIDL（インタフェース記述言語）](/articles/20220622a/)連載の1本目です。
 
 Open APIは[go-swaggerを用いたWebアプリケーション開発Tips19選](/articles/20200630/)という記事を過去に書いたこともあり、バージョン2（Swagger）をよく使っていましたしまだ継続してそれらを用いた開発もしています。2022.6.21時点では3.1.0が最新です。これまでリリースノートすらウォッチしていなかったので気になったことを調べてまとめました。
 
-## Open API Specificationとは
+### Open API Specificationとは
 
 [Open API Specification](https://github.com/OAI/OpenAPI-Specification)（公式でもOASと略されます）は、HTTP APIのIDL（インタフェース記述言語）です。HTTP APIということで、いわゆるRESTishなAPIも含みます。エンドポイント（URLのパス）、パラメーター（リクエスト、レスポンスのヘッダ・ボディ）、認証フローなどを標準的に定義でき、そこからコードやAPIドキュメントを生成できて便利です。
 
@@ -29,7 +29,7 @@ Open APIは[go-swaggerを用いたWebアプリケーション開発Tips19選](/a
 
 なお、定義はYAMLやJSONで行います。
 
-## v2 と v3 の違いについて
+### v2 と v3 の違いについて
 
 我々がよく見るOpen API Specificationのメジャーバージョンは2つあり、v2とv3 があります。2022年時点ですとOpen API Specificationに関連した利用したいツールの対応次第かと思いますが、version 3.0は2017.7.26リリースで5年ほど経過するのでv3を採用するチームが多いのではないでしょうか（3.1との差は次章以降で触れます）。
 
@@ -56,7 +56,7 @@ Swaggerから Open API Specificationへの切り替えですが、 2015年にSwa
 
 [^1]: https://japan.zdnet.com/article/35073148/ より
 
-## v3.0、v3.1
+### v3.0、v3.1
 
 2017年に3.0.0が出て、2021年2月に待望（？）の3.1.0が出ました。リリースノートは[こちら](https://github.com/OAI/OpenAPI-Specification/releases)。
 
@@ -88,13 +88,13 @@ Swaggerから Open API Specificationへの切り替えですが、 2015年にSwa
 
 他にも、`example` が非推奨になり代わりに `examples` を利用しようよとか、 `type: [string, integer]` みたいに複数の型を指定できるようになったとか、`nullable: true` が `type: [string, "null"]` と書くといった拡張・変更があります。
 
-## 次期バージョンと気になったチケット
+### 次期バージョンと気になったチケット
 
 リポジトリを見ると[v3.1.1](https://github.com/OAI/OpenAPI-Specification/tree/v3.1.1-dev)と[v3.2.0](https://github.com/OAI/OpenAPI-Specification/tree/v3.2.0-dev) が推進のように見えます。[v3.2.0はマイルストーン](https://github.com/OAI/OpenAPI-Specification/milestone/12)が切られていて、3つのIssueが紐づいていました。また [Post 3.0のラベル](https://github.com/OAI/OpenAPI-Specification/labels/Post%203.0%20Proposal) もあります。
 
 関連Issueを読んでいて面白かった部分を紹介します
 
-### （1）[Investigate possibility of removing the constraint that paths must start with "/" #2327](https://github.com/OAI/OpenAPI-Specification/issues/2327)
+#### （1）[Investigate possibility of removing the constraint that paths must start with "/" #2327](https://github.com/OAI/OpenAPI-Specification/issues/2327)
 
 * パスが`/` 始まりである必要があるかですが、 [#2316](https://github.com/OAI/OpenAPI-Specification/issues/2316) を見ると、OPTIONSメソッドの場合は、`*` の指定も許容するようです。[RFC7231 4.7.3](https://datatracker.ietf.org/doc/html/rfc7231#section-4.3.7)
 * https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/OPTIONS#identifying_allowed_request_methods にもSyntaxでかかれれていました。
@@ -108,7 +108,7 @@ OPTIONS * HTTP/1.1
 
 OPTIONS、CORSのプリフライトリクエストの時に利用されるイメージしかなかったので、ターゲットに `*` できるの知らなかったです。
 
-### （2）[Deprecate discriminator? #2143](https://github.com/OAI/OpenAPI-Specification/issues/2143)
+#### （2）[Deprecate discriminator? #2143](https://github.com/OAI/OpenAPI-Specification/issues/2143)
 
 discriminatorの廃止議論です。まずdiscriminatorがなにかという話ですが、3.0で追加された Open API Specification独自の機能で、スキーマを切り替えることができます。次が[OpenAPI 3.0ガイドに記載されたInheritance and Polymorphism](https://swagger.io/docs/specification/data-models/inheritance-and-polymorphism/) に記載された例です。レスポンスは `oneOf`によって`Object1`, `Object2`, `sysObject`の3種類が取りうるとしています。このとき、どのスキーマを選択するか `discriminator.propertyName` に記載された `objectType` によって決定できるます。
 
@@ -153,7 +153,7 @@ components:
 
 こんなことできるんだ、凄い、良いよねって思いましたが、非推奨（Deprecate）の方向になっています。JSONスキーマとの互換性が理由のようです。互換性がないことでLinterなどの検証に難もあるようです。
 
-### （3）[Support for path parameters which can contain slashes #892](https://github.com/OAI/OpenAPI-Specification/issues/892)
+#### （3）[Support for path parameters which can contain slashes #892](https://github.com/OAI/OpenAPI-Specification/issues/892)
 
 パスパラメータにスラッシュ `/` を許容してほしいという要望です。背景としては
 
@@ -175,6 +175,6 @@ components:
 
 現状では、`/resources?path=foo/bar/baz` などとするか、個別定義していくかになるので少し大変なので要求が強いのはわかります。なるべく静的に定義したいという気持ちもわかります。仕様策定、、大変ですね。
 
-## まとめ
+### まとめ
 
 Open API Specificationの概略と、3.1とそれ以降の議論について簡単に紹介しました。JSONスキーマとの互換性、エコシステムのツールチェーンなどバランスを取って仕様策定する苦悩も伺いしれました。今あるHTTP APIを記述するという用途であれば、すでにさほど困らないかと思いますが、今後の動向もIssueなどを引き続き見ていきたいと思います。

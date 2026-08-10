@@ -14,7 +14,7 @@ author: 棚井龍之介
 lede: "Terraform stateをテーマにした勉強会が開かれました。私は後半パートでクラウドリソース自体をdestroy/createdせずに、Terraformリソース定義の記述場所を変更する方法について話しました。"
 ---
 
-# 勉強会に登壇しました
+## 勉強会に登壇しました
 
 こんにちは。
 TIGの棚井龍之介です。
@@ -45,9 +45,9 @@ TIGの棚井龍之介です。
 
 「state操作を図で表現する」というのが推しポイントだったのですが、勉強会後のツイートで Terraformの「moved block」という方法を教えて頂きました。実際に使ってみたことろ、terraform mvと同様の操作を、私が勉強会で説明した方法よりも安全に実行できると感じたため、この方法について以下で説明します。
 
-# moved blockを試す
+## moved blockを試す
 
-## 事前準備
+### 事前準備
 
 まずは、こちらの記事「[LocalStackに向けてTerraformを実行する](https://future-architect.github.io/articles/20201113/)」に沿って環境構築を進めて、ローカル環境でTerraformが操作できるようにします。
 
@@ -185,7 +185,7 @@ null_resource.resource_C
 
 以上で準備は完了です。
 
-## moved blockでリソースを改名する
+### moved blockでリソースを改名する
 
 さっそく、moved block を利用して、terraform mv と同様に「リソース名の変更」を実施してみましょう。
 

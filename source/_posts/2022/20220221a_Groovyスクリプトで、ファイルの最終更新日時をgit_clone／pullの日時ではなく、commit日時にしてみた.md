@@ -20,7 +20,7 @@ lede: "ファイルの最終更新日時を上書きするスクリプトをGroo
 * JVM 1.8.0_121
 * Perl 5.32.1
 
-# 背景
+## 背景
 
 `git clone/pull`した時に、ローカルにチェックアウトされたファイルの最終更新日時がどうなっているかご存知でしょうか。
 
@@ -36,7 +36,7 @@ lede: "ファイルの最終更新日時を上書きするスクリプトをGroo
 
 実はこれを実現するためのPerlスクリプトがGit公式から配布されています。今回はJVMで動かしたかったので、同様の処理を行う`Groovyスクリプト`を作成しました。
 
-# Perlスクリプト
+## Perlスクリプト
 
 まずはPerlスクリプトを用いた方法から紹介していきます。
 
@@ -131,7 +131,7 @@ close FH;
 
 <img src="/images/2022/20220221a/image_2.png" alt="git log出力" width="1124" height="785" loading="lazy">
 
-# Groovyスクリプト
+## Groovyスクリプト
 
 さて本題のGroovyスクリプトです。
 
@@ -220,7 +220,7 @@ Groovyのキャッチアップは以下のサイトを参考にしました。
 * [Groovyってどんな言語？JavaプログラマのためのGroovy入門 - CodeZine](https://codezine.jp/article/detail/3757)
 * [[Groovy]正規表現メモ - Qiita](https://qiita.com/saba1024/items/61aeaf36061df35f8bee)
 
-# 処理時間の比較
+## 処理時間の比較
 
 それぞれのスクリプトを、23,898ファイルを持つGitプロジェクトで実行して処理時間を測定しました。対象プロジェクトの開発期間は6年程で、コミットログもそれなりに育っているという状況です。(4334コミット)
 
@@ -243,7 +243,7 @@ powershell -C (Measure-Command {perl git-set-file-times.pl}).TotalSeconds
 powershell -C (Measure-Command {groovy git-set-file-times.groovy}).TotalSeconds
 ```
 
-# Groovyスクリプト改良版
+## Groovyスクリプト改良版
 
 Git logのオプションでフォーマットを指定すると、変更に強く、かつスッキリとしたソースになります。
 
@@ -283,7 +283,7 @@ for (log in logs) {
 
 <img src="/images/2022/20220221a/image_3.png" alt="git log出力例" width="1200" height="205" loading="lazy">
 
-# まとめ
+## まとめ
 
 GroovyスクリプトはJavaと同じ感覚で書けるので、普段Javaを使っている方はほとんどキャッチアップコストをかけずに習得出来ると思います。
 

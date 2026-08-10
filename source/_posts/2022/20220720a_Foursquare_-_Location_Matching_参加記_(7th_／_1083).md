@@ -16,7 +16,7 @@ eyecatch: /images/2022/20220720a/4sq_overview.png
 ---
 本記事は[「地図・GIS・位置特定に関する連載」](/articles/20220719a/)二日目の記事です。昨日の[「郵便番号・住所・緯度経度の体系について」](/articles/20220719b/)の記事も、今回の記事とは直接つながってはいませんが、参考になる部分もあるのでぜひご覧ください。
 
-# はじめに
+## はじめに
 
 こんにちは、Strategic AI Group所属の金子です。普段は推薦に関連する実装やデータ分析を行っています。
 
@@ -31,9 +31,9 @@ eyecatch: /images/2022/20220720a/4sq_overview.png
 * リーク問題について
 * 謝辞
 
-# 4sqコンペ概要
+## 4sqコンペ概要
 
-## タスク概要
+### タスク概要
 
 Foursquareは位置を共有するSNS等を提供する企業です。現在はあるPOI(Points-of-Interest, 同じ地図上の特定のポイント)について口コミ等を検索する「Foursquare」アプリや、あるPOIにチェックインし、それをシェアすることに特化した「Swarm」アプリなどを公開しています。これらに登録されているPOIはユーザーによって登録されます。
 
@@ -52,11 +52,11 @@ Foursquareは位置を共有するSNS等を提供する企業です。現在は�
 
 評価はmatchesに対し (正解のラベルと予測ラベルの積集合の数) / (正解のラベルと予測ラベルの和集合の数) で求められるIoUの平均で計算されました。
 
-## この問題が解けると何がうれしいか
+### この問題が解けると何がうれしいか
 
 今回のコンペのデータは意図的にノイズを加えたデータで、実務のデータとは異なるようでした。しかし、名前や住所・商品名の表記ゆれというのは至る所で発生する問題で、今回のコンペで用いられた手法は実務でこのようなゆれと向き合うにあたって有用であると考えられます。
 
-# 解法のサマリ
+## 解法のサマリ
 
 前回紹介した[H&Mコンペ](https://future-architect.github.io/articles/20220602b/)でもそうでしたが、600,000 x 600,000 の組み合わせについてすべて正確に評価することは難しいです。
 そこで、今回は以下の3つのパートで予測を行いました。
@@ -67,18 +67,18 @@ Foursquareは位置を共有するSNS等を提供する企業です。現在は�
 
 <img src="/images/2022/20220720a/4sq_overview.png" alt="4sq_overview" width="851" height="432" loading="lazy">
 
-# 解法の詳細
+## 解法の詳細
 
 上記の3つのパートに各データの前処理について加え、前処理から順に説明していきます。
 
-## 前処理パート
+### 前処理パート
 
 前処理では機械学習モデルがデータを解釈しやすいよう、データをカテゴリ変数とembeddingに変換することを目的にしました。
 そのために、NNが扱いやすいような形に自然言語を処理し、欠損値を埋め、無数にあるカテゴリを学習できる種類にまで減らすこと意識しました。
 
-### 自然言語の前処理
+#### 自然言語の前処理
 
-#### 文字の正規化
+##### 文字の正規化
 
 nameについてはたくさんの言語が混じっており、かつ日本語・中国語・タイ語のような分かち書きが必要な言語も多く混じっていました。そこでname, addressについては、文字単位で比較する用、単語同士で比較する用、NNに入れる用の三種類に向けた前処理を行いました。
 
@@ -100,33 +100,33 @@ nameについてはたくさんの言語が混じっており、かつ日本語�
 
 となるように変換しました。
 
-#### addressの欠損値の補完
+##### addressの欠損値の補完
 
 addressについては3.についてのみ、NNモデルに入れるため欠損値の補完を行いました。
 具体的には全レコードについて、addressがNaNでないものからhaversine距離で近傍3か所のaddressを連結して、embedding学習用の前処理としました。
 
-### 地名のカテゴリ変数化と前処理
+#### 地名のカテゴリ変数化と前処理
 
 city, state, countryはカテゴリ変数として扱うことにしました。countryは欠損値を"NAN"で埋めたうえでカテゴリ変数化、cityとstateについては出現回数上位約2000を代表として平均の緯度経度を計算し、欠損値、もしくは上位2000以外のcityとstateを上位2000との近傍で埋めました。
 
 また、cities1000という1000人以上の人口がいる市を集めたデータセットを用いて緯度経度から地名を求め、geo_nameという名前のカテゴリ変数にしました。これもまた出現数上位2000のどれかに割り振られるよう調整を行いました。
 
-### categoriesの前処理
+#### categoriesの前処理
 
 categoriesは1つの列にカンマ区切りで複数のカテゴリが入っていました。そこでカンマ区切りで分割し、RaggedTensorとして扱いました。また、categoriesに何も入っていない場合は"nan"のカテゴリで補完しました。後述のカテゴリ予測モデルを作った後は"nan"の行に予測を行い、カテゴリを1つ追加しました。
 
-### URL/Phoneの正規化
+#### URL/Phoneの正規化
 
 URLについては[urllib](https://docs.python.org/ja/3/library/urllib.parse.html)でネットワーク上の位置を示す部分抽出しました。
 電話番号は国際通話用の+81等が付いた形式とそうでない形式が混じっていたため、[phonenumbers](https://pypi.org/project/phonenumbers/)を用いて正規化を行い統一しました。
 
-### embeddingの作成
+#### embeddingの作成
 
-#### サブワードへの分割
+##### サブワードへの分割
 
 3で処理したローマ字について[SentencePiece](https://github.com/google/sentencepiece)でサブワード分割を学習しました。サブワードは単語をさらに分割したもので、例えば「競プロer」という未知の単語が出てきた際、「競プロ」をする「er」なんだなと解釈できるようになります。単語をすべて[0-9a-z& ]の範囲にしたのもsentence pieceで使える語彙をより有意義なものにするためです。nameとaddressについてそれぞれ32000のサブワードで表すようSentencePieceを別々に学習しました。
 
-#### embeddingの学習
+##### embeddingの学習
 
 学習にはname, address, categoriesと、カテゴリ変数にしたcountry, city, state, geo_nameを用い以下の3つのタスクを行いました。
 
@@ -138,7 +138,7 @@ URLについては[urllib](https://docs.python.org/ja/3/library/urllib.parse.htm
 
 なお、1のSkip-Gramタスクの学習はコンペ中[W2V & haversine NN baseline[Training/Inference]](https://www.kaggle.com/code/nadare/w2v-haversine-nn-baseline-training-inference)というノートブックで公開しています。
 
-#### embeddingの評価
+##### embeddingの評価
 
 embeddingの評価としてデータごとに近傍を取得し、precision@16 (≒ maxIoU)を計算して評価を行いました。
 ベースラインとしてUniversal Sentence Encoderでのコサイン類似度の近傍と、haversine距離の近傍を用意しました。
@@ -157,7 +157,7 @@ embeddingの評価としてデータごとに近傍を取得し、precision@16 (
 
 nameに関しては、Universal Sentence Encoderよりも高いprecisionで、非常に質の高いembeddingを作成できました。
 
-### K-means++ & Word Tour
+#### K-means++ & Word Tour
 
 embeddingをLightGBMのようなGBDTが解釈しやすい形にするため、球面K-means++と[Word Tour](https://arxiv.org/abs/2205.01954)を組み合わせた手法で1次元に落とし込みました。Word Tourはembedding間の距離を元に巡回セールスマン問題(TSP)を解き、その順番でembeddingを並び替えるという手法で、これにより1次元上で距離の近い位置に似たembeddingが並ぶようになります。
 
@@ -181,13 +181,13 @@ hot_dog
 
 K-means系の特徴量としては、Word Tourで並べなおしたK-meansのクラスタラベルと、各クラスタ中心までの距離をデータに紐づけました。
 
-## retrieval パート
+### retrieval パート
 
-### 概要
+#### 概要
 
 retrieval パートではGPU上で全組み合わせの計算ができる高速で簡単な手法で、取りこぼしが無いようモデルを構築しました。
 
-### 候補生成
+#### 候補生成
 
 作成したembeddingやhaversine距離を元に1つのサンプルにつき32の候補を作成しLightGBMでの学習・予測に用いました。
 候補生成は以下の5つの方法を用いました。これらはTensorFlowを用いてGPU上で計算を行ったので、全組み合わせについて愚直に計算できました。
@@ -200,11 +200,11 @@ retrieval パートではGPU上で全組み合わせの計算ができる高速�
 |4| nameの文字単位での一致度による近傍|8|
 |5| nameのembeddingのコサイン類似度による近傍|4|
 
-#### haversine距離とembeddingのコサイン類似度を用いた重回帰による近傍
+##### haversine距離とembeddingのコサイン類似度を用いた重回帰による近傍
 
 2についてはhaversine距離の対数と各embeddingのコサイン類似度から重回帰を行いました。重回帰の学習はロジスティック回帰で行うよりも、正例がより高いスコアになるようランク学習を行うことでよりよい重回帰の係数を得ることができました。
 
-#### Bag of Words一致度による近傍
+##### Bag of Words一致度による近傍
 
 3, 4については単語単位、文字単位でのBag of Wordベクトルを作成し、コサイン類似度・precision・recallをもとめました。
 precision・recallについては「フューチャー株式会社」をクエリ、「フューチャー」をターゲットとして文字単位で比較した際、
@@ -216,7 +216,7 @@ precision・recallについては「フューチャー株式会社」をクエ�
 このような手法を用いたのは、POIのペアとして「〇〇コンビニ」と「〇〇コンビニ　XXX店」のような組み合わせを多く見たからです。
 Bag of Wordsベクトルをl2正規化した際のコサイン類似度と、precision, recallの大きい順に候補を取得し、同率の場合は重回帰のスコアで並べなおして上位を取得しました。
 
-#### 候補生成の精度
+##### 候補生成の精度
 
 この5つの手法で非対称な候補生成を行った結果、
 
@@ -227,35 +227,35 @@ Bag of Wordsベクトルをl2正規化した際のコサイン類似度と、pre
 
 まで高めることができました。
 
-## predict パート
+### predict パート
 
-### 概要
+#### 概要
 
 predict パートでは、ある地点(query)とその候補(candidate)の1:1の間の特徴量を追加し、LightGBMで二値分類を行いました。
 今回のデータはPOIのペアを持たないデータも多く、False Positiveが悪影響を与えやすかったので、それらを防ぐ工夫も検討しました。
 
-### 特徴量生成
+#### 特徴量生成
 
-#### query, candidateのそれぞれのカテゴリとword tourの一次元の距離
+##### query, candidateのそれぞれのカテゴリとword tourの一次元の距離
 
 IDごとにそれぞれのカテゴリやクラスタを計算し、queryとcandidateの両方のIDとマージしました。
 また、Word Tourで求めたクラスタラベルについては1次元上での距離を計算しました。
 
-#### name, addressについてのゲシュタルトマッチング、レーベンシュタイン距離、ジャロ・ウィンクラー距離
+##### name, addressについてのゲシュタルトマッチング、レーベンシュタイン距離、ジャロ・ウィンクラー距離
 
 これらは文字列の類似度を計算する古典的な手法で、Python内蔵の[difflib](https://docs.python.org/ja/3/library/difflib.html)や、[Levenshtein](https://github.com/ztane/python-Levenshtein)といったライブラリで計算できます。CPUでの計算なので時間はかかりますが、有効な特徴量であったため、3種類の方法で加工したname, addressとname, addressの数字部分だけを抽出したものをこれらの手法で類似度を計算しました。
 
-#### name, addressについてのROUGE-N, ROUGE-L
+##### name, addressについてのROUGE-N, ROUGE-L
 
 ROUGEは文章要約タスクの良しあしを測るのにつかわれることが多い手法で、文章同士について一定の分割をした後、共通部分のprecision, recall, F値を計算します。ROUGE-NはN-gram、ROUGE-LはLCSを用いてROUGEを計算します。前者はTensorFlowのRaggedTensorを活用、後者はtensorflow-textにあるrouge_l関数を用いてGPU上で高速に計算しました。
 
-### 学習・予測
+#### 学習・予測
 
-#### 学習データ
+##### 学習データ
 
 学習はLightGBMを用い、特徴量の評価時はpidで分割した5foldでの計算、提出時は全データを用いてiteration数を決め打ちで学習を行いました。
 
-#### sample weight
+##### sample weight
 
 sample weightは他のPOIのペアをすべて当てられたうえで予測を間違えたときのIoUの損失をweightとしました。これは、前述のとおりTrue NegativeよりもFalse Positiveの方がスコアに対する悪影響が大きいからです。weightは正例で平均して0.8、負例で1.0になりました。
 
@@ -266,7 +266,7 @@ dev_data_df["weight"] = np.where(dev_data_df["label"],
 dev_data_df["weight"] = dev_data_df["weight"] / dev_data_df["weight"].mean()
 ```
 
-#### LightGBMのハイパーパラメータ
+##### LightGBMのハイパーパラメータ
 
 LightGBMの基本的なハイパーパラメータはnum_leavesが2^12が最適で、学習率は0.1と高く、2000iterationsまで学習を行いました。これでもpidで分割したバリデーションデータでのAUCが上昇し続けました。
 
@@ -291,22 +291,22 @@ lgb_params = {
     "seed": 0}
 ```
 
-#### 予測
+##### 予測
 
 予測は500iterationのモデルを用いた時点で予測時に合計1時間以上かかることが分かったため、[cumlのForestInference](https://docs.rapids.ai/api/cuml/stable/api.html#cuml.ForestInference)を活用しGPU上での予測を行いました。これにより100倍近くの高速化がされ、2000, 3000iterationのモデルを用いても実行時間内に予測を終えられました。LightGBMはfloat64で境界値やleaf valueを持つ一方、ForestInferenceはfloat32で計算を行うので若干の精度低下はあるものの、それ以上の高速化の恩恵を受けたため採用しました。
 
-## Postprocess パート
+### Postprocess パート
 
 Postpeocessパートでは、グラフとして予測されたペアをつなげることで拾いこぼしを拾って精度を上げました。
 
-### 概要
+#### 概要
 
 ペア同士の予測値を出した後は、一定の閾値を元にUnionFindで頂点同士を連結しグラフを構築しました。
 各グラフに対して、NetworkXを用い、媒介中心性を元にした辺の排除を行った後、頂点間の距離が2以内の頂点のみを予測のペアとして出力を行いました。
 
-# テクニック集
+## テクニック集
 
-## メモリ増加のテクニック
+### メモリ増加のテクニック
 
 Kaggleにコードを提出する際、実行には以下の2つの環境を選べます。
 
@@ -321,16 +321,16 @@ Kaggleにコードを提出する際、実行には以下の2つの環境を選�
 
 embeddingをGPUに配置することで実質29GBのメモリを使えることになり余裕のある推論ができました。
 
-## 高速化のテクニック
+### 高速化のテクニック
 
 また、embeddingのコサイン類似度やROUGEの計算はGPUで行い、lgbmの推論もForestInferenceによるGPUでの推論を活用することで高速化できました。これのおかげで提出から結果が出るまでの時間はおよそ5時間で、4時間の余裕がありました。これを有効活用できなかったのは残念ですが、余裕をもって特徴量生成に集中できました。
 
-## 各言語処理のテクニック
+### 各言語処理のテクニック
 
 中国語の分かち書きには[zh_segmentation](https://tfhub.dev/google/zh_segmentation/1)、タイ語の分かち書き・ローマ字変換には[PyThaiNLP](https://pythainlp.github.io/)を用いました。特にPyThaiNLPは機能とドキュメントが充実しており、タイ語の処理にはとても使いやすいなと感じました。
 日本語の分かち書き・読み方の取得・ローマ字化は[Sudachi](https://github.com/WorksApplications/SudachiPy)と[PyKakasi](https://github.com/miurahr/pykakasi)を用いていて、特にSudachiについては日本語の表記ゆれの正規化まで取得できたのは利点でした。また、今回のタスクではSentencePieceの学習とSudachiのA mode(UniDic単位相当)の分割が相性良かったです。
 
-## 試したが効かなかったもの
+### 試したが効かなかったもの
 
 * Universal Sentence Encoderを用いたembedding特徴量の追加(LBが悪くなった)
 * Sentencepieceについてname, addressを同時に学習(precisionが下がった)
@@ -340,13 +340,13 @@ embeddingをGPUに配置することで実質29GBのメモリを使えること�
 * 転置インデックスを用いた候補生成(Pure Python実装だと遅かった)
 * LightGBMのTensorFlow実装(ForestInferenceを使う方がはるかに効率的だった)
 
-# リーク問題について
+## リーク問題について
 
 今回のコンペは参加者が推論を行うコードを提出すると、参加者が直接見ることのできないtestデータで評価を行われPublicとPrivateのリーダーボードが更新されました。しかし、コンペ終了後運営のミスによってtestデータの67％がtrainデータと一致していた可能性が参加者から指摘されました。(trainデータのnameと緯度経度が完全一致するレコードについてLB上で検証が行われました。)7/19時点で全提出について重複を排除したデータについて再評価が行われ、一部のチームに追加の賞金が支払われることが決まりました。
 
 このリークにより金圏付近までの解法の良しあしの比較が困難になってしまいました。ただ、リークがあったにしろ上位の解法は納得のできるもので、私自身も自身の解法は他にも活用できる自信を持っています。このリークによって上位の解法の価値がなくなったわけではないことについて、理解が広まればいいなと考えています。
 
-# 謝辞
+## 謝辞
 
 今回のコンペは[takapyさん](https://www.kaggle.com/takanobu0210)、[Shotaさん](https://www.kaggle.com/imazekishota)、[visionさん](https://www.kaggle.com/matsumotoyuki)、[Kurutonさん](https://www.kaggle.com/koichirokamada)と一緒に参加しました。チームで協力してディスカッションやコードの整備、励ましあいを行ったおかげで、今回金メダルを獲得できたと思っています。まずはチームメンバーに強く感謝したいと思っています。
 
@@ -355,7 +355,7 @@ embeddingをGPUに配置することで実質29GBのメモリを使えること�
 最後に、今回のコンペで一緒に戦い、ディスカッションを行ってくれたライバルたちにも感謝を込めて、本記事の終わりとさせていただきます。
 連載の次の記事は 澁川さんの[Redisのジオメトリ機能](/articles/20220721a/)です。お楽しみに！
 
-# リンク
+## リンク
 
 * [7th place solution(discussion)](https://www.kaggle.com/competitions/foursquare-location-matching/discussion/335800): コンペ終了後に投稿したdiscussion、解法について質問があればこちらのdiscussionへどうぞ
 * [7th place solution inference(inference notebook)](https://www.kaggle.com/code/nadare/7th-place-solution-inference): コンペで提出を行った推論用notebook

@@ -18,7 +18,7 @@ lede: "FlutterのWindows対応が正式版になったので軽く試してみ�
 
 FlutterのWindows対応が正式版になったので軽く試してみました。
 
-# インストール
+## インストール
 
 Flutterのいつものインストール手順でインストールします。
 
@@ -38,7 +38,7 @@ Flutterのいつものインストール手順でインストールします。
 
 <img src="/images/2022/20220318a/image.png" alt="Visual Studioインストール" width="1200" height="311" loading="lazy">
 
-# Windowsデスクトップの有効化
+## Windowsデスクトップの有効化
 
 CLI上でflutterコマンドを使って有効化します。
 
@@ -64,7 +64,7 @@ In order to run your application, type:
 Your application code is in .\lib\main.dart.
 ```
 
-# プロジェクトの作成とビルド
+## プロジェクトの作成とビルド
 
 Android Studioでプロジェクトを作ります。New Flutter Pojectでプロジェクトを作成します。僕はターゲットの追加でLinuxとかmacOSも試しに追加してみたのでいろいろプラットフォームが多いですが、いくらつけてもAndroid Studio上で選択できるわけではありません。クロスコンパイルとかできると便利なんですけどね。
 
@@ -91,7 +91,7 @@ $ du -h
 
 <img src="/images/2022/20220318a/image_5.png" alt="PCリソース利用量" width="1200" height="178" loading="lazy">
 
-# ついでにLinuxのコードも見てみる
+## ついでにLinuxのコードも見てみる
 
 安定版になったのはWindowsだけですが、Linuxも興味本位で覗いてみました。ビルド設定ファイルを見ると、GTKを使っていているようですね。GLFWでOpenGLベースのものも選べると。GTKなのでUbuntuとかのLinuxデスクトップであればIME対応も問題なさそうです。
 
@@ -113,11 +113,11 @@ group("linux") {
 }
 ```
 
-# ライブラリ対応
+## ライブラリ対応
 
 なお、Flutterのライブラリはマルチプラットフォーム対応はパッケージごとにだいぶ差がありますし、Windowsデスクトップ対応はその中でもかなり少ないです。例えば、人気のWebViewのパッケージの[webview_flutter](https://pub.dev/packages/webview_flutter)とか[flutter_inappwebview](https://pub.dev/packages/flutter_inappwebview)は非対応ですが、flutter.dev公式の[webview_flutter_platform_interface](https://pub.dev/packages/webview_flutter_platform_interface)なんかもでてきていて、ちょっとずつ使えるライブラリなんかも増えていくんじゃないかなと思います。
 
-# 他のフレームワークとの比較
+## 他のフレームワークとの比較
 
 QtとかElectronだと、ウィンドウとは独立して「アプリケーション」やら「メインプロセス」といったものがあり、ウィンドウはその付属物という世界観となっています。DelphiとかWin32の直利用とかもみんなそうですね。なので1つのアプリケーションで多数のウィンドウを持つMDIみたいなのもあったりはしますが、Flutterは元々がモバイルの世界観なのか、アプリケーション==ウィンドウというところはちょっと違うなという感じがありますが、それはまあそういうもんだな、という感じで受け入れられそうな気はします。
 
@@ -125,7 +125,7 @@ Visual Studioだけじゃなくて、QtみたいにWindows SDKも使えたり、
 
 ウェブサービスを開発しつつ、コンパニオンアプリをモバイルのついでにデスクトップ版も作るよ、というケースや、長時間動かしたあとの安定性とかはわかりませんがキオスク端末とかのWindows IoTみたいな長く使うOS環境で少ないメモリで動かすには良いかもしれません。
 
-# タスクトレイ常駐型アプリを作ってみる
+## タスクトレイ常駐型アプリを作ってみる
 
 ほとんどのシステムがウェブブラウザをインタフェースとして利用するウェブアプリケーションという時代にあって、ローカルでアプリケーションをわざわざ作る理由というのは、単体アプリケーションとして使えるほうが便利というもの以外に、システムに統合される便利UIを追加で提供する、みたいな理由があります。例えば、Google Driveはデスクトップ版のツールを入れたりするとローカルとの同期を取ったりできますし、AdobeやJetBrainsはアプリケーションの更新をダウンロードするインタフェースとして常駐プログラムを提供していたりします。
 

@@ -14,7 +14,7 @@ thumbnail: /images/2022/20220513a/thumbnail.png
 author: 真鍋優
 lede: "「Future Tech Night #21 Google Cloud: データエンジニア＋MLOps」に登壇させていただきましたので、その内容について触れていきたいと思います。"
 ---
-# はじめに
+## はじめに
 
 こんにちは、SAIG所属の真鍋です。
 
@@ -22,12 +22,12 @@ lede: "「Future Tech Night #21 Google Cloud: データエンジニア＋MLOps�
 
 本イベントはTIGの村田さんの「JSON関数と共に歩む、BigQueryを使った超汎化型データ活用基盤」パートと、私の「Vertex AIによるフルマネージドなMLOps導入」の2本立てで行われました。前者については、別記事が既に投稿されておりますので、そちらもご覧いただければ幸いです。
 
-# 発表資料
+## 発表資料
 
 * [Vertex AIによるフルマネージドなMLOps導入](https://speakerdeck.com/komodoran/vertex-ainiyoruhurumanezidonamlopsdao-ru)
 * [Future Tech Night #21 Google Cloud: データエンジニア＋MLOps](https://www.youtube.com/watch?v=o0oZnX1Ai-k)
 
-## MLOpsとは
+### MLOpsとは
 
 機械学習プロジェクトが広く一般に普及してきた昨今、多くのカンファレンスや企業活動の中でMLOpsが注目を集めています。
 MLOpsとは、下記のライフサイクルを潤滑に回すための概念であり、Machine Learning + DevOps + Operateを合わせたものです。
@@ -37,7 +37,7 @@ MLOpsとは、下記のライフサイクルを潤滑に回すための概念で
 本発表では、コーディングと学習のフェーズに焦点を当てています。
 如何にデータサイエンティストのためのコーディング環境や、ハイスペックな学習環境を用意するかといった環境面の問題や、実装されたアルゴリズムをどのようにサービスとして素早くデプロイするのか等が課題となってきます。
 
-## Vertex AIとは
+### Vertex AIとは
 
 Vertex AIとはGoogle Cloud Platformにおける必要なMLツールがすべて揃った一元的なAIプラットフォームであり、GAされたのが2021年5月と比較的新しいサービスです。
 
@@ -69,7 +69,7 @@ Pipelineは複数のコンポーネントから構成されており、デフォ
 
 <img src="/images/2022/20220513a/image_6.png" alt="メタデータ管理" width="800" height="450" loading="lazy">
 
-## Q&A
+### Q&A
 
 * VertexAIは、TerraformのようなlaCで構築は可能でしょうか？
   → 2022/5現在、Terraformで全てのサービスを用意することは難しいのが現状です。WorkBenchはAI Platformのコードをできますますが、パイプライン等は別途用意することが必要です。
@@ -80,7 +80,7 @@ Pipelineは複数のコンポーネントから構成されており、デフォ
 * 実験管理に関して、mlflow等で自分で作るよりVertex AI Pipelineに任せたほうが楽なんでしょうか。
   → 私の個人的な印象ですが、mlflowの実験管理機能の方が柔軟性に富んでおり、必要な情報をトラッキングが容易です。今後、Vertex AIとmlflowの連携についても探っていきたいと考えています。
 
-## おわりに
+### おわりに
 
 フルマネージドなサービスを用いることで、オンプレでは難しい柔軟かつ迅速な環境構築が可能である。
 
