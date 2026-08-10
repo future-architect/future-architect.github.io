@@ -128,6 +128,9 @@ hexo.extend.helper.register('doctor_checks', function() {
       // タイトルに連載名を含む記事（「Go 1.27 リリース連載：uuid」等）では、
       // 連載名の一部（リリース 等）に当たっても記事の主題ではない
       if (post.series && String(post.series).includes(t.name)) continue;
+      // 系統タグを既に持っていれば提案しない。DockerCompose が付いた記事に
+      // Docker を、Go1.22 が付いた記事に Go を重ねて振る必要はない
+      if (tagNames.some(mine => mine !== t.name && mine.toLowerCase().includes(t.name.toLowerCase()))) continue;
       let hit;
       if (/^[\x20-\x7e]+$/.test(t.name)) {
         // 英数タグは単語境界で照合する（SQL が PostgreSQL に当たるのを防ぐ）
