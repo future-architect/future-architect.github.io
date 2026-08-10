@@ -18,13 +18,6 @@ lede: "Flutterアプリのperformance測定と基本的な実装ポイントに�
 
 こんにちは。TIGの藤田です。[Future Tech Night #22 Flutter勉強会](https://future.connpass.com/event/242858/)にてお話した「Flutterアプリのperformance測定と基本的な実装ポイント」についてご紹介します。
 
-## コンテンツ
-
-1. Performanceについて
-2. DevToolsについて
-3. レンダリングのプロファイリングデモ
-4. メモリのプロファイリングデモ
-
 ## Performanceについて
 
 複数の観点があります。Flutter GitHub リポジトリではPerformance issue を４カテゴリに分けて管理しています： [perf: speed](https://github.com/flutter/flutter/issues?q=is%3Aopen+label%3A%22perf%3A+speed%22+sort%3Aupdated-asc+), [perf: memory](https://github.com/flutter/flutter/issues?q=is%3Aopen+label%3A%22perf%3A+memory%22+sort%3Aupdated-asc+), [perf: app size](https://github.com/flutter/flutter/issues?q=is%3Aopen+label%3A%22perf%3A+app+size%22+sort%3Aupdated-asc+), [perf: energy](https://github.com/flutter/flutter/issues?q=is%3Aopen+label%3A%22perf%3A+energy%22+sort%3Aupdated-asc+).
