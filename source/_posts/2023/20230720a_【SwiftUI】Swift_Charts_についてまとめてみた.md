@@ -13,7 +13,7 @@ author: 橋本竜我
 lede: "iOS16からApple標準で利用できるようになったSwift Chartsというグラフ等を作成できるフレームワークを取り上げたいと思います。"
 ---
 
-# はじめに
+## はじめに
 
 はじめまして！ 2022年5月キャリア入社、HealthCare Innovation Group(HIG)[^1]の橋本です。技術ブログ初投稿です。
 
@@ -26,7 +26,7 @@ iOS16からApple標準で利用できるようになったSwift Chartsという�
 
 早速本題に入っていきます。内容は次のような構成です。
 
-# 内容
+## 内容
 
 - Swift Chartsとは
   - Swift Chartsの基本的な使い方
@@ -40,7 +40,7 @@ iOS16からApple標準で利用できるようになったSwift Chartsという�
   - BarMark
 - iPhoneのScreen Timeの表示をSwift Chartsで作ってみる
 
-## Swift Chartsとは
+### Swift Chartsとは
 
 Swift Chartsとは、WWDC2022で発表されたカスタマイズされたグラフを作成できるSwiftUIフレームワークです。
 
@@ -57,7 +57,7 @@ https://developer.apple.com/videos/play/wwdc2023/10037/
 
 https://developer.apple.com/documentation/charts/sectormark
 
-### Swift Chartsの基本的な使い方
+#### Swift Chartsの基本的な使い方
 
 簡単な棒グラフを作っていきます。
 完成イメージは、縦軸が値段、横軸にフルーツが並ぶ棒グラフです。
@@ -136,7 +136,7 @@ BarMark内の`x: .value("Fruit", "Apple")`でx軸のラベル自体を`Fruit`と
 
 そこで、グラフの要素を構造体で定義することで`View`内を簡潔に記載できます。
 
-#### グラフを描く要素を定義するデータ構造を設計する
+##### グラフを描く要素を定義するデータ構造を設計する
 
 グラフで利用するデータ構造の一般的な設計について説明します。
 
@@ -172,7 +172,7 @@ struct ContentView: View {
 
 `Charts`を`ForEach`のように利用できるため、これまでSwiftUIを触ったことがある人にはとても使いやすいと思いました。
 
-## 6つのMarkとその使い方
+### 6つのMarkとその使い方
 
 6つのグラフを描画するMarkの使い方について、紹介します。
 表に6つのMark名と主に使われるグラフとそのイメージ画像を一覧化しています。
@@ -190,7 +190,7 @@ BarMarkの使い方は、すでに紹介しましたので、残りの5つのMar
 
 （ここでは基本的にデータ構造などのコードは省き、`Chart{}`内のコードのみを載せています）。
 
-### Area Markのサンプルコード
+#### Area Markのサンプルコード
 
 ```swift
 Chart(cheeseburgerCost) {
@@ -201,7 +201,7 @@ Chart(cheeseburgerCost) {
 }
 ```
 
-### LineMarkのサンプルコード
+#### LineMarkのサンプルコード
 
 ```swift
 Chart(data) {
@@ -212,7 +212,7 @@ Chart(data) {
 }
 ```
 
-### PointMarkのサンプルコード
+#### PointMarkのサンプルコード
 
 ```swift
 Chart(data) {
@@ -223,7 +223,7 @@ Chart(data) {
 }
 ```
 
-### RectangleMarkのサンプルコード
+#### RectangleMarkのサンプルコード
 
 このサンプルコードでは、`width`と`height`でバーエリア内の比率を1.0にすることでヒートマップを作成しています。作成されるヒートマップは、上記で記載している表中のイメージのものです。
 
@@ -268,7 +268,7 @@ struct RectangleMaskView: View {
 
 ```
 
-### RuleMarkのサンプルコード
+#### RuleMarkのサンプルコード
 
 ```swift
 private var data: [Pollen] = [
@@ -293,7 +293,7 @@ struct RuleMaskView: View {
 }
 ```
 
-### SectorMarkのサンプルコード(iOS17以降)
+#### SectorMarkのサンプルコード(iOS17以降)
 
 WWDC2023で発表された`SectorMark`のサンプルコードです。`BarMark`等で使っていた`x:`を`angle`に変えるだけで、簡単にPie chartsに変換できます。
 
@@ -317,11 +317,11 @@ var body: some View {
 
 https://developer.apple.com/videos/play/wwdc2023/10037/
 
-# スクリーンタイムのグラフを模倣して作ってみた
+## スクリーンタイムのグラフを模倣して作ってみた
 
 最後に、学習してきた知識を活用して、iPhoneアプリなどに標準で搭載されているスクリーンタイムのグラフを模倣してみました。
 
-### 環境
+#### 環境
 
 - macOS: Ventura 13.4.1
 - Xcode: Version 14.3.1 (14E300c)
@@ -396,13 +396,13 @@ struct ScreenTimeWidgetView: View {
 
 これらの課題は、時間を見つけて改善していきたいと思います。
 
-# さいごに
+## さいごに
 
 今回は、iOS16から利用できるようになったSwift Chartsについて理解を深めました。
 
 今後もSwift周りで学習した内容を投稿していきたいと思いますので、その際もお読みいただけると嬉しいです。
 
-# 参考リンク
+## 参考リンク
 
 https://developer.apple.com/documentation/charts/areamark
 

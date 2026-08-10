@@ -14,7 +14,7 @@ lede: "TerraCurlというツールが面白そうだったので触ってみま�
 ---
 <img src="/images/2023/20230328a/top.png" alt="" width="600" height="356" loading="lazy">
 
-# はじめに
+## はじめに
 
 Terraformがv1.4のリリースおめでとうございます。[Terraform連載2023](/articles/20230327a/) の2リソース目の記事です。
 
@@ -24,7 +24,7 @@ v1.4リリースとは関係ないですが、[TerraCurl](https://registry.terra
 
 リポジトリは[devops-rob/terraform-provider-terracurl](https://github.com/devops-rob/terraform-provider-terracurl)です。
 
-## TerraCurlの使いどころ
+### TerraCurlの使いどころ
 
 AWS、Google Cloud、Azureなど、日進月歩で新しいサービス、新機能が追加されています。例えば以下は [ITmediaさんのページ](https://www.itmedia.co.jp/enterprise/articles/2103/08/news067.html) から引用した、AWSの機能追加の推移ですがその勢いは加速しています。
 
@@ -34,7 +34,7 @@ AWS、Google Cloud、Azureなど、日進月歩で新しいサービス、新機
 
 こういった場面で役立つのが今回紹介するTerraCurlです。
 
-## local-exec
+### local-exec
 
 従来、Providerが対応していないとか、そもそもProviderが存在しないリソースを管理したい時、頼りにしていたのは [local-exec](https://developer.hashicorp.com/terraform/language/resources/provisioners/local-exec#example-usage) Provisioner でした。Provisionerというのは、Terraform側が用意した脱出ハッチのような仕組みで、任意のスクリプトをTerraformコマンド経由で呼び出せる機能です[^1]。[ドキュメント](https://developer.hashicorp.com/terraform/language/resources/provisioners/syntax#provisioners-are-a-last-resort)にも a Last Resort（最終手段）と書いてある奥の手です。
 
@@ -65,7 +65,7 @@ resource "null_resource" "my_custom_resource" {
 
 今回紹介するTerraCurlも、上記で説明した脱出ハッチ的な `local-exec`の使い方と似たようなユースケースになります。ネイティブのProviderではサポートされていないけど、サービス側のAPIではサポートされている場合に利用します。Provider側ですでにリソース作成が提供されていればTerraCurlを使う必要はありません。
 
-## TerraCurlでAPI呼び出し
+### TerraCurlでAPI呼び出し
 
 [TerraCurlドキュメントのExcample](https://registry.terraform.io/providers/devops-rob/terracurl/latest/docs/resources/request) を元に、Qiita APIを用いてダミーの記事を作成しています。Qiita記事をTerraform管理する対象したいユースケースは皆無だと思います。TerraCurlを使うという1点のみが理由です。
 
@@ -190,7 +190,7 @@ qiita_article_response = "6410f22e585d0907005e"
 
 ※URLまでキャプチャに載せていますが、テスト投稿した記事は削除済みです
 
-## Destoryする時どうするの？
+### Destoryする時どうするの？
 
 Qiita APIの記事投稿に関して、IDは公開後に分かります（APIで指定すれば固定できるかも知れませんが）。そのため、以下のような `output` で取得した値を、`destory_url` に指定できると良いのですが、これは `terraform apply` に決定する値ですので、循環参照となり指定できません。このあたりはどうするか一工夫が必要そうです。
 
@@ -205,7 +205,7 @@ resource "terracurl_request" "qiita_article" {
   }
 ```
 
-## TerraCurl所感
+### TerraCurl所感
 
 ドキュメントを見ると、相互TLS認証やリトライなど作り込みが良さそうな部分が見られ、フィットするのであれば非常に有用そうでした。
 
@@ -215,7 +215,7 @@ resource "terracurl_request" "qiita_article" {
 
 もし、上記に一致するような条件で、従来 `local-exec` で実行していたけど、内部的には `curl` コマンドだけだった場合には、 `tf` ファイルで完結するので素晴らしいツールだと思います。スクリプトを別途用意しなくてよいのは開発、保守的にも嬉しいと思います。
 
-## まとめ
+### まとめ
 
 TerraCurlを使ってみました。ツールの命名が素晴らしくcurlで済ませられるようなリソースに関してはシンデレラフィットしそうなProviderです。
 

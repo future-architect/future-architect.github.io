@@ -16,7 +16,7 @@ lede: "S3バケットをtreeするCLIコマンドを紹介します。"
 ---
 <img src="/images/2023/20230926a/stree-display.png" alt="" width="1200" height="600" loading="lazy">
 
-# はじめに
+## はじめに
 
 こんにちは。TIG/EXユニット所属の宮永です。
 
@@ -30,7 +30,7 @@ lede: "S3バケットをtreeするCLIコマンドを紹介します。"
 
 >streeは「エスツリー」と読みます。先に語感の良い名称を思いついたため、衝動に身を任せて開発しました。
 
-# 機能概要
+## 機能概要
 
 まずは利用画面を見ていただいたほうがイメージ付きやすいかと思いますのでgif画像を添付します。
 
@@ -43,25 +43,25 @@ streeは以下の機能をサポートしています。
 - LocalStack上のS3バケットのtree表示
 - カラー表示（オプションで無効化も可能です）
 
-# インストール方法
+## インストール方法
 
 GoとHomebrew経由でインストール可能です。
 
 各種ビルド済みのバイナリも公開しているので[Release](https://github.com/orangekame3/stree/releases)から手動インストールもできます。
 
-## Goによるインストール
+### Goによるインストール
 
 ```shell
 go install github.com/orangekame3/stree@latest
 ```
 
-## Homebrewによるインストール
+### Homebrewによるインストール
 
 ```sh
 brew install orangekame3/tap/stree
 ```
 
-# 使い方
+## 使い方
 
 ::: note warn
 **前提**
@@ -82,7 +82,7 @@ aws_access_key_id=XXXXXXXXXXXXXXXXXXXXX
 aws_secret_access_key=XXXXXXXXXXXXXXXXX
 ```
 
-## 基本的なコマンド
+### 基本的なコマンド
 
 バケット名とprofileを指定して、以下のコマンドを実行します。
 
@@ -119,7 +119,7 @@ my-bucket
 9 directories, 10 files
 ```
 
-## プレフィックスを指定
+### プレフィックスを指定
 
 通常のユースケースを考えると、バケットの中には大量のオブジェクトが存在していることが予想されます。
 
@@ -144,13 +144,13 @@ my-bucket
 4 directories, 3 files
 ```
 
-## リージョンのオーバーライド
+### リージョンのオーバーライド
 
 `--region(-r)`でリージョンを指定できます。
 
 profileに記載しているリージョンとは別のリージョンを指定したいときなどは`--region`フラグを利用してオーバーライドしてください。
 
-## Localstackでの利用
+### Localstackでの利用
 
 Localstackでも利用できます。
 
@@ -175,7 +175,7 @@ stree my-bucket/test/dir2 -r us-east-1 -e http://localhost:4537
 
 出力は同じであるため省略します。
 
-## カラー出力を無効化
+### カラー出力を無効化
 
 `--no-color(-n)`でカラー出力を無効化できます。
 
@@ -185,7 +185,7 @@ stree my-bucket/test/dir2 -r us-east-1 -e http://localhost:4537
 ▼カラーなし
 <img src="/images/2023/20230926a/no-color.png" alt="no-color.png" width="504" height="391" loading="lazy">
 
-# さいごに
+## さいごに
 
 実装に取り掛かるうえでtreeは骨が折れそうだなと思ったのですが、既にgteeというパッケージがGitHubで公開されていました。
 

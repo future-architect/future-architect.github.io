@@ -14,7 +14,7 @@ thumbnail: /images/2023/20230327b/thumbnail.png
 author: 渡邉光
 lede: "Terraform 1.4.0のENHANCEMENTSで以下の機能が追加されました。backend/gcs: Add storage_custom_endpoint argument, to allow communication with the backend via a Private Service Connect endpoint. 内容はtfstateが保存されているGCSへのアクセスがインターネット経由ではなく.."
 ---
-# 初めに
+## 初めに
 
 こんにちは！ 筋肉エンジニアのTIG渡邉です。[Terraform連載2023](/articles/20230327a/) の1リソース目の記事です。
 
@@ -31,7 +31,7 @@ Terraform 1.4.0の`ENHANCEMENTS`で以下の機能が追加されました。
 - GCE
 - GCS
 
-# Private Service Connectを利用しない構成
+## Private Service Connectを利用しない構成
 
 Private Service Connectを利用しない構成はこちらです。
 
@@ -41,7 +41,7 @@ GCEにTerraformをインストールし、Terraform Serverとしています。T
 
 <img src="/images/2023/20230327b/architecture01.drawio.png" alt="" width="772" height="591" loading="lazy">
 
-# Private Service Connectを利用した構成
+## Private Service Connectを利用した構成
 
 Private Service Connectを利用した構成はこちらになります。
 
@@ -51,7 +51,7 @@ Private Service Connectを利用した構成はこちらになります。
 
 <img src="/images/2023/20230327b/architecture02.drawio.png" alt="architecture02.drawio.png" width="772" height="591" loading="lazy">
 
-## Private Service Connectとは
+### Private Service Connectとは
 
 Private Service Connectとは一言でいうと、Google Cloud API にプライベートネットワーク経由でアクセスするための機能になります。
 
@@ -59,7 +59,7 @@ Private Service Connectとは一言でいうと、Google Cloud API にプライ�
 
 - https://blog.g-gen.co.jp/entry/google-api-private-service-connect-explained
 
-## Private Service Connectの作成
+### Private Service Connectの作成
 
 以下公式ドキュメントを参考にPrivate Service Connectを作成します。
 
@@ -117,7 +117,7 @@ xxxxxxxxxx@tky-bastion:~/terraform$ curl -v 10.0.3.0/generate_204
 * Connection #0 to host 10.0.3.0 left intact
 ```
 
-## Terraform の設定
+### Terraform の設定
 
 準備ができたのでTerraform 1.4.0の追加機能を検証していきます。
 Terraform公式ドキュメント(1.4.0)のBackend/gcsにstorage_custom_endpointが追加されていることが確認できます。
@@ -126,9 +126,9 @@ https://developer.hashicorp.com/terraform/language/settings/backends/gcs
 
 > storage_custom_endpoint / GOOGLE_BACKEND_STORAGE_CUSTOM_ENDPOINT / GOOGLE_STORAGE_CUSTOM_ENDPOINT - (Optional) A URL containing three parts: the protocol, the DNS name pointing to a Private Service Connect endpoint, and the path for the Cloud Storage API (/storage/v1/b, see here). You can either use a DNS name automatically made by the Service Directory or a custom DNS name made by you. For example, if you create an endpoint called xyz and want to use the automatically-created DNS name, you should set the field value as https://storage-xyz.p.googleapis.com/storage/v1/b. For help creating a Private Service Connect endpoint using Terraform, see this guide.
 
-## Private Service Connect経由のGCSアクセス確認
+### Private Service Connect経由のGCSアクセス確認
 
-### Terraform Backendの設定
+#### Terraform Backendの設定
 
 backend.tfにterraform 1.4で追加された`storage_custom_endpoint`を追加してみます。
 
@@ -147,7 +147,7 @@ terraform {
 }
 ```
 
-### tcpdumpを利用したPrivate Service Connect経由のGCSアクセス確認
+#### tcpdumpを利用したPrivate Service Connect経由のGCSアクセス確認
 
 tcpdumpを利用してPrivate Service Connectのエンドポイント(10.0.3.0)を経由してbackendのgcsへアクセスできていることを確認します。
 
@@ -229,7 +229,7 @@ Name:   storage-sampleendpoint.p.googleapis.com
 Address: 10.0.3.0
 ```
 
-# 余談
+## 余談
 
 余談ですが、`tcpdump -n -vv dst port 443`コマンドを実行してterraform initを実施し、GCEから443ポートへアクセスしたパケットをキャプチャしてみました。
 
@@ -411,7 +411,7 @@ d3rdzqodp6w8cx.cloudfront.net. 60 IN    A       18.65.202.87　★該当IPアド
 
 このことからTerraform 1.4.0で追加されたPrivate Service Connectを利用したbackend/gcsへのアクセスの機能を利用してもbackendのGCSへの通信のみプライベート接続され、Terraformのgoogle providerなどを利用するためにregistry.terraform.ioへのインターネットアクセスは避けられず完全プライベートではterraformは利用できないことが分かりました（当たり前か...）
 
-# 最後に
+## 最後に
 
 今回はTerraform 1.4で追加されたPrivate Service Connectエンドポイント経由でbackendに指定したGCSへアクセスできることができる機能を検証しました。
 

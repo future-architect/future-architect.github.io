@@ -14,7 +14,7 @@ thumbnail: /images/2023/20230405a/thumbnail.png
 author: 前原応光
 lede: "今までは、GitLab でTerraform を利用する機会が多かったのですが、今回は、GitHub Actions を利用することになりました。そこで実施した内容をこの記事に書いていきたいと思います。"
 ---
-# はじめに
+## はじめに
 
 [Terraform連載](/articles/20230327a/)の7リソース目です。
 
@@ -24,13 +24,13 @@ lede: "今までは、GitLab でTerraform を利用する機会が多かった�
 
 そこで実施した内容をこの記事に書いていきたいと思います。
 
-# GitHub Actions の設定
+## GitHub Actions の設定
 
 GitHub Actions などを利用してAWS リソースを操作する場合にクレデンシャルを利用してきた方が多いのではないでしょうか。
 クレデンシャル利用は便利ですが、何かとリスクを抱えています。
 そこで一時的なトークンを受け取りGitHub Actions を実行する環境を作りたいと思います。
 
-## OIDC プロバイダの設定
+### OIDC プロバイダの設定
 
 OIDC プロバイダの追加をTerraform で行います。
 
@@ -61,7 +61,7 @@ ID プロバイダ設定をクリックし、追加されていることを確�
 
 <img src="/images/2023/20230405a/image.png" alt="image.png" width="1200" height="659" loading="lazy">
 
-## IAM Role 追加
+### IAM Role 追加
 
 次にGitHub Actions に割り当てるIAM Role を作成します。
 ここではサンプル的に作成しておりますので、管理者権限を付与しています。
@@ -139,7 +139,7 @@ resource "aws_iam_role_policy_attachment" "github_actions" {
 }
 ```
 
-## シークレット変数の設定
+### シークレット変数の設定
 
 GitHub の[Settings] > [Secrets and variables]からシークレット変数を設定します。
 
@@ -150,7 +150,7 @@ GitHub の[Settings] > [Secrets and variables]からシークレット変数を�
 
 これで設定が完了です。
 
-# Terraform 実行用のワークフロー
+## Terraform 実行用のワークフロー
 
 ここでは実際にワークフローを作成していきます。
 以下のディレクトリ構成とします。
@@ -254,7 +254,7 @@ Push 時に`terraform/*`でファイルの変更があった際にワークフ�
 Terraform を実行する際には、[setup-terraform](https://github.com/hashicorp/setup-terraform)を利用することで容易に実行できます。
 ここでは、Terraform の実行内容を簡略化して記載しています。
 
-## ワークフロー手動実行
+### ワークフロー手動実行
 
 `Terraform apply`を自動実行するのは怖いと思う方はいると思います。
 そこで、手動で実行するための方法を記載したいと思います。
@@ -371,7 +371,7 @@ Input タイプは、string、choice、boolean、environment　などが存在�
 また、`needs: network`とすることで、`network`ジョブが実行されていないとスキップする条件としています。
 この設定をする理由は、`network`ディレクトリ内のリソースを作成しないと`main`ディレクトリ内のリソースを作成できないと言った依存関係が発生している場合に利用するケースです。
 
-# おわりに
+## おわりに
 
 GitHub Actions を利用することでTerraform の実行環境を容易に作成できるかと思います。
 

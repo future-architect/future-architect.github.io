@@ -14,7 +14,7 @@ lede: "この記事はフューチャー Advent Calendar 2022の14日目の記�
 ---
 この記事は[フューチャー Advent Calendar 2022](https://qiita.com/advent-calendar/2022/future)の14日目の記事です。
 
-# はじめに
+## はじめに
 
 こんにちは。TIG DXユニットの村上です。
 
@@ -26,7 +26,7 @@ PythonでWeb APIを構築する方法は[OpenAPI GeneratorでPython Web API構�
 
 <img src="/images/2023/20230105a/image.png" alt="PythonアプリをDockerコンテナイメージビルド→ECR→Lambdaにデプロイする" width="778" height="495" loading="lazy">
 
-# Lambda起動用のモジュール
+## Lambda起動用のモジュール
 
 Lambdaでは起点となる関数とAPI Responseを返すreturn命令が必要になります。
 これらを満たすモジュールを実装します。
@@ -49,7 +49,7 @@ def lambda_handler(event, context):
 
 `lambda_handler`をLambda起動用関数に設定することで、APIを機能させることができます。
 
-# デプロイする方法
+## デプロイする方法
 
 Lambdaにソースコードをデプロイする方法は2種類あります。
 
@@ -67,7 +67,7 @@ https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/gettingstarted-limits.html
 
 本記事ではECRからデプロイする方法を解説します。
 
-# デプロイ用Dockerfileの作成
+## デプロイ用Dockerfileの作成
 
 デプロイ用のDockerfileには依存ライブラリとLambda起動用のランタイムのインストールが必要になります。
 Pythonのパッケージ管理には[Poetry](https://python-poetry.org/)を使っている場合を想定し、Dockerfileを以下のように実装します。
@@ -107,7 +107,7 @@ poetryはその性質上docker内に仮想環境を構築する必要があり�
 注意点として、poetryとそれ以外のライブラリはpipの依存関係チェックでエラーになる可能性があります。poetryで出力された`requirements.txt`に記述されたライブラリはpoetryによって依存関係の整合性が保証されていますが、その依存関係にpoetry自身は存在しません。このdocker内ではpipによってpoetryとそれら以外のライブラリがはじめて依存関係チェックの対象となるため、エラーになる可能性があります。よってpoetryは`requirements.txt`を出力したら速やかに削除します。
 また、Lambdaで起動するためには[awslambdaric](https://github.com/aws/aws-lambda-python-runtime-interface-client)というランタイムが必要なため、合わせてインストールします。
 
-# AWS CLIからデプロイする
+## AWS CLIからデプロイする
 
 上記のDockerfileをビルドします。
 proxy環境の場合はそのままではdocker内で各パッケージのインストールが行えないため、`--build-arg`にプロキシを設定する必要があります。
@@ -133,7 +133,7 @@ $ aws lambda update-function-code --function-name <Lambda名> \
 	--image-uri <AWSアカウントID>.dkr.ecr.ap-northeast-1.amazonaws.com/<ECRリポジトリ名>:latest
 ```
 
-# おわりに
+## おわりに
 
 最後までお読みいただきありがとうございました！
 

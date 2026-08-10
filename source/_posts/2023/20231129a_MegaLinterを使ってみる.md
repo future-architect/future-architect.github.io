@@ -13,7 +13,7 @@ thumbnail: /images/2023/20231129a/thumbnail.png
 author: 宮永崇史
 lede: "MegaLinterを最近個人開発のリポジトリに導入してみたので概要や使い方、所感などを記事にまとめました。"
 ---
-# はじめに
+## はじめに
 
 こんにちは、宮永 ( [@orangekame3](https://x.com/orangekame3) ) と申します。
 
@@ -26,7 +26,7 @@ lede: "MegaLinterを最近個人開発のリポジトリに導入してみたの
 [MegaLinter](https://megalinter.io/latest/)を最近個人開発のリポジトリに導入してみたので概要や使い方、所感などを記事にまとめました。
 とても便利なツールなので本記事を機に利用してみてください。
 
-# MegaLinterとは
+## MegaLinterとは
 
 MegaLinterはdockerイメージをベースに各種リンターやフォーマッタを各リポジトリに導入できるOSSツールです。ローカルでも利用できますし、dockerイメージが用意されているため、各種CIサービスでも簡単に導入できます。
 
@@ -37,7 +37,7 @@ Supporting 55 languages, 24 formats, 20 tooling formats and ready to use out of 
 
 55言語というのは55個のLinterツールが用意されている。ということみたいです。例えばGo言語であれば`golangci-lint`と`revive`がサポートされており、これを2つ分とカウントしています。他の言語に関しても1言語1ツールというわけではなく、かなり広範にサポートしているため、普通に利用する分にはMegaLinter1つ入れておけばリンターやフォーマッタはカバーできそうです。
 
-## 概要
+### 概要
 
 基本的なフローは下図のようにコミットがある度にLinterが走り、各種レポートが作成されるというものです。
 
@@ -61,7 +61,7 @@ Supporting 55 languages, 24 formats, 20 tooling formats and ready to use out of 
 
 一方で、「CIにかかる時間を最適化したい」「MegaLinterにないLinterを使いたい」という方には向かないかもしれないです。
 
-## 実際に使ってみた
+### 実際に使ってみた
 
 サンプル用に"Hello, 世界"と標準出力するGoのファイルを用意します。
 
@@ -334,7 +334,7 @@ Download it from artifacts then copy-paste it in your local repo to apply linter
 ✅ Successfully linted all files without errors
 ```
 
-## PR上のコメント機能
+### PR上のコメント機能
 
 では、このブランチをリモートリポジトリにPushしてPR上のコメントを確認します。
 
@@ -346,7 +346,7 @@ Download it from artifacts then copy-paste it in your local repo to apply linter
 
 PRは[こちら](https://github.com/orangekame3/megalinter-sample/pull/1)です。
 
-# さいごに
+## さいごに
 
 以上、 MegaLinterの紹介と簡単な利用方法を解説しました。
 
