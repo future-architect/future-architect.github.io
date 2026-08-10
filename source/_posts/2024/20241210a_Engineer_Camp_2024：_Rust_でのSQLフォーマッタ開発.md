@@ -94,7 +94,7 @@ uroboroSQL-fmt の特徴の1つとして、2WaySQLに対応していることが
 
 #### 2WaySQL とは
 
-2WaySQL とは、バインドパラメータや制御構文を利用して実行することができるSQLの拡張構文のようなものです。uroboroSQL-fmt は [uroboroSQL](https://future-architect.github.io/uroborosql-doc/)、[go-twowaysql](https://github.com/future-architect/go-twowaysql)、[Doma](https://doma.readthedocs.io/en/latest/) といった2WaySQLをサポートしています。
+2WaySQL とは、バインドパラメータや制御構文を利用して実行できるSQLの拡張構文のようなものです。uroboroSQL-fmt は [uroboroSQL](https://future-architect.github.io/uroborosql-doc/)、[go-twowaysql](https://github.com/future-architect/go-twowaysql)、[Doma](https://doma.readthedocs.io/en/latest/) といった2WaySQLをサポートしています。
 
 #### uroboroSQL-fmt の 2WaySQL フォーマット戦略
 
