@@ -8,7 +8,7 @@ tags:
   - 技術選定
   - IaC
 categories:
-  - Infrastructure
+  - DevOps
 series: "Terraform2026"
 thumbnail: /images/2026/20260522a/thumbnail.png
 author: 八木雅斗
