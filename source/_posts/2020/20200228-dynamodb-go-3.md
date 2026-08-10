@@ -18,13 +18,13 @@ lede: "DynamoDB×Go連載の第3弾目です。今までは AWS SDK Go やそれ
 
 <img src="/images/2020/20200228/go-cdk-logo-gopherblue.png" class="img-middle-size" loading="lazy">
 
-# はじめに
+## はじめに
 
 こんにちは、TIG DXユニット[真野](https://twitter.com/laqiiz)です。この技術ブログの運営もしています。
 
 [DynamoDB×Go連載](/tags/DynamoDB%C3%97Go/)の第3弾目です。今までは `AWS SDK Go` やそれをラップした`guregu/dynamo` について説明していましたが、 **Go CDK（Go Cloud Development Kit）** を用いたDynamoDB操作について説明します。
 
-# Go CDKとは？
+## Go CDKとは？
 
 > Go CDKは2018/07 に Google の Go チームが立ち上げたプロジェクトで、Go アプリケーションを各クラウド間でポータブルにすることを目指して、実装されています。
 
@@ -35,7 +35,7 @@ lede: "DynamoDB×Go連載の第3弾目です。今までは AWS SDK Go やそれ
 
 ※名称の揺れについてはGo CDKの方が正式名称ですが、ググラビリティが悪いかなと思い（特にAWS CDKと似ている）、連載版は古い呼び方であるGo Cloudを使わせてもらっていました。
 
-# 記事の趣旨
+## 記事の趣旨
 
 ご存じの通り、DynamoDBはKVSと言われているものの、非常に多くの機能が存在します。KVSと名前だけ見ると、PK(Primary Key)に対してGet/Put/Deleteなどの基礎的なCRUD処理や、せいぜいそのBatch操作くらいしかできないイメージがありますよね。
 
@@ -45,7 +45,7 @@ lede: "DynamoDB×Go連載の第3弾目です。今までは AWS SDK Go やそれ
 
 というわけで、どの程度DynamoDBの機能がGo CDKから利用できるのか調査していきます。なお、私はDynamoDBのプロフェッショナルではなくイチ開発者ですので色々漏れがあると思います。ぜひTwitterなどでフィードバックを頂ければと思います。
 
-# 前提
+## 前提
 
 なお、Go CDKは進化が早いため今回対応していないと判断したものも、実は記事の公開後に実装されている可能性があります。差分については [release-notes](https://github.com/google/go-cloud/releases) などから適時確認ください。
 
@@ -53,7 +53,7 @@ lede: "DynamoDB×Go連載の第3弾目です。今までは AWS SDK Go やそれ
 * Go 1.13.4
 * Go CDK v0.19.0
 
-# 調査結果
+## 調査結果
 
 調査観点は以下としました。それぞれ○が一通りの機能が利用できる、△が一部利用可能、☓は機能提供がされていないということを示しています。
 
@@ -66,16 +66,16 @@ lede: "DynamoDB×Go連載の第3弾目です。今までは AWS SDK Go やそれ
 
 詳細を説明していきます。
 
-# 実証コード
+## 実証コード
 
 それぞれGoのコードベースで記載方法をまとめていきます。
 
 第1回の記事同様 DynamoDB Local を利用してローカル環境を準備します。
 https://future-architect.github.io/articles/20200225/
 
-## 0. 事前準備
+### 0. 事前準備
 
-### SDKのセットアップ
+#### SDKのセットアップ
 
 セッション及びDynamoDBを操作するクライアントを生成します。
 
@@ -102,7 +102,7 @@ DynamoDB clientを生成するまでは、公式SDK通りの手順となりま�
 
 この時、**ハッシュキー** と **ソートキー** の両方を指定していますが、もしソートキーが無ければ空文字を指定すればOKです。
 
-### レコードを表現する構造体の定義
+#### レコードを表現する構造体の定義
 
 ```go 構造体定義
 type Item struct {
@@ -116,9 +116,9 @@ type Item struct {
 
 ほぼ、AWS SDKと同じですね。
 
-## 1. 基本的なCRUD
+### 1. 基本的なCRUD
 
-### Create
+#### Create
 
 利用するメソッドは `Create` です。
 
@@ -131,7 +131,7 @@ if err := coll.Create(ctx, &write); err != nil {
 
 直感的だと思います。
 
-### Read
+#### Read
 
 利用するメソッドは `Get`です。
 
@@ -146,7 +146,7 @@ fmt.Printf("got: %+v\n", read)
 
 これも直感的です。
 
-### Update
+#### Update
 
 これはやや特殊です。`Update` を用いますが、更新する差分を `docstore.Mods` というmapに値をもたせます。
 
@@ -174,7 +174,7 @@ if err := coll.Update(ctx, &notFoundKey, docstore.Mods{"MyText": "update text"})
 
 エラーメッセージから推測すると、Go CDKのUpdateはDynamoDBのConditional Expressionsを利用していることがわかりますね。
 
-## Replace
+### Replace
 
 項目全体を置き換える場合です。存在しない場合はエラーになります。
 
@@ -191,7 +191,7 @@ if err := coll.Replace(ctx, &replace); err != nil {
 
 もし、存在しない場合は `Create`, 存在する場合は `Replace` をしたい場合は `Put` を使うようです。今回はあまりにコードがそのままなので省略します。
 
-### Delete
+#### Delete
 
 利用するメソッドは `Delete` です。
 
@@ -205,7 +205,7 @@ if err := coll.Delete(ctx, &deleteKey); err != nil {
 
 ここまでで一通りのCRUD操作ができることを確認できました。
 
-## 2. バッチ処理のCRUD
+### 2. バッチ処理のCRUD
 
 大量データを扱う場合は、1件1件データを登録するのではなくバッチ登録を行いたいケースは多いのでは無いでしょうか？
 
@@ -231,7 +231,7 @@ ActionsはCreateだけではなく、Get/Create/Replace/Put/Update/Delete の6�
 
 今回は関数をチェーンで登録しましたが、Actionsで `ActionList` が取得できるので、もちろんforループと合わせて追加もできます。
 
-## 3. 条件付き書き込み
+### 3. 条件付き書き込み
 
 Go CDKはドキュメントを読んだ限りは、条件付き書き込みはサポートされていないようです。しかし、Revisionsという機能があり、いわゆる楽観的ロックのような利用用途を公式でサポートされています。
 
@@ -314,11 +314,11 @@ DynamoDBのConditional Expressionsほど万能では無いですが、多くの�
 }
 ```
 
-## 4. クエリ
+### 4. クエリ
 
 [Go Cloud#3 Go CloudのDocStoreを使う](/articles/20191113/) の記事で説明されているように、Go CDKはクエリもサポートされています。`Where()`、`OrderBy()`、`Limit()` で、 Whereの演算子は `=`, `>`, `<`, `>=`, `<=` の5種類です。ほとんどやりたいことはできるのではないでしょうか？
 
-# まとめ
+## まとめ
 
 * 使ってみた感想としてGo CDKのDocStoreは非常にリッチな機能を持っており、ベーシックなAWS SDKと遜色なく利用できました。Condition Expressionsで複雑な条件を利用しないなど、限られたユースケースであればむしろ生産性が高まるのではないでしょうか
 * Go CDKを用いればドライバ切り替えでmemstoreというモック切り替えも可能ですし、テスタビリティとしても有用です

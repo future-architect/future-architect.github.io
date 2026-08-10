@@ -13,7 +13,7 @@ lede: "今回はVue.jsの最初の難関（だと思っている）「props down
 プロジェクトで独自のコンポーネントを作ったり、会社として用意しているコンポーネントの利用、改良ができるようになってもらいたいという思いから、その導入を解説しようということです。"
 ---
 
-# はじめに
+## はじめに
 
 こんにちは、とあるプロジェクトでアーキチームに所属している東郷です。
 
@@ -28,7 +28,7 @@ lede: "今回はVue.jsの最初の難関（だと思っている）「props down
 
 * [Vue.jsのslotの機能を初心者にわかるように解説してみた](/articles/20200428/)
 
-# Vue.jsとMVVM
+## Vue.jsとMVVM
 
 props down, event upの理解のためにMVVMについて簡単に触れておきましょう。
 下記は、Vueの[公式サイト(https://012-jp.vuejs.org/guide/)](https://012-jp.vuejs.org/guide/)から引用しました
@@ -39,7 +39,7 @@ props down, event upの理解のためにMVVMについて簡単に触れてお�
 初心者にとってはMVVM パターンと言われてもピンとこないと思います。
 そこで、導入として例を交えながら詳しく解説します。
 
-## MVVMはModel-View-ViewModelの頭文字
+### MVVMはModel-View-ViewModelの頭文字
 
 下の図はVue.jsの公式サイトから拝借しました。
 図で見ると何となく分かった感じがしますが、何となくの理解ではなく確実に理解しましょう。
@@ -61,7 +61,7 @@ props down, event upの理解のためにMVVMについて簡単に触れてお�
 
 上記の話の見せ方（ある種のテンプレート）の部分をview(見た目)としてDOMが担当します。viewに流しこむデータの取得・加工、viewで受けた操作の命令を受けるのはmodelとしてのJavaScriptです（写真管理のwebサービスなんかであればダウンロード操作など）
 
-## MVVMの実現のために重要なData binding
+### MVVMの実現のために重要なData binding
 
 Vue.jsがMVVMを実現するために取り入れている仕組みにData bindingがあります。
 
@@ -79,7 +79,7 @@ Data bindingは、よく「データを流し込む目印を打ち込む」と�
 ちなみに、MVVMやData bindingはVue.js専用の言葉ではありません。
 MVVMはプロダクトの構成パターン、Data bindingは仕組みの名前であり他の言語やFrameworkでも当然登場します。
 
-# props down, event up が何を意味するのか
+## props down, event up が何を意味するのか
 
 ちょっと前置きが長くなりましたが、本題のprops down, event upについて、実例を交えながら解説をしていきます。
 
@@ -355,7 +355,7 @@ export default {
 
 Vue.jsとしてそういった要望に対応できるにmodelオプションというものを用意されています。必要に応じて勉強してみてください。また`props`や`$emit`を使わない親子間データ連携もあります。特徴も違います。ぜひ使い分けてみててください。
 
-# まとめ
+## まとめ
 
 最後に言葉でしっかりと表現して自分のものにしておきましょう。
 

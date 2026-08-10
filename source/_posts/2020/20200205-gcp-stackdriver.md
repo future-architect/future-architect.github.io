@@ -16,7 +16,7 @@ lede: "Google Cloudをテーマにした連載企画を始めるということ�
 
 1記事でまとめるには手が余るほど様々な機能があるため、初回はログの出力とビューア周りといったアプリケーション開発者視点での機能に絞って説明していきます。利用コードはGoで書かれていますが、汎用的な内容なので他の言語でもある程度通じる内容にしているつもりです。"
 ---
-# はじめに
+## はじめに
 
 [GCPをテーマにした連載企画](/articles/20200202/)を始めるということで、初回はStackdriver Loggingの活用方法をまとめます。1記事でまとめるには手が余るほど様々な機能があるため、初回はログの出力とビューア周りといったアプリケーション開発者視点での機能に絞って説明していきます。利用コードはGoで書かれていますが、汎用的な内容なので他の言語でもある程度通じる内容にしているつもりです。
 
@@ -33,7 +33,7 @@ lede: "Google Cloudをテーマにした連載企画を始めるということ�
 9. 初めてのGCP 画像AI(VISION API)をさわってみた
 10. Cloud Deployment Manager
 
-# Stackdriver Loggingについて
+## Stackdriver Loggingについて
 
 <img src="/images/2020/20200205/photo_20200205_01.png" class="img-small-size" loading="lazy">
 
@@ -41,7 +41,7 @@ lede: "Google Cloudをテーマにした連載企画を始めるということ�
 
 なお、2020/02/04時点ではログデータがプロジェクトごとに[最初の50 GiBが無料で、 その後は$0.50/GiB](https://cloud.google.com/stackdriver/pricing) の費用がかかります。
 
-# Stackdriver Loggingにログを流す方法
+## Stackdriver Loggingにログを流す方法
 
 Stackdriver Loggingへ直接ログデータを流し込むには、[Logging Client Libraries](https://cloud.google.com/logging/docs/reference/librarie)が存在します。こちらは内部的にStackdriver LoggingのWeb APIのエンドポイントをコールしてログデータを流し込んでくれます。
 
@@ -53,7 +53,7 @@ Logging Client Librariesを利用しなくても、CloudRunやFunction上にア�
 
 今回はアプリケーションからLogging Client Librariesを **利用しない** ケースで調査しています。
 
-# ログレベルについて
+## ログレベルについて
 
 ログレベル（Stackdriver Loggingのコンテキストではseverity）によって、ビューアで表示する見た目を変更できます。
 
@@ -115,7 +115,7 @@ func FmtJSON(logLevel, message string) string {
 わたしたちは、だいたいDEBUG, INFO, WARNING, ERRORの4種類をアプリケーションコードで利用することが多いです。
 開発環境ではDEBUG、プロダクション以上ではINFOレベルでログ出力させ、ERROR以上でSlackやメールに通知するようにしています。
 
-## うまく行かないケース
+### うまく行かないケース
 
 ログ出力内容をJSONではななくただのテキスト形式、例えば `fmt.Println("[INFO] call any method")`  にしてもStackdriverはseverityを認識してくれません。
 
@@ -148,7 +148,7 @@ func StartFunc(w http.ResponseWriter, r *http.Request) {
 
 こういったログ出力ポリシーになっている場合は、文字列ではERRORというラベルが見えますが、ビューア上は何も変化しないため見落としに注意ください。
 
-# ログ取得時間について
+## ログ取得時間について
 
 ログレベルの `severity` 同様に `time` というJSONフィールドを設定すると、ログ上のタイムスタンプを上書きできます。指定しない場合はおそらく現在時刻が設定されます。
 
@@ -178,7 +178,7 @@ func FmtJSON(logLevel, message string) string {
 
 timeフィールドは任意項目ですが、ローカル実行での確認時にも便利なため特に理由がなければ付けたほうが良いと思います。
 
-# Stackdriver Traceとは
+## Stackdriver Traceとは
 
 <img src="/images/2020/20200205/trace.png" class="img-small-size" loading="lazy">
 
@@ -192,7 +192,7 @@ https://future-architect.github.io/articles/20190604/
 
 <img src="/images/2020/20200205/photo_20200205_07.png" style="border:solid 1px #000000" loading="lazy">
 
-## Stackdriver TraceとStackdriver Loggingの連携
+### Stackdriver TraceとStackdriver Loggingの連携
 
 連携の前準備として、アプリケーションのロールに **Cloud Trace エージェント** のロールが必須になります。
 
@@ -261,7 +261,7 @@ Stackdriver Trace側のログのリンクを見ると、Stackdriver Loggingで�
 
 今回のサンプルコードには記載していないですが、ログ側に検索条件や処理件数を出力しておくと、その処理時間が妥当なのか、想定外なのか判断ができるため、性能調査などを行う場合には非常に有用だと思います。
 
-## GCP以外でアプリケーションを動かす場合
+### GCP以外でアプリケーションを動かす場合
 
 GCP以外のリソース上でアプリケーションを動かす場合は、`trace` と、`spanId` のフィールドを利用するとStackdriver TraceとLoggingを紐付けることができるようです。その場合はログ出力部分を以下のように書き換えれば良いと思います。 **こちらはまだ未検証なので参考程度にお願いします。**
 
@@ -281,11 +281,11 @@ func FmtJSON(logLevel, message string, span *trace.Span) string {
 }
 ```
 
-# その他
+## その他
 
 Stackdriverの [LogEntry](https://cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry) のドキュメントを読むと、他にも `labels` や `traceSampled` などのオプションが存在します。  `traceSampled` はデフォルト false ですが、 trueにするとサンプリングされて Stackdriver Trace側に連携されるようです。このあたりの使い分けは別途調査したいと思います。
 
-# まとめ
+## まとめ
 
 * Stackdriver Loggingで視認性を上げるためには、JSON形式でログを出力しseverityを設定する
 * time項目も設定しておくと良い

@@ -19,7 +19,7 @@ lede: "昨今様々なシステムで利用さているAWSのLambdaですが、�
 
 [サーバレス連載企画](/articles/20200322/)の7回目です。
 
-# はじめに
+## はじめに
 
 こんにちは。TIGのDXチームに所属している加部です。
 
@@ -29,7 +29,7 @@ AWSに少し詳しい人であればLambdaをAWSのサービストリガで起�
 
 この記事ではAWSのローカルモック環境であるLocalStackを用いて、皆さんのローカル環境でも試せるよう各起動型の設定方法を追っていきます。
 
-# Lambdaの起動型
+## Lambdaの起動型
 
 まずはLambdaの起動型について見ていきましょう。Lambdaの起動型には同期、非同期、ストリームベースの3つがあります。
 
@@ -59,7 +59,7 @@ AWSに少し詳しい人であればLambdaをAWSのサービストリガで起�
         - Kinesis Data Stream
         - Dynamo DB Stream
 
-# 各起動型の設定方法
+## 各起動型の設定方法
 
 基本的な流れとしてはどの起動型も下記のような同じ流れになります。
 
@@ -69,7 +69,7 @@ AWSに少し詳しい人であればLambdaをAWSのサービストリガで起�
 
 手順3のLambdaのトリガ設定が各起動型で変わってきます。それでは各起動型の設定方法を実践していきましょう。
 
-## 事前準備
+### 事前準備
 
 LocalStackを[こちら](https://github.com/localstack/localstack)からダウンロードしてください。LocalStack起動コマンド(macOSの場合)
 
@@ -79,7 +79,7 @@ TMPDIR=/private$TMPDIR docker-compose up -d
 
 LocalStackの詳細については[こちらのブログ](/articles/20191115/)で解説しているので興味のある方は読んでみてください。
 
-## 同期型
+### 同期型
 
 ではまず同期型の呼び出しから設定/実装方法を見ていきましょう。今回はよくあるAPI Gateway --> Lambdaという構成を参考に進めていきます。
 
@@ -208,7 +208,7 @@ $ curl -i http://localhost:4567/restapis/${rest_api_id}/prod/_user_request_/hell
 hello lambda
 ```
 
-## 非同期型
+### 非同期型
 
 続いてS3とLambdaの連携です。API Gatewayに比べるとだいぶ設定が簡単です。S3にローカルPCからオブジェクトをコピーし、Lambdaが起動できることを確認していきます。
 
@@ -370,7 +370,7 @@ aws logs get-log-events \
 }
 ```
 
-## ストリームベース
+### ストリームベース
 
 最後はストリームベーズのLambda起動の設定です。ローカルPCからKinesisへメッセージをPUTしてLambdaを起動させましょう。
 
@@ -479,7 +479,7 @@ aws logs get-log-events \
 }
 ```
 
-## 終わりに
+### 終わりに
 
 長文ご付き合いありがとうございました。今回はLambdaの各起動型の中から代表的なリソースのイベントによるLambdaの起動設定をおさらいしてきました。
 

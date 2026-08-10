@@ -15,7 +15,7 @@ lede: "Terraform Validatorを使って、組織のセキュリティポリシー
 
 [GCP連載](/articles/20200202/)の6回目です。今回は**Terraform Validatorを使って、組織のセキュリティポリシーの自動チェックを継続的に行う**方法を紹介します。併せて、ポリシーをコードとして管理する方法も紹介します。**Policy as code** です。もちろんセキュリティポリシーのみだけではなく、命名規則やリージョン制限なども扱えます。
 
-# Infrastructure as code 理想と現実
+## Infrastructure as code 理想と現実
 
 Infrastructure as code (以下 IaC)、ここ最近大分一般的になってきました。弊社でも大半のプロジェクトは導入しています。3年前とかに導入するために一苦労していた時代が懐かしい..
 IaCが当たり前になった今、インフラの構成管理はもう問題ないかというとそうではありません。**特にプロジェクト数がスケールする場合**、以下のような問題が発生してしまっているのではないでしょうか。
@@ -32,7 +32,7 @@ GCPだけではなく、多くのクラウド管理者が同じような悩み�
 
 IaCがアプリケーション開発やっと同じ土俵に立った今、同じく **CI(継続的インテグレーション)** の仕組みが必要になってくるのは、自然の流れかと思います。terraform fmtがされているか、planが通るか、等の簡単なチェックをやっている人は多いと思いますが、それよりも高度なチェックを行う仕組みがなく私も方法を探しておりました。
 
-# Terraform Validator とは
+## Terraform Validator とは
 
 これを実現するのが、今回紹介する **Terraform Validator** です。Terraform Validatorは、 **terraformがapplyされる前に、インフラのリソース設定が定義したポリシーに従っているかをチェックできるツール**です。GCPのオープンソースとして公開されています。 [GoogleCloudPlatform/terraform-validator](https://github.com/GoogleCloudPlatform/terraform-validator)
 
@@ -55,7 +55,7 @@ Found Violations:
 Constraint allow_some_storage_location on resource //storage.googleapis.com/validator-trial: //storage.googleapis.com/validator-trial is in a disallowed location.
 ```
 
-# ハンズオン
+## ハンズオン
 
 ではさっそく、実際に試してみます。**"GCSのロケーションに制限をかける"** シンプルなパターンで試してみます。以下のようにフォルダ構成を用意し、2つのファイルを作成しました。
 
@@ -64,7 +64,7 @@ Constraint allow_some_storage_location on resource //storage.googleapis.com/vali
 
 <img src="/images/2020/20200213/photo_20200213_03.png" loading="lazy">
 
-## Terraform Validator インストール
+### Terraform Validator インストール
 
 バイナリファイルがGCSで公開されているので、最新版をダウンロードし適当なパスに配置
 
@@ -75,7 +75,7 @@ mv terraform-validator-linux-amd64 terraform-validator-linux-amd64
 chmod 755 terraform-validator
 ```
 
-## Policyを定義
+### Policyを定義
 
 PolicyをGit cloneし、`POLICY_PATH` を定義
 
@@ -107,7 +107,7 @@ spec:
     exemptions: []
 ```
 
-## Terraform planの実行
+### Terraform planの実行
 
 main.tfは以下のように定義されています。`location="us-central1-a"` と設定しています
 (その他 variable.tf, provider.tf等は省略)
@@ -134,7 +134,7 @@ terraform.tfplanのバイナリをjsonへ変換
 terraform show -json ./terraform.tfplan > ./terraform.tfplan.json
 ```
 
-## Terraform Validatorの実行
+### Terraform Validatorの実行
 
 これで準備は整いました。Terraform Validatorの実行を行います。
 
@@ -168,12 +168,12 @@ No violations found
 
 今度はValidationが成功しました！ ✅ 期待通りの動きをしてくれました。
 
-# ポリシー定義 (Policy as code)
+## ポリシー定義 (Policy as code)
 
 サンプルポリシーは、先ほど利用した [forseti-security/policy-library](https://github.com/forseti-security/policy-library/tree/master/samples) にあります。これらのyamlファイルを `POLICY_PATH` で定義した `/<your_work_space>/policy-library` の中の `policies/constraints/` 配下に配置すればOKです。Policy as codeが簡単に実現できます。
 以下に、サンプルから一部をピックアップしてご紹介します。セキュリティポリシーを定義できるほかにも、リソースの命名規則の制限ができたりするのは地味に嬉しいですね。
 
-#### ポリシー定義のサンプル
+##### ポリシー定義のサンプル
 
 * 一般的な制限
   * リソースの命名規則(正規表現で指定)
@@ -203,7 +203,7 @@ No violations found
 
 どのような制限をかけることができるかイメージできたでしょうか。実はこちらに用意されていないものでも、Custom Policyとして自身でポリシールールを記述することもできます。詳細は[こちら](https://github.com/forseti-security/policy-library/blob/master/docs/constraint_template_authoring.md)
 
-# 実際の運用
+## 実際の運用
 
 実行方法とポリシーの定義方法が分かったところで、実際の運用方法についてです。
 以下のように、TerraformのソースコードのPRに対して、Terraform Validatorを実行し、結果をPRにフィードバックさせるようにするのが良いと思います。Githubと連携が可能であれば、CloudBuildで以下のようにCIを回すのが簡単でよいです。
@@ -241,7 +241,7 @@ steps:
 PR上でのフィードバックのイメージ
 <img src="/images/2020/20200213/photo_20200213_05.png" loading="lazy">
 
-# 最後に
+## 最後に
 
 本記事ではあまり触れませんでしたが、実は、[Forseti](https://forsetisecurity.org/)というツールを用いてOngoingでの監視も可能です。こちらもGCPが公開しているオープンソースのツールです。これを用いれば、一元管理されたポリシーでTerraform経由ではない手作業によるポリシー違反の発生も検知できます。
 

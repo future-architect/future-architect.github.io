@@ -15,7 +15,7 @@ thumbnail: /images/2020/20200927/thumbnail.png
 author: 辻大志郎
 lede: "業務アプリケーションのビジネスロジックをサーバーレスで実装することも増えてきました。AWSサービストリガによるLambda関数起動の記事にもあるようにAPI GatewayとLambda関数を組み合わせてHTTPサーバを提供することも容易にできます。バックエンドのWebAPIをLambda関数で動かすユースケースがよくあるパターンです。Lambda関数とアプリケーションロジックの実装は密結合になりやすいですが、HTTPサーバで動作するように実装して、Lambda関数として組み込むと、従来のHTTPサーバを実装するノウハウを活かしつつ、サーバレスで動作するバックエンドのWebAPIを構築できます。"
 ---
-# はじめに
+## はじめに
 
 こんにちは、TIGの辻です。
 
@@ -27,7 +27,7 @@ go-swaggerに閉じた入門記事として、以下もおすすめです。
 
 * [go-swaggerでhello world | フューチャー技術ブログ](/articles/20200824/)
 
-# 概要
+## 概要
 
 AWS上に構築するインフラはこんな感じです。シンプル。
 
@@ -89,7 +89,7 @@ Default region name [None]: ap-notrheast-1
 Default output format [None]: json
 ```
 
-# インフラ構築
+## インフラ構築
 
 AWS上に構築するインフラはTerraformで使います。一時的な動作確認で使うリソースの場合GUIでポチポチリソースを作成しても問題ないですが、業務でインフラを構築する場合はAWS CloudFormationやTerraformを使うことが一般的です。GUIでポチポチする際に暗黙的に作成されるリソースもしっかり把握していきましょう。
 
@@ -373,7 +373,7 @@ $ terraform apply
 ...
 ```
 
-# Goのアプリケーション開発
+## Goのアプリケーション開発
 
 Web API開発です。今回はサンプルアプリケーションなのでGETとPOSTだけ対応している以下の2つのパスを用意します。
 
@@ -388,7 +388,7 @@ Web API開発です。今回はサンプルアプリケーションなのでGET�
 go mod init example
 ```
 
-## API定義
+### API定義
 
 GoのWebアプリケーションフレームワークはEchoやGinやchiやgo-swaggerなどいろいろありますが、今回はgo-swaggerを用いることにします。どのWebアプリケーションフレームワークを使うかはGopherの間でも意見が分かれるところなので、使い慣れたWebアプリケーションフレームがあれば、それを使うのもよしです。上記のメソッドとパスをSwaggerで記述していきます。`swagger.yaml` にすると以下のようになります。ちなみにSwaggerの書き方・規約は[スキーマファースト開発のためのOpenAPI（Swagger）設計規約](/articles/20200409/) の記事がオススメです。
 
@@ -496,7 +496,7 @@ version: v0.25.0
 commit: f032690aab0634d97e2861a708d8fd9365ba77d2
 ```
 
-## データストア
+### データストア
 
 ユーザの情報を格納するDynamoDBのテーブル名は `users` としておきます。スキーマは以下です。
 
@@ -567,7 +567,7 @@ data "aws_iam_policy_document" "example_lambda_policy" {
 
 新しいリソースを定義したら `terraform apply` しておきます。
 
-## パッケージ構成
+### パッケージ構成
 
 ちょっとしたLambda関数であれば `main.go` の1ファイルで良い場合もありますが、バックエンドのWeb APIを提供するとなるとそうはいかないでしょう。Goのパッケージ構成は悩みポイントの1つです。プロジェクトの規模や開発メンバーのスキルセットなどにもよると思いますが、個人的にはフラットなパッケージ構成を導入することが多い気がします。[あなたのGoアプリ/ライブラリのパッケージ構成もっとシンプルでよくない？](/articles/20200528/)や[go-swaggerを用いたWebアプリケーション開発Tips19選](/articles/20200630/)の記事を参考にしてみてください。今回は以下のようなフラットパッケージとします。
 
@@ -595,7 +595,7 @@ cd example
 mkdir cmd\lambda gen testdata
 ```
 
-## ビルド
+### ビルド
 
 ビルドなどのタスクはMakefileに記述しておきます。
 
@@ -655,7 +655,7 @@ go get github.com/go-openapi/runtime
 go get github.com/jessevdk/go-flags
 ```
 
-## ハンドラ実装
+### ハンドラ実装
 
 準備が整ったので、ハンドラの実装をしていきましょう。
 
@@ -965,7 +965,7 @@ func configureAPI(api *operations.ExampleAppAPI) http.Handler {
 // ...
 ```
 
-## Lambda関数インテグレーション
+### Lambda関数インテグレーション
 
 go-swaggerで実装したWebアプリケーションサーバをLambda関数として動かすようにします。GoのLambda関数として有効なシグネチャは以下の通りです。
 
@@ -1028,7 +1028,7 @@ func main() {
 }
 ```
 
-# ビルド/デプロイ
+## ビルド/デプロイ
 
 準備は整いました！ Goのファイルをビルドしzip化してAWS Lambda関数にデプロイしましょう。デプロイのコマンドはMakefileにタスクとして記述していました。
 

@@ -25,7 +25,7 @@ lede: "ちょっとしたフロントエンドの開発で、TypeScriptに最初
 * ncc
 * Rome.js
 
-# JavaScriptのビルドツールとは
+## JavaScriptのビルドツールとは
 
 JavaScriptでビルドといっても、いろいろなステップがあります。
 
@@ -37,7 +37,7 @@ JavaScriptでビルドといっても、いろいろなステップがありま�
 
 なお、これにファイルの変更検知を行って、変更時に変更部分だけをビルド（ウォッチ）、読み込んでいるブラウザに変更したことを伝えてリロードを行わせる開発サーバーとよぶサーバーも加えると、世間で「JavaScriptのビルドツール」と呼ぶ機能はだいたい網羅されるんじゃないですかね。
 
-# Parcel
+## Parcel
 
 [Parcel](https://parceljs.org/)はゼロコンフィグを目指したバンドラーです。TypeScriptも最初からサポートしています。エントリーポイントを指定するだけでビルドしてくれます。tsconfig.jsonがあればそれを拾って解釈してくれますし、なくても動きます。単にtsファイルをエントリーポイントとしてわたしてあげれば、そのままTypeScriptの処理系をインストールしつつビルドしてくれます。最初のビルドも高速ですし、キャッシュもしてくれて2回目以降も速いです。TreeShakingとかの生成されたファイルの最適化機構も入っているとのこと。
 
@@ -53,7 +53,7 @@ npx parcel build src/index.ts
 [Parcel 2系になったらTypeScriptのエラーを報告しない問題に対応するよ](https://github.com/parcel-bundler/parcel/issues/1378
 )、と昨年のコメントにはあるものの、次の[2.0のリリースまでのハードルはかなり高そう](https://github.com/parcel-bundler/parcel/projects/5)。2.0が出てさえくれれば設定のかんたんさとかは抜群なので、期待しています。
 
-# FuseBox
+## FuseBox
 
 [FuseBox](https://fuse-box.org/)はそこそこ歴史はあるツールですが、ここで紹介する他のツールと違い、CLIを提供しません。JavaScriptかTypeScriptでビルドの設定ファイルを作ります。現状は3系ですが、これも新バージョンの4系が開発中で、``@next``をつけてインストールします。
 
@@ -152,7 +152,7 @@ task("dist", async ctx => {
   development Development server is running at http://localhost:4444
 ```
 
-# ncc
+## ncc
 
 npmにアップロードするコードをシンプルにする、超快適に開発する、というのを目指して作られているのが[ncc](https://www.npmjs.com/package/@zeit/ncc)です。ある意味browserifyの後継な感じを受けます。簡単。ひたすら簡単。Next.jsで有名なZeitが開発しています。
 
@@ -181,7 +181,7 @@ ts-nodeは実行にtypescriptパッケージが必要で、ts-nodeとtypescript�
 
 一方、ウェブフロントエンドの開発を手助けしてくれる開発サーバーはありません。ExpressとかでAPIサーバーを実装するには良さそうです。
 
-# Rome.js
+## Rome.js
 
 * https://romejs.dev/
 
@@ -281,7 +281,7 @@ npm install -D ../rome/dist
 
 ・・・人に紹介するにはまだまだexperimentalすぎる感じはありますが。会長曰く「僕も試してないです。渋川さんなら一番早く書籍にしてくれるはず」とのこと。
 
-# まとめ
+## まとめ
 
 まだ正式リリースしていないバージョンも含めて、TypeScriptに最初から対応しているビルド・バンドルツールをいくつか紹介してきました。webpack一強だからこそ、そのwebpackにはない強みを出そうと活発に開発されています。このあたりのエコシステムの活発さはNode.js界隈はやはり強いですね。
 

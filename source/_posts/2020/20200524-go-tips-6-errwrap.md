@@ -17,13 +17,13 @@ lede: "フューチャー社内には「Go相談室」というチャットル�
 
 [Go Tips連載](/tags/GoTips%E9%80%A3%E8%BC%89/)の第6弾です。
 
-# はじめに
+## はじめに
 
 TIG DXユニットの真野です。先週の[この記事](/articles/20200519/)ぶりの投稿になります。
 
 フューチャー社内には「Go相談室」というチャットルームがあり、そこでGoに関連する疑問を投げたら、大体1日くらいで強い人が解決してくれるという神対応が行われています。そこでAWSやGCPの独自エラーをError warppingされた時にどうやってハンドリングすればよいの？ と聞いた時にやり取りした内容をまとめました。
 
-# 背景
+## 背景
 
 Go1.13から`fmt.Errorf` 関数に `%w`という[新しい構文が追加サポート](https://blog.golang.org/go1.13-errors)されたことは、ご存知の方が多いと思います。
 
@@ -76,7 +76,7 @@ func AnyFunc() error {
 
 この場合はシンプルで良いのですが、AWS SDK for GoなどのerrorをWrapした時に呼び出し側で判定をしたい時、どうすればよいのかが直接的な内容が見当たらなかったのでここにまとめておきたいと思います。
 
-# Handling Errors in the AWS SDK for Go
+## Handling Errors in the AWS SDK for Go
 
 [ドキュメント](https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/handling-errors.html)を読むと例えば、AWSのErorrハンドリングは以下のように、`awserr.Error` というインタフェースで表現されており、一度errを型アサーションしてから内部的なエラーコードに応じてハンドリングすることになっています。
 
@@ -120,7 +120,7 @@ func main() {
 
 ※Go Playgroundでサンプルを載せようと思いましたが、importでTimeoutになったので諦めました
 
-# 対応方法
+## 対応方法
 
 この `awserr.Error` を満たすerrorをWrapしたときはどうすべきかというと、 `errors.As` を用います。`errors.As` を代入用の変数とともに利用するとうまくいきます。
 
@@ -144,7 +144,7 @@ if err := AnyFunc(); err != nil {
 
 例として愚直にif分岐をすべて網羅するように書きましたが、早期returnを活用すると、よりネストが浅く見通しが良いコードにできると思います。
 
-## GCP SDKの場合
+### GCP SDKの場合
 
 しばしば[以下のエラーを返すことが多い](https://godoc.org/cloud.google.com/go/bigquery#hdr-Errors)とのことです。
 
@@ -200,7 +200,7 @@ if err := AnyFunc(); err != nil {
 
 どのAPIがどういったerrorを返しうるかは、各[GoDoc](https://godoc.org/cloud.google.com/go)に書いてありますので、個別のハンドリングが必要な場合は確認することになると思います。
 
-# Stacktraceの出力について
+## Stacktraceの出力について
 
 https://play.golang.org/p/NAYR7XySCdW にサンプルコードを載せましたが、 `%w`構文を用いた`fmt`パッケージではStacktraceが出力されません。もし、Stacktraceが必要な場合は `fmt.Errorf`ではなく `xerrors.Errorf` を用いてWrapします。
 
@@ -250,7 +250,7 @@ stacktrace: anyFunc any error - internal failed:
 
 * [Go Playground] https://play.golang.org/p/nfu_JXo6N_e
 
-# まとめ
+## まとめ
 
 * Sentinel errorの場合は、`errors.Is` で、独自Error型を宣言している場合は、 `errors.As` を利用してハンドリングする
 * Stacktrace情報が必要な場合は、xerrorsパッケージを利用する

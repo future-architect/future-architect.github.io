@@ -24,7 +24,7 @@ TIGの渋川です。
 
 * https://buildpacks.io
 
-# Buildpacksとは
+## Buildpacksとは
 
 Herokuがオリジナルで作ったビルドツールです。HerokuのオリジナルはHerokuのプラットフォーム用のビルドツールだったと思いますが（使ったことはない）、CNCF版はコンテナイメージを作成します。オリジナル版とはいろいろ違いがあり、区別をつけるためにCloud Native Buildpacks（略してCNB）と呼称されているようです。
 
@@ -44,7 +44,7 @@ Cloud Functionsなどはランタイムの種類はオプションで設定し�
 
 デフォルトで提供されているビルダーを使ってイメージを作るだけでは大した説明にならないので、いっそのこと自分のビルダーを作ってみようと思います。
 
-## Buildpacksの構造
+### Buildpacksの構造
 
 ユーザーがイメージ作成時に指定するのは「ビルダー」です。ビルダーにはBuildpackがいくつか含まれます。
 
@@ -56,7 +56,7 @@ Buildpackは、現在のワークフォルダが自分のタスクと関係あ�
 
 ビルダーを作るにはこれらの構成要素を1つずつ作っていくことになります。
 
-## 物理配置
+### 物理配置
 
 なお、これは論理的な構成要素であって、実際はどれもDockerイメージです。Buildpackはファイルにしてビルダーイメージに含めることもできますが、それぞれのBuildpackをDockerイメージにしてもいけます（今回の作例は全部ファイル化しています）。最低限、Stackのイメージ2つとビルダーのイメージの3つのDockerイメージとなります。
 
@@ -64,7 +64,7 @@ Buildpackは、現在のワークフォルダが自分のタスクと関係あ�
 
 ビルダーの設定ファイル内でのStackやBuildpackの指定時や、ビルド時のビルダーの指定はローカルのDockerにインストール済みのイメージでも良いですし、Docker HubやGCR、ECRなどのコンテナレジストリでもいけます。チーム内で共有するときはチームで共有するレジストリに入れてあげてもいいし、チームメンバーが各ローカルでビルドしても良いです。Dockerfileを配るか、アップロードしたイメージを使ってもらうか、というのと同じです。今回はすべてローカルでビルドして使っているのでコンテナレジストリにはpushしていません。
 
-## 実行イメージの構造
+### 実行イメージの構造
 
 Buildpacksを使って作った実行イメージですが、
 
@@ -75,11 +75,11 @@ Buildpacksを使って作った実行イメージですが、
 
 これは、例えばフロントエンドをビルドしたファイルを入れて、PythonとかGoでAPIサーバーを起動して配信する、みたいなことが簡単にできますし、複数のバッチのプログラムが含まれるイメージを1つ作ってデプロイし、ECS Run Taskのオプションで起動するバッチを切り替える、みたいなことが簡単にできそうです。
 
-# まずは空のビルダーを作る
+## まずは空のビルダーを作る
 
 それではまずは空のビルダーを作ってみましょう。
 
-## 準備：Stackを決めてフォルダを作成
+### 準備：Stackを決めてフォルダを作成
 
 まずは実行とビルドのイメージを決定します。PythonのDebian系のイメージを使ってビルドをしてdistrolessを作成したいとします。
 
@@ -106,7 +106,7 @@ Buildpacksを使って作った実行イメージですが、
 + builder.toml
 ```
 
-## 空のBuildpack
+### 空のBuildpack
 
 順番的にはまずはBuildpackです。既存のBuilderに対してオリジナルのBuildpackを適用することもできそうですが(stackを既存のものを指定して、pack build時に--buildpackで個別に読み込み)、理解のためにゼロから作ります。
 
@@ -162,7 +162,7 @@ pack package-buildpack empty.cnb --config ./empty-package.toml --format file
 popd
 ```
 
-## イメージの作成
+### イメージの作成
 
 Buildpackのstackは既存のDockerhubのイメージそのままではダメで、Stackの印をつける必要があります。[ここ
 ](https://buildpacks.io/docs/concepts/components/stack/)に書かれているように、実行用イメージはラベルでstackのIDを、ビルド用のイメージは環境変数でstackのIDとユーザーとグループのIDを指定します。rootユーザーではエラーになるのでユーザーを作る必要があります。
@@ -197,7 +197,7 @@ docker build -t distroless:python-builder -f ./Dockerfile.build .
 popd
 ```
 
-## ビルダーの作成
+### ビルダーの作成
 
 ようやくここまできました。といっても何もしないビルダーですが。builderはdockerイメージとして作成されて、dockerのイメージリストに格納されます。一度ビルダーを作成すれば、どのフォルダからも自由に利用できます。
 
@@ -235,7 +235,7 @@ REPOSITORY             TAG                 IMAGE ID            CREATED          
 python                 distroless          b0ed12f6c423        40 years ago        125MB
 ```
 
-## 試しに実行してみる
+### 試しに実行してみる
 
 ```bash
 % pack build empty-sample --builder python:distroless
@@ -271,7 +271,7 @@ REPOSITORY             TAG                 IMAGE ID            CREATED          
 empty-sample           latest              dfe5b21636ef        40 years ago        54.6MB
 ```
 
-# 実用的なPythonのウェブアプリ用のbuildpackを作成する
+## 実用的なPythonのウェブアプリ用のbuildpackを作成する
 
 一通り骨格はできたので、次に中身を作っていきます。
 
@@ -291,7 +291,7 @@ https://github.com/paketo-buildpacks/go/blob/main/buildpack.toml
 
 Dockerは行志向のプログラムになっていて、その行のコンテキスト（ファイル）と、Dockerのコマンドが等しければキャッシュします。Buildpackは自分でキャッシュのチェックのロジックを組む必要があります。詳細は調べきれなかったので今回はキャッシュはしていません。
 
-## Buildpack作成のイテレーション
+### Buildpack作成のイテレーション
 
 最初に空のビルダーを作りましたが、これは実は大切なことです。emptyというbuildpackでなくても、最初から作りたいbuildpackを作ってやっても良いのですが、ベースとなるビルダーが構築済みだと、アプリケーションのビルド時にbuildpackを独自にうわがいて使うことができます。いちいちビルダーをビルドし直さなくてもすばやくアプリケーションコードとビルダーの両方の調整が行えます。やたらとレイヤー化だので、ステップをわけているせいで、何度もビルドを回すのが面倒なツールが世の中増えていますが、この開発を高速に回せる使い勝手はとても良いです。ビルドツールはたいてい面倒なことが多いので・・・
 
@@ -299,7 +299,7 @@ Dockerは行志向のプログラムになっていて、その行のコンテ�
 % pack build webapp --builder python:distroless --buildpack ../buildpack/python
 ```
 
-## Python検知コード
+### Python検知コード
 
 まずは検知コード。いつものrequirements.txtがあればPythonプロジェクトとみなします。検知した結果をビルドレイヤーに渡す場合は最後の引数にファイルを書き出すことによって実現できます。このサンプルはシンプルなまにしておきます。
 
@@ -317,7 +317,7 @@ fi
 echo "---> Python Buildpack"
 ```
 
-## Pythonビルドコード
+### Pythonビルドコード
 
 ビルドの方はやや複雑です。
 
@@ -368,7 +368,7 @@ buildpackごとにlaunch.tomlファイルを作ると、実行時のエントリ
 
 ここではコマンドを決め打ちにしていますが、たとえばカレントフォルダにENTRYPOINTというテキストファイルを置いて、それの中を実行コマンドにする、みたいなことも自由にできます。
 
-## アプリケーションコードの作成
+### アプリケーションコードの作成
 
 それでは作ったビルダーを使ってStarletteアプリをビルドしてみます。作業フォルダを作り、まず検知に必要なrequirements.txtを作成します。作業フォルダはビルダーのフォルダとまったく別のフォルダで大丈夫です。
 
@@ -424,7 +424,7 @@ if __name__ == "__main__":
 
 実用的には、uvicornworker.pyというファイル名だったら、これらの``site.addsitedir()``を呼び出す、みたいな環境差異吸収のところまでBuildpackを作り込んだ方がBuildpackの思想的には良い気がしました。
 
-## アプリケーションをビルドしてみる
+### アプリケーションをビルドしてみる
 
 emptyなBuildpackはもういらないので削除してしまっても良いでしょう。あとはこれでpackingして、再度ビルダーを構築します。
 
@@ -501,7 +501,7 @@ INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
 ```
 
-# まとめ
+## まとめ
 
 デフォルトのdistroless向けのPythonのビルダーないじゃん、からはじまってBuildpackのビルダーを一通り作ってみました。
 

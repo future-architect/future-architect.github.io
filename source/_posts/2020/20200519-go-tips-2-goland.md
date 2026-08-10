@@ -15,7 +15,7 @@ lede: "今回はGoでアプリ開発するときにお世話になっている�
 
 <img src="/images/2020/20200519/top.png" loading="lazy">
 
-# はじめに
+## はじめに
 
 [Go Tips連載](/tags/GoTips%E9%80%A3%E8%BC%89/)の第2弾です。
 
@@ -23,7 +23,7 @@ lede: "今回はGoでアプリ開発するときにお世話になっている�
 
 今回はGoでアプリ開発するときにお世話になっている人が多い、[Goland](https://www.jetbrains.com/go/)のTipsを紹介します。
 
-# 背景
+## 背景
 
 [The Twelve-Factor App](https://12factor.net/ja/)の方法論や、Dockerなどコンテナの流行に合わせて、環境変数でアプリケーションの設定を切り替えることが増えていると思います。
 
@@ -48,7 +48,7 @@ export AWS_REGION=ap-northeast-1
 
 これは大変なタスクです。
 
-# 結論
+## 結論
 
 Key=Value形式をセミコロン区切りでクリップボードにコピーすると、一括で貼り付け可能です。
 
@@ -62,14 +62,14 @@ Environment VariablesのアイコンをクリックすればOKです。
 
 CLI操作では無いのが強いていうと不満ですが、とても楽ちんです。
 
-# おまけ
+## おまけ
 
 `envfile` を読み込むプラグインが存在します。
 https://plugins.jetbrains.com/plugin/7861-envfile
 
 これを用いれば、ターミナルはdirenv 、Goland上ではEnvFileに任せると一貫性があるかも知れません。
 
-# まとめ
+## まとめ
 
 * Golandはセミコロン区切りで複数の環境変数をコピー&ペースト可能
 * プラグインを入れればもう少し固く管理も可能

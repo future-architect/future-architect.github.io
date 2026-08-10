@@ -20,7 +20,7 @@ The Gopher character is based on the Go mascot designed by [Renée French](http:
 TIG DXチームの伊藤真彦です。
 今回はgo-swaggerの具体的な実装方法を紹介します。
 
-# 目次
+## 目次
 
 * はじめに
 * go-swaggerのインストール
@@ -30,7 +30,7 @@ TIG DXチームの伊藤真彦です。
 * ハンドラを実装する
 * ついにhello world完了
 
-# はじめに
+## はじめに
 
 最近の私のメイン業務は[go-swagger](https://github.com/go-swagger/go-swagger)を用いたAPI開発です。
 go-swaggerはOpenAPI(Swagger) からGoのコードを生成するライブラリです。
@@ -39,7 +39,7 @@ go-swaggerはOpenAPI(Swagger) からGoのコードを生成するライブラリ
 しかし、技術選定としての参考情報やtips集はあるものの、どのように実装していけばAPIが動くのかを理解するドキュメントは少なく、いざ実装となると学習コストがかかってしまいます。
 そこで、今回はストーリーベースでの実装手順を説明します。
 
-# go-swaggerのインストール
+## go-swaggerのインストール
 
 go-swaggerは開発環境にインストールして使用します。
 下記コマンドでインストールできます。
@@ -62,7 +62,7 @@ Dockerコンテナ以外は概ね開発環境のOSによる入手経路の違い
 アプリケーションをコンテナイメージの上で実行する場合、公式のコンテナイメージを[マルチステージビルド](https://matsuand.github.io/docs.docker.jp.onthefly/develop/develop-images/multistage-build/)に用いる事も可能ですね、夢が広がります。
 方法は様々ですが、インストール後にswaggerコマンドが利用可能になります。(コンテナ形式での導入を除く)
 
-# swagger.yamlを準備する
+## swagger.yamlを準備する
 
 OpenAPIの仕様に従ってアプリケーションが生成される以上、まずはAPIの仕様を定義するファイルが無いと始まりません。
 まずは`swagger.yaml`を作成します。
@@ -122,7 +122,7 @@ URLのクエリパラメータに`name`を持たせることができる。
 
 この`swagger.yaml`を元に実際にソースコードをビルドしてみましょう。
 
-# ソースコードをビルドする
+## ソースコードをビルドする
 
 ディレクトリの構成は自由ですが、私のチームでは自動生成されたコードは`server/gen`に配置される構成をとっています。
 下記のような構成でserver/genまでディレクトリを作成します。
@@ -145,7 +145,7 @@ swagger generate server -a factory -A factory -t gen f ./swagger/swagger.yaml
 
 今回は`--exclude-main`を使用せずに`main.go`も生成してもらいます。コマンドの実行に成功すると、`server/gen`配下に各種ファイルが生成されます。
 
-# 試しにサーバーを立ち上げてみる
+## 試しにサーバーを立ち上げてみる
 
 main.goを実行することでサーバーが起動します。
 
@@ -161,7 +161,7 @@ go run gen/cmd/factory-server/main.go --host 0.0.0.0 --port 3000
 
 エラーが出ます、hello worldまではあと一歩ですが、まだやることがあります。
 
-# ハンドラを実装する
+## ハンドラを実装する
 
 自動生成したコードだけではAPIサーバは完成しません。
 
@@ -239,7 +239,7 @@ import (
 
 ここまで書けたら今度こそサーバーを起動して動かしてみましょう。
 
-# ついにhello world完了
+## ついにhello world完了
 
 先ほど書いた内容と同じ手順でサーバーを立ち上げます。
 
@@ -256,7 +256,7 @@ go run gen/cmd/factory-server/main.go --host 0.0.0.0 --port 3000
 
 今回はhello world編ということでここまでになります、是非皆さんも実際に試してみてください。
 
-# go-swaggerの関してはこちらの記事もおすすめです
+## go-swaggerの関してはこちらの記事もおすすめです
 
 * [LambdaとGoを使ったサーバーレスWebAPI開発実践入門](/articles/20200927/)
 * [go-swaggerを用いたWebアプリケーション開発Tips19選](/articles/20200630/)

@@ -13,19 +13,19 @@ author: 丸野大輔
 lede: "2019年4月入社_FRX_DigitalLibraryチームの丸野です。研修修了後PJにアサインされて約4ヶ月ほどReact.jsを使って開発を行ってきましたが、Reduxの理解にとても苦しみました。そこで今回はReduxの概要を噛み砕いて説明していきます。同じ悩みを持つ人の理解の助けになればと思います。"
 ---
 
-# はじめに
+## はじめに
 
 はじめまして、2019年4月入社の丸野です。[フロントエンドでシステム開発を2年半続けてハマったことから得た教訓3つ](/articles/20191029/) の記事を書いた柏木さんと同じチームに所属しています。
 
 研修修了後PJにアサインされて約4ヶ月ほどReact.jsを使って開発を行ってきましたが、Reduxの理解にとても苦しみました。そこで今回はReduxの概要を噛み砕いて説明していきます。同じ悩みを持つ人の理解の助けになればと思います。
 (Redux公式ドキュメントは[こちら](https://redux.js.org/)です。)
 
-# 開発で使用している技術要素
+## 開発で使用している技術要素
 
 * React.js（16.4.1）
 * Redux（3.7.2）
 
-# そもそもReduxって何か
+## そもそもReduxって何か
 
 Reduxとは、React.jsで使用するstateつまりアプリケーションの状態を管理するフレームワークです
 簡単にReduxの概念の下記に図式化してみました
@@ -37,11 +37,11 @@ Reduxとは、React.jsで使用するstateつまりアプリケーションの�
 **Reducer**：Actionを元にStateを更新するメソッド
 **Store**：Stateの情報を保持している場所
 
-# Reduxのデータフロー
+## Reduxのデータフロー
 
 では上記で示した概略図をもとにReduxのデータフローをそれぞれ説明していきたいと思います
 
-## （1）ActionCreatorsによってActionを生成する
+### （1）ActionCreatorsによってActionを生成する
 
 * ユーザーのインプットによってComponent上からAction作成依頼が飛びActionCreatorでActionが作成されます
 
@@ -78,7 +78,7 @@ function testFunctionA(testStateA) {
 import { testFunctionA } from "testActionCreator";
 ```
 
-## （2）Actionをdispatchする
+### （2）Actionをdispatchする
 
 <img src="/images/2020/20200429/3.png" alt="Actionのディスパッチ" class="img-small-size" loading="lazy">
 
@@ -90,7 +90,7 @@ import { testFunctionA } from "testActionCreator";
   dispatch(testFunctionA());
 ```
 
-## （3）ReducerによってStore内のStateを更新する
+### （3）ReducerによってStore内のStateを更新する
 
 * Reducerとは、Actionを元にStateを更新するメソッドのことを言います
 * 引数のstateの更新するのではなく、新しいstateのオブジェクトを返します
@@ -114,12 +114,12 @@ export const testReducer = ({ testStateA = "", testStateB = "" } = {}, action) =
 };
 ```
 
-## （4）ReactとReduxを連携しStore内のStateをComponentで参照する
+### （4）ReactとReduxを連携しStore内のStateをComponentで参照する
 
 * mapStateToPropsを使用するとComponentのpropsにStateの中身を詰め込むことが出来ます
 * それによって、Store内にあるStateををthis.props.testStateAとして使用することが出来ます
 
-# まとめ
+## まとめ
 
 説明させていただいたReduxの概要は下記の通りです。
 
@@ -171,7 +171,7 @@ export const testReducer = ({ testStateA = "", testStateB = "" } = {}, action) =
 };
 ```
 
-# さいごに
+## さいごに
 
 今回はReduxの基礎的な部分の解説をさせていただきました。Redux理解の足がかりにしていただければ幸いです。
 

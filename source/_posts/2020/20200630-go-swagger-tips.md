@@ -15,19 +15,19 @@ author: 真野隼記
 lede: "業務でヘビーユーズしているgo-swaggerについての開発Tipsをまとめました。"
 
 ---
-# はじめに
+## はじめに
 
 TIG DXユニット [^1]の真野です。echo → 生net/http → gorilla/mux → go-swagger, gqlgenの経歴でGoのHTTP APIを実装してきました。本記事では最近業務でヘビーユーズしているgo-swaggerについての開発Tipsをまとめました。
 
  [^1]: TIG(Technology Innovation Group)というフューチャーグループのIT技術を良い感じに推進する部署と、その中にあるDXユニットという、デジタルトランスフォーメーションに関わる仕事を主に推進していくチームのことです。
 
-# 背景
+## 背景
 
 フューチャーではGoを採用する案件が増えて来ており、その際に[go-swagger](https://github.com/go-swagger/go-swagger) というツールを利用することが多いです。 [^2] 理由はWeb APIのスキーマを駆動に開発することに慣れているという開発文化（DBレイヤのERDやデータフローを駆動に開発することは今も多い）や、リリース後の保守や将来のマイグレーションを考慮しなるべく特定のDSLに依存したくないというポリシーを強く持つこと、開発前にある程度固く機能数を洗い出して工数見積もりや開発スケジュールに活かしたいといった大人な事情など、色々相性が良いからだと思います。
 
  [^2]: もちろん、echo派や生net/http派やその他の勢力もいます
 
-# Swaggerとは
+## Swaggerとは
 
 https://swagger.io/
 
@@ -35,19 +35,19 @@ https://swagger.io/
 
 YAML(JSON）でWeb APIの定義を記載することで、ドキュメンテーション・Client/Serverのコード生成・モックサービスの生成など多くのメリットを享受できます。またエコシステムも多数作られ、あるDSLに則ることでコードからSwaggerファイルを生成するなど、リバース系の生成手段も出てきています。
 
-# Swaggerを記述する流れ
+## Swaggerを記述する流れ
 
 Swagger(OpenAPI)のYAML定義は生で書くと大変なので、武田さんの[本当に使ってよかったOpenAPI (Swagger) ツール](/articles/20191008/) 記事で紹介されたツールを利用してYAMLファイルを作成し、それをインプットにサーバサイドのコードを自動生成しています。中にはそれらの文明を捨て生身のYAML職人になった猛者もいます。続いて後述するgo-swaggerでサーバサイドやクライアントサイドのコードを生成・実装・テストし、その中で足りない点を設計にフィードバック（つまりYAMLを修正）し、さらにコードを再生成するといったサイクルを取ることが一般的だと思います。
 
 実際に生成したSwaggerに対する規約は、亀井さんの[スキーマファースト開発のためのOpenAPI（Swagger）設計規約](/articles/20200409/)の記事を見ると、どのようなところに注意すべきか分かって良いと思います。
 
-# go-swaggerはWebアプリケーションフレームワーク
+## go-swaggerはWebアプリケーションフレームワーク
 
 [go-swagger](https://github.com/go-swagger/go-swagger)とは、Swaggerファイルを入力にGoのコードを生成できるツールです。生成されるコードは、go-openapi で管理されているモジュールが利用されています。go-swaggerそのものの技術選定については、多賀さんの[WAFとして go-swagger を選択してみた](/articles/20190814/) 記事にも記載があります。
 
 go-swaggerがWAF(Webアプリケーションフレームワーク）というのは直感では理解しにくいですが、go-swaggerで生成したサーバサイドのコードは、実質的にechoやginのように多くの機能を持ちます。 例えば、**URLのルーティング**、**入力Validation**、**クエリパラメータ**、フォーム、リクエストヘッダ、リクエストボディなどの **入力modelへのバインディング**、**HTTPレスポンスコード別のmodelの作成**や、**Middlewareの設定専用の関数**など多くをサポートしていますし、**固有のビジネスロジックを書くルール**もgo-swaggerの生成したコードによって決められています。
 
-# フロントエンド側の生成は？
+## フロントエンド側の生成は？
 
 TypeScriptのフロントエンド側の生成は[openapi-generator](https://openapi-generator.tech/docs/generators/)を当社では採用することが多いです。あくまでサーバサイドの生成にgo-swaggerを用いています。go-swaggerもクライアントコードは生成でき、こちらはあるWeb APIロジック中で、別のWeb APIを呼び出す時に利用したりもします（下図のイメージ）
 
@@ -55,11 +55,11 @@ TypeScriptのフロントエンド側の生成は[openapi-generator](https://ope
 
 The Gopher character is based on the Go mascot designed by [Renée French](http://reneefrench.blogspot.com/).
 
-# Tips
+## Tips
 
 そんなgo-swaggerを用いてWeb APIサーバを開発し、いくつかのシステムをリリースしてきました。そこで得たTipsを紹介していきます。比較的サーバサイドの話が多いですが、一部クライアントサイドの話しもあります（前述したあるWeb APIサーバから、別のOpenAPIで定義されているWeb APIを呼び出すことも合ったので）
 
-## 1. インストールバージョンをチームで固定しよう
+### 1. インストールバージョンをチームで固定しよう
 
 [インストール手順](https://goswagger.io/install.html)は様々ですが、コードを自動生成する関係上、バージョンは必ず揃えた方が良いです。もしチーム内に複数バージョンが混在してしまうと、自動生成するたびに不要なコード差分が発生して履歴が汚れてしまいます。
 
@@ -71,7 +71,7 @@ go get -u github.com/go-swagger/go-swagger/cmd/swagger@v0.23.0
 
 特に理由がなければ最新のバージョンを利用するのが良いと思います。2020/05/19時点では[リリースノート](https://github.com/go-swagger/go-swagger/releases)を見る限り数ヶ月ごとにリリースされているように活発に開発が続いているので、適時バージョンも上げていきたいですね。
 
-## 2. swagger genrate server コマンドの推奨オプション
+### 2. swagger genrate server コマンドの推奨オプション
 
 オプションは[公式ドキュメント](https://goswagger.io/generate/server.html)に記載されています。次のオプションは設定したほうが良いかなと思います。
 
@@ -90,7 +90,7 @@ swagger generate server -a routemanagement -A routemanagement \
 
 立ち上がり初期は、`-a`や`-A`の値を変えながらしっくり来るのを探すことがオススメです。
 
-## 3. パッケージ構造
+### 3. パッケージ構造
 
 先ほど、出力先ディレクトリを `gen` に指定しましたが、[公式ドキュメントにもgenで生成する例](ttps://goswagger.io/tutorial/custom-server.html)が書いてありました。最初は `generated` にしようか迷いましたが、短いですし `gen` に合わせることをおすすめします。
 
@@ -112,7 +112,7 @@ genの意味が何か？ というのは新規参画者が全員抱く疑問だ�
 
 例がモノリポで作っているイメージなので、適時書き換えて参考にしていただければです。
 
-## 4. 起動時オプションの `--host`には注意
+### 4. 起動時オプションの `--host`には注意
 
 go-swaggerで生成した[サーバ起動時オプション](https://goswagger.io/tutorial/todo-list.html)がいくつか存在します。その中で必須なのは、`--host`と `--port` だと思います。`--host` を指定した場合はデフォルト`localhost`、つまり `127.0.0.1`になります。そうすると、ローカル開発では良いですが、他のサーバからアクセスできなくなります。ネットワークインタフェースを個別に指定したいケースは別ですが、基本的には `--host 0.0.0.0` を指定すると良いでしょう。
 
@@ -124,7 +124,7 @@ go-swaggerで生成した[サーバ起動時オプション](https://goswagger.i
 
 `--host`は`$HOST`、`--port`は`$PORT`という環境変数でも利用できるので、コンテナ化するときなどはこちらを利用するのも良いと思います。特に[GCPのCloudRunは$PORTで待ち受けるのが必須](https://cloud.google.com/run/docs/reference/container-contract)なので、この場合はGCP側にポート設定は任せましょう。
 
-## 5. OpenAPIのバージョンを見間違えないように注意
+### 5. OpenAPIのバージョンを見間違えないように注意
 
 go-swaggerが対応しているのは `OAS2` であるので注意です。最新は `OAS3` ですが、その記法は利用できないことがあります。特にググった時に出てくる公式ドキュメントが `OAS2`であることをよく確認しましょう
 
@@ -144,7 +144,7 @@ go-swaggerが対応しているのは `OAS2` であるので注意です。最�
 
 https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md
 
-## 6. go-swaggerで対応しているOpenAPIの規約とは
+### 6. go-swaggerで対応しているOpenAPIの規約とは
 
 5で説明したとおり、OpenAPIの3系と2系（Swagger）でGoogle検索しにくいのが実情だと思います。さらにその中でgo-swaggerがその記法に対応しているかどうか迷う場面が出てくると思います。
 
@@ -154,7 +154,7 @@ https://github.com/go-swagger/go-swagger/blob/master/docs/use/spec/params.md
 
 主要どころは網羅できているとお気づきになると思います。実際、経験上はほとんどが問題なく利用できてきました。もし、上手く動かない場合は、設定ミスや仕様の勘違い、あるいはコードの再生成をし忘れているといった可能性が高いです。
 
-## 7. Swaggerのモデルの必須属性を外すとGoのコードがポインタじゃなくなり便利だが落とし穴がある
+### 7. Swaggerのモデルの必須属性を外すとGoのコードがポインタじゃなくなり便利だが落とし穴がある
 
 Goの辛いところかも知れませんが、nullかどうかを判定するためにGoではしばしばstringやint64のフィールドが、必須設定されるとポインタ型になります。これを `swag.String()/swag.StringValue()` や `swag.Int64()/swag.Int64Value()` で変換するのが厄介なので、特にレスポンスに関してはチェックもしないし必須属性を外そうかという判断になりがちだと思います。
 
@@ -162,7 +162,7 @@ Goの辛いところかも知れませんが、nullかどうかを判定する�
 
 ..なんというか、色々歪みが大きい気がするので、必ずレスポンスに含まれる項目であれば素直に必須だという宣言に、Swagger上はしておく方が良いかも知れません。このあたりはチーム全体の判断になると思います。
 
-## 8. 数値始まりのフィールド名にNrというプレフィックスが付与される
+### 8. 数値始まりのフィールド名にNrというプレフィックスが付与される
 
 数値始まりのフィールド `0x9101` といったフィールドを、go-swaggerで生成すると、 `Nr0x9101` と言った具合に`Nr`といったプレフィックスが付与されます。ドキュメントには見当たりませんでしたが、コードでは[この辺](https://github.com/go-swagger/go-swagger/blob/b6f0abd35e2a0d1415e1b4776e35e33808d2ce62/generator/template_repo.go#L551
 ) に実装されていました。おそらく数値を表すNumberのドイツ語読み？ でしょうか。これはGoのフィールド名が数字始まりを許可しないため、仕方ない挙動だとは思いますが、`Nr`は辞めたいと思われる方も多いのではないでしょうか？
@@ -171,7 +171,7 @@ Goの辛いところかも知れませんが、nullかどうかを判定する�
 
 `x-go-name` ですが、おそらくは、`company_cd`や`user_id`といったsnake_caseでAPIを定義した場合、go-swaggerのデフォルトの挙動は `companyCd`、`userId`といった具合に、Goの慣習と合わないことへの対応に使うことが本来は多いと思います。このあたりに用いるのであれば本来の意図したオプションだと思います。
 
-## 9. go-swaggerの拡張記法
+### 9. go-swaggerの拡張記法
 
 7,8と関連しますが、`x-omitempty`や`x-go-name`以外にも、go-swagger独自の拡張パラメータが存在します。
 
@@ -180,7 +180,7 @@ https://github.com/go-swagger/go-swagger/blob/master/generator/types.go#L45
 
 この中でも、比較的よく使いそうなのは `x-go-type`や`x-order`でしょうか？ `x-go-type` は自分でtype aliasした型を指定することが出来ます。 `x-order`は、go-swaggerはデフォルトの挙動では、Swaggerに記載した順番にStructのフィールドを生成してくれません。それが視認性など場合によっては困ると言った場合に、順序を指定することも出来ます。あまり乱用すると、扱いにくいSwaggerファイルになりかねないので、トレードオフを考えながら指定していくと良いかなと思います。
 
-## 10. DateTimeを活用しよう
+### 10. DateTimeを活用しよう
 
 `type=string`を指定した時に、`format`には、`date`, `date-time` などが[指定できます](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#data-types)。
 
@@ -264,7 +264,7 @@ dateTime := strfmt.ParseDateTime("2020-05-20T15:04:05Z07:00")
 
 time.Timeへの変換さえ慣れれば、自前で日付パースを行うコードを減らせ見通しが良くなると思います。ぜひ、日付周りのデータを受け付ける場合は活用下さい。
 
-## 11. アクセスログ
+### 11. アクセスログ
 
 Go系のWAF全般に言えることかも知れませんが、go-swaggerも標準ではアクセスログなどが一切出力されず、自前でMiddlewareを仕込む必要があります。
 
@@ -346,7 +346,7 @@ func setupGlobalMiddleware(handler http.Handler) http.Handler {
 
 これで、go-swaggerへのリクエストに対してロギングを行うことができました。開発や利用状況の調査などに役立て下さい。
 
-## 12. panicしたときの防御
+### 12. panicしたときの防御
 
 これも11に関連した話ですが、go-swaggerのロジックでpanicが発生するとレスポンスを何も返さないため不便です（どこかのレイヤーでGateway Timeoutなどが発生します）。この場合は、panicをキャプチャするmiddlewareを設定し、500エラーを返すなどをしたほうが良いでしょう。
 
@@ -393,7 +393,7 @@ func setupGlobalMiddleware(handler http.Handler) http.Handler {
 
 これで、panicが発生しても仕様通りに何かしらレスポンスできました。
 
-## 13. Middleware
+### 13. Middleware
 
 現実には、10, 11以外にも多くのMiddlewareを実装する必要が出てくると思います。多いのは、CORS、gzipでしょう。BodyLimitやRateLimitなどは、LANを飛び出してWeb APIを実装すると必要性が出てくると思います。どういったMiddlewareが必要になってくるかは、[echoのMiddlewareページ](https://echo.labstack.com/middleware)を見て、どういった観点がありそうか確認してみるのも良いかも知れません。
 
@@ -462,7 +462,7 @@ func setupGlobalMiddleware(handler http.Handler) http.Handler {
 
 デコレートの階層が深すぎてよくわからなくなってきましたが、浅い方から順番に動くので、アクセスログはCORSの前に出したいとかがあれば順序を動かしてみてください。
 
-## 14. エラーハンドリング
+### 14. エラーハンドリング
 
 go-swaggerの入力Validationでエラーが発生したときは、デフォルトでは `422 Unprocessable Entity` が発生します。422のままで良いよという方はこのままでも良いですが、`400 Bad Request`で統一したい場合もあるでしょう。理由は、悪さをしようとするユーザーのリクエストがあるという性悪説にたって、不正パラメーターの詳細なエラー情報は悪いクライアントに不要な情報を与えるものとなりかねないので、雑に400を返すといった考えもあると思うからです。
 
@@ -500,7 +500,7 @@ func errorAsJSON(err Error) []byte {
 
 上記で、色々go-swaggerのフレームワーク側が対応してしてくれているエラーハンドリングも自由自在になりました。あまりカスタマイズすると、本家バージョンアップの追随が大変なので、なるべくgo-swagger標準の形式に則ってWeb API設計することがおすすめですが、いざという時の逃げ道として認識してもらえると幸いです。
 
-## 15. Defaultステータスコードの勧め
+### 15. Defaultステータスコードの勧め
 
 `OAS2` のSwagger定義に、[Defaultレスポンス](https://swagger.io/docs/specification/2-0/describing-responses/#Default)という設定が出来ます。
 
@@ -533,7 +533,7 @@ if _, err := api.user.GetUserContract(params); err != nil {
 
 これは、ステータスコード別にバインドするStructを自動生成する関係上、想定外のステータスコードの場合に動かしようが無いからだともいます。[このあたりのIsseuにも似たような議論](https://github.com/go-swagger/go-swagger/issues/1470)がありました。これを避けるためには、横断的にエラー時のModelを共通化しておき、全てのエンドポイントごとにDefaultステータスコードを設定しておくことがオススメです。
 
-## 16. NewXxxの関数を利用する
+### 16. NewXxxの関数を利用する
 
 15でもちょっと実装が出ましたが、go-swaggerで生成したクライアントコードを利用して、サーバにリクエストする場合について注意があります。リクエストパラメータの生成には、 `NewXxx`を利用してStructを作らないと、timeout=0になって、`context deadline exceeded` エラーとなり上手く動作しません。[このあたりのIssue](https://github.com/go-swagger/go-swagger/issues/919#)でも話題にしています。
 
@@ -549,7 +549,7 @@ params := user.NewPostUserParamsWithContext(ctx).
 })
 ```
 
-## 17. クライアントコードでホスト名やBASE_PATHを書き換えたい
+### 17. クライアントコードでホスト名やBASE_PATHを書き換えたい
 
 Swaggerに記載するホスト名と開発中のホスト名は異なるため、書き換えが必要です。また、URLの基底となるパスですが、 `/v1` などを設定することが一般的だと思います。一方で、ロードバランサやAPIゲートウェイの仕様のため、本番環境では別の基底パスを追加したいときがあると思います。そうすると、ローカルで利用したいURLと差異がでるため、差異を吸収する設定が必要です。
 
@@ -580,7 +580,7 @@ if _, err := client.Default.user.GetUserContract(user.NewGetUserParamsWithContex
 
 この辺りの作り込みは上手く環境変数など外部プロパティで切り替えられるようにしておきたいですね。
 
-## 18. 単体テストの話
+### 18. 単体テストの話
 
 go-swaggerのサーバサイドの単体テストは、Goの関数呼び出しと同様に実現できます。レスポンスに関しては `httptest.NewRecorder()` を利用するとヘッダ・ボディなど全て取得できます。
 
@@ -624,7 +624,7 @@ func TestGetUser(t *testing.T) {
 
 レスポンスボディのチェックは、jsondiffというパッケージを利用していますが、他にも色々な方法があると思いますので、要件に合わせて書き換えて下さい。他のGoのテストの考え方と特に変わらないのは嬉しいですね。
 
-## 19. Lambdaで動かしたい
+### 19. Lambdaで動かしたい
 
 go-swaggerのサーバですが、[実はAWS Lambdaでも動かせます](https://github.com/go-swagger/go-swagger/issues/962#issuecomment-478382896)。`httpadapter` というパッケージを利用することで、API Gatewayの`events.APIGatewayProxyRequest` といったイベントを、go-swaggerのリクエストである `*http.Request` に変換してくれます。コードは下記のようなイメージです。
 
@@ -673,7 +673,7 @@ func main() {
 
 他のServlerless相当でgo-swaggerで動かしたい場合も、このコードを参考にサーバレス関数のイベントを、`*http.Request` に変換すれば動かすことができそうです。夢が広がりますね！
 
-# まとめ
+## まとめ
 
 最初は3,4つのTipsをまとめて終わりにしようかと思いましたが、書いていると非常に長くなってしまいました。go-swaggerは良いプロダクトだと思うのですが、定義情報からコードを自動生成する関係上、どこまで何ができるのかイメージがつきにくかったり、そもそもOpenAPI（Swagger）の知識も必要のため敷居が高かったりと、最初はハマる箇所が多いからかも知れません（さらにはサーバサイドとクライアントサイドの2種類のコードも生成できるためネタが増える..）
 
