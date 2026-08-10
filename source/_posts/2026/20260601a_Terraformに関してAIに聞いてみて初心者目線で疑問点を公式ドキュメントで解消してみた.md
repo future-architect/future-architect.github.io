@@ -7,7 +7,7 @@ tags:
   - TerraformCloud
   - IaC
 categories:
-  - Infrastructure
+  - DevOps
 series: "Terraform2026"
 thumbnail: /images/2026/20260601a/thumbnail.jpg
 author: 永井辰弥
