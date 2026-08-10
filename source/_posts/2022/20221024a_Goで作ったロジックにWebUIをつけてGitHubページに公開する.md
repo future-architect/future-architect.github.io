@@ -6,6 +6,7 @@ tags:
   - Next.js
   - Go
   - WebAssembly
+  - GitHub
 categories:
   - Frontend
 thumbnail: /images/2022/20221024a/thumbnail.png

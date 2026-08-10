@@ -6,6 +6,7 @@ tags:
   - LLM
   - Azure
   - Python
+  - 生成AI
 categories:
   - DataScience
 thumbnail: /images/2024/20240822a/thumbnail.png

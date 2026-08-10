@@ -8,6 +8,7 @@ tags:
   - LLM
   - Bedrock
   - AWS CDK
+  - 生成AI
 categories:
   - DataScience
 thumbnail: /images/2025/20250207a/thumbnail.png

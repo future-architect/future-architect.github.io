@@ -7,6 +7,7 @@ tags:
   - Lambda
   - Linter
   - 静的解析
+  - AWS
 categories:
   - Programming
 series: "サーバレス2021"

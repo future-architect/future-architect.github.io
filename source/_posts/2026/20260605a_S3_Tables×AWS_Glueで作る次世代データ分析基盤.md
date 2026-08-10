@@ -6,6 +6,7 @@ tags:
   - Glue
   - S3
   - データレイク
+  - AWS
 categories:
   - DataEngineering
 thumbnail: /images/2026/20260605a/thumbnail.png

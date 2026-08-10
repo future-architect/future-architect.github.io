@@ -6,6 +6,7 @@ tags:
   - スペック駆動開発
   - Kiro
   - ハッカソン
+  - AWS
 categories:
   - AIDD
 thumbnail: /images/2025/20251203a/thumbnail.png
