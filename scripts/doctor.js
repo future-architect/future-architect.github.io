@@ -22,6 +22,11 @@ function matchableTag(name) {
   return name.length >= 4;
 }
 
+// 数が多い受け皿カテゴリ。カテゴリ運用のルールとして、ここへ寄せる提案はしない
+// （何でも Programming / DevOps に見えてしまうため、具体的なカテゴリへ
+// 移す方向だけを提案する）
+const SUGGEST_IGNORE = new Set(['Programming', 'DevOps']);
+
 hexo.extend.helper.register('doctor_checks', function() {
   const posts = this.site.posts.sort('-date');
 
@@ -29,9 +34,11 @@ hexo.extend.helper.register('doctor_checks', function() {
   // 自分の票が入ると、小さいタグでは現状カテゴリが常に勝って検出できない
   const tagCat = new Map(); // タグ -> (カテゴリ -> 記事数)
   const tagN = new Map();
+  const catSize = new Map(); // カテゴリ -> 記事数
   posts.forEach(post => {
     const cat = post.categories.first();
     if (!cat) return;
+    catSize.set(cat.name, (catSize.get(cat.name) || 0) + 1);
     post.tags.forEach(tag => {
       if (tag.name === 'インデックス') return;
       if (!tagCat.has(tag.name)) tagCat.set(tag.name, new Map());
@@ -75,19 +82,28 @@ hexo.extend.helper.register('doctor_checks', function() {
       });
       if (score.size) {
         const ranked = [...score.entries()].sort((a, b) => b[1] - a[1]);
-        const [predName, predScore] = ranked[0];
+        // 受け皿カテゴリへ寄せる提案はしない（運用ルール）
+        const candidate = ranked.find(([c]) => c !== actualCat.name && !SUGGEST_IGNORE.has(c));
         const actualScore = score.get(actualCat.name) || 0;
-        // 提案が現状の2倍以上の票、かつ絶対値でも1.5票以上のときだけ出す。
-        // 緩めると数百件になりレビューできない
-        if (predName !== actualCat.name && predScore >= 2 * actualScore && predScore >= 1.5) {
-          suggestions.push({
-            title: post.title,
-            path: post.path,
-            actual: actualCat.name,
-            suggested: predName,
-            predScore: Math.round(predScore * 10) / 10,
-            actualScore: Math.round(actualScore * 10) / 10,
-          });
+        if (candidate) {
+          const [predName, predScore] = candidate;
+          // 迷ったら数の少ない専門カテゴリへ寄せる、という運用ルールを写す。
+          // 大きいカテゴリから小さいカテゴリへの提案は現状と同票でも出し、
+          // 逆方向は2倍以上の票を要求する。緩めすぎると数百件になりレビューできない
+          const toSmaller = (catSize.get(predName) || 0) < (catSize.get(actualCat.name) || 0);
+          const pass = toSmaller
+            ? predScore >= actualScore && predScore >= 1.0
+            : predScore >= 2 * actualScore && predScore >= 1.5;
+          if (pass) {
+            suggestions.push({
+              title: post.title,
+              path: post.path,
+              actual: actualCat.name,
+              suggested: predName,
+              predScore: Math.round(predScore * 10) / 10,
+              actualScore: Math.round(actualScore * 10) / 10,
+            });
+          }
         }
       }
     }
