@@ -13,7 +13,7 @@ thumbnail: /images/2021/20210609a/thumbnail.png
 author: MaineK00n
 lede: "VulsでDebianをスキャンしたとき、CVE情報のベースをOVALからDebian Security Trackerへ変更しようというものです。実装してみると、変更前はスキャン時間の90％ileが3.37sだったのですが、変更後は11.15sまで増加してしまいました。"
 ---
-## Vuls開発中に出会ったGORMあれこれ
+## はじめに
 
 はじめまして、中岡([@MaineK00n](https://twitter.com/MaineK00n))と申します。
 
