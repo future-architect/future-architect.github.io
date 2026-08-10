@@ -167,7 +167,7 @@ func run() async {
 
 `Sendable`に準拠していない`Box`クラスの`box`インスタンスが`Isolaton boudary`を超えたため、このエラーがでてきます。
 
-このように、`Isolaton boudary`が存在していることを体験することができました。
+このように、`Isolaton boudary`が存在していることを体験できました。
 
 ## おわりに
 
