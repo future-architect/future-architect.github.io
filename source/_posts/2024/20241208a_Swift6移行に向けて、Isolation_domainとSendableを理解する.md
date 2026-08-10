@@ -171,7 +171,7 @@ func run() async {
 
 ## おわりに
 
-SwiftZoomin#20（[感覚的に理解するConcurrency: Swift 6はIsolationとSendableを用いてどのようにデータ競合を防止するか](https://youtu.be/AUcn2y2jjNs?si=_fyNjme2hDA236sl)）動画前半の内容について私なりにまとめさせていただきました。（[@koher](https://qiita.com/koher)さん、大変わかりやすく説明いただきありがとうございました。）
+SwiftZoomin#20（[感覚的に理解するConcurrency: Swift 6はIsolationとSendableを用いてどのようにデータ競合を防止するか](https://youtu.be/AUcn2y2jjNs?si=_fyNjme2hDA236sl)）動画前半の内容について私なりにまとめさせていただきました（[@koher](https://qiita.com/koher)さん、大変わかりやすく説明いただきありがとうございました）。
 
 Swift6への移行は、コンパイル時にデータ競合が起こる可能性のある箇所を事前につぶすことができるので、アプリの品質向上に直結するため、ビジネス的にもとても有用なものだと思っております。
 
