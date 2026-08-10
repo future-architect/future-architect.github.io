@@ -15,7 +15,7 @@ lede: "Dev Containers便利ですよね？使っていますか？便利なの�
 ---
 Dev Containers便利ですよね？使っていますか？便利なのですが、久々に新しい環境を作ろうとしてちょっとはまったので解決のメモを書いておきます。書いておけばそのうち生成AIが拾って簡単に解決できるようになると思うので。
 
-# Node.jsのイメージがおかしい
+## Node.jsのイメージがおかしい
 
 Node.js + PostgreSQLのベース設定をもとに環境を作ると、いきなり起動時に失敗します。Node.js 22であれば問題ないのですが、現在アクティブなサポートバージョンの24だとエラーになります。コンテナイメージのタグの命名規則が変わったようです。
 
@@ -26,7 +26,7 @@ Node.js + PostgreSQLのベース設定をもとに環境を作ると、いきな
 + FROM mcr.microsoft.com/devcontainers/javascript-node:dev-24-trixie
 ```
 
-# 同一のWSLで複数のPostgreSQLを使うDev Containersを利用するとエラー
+## 同一のWSLで複数のPostgreSQLを使うDev Containersを利用するとエラー
 
 これ、わかりにくかったのですが、DBに依存しているアプリケーション開発環境の方が起動できない（参加したいネットワーク service.dbがない）という感じのエラーなのですが、よくよく見てみると、DBがエラーで再起動を続けています。
 
@@ -49,7 +49,7 @@ Node.js + PostgreSQLのベース設定をもとに環境を作ると、いきな
         POSTGRES_DB: postgres
 ```
 
-# サービス名も重複しない名前にしておく
+## サービス名も重複しない名前にしておく
 
 アプリ名がぶつかるのもよくないということを聞きましたので、そうなるとサービス名とかも変えておく方が良いですね
 
@@ -69,7 +69,7 @@ Node.js + PostgreSQLのベース設定をもとに環境を作ると、いきな
       restart: unless-stopped
 ```
 
-# プロキシ
+## プロキシ
 
 プロキシ突破はコツがわからないと苦労しがちです。一般的なDockerのプロキシ設定であれば、以下の当ブログの記事で書かれたGUIの設定の内容で十分でしょう。
 
@@ -97,7 +97,7 @@ Dev Containersは、.devcontainer/devcontainer.jsonが設定の大本です。�
 * devcontainer.json(実行環境の通信)
 * Dockerfile(sudoの通信)
 
-## ホスト環境(イメージ取得、ビルド時のapt-getなどの通信)
+### ホスト環境(イメージ取得、ビルド時のapt-getなどの通信)
 
 まず、Dockerが動くホスト環境でDockerのプロキシ設定および、環境変数を指定します。条件によって組み合わせが複雑なので要注意です。
 
@@ -109,11 +109,11 @@ Dev Containersは、.devcontainer/devcontainer.jsonが設定の大本です。�
 
 個々の設定が終わったあとの確認方法としては、これらを設定すれば、ホスト環境の中でdocker pullやcurlコマンドで外につなぎにいけるはずなので、Dev Containersの起動前に試してみましょう。また、Dockerfileの中の外部通信(apt-getなど)もいけるはず。
 
-### (1): Dockerデスクトップのプロキシ設定
+#### (1): Dockerデスクトップのプロキシ設定
 
 Dockerデスクトップの場合はGUIで設定ができます。これを設定することで、イメージ取得やビルド内の通信の両方でプロキシが取った状態で通信ができます。
 
-### (2): Linuxのイメージ取得用の設定
+#### (2): Linuxのイメージ取得用の設定
 
 Dockerコマンド自体はデーモンへのリクエストだけを行い、実際のビルドやイメージ取得はデーモンが行います。そのデーモンに対しては専用の設定ファイルがあります。
 
@@ -130,7 +130,7 @@ Environment="NO_PROXY=localhost,127.0.0.1,docker-registry.somecorporation.com"
 sudo system docker restart
 ```
 
-### (3): WSL2+Linuxのイメージ取得の設定
+#### (3): WSL2+Linuxのイメージ取得の設定
 
 WSL2の中でLinux版のDockerを使っている場合、現行のWSL2であればは自動でWindowsのプロキシを設定する機能(autoProxy)があります。Windows側設定が適切であればイメージ取得は通るようになります。裏のネットワークインタフェース側で解決してくれるようです。デフォルトでtrueになっていますが、明示的に書きたい場合は次のように設定します。
 
@@ -140,7 +140,7 @@ dnsTunneling=true
 autoProxy=true
 ```
 
-### (4): LinuxのDockerの設定
+#### (4): LinuxのDockerの設定
 
 ビルド時にプロキシ情報の環境変数を渡す方法には、--build-argでコマンドで渡す方法と設定ファイルで渡す方法があります。VSCodeのDev Containersのビルドの中の触れない場所で呼ばれてオプションが追加できないため、ファイルで渡す方法しかないでしょう。
 
@@ -158,7 +158,7 @@ autoProxy=true
 
 Dockerfile内で直接書いてしまう方法もありますが、ポータビリティも下がりますし、認証情報が入る可能性があるため、お勧めしません。
 
-### (5): 環境変数の設定(WSL2の場合)
+#### (5): 環境変数の設定(WSL2の場合)
 
 デスクトップ版はWSL2を使います。また、WSL2+Linux版の組み合わせでもWSL2になります。Dev Containerに渡すにはWSL2の中のLinuxの環境変数にプロキシ設定がある状態にしておく必要があります。
 
@@ -168,7 +168,7 @@ Dockerfile内で直接書いてしまう方法もありますが、ポータビ�
 
 これらで指定した環境変数がWSL2の中にも取り込まれます。それ以外としては次のLinux単独の環境変数設定方法も使えます。
 
-### (6): 環境変数の設定(Linuxの場合)
+#### (6): 環境変数の設定(Linuxの場合)
 
 WSL2ではないLinuxの場合は、いつも通り、ユーザーの.profileとか.bashrcといったところに環境変数でプロキシ設定を書きます。
 
@@ -178,7 +178,7 @@ export https_proxy="http://proxy.example.com:8080"
 export no_proxy="localhost,127.0.0.1,host.docker.internal"
 ```
 
-## devcontainer.json(実行環境の通信)
+### devcontainer.json(実行環境の通信)
 
 devcontainer.jsonの中でホスト側の環境変数を実行時に展開してくれる機能があるのでこれを利用します。`docker run -e 環境変数=値`で渡すのと同じですが、元の変数も参照として書けるため、設定ファイルをプロジェクトで共有する場合にもハードコード不要で安全です。
 
@@ -203,7 +203,7 @@ devcontainer.jsonの中でホスト側の環境変数を実行時に展開して
 COPY my-company-ca.crt /usr/local/share/ca-certificates/my-company-ca.crt
 ```
 
-## Dockerfile(sudoの通信)
+### Dockerfile(sudoの通信)
 
 これまでのところでほぼ問題ありませんが、開発環境の中でapt-getで追加のツールなどを入れようとするとエラーになります。devcontainer.jsonは、作業ユーザーの環境変数には設定してくれますが、sudo apt-getとすると、一時的に環境変数が設定されていない別ユーザーに代わってしまい、設定が見えなくなってしまうからです。
 
@@ -213,12 +213,12 @@ sudoしても必要な環境変数を引き継ぐような設定をDockerfileに
 RUN echo 'Defaults env_keep += "http_proxy https_proxy HTTP_PROXY HTTPS_PROXY no_proxy NO_PROXY"' >> /etc/sudoers
 ```
 
-## macOSの場合
+### macOSの場合
 
 macOSの場合はWSL2のレイヤーを意識する必要性がないのでシンプルです。Linux VMは確かにありますが、Windowsと違ってパフォーマンスのためにWSL2の中のファイルシステムに環境を作ってWSL2の中からVSCodeを起動するということがないからです。
 
 Docker Desktop版を使うなら、そちらのプロキシ設定とmacOSの一般の環境変数にhttp_proxyなどを設定すればおしまいです。Linux VMの中にわざわざ作るのであれば同じように設定は必要になると思いますが。
 
-# まとめ
+## まとめ
 
 Dev Containersは便利ですが、若さにあふれているというか、安定性よりも新しいものを、という気概を感じます。そこそこ小さい苦労があったので、メモ代わりに書いてみました。もし、ほかにもこんな問題もあったぞとかがあれば、Xなどでお知らせいただければと思います。

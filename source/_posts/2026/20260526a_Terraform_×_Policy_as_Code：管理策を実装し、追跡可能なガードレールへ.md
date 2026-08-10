@@ -19,7 +19,7 @@ lede: "「PaC は管理策を実装するのである。通常、PaC が実装�
 >
 > 出典: Policy as Code (O'Reilly Media)
 
-# 1. はじめに
+## 1. はじめに
 
 こんにちは、棚井龍之介です。本記事は [Terraform 連載 2026](/articles/20260518a/) の5本目です。
 
@@ -33,7 +33,7 @@ Terraform のコードを Claude Code をはじめとした生成 AI に書か�
 
 そのために、Policy as Code(以下 PaC)ツールである trivy、checkov、conftest の 3 つを、同じサンプルコードに当てて、それぞれの役割分担を見ていきます。
 
-# 2. 「管理策の実装」とは、ルールをコードで強制する仕組み
+## 2. 「管理策の実装」とは、ルールをコードで強制する仕組み
 
 まず、PaC というものの位置づけを確認していきます。
 
@@ -50,7 +50,7 @@ Terraform のコードを Claude Code をはじめとした生成 AI に書か�
 
 これら 4 つの観点で各ツールを見ていくと、それぞれの性格の違いが浮かび上がってきます。後の章で、今回検証したツールである trivy、checkov、conftest がどの観点に強くて、どの観点に弱いのかを実際に確認していきます。
 
-# 3. 違反入りの .tf ファイルで検証環境を用意する
+## 3. 違反入りの .tf ファイルで検証環境を用意する
 
 今回の検証用に、意図的にセキュリティ違反を含めた `.tf` ファイル一式と、conftest 用の自作 Rego ポリシーを用意しました。
 
@@ -72,7 +72,7 @@ Terraform のコードを Claude Code をはじめとした生成 AI に書か�
     └── rds.rego                    # FSBP RDS.2, 3, 8, 11
 ```
 
-## insecure/(検証対象の Terraform コード)
+### insecure/(検証対象の Terraform コード)
 
 <details>
 <summary>insecure/provider.tf</summary>
@@ -353,7 +353,7 @@ resource "aws_kms_key" "no_rotation" {
 
 </details>
 
-## policies/(conftest 用 Rego ポリシー)
+### policies/(conftest 用 Rego ポリシー)
 
 <details>
 <summary>policies/s3.rego</summary>
@@ -526,7 +526,7 @@ deny contains msg if {
 
 `policies/` 配下の 4 ファイルは conftest の自作ポリシーで、第 6 章で詳しく取り上げます。
 
-# 4. 3 つの PaC 実現ツールの違い
+## 4. 3 つの PaC 実現ツールの違い
 
 trivy、checkov、conftest を、まず基本情報で並べてみます。
 
@@ -552,7 +552,7 @@ conftest は他の 2 つとは設計が大きく異なります。利用者が�
 
 conftest が内部で使っている OPA(Open Policy Agent)は CNCF の Graduated プロジェクトで、Kubernetes Admission Controller など IaC 以外でも広く使われています。以前であれば Rego という独自言語を覚える必要があり、学習コストの高さが採用の壁でした。現在は生成 AI を活用して Rego を記述できるため、その負担は大きく軽減されています。
 
-# 5. 同一サンプルへの、3 ツールの検出結果
+## 5. 同一サンプルへの、3 ツールの検出結果
 
 以降では、これらの違いが実際の検出結果としてどう現れるかを見ていきます。
 
@@ -604,7 +604,7 @@ conftest の 12 件という数字は、今回自作した 11 個の `deny` ル�
 
 なお、合計件数の差(59 / 41 / 12)はツールの優劣を示すものではなく、上述のとおり 1 違反に対する発火数の違いと、conftest においては「書いたルールしか発火しない」設計の違いを反映したものです。
 
-# 6. 自作 Rego で「うちはこれを守る」を書き出す
+## 6. 自作 Rego で「うちはこれを守る」を書き出す
 
 前章で触れた通り、conftest は書いた分しか検出しないツールです。そのため 12 件という数字は、trivy や checkov の検出数とそのまま並べて多寡を比較するものではなく、自分たちで「これを守る」と書いたチェックの結果として現れた数字です。自分たちで決めたルールを、自分たちの言葉で書き出した分だけが結果に返ってくる、というのが conftest の使い方になります。
 
@@ -639,7 +639,7 @@ trivy や checkov だとルール ID(`AVD-AWS-0080` や `CKV_AWS_17`)がメッ�
 
 なお、IAM のように `jsonencode()` で組み立てられたポリシーは、Source mode の conftest からは構造化された JSON として読み取れません。今回は正規表現マッチで暫定対応しました。正確性を求めるのであれば、`terraform plan -json` の Plan mode を使う必要があります。実用上は、組み込みルールを持つ checkov に IAM を任せて、conftest は自分たちで書きたいチェックを引き受けるという分担が現実的だと感じています。
 
-# 7. 「広く × 個別」のペアを運用に組み込む
+## 7. 「広く × 個別」のペアを運用に組み込む
 
 今回の検証から見えてきた運用上の提案として、trivy / checkov と conftest を別の役割で組み合わせるパターンを置いておきます。
 
@@ -651,7 +651,7 @@ trivy と checkov は「広く拾う」役割です。組み込みルールで�
 
 「広く拾う」trivy / checkov と「狭く明示する」conftest という二段構えが、今回の検証から見えた運用上の落としどころです。組み込みルールのツールと自作ルールのツールを併用するパターン自体は PaC を扱う場面でしばしば語られる構成で、今回の検証でも実感としてそこに着地しました。
 
-# 8. まとめ
+## 8. まとめ
 
 本記事では、AI が書いた Terraform コードに対するシフトレフト型のガードレールとして、trivy、checkov、conftest の 3 ツールを同じサンプルに当てて検証しました。
 
@@ -661,7 +661,7 @@ trivy と checkov は「広く拾う」役割です。組み込みルールで�
 
 本記事で示したシフトレフト型のガードレールが、Terraform 運用の中で参考になれば幸いです。
 
-# 参照
+## 参照
 
 - [AWS MCP Server がGAに - Claude Codeから検証: IAMガードレール設計](https://future-architect.github.io/articles/20260525a/)
 - [Policy as Code (O'Reilly)](https://learning.oreilly.com/library/view/kodotositenoporisi/9798341627093/ch01.html)

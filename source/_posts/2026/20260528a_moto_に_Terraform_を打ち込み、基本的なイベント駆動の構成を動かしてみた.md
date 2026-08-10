@@ -12,7 +12,7 @@ thumbnail: /images/2026/20260528a/thumbnail.png
 author: 市川裕也
 lede: "Terraform を打ち込むことができる AWS エミュレータの「moto」を紹介します。"
 ---
-# はじめに
+## はじめに
 
 こんにちは。 CSIG の市川です。
 
@@ -28,13 +28,13 @@ lede: "Terraform を打ち込むことができる AWS エミュレータの「m
 
 この記事では、moto に対して Terraform を打ち込み、さらに「S3 → SQS → コンテナ」というイベント駆動の構成が動くところまでをローカルで検証します。
 
-# この記事を読むとできるようになること
+## この記事を読むとできるようになること
 
 - `docker compose up` で立ち上げた moto に対して、Terraform で AWS リソースを作成できる
 - S3 → SQS → ECS サービス という典型的なイベント駆動構成が moto 上で動くかどうか、自分の目で確かめられる
 - moto で「どこまで再現できて、どこからは無理か」が判断できるようになる
 
-# moto とは
+## moto とは
 
 [moto](https://github.com/getmoto/moto) はもともと Python の [boto3](https://github.com/boto/boto3) 用のユニットテスト向け mock ライブラリです。
 
@@ -44,7 +44,7 @@ lede: "Terraform を打ち込むことができる AWS エミュレータの「m
 
 今回はこのサーバーモードを使います。対応サービスの一覧は公式の [Implementation Coverage](https://docs.getmoto.org/en/latest/docs/services/index.html) に記載されています。S3 / SQS / IAM / ECS / CloudWatch Logs / DynamoDB / Lambda など、よく使うサービスが幅広くカバーされています。
 
-# moto と LocalStack の使い分け
+## moto と LocalStack の使い分け
 
 ざっくり並べるとこんな印象です。
 
@@ -58,7 +58,7 @@ lede: "Terraform を打ち込むことができる AWS エミュレータの「m
 
 「Lambda が SQS から自動で起動する」「Cognito の状態遷移を再現する」みたいなことをしたい場合は LocalStack（有料機能を含めて）を使用する必要がありますが、「API レスポンスと、ごく一部の副作用さえあれば良い」という用途であれば、 moto で十分なケースが多そうです。
 
-# 今回検証すること
+## 今回検証すること
 
 この記事では 2 つのことを試します。
 
@@ -77,7 +77,7 @@ put JSON --> [S3] --event--> [SQS] --ポーリング--> [ECS サービス 相当
 
 動作検証を行ったリポジトリは [moto-terraform](https://github.com/yy-at-here/moto-terraform) に上げているので、興味がある方はご参照ください。
 
-# 準備: moto のサーバーモードを立ち上げる
+## 準備: moto のサーバーモードを立ち上げる
 
 `docker-compose.yml` で `motoserver/moto` を起動します。
 
@@ -98,12 +98,12 @@ services:
 %
 ```
 
-# 試したいこと（1） : Terraform を moto に打ち込む
+## 試したいこと（1） : Terraform を moto に打ち込む
 
 ここからが本題のひとつめです。
 Terraform の provider が向く先を moto に切り替えていきます。
 
-## Terraform に moto を打ち込むための設定
+### Terraform に moto を打ち込むための設定
 
 以下のような `main.tf` を使用する想定とします。
 
@@ -210,7 +210,7 @@ http://localhost:5050/my-bucket/key.txt
 
 </details>
 
-### 作成するリソース (一部抜粋)
+#### 作成するリソース (一部抜粋)
 
 S3 バケットと SQS キューを、以下の設定で作成します。
 
@@ -261,7 +261,7 @@ resource "aws_sqs_queue_policy" "allow_s3" {
 }
 ```
 
-## Terraform コマンドが実行できることを確認する
+### Terraform コマンドが実行できることを確認する
 
 ここまで揃ったら、あとは Terraform コマンドを叩くだけです。
 
@@ -288,7 +288,7 @@ QueueUrls:
 - http://localhost:5050/123456789012/moto-test-queue
 ```
 
-# 試したいこと（2） : S3 → SQS → コンテナ のイベント駆動を動かす
+## 試したいこと（2） : S3 → SQS → コンテナ のイベント駆動を動かす
 
 次は副作用ありのフローを試します。
 S3 にオブジェクトが作成されたら自動的に SQS にイベント通知が飛び、それを ECS サービスが拾って後段で処理する、という構成を moto 上で動かします。
@@ -314,7 +314,7 @@ S3 にオブジェクトが作成されたら自動的に SQS にイベント通
 > - s3:ObjectDeleted
 > - s3:ObjectRestore:Post
 
-## S3 → SQS の通知設定
+### S3 → SQS の通知設定
 
 Terraform で、以下のような S3 イベント通知を設定します。
 
@@ -339,7 +339,7 @@ resource "aws_s3_bucket_notification" "to_sqs" {
 「`.json` で終わるオブジェクトが作られたら SQS にイベントを送る」だけのシンプルな設定です。
 これがちゃんと moto 上で副作用として発火するのかが、ここでの検証ポイントになります。
 
-## ポーリング用のコンテナを起動する
+### ポーリング用のコンテナを起動する
 
 今回は `docker-compose.yml` でコンテナを作成し、このコンテナを ECS サービスの代わりとしました。
 
@@ -368,7 +368,7 @@ moto の ECS は API のレスポンスを返すだけで、実際にコンテ�
 最初は、上記のコンテナも ECS のエミュレータ上で動かせたら嬉しいと考えていたのですが、上記の制約より、普通のコンテナとして動かす方針で検証を進めました。
 :::
 
-### 動かしてみる
+#### 動かしてみる
 
 初期状態のキュー内のメッセージは当然 0 個です。
 
@@ -416,7 +416,7 @@ moto-terraform-ecs-task2-1  | 2026/05/24 06:36:15 received JSON: {"hello": "worl
 
 無事、 S3 → put event → SQS → コンテナでポーリング の流れが動くことを確認できました。
 
-# moto を使用する際の制約
+## moto を使用する際の制約
 
 ここまで動いたとはいえ、moto は実 AWS の完全な置き換えではありません。今回検証して見えた範囲だと、以下のような制約があります。
 
@@ -429,7 +429,7 @@ moto-terraform-ecs-task2-1  | 2026/05/24 06:36:15 received JSON: {"hello": "worl
 
 どのような API および副作用が実装されているかはドキュメントにかなり詳しくまとまっているので、テストしたい AWS・Terraform 操作を満たす API が moto に実装されているかを確認してから moto の採用を決定するのが良いと思います。
 
-# まとめ
+## まとめ
 
 この記事では moto に対して Terraform を打ち込み、S3 → SQS → ECS サービス (相当のコンテナ) というイベント駆動の構成をローカル完結で動かしてみました。
 

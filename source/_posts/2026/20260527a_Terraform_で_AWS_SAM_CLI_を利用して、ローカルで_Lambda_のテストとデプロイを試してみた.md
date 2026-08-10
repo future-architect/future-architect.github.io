@@ -18,13 +18,13 @@ lede: "AWS SAM CLI は Docker を使って Lambda 実行環境をローカルに
 
 <img src="/images/2026/20260527a/top.jpg" alt="" width="800" height="446">
 
-# はじめに
+## はじめに
 
 こんにちは、香村真紀です。本記事は [Terraform連載 2026](/articles/20260518a/) の掲載記事です。
 
 AWS SAM CLI は Docker を使って Lambda 実行環境をローカルに再現するため、AWS へデプロイせずに関数の動作確認ができます。Terraform 構成のまま使える点が便利だったので、ローカルテストとデプロイの方法を紹介します。
 
-# 前提条件
+## 前提条件
 
 - AWS CLI v2.34.41
 - Terraform v1.14.3
@@ -32,7 +32,7 @@ AWS SAM CLI は Docker を使って Lambda 実行環境をローカルに再現�
 - Docker v29.1.3（`sam local` の実行に必要）
 - AWS SAM CLI v1.161.0
 
-# SAM でできること
+## SAM でできること
 
 [AWS 公式ドキュメント](https://docs.aws.amazon.com/ja_jp/serverless-application-model/latest/developerguide/what-is-sam-overview.html#what-is-sam-cli)
 
@@ -48,7 +48,7 @@ AWS SAM CLI は Docker を使って Lambda 実行環境をローカルに再現�
 
 ※ この記事では「ローカルでのデバッグとテスト」と「デプロイ」を中心に紹介します。
 
-# AWS SAM CLI で Lambda 関数のプロジェクトを自動生成
+## AWS SAM CLI で Lambda 関数のプロジェクトを自動生成
 
 AWS SAM（Serverless Application Model）を使って、Lambda 関数のサンプルプロジェクトを自動生成しました。
 
@@ -111,7 +111,7 @@ Docker を使って自分の Mac 上に Lambda の実行環境を再現し、実
 https://xxxxxxxxxx.execute-api.ap-northeast-1.amazonaws.com/Prod/hello/
 ```
 
-## AWS リソースを削除する場合
+### AWS リソースを削除する場合
 
 ```sh
 cd sam-app
@@ -127,18 +127,18 @@ sam delete
 
 注意：S3 バケット（aws-sam-cli-managed-default-...）は削除するか確認されます。
 
-# Terraform + SAM CLI 構成で作り直す
+## Terraform + SAM CLI 構成で作り直す
 
 [AWS 公式ドキュメント](https://docs.aws.amazon.com/ja_jp/serverless-application-model/latest/developerguide/terraform-support.html)
 
-## SAM 単体との構成比較
+### SAM 単体との構成比較
 
 | ファイル / ディレクトリ | SAM 単体 | Terraform + SAM CLI |
 | --- | --- | --- |
 | `template.yaml` | ✅ 必要（手書き） | ❌ 不要（Terraform の `.tf` ファイルが代わり） |
 | `samconfig.toml` | ✅ 必要 | ❌ 不要（`sam deploy` を使わないため） |
 
-## 初期構成の方針
+### 初期構成の方針
 
 `sam init` は SAM 単体（`template.yaml` ベース）のプロジェクトを生成するためのコマンドなので、今回の構成では使いません。
 
@@ -151,7 +151,7 @@ sam delete
 
 - `sam local invoke --hook-name terraform` で Lambda を直接呼ぶ
 
-## Step 1：構成を考える
+### Step 1：構成を考える
 
 ```sh
 sam-tf-app/
@@ -167,7 +167,7 @@ sam-tf-app/
     └── iam.tf
 ```
 
-## Step 2：Lambda のコードを書く
+### Step 2：Lambda のコードを書く
 
 ```sh
 cd functions/hello
@@ -198,7 +198,7 @@ func main() {
 }
 ```
 
-## Step 3：Terraform ファイルを書く
+### Step 3：Terraform ファイルを書く
 
 `provider.tf`（リージョン・プロバイダー設定）と `iam.tf`（Lambda 実行ロール）はこの記事では省略します。
 
@@ -260,7 +260,7 @@ resource "aws_lambda_function" "hello" {
 
 ③ の `null_resource.sam_metadata_aws_lambda_function_hello` が SAM CLI に Lambda の場所を伝える案内板です。これがないと `sam build --hook-name terraform` が Lambda を認識できません。
 
-## Step 4：コマンドを実行
+### Step 4：コマンドを実行
 
 コマンドを実行する前に、`sam build --hook-name terraform` が何をしているかを理解しておくと動作のイメージがつかみやすくなります。
 
@@ -299,7 +299,7 @@ SAM 単体の `sam build` との違いは以下の通りです。
 | ビルド成果物の格納先 | `.aws-sam/build/` | `.aws-sam/build/`（同じ） |
 | ローカル実行コマンド | `sam local invoke 関数名` | `sam local invoke --hook-name terraform リソース名` |
 
-### 実際のコマンド
+#### 実際のコマンド
 
 ```sh
 # Go の依存解決（functions/hello/ で実行）
@@ -318,7 +318,7 @@ sam local invoke --hook-name terraform aws_lambda_function.hello -e ../events/ev
 terraform apply
 ```
 
-### ローカルテストの実行例
+#### ローカルテストの実行例
 
 `events/event.json`（`sam local invoke` に渡すイベント）：
 
@@ -351,9 +351,9 @@ sam local invoke --hook-name terraform aws_lambda_function.hello -e ../events/ev
 {"statusCode":200,"body":"{\"message\": \"hello world\"}"}
 ```
 
-# API Gateway を追加する
+## API Gateway を追加する
 
-## ファイル構成の更新
+### ファイル構成の更新
 
 ```sh
 sam-tf-app/
@@ -370,7 +370,7 @@ sam-tf-app/
     └── api_gateway.tf     # 追加
 ```
 
-## main.go を API Gateway 対応に変更
+### main.go を API Gateway 対応に変更
 
 API Gateway のリクエスト/レスポンス型を使うよう更新します。
 
@@ -400,7 +400,7 @@ func main() {
 }
 ```
 
-## api_gateway.tf を作成
+### api_gateway.tf を作成
 
 SAM 単体では `template.yaml` の `Events:` 数行で済む部分を、Terraform では明示的に書く必要があります。
 全コードはこの記事では省略します。
@@ -429,7 +429,7 @@ resource "aws_lambda_permission" "api_gateway" {
 }
 ```
 
-## ビルドとデプロイ
+### ビルドとデプロイ
 
 ```sh
 # terraform/ で実行
@@ -444,7 +444,7 @@ curl $(terraform output -raw api_endpoint)
 # {"message": "hello world"}
 ```
 
-## API Gateway のローカルテスト
+### API Gateway のローカルテスト
 
 `sam local start-api` を使うと、ローカルで API Gateway + Lambda の動作を確認できます。
 
@@ -461,21 +461,21 @@ curl http://127.0.0.1:3000/hello
 
 `sam local invoke` との違いは、`start-api` はサーバーを起動したままにするため、ブラウザや curl で何度でもリクエストを送れる点です。
 
-## AWS リソースを削除する場合
+### AWS リソースを削除する場合
 
 ```sh
 # terraform/ で実行
 terraform destroy
 ```
 
-# さいごに
+## さいごに
 
 Terraform + AWS SAM CLI を使うことで、AWS へデプロイせずに Lambda の動作確認ができました。
 
 コードを他のコードと同じリポジトリで一元管理できるようになり、EOL や脆弱性管理のフローにも乗せやすくなります。
 Terraform で Lambda を管理している方の参考になれば幸いです。
 
-## 参考リンク
+### 参考リンク
 
 - [AWS SAM CLI とは（公式）](https://docs.aws.amazon.com/ja_jp/serverless-application-model/latest/developerguide/what-is-sam-overview.html)
 - [AWS SAM CLI Terraform サポート（公式）](https://docs.aws.amazon.com/ja_jp/serverless-application-model/latest/developerguide/terraform-support.html)

@@ -14,7 +14,7 @@ lede: "2026年7月1日に AWS Certified Advanced Networking - Specialty に続�
 ---
 <img src="/images/2026/20260708a/image1.png" alt="" width="600" height="600" loading="lazy">
 
-# はじめに
+## はじめに
 
 フューチャーでFutureVuls（脆弱性管理SaaS）の開発に携わる棚井です。
 
@@ -26,7 +26,7 @@ lede: "2026年7月1日に AWS Certified Advanced Networking - Specialty に続�
 
 これを見て、ネットワークの障害調査も、これからはエージェントが担っていくのだろうと感じました。ただ、エージェントがどのメトリクスを見て、どのサービスのログを読んでいるのかを自分が分かっていないと、出てきた結果を判断できません。その中身を正しく理解しておきたいというのも、ネットワークを棚卸ししようと思った理由の1つでした。
 
-# 試験の概要
+## 試験の概要
 
 ANS-C01は、AWSとオンプレをまたぐネットワークを大規模に設計し、運用し、守れるかを問うSpecialtyレベルの認定です。出題は4分野に分かれます。
 
@@ -48,11 +48,11 @@ ANS-C01は、AWSとオンプレをまたぐネットワークを大規模に設�
 
 冒頭のとおり、この試験は2026年8月25日で受験できなくなります。廃止前に取った認定は、取得日から3年はそのまま有効です（私の場合は2029年7月まで）。ただし廃止後は新規発行も再認定もありません。AWSはここ数年でSpecialtyを絞っていて、Machine Learning - Specialtyも2026年3月末で廃止済みです。ネットワークもその流れの中にあります。
 
-# 学習方法
+## 学習方法
 
 私の学習は、シンプルに2ステップでした。
 
-## 1. 完全対応テキストで全体像をつかむ
+### 1. 完全対応テキストで全体像をつかむ
 
 <img src="/images/2026/20260708a/image2.jpg" alt="image2.jpg" width="281" height="400" loading="lazy">
 
@@ -62,7 +62,7 @@ ANS-C01は、AWSとオンプレをまたぐネットワークを大規模に設�
 
 役に立ったのは、むしろ古い知識のほうでした。以前[マスタリングTCP/IP 入門編（第6版）](https://www.amazon.co.jp/dp/4274224473)で学んだTCPやIP、ルーティング、DNSといったプロトコルの基礎です。AWSのネットワークも、結局はこの上に乗っています。パケットの中で何が起きているかを、昔[Wiresharkで通信プロトコルを見る](https://future-architect.github.io/articles/20210823b/)で一度追っておいたことが、そのまま理解の下敷きになりました。
 
-## 2. Udemyの演習問題で長文に慣れる
+### 2. Udemyの演習問題で長文に慣れる
 
 <img src="/images/2026/20260708a/image3.png" alt="image3.png" width="302" height="320" loading="lazy">
 
@@ -72,11 +72,11 @@ ANS-C01は、AWSとオンプレをまたぐネットワークを大規模に設�
 
 ANS-C01は、とにかく問題文が長いのが特徴です。しかも設問ごとにネットワークの状況が違うので、長い文章を読んで、頭の中に構成図を描き直しながら答えることになります。正直、読むだけで脳が疲れます。正解を一発で当てにいくよりも、明らかにおかしい選択肢から落としていくほうが、効率的に回答できる問題もいくつか見られました。この長文への耐性は、Udemyで数を解いて慣れるしかありませんでした。
 
-# 試験勉強で得た学び
+## 試験勉強で得た学び
 
 おさらいの中で理解が整理された論点を、いくつか挙げます。
 
-## Transit Gateway、VPCピアリング、PrivateLinkの使い分け
+### Transit Gateway、VPCピアリング、PrivateLinkの使い分け
 
 VPCをまたいでつなぐ方法は複数あり、目的で選び分けます。3つを表に並べました。
 
@@ -110,7 +110,7 @@ flowchart TB
 
 参考：[VPC ピアリング接続の仕組み](https://docs.aws.amazon.com/ja_jp/vpc/latest/peering/vpc-peering-basics.html)、[AWS Transit Gateway の仕組み](https://docs.aws.amazon.com/ja_jp/vpc/latest/tgw/how-transit-gateways-work.html)、[AWS PrivateLink とは](https://docs.aws.amazon.com/ja_jp/vpc/latest/privatelink/what-is-privatelink.html)
 
-## Gateway Load Balancerでセキュリティアプライアンスを挟む
+### Gateway Load Balancerでセキュリティアプライアンスを挟む
 
 サードパーティのファイアウォールやIDS/IPSをAWSに持ち込むとき、Gateway Load Balancer(GWLB)を使います。通信の経路上にアプライアンスを挟み、通り道で検査します。GWLBは通信をGENEVE（UDP 6081）でカプセル化してアプライアンスに渡し、検査を通ったトラフィックを戻します。
 
@@ -144,7 +144,7 @@ flowchart LR
 
 参考：[Gateway Load Balancer とは？](https://docs.aws.amazon.com/ja_jp/elasticloadbalancing/latest/gateway/introduction.html)、[一元化されたネットワークセキュリティのための Transit Gateway での Gateway Load Balancer の使用](https://docs.aws.amazon.com/ja_jp/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/using-gwlb-with-tg-for-cns.html)
 
-## DNS FirewallとNetwork Firewallの違い
+### DNS FirewallとNetwork Firewallの違い
 
 Route 53 Resolver DNS FirewallとAWS Network Firewallは、名前は似ていますが守る層が違います。
 
@@ -169,7 +169,7 @@ flowchart TB
 
 参考：[Resolver DNS Firewall の仕組み](https://docs.aws.amazon.com/ja_jp/Route53/latest/DeveloperGuide/resolver-dns-firewall-overview.html)、[AWS Network Firewall とは](https://docs.aws.amazon.com/ja_jp/network-firewall/latest/developerguide/what-is-aws-network-firewall.html)
 
-## 到達性の調査はReachability AnalyzerとRoute Analyzerで
+### 到達性の調査はReachability AnalyzerとRoute Analyzerで
 
 疎通しないときの調査ツールは2つあり、見ている層が違います。
 
@@ -191,7 +191,7 @@ flowchart TB
 
 参考：[Reachability Analyzer の仕組み](https://docs.aws.amazon.com/ja_jp/vpc/latest/reachability/how-reachability-analyzer-works.html)、[AWS Network Manager の Route Analyzer](https://docs.aws.amazon.com/ja_jp/network-manager/latest/tgwnm/route-analyzer.html)
 
-# 試験を終えて
+## 試験を終えて
 
 受けてみて、一番の収穫は、ねらいどおりネットワークの知識武装ができたことでした。試験範囲を通しで一巡したことで、業務で使ってきた機能が全体のどこに位置づき、サービスどうしがどうつながっているのかが見えてきました。
 
@@ -208,7 +208,7 @@ flowchart TB
 
 配点が最も大きい第1分野「ネットワーク設計」を落としながら、残りの7割で合格ラインに届いた結果でした。設計は、なぜその構成を選ぶかを最も広く問う分野で、そこを詰めきれなかったのが数字に出ています。余裕をもって超えたというより、なんとか届いた、というのが正直なところです。
 
-# おわりに
+## おわりに
 
 身につけた知識は、ネットワークの設計や障害調査で役立ちます。設計から障害調査までをAIが担うようになっても、その出力の妥当性を自分で見極められるように、知識をアップデートし続けたいと思います。
 

@@ -15,13 +15,13 @@ lede: "初めてArtifact Registryに触れたのでその内容について紹�
 
 [Terraform連載2026](/articles/20260518a/) の2本目です。
 
-# はじめに
+## はじめに
 
 2024年新卒入社の製造エネルギーグループの大江悠斗です。
 
 初めてArtifact Registryに触れたのでその内容について紹介させてください。
 
-# Artifact Registryとは
+## Artifact Registryとは
 
 Artifact RegistryとはGoogle Cloud環境で開発の成果物を一元管理・保管するサービスです。
 
@@ -38,7 +38,7 @@ GitHub ActionsやCloud BuildなどのCI/CDと連携して、「自動でビル�
   * **厳密なアクセス制限**
   IAMを使って細かい権限管理が可能です。
 
-# 背景と課題
+## 背景と課題
 
 Google Cloud環境でCloud Run、Cloud Functionsやdbtなどを利用していると、デプロイのたびにArtifact Registryへ新しいコンテナイメージが自動保存されます。
 
@@ -46,7 +46,7 @@ Google Cloud環境でCloud Run、Cloud Functionsやdbtなどを利用してい�
 
 このコストを最適化するため、不要な旧世代イメージを自動削除する **クリーンアップポリシー** を導入することにしました。
 
-# 仕様理解に苦労した点
+## 仕様理解に苦労した点
 
 ここが今回、私が一番苦戦した点です。
 
@@ -61,7 +61,7 @@ Artifact Registryのクリーンアップポリシーは、以下の2つをセ�
 
 <img src="/images/2026/20260519a/Gemini_Generated_Image_.png" alt="Gemini_Generated_Image_.png" width="1200" height="603" loading="lazy">
 
-# 参考：環境ごとの設計方針
+## 参考：環境ごとの設計方針
 
 参考までに、今回の導入に当たってはコストとリスクのバランスを考慮し、以下の方針で環境ごとに保持世代数を使い分けました。
 
@@ -70,7 +70,7 @@ Artifact Registryのクリーンアップポリシーは、以下の2つをセ�
 
 このように何でもかんでも削除するのではなく、「万が一の時、環境ごとにどこまで戻せるべきか」というビジネス継続性の視点をもって設定をしました。
 
-# Terraformによる実装例
+## Terraformによる実装例
 
 汎用的な Terraform コードの例を紹介します 。ポイントは、保持したい条件（KEEP）と、それ以外を削除する条件（DELETE）の両方を定義することです。
 
@@ -109,7 +109,7 @@ resource "google_artifact_registry_repository" "example_repo" {
 ※本記事のコードはTerraform `v1.1.0` 以上、Google Cloud Provider `v6.4.0` にて動作確認しています。
 
 
-# 導入時の注意点
+## 導入時の注意点
 
 設定を反映させる際、以下の点に注意するとスムーズです。
 
@@ -126,7 +126,7 @@ protoPayload.methodName="google.devtools.artifactregistry.v1.ArtifactRegistry.Ba
 
 ※ドライランの挙動はデータアクセス監査ログとして出力されます。事前にArtifact Registry APIのログ取得を有効にしておく必要があります。
 
-# さいごに
+## さいごに
 
 今回は Artifact Registry のコスト最適化について紹介しました。
 
@@ -134,6 +134,6 @@ protoPayload.methodName="google.devtools.artifactregistry.v1.ArtifactRegistry.Ba
 
 この記事が、同じように「イメージが消えない！」と悩む方の助けになれば幸いです。
 
-# 参考リンク
+## 参考リンク
 
 - [Artifact Registry のクリーンアップ ポリシーの管理](https://docs.cloud.google.com/artifact-registry/docs/repositories/cleanup-policy?hl=ja)

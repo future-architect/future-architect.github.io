@@ -14,7 +14,7 @@ lede: "Mermaid.js で図を書こうと Mermaid Live Editor を開いたはい�
 
 <img src="/images/2026/20260612a/top.png" alt="" width="512" height="265">
 
-# はじめに
+## はじめに
 
 TIG（Technology Innovation Group）の真野です。
 
@@ -22,7 +22,7 @@ Mermaid.js で図を書こうと [Mermaid Live Editor](https://mermaid.live/) �
 
 そんな人に役立つかもしれない知識を、Tipsという形で9つまとめました。
 
-## Mermaid.js とは？
+### Mermaid.js とは？
 
 [Mermaid.js](https://mermaid.js.org/) はテキスト DSL から SVG で図を描画する JavaScript ライブラリです。2014年公開時点ではフローチャートとシーケンス図の2種類しかありませんでした。今ではフローチャート、シーケンス図、ER 図など、v11 時点で30種類近いダイアグラムに対応しています（[ちなみに名前は『リトル・マーメイド』から取った](https://github.com/mermaid-js/mermaid/issues/1904#issuecomment-787065874)そうです）。
 
@@ -30,7 +30,7 @@ Mermaid.js で図を書こうと [Mermaid Live Editor](https://mermaid.live/) �
 
 同じく「図をテキストで書く」系としては [PlantUML](https://plantuml.com/) が先行しています。PlantUML は Java ベースで開発されていて、配置図・タイミング図・ユースケース図など UML 記号の網羅性が高いのが特徴です。ただしレンダリングにサーバサイド環境を要する分、GitHub や社内 Wiki にそのまま貼って読ませる気軽さは Mermaid の方がある、という棲み分けかなと思います。フューチャーでも過去に [PlantUML 用のカラーテーマ（toy / vibrant / mars）を自作して公式テーマに採用された](https://future-architect.github.io/articles/20211108a/) 経緯があり、社内では Mermaid.js も PlantUML もよく使われています。
 
-## Mermaid Live Editor とは？
+### Mermaid Live Editor とは？
 
 [Mermaid Live Editor](https://mermaid.live/) は、Mermaid コードを書くとリアルタイムでプレビューしてくれる公式ブラウザ IDE です。ログイン不要で、開けばすぐ使えます。
 
@@ -42,9 +42,9 @@ Mermaid.js で図を書こうと [Mermaid Live Editor](https://mermaid.live/) �
 
 裏側は VS Code と同じ [Monaco Editor](https://microsoft.github.io/monaco-editor/) ベースで、`Config` タブは独立した Monaco インスタンスです。これが後述するショートカット系Tipsに効いてきます。
 
-# エディタを効率化する
+## エディタを効率化する
 
-## 1. VS Code のショートカットがそのまま使える
+### 1. VS Code のショートカットがそのまま使える
 
 Live Editor のエディタは VS Code と同じ [Monaco Editor](https://microsoft.github.io/monaco-editor/) ベースなので、VS Code の感覚で使えるショートカットがそのまま効きます。個人的にヘビロテしているのは次の3つです。
 
@@ -56,7 +56,7 @@ Live Editor のエディタは VS Code と同じ [Monaco Editor](https://microso
 
 ガントチャートで全タスクの期間を後ろ倒しにしたい時や、シーケンス図で参加者名を一括リネームしたい時にマルチカーソルが効きます。クラス図の属性名リファクタでは、正規表現置換（例：`private string (\w+)Name` → `private string $1_name`）が刺さります。「マウスに手を伸ばさない編集」が図面の編集にもそのまま効くのは、地味ですが効果が大きいです。
 
-## 2. Config タブでスタイルを本体コードから隔離する
+### 2. Config タブでスタイルを本体コードから隔離する
 
 Live Editor の左ペイン `Config` タブに JSON を書くと、[`theme` / `themeVariables`](https://mermaid.js.org/config/theming.html) といったスタイル設定を、コード本体の [frontmatter](https://mermaid.js.org/config/configuration.html#frontmatter-config) とは分離してプレビューに反映できます。
 
@@ -83,7 +83,7 @@ frontmatter に `config:` を書くのと見た目の結果は同じです。
 
 ちなみに、`config` を変更してもURLは反映されるので、単にMermaid Live Editorで閉じてやり取りする場合はどちらを使っても大差ないです。こだわりがなければ、私は移植性が高いfrontmatter記述が良いと思いますが、どうでしょうか？
 
-## 3. 時計アイコンで履歴パネルを開きスナップショット保存
+### 3. 時計アイコンで履歴パネルを開きスナップショット保存
 
 画面上部の GitHub アイコンの隣にある白黒の🕓️アイコンをクリックすると、履歴パネルが開きます。`Save Current State` を押すと現在の編集状態がスナップショットとして残り、後から一覧から選んで戻せます。
 
@@ -91,15 +91,15 @@ frontmatter に `config:` を書くのと見た目の結果は同じです。
 
 同じ履歴パネルに `Save diagram` ボタンもありますが、こちらは Mermaid Chart のクラウドに保存するもので、[Mermaid Chart](https://www.mermaidchart.com/) アカウントへのログインが必要です。長期保管したいバージョンや環境を跨いで残したいバージョンは、ログインの上 `Save diagram` を使うか、GitHub 等の外部リポジトリで別途管理する運用になります。
 
-# 見た目を整える
+## 見た目を整える
 
-## 4. ダークモードでの見え方を気軽に確認する
+### 4. ダークモードでの見え方を気軽に確認する
 
 Live Editor のプレビューエリア右下（白塗りの☀マーク / 🌜️マーク）には、背景をライト/ダークに切り替えるアイコンがあります。
 
 Tip 2 のように `themeVariables` で独自スタイルを当てた時は、両モードで確認するクセをつけておくのが安全です。ライトモードでは視認性が良くなったが、ダークモードでは文字が読みにくいといったことも多いためです。特に技術ブログなど、外部公開系はどちらでも読めるようにしておくと、読者に優しいです。
 
-## 5. スクラッチモードを Live Editor の外でも使う
+### 5. スクラッチモードを Live Editor の外でも使う
 
 Live Editor のプレビューエリアの下部に、図を手書き風に描画してくれる `Sketch` モードの切替ボタン（✏️のようなボタン）があります。手書き風の方が頭に入りやすい気がするので、よく使いたくなります。
 
@@ -127,9 +127,9 @@ flowchart LR
 
 [`look: handDrawn`](https://mermaid.js.org/intro/syntax-reference.html#selecting-diagram-looks) は Mermaid v11 でサポートされた設定で、[Rough.js](https://roughjs.com/) ベースの揺れた線で図が描画されます。Live Editor の `Sketch` ボタンをオンにした時と同じ見た目が、コードブロックを貼り付けた先でも再現されるようになります。
 
-# 共有・公開のTips
+## 共有・公開のTips
 
-## 6. 実は読み取り専用ビューを作れる
+### 6. 実は読み取り専用ビューを作れる
 
 Live Editor の共有URLには、実は2種類あります。
 
@@ -140,7 +140,7 @@ Live Editor の共有URLには、実は2種類あります。
 
 `Share` ボタンから取得できるのは `edit` 系 URL のみで、`view` URL は UI 上には出てきません。コピーした URL のパス部分を手動で `view` に書き換える必要があります。
 
-## 7. URL ハッシュの正体は pako + URL-safe base64
+### 7. URL ハッシュの正体は pako + URL-safe base64
 
 共有URLの `#pako:...` の正体を追っておきます。Live Editor の[serde.ts](https://github.com/mermaid-js/mermaid-live-editor/blob/develop/src/lib/util/serde.ts) を読むと、以下の処理が行われています。
 
@@ -169,9 +169,9 @@ print(f"https://mermaid.live/view#pako:{encoded}")
 
 社内ツールで CSV → 図 → Live Editor URL という一括変換パイプラインを組もうと思えば組めそうです。pakoってなんだろう思ってましたが、ライブラリ名だったとは。
 
-# Sample Diagrams を覗く
+## Sample Diagrams を覗く
 
-## 8. Sample Diagrams にある ZenUML とは？
+### 8. Sample Diagrams にある ZenUML とは？
 
 Live Editor 上部の `Sample Diagrams` ドロップダウンを開くと、フローチャートやシーケンス図などに並んで `ZenUML` という見慣れない選択肢が入っています。個人的に以前から気になっていたので、この機会に中身を覗いてみました。
 
@@ -212,9 +212,9 @@ zenuml
 
 ただし現時点では大きな落とし穴があります。（※2026年5月時点）手元で試した限り、GitHub Markdown も Qiita も ZenUML コードブロックを描画できませんでした（各プラットフォームが内蔵する Mermaid レンダラーが ZenUML 統合のバージョンにまだ追いついていないのが原因のようです）。Mermaid 最大の旨味である「コードブロックをそのまま貼って読ませる」気軽さが失われるので、現時点では ZenUML の採用は見送り、標準の `sequenceDiagram` を使うのが無難、というのが実際に試してみての結論です。
 
-# セキュアに使う
+## セキュアに使う
 
-## 9. Actions タブの Export 系ボタンは外部サービスに図コードを送信している
+### 9. Actions タブの Export 系ボタンは外部サービスに図コードを送信している
 
 `Actions` タブには `Copy Image` / `PNG` / `SVG` / `PDF` / `Copy Markdown` といった便利なボタンが並んでいます。Mermaid にネイティブ対応していない社内 Wiki やメール本文に図を貼りたい時に刺さる機能ですが、実際には Live Editor 本体ではなく外部サービスの [mermaid.ink](https://mermaid.ink/) や [Kroki](https://kroki.io/) にコードを送信してサーバサイドでレンダリングしています。
 
@@ -246,7 +246,7 @@ flowchart LR
 
 おまけで、[Mermaid Chart](https://www.mermaidchart.com/) アカウント（無料）でログインすると、シンタックスエラー時にプレビューエリアに `Fix with AI` ボタンが表示され、LLM に修正案を返してもらえる機能も使えます。GeminiやClaudeなどに直してもらう人が多いと思いますので、利用したいモチベーションは低いかと思いますが、これも Mermaid Chart の LLM 基盤にコードを送信する仕組みです。そのため、Export 系と同じく社外秘の図では使わない方針が固いでしょう。
 
-# おわりに
+## おわりに
 
 毎日のように開いている Live Editor ですが、改めて整理してみると意外と触れていない機能がまだまだある、というのが書き終えての率直な感想です。
 
