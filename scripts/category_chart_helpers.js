@@ -133,6 +133,31 @@ hexo.extend.helper.register('get_monthly_category_data', function(year) {
   return JSON.stringify({months, series});
 });
 
+// 月ページの週別 × カテゴリ別の投稿数 (#2227)。週は「その月の何日目か」で
+// 決める（1〜7日 = 第1週）。posts_stack_series と同じ規則で、ISO週だと
+// 月をまたぐ週が出て合計が月の投稿数と合わなくなる
+hexo.extend.helper.register('get_weekly_category_data', function(year, month) {
+  const ym = year.toString() + month.toString().padStart(2, '0');
+  const daysInMonth = new Date(Number(year), Number(month), 0).getDate();
+  const weekCount = Math.ceil(daysInMonth / 7);
+  const byCat = new Map();
+  this.site.posts.forEach(post => {
+    if (post.date.format('YYYYMM') !== ym) return;
+    const cat = post.categories.first();
+    if (!cat) return;
+    if (!byCat.has(cat.name)) byCat.set(cat.name, new Array(weekCount).fill(0));
+    const w = Math.min(weekCount, Math.ceil(Number(post.date.format('D')) / 7)) - 1;
+    byCat.get(cat.name)[w]++;
+  });
+  const weeks = Array.from({length: weekCount}, (_, i) => `第${i + 1}週`);
+  // 並びは年ページと同じサイト累計の多い順で固定 (#2201)
+  const series = this.site.categories.toArray()
+    .sort((a, b) => b.length - a.length || (a.name < b.name ? -1 : 1))
+    .filter(c => byCat.has(c.name))
+    .map(c => ({name: c.name, data: byCat.get(c.name)}));
+  return JSON.stringify({weeks, series});
+});
+
 /**
  * カテゴリ1つ分の統計。件数・寄稿者数（累計・直近1年）と
  * よく使われるタグ（上位5個）を返す。

@@ -77,6 +77,28 @@ hexo.extend.helper.register('summary_yearly_term', function(year) {
   };
 });
 
+// 月ページの統計。年ページ（summary_yearly_term）と同じ構成 (#2227)
+hexo.extend.helper.register('summary_monthly_term', function(year, month) {
+  const ym = year.toString() + month.toString().padStart(2, '0');
+  const posts = this.site.posts.filter(post => post.date.format("YYYYMM") === ym);
+
+  const total = posts.map(post => getSNSCnt(post.permalink)).reduce((acc, cur) => acc + cur);
+  const authors = posts.map(post => post.author).flat().unique().length;
+  const tw = posts.map(post => getTwitterCnt(post.permalink)).reduce((acc, cur) => acc + cur);
+  const fb = posts.map(post => getFacebookCnt(post.permalink)).reduce((acc, cur) => acc + cur);
+  const hatebu = posts.map(post => getHatebuCnt(post.permalink)).reduce((acc, cur) => acc + cur);
+  const pocket = posts.map(post => getPocketCnt(post.permalink)).reduce((acc, cur) => acc + cur);
+
+  return {
+    total: total,
+    authors: authors,
+    twitter: tw,
+    facebook: fb,
+    hatebu: hatebu,
+    pocket: pocket
+  };
+});
+
 /*
  * カテゴリ個別ページ
  */
