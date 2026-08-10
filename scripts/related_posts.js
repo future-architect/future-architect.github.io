@@ -49,7 +49,7 @@ function generateRelatedPostsHtml(posts, series) {
       const scoreText = related.score ? `スコア: ${related.score.toFixed(4)}` : '';
       const titleAttr = `${related.lede} ${scoreText}`.trim();
       // マークアップは lib/post_list.js に集約している
-      result += postListItem(related, 'related-posts-item', titleAttr);
+      result += postListItem(related, 'related-posts-item', titleAttr, true);
     }
   }
 
