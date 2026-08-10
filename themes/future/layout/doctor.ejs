@@ -72,21 +72,45 @@
 
       <h2 class="bottom-content-header">1記事にしか使われていないタグ</h2>
       ※「同居」は、同じ記事に1記事タグ同士が付いているもの。その記事のタグ付けがまとめて薄い可能性が高い
-      <%# 1タグ1行で並べると縦に長すぎる。先頭の1文字（英字は大文字に寄せる）が
-          同じタグを同じ行にまとめて、辞書の索引のように引けるようにする (#2259)。
+      <%# 1タグ1行で並べると縦に長すぎる。辞書の索引のように、英数字は先頭の
+          1文字（大文字に寄せる）、カナは五十音の行（濁音・半濁音は元の行）で
+          まとめ、漢字始まりは1行に集約する (#2259)。
           同居ありは意味の違う印なので別枠のまま %>
       <%
+        const KANA_ROWS = [
+          ['ア行', 'アイウエオァィゥェォヴ'],
+          ['カ行', 'カキクケコガギグゲゴヵヶ'],
+          ['サ行', 'サシスセソザジズゼゾ'],
+          ['タ行', 'タチツテトダヂヅデドッ'],
+          ['ナ行', 'ナニヌネノ'],
+          ['ハ行', 'ハヒフヘホバビブベボパピプペポ'],
+          ['マ行', 'マミムメモ'],
+          ['ヤ行', 'ヤユヨャュョ'],
+          ['ラ行', 'ラリルレロ'],
+          ['ワ行', 'ワヲン'],
+        ];
+        const keyOf = name => {
+          let c = name[0];
+          if (/[\x20-\x7e]/.test(c)) return c.toUpperCase();
+          // ひらがな始まりはカタカナに寄せて行を判定する
+          if (/[ぁ-ん]/.test(c)) c = String.fromCharCode(c.charCodeAt(0) + 0x60);
+          const row = KANA_ROWS.find(([, chars]) => chars.includes(c));
+          return row ? row[0] : '漢字';
+        };
+        // 行の並びは 英数字（字順）→ 五十音 → 漢字
+        const rowNames = KANA_ROWS.map(r => r[0]);
+        const orderOf = k => rowNames.includes(k) ? 0x10000 + rowNames.indexOf(k)
+          : (k === '漢字' ? 0x20000 : k.charCodeAt(0));
         const singleGroups = [];
         const lonely = checks.singleUse.filter(t => t.lonelyPair);
         if (lonely.length) singleGroups.push(['同居あり', lonely]);
         const byInitial = new Map();
         checks.singleUse.filter(t => !t.lonelyPair).forEach(t => {
-          const c = t.name[0].toUpperCase();
-          if (!byInitial.has(c)) byInitial.set(c, []);
-          byInitial.get(c).push(t);
+          const k = keyOf(t.name);
+          if (!byInitial.has(k)) byInitial.set(k, []);
+          byInitial.get(k).push(t);
         });
-        // 小文字始まりのタグがあると出現順が乱れるので、行は字順に並べ直す
-        [...byInitial.entries()].sort((a, b) => (a[0] < b[0] ? -1 : 1)).forEach(g => singleGroups.push(g));
+        [...byInitial.entries()].sort((a, b) => orderOf(a[0]) - orderOf(b[0])).forEach(g => singleGroups.push(g));
       %>
       <ul class="doctor-list">
         <% singleGroups.forEach(function(g){ %>
