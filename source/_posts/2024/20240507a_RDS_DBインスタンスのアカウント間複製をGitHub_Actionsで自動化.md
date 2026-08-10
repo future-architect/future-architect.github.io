@@ -15,7 +15,7 @@ thumbnail: /images/2024/20240507a/thumbnail.png
 author: 太田寛明
 lede: "本番環境のAmazon RDS DBインスタンスを別アカウントの検証環境にバックアップリストアする作業を自動化する機会があったので、その手法について紹介します"
 ---
-# はじめに
+## はじめに
 
 こんにちは。Strategic AI Group所属の太田寛明です。
 
@@ -23,7 +23,7 @@ lede: "本番環境のAmazon RDS DBインスタンスを別アカウントの検
 
 自動化する方法は様々[^1]あると思いますが、今回はGitHub Actionsを利用しました。複数のAWS CLIコマンドを各アカウントごとに日次で定期実行します。
 
-# バックアップリストアの実装
+## バックアップリストアの実装
 
 RDS DBインスタンスをアカウント間でバックアップリストアする方法に関しては、AWSの公式ドキュメントに記載があります。
 
@@ -42,7 +42,7 @@ RDS DBインスタンスをアカウント間でバックアップリストア�
 
 今回はAWS CLIコマンド[^2]を用いた実装を自動化したので、この実装に基づいて各プロセスをもう少し詳しく紹介していきます。
 
-## 1. 本番環境のDBのスナップショットを作成
+### 1. 本番環境のDBのスナップショットを作成
 
 Amazon RDSのスナップショットには自動スナップショットと手動スナップショットの2種類が存在します。
 
@@ -95,7 +95,7 @@ aws rds wait db-snapshot-available \
 - [DB スナップショットの削除](https://docs.aws.amazon.com/ja_jp/AmazonRDS/latest/UserGuide/USER_DeleteSnapshot.html)
 - [DB スナップショットのコピー](https://docs.aws.amazon.com/ja_jp/AmazonRDS/latest/UserGuide/USER_CopySnapshot.html)
 
-## 2. スナップショットを検証環境のアカウントに共有
+### 2. スナップショットを検証環境のアカウントに共有
 
 本番環境で作成した手動スナップショットを検証環境のアカウントでも参照できるように共有します。
 
@@ -112,7 +112,7 @@ aws rds modify-db-snapshot-attribute \
 
 - [DB スナップショットの共有](https://docs.aws.amazon.com/ja_jp/AmazonRDS/latest/UserGuide/USER_ShareSnapshot.html)
 
-## 3. 共有されたスナップショットから検証環境上でDBを復元
+### 3. 共有されたスナップショットから検証環境上でDBを復元
 
 いよいよDBの復元ですが、AWS KMSによる暗号化を行った際、1つ注意点があります。
 以下の制限により、カスタマーマネージドキーを使用してスナップショットを暗号化する必要がありました。
@@ -128,7 +128,7 @@ aws rds modify-db-snapshot-attribute \
 
 このため、他アカウントから共有された暗号化済みの手動スナップショットを利用してDBインスタンスを復元したい場合は、指示された回避策に従って再びスナップショットのコピーを作成し、それをもとにDBインスタンスの復元を行う必要があります。
 
-### 共有されたスナップショットのコピー
+#### 共有されたスナップショットのコピー
 
 前述した通り、まずは本番環境から共有された暗号化済みのスナップショットを検証環境上でコピーします。
 
@@ -178,7 +178,7 @@ aws rds wait db-snapshot-available \
 - [DB スナップショットの削除](https://docs.aws.amazon.com/ja_jp/AmazonRDS/latest/UserGuide/USER_DeleteSnapshot.html)
 - [DB スナップショットのコピー](https://docs.aws.amazon.com/ja_jp/AmazonRDS/latest/UserGuide/USER_CopySnapshot.html)
 
-### スナップショットからDBインスタンスを復元
+#### スナップショットからDBインスタンスを復元
 
 続いて検証環境上でコピーしたスナップショットをもとに、DBインスタンスを復元します。
 
@@ -214,7 +214,7 @@ aws rds wait db-instance-available \
 - [DB インスタンスを削除する](https://docs.aws.amazon.com/ja_jp/AmazonRDS/latest/UserGuide/USER_DeleteInstance.html)
 - [DB スナップショットからの復元](https://docs.aws.amazon.com/ja_jp/AmazonRDS/latest/UserGuide/USER_RestoreFromSnapshot.html)
 
-# バックアップリストアの自動化
+## バックアップリストアの自動化
 
 さて、[バックアップリストアの実装](#バックアップリストアの実装)で作成したファイル達を各アカウントでそれぞれ手動実行することで、検証環境上に本番環境のDBを復元できるようになりました。
 
@@ -223,7 +223,7 @@ aws rds wait db-instance-available \
 
 一般的に`aws-actions/configure-aws-credentials`を使用してAWS CLIコマンドを実行するために必要な設定については、[Terraform とGitHub Actions](https://future-architect.github.io/articles/20230405a/)等を参考にしてみてください。
 
-## 必要なIAMロールの設定
+### 必要なIAMロールの設定
 
 [バックアップリストアの実装](#バックアップリストアの実装)で作成したファイル達が正常に実行されるためには、以下ポリシーがIAMロールに付与されており、アクセスが許可されている必要があります。
 
@@ -232,7 +232,7 @@ aws rds wait db-instance-available \
 
 1つずつ見ていきましょう。
 
-### AWS CLIコマンド実行のために必要なポリシー
+#### AWS CLIコマンド実行のために必要なポリシー
 
 [バックアップリストアの実装](#バックアップリストアの実装)を踏まえると、本番/検証環境で以下AWS CLIコマンド群を実行できるようにする必要があると分かります。
 
@@ -254,7 +254,7 @@ aws rds wait db-instance-available \
 要件によっては、さらに細かくカスタマイズする必要もあると思うので参考程度に留めて役立ててもらえればと思います。
 また、本番/検証環境のそれぞれのアカウントごとに、実行すべきコマンド群が異なるので注意して設定してください。
 
-#### スナップショットの削除複製に必要なポリシーの実装例
+##### スナップショットの削除複製に必要なポリシーの実装例
 
 本番環境と検証環境の両方のアカウントで必要になります。
 
@@ -277,7 +277,7 @@ aws rds wait db-instance-available \
 }
 ```
 
-#### スナップショットの共有に必要なポリシーの設定例
+##### スナップショットの共有に必要なポリシーの設定例
 
 本番環境のアカウントでのみ必要になります。
 
@@ -298,7 +298,7 @@ aws rds wait db-instance-available \
 }
 ```
 
-#### DBインスタンスの削除復元に必要なポリシーの設定例
+##### DBインスタンスの削除復元に必要なポリシーの設定例
 
 検証環境のアカウントでのみ必要になります。
 
@@ -334,9 +334,9 @@ aws rds wait db-instance-available \
 }
 ```
 
-### 検証環境上での本番環境のAWS KMSキーの使用に必要なポリシー
+#### 検証環境上での本番環境のAWS KMSキーの使用に必要なポリシー
 
-#### 本番環境での設定
+##### 本番環境での設定
 
 スナップショットの暗号化に使用したカスタマーマネージドキーのKMSキーポリシーにて、共有先の検証環境のアカウントをキーユーザーに指定することで、検証環境上でそのKMSキーへのアクセスを許可できるようになります。
 
@@ -385,7 +385,7 @@ aws rds wait db-instance-available \
 
 - [他のアカウントのユーザーに KMS キーの使用を許可する#他のアカウントで使用できる KMS キーを作成する](https://docs.aws.amazon.com/ja_jp/kms/latest/developerguide/key-policy-modifying-external-accounts.html#cross-account-console)
 
-#### 検証環境での設定
+##### 検証環境での設定
 
 上記設定により本番環境側は、このKMSキーに対するアクセス許可を検証環境に与えました。
 しかし実際に検証環境上でKMSキーを使用できるようにするためには、このKMSキーを使用するロールに対して検証環境側からアクセス許可を与える必要もあります。
@@ -432,7 +432,7 @@ aws rds wait db-instance-available \
 
 - [他のアカウントのユーザーに KMS キーの使用を許可する](https://docs.aws.amazon.com/ja_jp/kms/latest/developerguide/key-policy-modifying-external-accounts.html)
 
-## GitHub Actions ワークフローを作成する
+### GitHub Actions ワークフローを作成する
 
 必要なIAMロールを設定できたので、あとはGitHub Actionsのワークフローを作成すればバックアップリストア作業を自動化できます。
 
@@ -496,7 +496,7 @@ jobs:
         run: sh restore_stg.sh
 ```
 
-# さいごに
+## さいごに
 
 今回は、RDS DBインスタンスをアカウント間でバックアップリストアする方法とGitHub Actionsを用いた自動化の方法を紹介させていただきました。もしRDS DBのバックアップ方法に悩んでいる方がいれば試してみてください。
 

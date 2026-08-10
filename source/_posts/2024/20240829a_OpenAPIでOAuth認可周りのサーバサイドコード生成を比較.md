@@ -19,7 +19,7 @@ lede: "夏といえばコード生成というわけで、HTTP API仕様を定�
 ---
 [夏の自由研究連載2024](/articles/20240819a/) の3日目です。
 
-# はじめに
+## はじめに
 
 TIG 真野です。
 
@@ -31,12 +31,12 @@ TIG 真野です。
 
 - https://github.com/ma91n/summer2024
 
-## コード生成の対象
+### コード生成の対象
 
 - Go言語のみ
 - サーバサイドのみ（※クライアントコードは対象外）
 
-## 比較ツール
+### 比較ツール
 
 Goコードを生成可能な以下のツールを対象にします。今どきはOpen API 3.0.3（3.1.0） を使うと思うので、3系に対応しているツールを選定しています。[フューチャー技術ブログではgo-swagger記事がいくつかありますが](https://future-architect.github.io/tags/go-swagger/)、go-swaggerは2系にしか対応していないので対象外としています。
 
@@ -44,13 +44,13 @@ Goコードを生成可能な以下のツールを対象にします。今どき
 1. [oapi-codegen](https://github.com/oapi-codegen/oapi-codegen) v2.2.0 `net/http` モード、`strict-server` モード
 1. [openapi-generator](https://github.com/OpenAPITools/openapi-generator) v7.8.0 `gorilla/mux` ルーターモード
 
-## 検証の構成やコードについて
+### 検証の構成やコードについて
 
 構成ですが、クライアントを `curl` で、JWTトークンをGo製のCLIツールで作成し、OAuth 2.0でいう認可サーバを無くした状態で検証しています（※本来は、公開鍵を `/oauth2/jwks` や `jwks_uri` で指定されたURLから取得できるようにすべきですが、ハードコードで省略しています）。
 
 <img src="/images/2024/20240829a/openapi.drawio_(2).png" alt="openapi.drawio_(2).png" width="1200" height="719" loading="lazy">
 
-## 利用するJWTトークンについて
+### 利用するJWTトークンについて
 
 認可サーバやIdPを今回用意しないので、替わりに `openssl` で秘密鍵・公開鍵を作成します。秘密鍵でJWTを署名し、公開鍵で検証することを想定しているので、非対称鍵系署名アルゴリズムを選定します。
 
@@ -113,7 +113,7 @@ $ go run .
 eyJhbGciOiJFUzUxMiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJteS1hdXRoLXNlcnZlciIsInNjcCI6InJlYWQ6aGVsbG9zIHdyaXRlOmhlbGxvcyIsInN1YiI6IjEyMyJ9.AM5-XwIJM0HBxHeaUt2SXU7fU8UXQhet6DfzP7i0JoTVLwbme36NZ-rG_8URqtUkQ2knvi7D3iydvCGgoDGdHm41Ae3aMDNG-yjwUiH7O9xJVLPly2EkwQC0GdsZU6ax-99t0ePDaeJaNf7k799hgxDQ3op9KCNTr8pDfvR2a6PkLvfQ
 ```
 
-## openapi.yaml
+### openapi.yaml
 
 `openapi.yaml` の security schemes は次のように記載しています。先述の通り、OAuth 2.0での認可サーバ、OIDCでのIdPは利用しない構成のため、authorizationUrlなどの値はすべてダミー値であり、検証には使われません。
 
@@ -197,7 +197,7 @@ paths:
 
 `openapi.yaml`の全体は https://github.com/ma91n/summer2024/blob/main/openapi.yaml を参照ください。
 
-## 検証項目
+### 検証項目
 
 この `openapi.yaml` を元にコード生成を行い、次の内容がどのように変化するか確認しました。
 
@@ -205,7 +205,7 @@ paths:
 2. 生成された認証設定のコードを各フレームワークでどのように実装するか
 3. OAuth2、OIDC でスコープ（`write:hellos` などの部分）がどう生成コードに影響を与えるか
 
-## 結果サマリ
+### 結果サマリ
 
 【凡例】 ✅️対応あり ✘対応なし
 
@@ -217,7 +217,7 @@ paths:
 
 今回の検証における、おすすめ度は記載順で、`ogen` >= `oapi-codegen` > `openapi-generator` といった感覚です。別の角度では全く結果が変わることも想定されますので、あくまで判断材料の一部としての利用、認識いただければです。
 
-## 1. ogen
+### 1. ogen
 
 セットアップです。
 
@@ -388,7 +388,7 @@ ogenのサーバサイドコード生成について、まとめると次のよ�
 - JWTトークンのパースや検証を自前で実装する
 - JWTトークンの値を後続に引き渡したい場合は、 `context.Context` を経由する
 
-## 2. oapi-codegen
+### 2. oapi-codegen
 
 `ogen`より先発だけあって、利用実績も多数な`oapi-codegen`ですが、[2024年5月](https://github.com/oapi-codegen/oapi-codegen/discussions/1605)にOrganizationが`deepmap`から`oapi-codegen` に変わったようです。
 
@@ -548,7 +548,7 @@ oapi-codegenのサーバサイドコード生成について、まとめると�
 - JWTトークンのパースどころか、リクエストヘッダから取得するところまで自前開発が必要（とはいえ、大したコード量にはならない）
 - 様々な出力モードがあるため、検索結果が別の設定モードの場合があり、見極め力が必要な場合がある
 
-## 3. openapi-generator
+### 3. openapi-generator
 
 最も有名なコード生成ツールである `openapi-generator` を試します。様々な言語に対応していますが、記事の趣旨からGo言語かつサーバサイドに絞って生成します。
 
@@ -639,7 +639,7 @@ func validateToken(r *http.Request) error {
 - Yusuke ItoさんのZennブック[【Go言語】OpenAPI Generatorを使いこなすスキーマ駆動開発]によれば、カスタマイズしたテンプレート実行には、Java環境（Mavenなど）が必要で、メンバーのスキルセット次第では障壁がある（FAT JAR提供とかあったらすいません）
 - 調査すると、他の言語（Swiftなど）の結果が出てくるので、検索ワード力が必要かもしれない
 
-## さいごに
+### さいごに
 
 OpenAPI 3系かつGoのサーバサイドコード生成に対応した `ogen`・`oapi-codegen`・`openapi-generator`について、Bearer・OAuth2.0・OIDC認可でどのようにコード生成が対応しているか試しました。現時点では `ogen` が後発だけあって一番垢抜けていて、`oapi-codegen`も十分に扱いやすい。`openapi-generator`は玄人向けだなと感じました。
 

@@ -22,11 +22,11 @@ lede: "Cloudflareは、インターネット上で運営されている最大の
 
 Cloudflare連載の第1日目とインデックス記事です。
 
-## Cloudflare連載を始めます
+### Cloudflare連載を始めます
 
 CDNやインターネットセキュリティを中心としたサービスプロバイダーであるCloudflareを題材とした連載を開催します。Cloudflareについては技術ブログではこれまで、個人の寄稿で数記事上がっていましたが、連載という形にするのは今回が初めてです。
 
-## Cloudflareとは
+### Cloudflareとは
 
 Cloudflareは、[公式](https://www.cloudflare.com/ja-jp/learning/what-is-cloudflare/)では以下の様に書かれていました。
 
@@ -35,7 +35,7 @@ Cloudflareは、[公式](https://www.cloudflare.com/ja-jp/learning/what-is-cloud
 上記の様にCloudflare自体でもサービスを持ちつつ、既存のシステムのセキュリティ、パフォーマンスを向上することを目的としているサービス群です。
 AWSなどのパブリッククラウドではリージョン、ゾーンという概念がありますが、Cloudflareでは全てエッジネットワークにて構築されており、ユーザが接続する時は一番近い接続点に繋ぎにいき、Cloudflareのサービス、その裏の他のクラウドに接続などをしています。
 
-## 連載日程
+### 連載日程
 
 今回は初めての連載ということもあり、5人が参加してくれました。内容は初めて触った系の記事もありますが、わずかながら社内の知見も公開されるようなので、ぜひ楽しみにお待ちください。
 
@@ -51,7 +51,7 @@ AWSなどのパブリッククラウドではリージョン、ゾーンとい�
 
 ----
 
-# Cloudflare WorkersでPythonを使いたい
+## Cloudflare WorkersでPythonを使いたい
 
 今から約1ヶ月前、2024/04/02にCLoudflareのアナウンスより、Workersにオープンベータという形でPythonが利用できるようになりました。
 
@@ -61,7 +61,7 @@ https://blog.cloudflare.com/python-workers
 個人的には、これまでWorkersのアーキテクチャからJavaScriptのみをサポートしていたこともあり、ちょっととっつきづらい部分もありましたが、まだ自分に馴染みのあるPythonが使えるようになったことで言語選択の幅が出たことは喜ばしいことですね。
 さて、早速動かせるところまでは動かしてみましょう。
 
-## 必要なもの
+### 必要なもの
 
 事前準備は以下のコマンドで[wrangler](https://developers.cloudflare.com/workers/wrangler/install-and-update/)コマンドを利用できるようにしておきましょう。
 
@@ -69,7 +69,7 @@ https://blog.cloudflare.com/python-workers
 npm install wrangler --save-dev
 ```
 
-## コマンドを利用してWorkersにPythonをデプロイする
+### コマンドを利用してWorkersにPythonをデプロイする
 
 はじめにPythonのプロジェクトを作成しましょう。以下のコマンドから作成します。
 
@@ -106,7 +106,7 @@ async def on_fetch(request, env):
 
 ここまででの作業でPythonのアプリケーションが動く様になったので、次はPythonのパッケージを入れて試してみます。
 
-## Pythonのパッケージのサポート
+### Pythonのパッケージのサポート
 
 2024/04/02時点でWorkersがサポートしているPythonのパッケージですが、公式の[Packages](https://developers.cloudflare.com/workers/languages/python/packages/)のページに記載があります。しかし、
 
@@ -146,7 +146,7 @@ Total Upload: 0.06 KiB / gzip: 0.07 KiB
 
 実際に色々動かしてみたかったところではありますが、ネイティブでもっと動かせる時が来たらさらに試してみようと思います。
 
-## まとめ
+### まとめ
 
 Cloudflare連載のインデックス記事とWorkersでPythonがオープンベータで使えるようになったのでできるところまで試してみた記事でした。
 

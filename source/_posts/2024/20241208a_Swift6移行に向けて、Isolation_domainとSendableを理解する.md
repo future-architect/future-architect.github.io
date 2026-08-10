@@ -23,10 +23,10 @@ HealthCare Innovation Group(HIG)[^1]の橋本です。
 
 先日参加したSwiftZoomin#20の内容から、Swift6移行に向けて理解が必要なSwift Concurrencyの重要な概念について簡単にまとめました。
 
-SwiftZoomin#20の動画は、次のリンク先からYoutube上で視聴可能です。
+SwiftZoomin#20の動画は、次のリンク先からYouTube上で視聴可能です。
 - [感覚的に理解するConcurrency: Swift 6はIsolationとSendableを用いてどのようにデータ競合を防止するか](https://youtu.be/AUcn2y2jjNs?si=_fyNjme2hDA236sl)
 
-# Swift6移行に向けて、重要な概念3つ
+## Swift6移行に向けて、重要な概念3つ
 
 以下３つの概念についてまとめいきます。
 
@@ -34,18 +34,18 @@ SwiftZoomin#20の動画は、次のリンク先からYoutube上で視聴可能�
 - Isolation boundary
 - Sendable
 
-## Isolation domain
+### Isolation domain
 
 `隔離=Isolation`する領域のことを`Isolation domain`と呼びます。
-`Isolation domain`の重要な特性は、**一つのIsolation domainのなかでは同時に一つの処理しか実行されない**ことです。（＝一つのIsolation domainの中で並行実行されることはないことと同義）
+`Isolation domain`の重要な特性は、**一つのIsolation domainのなかでは同時に一つの処理しか実行されない**ことです（＝1つのIsolation domainの中で並行実行されることはないことと同義）
 
 参考
 
 - [Isolation Domains | Migrating to Swift 6](https://www.swift.org/migration/documentation/swift-6-concurrency-migration-guide/dataracesafety/#Isolation-Domains)
 
-### actor
+#### actor
 
-`actor`というのは、一つの領域で隔離(Isolation)することでデータ競合を防いでいます。
+`actor`というのは、1つの領域で隔離(Isolation)することでデータ競合を防いでいます。
 
 最も馴染み深いのは、`MainActor`の`Isolation domain`であり、`actor`のインスタンスに紐づいたIsolation domainも存在します。
 
@@ -64,7 +64,7 @@ let b = Counter() // bのIsolation domain、aとbは別のIsolation domainであ
 
 - [Actor | Apple Developer Documentation](https://developer.apple.com/documentation/swift/actor)
 
-## Isolation boundary
+### Isolation boundary
 
 `Isolation domain`が複数存在しているときのそれぞれの`Isolation domain`の間の境界のことを`Isolation boundary`と呼びます。
 
@@ -72,13 +72,13 @@ let b = Counter() // bのIsolation domain、aとbは別のIsolation domainであ
 
 この`Isolation boundary`を超えて値を受け渡すために、次の`Sendable`が必要になってきます。
 
-## Sendable
+### Sendable
 
 **Sendable 並行にアクセスされても安全な型だけが準拠できるプロトコル**
 `Sendable`の特徴は、`Sendable`に準拠した型の値だけが`Isolation boudnary`を超えられるようになります。
 つまり、`Sendable`を使うことで実行時にデータ競合が起こらないことをコンパイル時にチェックできるように、型の問題とすることで実現しています。
 
-### non-Sendable
+#### non-Sendable
 
 `Sendable`に対して、`non-Sendable`な値は、`Isolation boundary`を超えることができません。
 
@@ -87,7 +87,7 @@ let b = Counter() // bのIsolation domain、aとbは別のIsolation domainであ
 - [Sendable Types | Migrating to Swift 6](https://www.swift.org/migration/documentation/swift-6-concurrency-migration-guide/dataracesafety/#Sendable-Types)
 - [Sendable Types | The Swift Programming Language](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/concurrency/#Sendable-Types)
 
-## Sendableを体感する
+### Sendableを体感する
 
 <img src="/images/2024/20241208a/Sendable.png" alt="" width="1031" height="685" loading="lazy">
 
@@ -135,7 +135,7 @@ func run() {
 }
 ```
 
-## Isolation boundaryを体感する
+### Isolation boundaryを体感する
 
 `Sendable`に準拠していない`non-Sendable`な`Box`クラスが`Isolation boundary`を超えるとコンパイルエラーが出る例を示します。
 
@@ -167,11 +167,11 @@ func run() async {
 
 `Sendable`に準拠していない`Box`クラスの`box`インスタンスが`Isolaton boudary`を超えたため、このエラーがでてきます。
 
-このように、`Isolaton boudary`が存在していることを体験することができました。
+このように、`Isolaton boudary`が存在していることを体験できました。
 
-# おわりに
+## おわりに
 
-SwiftZoomin#20（[感覚的に理解するConcurrency: Swift 6はIsolationとSendableを用いてどのようにデータ競合を防止するか](https://youtu.be/AUcn2y2jjNs?si=_fyNjme2hDA236sl)）動画前半の内容について私なりにまとめさせていただきました。（[@koher](https://qiita.com/koher)さん、大変わかりやすく説明いただきありがとうございました。）
+SwiftZoomin#20（[感覚的に理解するConcurrency: Swift 6はIsolationとSendableを用いてどのようにデータ競合を防止するか](https://youtu.be/AUcn2y2jjNs?si=_fyNjme2hDA236sl)）動画前半の内容について私なりにまとめさせていただきました（[@koher](https://qiita.com/koher)さん、大変わかりやすく説明いただきありがとうございました）。
 
 Swift6への移行は、コンパイル時にデータ競合が起こる可能性のある箇所を事前につぶすことができるので、アプリの品質向上に直結するため、ビジネス的にもとても有用なものだと思っております。
 

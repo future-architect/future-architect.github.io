@@ -19,13 +19,13 @@ lede: "VSCodeの拡張機能である「GitLens — Supercharge Git in VS Code�
 
 [春の入門連載2024](/articles/20240408a/)、5本目の記事です。
 
-# はじめに
+## はじめに
 
 こんにちは。CSIG（Cyber Security Innovation Group）の[棚井](/authors/%E6%A3%9A%E4%BA%95%E9%BE%8D%E4%B9%8B%E4%BB%8B/)です。
 
 [春の入門連載2024](/articles/20240408a/)ということで、VSCodeの拡張機能である「[GitLens — Supercharge Git in VS Code](https://github.com/gitkraken/vscode-gitlens)」を取り上げます。
 
-# エディタ選び
+## エディタ選び
 
 みなさんは、普段の開発エディタには何を利用されていますか？
 
@@ -42,7 +42,7 @@ JetBrainsの製品はインストール時点で豊富な開発支援機能が�
 
 本ブログでは、この「開発支援ツール」である「GitLens」について紹介します。
 
-# GitLensとは
+## GitLensとは
 
 GitLensは、VSCode内での「Gitを用いた開発」を便利にする拡張機能です。
 
@@ -64,7 +64,7 @@ GitLensが提供する機能は、一言で表現すると「ソースコード�
 
 この「編集履歴」はGitに保存されているので、GitコマンドやGitHub、GitLabの画面で確認可能です。その「編集履歴の確認作業」を、コードリーディングしながら「エディタ内で完結」できたら、エディタとブラウザの切り替えが不要となり、開発作業に集中できませんか？ をツールとして実現したのが、今回紹介するGitLensです。
 
-# GitLensの環境設定
+## GitLensの環境設定
 
 導入初期に必要な以下の方法を説明します。
 
@@ -72,7 +72,7 @@ GitLensが提供する機能は、一言で表現すると「ソースコード�
 * チュートリアルの確認
 * GitLens設定値の確認、変更
 
-## インストール方法
+### インストール方法
 
 Visual StudioのMarketplaceで「[GitLens — Git supercharged](https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens)」として配信されているので、VSCodeの拡張機能から追加可能です。
 
@@ -96,7 +96,7 @@ VSCode内でのGitLens操作方法、設定状況が分からなくなった場�
 
 以下、それぞれの内容を説明します。
 
-## Welcome to GitLens
+### Welcome to GitLens
 
 ■ `Ctrl + p` -> `>GitLens: Welcome`
 
@@ -108,7 +108,7 @@ GitLesnの基本操作内容や、各種チュートリアルへのリンクが�
 
 このページの内容を、実際のコードと突き合わせながら確認すれば、GitLensの機能は一通り確認可能です。本ブログの内容は、Welcome to GitLensを元に作成しております。
 
-## GitLens Settings
+### GitLens Settings
 
 ■ `Ctrl + p` -> `>Open Settings`
 
@@ -118,7 +118,7 @@ GitLens専用のカスタマイズ画面です。「[GitLens Documentation](http
 
 次の章で説明する「アノテーションの表示」について、その表示フォーマットのカスタマイズも可能です。
 
-# GitLensの機能紹介
+## GitLensの機能紹介
 
 GitLensにより「ソースコードの編集履歴をエディタ内で確認する」方法について、基本的な機能を紹介します。
 
@@ -132,7 +132,7 @@ GitLensにより「ソースコードの編集履歴をエディタ内で確認�
 * 【4】Revision Navigation
 * 【5】Open File on Remote
 
-## 【1】Inline and Status Bar Blame
+### 【1】Inline and Status Bar Blame
 
 コードラインにカーソルを合わせると、右側に以下のアノテーション情報を表示します。
 
@@ -154,7 +154,7 @@ GitLensにより「ソースコードの編集履歴をエディタ内で確認�
 
 エディタ内の操作として、複数の方法が提供されていることが分かります。
 
-## 【2】Rich Hovers
+### 【2】Rich Hovers
 
 【1】で表示されたアノテーションにマウスをホバーすると、コミット内容の詳細が表示されます。
 
@@ -172,7 +172,7 @@ Pull Requestでの説明内容を確認すると「実装コードだけ」を�
 
 PRにはissueが紐づけられていることが多いので、コードリーディング中に「実装意図が分からない」と壁にぶつかったら、この機能により大本のPRへジャンプ可能です。
 
-## 【3】File Annotations
+### 【3】File Annotations
 
 Inline Bar Blameをファイル内のコードブロック単位で表示します。
 
@@ -190,7 +190,7 @@ Inline Bar Blameをファイル内のコードブロック単位で表示しま�
 
 <img src="/images/2024/20240415a/コメント_2024-04-15_093416.png" alt="" width="1200" height="287" loading="lazy">
 
-## 【4】Revision Navigation
+### 【4】Revision Navigation
 
 `Revision`機能を利用することで、以下の2つを確認できます。
 
@@ -213,7 +213,7 @@ Inline Bar Blameをファイル内のコードブロック単位で表示しま�
 
 差分は複数回遡れるため、対象のファイルや行数が「どのような経緯で更新され続け、現在に至るのか」を視覚的に確認できます。
 
-## 【5】Open File on Remote
+### 【5】Open File on Remote
 
 VSCodeで開いているファイルに対して、対応するホスティングページを表示する機能です。
 
@@ -229,7 +229,7 @@ VSCodeで開いているファイルに対して、対応するホスティン�
 
 エディタでソースコードを確認しながら、かつ、ファイルのリンクを共有したい場合に、この機能は非常に便利で私は多用しています。
 
-# おわりに
+## おわりに
 
 本ブログでは、VSCodeの拡張機能であるGitLensについて説明しました。
 

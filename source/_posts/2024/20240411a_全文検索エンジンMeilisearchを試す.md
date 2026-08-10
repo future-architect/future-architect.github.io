@@ -14,7 +14,7 @@ lede: "ある静的サイトジェネレーターで生成された膨大なド�
 ---
 <img src="/images/2024/20240411a/meilisearch-logo-light.png" alt="" width="495" height="74" loading="lazy">
 
-# はじめに
+## はじめに
 
 こんにちは、TIGの岸本卓也です。 [春の入門連載2024](/articles/20240408a/) の3番目です。
 
@@ -28,7 +28,7 @@ lede: "ある静的サイトジェネレーターで生成された膨大なド�
 
 このような課題を解決すべく新たな全文検索エンジンを探す中でMeilisearchという製品を見つけました。Meilisearchは日本語の検索においても良さそうでかつ手軽に試せたので、試した内容を紹介します。
 
-# Meilisearchとは
+## Meilisearchとは
 
 公式サイトの [トップページ](https://www.meilisearch.com/) やドキュメントの [概説ページ](https://www.meilisearch.com/docs/learn/what_is_meilisearch/overview) によると、検索の応答が早く、すぐに使い始められる、というのが大きな特徴のようです。機能はRESTful APIで提供され、Blogやドキュメントサイトの検索のほか、ECサイトにおける検索への組み込みといったユースケースがあるそうです。
 
@@ -39,14 +39,14 @@ lede: "ある静的サイトジェネレーターで生成された膨大なド�
 
 日本で活動されている [@mosuka (Minoru OSUKA) さんをはじめとしたOSSコミッターの皆さま](https://qiita.com/mosuka/items/fbda479b25a7ccd7c350) により日本語処理が改善されているようです。
 
-# 試用環境
+## 試用環境
 
 当記事は以下の環境で実施しました。
 
 * EC2インスタンス: t3.small
 * Meilisearchバージョン: v1.7.1 (prototype-japanese-10)
 
-# セットアップ
+## セットアップ
 
 公式ドキュメントの [Installationページ](https://www.meilisearch.com/docs/learn/getting_started/installation) ではインストール方法が複数提示されています。ここでは、日本語向けの公式ビルドバイナリが簡単に使えるDockerイメージの方法で構築します。
 
@@ -81,7 +81,7 @@ docker run -it --rm \
 
 まだインデックスを作成していないので何も検索できませんが、これでMeilisearchを使う準備は整いました。
 
-# インデックス作成
+## インデックス作成
 
 試しに当ブログサイトのインデックスを作成してみます。
 
@@ -91,7 +91,7 @@ docker run -it --rm \
 
 とあるのでメンテナンスは限定的なようですが、ひとまず使えました。
 
-## docs-scraperによるスクレイピング
+### docs-scraperによるスクレイピング
 
 設定ファイルのリファレンスは [READMEのこちら](https://github.com/meilisearch/docs-scraper?tab=readme-ov-file#-more-configurations) に記載があり、設定の具体例は [README記載の例](https://github.com/meilisearch/docs-scraper?tab=readme-ov-file#set-your-config-file) や [公式ドキュメント向けの設定ファイル](https://github.com/meilisearch/documentation/blob/main/docs-scraper.config.json) が参考になります。また、
 meilisearch/docs-scraperは [algolia/docsearch-scraper](https://github.com/algolia/docsearch-scraper) のフォークなので、[AlgoliaのConfig Filesページ](https://docsearch.algolia.com/docs/legacy/config-file/) の説明もある程度参考になります。
@@ -261,12 +261,12 @@ content ← selectors.text
 }
 ```
 
-# さいごに
+## さいごに
 
 当記事ではMeilisearchのセットアップと実際のwebサイトのクローリング例を紹介しました。Meilisearchを動かすのも検索の応答速度も謳い文句通りに早くて好印象でした。インデックスを作成するのも、とりあえず動かすだけなら `selectors` を大まかに設定してみれば良いのでHTML, CSSの知識があれば難易度は低いと思います。
 
 今回は試すに至りませんでしたが、より良い検索結果を得るにはインデックスの作り方や [フィルター](https://www.meilisearch.com/docs/learn/what_is_meilisearch/overview#features:~:text=Filtering%20and%20faceted%20search%3A%20Enhance%20user%20search%20experience%20with%20custom%20filters%20and%20build%20a%20faceted%20search%20interface%20in%20a%20few%20lines%20of%20code) など使える種々の機能があるようなので、折を見て試していこうと考えています。
 
-# 参考リンク
+## 参考リンク
 
 * [Meilisearch Documentation](https://www.meilisearch.com/docs)

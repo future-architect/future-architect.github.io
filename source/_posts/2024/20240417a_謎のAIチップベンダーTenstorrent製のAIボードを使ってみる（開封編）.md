@@ -15,17 +15,17 @@ SAIGの山本です。
 
 先日リリースされたTenstorrent製のAI推論アクセラレーションボード[Grayskull e150](https://tenstorrent.com/cards/#grayskull-e150)を早速入手しましたので、開封します。
 
-# [Tenstorrent](https://tenstorrent.com/)とは
+## [Tenstorrent](https://tenstorrent.com/)とは
 
 カナダのトロントに本社がある、知る人ぞ知る、[ジム・ケラー](https://ja.wikipedia.org/wiki/%E3%82%B8%E3%83%A0%E3%83%BB%E3%82%B1%E3%83%A9%E3%83%BC)率いる[RISC-V](https://ja.wikipedia.org/wiki/RISC-V)/AIチップベンダーです。日本法人も昨年に設立されています。
 
-# Grayskullとは
+## Grayskullとは
 
 Tenstorrent社が開発した、AI推論アクセラレーションチップです。
 
 簡単に説明するとCPUの一種であるRISC-Vがメチャメチャ沢山内蔵されているチップで、AI推論などが効率的に行えるアーキテクチャーになっています。詳しくは、[Tenstorrent社の動画](https://www.youtube.com/watch?v=lPX1H3jW8ZQ&t=17m45s)などをご覧ください。また、機会がありましたら、別途、アーキテクチャなどについて説明したいと思います。
 
-# 開封
+## 開封
 
 手前がブロアー（冷却ファン）の、奥がボード本体が入っている箱になります。
 <img src="/images/2024/20240417a/IMG_3148.jpg" alt="" width="1200" height="900" loading="lazy">
@@ -48,7 +48,7 @@ Tenstorrent社が開発した、AI推論アクセラレーションチップで�
 その他、同梱されていたシールなど。黒い紙片はセットアップのオンラインマニュアルのURLのみ書かれていました。
 <img src="/images/2024/20240417a/IMG_3152.jpg" alt="" width="1200" height="862" loading="lazy">
 
-# セットアップ
+## セットアップ
 
 [Tenstorrent社のサイトにあるセットアップ手順](https://docs.tenstorrent.com/tenstorrent/add-in-boards-and-cooling-kits/grayskull-tm-e75-e150)を元に設定を行います。
 
@@ -61,7 +61,7 @@ Tenstorrent社が開発した、AI推論アクセラレーションチップで�
 
 PCIeのみ、最低動作環境よりも低いですが、一旦、こちらの環境で試してみます。
 
-# TT-SMI
+## TT-SMI
 
 NVIDIA向けにはnvidia-smiというコマンドがありますが、Tenstorrent向けにはtt-smiというコマンドがシステム管理インタフェースとして用意されています。
 このコマンドで、Tenstorrentのハードウェアやソフトウェアの状態やバージョンなどを確認できます。今回は最低限の動作確認までということで、このツールによる確認までにしたいと思います。
@@ -76,7 +76,7 @@ TT-SMI: デバイス計測画面
 TT-SMI: ファームウェア画面
 <img src="/images/2024/20240417a/SCR-20240412-pulb.png" alt="" width="1200" height="531" loading="lazy">
 
-# 終わりに
+## 終わりに
 
 開封編ということで、パッケージ内容の確認とセットアップ、システム管理ツールによるハードウェアとソフトウェアの状態の確認を行いました。
 

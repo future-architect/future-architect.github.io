@@ -14,7 +14,7 @@ thumbnail: /images/2024/20241018a/thumbnail.png
 author: 川渕皓太
 lede: "uroborosql-fmtにおいて2WaySQLのフォーマットに対応した方法を説明していきます。"
 ---
-# はじめに
+## はじめに
 
 2024年4月入社の川渕皓太です。
 
@@ -48,7 +48,7 @@ and	emp.last_name	=	/*last_name*/'Smith'
 
 本記事ではuroborosql-fmtにおいて2WaySQLのフォーマットに対応した方法を説明していきます。
 
-# uroborosql-fmtのフォーマット方法概要
+## uroborosql-fmtのフォーマット方法概要
 
 <img src="/images/2024/20241018a/process_flow.png" alt="process_flow.png" width="1200" height="286" loading="lazy">
 
@@ -56,7 +56,7 @@ and	emp.last_name	=	/*last_name*/'Smith'
 1. 取得したCSTを解析して独自の木構造の構造体に変換
 1. 変換した構造体から整形したSQLを生成して出力
 
-# 課題点
+## 課題点
 
 <!--
 2WaySQLとはそのまま実行することもでき、アプリケーションでパラメータを可変にしても実行できるSQLのことです。
@@ -87,7 +87,7 @@ where
 
 2WaySQLのIF文はどこに記述しても不正とはならず、文法ファイルが複雑になると考えたため、今回は**方法1の「入力SQLのIF文を解析して複数のSQLを生成し、それらのSQLをフォーマット後にマージする」** 案を採用しました。
 
-# 2WaySQLをフォーマットする方法概要
+## 2WaySQLをフォーマットする方法概要
 
 <img src="/images/2024/20241018a/2way_sql.png" alt="2way_sql.png" width="1200" height="277" loading="lazy">
 
@@ -95,7 +95,7 @@ where
 1. 生成したすべてのSQLをフォーマット
 1. フォーマット後のすべてのSQLをマージして出力
 
-# 2WaySQLのフォーマット方法詳細
+## 2WaySQLのフォーマット方法詳細
 
 具体例として以下のようなSQLをフォーマットする場合を考えます。
 
@@ -114,7 +114,7 @@ ddd
 from table1
 ```
 
-## 1. 生成されうるSQLを分岐網羅的に生成
+### 1. 生成されうるSQLを分岐網羅的に生成
 
 SQLを1行目から順にたどっていき、IF分岐を解析して以下のような木構造を作成します。
 
@@ -124,7 +124,7 @@ SQLを1行目から順にたどっていき、IF分岐を解析して以下の�
 
 <img src="/images/2024/20241018a/2WaySQL_for_blog.png" alt="2WaySQL_for_blog.png" width="660" height="777" loading="lazy">
 
-## 2. 生成されたSQLのフォーマット
+### 2. 生成されたSQLのフォーマット
 
 次に生成された木構造の葉をすべてフォーマットします。
 
@@ -132,7 +132,7 @@ SQLを1行目から順にたどっていき、IF分岐を解析して以下の�
 
 <img src="/images/2024/20241018a/2WaySQL_for_blog-フォーマット後.drawio_(1).png" alt="2WaySQL_for_blog-フォーマット後.drawio_(1).png" width="640" height="435" loading="lazy">
 
-## 3. フォーマット後のSQLをマージ
+### 3. フォーマット後のSQLをマージ
 
 木の深いところから順にマージしていき、最終的に木構造の根が全体の最終フォーマット結果になるようにします。
 
@@ -234,7 +234,7 @@ from
 	table1
 ```
 
-# さいごに
+## さいごに
 
 当社が作成したSQLフォーマッタであるuroborosql-fmtにおける2WaySQLのフォーマット方法を説明しました。
 
@@ -244,7 +244,7 @@ uroborosql-fmtは元のSQLを壊していないか検証するロジックを組
 
 - [uroborosql-fmtにおける2WaySQLフォーマット (後編: 結果検証編)](/articles/20241021a/)
 
-# 関連記事
+## 関連記事
 
 - [新しいSQLフォーマッターであるuroboroSQL-fmtをリリースしました | フューチャー技術ブログ](/articles/20231120a/)
 - [Engineer Camp2022 RustでSQLフォーマッタ作成（前編） | フューチャー技術ブログ](/articles/20220916b/)

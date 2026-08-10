@@ -16,7 +16,7 @@ lede: "2024/2/1、GDG Tokyo主催の「【Firebase】GDG Tokyo Monthly Online Te
 ---
 <img src="/images/2024/20240221a/image.png" alt="image.png" width="660" height="270" loading="lazy">
 
-# はじめに
+## はじめに
 
 こんにちは。最近スギ花粉耐性がないことを実感しつつある山本です。
 
@@ -26,7 +26,7 @@ lede: "2024/2/1、GDG Tokyo主催の「【Firebase】GDG Tokyo Monthly Online Te
 
 <script defer class="speakerdeck-embed" data-id="d4e715deb4044482a0aa0f0d3a5a492b" data-ratio="1.7772511848341233" src="//speakerdeck.com/assets/embed.js"></script>
 
-## GDG Tokyo Monthly Online Tech Talksとは？
+### GDG Tokyo Monthly Online Tech Talksとは？
 
 > Google Developers Group (GDG) Tokyo は主にGoogleのテクノロジーに興味のある人たちで情報を共有しあう集いです
 
@@ -40,7 +40,7 @@ lede: "2024/2/1、GDG Tokyo主催の「【Firebase】GDG Tokyo Monthly Online Te
 
 今回のイベントのテーマは「Firebase」に関わることで、15分枠 or 5分枠の登壇枠で開催されていました。
 
-## 登壇
+### 登壇
 
 最近お仕事でFirebaseに携わっていたこともあり、社内の人におすすめされたので登壇を申し込んでみました。(会社アカウントとしては初の登壇です...！ )
 
@@ -48,7 +48,7 @@ lede: "2024/2/1、GDG Tokyo主催の「【Firebase】GDG Tokyo Monthly Online Te
 
 以下内容を一部抜粋して紹介していきます。
 
-## アーキテクチャ紹介
+### アーキテクチャ紹介
 
 今回紹介したユースケースとしてはモバイルアプリ側はFlutter、バックエンドサービス側をFirebaseのサービスを活用したものです。
 
@@ -61,7 +61,7 @@ lede: "2024/2/1、GDG Tokyo主催の「【Firebase】GDG Tokyo Monthly Online Te
 使用したサービスを一覧で並べてみると、Firebaseを主としたかなりモダンな構成と言えるのではないでしょうか？
 自分は開発チームにあとから参画したのですが、なかなか良い経験となっています。
 
-## ログ&アラートについて
+### ログ&アラートについて
 
 <img src="/images/2024/20240221a/image_4.png" alt="image.png" width="963" height="536" loading="lazy">
 
@@ -76,7 +76,7 @@ Firebaseでログ・アラート周りに使用できるサービスとしては
 
 [Firebaseで取得したログをBigQueryに連携してユーザー操作をトラッキングする](https://future-architect.github.io/articles/20210316/)
 
-## Firebase Remote Configについて
+### Firebase Remote Configについて
 
 <img src="/images/2024/20240221a/image_5.png" alt="image.png" width="964" height="538" loading="lazy">
 
@@ -88,7 +88,7 @@ https://firebase.google.com/docs/remote-config?hl=ja
 
 まだ導入できていませんが、A/B testingなども行うことができるようなので将来的には触ってみたいですね。
 
-## まとめ
+### まとめ
 
 今回はGDG Tokyoにて、最近触ったFirebaseサービスとFlutterの活用事例について登壇してきました！
 会社アカウントで登壇することは初めてだったのですが、登壇になれた方やチームメンバーに手厚くフォロー頂き楽しく発表してくることができました。
@@ -96,6 +96,6 @@ https://firebase.google.com/docs/remote-config?hl=ja
 今後もどんどん登壇やアウトプットできるようにがんばります。
 ※スギ花粉とも頑張って生きていこうと思います。
 
-## 参考文献
+### 参考文献
 
 - https://firebase.google.com/docs/remote-config?hl=ja
