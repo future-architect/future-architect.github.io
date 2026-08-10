@@ -233,7 +233,7 @@ npx playwright show-report
 
 <img src="/images/2023/20230822a/画像1.png" alt="" width="1060" height="346" loading="lazy">
 
-## 終わりに
+## おわりに
 
 Playwrightのインストール方法と基本的な使い方を紹介しました。
 

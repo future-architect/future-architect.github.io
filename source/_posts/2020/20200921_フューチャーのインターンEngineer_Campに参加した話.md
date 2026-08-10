@@ -15,7 +15,7 @@ lede: "フューチャーのインターンEngineer Campに参加させていた
 
 <img src="/images/2020/20200921/図2.png" loading="lazy">
 
-## 初めに
+## はじめに
 
 はじめまして。フューチャーのインターンEngineer Campに参加させていただいた岡部です。
 

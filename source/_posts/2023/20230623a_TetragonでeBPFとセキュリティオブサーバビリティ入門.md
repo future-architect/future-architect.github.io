@@ -425,7 +425,7 @@ kprobeというのは先ほども出てきましたが、カーネルの関数�
 
 今までトレーシング機能を紹介してきましたが、フィルタリング条件に合致するイベントを検出した際に、プロセスに直接SIGKILLを送出する、といったことも可能です。
 
-## 終わりに
+## おわりに
 
 eBPFとeBPF製品Tetragonに入門にしてみました。Tetragonの親プロジェクトのCiliumでは、eBPFでネットワークを効率化しています。主要クラウドプロバイダーのKubernetesサービスでは、Ciliumが使用できるようになっており、例えばGoogle CloudのGKEでは[Dataplane V2](https://cloud.google.com/kubernetes-engine/docs/concepts/dataplane-v2?hl=ja)というモードで提供されています。暇があればCilium, eBPF+ネットワークも勉強したいなと思います。
 
