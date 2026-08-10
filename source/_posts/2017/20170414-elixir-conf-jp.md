@@ -234,7 +234,7 @@ nine nines(99.9999999％)のSLAを実現できると知って以来Erlang/OTPに
 * etsが性能向上する
 * JITはLLVMベースで実験中
 
-### 懇親会
+## 懇親会
 
 <img src="/images/2017/20170412/photo_20170412_02.jpeg" loading="lazy">
 
