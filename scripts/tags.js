@@ -80,17 +80,61 @@ hexo.extend.helper.register('posts_per_tag', function() {
   return {mean: round1(mean(counts)), median: median(counts)};
 });
 
-// 年ごとに初めて使われたタグの数。タグがどれだけ増えてきたかを示す
+// 年ごとに初めて使われたタグの数。タグがどれだけ増えてきたかを示す。
+// 内訳はタグの首位カテゴリ（最も多く使われているカテゴリ）で積む (#2279)。
+// どの分野が新しいトピックを生んでいるかが色で見える
 hexo.extend.helper.register('new_tags_by_year', function() {
-  const byYear = new Map();
+  const byYearCat = new Map(); // 初出年 -> (カテゴリ -> タグ数)
   this.site.tags.forEach(tag => {
     const first = tag.posts.map(p => p.date.format('YYYY')).sort()[0];
-    byYear.set(first, (byYear.get(first) || 0) + 1);
+    const catCount = new Map();
+    tag.posts.forEach(post => {
+      post.categories.forEach(c => catCount.set(c.name, (catCount.get(c.name) || 0) + 1));
+    });
+    // 同数の決着が無いとビルドごとに割り当てが変わる
+    const top = [...catCount.entries()].sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1))[0];
+    const cat = top ? top[0] : '未分類';
+    if (!byYearCat.has(first)) byYearCat.set(first, new Map());
+    const m = byYearCat.get(first);
+    m.set(cat, (m.get(cat) || 0) + 1);
+  });
+  const years = [...byYearCat.keys()].sort();
+  // 並びは他のカテゴリ積み上げと同じサイト累計順で固定 (#2201)
+  const present = new Set();
+  byYearCat.forEach(m => m.forEach((cnt, c) => present.add(c)));
+  const catOrder = this.site.categories.toArray()
+    .sort((a, b) => b.length - a.length || (a.name < b.name ? -1 : 1))
+    .map(c => c.name)
+    .filter(c => present.has(c));
+  const extras = [...present].filter(c => !catOrder.includes(c)).sort();
+  const series = catOrder.concat(extras).map(c => ({
+    name: c,
+    data: years.map(y => byYearCat.get(y).get(c) || 0)
+  }));
+  return JSON.stringify({years, series});
+});
+
+// 年ごとの新規タグを「定着したか」で積む (#2279)。
+// 定着 = 初出から1年以内に2記事目が付いたこと。観察窓を1年に固定するのは、
+// 「その後使われたか」で判定すると新しい年ほど再利用の機会が無く、
+// 年同士を比較できないため。初出から1年未満のタグは判定途中で「定着せず」側に出る
+hexo.extend.helper.register('new_tags_retention', function() {
+  const YEAR_MS = 365 * 24 * 60 * 60 * 1000;
+  const byYear = new Map(); // 初出年 -> {settled, unsettled}
+  this.site.tags.forEach(tag => {
+    const dates = tag.posts.map(p => p.date.valueOf()).sort((a, b) => a - b);
+    const year = tag.posts.map(p => p.date.format('YYYY')).sort()[0];
+    const settled = dates.length >= 2 && dates[1] - dates[0] <= YEAR_MS;
+    if (!byYear.has(year)) byYear.set(year, {settled: 0, unsettled: 0});
+    byYear.get(year)[settled ? 'settled' : 'unsettled']++;
   });
   const years = [...byYear.keys()].sort();
   return JSON.stringify({
     years,
-    counts: years.map(y => byYear.get(y))
+    series: [
+      {name: '定着', data: years.map(y => byYear.get(y).settled)},
+      {name: '定着せず', data: years.map(y => byYear.get(y).unsettled)}
+    ]
   });
 });
 
