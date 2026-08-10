@@ -8,7 +8,7 @@ tags:
   - AWS
   - CI/CD
 categories:
-  - DevOps
+  - IaC
 series: "Terraform2023"
 thumbnail: /images/2023/20230405a/thumbnail.png
 author: 前原応光

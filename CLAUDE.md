@@ -41,8 +41,12 @@ lede: "Go 1.27 で標準ライブラリに追加されたuuidパッケージを�
 ---
 ```
 
-- `categories` は既存の語彙から選ぶ。使用実績（記事数）: Programming 337 / DevOps 184 / Infrastructure 160 / Frontend 130 / Culture 121 / DataScience 113 / DB 70 / Mobile 57 / IoT 53 / Business 51 / DataEngineering 43 / Security 38 / Management 37 / AIDD 27 / 認証認可 25 / VR 20
+- `categories` は既存の語彙から選ぶ。使用実績（記事数）: Programming 334 / Infrastructure 146 / DevOps 139 / Frontend 133 / Culture 122 / DataScience 112 / DB 69 / Mobile 57 / IaC 57 / IoT 53 / Business 48 / DataEngineering 43 / Management 41 / Security 36 / AIDD 32 / 認証認可 24 / VR 20
   - `AI` は `AIDD` に、`Design` は `UI/UX` タグに統合済み。`_config.yml` の `alias` で転送している
+  - 基盤系3カテゴリの境界（#2057）: **基盤をコードで書く話は `IaC`**（Terraform / Ansible / CDK 等）、
+    **基盤そのものの設計・構築は `Infrastructure`**（クラウド・ネットワーク・OS）、
+    **作った後を回す仕組みは `DevOps`**（CI/CD・コンテナ・監視・保守運用）。
+    どのクラウドかは場所であって主題ではないので、カテゴリではなくタグ（AWS / GoogleCloud）が担う
 - `author` は `_profile.yml` に未登録なら追記する。**1記事1名**（配列にしない）。
   共著は著者ごとの集計・一覧・チャートで扱いが分かれ、規則が追えなくなる
 - `date` は同日に複数投稿するとき、`postid` の順に時刻をずらす（`a` は `00:00:00`、`b` は `00:00:01`）。

@@ -8,7 +8,7 @@ tags:
   - IaC
   - 可読性
 categories:
-  - DevOps
+  - IaC
 series: "秋のブログ週間2021"
 thumbnail: /images/2021/20211029a/thumbnail.png
 author: 伊藤太斉

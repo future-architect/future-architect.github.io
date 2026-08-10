@@ -6,7 +6,7 @@ tags:
   - Terraform
   - Policy-as-Code
 categories:
-  - DevOps
+  - IaC
 series: "Terraform2024"
 thumbnail: /images/2024/20240318a/thumbnail.png
 author: 原木翔

@@ -8,7 +8,7 @@ tags:
   - DR
   - マルチリージョン
 categories:
-  - DevOps
+  - IaC
 series: "Terraform2024"
 thumbnail: /images/2024/20240311a/thumbnail.png
 author: 伊藤太斉

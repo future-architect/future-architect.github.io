@@ -7,7 +7,7 @@ tags:
   - TerraformCloud
   - サーバーレス
 categories:
-  - Infrastructure
+  - IaC
 series: "Terraform2026"
 thumbnail: /images/2026/20260521a/thumbnail.jpg
 author: 片岡久人

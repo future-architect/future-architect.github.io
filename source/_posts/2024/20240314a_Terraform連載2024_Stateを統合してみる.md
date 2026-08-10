@@ -6,7 +6,7 @@ tags:
   - Terraform
   - tfstate
 categories:
-  - DevOps
+  - IaC
 series: "Terraform2024"
 thumbnail: /images/2024/20240314a/thumbnail.png
 author: 原田達也

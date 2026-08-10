@@ -8,7 +8,7 @@ tags:
   - GitHubActions
   - CI/CD
 categories:
-  - DevOps
+  - IaC
 series: "Terraform2023"
 thumbnail: /images/2023/20230403a/thumbnail.png
 author: 川口翔大

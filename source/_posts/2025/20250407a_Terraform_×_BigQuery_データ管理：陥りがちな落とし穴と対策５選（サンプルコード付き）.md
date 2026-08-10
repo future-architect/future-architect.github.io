@@ -8,7 +8,7 @@ tags:
   - BigQuery
   - データマネジメント
 categories:
-  - DataEngineering
+  - IaC
 series: "Terraform2025"
 thumbnail: /images/2025/20250407a/thumbnail.png
 author: 大前七奈

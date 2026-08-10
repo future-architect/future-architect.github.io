@@ -6,7 +6,7 @@ tags:
   - Terraform
   - ガイドライン
 categories:
-  - DevOps
+  - IaC
 series: "Terraform2025"
 thumbnail: /images/2025/20250409a/thumbnail.png
 author: 伊藤太斉

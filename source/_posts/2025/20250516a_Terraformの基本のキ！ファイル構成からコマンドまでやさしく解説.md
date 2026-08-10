@@ -7,7 +7,7 @@ tags:
   - 入門
   - 初心者向け
 categories:
-  - DevOps
+  - IaC
 series: "春の入門祭り2025"
 thumbnail: /images/2025/20250516a/thumbnail.png
 author: 染矢幸子

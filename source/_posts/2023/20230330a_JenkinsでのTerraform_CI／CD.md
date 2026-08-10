@@ -8,7 +8,7 @@ tags:
   - Terraform
   - CI/CD
 categories:
-  - DevOps
+  - IaC
 series: "Terraform2023"
 thumbnail: /images/2023/20230330a/thumbnail.png
 author: 渡邉光

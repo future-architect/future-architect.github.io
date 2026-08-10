@@ -7,7 +7,7 @@ tags:
   - IaC
   - Terraform
 categories:
-  - DevOps
+  - IaC
 series: "春の入門祭り2023"
 thumbnail: /images/2023/20230502a/thumbnail.png
 author: 伊藤太斉

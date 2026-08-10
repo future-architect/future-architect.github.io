@@ -8,7 +8,7 @@ tags:
   - Ansible
   - IaC
 categories:
-  - DevOps
+  - IaC
 series: "夏の自由研究2020"
 thumbnail: /images/2020/20200805/thumbnail.JPG
 author: 伊藤太斉

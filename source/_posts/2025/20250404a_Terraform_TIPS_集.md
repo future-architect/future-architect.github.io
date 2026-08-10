@@ -6,7 +6,7 @@ tags:
   - Terraform
   - Tips
 categories:
-  - DevOps
+  - IaC
 series: "Terraform2025"
 thumbnail: /images/2025/20250404a/thumbnail.png
 author: 前原応光

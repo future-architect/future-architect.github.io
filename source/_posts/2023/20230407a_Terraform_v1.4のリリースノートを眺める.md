@@ -7,7 +7,7 @@ tags:
   - Terraform1.4
   - リリースノート
 categories:
-  - DevOps
+  - IaC
 series: "Terraform2023"
 thumbnail: /images/2023/20230407a/thumbnail.png
 author: 伊藤太斉

@@ -8,7 +8,7 @@ tags:
   - 可読性
   - リーダブルコード
 categories:
-  - DevOps
+  - IaC
 series: "読書感想文"
 thumbnail: /images/2023/20230228a/thumbnail.jpg
 author: 伊藤太斉

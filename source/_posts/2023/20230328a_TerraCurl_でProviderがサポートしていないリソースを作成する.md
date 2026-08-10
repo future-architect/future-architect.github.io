@@ -6,7 +6,7 @@ tags:
   - Terraform
   - curl
 categories:
-  - DevOps
+  - IaC
 series: "Terraform2023"
 thumbnail: /images/2023/20230328a/thumbnail.png
 author: 真野隼記

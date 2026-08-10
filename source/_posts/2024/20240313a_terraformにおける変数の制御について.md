@@ -6,7 +6,7 @@ tags:
   - Terraform
   - IaC
 categories:
-  - DevOps
+  - IaC
 series: "Terraform2024"
 thumbnail: /images/2024/20240313a/thumbnail.png
 author: 森大作

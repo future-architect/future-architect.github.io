@@ -8,7 +8,7 @@ tags:
   - Terraform
   - Terraform1.4
 categories:
-  - Security
+  - IaC
 series: "Terraform2023"
 thumbnail: /images/2023/20230331a/thumbnail.png
 author: 岸下優介
