@@ -36,7 +36,7 @@ hexo.extend.helper.register('list_reference_posts', function() {
   // ul の直下に details は置けないため、畳む分は別の ul にして details で包む
   const more = hidden.length === 0 ? '' : `
     <details class="reference-post-more">
-      <summary>残り ${hidden.length} 件を表示</summary>
+      <summary>残り ${hidden.length}本を表示</summary>
       <ul class="reference-post-link">${items(hidden)}</ul>
     </details>`;
 
