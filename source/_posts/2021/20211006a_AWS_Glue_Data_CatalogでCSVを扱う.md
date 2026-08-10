@@ -7,6 +7,7 @@ tags:
   - Python
   - AWS
   - データカタログ
+  - CSV
 categories:
   - DataEngineering
 series: "Python"

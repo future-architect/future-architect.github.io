@@ -8,6 +8,7 @@ tags:
   - DynamoDB
   - StepFunctions
   - バッチ処理
+  - Lambda
 categories:
   - Programming
 series: "サーバレス2020"

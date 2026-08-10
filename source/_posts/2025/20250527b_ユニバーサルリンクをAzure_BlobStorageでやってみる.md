@@ -6,6 +6,7 @@ tags:
   - .NET
   - iOS
   - FutureOne
+  - Azure
 categories:
   - Mobile
 thumbnail: /images/2025/20250527b/thumbnail.png

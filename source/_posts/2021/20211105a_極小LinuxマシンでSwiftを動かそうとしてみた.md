@@ -6,6 +6,7 @@ tags:
   - Rust
   - M5Stack
   - Linux
+  - Swift
 categories:
   - IoT
 series: "秋のブログ週間2021"

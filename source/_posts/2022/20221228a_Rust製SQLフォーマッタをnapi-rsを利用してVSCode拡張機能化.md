@@ -8,6 +8,7 @@ tags:
   - VSCode
   - フォーマッター
   - コアテク
+  - VSCode拡張
 categories:
   - Programming
 thumbnail: /images/2022/20221228a/thumbnail.png

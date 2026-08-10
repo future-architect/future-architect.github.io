@@ -6,6 +6,7 @@ tags:
   - VSCode
   - チーム開発
   - Tips
+  - VSCode拡張
 categories:
   - DevOps
 thumbnail: /images/2020/20200828/thumbnail.png

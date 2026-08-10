@@ -5,6 +5,7 @@ postid: b
 tags:
   - 登壇レポート
   - TypeScript
+  - JavaScript
 categories:
   - Programming
 thumbnail: /images/2025/20251128b/thumbnail.jpg

@@ -7,6 +7,7 @@ tags:
   - PWA
   - Service Worker
   - Vite
+  - Vue3
 categories:
   - Frontend
 series: "Vue.js2024"

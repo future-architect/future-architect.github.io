@@ -5,6 +5,8 @@ postid: a
 tags:
   - AWS
   - ClaudeCode
+  - IAM
+  - MCP
 categories:
   - AIDD
 thumbnail: /images/2026/20260525a/thumbnail.png

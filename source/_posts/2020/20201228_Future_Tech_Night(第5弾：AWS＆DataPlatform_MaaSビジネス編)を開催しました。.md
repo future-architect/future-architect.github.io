@@ -7,6 +7,7 @@ tags:
   - データレイク
   - 登壇レポート
   - TechNight
+  - MaaS
 categories:
   - DataEngineering
 thumbnail: /images/2020/20201228/thumbnail.png

@@ -8,6 +8,7 @@ tags:
   - コアテク
   - 2WaySQL
   - Rust
+  - uroboroSQL
 categories:
   - Programming
 thumbnail: /images/2024/20241018a/thumbnail.png

@@ -9,6 +9,8 @@ tags:
   - go-swagger
   - Terraform
   - 入門
+  - WebAPI
+  - Lambda
 categories:
   - DevOps
 thumbnail: /images/2020/20200927/thumbnail.png

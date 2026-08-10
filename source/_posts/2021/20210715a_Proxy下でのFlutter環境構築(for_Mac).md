@@ -6,6 +6,7 @@ tags:
   - Flutter
   - プロキシ
   - 環境構築
+  - Mac
 categories:
   - Mobile
 series: "Dart/Flutter2021"

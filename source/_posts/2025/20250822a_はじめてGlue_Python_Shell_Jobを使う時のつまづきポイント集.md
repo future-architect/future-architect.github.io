@@ -8,6 +8,7 @@ tags:
   - ETL
   - Glue Python Shell
   - 初心者向け
+  - Python
 categories:
   - DataEngineering
 thumbnail: /images/2025/20250822a/thumbnail.jpg

@@ -6,6 +6,8 @@ tags:
   - 組織論
   - リーダーシップ
   - キャリア
+  - デザインパターン
+  - リファクタリング
 categories:
   - Management
 author: 宮原洋祐

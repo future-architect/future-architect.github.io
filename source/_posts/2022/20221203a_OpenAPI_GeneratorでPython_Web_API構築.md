@@ -7,6 +7,7 @@ tags:
   - WebAPI
   - Python
   - OpenAPIGenerator
+  - OpenAPI
 categories:
   - Programming
 thumbnail: /images/2022/20221203a/thumbnail.png

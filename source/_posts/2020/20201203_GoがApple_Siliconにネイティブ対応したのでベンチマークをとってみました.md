@@ -5,6 +5,7 @@ postid: ""
 tags:
   - Go
   - Mac
+  - Apple
 categories:
   - Programming
 thumbnail: /images/2020/20201203/thumbnail.png

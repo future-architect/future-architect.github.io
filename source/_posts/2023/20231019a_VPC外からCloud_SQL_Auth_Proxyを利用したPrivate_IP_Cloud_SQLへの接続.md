@@ -7,6 +7,7 @@ tags:
   - GoogleCloud
   - IAM
   - プロキシ
+  - VPC
 categories:
   - Infrastructure
 thumbnail: /images/2023/20231019a/thumbnail.png
