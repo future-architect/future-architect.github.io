@@ -38,14 +38,15 @@ hexo.extend.helper.register('popular_posts_in', function(posts, limit) {
   // 何年もかけて積んだ数字と最近読まれている数字を並べられるようにする。
   // 分母を 1+... にしているのは、公開直後の記事で 0 除算にしないため。
   // 年数のペナルティは線形だと弱く、累積PVの大きい古典が上位に残り続けた。
-  // 2乗だと直近1年の記事しか残らずきつい。中間の1.5乗にする
-  // （1年落ち=1/2、2年=1/3.8、4年=1/9）。中間はこの一点だけで、
-  // 効きが合わなければ線形か2乗に倒す。連続的な係数調整はしない (#2174)
+  // 2乗にする（1年落ち=1/2、2年=1/5、4年=1/17）。著者ページで古い記事
+  // ばかりが並ぶと、その著者が最近書けていないように見えてしまうし、
+  // この業界では数年前の記事は十分古い。効きの強さをページの種類
+  // （カテゴリ・タグ・著者）で分けることはしない (#2174)
   const YEAR = 365 * 24 * 60 * 60 * 1000;
   const now = Date.now();
   const score = post => {
     const years = (now - post.date.valueOf()) / YEAR;
-    return getGA4PV('/' + post.path) / (1 + years * Math.sqrt(years));
+    return getGA4PV('/' + post.path) / (1 + years * years);
   };
 
   const ranked = posts
