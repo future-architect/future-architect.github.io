@@ -274,7 +274,7 @@ uroboroSQLは現在v0.3に向けて、鋭意開発を進めており、まだま
 
 uroboroSQL PetClinicも認証機能など、エンタープライズ用途の参考になるような機能をまだまだ追加していきたいと思っていますので、こちらもよろしくお願いします。
 
-### 番外編：SQLログ表示機能
+## 番外編：SQLログ表示機能
 
 <img src="/images/2017/20170828/photo_20170828_05.png" class="img-middle-size" loading="lazy">
 

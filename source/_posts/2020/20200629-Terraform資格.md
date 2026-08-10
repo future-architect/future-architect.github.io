@@ -90,6 +90,6 @@ PC自体は順当にMacやWindowsなら受験が可能で、Webカメラやマ�
 あと、英語は本当に大事であると感じたので、英語もやろうと思いました。
 先日、[Terraformの入門記事](/articles/20200624/)も書きましたので、これからTerraform Associateを受験しようという方は参考にしてみてください。
 
-### 参考リンク
+## 参考リンク
 
 - [技術ブログ Terraform一覧](/tags/Terraform/)

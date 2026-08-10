@@ -98,6 +98,6 @@ Googlerの[Proppy](https://twitter.com/proppy)がアメリカに住んでいた�
 
 最後になりますが、本記事を読んでくださった方も、足を伸ばして遠くの勉強会へ行ってみてはいかがでしょうか？
 
-### 当日のまとめサイト
+## 当日のまとめサイト
 
 [DevFest in 信州2019](https://sites.google.com/site/gdgshinshu/home/archive/devfest19)

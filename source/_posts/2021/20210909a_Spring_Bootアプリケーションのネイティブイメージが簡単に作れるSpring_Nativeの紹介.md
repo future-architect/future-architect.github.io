@@ -135,7 +135,7 @@ GraalVMにはCommunity EditionとEnterprise Editonがあり、性能はEnterpris
 
 ネイティブイメージは起動時間の短さが魅力的ですが、実務的にはビルド時間の長さがネックになるのかなと思いました。今回は非常にシンプルなアプリにもかかわらず7分かかっているので、プロダクションレベルのアプリのビルドにどれくらい時間がかるのかは要検証だと思います。
 
-### 参考文献
+## 参考文献
 
 1. Spring Native Documentation, https://docs.spring.io/spring-native/docs/current/reference/htmlsingle/
 1. GraalVM https://www.graalvm.org/
