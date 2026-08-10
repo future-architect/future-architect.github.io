@@ -5,7 +5,6 @@ postid: ""
 tags:
   - GoogleCloud
   - Python
-  - OpenCensus
   - OpenTelemetry
   - CloudOperations
   - CloudRun
