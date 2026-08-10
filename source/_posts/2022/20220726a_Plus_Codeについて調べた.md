@@ -19,7 +19,7 @@ lede: "緯度・経度をコード化する技術に興味があったのでOpen
 
 TIG真野です。緯度・経度をコード化する技術に興味があったのでOpen Location Code（Plus Code）について調べました。[澁川さんのRedis記事](/articles/20220721a/)にもあったGeoHashのように、位置を特定するようなコード化はなぜかワクワクします。
 
-### Open Location Code（Plus Codes）とは
+## Open Location Code（Plus Codes）とは
 
 Google Mapsのヘルプが簡易的でわかりやすかったため引用します。
 
@@ -40,7 +40,7 @@ Open Location Codeは[google/open-location-code](https://github.com/google/open-
 
 公式ページは[Plus Codes](https://maps.google.com/pluscodes/) です。Plus Codeを生成する仕組みがOpen Location Code（OLC）で、ロケーションコードを生成するオープンな仕組みのためこの名前になったそうです。そもそも、なんでPlus Codeかというと、生成されるコードにプラス記号が含まれているためだそうです（なるほど！）。
 
-### なぜ生まれたか
+## なぜ生まれたか
 
 [公式のLearnタブ](https://maps.google.com/pluscodes/learn/)にどのような用途で使われることを想定しているかが短くまとめてくれています。
 
@@ -66,7 +66,7 @@ Open Location Codeは[google/open-location-code](https://github.com/google/open-
   * オフラインでエンコード/デコードができる（モバイル通信が発生すると安価ではない）
   * アルゴリズムは公開され自由に使える。1つのプロバイダーに依存しない
 
-#### 緯度・経度じゃダメなのか？
+### 緯度・経度じゃダメなのか？
 
 この手のソリューションでたまに思う、（GeoHashのように文字列プレフィックスで検索するのではないなら）緯度・経度を生で共有すればよいじゃないか？ に関しても記載がありました。まとめます。
 
@@ -76,7 +76,7 @@ Open Location Codeは[google/open-location-code](https://github.com/google/open-
 
 極論、自分の住所を町名・番地とかじゃなくて緯度経度で覚えているの？ って言われた気持ちになりました。確かに覚えられないですし扱いにくいですね。
 
-#### GeoHashじゃダメなのか？
+### GeoHashじゃダメなのか？
 
 同様にGeoHashとの相違点についても触れていました。
 
@@ -88,7 +88,7 @@ Open Location Codeは[google/open-location-code](https://github.com/google/open-
 
 他にも要求事項に沿った既存サービス・規格がなかったため生まれたと書かれています。
 
-### コード体系
+## コード体系
 
 さきほど見せたPlus Codeは `JPCG+XX 品川区、東京都` でしたが、これがどのようなルールで構成されるか見ていきましょう。
 
@@ -125,7 +125,7 @@ Open Location Codeは[google/open-location-code](https://github.com/google/open-
 
 <img src="/images/2022/20220726a/image_2.png" alt="image.png" width="1200" height="751" loading="lazy">
 
-### Web API
+## Web API
 
 オフラインでも使えるライブリが公開されていますが、まずplus.codes のWeb APIを使ってみます。
 [ドキュメント](https://github.com/google/open-location-code/wiki/Plus-codes-API)から、Google APIキーなしだと以下。
@@ -171,7 +171,7 @@ boundsのnortheast, southwestは書いているママですが、北東と南西
     },
 ```
 
-### Go SDK
+## Go SDK
 
 主要な言語のライブラリは揃っています（PL/SQLまである）。せっかくなのでGoで遊んでみます。
 
@@ -227,7 +227,7 @@ func main() {
 
 ショートコードの場合は、「品川区、東京」の代わりに、現在位置を示した緯度経度を指定すると、近隣のコードを探してくれるのが便利だなと思いました。
 
-### まとめ
+## まとめ
 
 Plus Codeとは何か、どのような意図で作られたかについてまとめました。調べるまではGeoHash（やQuadKey）との違いはなんだろうか？ と疑問でしたが、背景を抑えていくと使い分けも分かってくると思います。GoのSDKも中身の実装までは軽くしか見れていませんが、コア部分はコンパクトに見えます。少なくてもSDKのAPIを見てみると、どこまでがアルゴリズムで、どこからはGoogle Maps APIのジオコーディングで行われているかイメージが湧きます。
 

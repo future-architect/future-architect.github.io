@@ -22,24 +22,24 @@ lede: "AmazonConnect BootCampセッションでハンズオン受けた知識を
 
 AmazonConnectは海外・日本での導入事例も増えてきていますが、ブログはまだ数が少ないと思いますので、実際に手を動かした作った仕組みと合わせて共有します。
 
-### AmazonConnect セッション#day1 2018.11.06
+## AmazonConnect セッション#day1 2018.11.06
 
-#### セールスと技術担当者からのAmazonConnectの説明
+### セールスと技術担当者からのAmazonConnectの説明
 
 米AWSから営業のご担当とソリューションアーキテクトの方がいらっしゃって、両名からの講義という形でした。
 完全に全編英語となりびっくりしましたが、日本AWSの方の通訳があるため安心です。
 
 AWSの広告っぽくなってしまうので、サラッと記載します。
 
-### Sales
+## Sales
 
-#### AmazonConnectについて
+### AmazonConnectについて
 
 - AmazonConnectのサービス自体は1.5年前から開始され、東京リージョンでのサービスインも決定している
 - 今となっては大規模な導入事例もあり、安定した実績がある（海外では銀行やISP、アパレルなど様々）
 - もともとはAmazonのEC事業を支えるコールセンター業務向けのソリューション
 
-#### AmazonConnectのウリ
+### AmazonConnectのウリ
 
 - S3に録音データを保存したり、LambdaやSageMaker、Lexなどと連携させることで高度なコールセンターソリューションを提供できる
 - CRM（顧客管理システム）との連携も容易で、熟達していなくても1, 2時間で連携作業が完了できる
@@ -48,14 +48,14 @@ AWSの広告っぽくなってしまうので、サラッと記載します。
 - IVRやCTIみたいな大規模設備は不要で、インターネット回線だけあれば使える
 - おおよその顧客で25％程度の運用費節約ができている
 
-### Solution Architect
+## Solution Architect
 
-#### リージョン展開について
+### リージョン展開について
 
 - 東京リージョンのConnectは今現在インプリを行っている状態
 - 近いところではシドニーリージョン。日本の電話番号もここで取得可能
 
-#### AWSマネージドサービスとの連携
+### AWSマネージドサービスとの連携
 
 様々なサービスと連携可能で、特に下記のサービスとの連携事例が多いそうです。
 
@@ -76,16 +76,16 @@ AWSの広告っぽくなってしまうので、サラッと記載します。
 - Kibanaで表示する[デモ](https://aws.amazon.com/jp/blogs/big-data/analyzing-amazon-connect-records-with-amazon-athena-aws-glue-and-amazon-quicksight/)をやってた。※URLではQuicksite
 - Amazon connectのコンソールでもリアルタイム/オンデマンドのデータを表示できる（とはいえ可視化できるデータは少なめ）
 
-#### 3rd-Party システムとの連携
+### 3rd-Party システムとの連携
 
 引用ですが、下記のスライドで説明がありました。
 <img src="/images/2018/20181202/photo_20181202_01.png" loading="lazy">
 
-#### CCP（ソフトフォン）の拡張
+### CCP（ソフトフォン）の拡張
 
 デフォルトのソフトフォンだと、必要なCRMの情報が出力できないなど、昨今の日本のコールセンター向けとしては利用に耐えられないと思われますが、拡張が可能になっています。
 
-##### Streams API
+#### Streams API
 
 - Githubにてオープンソースで提供
 - CCP（ソフトフォン）を操作するAPI群
@@ -97,9 +97,9 @@ AWSの広告っぽくなってしまうので、サラッと記載します。
 長くなりましたが、１日目はこのような流れで終了しました。
 ２日目は実際にハンズオンをしながらAmazonConnectでコールセンタソリューションを構築します。
 
-### AmazonConnect セッション#day2 2018.11.07
+## AmazonConnect セッション#day2 2018.11.07
 
-#### Connectインスタンスの作成
+### Connectインスタンスの作成
 
 <img src="/images/2018/20181202/photo_20181202_02.png" style="border:solid 1px #000000" loading="lazy">
 
@@ -111,7 +111,7 @@ AWSの広告っぽくなってしまうので、サラッと記載します。
 - CloudFormationでの構築も可能
 - 後ほど、AmazonConnect > インスタンスエイリアスから設定変更可能
 
-#### インスタンスの設定
+### インスタンスの設定
 
 <img src="/images/2018/20181202/photo_20181202_03.png" style="border:solid 1px #000000" loading="lazy">
 
@@ -124,7 +124,7 @@ AWSの広告っぽくなってしまうので、サラッと記載します。
 この画面に「管理者としてログイン」ボタンがありますが、セキュリティ的に通常利用はしないそう（パスワード忘れのときのみ）AWSのルートアカウントのような扱いですね。
 また、CloudFrontを経由しているらしく、若干不具合（ロードが遅いなど）が起きました（研修中に403 Error結構出てました...）
 
-#### 1. 電話番号の取得
+### 1. 電話番号の取得
 
 ここからはAmazonConnectの管理画面にログインして操作をします。
 <img src="/images/2018/20181202/photo_20181202_04.png" loading="lazy">
@@ -134,7 +134,7 @@ AWSの広告っぽくなってしまうので、サラッと記載します。
 - 電話番号の管理から電話番号の取得/削除及び番号ごとのIVRフローの変更を行うことができる
 - 日本の電話番号が取れない事象も起こり、そこのリソース枯渇もスコープに入れ、事前に確保しておくと無難です
 
-#### 2. 電話応対時間の設定
+### 2. 電話応対時間の設定
 
 <img src="/images/2018/20181202/photo_20181202_05.png" loading="lazy">
 
@@ -142,7 +142,7 @@ AWSの広告っぽくなってしまうので、サラッと記載します。
   - TimezoneをAsia/Tokyoにすること！
   - 作成された段階ではキューがアタッチされていない状況になる。時間の適用を行う際はキューにアタッチをすること
 
-#### 3. キューの作成
+### 3. キューの作成
 
 <img src="/images/2018/20181202/photo_20181202_06.png" loading="lazy">
 
@@ -153,7 +153,7 @@ AWSの広告っぽくなってしまうので、サラッと記載します。
 - Maximum contacts in queueでキューに何人待たせられるかを決められる。ここは最大99になっているが、AWSへの緩和申請で上限を変えられる
 - Quick connectsで他のキューに飛ばしたり、転送したりが可能
 
-#### 4. プロンプトの作成
+### 4. プロンプトの作成
 
 <img src="/images/2018/20181202/photo_20181202_07.png" loading="lazy">
 
@@ -161,7 +161,7 @@ AWSの広告っぽくなってしまうので、サラッと記載します。
 - 問い合わせフロー内でPollyに喋らせることも可能なので、フロー作成の際はそちらで手軽に代用も可能です
 - 自然な人間の声や音楽が必要な際はここから登録して利用が必要です
 
-#### 5. 問い合わせフローの作成
+### 5. 問い合わせフローの作成
 
 <img src="/images/2018/20181202/photo_20181202_08.png" style="border:solid 1px #000000" loading="lazy">
 
@@ -181,7 +181,7 @@ AWSの広告っぽくなってしまうので、サラッと記載します。
     - transfer to queue flow: あるエージェントが、別のキューにクイックコネクトで転送するときにあるエージェントが体験するフロー
   - これらのフローを使って、フロー全体が大きくなりすぎないよう、フローをつないで利用するのがベストプラクティスとのこと
 
-#### Contact flow designer
+### Contact flow designer
 
 <img src="/images/2018/20181202/photo_20181202_09.png" loading="lazy">
 
@@ -190,7 +190,7 @@ AWSの広告っぽくなってしまうので、サラッと記載します。
 - 上述しましたが、ベストプラクティスとしては小さいフローを構築し、それらを結合するのが良い
 - 以下のSetやInteractはFlowの種類によって若干使えるものが違う（例えばhold系のFlowではLoopで音楽を流すみたいな機能が使える）
 
-##### Interact
+#### Interact
 
 - ユーザ入力などのインタラクティブな処理を行う
 - ユーザ入力の取得、保存、保留、プロンプトの再生が可能
@@ -199,7 +199,7 @@ AWSの広告っぽくなってしまうので、サラッと記載します。
   - Default: 設定した番号以外をユーザが押した場合
   - Timeout: ユーザが何もしなかったとき
 
-##### Set
+#### Set
 
 - working queueを使ってLambdaと連携し、Dynamoと連携することで大量のキューを捌くなどのユースケースがある
 - set contact attributesを使うことでキューの状態や3rd-PartyのAPIから取得したデータを使って顧客の氏名を取得・利用したり、LambdaでDBにアクセスしてその返り値を利用したりできる
@@ -207,27 +207,27 @@ AWSの広告っぽくなってしまうので、サラッと記載します。
 - Call back numberを利用することで、キューの滞留が解消されたらシステムから電話するようなシステムフローを構築することも可能。ユーザは一旦電話を切ることができるし、その間は課金が発生しない
 - WebページにAPIを使ってCall backやCall meの機能を使うことが可能。もちろんAttributeも利用可能。
 
-##### Branch
+#### Branch
 
 - ユーザ属性やキューの滞留などを基にフローを分けるなんてことも可能
 
-##### Integrate
+#### Integrate
 
 - Lambdaを使って様々な外部サービスと接続できる
 - 通常Lambdaはcoldからの起動になるので、Timeoutはデフォルトの3秒から最大の8秒に修正しましょう（特に最初のLambdaの起動）
   - CloudWatchで30分間隔くらいでpingすれば常にWarmにしておける。
 
-##### Terminate / Transfer
+#### Terminate / Transfer
 
 - Transfer flowを使うことで他のフローに転送でき、フローを小さく保つことが可能
 - Transfer Queueを使うことで後でかけ直す機能が作成できる。
 - Transfer to phone numberを使うことで固定電話や携帯電話に転送できる。もちろん、IP電話でもOK
 
-##### エラー処理
+#### エラー処理
 
 - 適切なフローに投げるか接続を切るか、の処理を行い、通話の最初に戻る、みたいなことはLoopを起こすのでやめましょう。
 
-##### 6. ルーティングプロファイルの作成
+#### 6. ルーティングプロファイルの作成
 
 <img src="/images/2018/20181202/photo_20181202_10.png" loading="lazy">
 
@@ -237,7 +237,7 @@ AWSの広告っぽくなってしまうので、サラッと記載します。
   - 遅延（Delay）はキューに転送開始するまでの最低待ち時間
 - キューの割当により、いわゆるスキルベース（エージェントのスキルによって割当を変える）のルーティングも可能
 
-##### 7. ユーザー管理
+#### 7. ユーザー管理
 
 - ユーザーマネジメントからユーザの追加/削除が可能
   - 追加する場合は手動入力 or CSVに入力してアップロードすることも可能。
@@ -251,7 +251,7 @@ AWSの広告っぽくなってしまうので、サラッと記載します。
 | Admin             | コンタクトセンター管理者用。ユーザーとアクセス権限、メトリクスおよび品質、ルーティングへのアクセスが可能。 |
 | QualityAnalyst    | スーパーバイザー、コンタクトセンター管理者用。メトリクスおよび品質へのアクセスのみ可能。 |
 
-##### 3rd-partyへのストリーム
+#### 3rd-partyへのストリーム
 
 レイテンシは当然気になりますよね？
 顧客 -> Stream -> Speech to Textサービスのような形で日本語で話した内容を解釈してマネージドサービスと連携できるいい方法がないか知りたかったのですが、現時点（2018/11/07）では無いようです。
@@ -260,12 +260,12 @@ AWSの広告っぽくなってしまうので、サラッと記載します。
 - Kinesis video streamを利用可能になる予定
 - LEXの日本語対応はまだ先（ロードマップにはある）
 
-### 実際に作ってみた
+## 実際に作ってみた
 
 ECサイトで注文情報の変更・キャンセルを行う自動応答システムをイメージして、コールフローを作成しました。
 前提として、注文番号とかお問い合わせ番号は長すぎるので、ダイアルプッシュでなく音声認識で受付ができるようにしました。
 
-#### フロー
+### フロー
 
 1. 電話をかけるとDynamoDBから最近の注文情報を電話番号を基に取得して、「最近〇〇をご購入いただきましたが、これに関するご質問ですか？」と音声を流します
 2. ここはIVRで分岐としました
@@ -274,15 +274,15 @@ ECサイトで注文情報の変更・キャンセルを行う自動応答シス
     5. オペレータに電話転送
 6. 上記1と2の場合はSMSもLambda経由で送るようにしました
 
-##### 全体図
+#### 全体図
 
 <img src="/images/2018/20181202/photo_20181202_11.png" style="border:solid 1px #000000" loading="lazy">
 
-#### 手順
+### 手順
 
 前提として、電話番号の取得などの基本的な設定は完了しているものとして進めます。
 
-##### 先ずはDynamoDBにデモ用のデータを入れます。
+#### 先ずはDynamoDBにデモ用のデータを入れます。
 
 - JustinさんがNorth Faceのジャケットを買った的なデータです。
 
@@ -297,7 +297,7 @@ $ aws dynamodb put-item --table-name CustomerTable --item '{
 }'
 ```
 
-##### Lambdaを作成します。今回は下記の３つを作成しました。
+#### Lambdaを作成します。今回は下記の３つを作成しました。
 
 エラーチェックとか不要な変数とか目を瞑ってください・・・。
 キャンセルTrueでも配送日変更できるなどツッコミどころ満載です。
@@ -306,7 +306,7 @@ $ aws dynamodb put-item --table-name CustomerTable --item '{
     2. キャンセル書き込み用
     3. 配送情報変更用
 
-###### 注文情報の読み込み（直近の注文履歴参照用）
+##### 注文情報の読み込み（直近の注文履歴参照用）
 
 ```javascript OrderTableRead
 var AWS = require("aws-sdk");
@@ -366,7 +366,7 @@ function buildResponse(isSuccess, recordFound, customerName, orderId, orderedIte
 
 ```
 
-###### キャンセル書き込み用
+##### キャンセル書き込み用
 
 ```javascript CancelOrder
 var AWS = require("aws-sdk");
@@ -427,7 +427,7 @@ function buildResponse(isSuccess) {
 
 ```
 
-###### 配送日変更用
+##### 配送日変更用
 
 ```javascript ChangeOrderDate
 var AWS = require("aws-sdk");
@@ -489,7 +489,7 @@ function buildResponse(isSuccess) {
 }
 ```
 
-##### AmazonConnectからLambdaを呼び出すためのパーミッションの設定をします（現状GUIからは設定不可）
+#### AmazonConnectからLambdaを呼び出すためのパーミッションの設定をします（現状GUIからは設定不可）
 
 - 併せてLambdaからDynamoDB/SNSへのFullAccessも許可しておきます（デモなのでセキュリティはご愛嬌で・・・）
 - 本来はアクセスすべきリソースだけ指定してください
@@ -505,7 +505,7 @@ aws lambda add-permission --function-name function:<Lambda Function名> \
 > ※ ARNはAWSコンソール > AmazonConnect > インスタンスエイリアス名　から確認できます。
 <img src="/images/2018/20181202/photo_20181202_12.png" style="border:solid 1px #000000" loading="lazy">
 
-##### Lexとの連携を作成します。
+#### Lexとの連携を作成します。
 
 先ずはLexチャットボットを用意しましょう。
 右端の`Test ChatBot`からチャットボットのテストができます。
@@ -517,62 +517,62 @@ aws lambda add-permission --function-name function:<Lambda Function名> \
 
 <img src="/images/2018/20181202/photo_20181202_13.png" style="border:solid 1px #000000" loading="lazy">
 
-###### Amazon LexとConnectを接続します。
+##### Amazon LexとConnectを接続します。
 
 下図の通り、Lexボットを作成したリージョンとボット名を選択して追加します。
 
 <img src="/images/2018/20181202/photo_20181202_14.png" style="border:solid 1px #000000" loading="lazy">
 
-##### 最後にフローを作成します。
+#### 最後にフローを作成します。
 
 <img src="/images/2018/20181202/photo_20181202_15.png" style="border:solid 1px #000000" loading="lazy">
 
 かいつまんで説明すると、吹き出し部分が重要なところで、データの受け渡しで若干躓くところです。
 個別に見ていきましょう。
 
-###### 電話番号の取得
+##### 電話番号の取得
 
 電話をかけてきた相手の電話番号はシステムの値で取得可能です。
 宛先キーは使いやすい名称を設定すれば良いと思います（今回はCallerIDでいきます）。
 <img src="/images/2018/20181202/photo_20181202_16.png"  class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
 
-###### Lambdaの呼び出し
+##### Lambdaの呼び出し
 
 先程取得したCallerID（発信者電話番号）を引数としてセットします。
 呼び出すLambdaのARNは関数画面から取得してきましょう。
 <img src="/images/2018/20181202/photo_20181202_17.png"  class="img-middle-size"  style="border:solid 1px #000000" loading="lazy">
 
-###### 値のチェック
+##### 値のチェック
 
 Lambda関数の戻り値をチェックできます。
 ここでは発信者電話番号をキーとした注文情報レコードの有無を確認することを想定しています。
 <img src="/images/2018/20181202/photo_20181202_18.png" class="img-middle-size"  style="border:solid 1px #000000" loading="lazy">
 
-###### ダイヤルプッシュを取得（IVR）
+##### ダイヤルプッシュを取得（IVR）
 
 IVRの機能を枠ひとつでできてしまいます！
 ここは特につまずくことなく設定可能かなと思います。
 <img src="/images/2018/20181202/photo_20181202_19.png"  style="border:solid 1px #000000" loading="lazy">
 
-###### キャンセル関数
+##### キャンセル関数
 
 複数の引数を持つLambda関数にもちゃんとデータを渡すことができます。
 <img src="/images/2018/20181202/photo_20181202_20.png" style="border:solid 1px #000000" loading="lazy">
 
-###### Lexで顧客の入力を取得
+##### Lexで顧客の入力を取得
 
 前項の「ダイヤルプッシュを取得（IVR）」と同様のことをLexを用いて実装可能です。
 ボットを選択するだけなので、とても簡単に追加できます。
 <img src="/images/2018/20181202/photo_20181202_21.png" style="border:solid 1px #000000" loading="lazy">
 
-###### 配送日変更関数の呼び出し
+##### 配送日変更関数の呼び出し
 
 以前までと違うのが、Lexで取得してきた値を引数としたい点です。
 素晴らしいことにこれもGUIで簡単に取れてしまいます。
 （Lexの部分だけ抜き取っています）。。
 <img src="/images/2018/20181202/photo_20181202_22.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
 
-###### 完成！
+##### 完成！
 
 これでフローの完成です！ 長丁場お疲れ様でした！
 右上の保存・・・を押しても反映されないので、保存の右の▼をクリック→保存して発行を実行してください。
@@ -580,7 +580,7 @@ IVRの機能を枠ひとつでできてしまいます！
 あとはしばらくして電話をかければ動作を確認できます！
 多少クセはありますがとっても簡単ですね。
 
-### まとめ
+## まとめ
 
 とっても長くなってしまいましたが、２日間非常に濃い内容のセッションでした。
 やはりLambdaとの連携がとても強力で、基幹のシステムと連携して様々な活用が想像できますね！
@@ -589,7 +589,7 @@ AmazonConnectならではの強みを活かしてEC2インスタンスの再起�
 この実習での作品が発想勝ちだったのか、AmazonConnectサンプルコールセンター対決で優勝をいただきましてechospotをもらえました！（ありがとうございます！）。
 <img src="/images/2018/20181202/photo_20181202_23.jpeg" loading="lazy">
 
-### 参考
+## 参考
 
 - [Amazon Connect Contact Center Blog Channel](https://aws.amazon.com/blogs/contact-center/)
 - [Salesforce Connector information](https://aws.amazon.com/jp/blogs/contact-center/building-an-automated-ai-experience-with-amazon-connect-and-salesforce-service-cloud/)

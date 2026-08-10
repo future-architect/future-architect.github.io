@@ -22,7 +22,7 @@ Auth0のドキュメントに記載されているAPI操作は、curlコマン�
 
 ついでに、Auth0にいる全ユーザー数を取得する方法も共有します。
 
-### Windowsのcurl事情
+## Windowsのcurl事情
 
 CLIから通信を行える便利コマンド `curl` は元々UNIX系のコマンドで、もともとWindowsにはインストールされていませんでした。
 
@@ -44,7 +44,7 @@ Uri:
 
 注意ですが、この記事に記載しているcurlコマンドをコマンドプロンプト上で動かす場合は、`\`のエスケープと、改行を消す必要があります（記事上では読みやすさのために改行を入れています）。
 
-### 結論から話すと
+## 結論から話すと
 
 以下のコマンドで動きます。
 
@@ -79,7 +79,7 @@ Uri:
   rm .\output.txt
   ```
 
-### 操作の流れ
+## 操作の流れ
 
 Auth0にいる総ユーザー数を取得を `Invoke-RestMethod` で記載する方法を共有します。
 
@@ -88,7 +88,7 @@ Auth0にいる総ユーザー数を取得を `Invoke-RestMethod` で記載する
 1. APIを利用するtokenを取得する（POSTリクエスト）
 2. 総ユーザー数取得APIを打つ（GETリクエスト）
 
-#### 1. APIを利用するtokenを取得する（POSTリクエスト）
+### 1. APIを利用するtokenを取得する（POSTリクエスト）
 
 ユーザー数取得に使う **Auth0 User Management API** を利用するためのtokenをまずは取得します。
 
@@ -103,7 +103,7 @@ curl --request POST \
   --data '{"client_id":"alphanumericWithCapita1Letter","client_secret":"alphanumericWithCapita1LetterChottoNaga1","audience":"https://$domain/api/v2/","grant_type":"client_credentials"}'
 ```
 
-##### 観察
+#### 観察
 
 まず元のCURLが何やってるか見ます。
 
@@ -113,7 +113,7 @@ curl --request POST \
 
 **data**とありますが **HTTPリクエストではbody** とも呼びます。ここまでで、 **`Invoke-RestMethod`でやることは「JSONをPOSTするリクエストを作れば良い**」ということが分かります。
 
-##### 公式ドキュメント見る
+#### 公式ドキュメント見る
 
 2022年11月時点ではpowershell-7.3が最新のようで、公式ドキュメントは[これ](https://learn.microsoft.com/ja-jp/powershell/module/microsoft.powershell.utility/invoke-restmethod?view=powershell-7.3)です。
 
@@ -184,7 +184,7 @@ Invoke-RestMethod : invalid json
 理由ですが、bodyにjson渡す渡す詐欺（コンテンツタイプでJSON渡すと宣言してるがJSONを渡していない状態）をしてるようです。よしなにやってくれると少し期待しましたが、ダメなようです。
 （※もし、何かしらの手法があれば教えてください）
 
-##### 対応方法
+#### 対応方法
 
 `auth0 invoke rest method post body json powershell` といったキーワードで探すと、[こちらの記事](https://www.thecodebuzz.com/invoke-restmethod-get-post-example-with-parameters/)に記載している通り、 `ConvertTo-Json`**[コマンド](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/convertto-json?view=powershell-7.3)を用いbodyのオブジェクトをJSONに変換**すれば良いということがわかります（`-Body $body` ➔　`-Body ($body|ConvertTo-Json)`）。
 
@@ -206,7 +206,7 @@ Invoke-RestMethod -Method Post -Uri "https://$domain/oauth/token" -ContentType '
 
 <img src="/images/2022/20221130a/1.png" alt="1.png" width="1200" height="181" loading="lazy">
 
-##### 出力結果最後まで出ない問題
+#### 出力結果最後まで出ない問題
 
 PowerShellの仕様か、Invoke-RestMethodの仕様なのか、**出力が最後まで出てくれずトークンが分からない問題** が発生しました。
 
@@ -219,7 +219,7 @@ PowerShellの仕様か、Invoke-RestMethodの仕様なのか、**出力が最後
 cat output.txt
 ```
 
-#### 総ユーザー数取得APIを打つ
+### 総ユーザー数取得APIを打つ
 
 最初に、Auth0全ユーザー数の取得コマンドを探すため、公式で用意されている[Auth0 User Management APIのドキュメント](https://auth0.com/docs/api/management/v2#!/Users/get_users)を見ます。
 
@@ -271,7 +271,7 @@ curl --request GET \
   --header 'authorization: Bearer $token'
 ```
 
-#### 観察・マッピング
+### 観察・マッピング
 
 クエリパラメータはGETなのでシンプルですね。token渡したGETリクエストするだけです。[公式ドキュメントのリンクはこちら](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/invoke-restmethod?view=powershell-7.3)です。
 
@@ -303,7 +303,7 @@ total  : xxx
 
 無事totalの数字が取得できました！
 
-### 最後に
+## 最後に
 
 curlコマンドの代替として、PowerShell標準の `Invoke-webRequest`だったり`Invoke-RestMethod` を用いてAuth0のAPIを操作する例をまとめました。
 

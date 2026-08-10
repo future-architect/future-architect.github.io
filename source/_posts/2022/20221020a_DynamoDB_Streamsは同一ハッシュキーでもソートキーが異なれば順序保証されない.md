@@ -31,13 +31,13 @@ TIG DXユニットの真野です。
 
 私がガッツリ勘違いしていて、でもトラブルシュートしてくれたのはチームの若手エースという、遺憾な結果でしたので、二度と繰り返さないという反省の意味も込め詳細を書きます。
 
-### DynamoDB Streamsとは
+## DynamoDB Streamsとは
 
 DynamoDB Streamsについては1.5年前に似たような小ネタを投稿しました。DynamoDB Streams自体についてはそちらを参照ください（今見ても（当時から）すでにタイトルが..）。
 
 * [オレのDynamoDB Streamsが再着火しないわけがない](/articles/20210122/)
 
-### ハマったケース
+## ハマったケース
 
 例を上げて説明します。
 
@@ -56,7 +56,7 @@ DynamoDB Streamsについては1.5年前に似たような小ネタを投稿し�
 
 最初は、センシングするデバイス側から送られる順番が狂ったとか、図では省略していますが途中で経由するKinesis Data StreamsのシャードIDにデバイスIDが入っていないなど、DynamoDBに書き込まれるまでで順序が狂ったのかと思っていましたが、書き込みデータにデバイスから送信日時とサーバ受付時間、DBへの永続日時を比較すると原因がDynamoDB Streamsでの出力で狂っていることが分かりました。
 
-### 発生メカニズム
+## 発生メカニズム
 
 [Amazon DynamoDB ストリームを使用して、順序付けされたデータをアプリケーション間でレプリケーションする方法 | Amazon Web Services ブログ](https://aws.amazon.com/jp/blogs/news/how-to-perform-ordered-data-replication-between-applications-by-using-amazon-dynamodb-streams/) からの図を参照します。
 
@@ -78,7 +78,7 @@ Lambdaの起動数ですが、同時実行数を1にすれば、次のように1
 
 これを開発した当初はデータ量もまだ少なく、シャードが細かく分割されていなかったためテストで検知されず、利用量が増えたことで顕在化したのかなとも思います。ハッシュキーが同じであればDynamoDB上は同一パーティションとなるので、そのままDynamoDB Streamsのシャードとなるのかと勘違いしていました。思い込みは良くないですね。後で切り分けするのは大変なので最初に裏取りしておくべきことでした。
 
-### 回避方法
+## 回避方法
 
 複数の回避手段があるかなと思います。てっとり早いのはDynamoDB Streamsではなく定時起動のジョブを作ることでしょう。
 
@@ -90,7 +90,7 @@ Lambdaの起動数ですが、同時実行数を1にすれば、次のように1
 
 * [Kinesis Data Streams を使用して DynamoDB への変更をキャプチャする。 - Amazon DynamoDB](https://docs.aws.amazon.com/ja_jp/amazondynamodb/latest/developerguide/kds.html)
 
-### まとめ
+## まとめ
 
 * AWSドキュメント、ちゃんと読みましょう（自戒）
 * DynamoDB Streamsの起動順序は項目単位。ソートキーが指定されているテーブルの場合は、ハッシュキー＋ソートキーの単位での保証となる
