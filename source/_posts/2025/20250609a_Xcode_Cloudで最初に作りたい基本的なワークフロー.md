@@ -178,6 +178,7 @@ Git タグの Push をトリガーとするため、Tag Changes を選択しま�
 #### Actions
 
 TestFlight リリースを行う本ワークフローではビルドとテストに加えて、アーカイブも追加します。
+
 1. Build - iOS
   <img src="/images/2025/20250609a/image_6.png" alt="image.png" width="1200" height="789" loading="lazy">
 2. Test - iOS

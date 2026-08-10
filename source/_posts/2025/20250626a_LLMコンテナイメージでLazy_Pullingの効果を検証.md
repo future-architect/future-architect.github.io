@@ -206,6 +206,7 @@ echo "Duration: $((END - START)) seconds"
 ```
 
 以上をコンテナ化します。ここでLLMのモデルをあらかじめpullしてイメージに同梱しておきます。アンチパターンな気もしますが...。
+
 ```dockerfile
 FROM python:3.11-slim
 

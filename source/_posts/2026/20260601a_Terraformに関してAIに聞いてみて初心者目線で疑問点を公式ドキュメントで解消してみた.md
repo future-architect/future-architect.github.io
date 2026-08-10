@@ -171,10 +171,10 @@ Terraform Coreの重要な役割である「状態管理」と「計画の実行
 
 例も交えてきれいにまとめまっていました。状態管理はTerraformの核となる機能のようです。理解しておくとTerraformへの理解も深まりそうなので公式ドキュメントを読んでみます。
 
-- [Stateの目的と概念](https://developer.hashicorp.com/terraform/language/state/purpose)
-- [Stateファイルの仕様や仕組み全体](https://developer.hashicorp.com/terraform/language/state)
-- [実行計画に関する公式ドキュメント](https://developer.hashicorp.com/terraform/cli/commands/plan)
-- [リソースの依存関係](https://developer.hashicorp.com/terraform/tutorials/configuration-language/dependencies)
+* [Stateの目的と概念](https://developer.hashicorp.com/terraform/language/state/purpose)
+* [Stateファイルの仕様や仕組み全体](https://developer.hashicorp.com/terraform/language/state)
+* [実行計画に関する公式ドキュメント](https://developer.hashicorp.com/terraform/cli/commands/plan)
+* [リソースの依存関係](https://developer.hashicorp.com/terraform/tutorials/configuration-language/dependencies)
 
 これらの公式ドキュメントを読むことで、以下の点がわかりました。
 

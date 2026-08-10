@@ -33,11 +33,13 @@ act は GitHub Actionsのワークフローをローカル上で実行できる�
 act のREADMEには以下のようにactを使うべき理由が書かれています。
 
 > Run your GitHub Actions locally! Why would you want to do this? Two reasons:
+>
 > - Fast Feedback - Rather than having to commit/push every time you want to test out the changes you are making to your .github/workflows/ files (or for any changes to embedded GitHub actions), you can use act to run the actions locally. The environment variables and filesystem are all configured to match what GitHub provides.
 > - Local Task Runner - I love make. However, I also hate repeating myself. With act, you can use the GitHub Actions defined in your .github/workflows/ to replace your Makefile!
 >
 > **日本語訳**:
 > GitHub Actions をローカルで実行しましょう！これを行うべき理由は2つあります：
+>
 > - フィードバックを早くする - .github/workflows/ ファイルに加えている変更（または埋め込まれた GitHub Actions への変更）をテストしたいと思うたびにコミット/プッシュをする代わりに、act を使えばアクションをローカルで実行できます。環境変数やファイルシステムは、GitHub が提供するものと一致するようにすべて設定されます
 > - タスクランナーとして動かす - 私は make が大好きです。しかし、同じことを繰り返すのも嫌いです。act を使えば、.github/workflows/ で定義された GitHub Actions をあなたの Makefile の代わりに利用できるのです！
 

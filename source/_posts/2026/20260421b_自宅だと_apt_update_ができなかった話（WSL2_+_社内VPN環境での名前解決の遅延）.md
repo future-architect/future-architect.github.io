@@ -300,4 +300,3 @@ generateResolvConf = false
 [^5]: [TCP Proxyを作って面倒なProxy設定を一掃する ～Rust製moproxyとnftablesによる透過プロキシ設定～](https://future-architect.github.io/articles/20250904a/)
 [^6]: [ローカルプロキシで認証プロキシの煩わしさを解消！](https://future-architect.github.io/articles/20240227a/)
 [^7]: [ProxyとDockerと新人社員と時々わたし](https://future-architect.github.io/articles/20201020/)
-

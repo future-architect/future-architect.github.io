@@ -65,6 +65,7 @@ https://vite-pwa-org.netlify.app/
 
 > Vite PWAは、既存のアプリケーションをほとんど設定不要でPWA（プログレッシブウェブアプリ）に変換するのをサポートします。一般的な使用例に適した実用的なデフォルト設定があらかじめ用意されています。
 > vite-plugin-pwaプラグインでは以下のことが可能です：
+>
 > - Webアプリケーションのマニフェストを生成し、それをエントリーポイントに追加する（マニフェスト生成についてはセットアップガイドを参照してください）。
 > - strategies オプションを使用してサービスワーカーを生成する（詳細は「サービスワーカーの戦略」セクションを参照してください）。
 > - ブラウザにサービスワーカーを登録するスクリプトを生成する（「サービスワーカーを登録する」セクションを参照してください）。
@@ -252,7 +253,7 @@ js
 png
 webmanifest
 ```
- 
+
  今回の場合、css、html、ico、js、png、webmanifestを指定すると良さそうです。globパターンを記載します。
 
 ```typescript
@@ -280,7 +281,7 @@ files generated
   dist/workbox-5ffe50d4.js
 ```
 
-書き出された `dist/sw.js` を見てみると、 `e.precacheAndRoute()` の引数に、書き出されたファイルが一覧されているようです。 
+書き出された `dist/sw.js` を見てみると、 `e.precacheAndRoute()` の引数に、書き出されたファイルが一覧されているようです。
 
 <img src="/images/2024/20241127a/Pasted_image_20241128142353.png" alt="Pasted_image_20241128142353.png" width="1200" height="1165" loading="lazy">
 
@@ -297,11 +298,11 @@ files generated
 このキャッシュ戦略にはいくつかあり、workbox-strategiesの機能で切り替えることができます。以下にその種類を簡単に記載しますが、詳細は[web.davの記事](https://web.dev/articles/runtime-caching-with-workbox?hl=ja)を参考にしてください。
 
 - Network First(ネットワーク優先)
-	- まずはネットワークを見に行き、最新のデータを返す。リクエストが失敗したり、時間がかかりすぎたりすると、最新のキャッシュを返す。
+ 	- まずはネットワークを見に行き、最新のデータを返す。リクエストが失敗したり、時間がかかりすぎたりすると、最新のキャッシュを返す。
 - Cache First(キャッシュ優先)
-	- まずは最新のキャッシュを返す。キャッシュが存在しない場合やキャッシュに不備がある場合はネットワークを見に行く。
+ 	- まずは最新のキャッシュを返す。キャッシュが存在しない場合やキャッシュに不備がある場合はネットワークを見に行く。
 - Stale While Revalidate(SWR)
-	- まずは最新のキャッシュを返すが、その裏でネットワークを見に行き、キャッシュを最新化する。
+ 	- まずは最新のキャッシュを返すが、その裏でネットワークを見に行き、キャッシュを最新化する。
 
 今回はNetwork Firstで実装してみようと思います。Vite PWAで外部リソースのキャッシュを有効化するには、 `runtimeCaching` オプションを利用します。また、今回は tsukumijima 氏によって公開されている「天気予報API(livedoor 天気互換)」のドメイン `weather.tsukumijima.net` と、気象庁のドメイン `www.jma.go.jp` から外部リソースが読み込まれているので、この2ドメインをruntimeCacheの対象としましょう。
 
@@ -340,13 +341,13 @@ https://vite-pwa-org.netlify.app/workbox/inject-manifest.html
 [Chrome for Developersのウェブサイト](https://developer.chrome.com/docs/workbox/modules/workbox-build?hl=ja#which-mode-to-use)では、各モードの選択を以下のように実施するべきとしています。
 
 - generateSWを使用するケース
-	- ファイルをプリキャッシュしたい場合
-	- 単純なランタイムキャッシュ（外部リソースのキャッシュ）が必要な場合
+ 	- ファイルをプリキャッシュしたい場合
+ 	- 単純なランタイムキャッシュ（外部リソースのキャッシュ）が必要な場合
 - injectManifestを使用するケース
-	- ServiceWorkerをより詳細に制御したい場合
-	- ファイルをプリキャッシュしたい場合
-	- ルーティングおよびキャッシュ戦略をカスタマイズする必要がある場合
-	- ServiceWorkerを他のプラットフォーム機能（Web Push等）と併用する場合
+ 	- ServiceWorkerをより詳細に制御したい場合
+ 	- ファイルをプリキャッシュしたい場合
+ 	- ルーティングおよびキャッシュ戦略をカスタマイズする必要がある場合
+ 	- ServiceWorkerを他のプラットフォーム機能（Web Push等）と併用する場合
 
 `injectManifest` モードを利用したVite PWAの設定についてもある程度知見が溜まってきたので、別途記事にできればと思います。
 
@@ -361,10 +362,9 @@ https://vite-pwa-org.netlify.app/workbox/inject-manifest.html
 色々調べるうえで役に立ったWebサイトを以下に記載します。Google系のドキュメントは機械翻訳されており、誤った訳も多いので、なるべく英語のドキュメントを読むことをおすすめします。
 
 - ServiceWorker についての理解
-    - [Service worker overview - Chrome for Developers](https://developer.chrome.com/docs/workbox/service-worker-overview)
+  - [Service worker overview - Chrome for Developers](https://developer.chrome.com/docs/workbox/service-worker-overview)
 - 初心者向けのServiceWorkerの図解
-    - [【イラスト付き】Servie Worker API【利用方法】](https://zenn.dev/peter_norio/articles/2896d638dece0e)
+  - [【イラスト付き】Servie Worker API【利用方法】](https://zenn.dev/peter_norio/articles/2896d638dece0e)
 - プリキャッシュ対応
-    - [Workboxを使ってPWAを完全オフライン対応した](https://zenn.dev/cureapp/articles/f66551b3995aaf)
-    - [workbox-precaching - Chrome for Developers](https://developer.chrome.com/docs/workbox/modules/workbox-precaching)
-
+  - [Workboxを使ってPWAを完全オフライン対応した](https://zenn.dev/cureapp/articles/f66551b3995aaf)
+  - [workbox-precaching - Chrome for Developers](https://developer.chrome.com/docs/workbox/modules/workbox-precaching)

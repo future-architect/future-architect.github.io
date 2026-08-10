@@ -106,6 +106,7 @@ uroboroSQL-fmt の特徴の1つとして、2WaySQLに対応していることが
 - [uroborosql-fmtにおける2WaySQLフォーマット (後編: 結果検証編)](/articles/20241021a/)
 
 #### 実際の不具合
+
 インターン期間中に遭遇したフォーマッタの不具合として、2WaySQLにおいて `as` キーワードの縦揃えが崩れてしまうというものがありました。
 
 <img src="/images/2024/20241210a/as-alignment-actual-expected.png" alt="as-alignment-actual-expected.png" width="871" height="294" loading="lazy">

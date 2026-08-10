@@ -24,6 +24,7 @@ HealthCare Innovation Group(HIG)[^1]の橋本です。
 先日参加したSwiftZoomin#20の内容から、Swift6移行に向けて理解が必要なSwift Concurrencyの重要な概念について簡単にまとめました。
 
 SwiftZoomin#20の動画は、次のリンク先からYouTube上で視聴可能です。
+
 - [感覚的に理解するConcurrency: Swift 6はIsolationとSendableを用いてどのようにデータ競合を防止するか](https://youtu.be/AUcn2y2jjNs?si=_fyNjme2hDA236sl)
 
 ## Swift6移行に向けて、重要な概念3つ
@@ -81,7 +82,6 @@ let b = Counter() // bのIsolation domain、aとbは別のIsolation domainであ
 #### non-Sendable
 
 `Sendable`に対して、`non-Sendable`な値は、`Isolation boundary`を超えることができません。
-
 
 - [Sendable | Apple Developer Documentation](https://developer.apple.com/documentation/swift/sendable)
 - [Sendable Types | Migrating to Swift 6](https://www.swift.org/migration/documentation/swift-6-concurrency-migration-guide/dataracesafety/#Sendable-Types)

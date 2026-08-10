@@ -100,6 +100,7 @@ def make_bucket(project_name, bucket_name, region):
 
 続いて、Dataflow上でパイプラインを実行していきます。Dataflow上でパイプラインを実行するにはいくつかのオプションを指定する必要があります（主にGCP関連）。ここでは、それらのオプションの説明とオプションの渡し方について説明します。
 Dataflowでパイプラインを実行するためには以下のようなオプションを指定する必要があります。
+
 |オプション名|説明|
 |:----:|:----|
 |runner|Dataflowで動かす場合には`DataflowRunner`を指定。ローカルで動かす場合には`DirectRunner`。|

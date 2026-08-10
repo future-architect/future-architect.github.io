@@ -203,7 +203,7 @@ DETAIL:  A generated column cannot reference another generated column.
 
 こちらもエラーになります。「他の生成列を参照することはできません」という内容です。デジャブ感があるのは、「生成列で自分自身の列を参照できるか」節でもこのメッセージを見たためです。格納生成列、仮想生成列のどちらも同じ結果になります。
 
-ドキュメントにも、 `The generation expression can refer to other columns in the table, but not other generated columns. `（生成式はテーブル内の他の列を参照できますが、他の生成列を参照することはできません。）とあるので、記載通りの挙動です。
+ドキュメントにも、 `The generation expression can refer to other columns in the table, but not other generated columns.`（生成式はテーブル内の他の列を参照できますが、他の生成列を参照することはできません。）とあるので、記載通りの挙動です。
 
 ### 5. 計算途中でnull値が混入したらどうなるか
 
@@ -292,7 +292,6 @@ ERROR:  unique constraints on virtual generated columns are not supported
 
 これは後述するインデックスのサポート有無の挙動の差でしょう。なお、これまた後述する式インデックスに一意制約をつけることで、実質的に、仮想生成列に一意制約をつけることはできます。
 
-
 ### 8. 生成列はインデックスに使えるか
 
 格納生成列、仮想生成列それぞれにインデックスを追加してみます。
@@ -347,7 +346,6 @@ WHERE full_name = 'Yamada Taro';
 ```
 
 実行計画レベルで、式インデックスが使われていることを確認できました。多少の回避方法が必要ですが、仮想列も事実上、インデックスを貼れると思ってよいでしょう。
-
 
 ### 9. 生成列はPKにできるか
 
@@ -675,7 +673,6 @@ Indexes:
 ```
 
 `CASCADE` を利用したら、利用していた元のカラムも同時に削除されました。強力ですね...。事故不可避なので存在自体を忘れたほうが良いでしょう。
-
 
 ## 格納生成列と仮想生成列の使い分け
 

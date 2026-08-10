@@ -108,7 +108,6 @@ resource "google_artifact_registry_repository" "example_repo" {
 
 ※本記事のコードはTerraform `v1.1.0` 以上、Google Cloud Provider `v6.4.0` にて動作確認しています。
 
-
 ## 導入時の注意点
 
 設定を反映させる際、以下の点に注意するとスムーズです。
@@ -136,4 +135,4 @@ protoPayload.methodName="google.devtools.artifactregistry.v1.ArtifactRegistry.Ba
 
 ## 参考
 
-- [Artifact Registry のクリーンアップ ポリシーの管理](https://docs.cloud.google.com/artifact-registry/docs/repositories/cleanup-policy?hl=ja)
+* [Artifact Registry のクリーンアップ ポリシーの管理](https://docs.cloud.google.com/artifact-registry/docs/repositories/cleanup-policy?hl=ja)

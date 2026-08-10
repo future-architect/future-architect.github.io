@@ -73,7 +73,6 @@ healthcare_data=# select * from patient_records ;
 (3 rows)
 ```
 
-
 ## 1.はじめに
 
 この章では、サンプルデータで具体例を示しつつ、`to_regtypemod`それ自体や背景情報を説明します。
@@ -101,13 +100,12 @@ to_regtypemod(text) → integer
 3. 存在しないデータ型が指定されたが、文法的に有効な場合はNULLを返す
 4. 文法エラーがある場合はERRORを発生させる
 
-
-
 ### 1.3 サンプルデータによるto_regtypemodの検証
 
 イメージしやすくするため、それぞれ実際に確認してみます。特に、「内部表現が返される」ということが引っかかりポイントな気がします。
 
 #### VARCHARの例
+
 ```
 healthcare_data=# SELECT to_regtypemod('varchar(50)');
  to_regtypemod
@@ -115,7 +113,6 @@ healthcare_data=# SELECT to_regtypemod('varchar(50)');
             54
 (1 row)
 ```
-
 
 このように内部表現の値で返されます。
 この値は、`to_regtype`関数と`format_type`関数と併用することで、見てわかる直感的な表現となります。
@@ -139,8 +136,6 @@ FROM
  character varying |            54 | character varying(50)
 (1 row)
 ```
-
-
 
 #### NUMERIC型でのスケール指定
 
@@ -232,7 +227,6 @@ healthcare_data=# SELECT to_regtypemod('address_type');
 
 PostgreSQL 17時点の型宣言では、カスタム型の中でも複合型(上記のように、複数フィールドを指定するもの)に型修飾子を付与する構文は存在しないので、同様のことをしたい場合にはトリガーを作成することになるのではないでしょうか？
 
-
 #### 存在しない型の場合
 
 存在しない型だが文法的に有効な場合には、以下のようにNULLが戻ります。
@@ -247,6 +241,7 @@ healthcare_data=# SELECT to_regtypemod('tekitounakata(200)');
 ```
 
 文法エラーでは、以下のようにエラーが発生します。
+
 ```
 healthcare_data=# SELECT to_regtypemod('!');
 ERROR:  syntax error at or near "!"
@@ -269,13 +264,11 @@ CONTEXT:  invalid type name "!"
 
 データ型そのものだけでは、例えばNUMERICを指定しても最大長までは許容されてしまうので、実際の用途に合わせたデータのサイズや精度、その他の具体的な制約を表現することができません。型修飾子は、これらの制約を定義するために用いられます。
 
-
 実際にNUMERIC型を例に挙動を確認していきます。
 
 https://www.postgresql.jp/document/16/html/datatype-numeric.html
 
 NUMERIC型では、型修飾子としてprecisionとscaleを指定可能で、省略することも可能です。
-
 
 ```sql
 -- サンプルテーブルの作成
@@ -337,7 +330,6 @@ healthcare_data=# select * from sample_patient_info;
 
 PostgreSQLの`pg_attribute`テーブルの`atttypmod`カラム(int4, 32bit)などで管理されます。
 
-
 このフィールドには、カラムごとの型修飾子の内部表現が整数として保存されています。このatttypmodを使って、カラムがどのような制約を持つかを確認できます。
 
 サンプルデータのテーブルに確認すると、以下のようになっています。
@@ -361,6 +353,7 @@ healthcare_data=# SELECT attname, atttypid, atttypmod FROM pg_attribute WHERE at
 ```
 
 以下のようにしてto_regtypemodで取得した型修飾子と、同一の内部表現値ですね。
+
 ```
 healthcare_data=# SELECT to_regtypemod('numeric(5,2)');
  to_regtypemod
@@ -372,7 +365,6 @@ healthcare_data=# SELECT to_regtypemod('numeric(5,2)');
 ご覧の通り、typemodの表現には内部表現が用いられているので、よほどの職人でなければ目で見てどの型修飾子が付与されているのかの判定は難しいです。
 
 この内部表現は、以下のようにformat_type関数を適応することで、値を内部表現から戻すことができます。
-
 
 ```
 healthcare_data=# SELECT format_type(
@@ -387,13 +379,11 @@ healthcare_data=# SELECT format_type(
 
 ```
 
-
 せっかくなので、format_type関数の内部実装までおって確認をしましょう。
 
 format_typeについては、postgresリポジトリにおける以下のファイルで実装されています。
 
 https://github.com/postgres/postgres/blob/master/src/backend/utils/adt/format_type.c#L390
-
 
 ```c
 /*
@@ -477,7 +467,6 @@ FROM
 
 ```
 
-
 `typmodout`で指定されている関数のうち、確認対象としては`numerictypmodout`が呼び出される関数であることを確認できました。これは、以下の`numeric.c`で実装されています。
 
 https://github.com/postgres/postgres/blob/master/src/backend/utils/adt/numeric.c#L1368
@@ -532,10 +521,8 @@ numeric_typmod_scale(int32 typmod)
 
 ようやく復元の処理にたどり着けましたね。VARHDRSZについては、データ全体のバイト数を表現しており、4バイトとなります。
 
-
 まとめると、NUMERIC型と型修飾子で表現された`327686`とい
 う値をbit表現に変換してヘッダーを引いた場合は、以下のようなイメージで復元をされます。
-
 
 <img src="/images/2024/20241023b/image.png" alt="image.png" width="518" height="105" loading="lazy">
 
@@ -549,7 +536,6 @@ numeric_typmod_scale(int32 typmod)
 
 これを文字列 -> `typemod`の形式に直接変換できるという意味で、`to_regtypemod`関数には大きな価値があると感じます。
 
-
 ## 3. 具体の活用事例を考える
 
 `to_regtypemod`自体は文字列からtypemodを取得する関数であるため、外部システムやテストとのやりとりが最も活用される事例ではないかと思います。
@@ -558,9 +544,7 @@ numeric_typmod_scale(int32 typmod)
 
 https://www.postgresql.org/message-id/DF2324CA-2673-4ABE-B382-26B5770B6AA3@justatheory.com
 
-
 データベースのテスト実装などでもそうですし、あるいは他システムとのマイグレーションの事前検証(MySQL -> PostgreSQLとか)、スキーマ間の移行などにも役立つかもしれません。
-
 
 ## 4. まとめ
 
@@ -571,8 +555,8 @@ PostgreSQL 17で新規に追加された`to_regtypemod`関数では、文字列(
 医療や金融システムなど、型修飾子レベルで正確なデータ型管理が求められる分野で `to_regtypemod` を活用することで、データの整合性を高いレベルで維持しつつ、開発・運用の効率化を図ることができるのではないでしょうか？
 
 ## 参考文献
+
 - https://pgpedia.info/t/to_regtypemod.html
 - https://www.postgresql.jp/document/16/html/datatype-numeric.html
 - https://github.com/postgres/postgres
 - https://www.postgresql.org/message-id/DF2324CA-2673-4ABE-B382-26B5770B6AA3@justatheory.com
-

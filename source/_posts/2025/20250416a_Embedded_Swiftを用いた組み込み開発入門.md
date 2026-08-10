@@ -83,6 +83,7 @@ Embededed Swiftでは、以下のSwiftが提供する動的機能を制限する
 ### 事前準備
 
 次のドキュメントに沿って事前準備行います。
+
 - [apple/swift-embedded-examples](https://github.com/apple/swift-embedded-examples/tree/main?tab=readme-ov-file#building-the-examples)
 
 その後、今回使用するRaspberry Pi Pico Wに対するサンプルプロジェクトの`README.md`に沿ってビルドランまで行います。
