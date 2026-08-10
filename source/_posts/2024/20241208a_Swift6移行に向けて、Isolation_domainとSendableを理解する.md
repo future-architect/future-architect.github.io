@@ -37,7 +37,7 @@ SwiftZoomin#20の動画は、次のリンク先からYouTube上で視聴可能�
 ### Isolation domain
 
 `隔離=Isolation`する領域のことを`Isolation domain`と呼びます。
-`Isolation domain`の重要な特性は、**一つのIsolation domainのなかでは同時に一つの処理しか実行されない**ことです。（＝一つのIsolation domainの中で並行実行されることはないことと同義）
+`Isolation domain`の重要な特性は、**一つのIsolation domainのなかでは同時に一つの処理しか実行されない**ことです（＝1つのIsolation domainの中で並行実行されることはないことと同義）
 
 参考
 
