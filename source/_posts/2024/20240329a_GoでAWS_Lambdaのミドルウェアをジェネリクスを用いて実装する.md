@@ -7,6 +7,7 @@ tags:
   - Lambda
   - デザインパターン
   - ジェネリクス
+  - AWS
 categories:
   - Programming
 thumbnail: /images/2024/20240329a/thumbnail.png

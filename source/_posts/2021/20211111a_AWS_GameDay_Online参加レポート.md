@@ -6,6 +6,7 @@ tags:
   - AWS
   - コンテスト
   - 参戦記
+  - 参加レポート
 categories:
   - Infrastructure
 thumbnail: /images/2021/20211111a/thumbnail.png

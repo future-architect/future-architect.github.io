@@ -5,6 +5,7 @@ postid: b
 tags:
   - ハッカソン
   - コンテスト
+  - 参加レポート
 categories:
   - Programming
 thumbnail: /images/2021/20211115b/thumbnail.png

@@ -5,6 +5,7 @@ postid: a
 tags:
   - AWS
   - 合格記
+  - Claude
 categories:
   - Security
 thumbnail: /images/2026/20260604a/thumbnail.png

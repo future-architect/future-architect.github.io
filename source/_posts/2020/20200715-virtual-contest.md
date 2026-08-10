@@ -8,6 +8,7 @@ tags:
   - 社内勉強会
   - コンテスト
   - 初心者向け
+  - Tips
 categories:
   - Culture
 thumbnail: /images/2020/20200715/thumbnail.png

@@ -5,6 +5,7 @@ postid: a
 tags:
   - エネルギー業界
   - 展示会
+  - 参加レポート
 categories:
   - Business
 thumbnail: /images/2026/20260529a/thumbnail.jpg

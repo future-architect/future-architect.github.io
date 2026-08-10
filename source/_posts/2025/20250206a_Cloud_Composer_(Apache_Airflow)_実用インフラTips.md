@@ -5,6 +5,7 @@ postid: a
 tags:
   - Airflow
   - GoogleCloud
+  - Tips
 categories:
   - Infrastructure
 thumbnail: /images/2025/20250206a/thumbnail.png

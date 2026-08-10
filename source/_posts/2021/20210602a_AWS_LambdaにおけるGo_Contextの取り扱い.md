@@ -6,6 +6,7 @@ tags:
   - Go
   - Lambda
   - context
+  - AWS
 categories:
   - Programming
 series: "サーバレス2021"
