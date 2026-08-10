@@ -5,7 +5,6 @@ postid: a
 tags:
   - テスト
   - Go
-  - テスト
   - Docker
 categories:
   - Programming
