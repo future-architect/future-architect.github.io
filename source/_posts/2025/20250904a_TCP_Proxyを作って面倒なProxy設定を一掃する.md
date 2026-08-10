@@ -3,7 +3,7 @@ title: "TCP Proxyを作って面倒なProxy設定を一掃する ～Rust製mopro
 date: 2025/09/04 00:00:00
 postid: a
 tags:
-  - Network
+  - ネットワーク
   - プロキシ
   - Linux
   - WSL

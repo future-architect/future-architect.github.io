@@ -4,7 +4,7 @@ date: 2021/08/31 00:00:00
 postid: a
 tags:
   - AWS
-  - Network
+  - ネットワーク
   - 初心者向け
   - VPC
   - トラブルシュート

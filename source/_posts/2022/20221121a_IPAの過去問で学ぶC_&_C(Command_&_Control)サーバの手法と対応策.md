@@ -4,7 +4,7 @@ date: 2022/11/21 00:00:00
 postid: a
 tags:
   - IPA
-  - Network
+  - ネットワーク
 categories:
   - Security
 thumbnail: /images/2022/20221121a/thumbnail.png

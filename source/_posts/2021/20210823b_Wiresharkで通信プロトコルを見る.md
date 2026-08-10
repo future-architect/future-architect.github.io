@@ -4,7 +4,7 @@ date: 2021/08/23 00:00:01
 postid: b
 tags:
   - Wireshark
-  - Network
+  - ネットワーク
   - 初心者向け
   - TCP/IP
 categories:

@@ -4,7 +4,7 @@ date: 2021/06/18 00:00:00
 postid: a
 tags:
   - AWS
-  - Network
+  - ネットワーク
   - VPC
   - 技術選定
 categories:

@@ -4,7 +4,7 @@ date: 2021/10/26 00:00:00
 postid: a
 tags:
   - AWS
-  - Network
+  - ネットワーク
   - リトライ
   - Go
   - トラブルシュート
