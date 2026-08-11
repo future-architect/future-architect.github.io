@@ -8,7 +8,7 @@ tags:
   - Python
   - 生成AI
 categories:
-  - DataScience
+  - AIDD
 thumbnail: /images/2024/20240822a/thumbnail.png
 author: 山田勇一
 lede: "LLMが流行って久しいですが、MS、AWS、Googleクラウドベンダ各社が自社のマネージドを利用したサンプルアプリを公開し始めているので、中の実装を見つつリファレンスとしての考え方を確認しようと思い形にしてみました。"

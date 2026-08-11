@@ -123,7 +123,7 @@ Boto3を使用したQueryは非常に簡単に行えますが、Queryで取得�
 それでは、以下のスクリプトによって作成したテーブル*mydht22*よりデータを取得、JSONファイルとして保存します。
 
 >*※本環境ではAWS_PROFILEが設定してあることを前提としています。
-AWS_PROFILEの設定方法は以下ををご参照ください。
+AWS_PROFILEの設定方法は以下をご参照ください。
 
 * [名前付きプロファイル \- AWS Command Line Interface](https://docs.aws.amazon.com/ja_jp/cli/latest/userguide/cli-configure-profiles.html)*
 

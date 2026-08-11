@@ -8,6 +8,7 @@ tags:
   - コールセンター
 categories:
   - Infrastructure
+thumbnail: /images/2018/20181202/thumbnail.jpeg
 author: 市川諒
 lede: "AmazonConnect BootCampセッションでハンズオン受けた知識を活かし、実際にコールセンターを作ってみました"
 ---
@@ -302,9 +303,9 @@ $ aws dynamodb put-item --table-name CustomerTable --item '{
 エラーチェックとか不要な変数とか目を瞑ってください・・・。
 キャンセルTrueでも配送日変更できるなどツッコミどころ満載です。
 
-    1. 注文情報の読み込み（直近の注文履歴参照用）
-    2. キャンセル書き込み用
-    3. 配送情報変更用
+1. 注文情報の読み込み（直近の注文履歴参照用）
+2. キャンセル書き込み用
+3. 配送情報変更用
 
 ##### 注文情報の読み込み（直近の注文履歴参照用）
 

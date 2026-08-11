@@ -4,7 +4,7 @@ date: 2021/06/23 00:00:00
 postid: a
 tags:
   - JavaScript
-  - TechBlog
+  - 運営
 categories:
   - Frontend
 series: "フロントエンド"

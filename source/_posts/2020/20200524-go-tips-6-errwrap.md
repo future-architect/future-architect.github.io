@@ -206,8 +206,7 @@ https://play.golang.org/p/NAYR7XySCdW にサンプルコードを載せました
 
 シビアに性能が求められない、例えばBackendのWeb APIをGoで実装する場合は、 [xerrorsパッケージ](https://godoc.org/golang.org/x/xerrors)を利用した方が、2020/01/26 時点では良さそうです。
 
-* xerrorsについては、そな太さんの [Goの新しいerrors パッケージ xerrors
-](https://qiita.com/sonatard/items/9c9faf79ac03c20f4ae1) の記事がとても参考になりました
+* xerrorsについては、そな太さんの [Goの新しいerrors パッケージ xerrors](https://qiita.com/sonatard/items/9c9faf79ac03c20f4ae1) の記事がとても参考になりました
 
 ```go xerrorsを使った例
 import (

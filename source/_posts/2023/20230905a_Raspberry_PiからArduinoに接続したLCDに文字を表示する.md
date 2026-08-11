@@ -52,7 +52,7 @@ lede: "Raspberry Piに立てたWebサーバのブラウザから好きな文字�
 
 家にあるArduinoを使おうとしたのですが、どのLCDを買えばよいのかがよく分からなかったので、新しくスターターキットを購入しました。値段の割に基本的なセンサー類からLCDやコントローラーまでついている上にサンプルコードまでついていて分かりやすいです。
 
-[ELEGOO Arduino用UNO R3スターターキット レベルアップ チュートリアル付 mega2560 r3 nanoと互換 [並行輸入品] ](https://www.amazon.co.jp/dp/B06XF2HZGT/ref=as_sl_pc_qf_sp_asin_til?tag=amazon0b2-22&linkCode=w00&linkId=e5061d4d72ecf8efbd042e6417de9ad3&creativeASIN=B06XF2HZGT)
+[ELEGOO Arduino用UNO R3スターターキット レベルアップ チュートリアル付 mega2560 r3 nanoと互換 [並行輸入品]](https://www.amazon.co.jp/dp/B06XF2HZGT/ref=as_sl_pc_qf_sp_asin_til?tag=amazon0b2-22&linkCode=w00&linkId=e5061d4d72ecf8efbd042e6417de9ad3&creativeASIN=B06XF2HZGT)
 
 以下、実際につないで動かしてみた画像と使用したソースコードです。
 

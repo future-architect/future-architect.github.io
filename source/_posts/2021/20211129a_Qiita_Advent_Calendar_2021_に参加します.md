@@ -3,7 +3,7 @@ title: "Qiita Advent Calendar 2021 に参加します"
 date: 2021/11/29 00:00:00
 postid: a
 tags:
-  - TechBlog
+  - 運営
   - アドベントカレンダー
   - Qiita
 categories:

@@ -203,7 +203,9 @@ ArgoCDの画面からアプリケーションをForegroundで削除した結果�
 
 エラーが起こり、APP CONDITIONSにて以下のエラーログが表示されます。
 
-    admission webhook "validation.gatekeeper.sh" denied the request: [pvc-constraint] : DELETE request detected in monitoring namespace. Cancel the request for PVC to prevent deletion
+```text
+admission webhook "validation.gatekeeper.sh" denied the request: [pvc-constraint] : DELETE request detected in monitoring namespace. Cancel the request for PVC to prevent deletion
+```
 
 pvc-constraint（Constraint名）より、リクエストが拒否されたエラーログが表示され、Comstraint-Templateで記述した通りのエラー文があることから、作成したポリシーによってPVCリソースの削除リクエストが拒否されたことがわかります。
 

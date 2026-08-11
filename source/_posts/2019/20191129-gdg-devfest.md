@@ -59,7 +59,7 @@ Terraformを当社に入社して以来3ヶ月弱触ってきて、せっかく�
 
 #### セッション
 
-- [DevOps環境のの紹介](https://speakerdeck.com/koda/devfest-in-shinshu-2019-abount-devops-in-gcp)
+- [DevOps環境の紹介](https://speakerdeck.com/koda/devfest-in-shinshu-2019-abount-devops-in-gcp)
   - 言葉としては浸透してきているDevOpsを改めて考える機会になりました。インフラで実際に使える例も示していただいたのでとてもわかりやすかったです。
 - デバイス＋グーグル：グーグルの技術とDIYのデバイスの繋ぎ方
   - こちらは午前のハンズオンと内容がリンクしたセッションでした。簡単ではありますが、マイコンを使った機械学習の中身等も解説していただきました。

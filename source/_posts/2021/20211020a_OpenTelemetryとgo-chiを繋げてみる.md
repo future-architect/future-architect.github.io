@@ -85,7 +85,7 @@ _, span := tracer.Start(ctx, "getUser", oteltrace.WithAttributes(attribute.Strin
 defer span.End()
 ```
 
-このサンプルもstdoutエクスポーターがが最初から設定されているので、まずはこの状態で動かしてみて、欲しい情報が出ているか確認します。確認できたら、エクスポーター側も変更して、実際の出力先へのインターフェースを追加していきます。GCPとか、OSSのJaegerとかZipkinとかもありますし、SaaSのSplunkとかNew Relicとかありますね。
+このサンプルもstdoutエクスポーターが最初から設定されているので、まずはこの状態で動かしてみて、欲しい情報が出ているか確認します。確認できたら、エクスポーター側も変更して、実際の出力先へのインターフェースを追加していきます。GCPとか、OSSのJaegerとかZipkinとかもありますし、SaaSのSplunkとかNew Relicとかありますね。
 
 AWSはコレクター向けのものがあるので、アプリのエクスポーターとしてはコレクターを選択してコレクターの設定をするとX-Rayに出せるようです。
 

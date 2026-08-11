@@ -34,7 +34,7 @@ k8s完全ガイドでは[minikube](https://github.com/kubernetes/minikube)だっ
 
 ## minikubeとは
 
-ローカルk8sクラスタをを簡単に構築できる定番のツールです。DockerやVirtualBoxで仮想マシンが立ち上がりその上にk8sが構築されます。
+ローカルk8sクラスタを簡単に構築できる定番のツールです。DockerやVirtualBoxで仮想マシンが立ち上がりその上にk8sが構築されます。
 
 下の様にオプションなしで起動した場合、筆者環境ではDockerコンテナとして起動します。デフォルトでは1 nodeで構築されます。
 

@@ -34,7 +34,7 @@ Webアプリで利用しやすい、JavaScript製のライブラリの代表的�
 | 特徴       | 高性能                                               | diagrams.net (旧 draw.io) で使われている      | 多機能                      | GitLabで標準利用可                                 |
 | ライセンス | Apache License 2.0 / MIT License                     | Apache License 2.0                            | 修正BSDライセンス           | MIT License                                        |
 
-この中で、本記事でははVis Networkを用いて階層グラフを表示する方法をご紹介します。
+この中で、本記事ではVis Networkを用いて階層グラフを表示する方法をご紹介します。
 
 mxGraphについて[次の記事](/articles/20210304/)で紹介する予定ですのでお楽しみに。
 

@@ -61,11 +61,13 @@ lede: "経営者がセキュリティ投資判断をしやすくする簡易ダ�
 <iframe width="560" height="315" src="https://www.youtube.com/embed/jUJgXRPqGQQ?si=9A9N8BlqrtPkfNiS" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 ### 【経営者ビュー】
+
 投資対効果を検討するため、その対策を行ったときの想定損失低減率を縦軸、１つの対策で自社の資産をどの程度（範囲/規模）守ることができるのかのカバレッジを横軸に4象限で区分けし、現状に即したセキュリティ投資対象を選別することを想定しています。バブルチャートは投資割合を表しており、左下の基準(1)となる円より大きければ過剰投資、小さければ投資不足を意味します。つまり、右上の "IDEAL AREA" に基準円と同じ大きさの円があれば、**最適な投資対象** に **最適な投資額** を投じていることになります。具体的な数値は、カーソルオン時のポップアップに記載しています。
 
 <img src="/images/2025/20251028b/image.png" alt="image.png" width="1200" height="551" loading="lazy">
 
 ### 【技術者ビュー】
+
 経営者に根拠をもって説明するため、技術的脅威（attack technique）と防御策と対象資産を網羅的に紐づけ、防御策の有効性を可視化することを想定しています。クリックすると、各ノードは該当するMITREのリンクへアクセスしてくれます。
 
 <img src="/images/2025/20251028b/21eb3673-f334-4431-9977-1871ffb96a81.png" alt="" width="1200" height="587" loading="lazy">
