@@ -6,7 +6,7 @@ tags:
   - コーディング規約
   - コードレビュー
   - 可読性
-  - 新人向け
+  - 初心者向け
   - 入門
 categories:
   - Programming
