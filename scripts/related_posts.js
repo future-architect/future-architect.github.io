@@ -7,6 +7,64 @@ const {getSNSCnt} = require('./lib/sns');
 const {postListItem} = require('./lib/post_list');
 const {navLinkedPaths} = require('./lib/series');
 
+// 親を経由した一致を1段ごとに弱める係数
+const DECAY = 0.5;
+
+// オントロジー展開はサイト全体で不変なので、一度だけ集計して使い回す
+let ontologyCache = null;
+
+/**
+ * 記事のタグ集合を source/_data/tag_ontology.yml の broader で推移的に
+ * 展開した「トークン集合」を全記事分作る。
+ *
+ * 執筆者は具体タグ（daisyUI）だけ付ければよく、抽象タグ（CSS / IaC 等）を
+ * 付けるかの判断を執筆時に強いない。抽象への接続はオントロジーが肩代わりし、
+ * タグを直接共有しない同系統の記事もここで繋がる (#2292)。
+ */
+function buildTokenIndex(site) {
+  const ontology = (site.data && site.data.tag_ontology) || {};
+
+  const expandMemo = new Map();
+  const expand = name => {
+    if (expandMemo.has(name)) return expandMemo.get(name);
+    const depths = new Map([[name, 0]]);
+    const queue = [[name, 0]];
+    while (queue.length) {
+      const [cur, d] = queue.shift();
+      const node = ontology[cur];
+      for (const parent of (node && node.broader) || []) {
+        // より浅い経路で到達済みなら辿り直さない（オントロジーに循環があってもここで止まる）
+        if (!depths.has(parent) || depths.get(parent) > d + 1) {
+          depths.set(parent, d + 1);
+          queue.push([parent, d + 1]);
+        }
+      }
+    }
+    expandMemo.set(name, depths);
+    return depths;
+  };
+
+  const postTokens = new Map();   // 記事ID -> Map(トークン -> 最小深さ)
+  const df = new Map();           // トークン -> 展開後にそれを持つ記事数
+  const postsByToken = new Map(); // トークン -> 記事の配列
+  site.posts.forEach(post => {
+    const tokens = new Map();
+    post.tags.forEach(tag => {
+      for (const [t, d] of expand(tag.name)) {
+        if (!tokens.has(t) || tokens.get(t) > d) tokens.set(t, d);
+      }
+    });
+    postTokens.set(post._id, tokens);
+    for (const t of tokens.keys()) {
+      df.set(t, (df.get(t) || 0) + 1);
+      if (!postsByToken.has(t)) postsByToken.set(t, []);
+      postsByToken.get(t).push(post);
+    }
+  });
+
+  return {postTokens, df, postsByToken};
+}
+
 /**
  * 上位から maxCount 本選ぶ。ただし同じ連載の記事で全部は埋めない。
  *
@@ -117,38 +175,43 @@ hexo.extend.helper.register('list_related_posts', function() {
     authorIDF[author] = Math.log(allPostsCount / postCountByAuthor);
   });
 
-  // 2. 関連度スコアリング (タグと著者のIDFを考慮)
-  const tagRelatedPosts = post.tags.data
-    .flatMap(tag => tag.posts.data)
-    .filter(p => p._id !== post._id && !isExcluded(p));
+  // 2. 関連度スコアリング（オントロジー展開したタグと著者のIDFを考慮）
+  if (!ontologyCache) ontologyCache = buildTokenIndex(this.site);
+  const {postTokens, df, postsByToken} = ontologyCache;
+  const myTokens = postTokens.get(post._id) || new Map();
 
-  if (tagRelatedPosts.length === 0) {
+  // 候補は「展開後の集合が交差する記事」。タグを直接共有しない記事もここで入る
+  const candidateIds = new Set();
+  const candidates = [];
+  for (const t of myTokens.keys()) {
+    for (const p of postsByToken.get(t) || []) {
+      if (p._id === post._id || candidateIds.has(p._id) || isExcluded(p)) continue;
+      candidateIds.add(p._id);
+      candidates.push(p);
+    }
+  }
+
+  if (candidates.length === 0) {
     // タグ関連記事がなければカテゴリの記事を取得し、HTMLを生成して返す
     console.log(`[INFO] Related Posts: No tag-related posts found for "${post.title}". Falling back to category.`);
     const categoryPosts = getCategoryRelatedPosts(this, post, isExcluded);
     return generateRelatedPostsHtml(categoryPosts, post.series);
   }
 
-  const tagIDF = {};
-  post.tags.data.forEach(tag => {
-    tagIDF[tag.name] = Math.log(allPostsCount / tag.posts.length);
-  });
-
-  const relatedPosts = tagRelatedPosts.reduce((acc, p) => {
-    // 既に評価済みの記事はスキップする。
-    // tagRelatedPosts には共有タグの数だけ同じ記事が並ぶため、
-    // ここで加算するとタグを多く共有する記事のスコアが二重三重に積み上がる
-    if (acc.some(item => item._id === p._id)) {
-      return acc;
-    }
-
+  // IDF は展開後の頻度で計算する。抽象タグ（CSS 等）は展開後に大量の記事が
+  // 持つトークンになるので IDF が自然に下がり、「抽象タグで繋がっただけ」の
+  // 記事は弱くしか効かない。しきい値ではなく構造で氾濫を防ぐ。
+  // さらに親経由の一致は深さ1段ごとに DECAY 倍し、
+  // 直接一致 > 親子（片側が親を直接持つ）> 兄弟（親を共有）の順を保つ
+  const idf = t => Math.log(allPostsCount / df.get(t));
+  const relatedPosts = candidates.map(p => {
+    const theirTokens = postTokens.get(p._id);
     let score = 0;
-
-    p.tags.data.forEach(tag => {
-      if (tagIDF[tag.name]) {
-        score += tagIDF[tag.name];
-      }
-    });
+    for (const [t, myDepth] of myTokens) {
+      const theirDepth = theirTokens.get(t);
+      if (theirDepth === undefined) continue;
+      score += idf(t) * Math.pow(DECAY, myDepth + theirDepth);
+    }
 
     // タグを多く持つ記事ほど1タグあたりの意味が薄いため、タグ数で正規化する。
     // これがないと、大きなタグを複数持つ記事が全記事の関連記事を占めてしまう
@@ -158,9 +221,8 @@ hexo.extend.helper.register('list_related_posts', function() {
       score += authorIDF[p.author];
     }
 
-    acc.push({ ...p, score: score });
-    return acc;
-  }, []);
+    return { ...p, score: score };
+  });
 
   // 3. 関連度スコアでソートし、同スコアの場合は公開日が近い記事を優先する。
   //    技術記事は前提バージョンなど時代の文脈に依存するため、同じ関連度なら
