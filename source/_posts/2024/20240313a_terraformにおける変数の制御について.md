@@ -4,7 +4,6 @@ date: 2024/03/13 00:00:00
 postid: a
 tags:
   - Terraform
-  - IaC
 categories:
   - IaC
 series: "Terraform2024"

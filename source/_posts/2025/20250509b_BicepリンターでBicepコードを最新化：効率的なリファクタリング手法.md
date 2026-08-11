@@ -4,7 +4,6 @@ date: 2025/05/09 00:00:01
 postid: b
 tags:
   - Azure
-  - IaC
   - Linter
   - FutureOne
   - リファクタリング

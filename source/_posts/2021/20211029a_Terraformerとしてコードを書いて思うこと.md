@@ -5,7 +5,6 @@ postid: a
 tags:
   - Terraform
   - 設計
-  - IaC
   - 可読性
 categories:
   - IaC

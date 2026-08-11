@@ -5,7 +5,6 @@ postid: a
 tags:
   - Terraform
   - Cloudflare
-  - IaC
   - tfstate
 categories:
   - IaC

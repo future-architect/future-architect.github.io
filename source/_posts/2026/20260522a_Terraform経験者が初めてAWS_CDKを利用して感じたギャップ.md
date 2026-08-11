@@ -6,7 +6,6 @@ tags:
   - Terraform
   - AWS CDK
   - 技術選定
-  - IaC
 categories:
   - IaC
 series: "Terraform2026"

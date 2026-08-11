@@ -6,7 +6,6 @@ tags:
   - Terraform
   - GoogleCloud
   - Ansible
-  - IaC
 categories:
   - IaC
 series: "夏の自由研究2020"

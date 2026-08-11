@@ -4,7 +4,6 @@ date: 2019/09/03 15:20:52
 postid: ""
 tags:
   - Terraform
-  - IaC
 categories:
   - IaC
 author: 木村拓海

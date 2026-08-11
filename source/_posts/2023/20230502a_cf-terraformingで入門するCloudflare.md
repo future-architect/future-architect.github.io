@@ -4,7 +4,6 @@ date: 2023/05/02 00:00:00
 postid: a
 tags:
   - Cloudflare
-  - IaC
   - Terraform
 categories:
   - IaC
