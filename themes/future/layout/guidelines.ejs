@@ -1,0 +1,75 @@
+<%# ガイドラインのポータル (#2295)。実体（外部サイト）への入口と、
+    タグ「ガイドライン」の公開アナウンス記事のパネルを節ごとに出す。
+    どの節に属するかは記事本文が張っている外部リンクで自動分類する。
+    節を手で管理しなくても、新しいアナウンス記事が増えれば勝手に並ぶ %>
+<div class="container">
+  <%- partial('_partial/breadcrumb', {items: [
+        {label: 'ホーム', url: '/'},
+        {label: 'ガイドライン'}
+      ]}) %>
+  <section id="main" class="margin-top-30">
+    <div class="footer-gap">
+      <h1 class="list-page margin-bottom-20">フューチャーのガイドライン</h1>
+      フューチャーが無償公開している設計ガイドライン・コーディング規約・学習コンテンツの入口です。いずれも現場のプロジェクトで培った知見を有志がまとめ、継続的に更新しています。
+      <%
+        // 母集合はタグ「ガイドライン」∪「コーディング規約」。コーディング規約の
+        // 公開アナウンスは「コーディング規約」タグ側にしか付いていない記事がある。
+        // フロントマターに専用キーは足さない（見えない語彙になり、入稿ツール側の
+        // 対応も要る）。本文が張っている外部リンクで節に自動分類し、
+        // どのサイトにもリンクしない記事（タグの緩い使われ方）は自然に落ちる
+        const seen = new Set();
+        const posts = [];
+        ['ガイドライン', 'コーディング規約'].forEach(function(name){
+          const t = site.tags.findOne({name: name});
+          if (t) t.posts.forEach(function(p){
+            if (!seen.has(p._id)) { seen.add(p._id); posts.push(p); }
+          });
+        });
+        posts.sort((a, b) => b.date - a.date);
+        const links = p => String(p.content || '');
+        const arch = posts.filter(p => links(p).includes('arch-guidelines'));
+        const coding = posts.filter(p => !links(p).includes('arch-guidelines') && links(p).includes('coding-standards'));
+        const ts = posts.filter(p => !links(p).includes('arch-guidelines') && links(p).includes('typescript-guide'));
+      %>
+      <% const panelGrid = list => { %>
+        <% if (list.length) { %>
+        <div class="row g-4">
+          <% list.forEach(function(p){ %>
+          <div class="col-12 col-md-6">
+            <div class="article-card series-panel h-100">
+              <% if (p.thumbnail) { %>
+              <a href="<%- url_for(p.path) %>" title="<%= p.title %>" class="img_wrap panel-thumb">
+                <img src="<%= p.thumbnail %>" alt="" width="200" height="135" loading="lazy">
+              </a>
+              <% } %>
+              <div class="panel-body">
+                <a href="<%- url_for(p.path) %>" class="panel-title"><%= p.title %></a>
+                <div class="panel-meta"><%= date(p.date, 'YYYY.MM.DD') %> 公開</div>
+              </div>
+            </div>
+          </div>
+          <% }) %>
+        </div>
+        <% } %>
+      <% } %>
+
+      <%- partial('_partial/section-heading', {id: 'archguidelines', text: '設計ガイドライン（Future Architecture Guidelines）'}) %>
+      Web API・Terraform・ログ・バッチ・PostgreSQL・非同期処理・データマネジメントなど、システム設計の指針を領域別にまとめたガイドライン集です。ソフトスキルや性能テスト入門などの読み物も含みます。
+      <p class="more-link"><a href="https://future-architect.github.io/arch-guidelines/" target="_blank" rel="noopener">Future Architecture Guidelines を読む</a></p>
+      <% panelGrid(arch) %>
+
+      <%- partial('_partial/section-heading', {id: 'codingstandards', text: 'コーディング規約（Future Enterprise Coding Standards）'}) %>
+      エンタープライズ領域に特化したコーディング規約です。Java・SQL などの言語規約と、Gitブランチフローなどの開発プロセス規約を含みます。
+      <p class="more-link"><a href="https://future-architect.github.io/coding-standards/" target="_blank" rel="noopener">Future Enterprise Coding Standards を読む</a></p>
+      <% panelGrid(coding) %>
+
+      <%- partial('_partial/section-heading', {id: 'typescript', text: '仕事ですぐに使えるTypeScript'}) %>
+      JavaScript を経由せず、最初から TypeScript でウェブフロントエンド開発を学ぶための教育コンテンツです。
+      <p class="more-link"><a href="https://future-architect.github.io/typescript-guide/" target="_blank" rel="noopener">仕事ですぐに使えるTypeScript を読む</a></p>
+      <% panelGrid(ts) %>
+
+      <%- partial('_partial/section-heading', {id: 'relatedarticles', text: '関連記事'}) %>
+      各ガイドラインの狙いや背景は公開時の紹介記事が詳しいです。<a href="<%- url_for('/tags/ガイドライン/') %>">タグ「ガイドライン」</a>・<a href="<%- url_for('/tags/コーディング規約/') %>">タグ「コーディング規約」</a>の記事一覧もご覧ください。
+    </div>
+  </section>
+</div>
