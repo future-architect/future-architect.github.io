@@ -2,7 +2,9 @@
 
 // 記事末尾の「We're hiring」に出すパネル
 // スクロール量を抑えるため2枠だけ表示する。1枠目は採用ページ固定で、
-// 2枠目はコンテンツ3種から記事ごとに1つを選ぶ。
+// 2枠目はオウンドメディア2種から記事ごとに1つを選ぶ。
+// ガイドライン類は採用コマーシャルではないのでここには出さず、
+// /guidelines/ のポータルが入口を担う (#2295)
 
 const recruitPanel = {
   url: 'https://www.future.co.jp/recruit/recruit/rec-career/',
@@ -14,25 +16,18 @@ const recruitPanel = {
 
 const contentPanels = [
   {
-    url: 'https://future-architect.github.io/typescript-guide/',
-    title: '仕事ですぐに使えるTypeScript',
-    label: '仕事ですぐに使えるTypeScript',
-    image: '/typescript_guidelines.png',
-    lede: 'ウェブフロントエンドの開発を学ぶときに、JavaScriptを経由せずに、最初からTypeScriptで学んでいくコンテンツです。',
+    url: 'https://note.future.co.jp/',
+    title: '未来報',
+    label: '未来報（フューチャー公式note）',
+    image: '/miraiho.jpg',
+    lede: 'フューチャーの公式note。社員やカルチャー、イベントなど、会社の「いま」を発信しています。',
   },
   {
-    url: 'https://future-architect.github.io/arch-guidelines/',
-    title: 'Future Architecture Guidelines',
-    label: 'アーキテクチャガイドライン',
-    image: '/archtecture_guidelines.png',
-    lede: 'フューチャー株式会社の有志が作成する良いアーキテクチャを実現するための設計ガイドラインです。',
-  },
-  {
-    url: 'https://future-architect.github.io/coding-standards/',
-    title: 'Future Enterprise Coding Standard',
-    label: 'コーディング規約',
-    image: '/coding_standards.png',
-    lede: 'フューチャー株式会社が作成するエンタープライズ領域に特化したコーディング規約',
+    url: 'https://www.future.co.jp/lttf/',
+    title: 'LEAD TO THE FUTURE',
+    label: 'LEAD TO THE FUTURE',
+    image: '/lttf.jpg',
+    lede: 'フューチャーのオウンドメディア。AI・テクノロジーや業界のインサイト、プロジェクトの裏側を発信しています。',
   },
 ];
 
