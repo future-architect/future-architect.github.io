@@ -5,7 +5,6 @@ postid: a
 tags:
   - ベスブロ
   - 運営
-  - TechBlog
 categories:
   - Culture
 thumbnail: /images/2022/20220121a/thumbnail.png

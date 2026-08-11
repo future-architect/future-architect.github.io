@@ -4,7 +4,7 @@ date: 2020/11/25 00:00:00
 postid: ""
 tags:
   - アドベントカレンダー
-  - TechBlog
+  - 運営
   - Qiita
 categories:
   - Culture
