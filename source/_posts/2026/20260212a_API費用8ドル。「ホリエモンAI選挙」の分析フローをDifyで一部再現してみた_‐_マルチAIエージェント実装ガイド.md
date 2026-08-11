@@ -6,7 +6,7 @@ tags:
   - Dify
   - AIエージェント
 categories:
-  - DataScience
+  - AIDD
 thumbnail: /images/2026/20260212a/thumbnail.png
 author: 棚井龍之介
 lede: "最近、「マルチAIエージェント」という言葉をよく耳にするようになりました。単一のLLMですべてを解決するのではなく、検索が得意なAI、分析が得意なAIなどを適材適所で組み合わせる手法です。その好例として..."
