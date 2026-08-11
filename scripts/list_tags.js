@@ -60,14 +60,9 @@ function listTopPageTags(tags, options) {
       result += '</li>';
     });
 
-    if (minCount > 1) {
-        result += `<li>`
-        result += `<a href="/tags" style="color:#424242;">`;
-        result += "タグ一覧へ";
-        result += '</a>';
-        result += '</li>';
-    }
-
+    // 「タグ一覧へ」チップはここに居たが、タグに見えるうえ連載枠の
+    // 「すべての連載を見る」とテイストが揃わないため、ホーム側の
+    // 枠下リンク（すべてのタグを見る）に移した (#2304)
     result += '</ul>';
   } else {
     tags.forEach((tag, i) => {
