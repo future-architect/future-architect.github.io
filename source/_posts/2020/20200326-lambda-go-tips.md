@@ -247,5 +247,4 @@ panicということで予期せぬエラーの場合にはStackTraceを出し�
 * Lambda関数のパターンは決まっているのでmiddlewareを用意しても良いかも
 * `errorString null`の`null`はStackTrace項目で、通常は `null` が入るで問題なし
 
-[サーバレス連載](/articles/20200322/)の2本目でした。次は澁川さんの[Goでサーバーレス用の検索エンジンwatertowerを作ってみました
-](/articles/20200327/)でした。
+[サーバレス連載](/articles/20200322/)の2本目でした。次は澁川さんの[Goでサーバーレス用の検索エンジンwatertowerを作ってみました](/articles/20200327/)でした。

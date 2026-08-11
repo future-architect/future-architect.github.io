@@ -282,12 +282,12 @@ parameters:
       * type: `string`
       * format: `date-time`
 
-            ```yaml
-            created_date_time:
-                type: string
-                example: '2020-01-31T23:59:59+09:00'
-                format: date-time
-            ```
+      ```yaml
+      created_date_time:
+          type: string
+          example: '2020-01-31T23:59:59+09:00'
+          format: date-time
+      ```
 
     * ミリ秒精度（YYYY-MM-DDThh:mm:ss.sss+TZD）の場合
       * example: `2020-01-31T23:59:59.000+09:00`
@@ -295,12 +295,12 @@ parameters:
       * type: `string`
       * pattern: 必須
 
-            ```yaml
-            created_date_time:
-                type: string
-                example: '2020-01-31T23:59:59.000+09:00'
-                pattern: '^((?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9][0-9][0-9])[+|-]([0-9][0-9]:[0-9][0-9])$'`
-            ```
+      ```yaml
+      created_date_time:
+          type: string
+          example: '2020-01-31T23:59:59.000+09:00'
+          pattern: '^((?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9][0-9][0-9])[+|-]([0-9][0-9]:[0-9][0-9])$'`
+      ```
 
   * 時刻
     * ISO 8601形式（hh:mm）とする

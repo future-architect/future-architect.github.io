@@ -164,8 +164,7 @@ popd
 
 ### イメージの作成
 
-Buildpackのstackは既存のDockerhubのイメージそのままではダメで、Stackの印をつける必要があります。[ここ
-](https://buildpacks.io/docs/concepts/components/stack/)に書かれているように、実行用イメージはラベルでstackのIDを、ビルド用のイメージは環境変数でstackのIDとユーザーとグループのIDを指定します。rootユーザーではエラーになるのでユーザーを作る必要があります。
+Buildpackのstackは既存のDockerhubのイメージそのままではダメで、Stackの印をつける必要があります。[ここ](https://buildpacks.io/docs/concepts/components/stack/)に書かれているように、実行用イメージはラベルでstackのIDを、ビルド用のイメージは環境変数でstackのIDとユーザーとグループのIDを指定します。rootユーザーではエラーになるのでユーザーを作る必要があります。
 
 ```Dockerfile images/Dockerfile.run
 FROM gcr.io/distroless/python3-debian10

@@ -23,8 +23,7 @@ lede: "3月17日に開催された「Future Tech Night #21 Google Cloud: デー�
 登壇時の資料および動画がそれぞれ以下にアップロードされています。
 
 [JSON関数と共に歩む、BigQueryを使った超汎化型データ活用基盤](https://speakerdeck.com/mura123yasu/jsonguan-shu-togong-nibu-mu-bigquerywoshi-tutachao-fan-hua-xing-detahuo-yong-ji-pan)
-[Future Tech Night #21 Google Cloud: データエンジニア＋MLOps
-](https://www.youtube.com/watch?v=o0oZnX1Ai-k)
+[Future Tech Night #21 Google Cloud: データエンジニア＋MLOps](https://www.youtube.com/watch?v=o0oZnX1Ai-k)
 
 ## サマリ
 
