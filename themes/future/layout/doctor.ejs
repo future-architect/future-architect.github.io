@@ -133,6 +133,35 @@
         <% }) %>
       </ul>
 
+      <h2 class="bottom-content-header">タグの親子関係（オントロジー）</h2>
+      ※<code>source/_data/tag_ontology.yml</code> の broader の可視化。関連記事の計算が辿る辺で、「子タグの記事に親タグを打つのは冗長」という自明な包含だけを登録しています（#2292）。灰色はタグとして実在しない概念ノード。「系統」は自分＋子孫のユニーク記事数
+      <% const onto = doctor_ontology(); %>
+      <%
+        function renderNode(n) { %>
+        <li>
+          <% if (n.path) { %><a href="<%- url_for(n.path) %>"><%= n.name %></a><% } else { %><span class="ontology-concept"><%= n.name %></span><% } %>
+          <span class="ontology-count"><%= n.posts %>本<% if (n.family > n.posts) { %>・系統<%= n.family %>本<% } %><% if (n.otherParents.length) { %>・他の親: <%= n.otherParents.join('、') %><% } %></span>
+          <% if (n.children.length) { %>
+          <ul>
+            <% n.children.forEach(renderNode) %>
+          </ul>
+          <% } %>
+        </li>
+      <% } %>
+      <div class="ontology-forest">
+        <% onto.trees.forEach(function(t){ %>
+        <ul class="ontology-tree">
+          <% renderNode(t) %>
+        </ul>
+        <% }) %>
+      </div>
+      <ul class="doctor-list">
+        <li>
+          <span class="doctor-note">親も子も無い根タグ（<%= onto.standalone.length %>件）</span>
+          <% onto.standalone.forEach(function(n, i){ %><a href="<%- url_for(n.path) %>"><%= n.name %></a><span class="ontology-count"><%= n.posts %>本</span><%= i < onto.standalone.length - 1 ? '、' : '' %><% }) %>
+        </li>
+      </ul>
+
       <h2 class="bottom-content-header">タイトルにタグ名を含むのに、そのタグが付いていない記事</h2>
       ※英数3文字・和文4文字未満のタグ名は一般語に当たりやすいので照合していません
       <ul class="doctor-list">

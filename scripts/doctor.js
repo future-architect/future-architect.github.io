@@ -216,3 +216,66 @@ hexo.extend.helper.register('doctor_checks', function() {
 
   return {suggestions, untagged, overTagged, missing, missingTotal, nearDuplicates, categoryDupTags, singleUse};
 });
+
+/**
+ * タグオントロジー（source/_data/tag_ontology.yml）の親子構造を /doctor/ で
+ * 見るためのツリー。複数親のノードはそれぞれの親の下に重複して出す
+ * （DAG を1本の木に潰すと片方の系統から見えなくなる）。
+ */
+hexo.extend.helper.register('doctor_ontology', function() {
+  const ontology = (this.site.data && this.site.data.tag_ontology) || {};
+
+  const tagInfo = new Map(); // タグ名 -> {path, ids}
+  this.site.tags.forEach(tag => {
+    tagInfo.set(tag.name, {path: tag.path, ids: new Set(tag.posts.map(p => p._id))});
+  });
+
+  const children = new Map();
+  const hasParent = new Set();
+  for (const [name, node] of Object.entries(ontology)) {
+    for (const p of (node && node.broader) || []) {
+      if (!children.has(p)) children.set(p, []);
+      children.get(p).push(name);
+      hasParent.add(name);
+    }
+  }
+
+  // 系統（自分＋子孫）のユニーク記事数。複数親経由で同じ記事を
+  // 二重に数えないよう、本数ではなく記事IDの集合で持つ
+  const familyMemo = new Map();
+  const familyIds = (name, trail) => {
+    if (familyMemo.has(name)) return familyMemo.get(name);
+    const acc = new Set(tagInfo.has(name) ? tagInfo.get(name).ids : []);
+    for (const c of children.get(name) || []) {
+      if (trail.has(c)) continue; // 循環は整合性チェック側の担当。ここでは辿らないだけ
+      trail.add(c);
+      for (const id of familyIds(c, trail)) acc.add(id);
+    }
+    familyMemo.set(name, acc);
+    return acc;
+  };
+
+  const build = (name, parentName) => {
+    const info = tagInfo.get(name);
+    return {
+      name,
+      path: info ? info.path : null, // タグとして実在しない概念ノードはリンク先が無い
+      posts: info ? info.ids.size : 0,
+      family: familyIds(name, new Set([name])).size,
+      otherParents: ((ontology[name] || {}).broader || []).filter(p => p !== parentName),
+      children: (children.get(name) || [])
+        .map(c => build(c, name))
+        .sort((a, b) => b.family - a.family || (a.name < b.name ? -1 : 1)),
+    };
+  };
+
+  const roots = Object.keys(ontology).filter(n => !hasParent.has(n));
+  const trees = roots.filter(n => children.has(n))
+    .map(n => build(n, null))
+    .sort((a, b) => b.family - a.family || (a.name < b.name ? -1 : 1));
+  const standalone = roots.filter(n => !children.has(n))
+    .map(n => build(n, null))
+    .sort((a, b) => b.posts - a.posts || (a.name < b.name ? -1 : 1));
+
+  return {trees, standalone, nodeCount: Object.keys(ontology).length};
+});
