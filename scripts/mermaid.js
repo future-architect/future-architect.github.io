@@ -42,12 +42,24 @@ function readSvg(hash) {
 hexo.extend.filter.register('before_post_render', (data) => {
   if (ignore(data)) return;
   let matched = false;
+  let missing = 0;
   data.content = data.content.replace(fenceRegExp(), (raw, start, quote, lang, source, endQuote, end) => {
     matched = true;
-    return `${start}<pre class="mermaid" data-mermaid="${hashOf(source)}">${source}</pre>${end}`;
+    const hash = hashOf(source);
+    if (!fs.existsSync(path.join(CACHE_DIR, `${hash}.svg`))) missing++;
+    return `${start}<pre class="mermaid" data-mermaid="${hash}">${source}</pre>${end}`;
   });
   if (matched) {
     data.content += `\n\n${MERMAID_SCRIPT}`;
+  }
+  // SVG化し忘れはフォールバックで表示できてしまい気づけないため、ここで知らせる。
+  // このフィルタは新規・編集した記事のレンダリング時に必ず通る
+  // （db.json にキャッシュ済みの記事では出ないが、書いた本人の環境では必ず出る）
+  if (missing > 0) {
+    hexo.log.warn(
+      'mermaid: %s に SVG キャッシュ未生成の図が %d 件あります。`make mermaid` を実行してコミットしてください（それまではブラウザ描画で表示されます）',
+      data.source, missing
+    );
   }
 }, 9);
 
