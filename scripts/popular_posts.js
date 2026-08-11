@@ -34,9 +34,13 @@ const rankingList = (posts, caps = [RANKING_DISPLAY_COUNT, RANKING_MAX_COUNT]) =
   // 2段目は「開いた人がさらに深掘りする」動線なので、1段目の details の中に入れ子にする
   const build = idx => {
     if (idx >= bounds.length || bounds[idx - 1] >= posts.length) return '';
+    // 件数は「このクリックで追加表示される数」を出す（全残数だと開いた数と合わない）。
+    // 入れ子の最終段だけ、それで打ち止めだと分かるよう「残りの」にする
+    const count = bounds[idx] - bounds[idx - 1];
+    const isNestedLast = idx > 1 && idx === bounds.length - 1;
     return `
     <details class="ranking-more">
-      <summary>残り ${posts.length - bounds[idx - 1]}本を表示</summary>
+      <summary>${isNestedLast ? '残りの' : '残り'} ${count}本を表示</summary>
       <ul class="nav featured-post-link">${items(posts.slice(bounds[idx - 1], bounds[idx]), bounds[idx - 1])}</ul>${build(idx + 1)}
     </details>`;
   };
