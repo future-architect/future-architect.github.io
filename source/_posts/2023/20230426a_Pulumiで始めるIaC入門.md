@@ -3,7 +3,6 @@ title: "Pulumiで始めるIaC入門"
 date: 2023/04/26 00:00:00
 postid: a
 tags:
-  - IaC
   - 入門
 categories:
   - IaC

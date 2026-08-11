@@ -5,7 +5,6 @@ postid: ""
 tags:
   - Ansible
   - 登壇レポート
-  - IaC
 categories:
   - IaC
 thumbnail: /images/2018/20180209/thumbnail_20180209.png

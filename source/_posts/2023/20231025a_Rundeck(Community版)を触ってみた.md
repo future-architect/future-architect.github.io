@@ -4,7 +4,8 @@ date: 2023/10/25 00:00:00
 postid: a
 tags:
   - ジョブスケジューラ
-  - IaC
+  - Terraform
+  - Ansible
   - 保守運用
   - クラウドマイグレーション
 categories:

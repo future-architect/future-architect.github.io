@@ -5,7 +5,6 @@ postid: a
 tags:
   - Terraform
   - TerraformCloud
-  - IaC
 categories:
   - IaC
 series: "Terraform2026"
