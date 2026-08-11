@@ -8,7 +8,7 @@ tags:
   - ノーコード
   - Claude
 categories:
-  - DataScience
+  - AIDD
 thumbnail: /images/2024/20240402a/thumbnail.png
 author: 前川喜洋
 lede: "DifyとAnthropic Claudeを使って簡単に生成AIアプリケーションを構築する方法をご紹介します。"

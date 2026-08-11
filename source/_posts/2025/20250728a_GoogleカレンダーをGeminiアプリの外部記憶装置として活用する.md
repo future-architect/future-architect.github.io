@@ -8,7 +8,7 @@ tags:
   - 生成AI
   - Googleカレンダー
 categories:
-  - DataScience
+  - AIDD
 series: "AI Tips"
 thumbnail: /images/2025/20250728a/thumbnail.png
 author: 清水雄一郎

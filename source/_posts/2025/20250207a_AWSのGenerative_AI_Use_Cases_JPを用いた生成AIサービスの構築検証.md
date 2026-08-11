@@ -10,7 +10,7 @@ tags:
   - AWS CDK
   - 生成AI
 categories:
-  - DataScience
+  - AIDD
 thumbnail: /images/2025/20250207a/thumbnail.png
 author: 小川智也
 lede: "AWSを用いた生成AIアプリケーションの実装として、Generative AI Use Cases JP についての検証を行いました。"
