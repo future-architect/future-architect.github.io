@@ -249,7 +249,7 @@ Kibanaが起動しました。
 <img src="/images/2017/20170119/photo_20170119_22.png" loading="lazy">
 
 するとグラフが最大化されます。
-そして、次は表示期間を変更します。右上[Last 15 minutes]ををクリック。
+そして、次は表示期間を変更します。右上[Last 15 minutes]をクリック。
 
 <img src="/images/2017/20170119/photo_20170119_23.png" loading="lazy">
 

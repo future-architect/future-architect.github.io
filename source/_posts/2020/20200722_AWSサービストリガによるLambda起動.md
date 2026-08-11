@@ -405,7 +405,7 @@ func main() {
 }
 ```
 
-3回目なのでデプロイのコマンドはは割愛します。いままでのコマンドと同じになります。Lambdaが作成できたら次はトリガ起動のもととなるKinesisStreamを作成します。
+3回目なのでデプロイのコマンドは割愛します。いままでのコマンドと同じになります。Lambdaが作成できたら次はトリガ起動のもととなるKinesisStreamを作成します。
 
 ```sh KinesisStream作成
 aws kinesis --endpoint-url=http://localhost:4568 create-stream --stream-name lambda-test --shard-count 1

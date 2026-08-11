@@ -69,7 +69,7 @@ https://github.com/go-swagger/go-swagger/issues/1122#issuecomment-323113089
 他言語経験者で Go 初心者の方が開発する際に、コード生成で Handler 周りが出力されるので、細かい部分で詰まることなく開発できていたのかなと思っています。
 go-swagger コマンドを開発端末で実行できるように、開発環境をしっかり事前に整備する必要はありました。go-swagger コマンドがうまくインストールできない等の問題は起きて、対応したりしてました。(ちなみに、公式からバイナリ落としてもらうが一番簡単な解決策でした）
 
-#### Q. WAF(Web Application Framework)よりもgo-swaggerのメリットが大きかったでしょうか？ 私ははechoとgo-swaggerで悩んで結局echoにしました。
+#### Q. WAF(Web Application Framework)よりもgo-swaggerのメリットが大きかったでしょうか？ 私はechoとgo-swaggerで悩んで結局echoにしました。
 
 前提として、go-swagger も WAF としての機能は備えている認識です。
 他のブログ記事に、以下の通り記載があり、私自身も同じ理解です。

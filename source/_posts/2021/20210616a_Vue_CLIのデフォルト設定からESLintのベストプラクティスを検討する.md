@@ -103,7 +103,7 @@ Linter/Formatter無しの状態とpackage.jsonを比較してみます。
 
 <img src="/images/2021/20210616a/image_5.png" alt="package.jsonの比較" width="709" height="844" loading="lazy">
 
-`scripts`の設定にに`lint`コマンドが追加されています。
+`scripts`の設定に`lint`コマンドが追加されています。
 
 これにより`npm run lint`コマンドでLinterの指摘事項を確認できます。
 `npm run lint --fix`コマンドで、ある程度自動フォーマットすることも可能です。

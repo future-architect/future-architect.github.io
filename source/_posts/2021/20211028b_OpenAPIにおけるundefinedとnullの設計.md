@@ -529,7 +529,7 @@ type User struct {
 }
 ```
 
-`undefined`の場合は`Set`プロパティが`false`、`null`値が指定された場合はは`Set`プロパティが`true`となります。
+`undefined`の場合は`Set`プロパティが`false`、`null`値が指定された場合は`Set`プロパティが`true`となります。
 
 ```go
 func main() {

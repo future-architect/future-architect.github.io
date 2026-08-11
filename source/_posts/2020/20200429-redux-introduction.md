@@ -117,7 +117,7 @@ export const testReducer = ({ testStateA = "", testStateB = "" } = {}, action) =
 ### （4）ReactとReduxを連携しStore内のStateをComponentで参照する
 
 * mapStateToPropsを使用するとComponentのpropsにStateの中身を詰め込むことが出来ます
-* それによって、Store内にあるStateををthis.props.testStateAとして使用することが出来ます
+* それによって、Store内にあるStateをthis.props.testStateAとして使用することが出来ます
 
 ## まとめ
 
