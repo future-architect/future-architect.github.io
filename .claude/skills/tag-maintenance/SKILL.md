@@ -13,8 +13,12 @@ description: タグの親子オントロジー（source/_data/tag_ontology.yml�
 - 抽象への接続は `source/_data/tag_ontology.yml` の `broader` が肩代わりし、
   `scripts/related_posts.js` が展開して関連記事を計算する
 - 例外の慣例: Go リリース連載は `Go` と `Go1.27` を両方付ける
-- 書くのは意味的な包含関係だけ。共起・名前の形（Go1.26/Go1.27 の兄弟）から
-  機械的に導出できる関係は `scripts/related_tags.js` が担うので書き写さない
+- **辺を書く基準**: 「A の記事に B タグを打つのは冗長で打ちたくない」と筆者が感じる
+  自明な包含だけ書く（TypeScript 記事に JavaScript を打ちたくない、の肩代わり）。
+  Swift と iOS のような文脈次第の関係は書かず、筆者が直接タグで表明する。
+  迷ったら書かない
+- 共起・名前の形（Go1.26/Go1.27 の兄弟）から機械的に導出できる関係は
+  `scripts/related_tags.js` が担うので書き写さない
 
 ## データ形式
 

@@ -207,9 +207,11 @@ hexo.extend.helper.register('list_related_posts', function() {
   const relatedPosts = candidates.map(p => {
     const theirTokens = postTokens.get(p._id);
     let score = 0;
+    let sharesDirectTag = false;
     for (const [t, myDepth] of myTokens) {
       const theirDepth = theirTokens.get(t);
       if (theirDepth === undefined) continue;
+      if (myDepth === 0 && theirDepth === 0) sharesDirectTag = true;
       score += idf(t) * Math.pow(DECAY, myDepth + theirDepth);
     }
 
@@ -217,7 +219,11 @@ hexo.extend.helper.register('list_related_posts', function() {
     // これがないと、大きなタグを複数持つ記事が全記事の関連記事を占めてしまう
     score /= Math.sqrt(p.tags.length || 1);
 
-    if (p.author === post.author) {
+    // 著者点は「関連しているか」の証拠ではなく、関連済み候補間の調停。
+    // 立証は直接タグにしかできないので、タグを直接共有する候補にだけ乗せる。
+    // 展開経由だけの候補に乗せると、弱い接続（0.3点程度）に著者点（3点前後）が
+    // 乗って直接一致の記事を押し出す（#2292 の影響測定では84枠全てが同著者だった）
+    if (sharesDirectTag && p.author === post.author) {
       score += authorIDF[p.author];
     }
 
