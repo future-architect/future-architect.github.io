@@ -164,7 +164,7 @@ curl "https://[サービスID].io/api/v1/blog/l5cn1orii" -H "X-API-KEY: YOUR_API
 
 <img src="/images/2020/20200512/photo_20200512_12.png" style="border:solid 1px #000000" loading="lazy">
 
-「ブログ作成者」に以下のようなコンテンツを作成します．この未来太郎さんの各種情報ををブログ記事のコンテンツ側から取得したいと思います．
+「ブログ作成者」に以下のようなコンテンツを作成します．この未来太郎さんの各種情報をブログ記事のコンテンツ側から取得したいと思います．
 <img src="/images/2020/20200512/photo_20200512_13.png" style="border:solid 1px #000000" loading="lazy">
 参照される側のコンテンツ作成はこれで完了です．
 

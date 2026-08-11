@@ -606,7 +606,7 @@ openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outfor
 
 ### yamlファイルの作成とapply
 
-[Dockerが動作しているホストのHostnameを表示するNginxコンテナ](https://qiita.com/yasthon/items/6a4627f249bb7fa52eb9)をお借りして、Metal-LBででロードバランシングします。
+[Dockerが動作しているホストのHostnameを表示するNginxコンテナ](https://qiita.com/yasthon/items/6a4627f249bb7fa52eb9)をお借りして、Metal-LBでロードバランシングします。
 
 yamlは[こちら](https://qiita.com/yasthon/items/c29d0b9ce34d66eab3ec#kubernetes-%E3%81%A7-%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E3%82%92%E5%8B%95%E3%81%8B%E3%81%99)を参考にさせて頂いております。
 MetalLB v0.13以降はConfigMapでの設定が廃止され、Custom Resource Definitions（CRD）での設定が推奨になったようで、MetalLBの部分だけv0.13に適合するように書き換えます。
