@@ -186,7 +186,7 @@ Windows上の指定したフォルダ配下に格納されているファイル�
 ||TIMESTAMP|timestamp|timestamp||
 |バイナリ|BLOB|bytea|bytea||
 ||RAW|bytea|bytea||
-|その他|ROWID|oid|character(255)|||
+|その他|ROWID|oid|character(255)||
 
 特殊型については個別に御確認ください。
 

@@ -100,7 +100,7 @@ Oracleに存在する主なオブジェクトについてPostgreSQLの存在有�
 | データベースリンク  | ×  | dblink関数または、FDW(Foreign Data Wrapper) で代替可能。 |
 | パッケージ  | ×  | 3-2で記載。 |
 | プロシージャ | × | 3-2で記載。 |
-| ファンクション | 〇 | ||
+| ファンクション | 〇 | |
 
 〇：存在　△：一部存在　×：無し
 
@@ -121,7 +121,7 @@ Oracleに存在する主なオブジェクトについてPostgreSQLの存在有�
 |数値|NUMBER|smallint/bigint/integer/decimal/real/double precision|精度によってデータ型を選択|
 |日付|DATE/TIMESTAMP|timestamp||
 |バイナリ|BLOB/RAW|bytea||
-|その他|ROWID|oid|||
+|その他|ROWID|oid||
 
 ### 3-2.アプリケーション（SQL）移行
 
