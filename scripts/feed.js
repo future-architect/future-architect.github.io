@@ -145,8 +145,29 @@ hexo.extend.generator.register('feed', (locals) => {
     posts,
   };
 
-  return [
+  const results = [
     {path: 'atom.xml', data: buildAtom(Object.assign({feedUrl: full_url_for.call(hexo, 'atom.xml')}, opts))},
     {path: 'rss2.xml', data: buildRss2(Object.assign({feedUrl: full_url_for.call(hexo, 'rss2.xml')}, opts))},
   ];
+
+  // カテゴリ別フィード（#2294）。パスはカテゴリページ配下の
+  // categories/<カテゴリ>/atom.xml。rss2 はサイト全体の互換用にだけ残し、
+  // カテゴリ別は atom のみとする。タグ別は購読需要が見えてから検討する
+  for (const category of locals.categories.toArray()) {
+    const categoryPosts = category.posts.sort('-date').toArray().slice(0, feedCfg.limit);
+    if (categoryPosts.length === 0) continue;
+    const path = category.path + 'atom.xml';
+    results.push({
+      path,
+      data: buildAtom(Object.assign({}, opts, {
+        title: `${category.name} カテゴリ | ${config.title}`,
+        subtitle: `${category.name} カテゴリの記事一覧`,
+        siteUrl: full_url_for.call(hexo, category.path),
+        feedUrl: full_url_for.call(hexo, path),
+        posts: categoryPosts,
+      })),
+    });
+  }
+
+  return results;
 });
