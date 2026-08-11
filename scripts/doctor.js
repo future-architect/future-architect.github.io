@@ -180,7 +180,23 @@ hexo.extend.helper.register('doctor_checks', function() {
   }
   nearDuplicates.sort((x, y) => (x.bN - x.aN) - (y.bN - y.aN) || y.aN - x.aN);
 
-  // 5) 1記事タグ。同じ記事に1記事タグ同士が同居している場合は、その記事の
+  // 5) カテゴリと同名のタグ。語彙が重複しているので、タグ側を削除して
+  //    _config.yml の alias でタグURLをカテゴリへ転送する運用（IaC の前例 #2291）。
+  //    大文字小文字違いの表記ゆれも同一視して拾う
+  const categoryDupTags = [];
+  const catByLower = new Map();
+  this.site.categories.forEach(cat => {
+    catByLower.set(cat.name.toLowerCase(), {name: cat.name, path: cat.path, n: cat.length});
+  });
+  this.site.tags.forEach(tag => {
+    const cat = catByLower.get(tag.name.toLowerCase());
+    if (cat) {
+      categoryDupTags.push({name: tag.name, path: tag.path, n: tag.length, cat: cat.name, catPath: cat.path, catN: cat.n});
+    }
+  });
+  categoryDupTags.sort((a, b) => b.n - a.n);
+
+  // 6) 1記事タグ。同じ記事に1記事タグ同士が同居している場合は、その記事の
   //    タグ付けがまとめて薄い可能性が高いので印を付ける
   //    （タグクラウドで * / ** として出していた仕様の移設）
   const singleUse = [];
@@ -198,5 +214,5 @@ hexo.extend.helper.register('doctor_checks', function() {
   }
   singleUse.sort((x, y) => (y.lonelyPair - x.lonelyPair) || (x.name < y.name ? -1 : 1));
 
-  return {suggestions, untagged, overTagged, missing, missingTotal, nearDuplicates, singleUse};
+  return {suggestions, untagged, overTagged, missing, missingTotal, nearDuplicates, categoryDupTags, singleUse};
 });
