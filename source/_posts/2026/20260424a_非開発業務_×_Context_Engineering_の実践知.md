@@ -204,7 +204,7 @@ UIから明示的に指定した瞬間に、コンテキストとして確実に
 
 <img src="/images/2026/20260424a/image_2.png" alt="image.png" width="760" height="636" loading="lazy">
 
-5. 各フェーズが終われば次ののhandoffボタンを押下で、次のフェーズへ移行
+5. 各フェーズが終われば次のhandoffボタンを押下で、次のフェーズへ移行
 
 #### 参考：**SubAgent パターンとの比較**
 
