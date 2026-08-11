@@ -20,7 +20,7 @@ OpenTelemetryのGoのTraceがstableになり、1.0がリリースされました
 |:-:|:-|
 | 2021/02/17  | [OpenTelemetryのTracingの仕様が1.0に](https://medium.com/opentelemetry/opentelemetry-specification-v1-0-0-tracing-edition-72dd08936978)  |
 | 2021/02/26  | [.NET実装が1.0に](https://medium.com/opentelemetry/opentelemetry-net-reaches-v1-0-e7c5e975fd44)  |
-| 2021/03/06 | [Java実装が1.0に](https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/tag/v1.0.0)
+| 2021/03/06 | [Java実装が1.0に](https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/tag/v1.0.0) |
 | 2021/03/27  | [Python実装が1.0に](https://medium.com/opentelemetry/announcing-opentelemetry-python-1-0-4e097562b8e0) |
 | 2021/09/20  | [C++実装が1.0に](https://github.com/open-telemetry/opentelemetry-cpp/releases/tag/v1.0.0)  |
 | 2021/09/21  | [Go実装が1.0に](https://github.com/open-telemetry/opentelemetry-go/releases/tag/v1.0.0) |
