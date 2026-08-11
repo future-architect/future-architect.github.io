@@ -20,7 +20,8 @@ const BLOCKS = [
   /<figure\b[^>]*\bclass="[^"]*\bhighlight\b[^"]*"[\s\S]*?<\/figure>/gi,
   /<details\b[\s\S]*?<\/details>/gi,
   /<pre\b[\s\S]*?<\/pre>/gi,
-  // mermaid 図は pre.mermaid で出るが、上の pre で拾えなかった場合の保険
+  // ビルド時SVG化した mermaid 図（#1955）。foreignObject 内のラベルを数えない
+  /<svg\b[\s\S]*?<\/svg>/gi,
   /<script\b[\s\S]*?<\/script>/gi,
   /<style\b[\s\S]*?<\/style>/gi
 ];

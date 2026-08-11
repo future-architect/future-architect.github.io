@@ -73,6 +73,21 @@ ga > ga_cache.json
 pv > ga4_pv.json
 ```
 
+## Mermaid 図のSVGキャッシュ
+
+記事中の ```` ```mermaid ```` コードフェンスは、ビルド時に `source/_mermaid/<ソースのSHA-256>.svg` の
+キャッシュがあればインラインSVGとして展開される（ブラウザ側の mermaid.js 読み込みが不要になる）。
+キャッシュが無い図は従来どおりブラウザでレンダリングされるため、SVG未生成でも記事は壊れない。
+
+図を追加・編集したらローカルでキャッシュを更新してコミットする。Docker が必要
+（レンダラはセルフホストの [kroki](https://kroki.io/)。未起動なら自動で `docker compose` 起動する）。
+
+```sh
+make mermaid
+# 停止する場合
+docker compose -f mermaid_svg.compose.yml down
+```
+
 ## 画像圧縮
 
 pngquantをインストールする

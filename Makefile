@@ -14,6 +14,9 @@ fix:
 g:
 	node_modules/.bin/hexo g
 
+mermaid:
+	node mermaid_svg.mjs
+
 clean:
 	node_modules/.bin/hexo clean
 

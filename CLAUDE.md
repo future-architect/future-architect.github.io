@@ -9,6 +9,7 @@ Hexo 7.3 製の静的サイトで、GitHub Pages にホスティングされて�
 | --- | --- |
 | `source/_posts/<年>/` | 記事本体（Markdown）。年ごとのディレクトリに分かれる |
 | `source/images/<年>/<記事ID>/` | 記事ごとの画像。`thumbnail.jpg` / `top.jpg` を置くのが慣例 |
+| `source/_mermaid/` | mermaid 図のSVGキャッシュ（`make mermaid` が生成。手で編集しない） |
 | `themes/future/` | 自作テーマ。`layout/*.ejs`（EJS）と `source/css/`（Stylus） |
 | `scripts/` | Hexo の generator / helper 拡張（著者ページ、タグ、SNSカウント、OGPプレビューなど） |
 | `scaffolds/` | `hexo new` のテンプレート |
@@ -72,6 +73,7 @@ make clean  # キャッシュ・生成物の削除
 make fix    # textlint --fix（source/_posts 配下）
 make fmt    # markdownlint-cli2 --fix
 make lint   # npx lint-staged（git add 済みの記事のみ textlint）
+make mermaid # mermaid 図のSVGキャッシュ更新（Docker必須、記事の図を追加・編集したら実行してコミット）
 ```
 
 記事を書き換えたら `make fix` か、対象ファイルだけの
