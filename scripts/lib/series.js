@@ -125,6 +125,7 @@ function build(site) {
       name,
       total: posts.length,
       index: index || posts[0],
+      first: posts[0].date,
       latest: posts[posts.length - 1].date
     };
   })};
