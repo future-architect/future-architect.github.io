@@ -10,9 +10,12 @@
  * 渡せないため、根元のここで断つしかない。詳細は #2055。
  */
 
-hexo.model('Post').schema.virtual('tags').get(function() {
-  const Tag = hexo.model('Tag');
-  const PostTag = hexo.model('PostTag');
-  const ids = PostTag.find({post_id: this._id}, {lean: true}).map(item => item.tag_id);
-  return Tag.find({_id: {$in: ids}}).sort('name');
-});
+hexo
+  .model('Post')
+  .schema.virtual('tags')
+  .get(function () {
+    const Tag = hexo.model('Tag');
+    const PostTag = hexo.model('PostTag');
+    const ids = PostTag.find({ post_id: this._id }, { lean: true }).map((item) => item.tag_id);
+    return Tag.find({ _id: { $in: ids } }).sort('name');
+  });

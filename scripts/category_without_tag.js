@@ -9,32 +9,43 @@
  */
 
 const pagination = require('hexo-pagination');
-const {dominantTag} = require('./lib/dominant_tag');
+const { dominantTag } = require('./lib/dominant_tag');
 
-hexo.extend.generator.register('category_without_tag', function(locals) {
+hexo.extend.generator.register('category_without_tag', function (locals) {
   const perPage = (this.config.category_generator || {}).per_page || this.config.per_page || 10;
   const pages = [];
 
-  locals.categories.forEach(category => {
+  locals.categories.forEach((category) => {
     const dominant = dominantTag(category);
     if (!dominant) return;
 
     const rest = dominant.rest.sort('-date');
-    pages.push(...pagination(category.path + dominant.slug, rest, {
-      layout: ['category-without', 'archive', 'index'],
-      perPage,
-      data: {category: category.name, excludedTag: dominant.name, withoutPosts: rest, withoutPath: category.path + dominant.slug + '/'}
-    }));
+    pages.push(
+      ...pagination(category.path + dominant.slug, rest, {
+        layout: ['category-without', 'archive', 'index'],
+        perPage,
+        data: {
+          category: category.name,
+          excludedTag: dominant.name,
+          withoutPosts: rest,
+          withoutPath: category.path + dominant.slug + '/',
+        },
+      }),
+    );
   });
 
   return pages;
 });
 
 // カテゴリページから「◯◯ 以外の記事」への導線を出すのに使う
-hexo.extend.helper.register('category_without_tag', function(name) {
-  const category = this.site.categories.findOne({name});
+hexo.extend.helper.register('category_without_tag', function (name) {
+  const category = this.site.categories.findOne({ name });
   if (!category) return null;
   const dominant = dominantTag(category);
   if (!dominant) return null;
-  return {name: dominant.name, count: dominant.rest.length, path: category.path + dominant.slug + '/'};
+  return {
+    name: dominant.name,
+    count: dominant.rest.length,
+    path: category.path + dominant.slug + '/',
+  };
 });

@@ -6,6 +6,7 @@ s:
 
 fmt:
 	node_modules/.bin/markdownlint-cli2 --fix "**/*.md"
+	node_modules/.bin/prettier --write "scripts/**/*.js" "*.mjs"
 
 fix:
 	node_modules/.bin/textlint --fix source/_posts/*.md

@@ -5,8 +5,8 @@
 //
 // もとの markd を参考に拡張する
 // https://github.com/markedjs/marked/blob/e5796ecc435a30f96939e6a7b2229c14264b4bf8/src/Renderer.js#L92
-hexo.extend.filter.register('marked:renderer', function(renderer) {
-  renderer.table = function(header, body) {
+hexo.extend.filter.register('marked:renderer', function (renderer) {
+  renderer.table = function (header, body) {
     return `<div class="scroll">${table(header, body)}</div>\n`;
   };
 });
@@ -14,10 +14,5 @@ hexo.extend.filter.register('marked:renderer', function(renderer) {
 const table = (header, body) => {
   if (body) body = '<tbody>' + body + '</tbody>';
 
-  return '<table>\n'
-    + '<thead>\n'
-    + header
-    + '</thead>\n'
-    + body
-    + '</table>';
-}
+  return '<table>\n' + '<thead>\n' + header + '</thead>\n' + body + '</table>';
+};

@@ -1,17 +1,24 @@
 'use strict';
 
-var moment = require("moment");
+var moment = require('moment');
 
 // Work In Progress
-hexo.extend.helper.register('weekly_digest_mail_body', function() {
-
+hexo.extend.helper.register('weekly_digest_mail_body', function () {
   const fromDate = moment().add(-7, 'd').format();
 
-  const weeklyPosts = this.site.posts.reverse().filter(post => post.date.isAfter(fromDate)).slice(0, 30);
-  const weeklyPostHTML = weeklyPosts.map(post => `<li style="margin:18px auto"><a href="/${post.path}" style="font-weight:bold;color:#0045ff;font-size:calc(0.93em + 0.2vw)" rel="noreferrer" target="_blank">${post.title}</a><p>${post.date.format("MM/DD")} by ${post.author}さん</p></li>`).join("\n")
+  const weeklyPosts = this.site.posts
+    .reverse()
+    .filter((post) => post.date.isAfter(fromDate))
+    .slice(0, 30);
+  const weeklyPostHTML = weeklyPosts
+    .map(
+      (post) =>
+        `<li style="margin:18px auto"><a href="/${post.path}" style="font-weight:bold;color:#0045ff;font-size:calc(0.93em + 0.2vw)" rel="noreferrer" target="_blank">${post.title}</a><p>${post.date.format('MM/DD')} by ${post.author}さん</p></li>`,
+    )
+    .join('\n');
 
-  const currentYear =  new Date().getYear() + 1900;
-  const currentMonth =  new Date().getMonth() + 1;
+  const currentYear = new Date().getYear() + 1900;
+  const currentMonth = new Date().getMonth() + 1;
   const weeknumber = moment().week() - moment().startOf('months').week();
 
   return `

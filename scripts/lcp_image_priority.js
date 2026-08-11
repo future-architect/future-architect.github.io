@@ -16,10 +16,10 @@
  * 先頭画像は画面内に入るので、lazy 読み込みも外す（LCP候補に lazy が
  * 付いていると Lighthouse でも減点される）。
  */
-hexo.extend.filter.register('after_post_render', function(data) {
+hexo.extend.filter.register('after_post_render', function (data) {
   // 属性値の中に > が入ることがある（alt にコード片が書かれている記事がある）ため、
   // 引用符で囲まれた範囲を読み飛ばしながらタグの終端を探す
-  data.content = data.content.replace(/<img\b(?:[^>"']|"[^"]*"|'[^']*')*>/i, tag => {
+  data.content = data.content.replace(/<img\b(?:[^>"']|"[^"]*"|'[^']*')*>/i, (tag) => {
     // 同じタグに loading="lazy" が2回書かれている記事があるため、タグ内は全て除去する
     let t = tag.replace(/\s+loading\s*=\s*(["']?)lazy\1/gi, '');
     if (!/\bfetchpriority=/i.test(t)) {

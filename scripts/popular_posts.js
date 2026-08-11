@@ -1,10 +1,10 @@
 'use strict';
 
-const {getSNSCnt} = require('./lib/sns');
-const {postListItem} = require('./lib/post_list');
+const { getSNSCnt } = require('./lib/sns');
+const { postListItem } = require('./lib/post_list');
 
-const fs = require("fs");
-const gaCache = JSON.parse(fs.readFileSync("ga_cache.json", 'utf-8'));
+const fs = require('fs');
+const gaCache = JSON.parse(fs.readFileSync('ga_cache.json', 'utf-8'));
 
 // ランキング（トレンド・年間人気・SNS人気）の表示件数。
 // 記事が長文化する傾向にあるため、トップページのスクロール量を抑える目的で絞り、
@@ -21,7 +21,10 @@ const RANKING_YEARLY_MAX_COUNT = 50;
 const rankingList = (posts, caps = [RANKING_DISPLAY_COUNT, RANKING_MAX_COUNT]) => {
   // 順位はマークアップ側で振る。CSS カウンタだと「10件で畳む」定数と
   // 二重管理になる。畳んだ側は11位から続く
-  const items = (list, offset) => list.map((post, i) => postListItem(post, 'featured-posts-item', undefined, true, offset + i + 1)).join("\n");
+  const items = (list, offset) =>
+    list
+      .map((post, i) => postListItem(post, 'featured-posts-item', undefined, true, offset + i + 1))
+      .join('\n');
   // 段の境界。残りが1件だけの段は畳む意味がないので前段に吸収する
   const bounds = [];
   for (const cap of caps) {
@@ -32,7 +35,7 @@ const rankingList = (posts, caps = [RANKING_DISPLAY_COUNT, RANKING_MAX_COUNT]) =
     bounds.push(cap);
   }
   // 2段目は「開いた人がさらに深掘りする」動線なので、1段目の details の中に入れ子にする
-  const build = idx => {
+  const build = (idx) => {
     if (idx >= bounds.length || bounds[idx - 1] >= posts.length) return '';
     // 件数は「このクリックで追加表示される数」を出す（全残数だと開いた数と合わない）。
     // 入れ子の最終段だけ、それで打ち止めだと分かるよう「残りの」にする
@@ -51,7 +54,7 @@ const rankingList = (posts, caps = [RANKING_DISPLAY_COUNT, RANKING_MAX_COUNT]) =
   `;
 };
 
-hexo.extend.helper.register('popular_posts', function(term='weekly') {
+hexo.extend.helper.register('popular_posts', function (term = 'weekly') {
   const yearAgo = new Date();
   yearAgo.setDate(yearAgo.getDate() - 365); // 1year
   const halfYearAgo = new Date();
@@ -73,24 +76,29 @@ hexo.extend.helper.register('popular_posts', function(term='weekly') {
     return b.pv - a.pv;
   };
 
-  let [rate3d, rate1w, rate2w, rate4w, rate2m, rate3m, rate6m, rate12m] = [10, 8, 5, 4, 3.5, 3, 2.5, 2];
-  if (term === "yearly") {
+  let [rate3d, rate1w, rate2w, rate4w, rate2m, rate3m, rate6m, rate12m] = [
+    10, 8, 5, 4, 3.5, 3, 2.5, 2,
+  ];
+  if (term === 'yearly') {
     [rate3d, rate1w, rate2w, rate4w, rate2m, rate3m, rate6m, rate12m] = [3, 3, 3, 2, 2, 1.5, 1, 1];
   }
 
-  const popularPosts = gaCache[term].filter(gaPage => gaPage.path.indexOf("articles") > 0)
-    .filter(gaPage => {
-      return this.site.posts.data.some(post => post.permalink.indexOf(gaPage.path) > 0);
+  const popularPosts = gaCache[term]
+    .filter((gaPage) => gaPage.path.indexOf('articles') > 0)
+    .filter((gaPage) => {
+      return this.site.posts.data.some((post) => post.permalink.indexOf(gaPage.path) > 0);
     })
-    .flatMap(gaPage => {
-      const post = this.site.posts.data.filter(post => post.permalink.indexOf(gaPage.path) > 0).slice(0, 1)
+    .flatMap((gaPage) => {
+      const post = this.site.posts.data
+        .filter((post) => post.permalink.indexOf(gaPage.path) > 0)
+        .slice(0, 1);
       if (post && post.length > 0) {
         post[0].pv = parseInt(gaPage.pv);
         return post;
       }
-      return []; // もしpostがundefinedや空の配列なら空の配列を返す    
-    })  
-    .map(post => {
+      return []; // もしpostがundefinedや空の配列なら空の配列を返す
+    })
+    .map((post) => {
       if (post.date.toISOString() >= threeDayAgo.toISOString()) {
         post.pv = post.pv * rate3d;
       } else if (post.date.toISOString() >= aWeekAgo.toISOString()) {
@@ -110,21 +118,21 @@ hexo.extend.helper.register('popular_posts', function(term='weekly') {
       }
       return post;
     })
-    .filter(post => post.pv >= 0)
+    .filter((post) => post.pv >= 0)
     .sort(compareFunc)
     .slice(0, term === 'yearly' ? RANKING_YEARLY_MAX_COUNT : RANKING_MAX_COUNT);
 
-  const caps = term === 'yearly'
-    ? [RANKING_DISPLAY_COUNT, RANKING_MAX_COUNT, RANKING_YEARLY_MAX_COUNT]
-    : [RANKING_DISPLAY_COUNT, RANKING_MAX_COUNT];
+  const caps =
+    term === 'yearly'
+      ? [RANKING_DISPLAY_COUNT, RANKING_MAX_COUNT, RANKING_YEARLY_MAX_COUNT]
+      : [RANKING_DISPLAY_COUNT, RANKING_MAX_COUNT];
   return rankingList(popularPosts, caps);
 });
 
-hexo.extend.helper.register('sns_popular_posts', function() {
-
+hexo.extend.helper.register('sns_popular_posts', function () {
   const allPosts = this.site.posts.data;
-  allPosts.sort((a, b) => getSNSCnt(b.permalink) - getSNSCnt(a.permalink))
-  const popularPost = allPosts.slice(0, RANKING_MAX_COUNT)
+  allPosts.sort((a, b) => getSNSCnt(b.permalink) - getSNSCnt(a.permalink));
+  const popularPost = allPosts.slice(0, RANKING_MAX_COUNT);
 
   return rankingList(popularPost);
 });

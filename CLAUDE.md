@@ -75,7 +75,7 @@ make s      # ローカルサーバ（http://localhost:4000）
 make g      # 静的ファイル生成（public/）
 make clean  # キャッシュ・生成物の削除
 make fix    # textlint --fix（source/_posts 配下）
-make fmt    # markdownlint-cli2 --fix
+make fmt    # markdownlint-cli2 --fix ＋ prettier（scripts/*.js と *.mjs のみ。記事MDは対象外 #2307）
 make lint   # npx lint-staged（git add 済みの記事のみ textlint）
 make mermaid # mermaid 図のSVGキャッシュ更新（Docker必須、記事の図を追加・編集したら実行してコミット）
 ```

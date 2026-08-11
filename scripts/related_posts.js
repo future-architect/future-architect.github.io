@@ -3,9 +3,9 @@
 // 関連記事の最大表示件数
 // 記事が長文化する傾向にあるため、記事末尾のスクロール量を抑える目的で絞っている
 const maxCount = 3;
-const {getSNSCnt} = require('./lib/sns');
-const {postListItem} = require('./lib/post_list');
-const {navLinkedPaths} = require('./lib/series');
+const { getSNSCnt } = require('./lib/sns');
+const { postListItem } = require('./lib/post_list');
+const { navLinkedPaths } = require('./lib/series');
 
 // 親を経由した一致を1段ごとに弱める係数
 const DECAY = 0.5;
@@ -25,7 +25,7 @@ function buildTokenIndex(site) {
   const ontology = (site.data && site.data.tag_ontology) || {};
 
   const expandMemo = new Map();
-  const expand = name => {
+  const expand = (name) => {
     if (expandMemo.has(name)) return expandMemo.get(name);
     const depths = new Map([[name, 0]]);
     const queue = [[name, 0]];
@@ -44,12 +44,12 @@ function buildTokenIndex(site) {
     return depths;
   };
 
-  const postTokens = new Map();   // 記事ID -> Map(トークン -> 最小深さ)
-  const df = new Map();           // トークン -> 展開後にそれを持つ記事数
+  const postTokens = new Map(); // 記事ID -> Map(トークン -> 最小深さ)
+  const df = new Map(); // トークン -> 展開後にそれを持つ記事数
   const postsByToken = new Map(); // トークン -> 記事の配列
-  site.posts.forEach(post => {
+  site.posts.forEach((post) => {
     const tokens = new Map();
-    post.tags.forEach(tag => {
+    post.tags.forEach((tag) => {
       for (const [t, d] of expand(tag.name)) {
         if (!tokens.has(t) || tokens.get(t) > d) tokens.set(t, d);
       }
@@ -62,7 +62,7 @@ function buildTokenIndex(site) {
     }
   });
 
-  return {postTokens, df, postsByToken};
+  return { postTokens, df, postsByToken };
 }
 
 /**
@@ -82,7 +82,7 @@ function pickRelatedPosts(posts, series) {
   for (const p of posts) {
     if (picked.length >= maxCount) break;
     const sameSeries = p.series === series;
-    if (sameSeries && picked.filter(x => x.series === series).length >= maxCount - 1) {
+    if (sameSeries && picked.filter((x) => x.series === series).length >= maxCount - 1) {
       deferred.push(p);
       continue;
     }
@@ -100,7 +100,7 @@ function generateRelatedPostsHtml(posts, series) {
     return `<p class="related-posts-none">No related post.</p>`;
   }
 
-  let result = "";
+  let result = '';
   for (let i = 0; i < count; i++) {
     const related = posts[i];
     if (related) {
@@ -120,9 +120,11 @@ function generateRelatedPostsHtml(posts, series) {
 // 「この記事を参照している記事」（reference_posts.js）に出る記事のID
 // 同じ記事が関連記事にも並ばないよう、除外するために使う
 function getReferencePostIds(ctx, post) {
-  return new Set(ctx.site.posts.data
-    .filter(p => p.path !== post.path && p.content.includes(post.path))
-    .map(p => p._id));
+  return new Set(
+    ctx.site.posts.data
+      .filter((p) => p.path !== post.path && p.content.includes(post.path))
+      .map((p) => p._id),
+  );
 }
 
 // カテゴリから関連記事を取得する関数（変更なし）
@@ -132,8 +134,9 @@ function getCategoryRelatedPosts(ctx, post, isExcluded) {
     return [];
   }
 
-  const categoryPosts = currentCategory.posts.data
-    .filter(p => p._id !== post._id && !isExcluded(p));
+  const categoryPosts = currentCategory.posts.data.filter(
+    (p) => p._id !== post._id && !isExcluded(p),
+  );
 
   categoryPosts.sort((a, b) => {
     const snsA = getSNSCnt(a.permalink);
@@ -142,16 +145,16 @@ function getCategoryRelatedPosts(ctx, post, isExcluded) {
       return snsB - snsA;
     } else {
       // 日付も同じなら パスで決める（決着が無いとビルドごとに並びが変わる）
-      return b.date.valueOf() - a.date.valueOf()
-        || (a.path < b.path ? -1 : a.path > b.path ? 1 : 0);
+      return (
+        b.date.valueOf() - a.date.valueOf() || (a.path < b.path ? -1 : a.path > b.path ? 1 : 0)
+      );
     }
   });
 
   return categoryPosts;
 }
 
-
-hexo.extend.helper.register('list_related_posts', function() {
+hexo.extend.helper.register('list_related_posts', function () {
   const post = this.post;
   if (!post.tags || !post.categories) {
     return `<p class="related-posts-none">No related post.</p>`;
@@ -164,20 +167,20 @@ hexo.extend.helper.register('list_related_posts', function() {
   // 同じ連載の記事は出さない。連載ナビが索引へのリンクを持ち、索引には
   // その連載の全記事が並ぶので、連載内はすべてナビ経由で辿れる。
   // 関連記事の役割は他の導線で辿り着けない関係を見せることなので枠を使わない
-  const isExcluded = p => referenceIds.has(p._id) || linked.has(p.path);
+  const isExcluded = (p) => referenceIds.has(p._id) || linked.has(p.path);
 
   // 1. 全著者数を取得し、著者のIDFを計算
   const allPostsCount = this.site.posts.length;
-  const authors = [...new Set(this.site.posts.data.map(p => p.author))];
+  const authors = [...new Set(this.site.posts.data.map((p) => p.author))];
   const authorIDF = {};
-  authors.forEach(author => {
-    const postCountByAuthor = this.site.posts.data.filter(p => p.author === author).length;
+  authors.forEach((author) => {
+    const postCountByAuthor = this.site.posts.data.filter((p) => p.author === author).length;
     authorIDF[author] = Math.log(allPostsCount / postCountByAuthor);
   });
 
   // 2. 関連度スコアリング（オントロジー展開したタグと著者のIDFを考慮）
   if (!ontologyCache) ontologyCache = buildTokenIndex(this.site);
-  const {postTokens, df, postsByToken} = ontologyCache;
+  const { postTokens, df, postsByToken } = ontologyCache;
   const myTokens = postTokens.get(post._id) || new Map();
 
   // 候補は「展開後の集合が交差する記事」。タグを直接共有しない記事もここで入る
@@ -193,7 +196,9 @@ hexo.extend.helper.register('list_related_posts', function() {
 
   if (candidates.length === 0) {
     // タグ関連記事がなければカテゴリの記事を取得し、HTMLを生成して返す
-    console.log(`[INFO] Related Posts: No tag-related posts found for "${post.title}". Falling back to category.`);
+    console.log(
+      `[INFO] Related Posts: No tag-related posts found for "${post.title}". Falling back to category.`,
+    );
     const categoryPosts = getCategoryRelatedPosts(this, post, isExcluded);
     return generateRelatedPostsHtml(categoryPosts, post.series);
   }
@@ -203,8 +208,8 @@ hexo.extend.helper.register('list_related_posts', function() {
   // 記事は弱くしか効かない。しきい値ではなく構造で氾濫を防ぐ。
   // さらに親経由の一致は深さ1段ごとに DECAY 倍し、
   // 直接一致 > 親子（片側が親を直接持つ）> 兄弟（親を共有）の順を保つ
-  const idf = t => Math.log(allPostsCount / df.get(t));
-  const relatedPosts = candidates.map(p => {
+  const idf = (t) => Math.log(allPostsCount / df.get(t));
+  const relatedPosts = candidates.map((p) => {
     const theirTokens = postTokens.get(p._id);
     let score = 0;
     let sharesDirectTag = false;
@@ -235,23 +240,25 @@ hexo.extend.helper.register('list_related_posts', function() {
   //    同時期の記事の方が読み継ぎやすい。連載の古い回が埋もれる問題も解消する。
   //    ただし過去方向は未来方向より重く扱い、わずかに新しい記事へ流れるようにする
   const PAST_PENALTY = 2;
-  const dateDistance = p => {
+  const dateDistance = (p) => {
     const diff = p.date.valueOf() - post.date.valueOf();
     return diff >= 0 ? diff : -diff * PAST_PENALTY;
   };
 
   // 最後にパスで決める。スコアと日付距離が同点になる組があり、
   // 決着が無いとビルドごとに選ばれる記事が入れ替わる
-  relatedPosts.sort((a, b) =>
-    b.score - a.score
-    || dateDistance(a) - dateDistance(b)
-    || (a.path < b.path ? -1 : a.path > b.path ? 1 : 0));
+  relatedPosts.sort(
+    (a, b) =>
+      b.score - a.score ||
+      dateDistance(a) - dateDistance(b) ||
+      (a.path < b.path ? -1 : a.path > b.path ? 1 : 0),
+  );
 
   // 4. 記事数がmaxCountに満たない場合はカテゴリから補填
   if (relatedPosts.length < maxCount) {
     const postsToFill = getCategoryRelatedPosts(this, post, isExcluded);
-    postsToFill.forEach(p => {
-      if(relatedPosts.findIndex(rp => rp._id === p._id) === -1) {
+    postsToFill.forEach((p) => {
+      if (relatedPosts.findIndex((rp) => rp._id === p._id) === -1) {
         relatedPosts.push(p);
       }
     });

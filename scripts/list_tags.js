@@ -3,10 +3,11 @@
 // custom list_tags
 // https://github.com/noraj/hexo/blob/master/lib/plugins/helper/list_tags.js
 
-const {getSNSCnt} = require('./lib/sns');
+const { getSNSCnt } = require('./lib/sns');
 
 // タグに紐づく記事のSNSリアクション（Twitter/FaceBook/Hatebu/Pocket/Feedly）の合計
-const snsTotalCount = tag => tag.posts.map(post => getSNSCnt(post.permalink)).reduce((acc, cur) => acc + cur, 0);
+const snsTotalCount = (tag) =>
+  tag.posts.map((post) => getSNSCnt(post.permalink)).reduce((acc, cur) => acc + cur, 0);
 
 function listTopPageTags(tags, options) {
   if (!options && (!tags || !Object.prototype.hasOwnProperty.call(tags, 'length'))) {
@@ -18,7 +19,9 @@ function listTopPageTags(tags, options) {
   options = options || {};
 
   const { style = 'list', transform, separator = ', ', suffix = '' } = options;
-  const showCount = Object.prototype.hasOwnProperty.call(options, 'show_count') ? options.show_count : true;
+  const showCount = Object.prototype.hasOwnProperty.call(options, 'show_count')
+    ? options.show_count
+    : true;
   const className = options.class || 'tag';
   const orderby = options.orderby || 'name';
   const order = options.order || 1;
@@ -27,15 +30,16 @@ function listTopPageTags(tags, options) {
 
   // Ignore tags with zero posts
   // 表示対象の絞り込みは amount で件数を切る前に済ませる
-  tags = tags.filter(tag => tag.length && tag.length >= minCount);
+  tags = tags.filter((tag) => tag.length && tag.length >= minCount);
 
   // Sort the tags
   // snsCount は Warehouse のフィールドではないため、配列に変換して独自に並べ替える
   if (orderby === 'snsCount') {
-    tags = tags.toArray()
-      .map(tag => ({tag, snsCount: snsTotalCount(tag)})) // 比較のたびに集計し直さないよう先にキーを持たせる
+    tags = tags
+      .toArray()
+      .map((tag) => ({ tag, snsCount: snsTotalCount(tag) })) // 比較のたびに集計し直さないよう先にキーを持たせる
       .sort((a, b) => b.snsCount - a.snsCount)
-      .map(entry => entry.tag);
+      .map((entry) => entry.tag);
   } else {
     tags = tags.sort(orderby, order).toArray();
   }
@@ -46,7 +50,7 @@ function listTopPageTags(tags, options) {
   if (style === 'list') {
     result += `<ul class="${className}-list" itemprop="keywords">`;
 
-    tags.forEach(tag => {
+    tags.forEach((tag) => {
       result += `<li class="${className}-list-item">`;
 
       result += `<a class="${className}-list-link" href="${this.url_for(tag.path)}${suffix}" rel="tag">`;

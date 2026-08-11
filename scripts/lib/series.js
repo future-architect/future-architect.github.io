@@ -47,9 +47,15 @@ function consume(title, prefix) {
   let i = 0;
   let j = 0;
   while (j < prefix.length) {
-    if (WS.test(prefix[j])) { j++; continue; }
+    if (WS.test(prefix[j])) {
+      j++;
+      continue;
+    }
     if (i >= title.length) return -1;
-    if (WS.test(title[i])) { i++; continue; }
+    if (WS.test(title[i])) {
+      i++;
+      continue;
+    }
     if (!sameChar(title[i], prefix[j])) return -1;
     i++;
     j++;
@@ -73,7 +79,10 @@ function consume(title, prefix) {
  * 実データでは620記事中40件が落ち、43件は接頭辞を持ちながら据え置かれた。
  */
 function navTitle(title, name) {
-  for (const [prefix, allowSpace] of [[name + '連載', true], [name, false]]) {
+  for (const [prefix, allowSpace] of [
+    [name + '連載', true],
+    [name, false],
+  ]) {
     const k = consume(title, prefix);
     if (k < 0) continue;
     const rest = title.slice(k);
@@ -90,7 +99,7 @@ let cache = null;
 function build(site) {
   const groups = new Map(); // 連載名 -> 記事
 
-  site.posts.sort('date', 1).each(post => {
+  site.posts.sort('date', 1).each((post) => {
     if (!post.series) return;
     if (!groups.has(post.series)) groups.set(post.series, []);
     groups.get(post.series).push(post);
@@ -98,10 +107,10 @@ function build(site) {
 
   const series = new Map(); // 記事のパス -> その記事から見た連載
   for (const [name, posts] of groups) {
-    const index = posts.find(p => p.tags && p.tags.some(t => t.name === 'インデックス'));
+    const index = posts.find((p) => p.tags && p.tags.some((t) => t.name === 'インデックス'));
 
     // 落とすのはナビの表示だけ。記事の title そのものは触らない
-    const nav = posts.map(p => ({path: p.path, title: navTitle(p.title, name)}));
+    const nav = posts.map((p) => ({ path: p.path, title: navTitle(p.title, name) }));
 
     posts.forEach((post, i) => {
       const entry = {
@@ -109,26 +118,29 @@ function build(site) {
         total: posts.length,
         index: index && index !== post ? index : null,
         prev: i > 0 ? nav[i - 1] : null,
-        next: i < posts.length - 1 ? nav[i + 1] : null
+        next: i < posts.length - 1 ? nav[i + 1] : null,
       };
       // ナビが既にリンクしている記事。関連記事・被参照記事から落とすのに使う
       entry.linked = new Set(
-        [entry.index, entry.prev, entry.next].filter(Boolean).map(p => p.path)
+        [entry.index, entry.prev, entry.next].filter(Boolean).map((p) => p.path),
       );
       series.set(post.path, entry);
     });
   }
 
-  return {byPath: series, list: [...groups].map(([name, posts]) => {
-    const index = posts.find(p => p.tags && p.tags.some(t => t.name === 'インデックス'));
-    return {
-      name,
-      total: posts.length,
-      index: index || posts[0],
-      first: posts[0].date,
-      latest: posts[posts.length - 1].date
-    };
-  })};
+  return {
+    byPath: series,
+    list: [...groups].map(([name, posts]) => {
+      const index = posts.find((p) => p.tags && p.tags.some((t) => t.name === 'インデックス'));
+      return {
+        name,
+        total: posts.length,
+        index: index || posts[0],
+        first: posts[0].date,
+        latest: posts[posts.length - 1].date,
+      };
+    }),
+  };
 }
 
 /** 記事から見た連載。連載に属さない記事は null */
@@ -157,4 +169,4 @@ function navLinkedPaths(site, post) {
   return s ? s.linked : NONE;
 }
 
-module.exports = {seriesOf, navLinkedPaths, allSeries};
+module.exports = { seriesOf, navLinkedPaths, allSeries };

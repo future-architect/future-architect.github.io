@@ -11,7 +11,7 @@
  * 記事本文だけでなくテーマのテンプレートや reference_posts.js も同じ形の
  * headerlink を出力するので、ページ全体のHTMLに対して一括で処理する。
  */
-hexo.extend.filter.register('after_render:html', function(str) {
+hexo.extend.filter.register('after_render:html', function (str) {
   return str.replace(
     /<a href="(#[^"]*)" class="headerlink" title="([^"]*)"><\/a>/g,
     (match, href, title) => {
@@ -19,6 +19,6 @@ hexo.extend.filter.register('after_render:html', function(str) {
         return match; // 名前の元になる文字列がなければ触らない
       }
       return `<a href="${href}" class="headerlink" title="${title}" aria-label="${title} へのリンク"></a>`;
-    }
+    },
   );
 });

@@ -5,8 +5,9 @@ async function getOgpData(url) {
   try {
     const response = await fetch(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36'
-      }
+        'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
+      },
     });
     if (!response.ok) {
       throw new Error(`Failed to fetch: ${response.statusText}`);
@@ -14,7 +15,8 @@ async function getOgpData(url) {
     const html = await response.text();
     const $ = cheerio.load(html);
 
-    const getMetaContent = (prop) => $(`meta[property="${prop}"]`).attr('content') || $(`meta[name="${prop}"]`).attr('content');
+    const getMetaContent = (prop) =>
+      $(`meta[property="${prop}"]`).attr('content') || $(`meta[name="${prop}"]`).attr('content');
 
     let description = getMetaContent('og:description') || getMetaContent('description');
     if (description === 'NULL') {
@@ -26,7 +28,7 @@ async function getOgpData(url) {
       description: description, // 取得したdescriptionを設定
       image: getMetaContent('og:image'),
       siteName: getMetaContent('og:site_name'),
-      favicon: $('link[rel="icon"], link[rel="shortcut icon"]').attr('href')
+      favicon: $('link[rel="icon"], link[rel="shortcut icon"]').attr('href'),
     };
 
     if (ogp.favicon && !ogp.favicon.startsWith('http')) {
@@ -41,24 +43,26 @@ async function getOgpData(url) {
   }
 }
 
-hexo.extend.tag.register('link_preview', async function(args) {
-  const url = args[0];
-  if (!url) return '';
+hexo.extend.tag.register(
+  'link_preview',
+  async function (args) {
+    const url = args[0];
+    if (!url) return '';
 
-  const data = await getOgpData(url);
+    const data = await getOgpData(url);
 
-  if (!data || !data.title) {
-    return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
-  }
+    if (!data || !data.title) {
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+    }
 
-  // 出力時に必ず空文字をフォールバックにする
-  const title = data.title || '';
-  const description = data.description || '';
-  const image = data.image;
-  const siteName = data.siteName || new URL(url).hostname;
-  const favicon = data.favicon;
+    // 出力時に必ず空文字をフォールバックにする
+    const title = data.title || '';
+    const description = data.description || '';
+    const image = data.image;
+    const siteName = data.siteName || new URL(url).hostname;
+    const favicon = data.favicon;
 
-  return `
+    return `
     <div class="link-preview-card">
       <a href="${url}" target="_blank" rel="noopener noreferrer" class="link-preview-card-anchor">
         <div class="link-preview-card-main">
@@ -73,4 +77,6 @@ hexo.extend.tag.register('link_preview', async function(args) {
       </a>
     </div>
   `;
-}, {async: true});
+  },
+  { async: true },
+);

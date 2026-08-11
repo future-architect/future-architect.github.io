@@ -16,9 +16,9 @@ function dominantTag(category) {
   if (category.length < MIN_POSTS) return null;
 
   const counts = new Map();
-  category.posts.forEach(post => {
+  category.posts.forEach((post) => {
     if (!post.tags) return;
-    post.tags.forEach(tag => {
+    post.tags.forEach((tag) => {
       if (OPS_TAGS.has(tag.name)) return;
       counts.set(tag.name, (counts.get(tag.name) || 0) + 1);
     });
@@ -28,13 +28,13 @@ function dominantTag(category) {
   for (const [name, count] of counts) {
     // 同数は名前で決める（決着が無いとビルドごとに変わる）
     if (!top || count > top.count || (count === top.count && name < top.name)) {
-      top = {name, count};
+      top = { name, count };
     }
   }
   if (!top || top.count / category.length <= DOMINANT_RATIO) return null;
 
-  const rest = category.posts.filter(post => !post.tags.some(t => t.name === top.name));
-  return {name: top.name, count: top.count, rest, slug: `without-${top.name.toLowerCase()}`};
+  const rest = category.posts.filter((post) => !post.tags.some((t) => t.name === top.name));
+  return { name: top.name, count: top.count, rest, slug: `without-${top.name.toLowerCase()}` };
 }
 
-module.exports = {dominantTag};
+module.exports = { dominantTag };

@@ -1,8 +1,8 @@
-"use strict";
+'use strict';
 
-const fetch = require("node-fetch");
-const HttpsProxyAgent = require("https-proxy-agent");
-const RssParser = require("rss-parser");
+const fetch = require('node-fetch');
+const HttpsProxyAgent = require('https-proxy-agent');
+const RssParser = require('rss-parser');
 
 let feedItems = [];
 
@@ -14,10 +14,9 @@ let feedItems = [];
     proxyAgent = new HttpsProxyAgent.HttpsProxyAgent(process.env.http_proxy);
   }
 
-  const techcastResponse = await fetch(
-    "https://anchor.fm/s/2890e980/podcast/rss",
-    { agent: proxyAgent }
-  );
+  const techcastResponse = await fetch('https://anchor.fm/s/2890e980/podcast/rss', {
+    agent: proxyAgent,
+  });
   const techcastResponseText = await techcastResponse.text();
 
   rssParser
@@ -26,11 +25,11 @@ let feedItems = [];
       feedItems = feed.items;
     })
     .catch((error) => {
-      console.error("TechCast RSS 取得失敗", error);
+      console.error('TechCast RSS 取得失敗', error);
     });
 })();
 
-hexo.extend.helper.register("generate_techcast_post", function () {
+hexo.extend.helper.register('generate_techcast_post', function () {
   const currentTime = new Date();
   const pastDate = currentTime.getDate() - 15; // 2week
   currentTime.setDate(pastDate);
@@ -39,20 +38,18 @@ hexo.extend.helper.register("generate_techcast_post", function () {
     if (currentTime.toISOString() <= item.isoDate) {
       return `<span class="newitem">NEW</span>`;
     }
-    return "";
+    return '';
   };
 
   const feedHTML = feedItems
     .slice(0, 3)
     .map(
       (item) =>
-        `<li><a href="${
-          item.link
-        }" title="フューチャーがお届けするポッドキャストです。${
+        `<li><a href="${item.link}" title="フューチャーがお届けするポッドキャストです。${
           item.title
-        }" target="_blank" rel="noopener">${label(item)} ${item.title}</a></li>`
+        }" target="_blank" rel="noopener">${label(item)} ${item.title}</a></li>`,
     )
-    .join("\n");
+    .join('\n');
 
   return `
   <div class="class="widget-wrap">
