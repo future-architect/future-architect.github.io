@@ -12,23 +12,37 @@ const gaCache = JSON.parse(fs.readFileSync("ga_cache.json", 'utf-8'));
 // details ならJSを足さずに済む（参照記事の畳みと同じ作り）
 const RANKING_DISPLAY_COUNT = 10;
 const RANKING_MAX_COUNT = 25;
+// 年間人気だけ2段目のおかわりで50位まで辿れる (#2309)。
+// PVの実測でテールに読む価値が残っているのは年間だけ
+// （25位: 年間4,532 / 月間336。トレンドの26位以下はほぼ横一線のノイズ帯）
+const RANKING_YEARLY_MAX_COUNT = 50;
 
-const rankingList = posts => {
+// caps は各段の終端順位（累積）。[10, 25] なら 10位まで表示 + 25位まで畳み
+const rankingList = (posts, caps = [RANKING_DISPLAY_COUNT, RANKING_MAX_COUNT]) => {
   // 順位はマークアップ側で振る。CSS カウンタだと「10件で畳む」定数と
   // 二重管理になる。畳んだ側は11位から続く
   const items = (list, offset) => list.map((post, i) => postListItem(post, 'featured-posts-item', undefined, true, offset + i + 1)).join("\n");
-  // 残りが1件だけなら畳む意味がないので、そのまま出す
-  const collapses = posts.length > RANKING_DISPLAY_COUNT + 1;
-  const shown = collapses ? posts.slice(0, RANKING_DISPLAY_COUNT) : posts;
-  const hidden = collapses ? posts.slice(RANKING_DISPLAY_COUNT) : [];
-  const more = hidden.length === 0 ? '' : `
+  // 段の境界。残りが1件だけの段は畳む意味がないので前段に吸収する
+  const bounds = [];
+  for (const cap of caps) {
+    if (posts.length <= cap + 1) {
+      bounds.push(posts.length);
+      break;
+    }
+    bounds.push(cap);
+  }
+  // 2段目は「開いた人がさらに深掘りする」動線なので、1段目の details の中に入れ子にする
+  const build = idx => {
+    if (idx >= bounds.length || bounds[idx - 1] >= posts.length) return '';
+    return `
     <details class="ranking-more">
-      <summary>残り ${hidden.length}本を表示</summary>
-      <ul class="nav featured-post-link">${items(hidden, shown.length)}</ul>
+      <summary>残り ${posts.length - bounds[idx - 1]}本を表示</summary>
+      <ul class="nav featured-post-link">${items(posts.slice(bounds[idx - 1], bounds[idx]), bounds[idx - 1])}</ul>${build(idx + 1)}
     </details>`;
+  };
   return `
   <div class="widget">
-    <ul class="nav featured-post-link">${items(shown, 0)}</ul>${more}
+    <ul class="nav featured-post-link">${items(posts.slice(0, bounds[0]), 0)}</ul>${build(1)}
   </div>
   `;
 };
@@ -94,9 +108,12 @@ hexo.extend.helper.register('popular_posts', function(term='weekly') {
     })
     .filter(post => post.pv >= 0)
     .sort(compareFunc)
-    .slice(0, RANKING_MAX_COUNT);
+    .slice(0, term === 'yearly' ? RANKING_YEARLY_MAX_COUNT : RANKING_MAX_COUNT);
 
-  return rankingList(popularPosts);
+  const caps = term === 'yearly'
+    ? [RANKING_DISPLAY_COUNT, RANKING_MAX_COUNT, RANKING_YEARLY_MAX_COUNT]
+    : [RANKING_DISPLAY_COUNT, RANKING_MAX_COUNT];
+  return rankingList(popularPosts, caps);
 });
 
 hexo.extend.helper.register('sns_popular_posts', function() {
