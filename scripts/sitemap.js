@@ -19,23 +19,29 @@
  */
 
 // 種別ごとの更新頻度と優先度。従来のプラグインが出していた値をそのまま踏襲する
-const ROOT = {changefreq: 'daily', priority: '1'};
+const ROOT = { changefreq: 'daily', priority: '1' };
 const RULES = {
-  post: {changefreq: 'weekly', priority: '0.6'},
-  page: {changefreq: 'weekly', priority: '0.8'},
-  tag: {changefreq: 'weekly', priority: '0.2'},
-  category: {changefreq: 'weekly', priority: '0.2'}
+  post: { changefreq: 'weekly', priority: '0.6' },
+  page: { changefreq: 'weekly', priority: '0.8' },
+  tag: { changefreq: 'weekly', priority: '0.2' },
+  category: { changefreq: 'weekly', priority: '0.2' },
 };
 
-const XML_HEAD = '<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type="text/xsl" href="sitemap.xsl"?>\n';
-const URLSET_ATTR = 'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"'
-  + ' xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"'
-  + ' xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd"'
-  + ' xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"';
+const XML_HEAD =
+  '<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type="text/xsl" href="sitemap.xsl"?>\n';
+const URLSET_ATTR =
+  'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"' +
+  ' xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"' +
+  ' xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd"' +
+  ' xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"';
 
-const escapeXml = s => String(s)
-  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-  .replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+const escapeXml = (s) =>
+  String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
 
 /**
  * config.url の末尾スラッシュ有無に左右されないよう正規化したうえで、
@@ -47,13 +53,15 @@ const escapeXml = s => String(s)
  * index.html は末尾を落として、ディレクトリ形式の URL に揃える。
  */
 const absUrl = (base, path) => {
-  const clean = String(path).replace(/^\//, '').replace(/index\.html$/, '');
+  const clean = String(path)
+    .replace(/^\//, '')
+    .replace(/index\.html$/, '');
   return encodeURI(`${base.replace(/\/$/, '')}/${clean}`);
 };
 
-const iso = d => (d && typeof d.toISOString === 'function') ? d.toISOString() : null;
+const iso = (d) => (d && typeof d.toISOString === 'function' ? d.toISOString() : null);
 
-function urlTag({loc, lastmod, changefreq, priority}) {
+function urlTag({ loc, lastmod, changefreq, priority }) {
   const lines = [`        <loc>${escapeXml(loc)}</loc>`];
   if (lastmod) lines.push(`        <lastmod>${lastmod}</lastmod>`);
   lines.push(`        <changefreq>${changefreq}</changefreq>`);
@@ -65,59 +73,80 @@ function urlset(entries) {
   return `${XML_HEAD}<urlset ${URLSET_ATTR}>\n\n${entries.join('\n\n')}\n\n</urlset>\n`;
 }
 
-hexo.extend.generator.register('sitemap', function(locals) {
+hexo.extend.generator.register('sitemap', function (locals) {
   const base = this.config.url;
   // 子サイトマップはいずれも先頭にサイトのルートを含む（従来の出力に合わせる）
-  const root = urlTag({loc: absUrl(base, ''), ...ROOT});
+  const root = urlTag({ loc: absUrl(base, ''), ...ROOT });
 
   // 最終更新はコンテンツ側の updated を優先し、無ければ date を使う
-  const lastmodOf = item => iso(item.updated) || iso(item.date);
+  const lastmodOf = (item) => iso(item.updated) || iso(item.date);
 
   const build = (items, rule, pathOf) => {
-    const entries = items.map(item => urlTag({
-      loc: absUrl(base, pathOf(item)),
-      lastmod: lastmodOf(item),
-      ...rule
-    }));
+    const entries = items.map((item) =>
+      urlTag({
+        loc: absUrl(base, pathOf(item)),
+        lastmod: lastmodOf(item),
+        ...rule,
+      }),
+    );
     return urlset([root, ...entries]);
   };
 
   // タグ・カテゴリの最終更新は、そこに属する記事の最新日時とみなす
-  const taxonomyLastmod = taxonomy => {
+  const taxonomyLastmod = (taxonomy) => {
     const dates = taxonomy.posts.toArray().map(lastmodOf).filter(Boolean);
     return dates.length ? dates.sort().pop() : null;
   };
-  const buildTaxonomy = (items, rule) => urlset([root, ...items.map(t => urlTag({
-    loc: absUrl(base, t.path),
-    lastmod: taxonomyLastmod(t),
-    ...rule
-  }))]);
+  const buildTaxonomy = (items, rule) =>
+    urlset([
+      root,
+      ...items.map((t) =>
+        urlTag({
+          loc: absUrl(base, t.path),
+          lastmod: taxonomyLastmod(t),
+          ...rule,
+        }),
+      ),
+    ]);
 
   // 404 はサイトマップに載せるものではないため除く。
   // 従来のプラグインは pages をそのまま出しており 404.html が混ざっていた
-  const pages = locals.pages.filter(p => !/(^|\/)404\.html$/.test(p.path));
+  const pages = locals.pages.filter((p) => !/(^|\/)404\.html$/.test(p.path));
 
   const children = [
-    {path: 'post-sitemap.xml', data: build(locals.posts.toArray(), RULES.post, p => p.path)},
-    {path: 'page-sitemap.xml', data: build(pages.toArray(), RULES.page, p => p.path)},
-    {path: 'category-sitemap.xml', data: buildTaxonomy(locals.categories.toArray(), RULES.category)},
-    {path: 'tag-sitemap.xml', data: buildTaxonomy(locals.tags.toArray(), RULES.tag)}
+    { path: 'post-sitemap.xml', data: build(locals.posts.toArray(), RULES.post, (p) => p.path) },
+    { path: 'page-sitemap.xml', data: build(pages.toArray(), RULES.page, (p) => p.path) },
+    {
+      path: 'category-sitemap.xml',
+      data: buildTaxonomy(locals.categories.toArray(), RULES.category),
+    },
+    { path: 'tag-sitemap.xml', data: buildTaxonomy(locals.tags.toArray(), RULES.tag) },
   ];
 
   // 子サイトマップの lastmod は、その中で最も新しい更新日時
-  const newest = xml => {
+  const newest = (xml) => {
     const m = xml.match(/<lastmod>([^<]+)<\/lastmod>/g) || [];
-    return m.map(x => x.replace(/<\/?lastmod>/g, '')).sort().pop() || null;
+    return (
+      m
+        .map((x) => x.replace(/<\/?lastmod>/g, ''))
+        .sort()
+        .pop() || null
+    );
   };
-  const index = XML_HEAD
-    + '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n\n'
-    + children.map(c => {
-      const lm = newest(c.data);
-      return `    <sitemap>\n        <loc>${absUrl(base, c.path)}</loc>`
-        + (lm ? `\n        <lastmod>${lm}</lastmod>` : '')
-        + `\n    </sitemap>`;
-    }).join('\n\n')
-    + '\n\n</sitemapindex>\n';
+  const index =
+    XML_HEAD +
+    '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n\n' +
+    children
+      .map((c) => {
+        const lm = newest(c.data);
+        return (
+          `    <sitemap>\n        <loc>${absUrl(base, c.path)}</loc>` +
+          (lm ? `\n        <lastmod>${lm}</lastmod>` : '') +
+          `\n    </sitemap>`
+        );
+      })
+      .join('\n\n') +
+    '\n\n</sitemapindex>\n';
 
-  return [...children, {path: 'sitemap.xml', data: index}];
+  return [...children, { path: 'sitemap.xml', data: index }];
 });

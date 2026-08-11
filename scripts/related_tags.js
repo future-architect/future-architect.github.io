@@ -64,7 +64,9 @@ function family(name) {
 // 1.27 -> 1027、2024 -> 2024。桁上げを 1000 にしているのは
 // 1.9 < 1.27 を正しく扱うため（文字列比較だと逆になる）
 function versionKey(name) {
-  return VERSIONED.exec(name)[2].split('.').reduce((acc, n) => acc * 1000 + Number(n), 0);
+  return VERSIONED.exec(name)[2]
+    .split('.')
+    .reduce((acc, n) => acc * 1000 + Number(n), 0);
 }
 
 // site.tags は毎回同じなので、共起の集計は一度だけ行って使い回す
@@ -72,11 +74,11 @@ let cache = null;
 
 function build(site) {
   const postTags = new Map(); // 記事ID -> タグ名の配列
-  const total = new Map();    // タグ名 -> 記事数
-  const path = new Map();     // タグ名 -> URL のパス
+  const total = new Map(); // タグ名 -> 記事数
+  const path = new Map(); // タグ名 -> URL のパス
   const families = new Map(); // 接頭辞 -> 同じ系列のタグ名
 
-  site.tags.forEach(tag => {
+  site.tags.forEach((tag) => {
     total.set(tag.name, tag.length);
     // URL は自前で組まない。tag_map や記号の置換（Go1.18 -> tags/Go1-18）が
     // 効いており、encodeURIComponent(name) では存在しないパスになる
@@ -86,7 +88,7 @@ function build(site) {
       if (!families.has(stem)) families.set(stem, []);
       families.get(stem).push(tag.name);
     }
-    tag.posts.forEach(post => {
+    tag.posts.forEach((post) => {
       if (!postTags.has(post._id)) postTags.set(post._id, []);
       postTags.get(post._id).push(tag.name);
     });
@@ -113,12 +115,12 @@ function build(site) {
     partners.get(b).push([a, n]);
   }
 
-  return {total, path, families, partners, postCount: site.posts.length};
+  return { total, path, families, partners, postCount: site.posts.length };
 }
 
-hexo.extend.helper.register('related_tags', function(tagName) {
+hexo.extend.helper.register('related_tags', function (tagName) {
   if (!cache) cache = build(this.site);
-  const {total, path, families, partners, postCount} = cache;
+  const { total, path, families, partners, postCount } = cache;
 
   const own = total.get(tagName);
   if (!own) return [];
@@ -126,41 +128,44 @@ hexo.extend.helper.register('related_tags', function(tagName) {
   // 同じ系列のタグ。共起では見えない関係なので、件数で足切りせず先に置く
   const stem = family(tagName);
   const siblings = (stem ? families.get(stem) || [] : [])
-    .filter(name => name !== tagName)
-    .map(name => ({
+    .filter((name) => name !== tagName)
+    .map((name) => ({
       name,
       path: path.get(name),
       posts: total.get(name),
       version: versionKey(name),
-      sibling: true
+      sibling: true,
     }))
     .sort((a, b) => b.version - a.version); // 新しいバージョンを先に
-  const siblingNames = new Set(siblings.map(s => s.name));
+  const siblingNames = new Set(siblings.map((s) => s.name));
 
   // 1ページに収まるタグでは、絞り込む必要がない。スクロールすれば全部見えるので、
   // 読者が求めるのは新しい記事に出会えるタグの方。
   // 1ページを超えるタグでは、逆に絞り込めること自体に価値がある
   const allowNarrowing = own > PER_PAGE;
 
-  const rows = (partners.get(tagName) || []).map(([name, n]) => {
-    const dest = total.get(name) || 0;
-    return {
-      name,
-      path: path.get(name),
-      co: n,
-      posts: dest,
-      fresh: dest - n, // 移動先にあって、いま見ているタグには無い記事数
-      lift: (n * postCount) / (own * dest)
-    };
-  }).filter(r =>
-    !siblingNames.has(r.name) // 兄弟は上で拾っているので重複させない
-    && r.co >= MIN_CO_OCCURRENCE
-    && r.posts >= MIN_DESTINATION_POSTS
-    && (allowNarrowing || r.fresh >= MIN_NEW_POSTS)
-  );
+  const rows = (partners.get(tagName) || [])
+    .map(([name, n]) => {
+      const dest = total.get(name) || 0;
+      return {
+        name,
+        path: path.get(name),
+        co: n,
+        posts: dest,
+        fresh: dest - n, // 移動先にあって、いま見ているタグには無い記事数
+        lift: (n * postCount) / (own * dest),
+      };
+    })
+    .filter(
+      (r) =>
+        !siblingNames.has(r.name) && // 兄弟は上で拾っているので重複させない
+        r.co >= MIN_CO_OCCURRENCE &&
+        r.posts >= MIN_DESTINATION_POSTS &&
+        (allowNarrowing || r.fresh >= MIN_NEW_POSTS),
+    );
 
   // 同点は名前で決める（決着が無いとビルドごとに並びが変わる）
-  const score = r => r.co * Math.log(1 + r.lift);
+  const score = (r) => r.co * Math.log(1 + r.lift);
   rows.sort((a, b) => score(b) - score(a) || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
   return siblings.concat(rows.slice(0, MAX_CO_TAGS));
 });

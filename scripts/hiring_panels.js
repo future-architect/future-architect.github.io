@@ -47,7 +47,7 @@ function hash(str) {
   return h;
 }
 
-hexo.extend.helper.register('hiring_panels', function(post) {
+hexo.extend.helper.register('hiring_panels', function (post) {
   // 同じ記事なら常に同じパネルになるよう、パスだけを入力にする
   return [recruitPanel, contentPanels[hash(post.path) % contentPanels.length]];
 });

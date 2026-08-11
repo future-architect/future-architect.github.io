@@ -1,51 +1,64 @@
 'use strict';
 
-const {getSNSCnt,getTwitterCnt,getFacebookCnt,getHatebuCnt,getPocketCnt} = require('./lib/sns');
+const {
+  getSNSCnt,
+  getTwitterCnt,
+  getFacebookCnt,
+  getHatebuCnt,
+  getPocketCnt,
+} = require('./lib/sns');
 
 // 総投稿件数
-hexo.extend.helper.register('count_articles', function() {
+hexo.extend.helper.register('count_articles', function () {
   return this.site.posts.length;
 });
 // 年別の投稿件数
-hexo.extend.helper.register('count_articles_year', function(year) {
-  return this.site.posts.filter(post => post.date.format("YYYY") === year.toString()).length;
+hexo.extend.helper.register('count_articles_year', function (year) {
+  return this.site.posts.filter((post) => post.date.format('YYYY') === year.toString()).length;
 });
 // 年・月別の投稿件数
-hexo.extend.helper.register('count_articles_month', function(year, month) {
+hexo.extend.helper.register('count_articles_month', function (year, month) {
   let mm = month.toString().padStart(2, '0');
-  return this.site.posts.filter(post => post.date.format("YYYYMM") === year.toString() + mm).length;
+  return this.site.posts.filter((post) => post.date.format('YYYYMM') === year.toString() + mm)
+    .length;
 });
 
 // 著者に紐づく投稿件数
-hexo.extend.helper.register('count_author', function(name) {
-  return this.site.posts.filter(post => post.author === name).length;
+hexo.extend.helper.register('count_author', function (name) {
+  return this.site.posts.filter((post) => post.author === name).length;
 });
 
 // 参考: https://github.com/hexojs/hexo/issues/2189
-hexo.extend.helper.register('count_tag', function(name) {
-  return this.site.posts.filter(post => post.tags.filter(tag => tag.name === name).length > 0).length;
+hexo.extend.helper.register('count_tag', function (name) {
+  return this.site.posts.filter((post) => post.tags.filter((tag) => tag.name === name).length > 0)
+    .length;
 });
 
-hexo.extend.helper.register('count_category', function(name) {
-  return this.site.posts.filter(post => post.categories.filter(category => category.name === name).length > 0).length;
+hexo.extend.helper.register('count_category', function (name) {
+  return this.site.posts.filter(
+    (post) => post.categories.filter((category) => category.name === name).length > 0,
+  ).length;
 });
 
-hexo.extend.helper.register('join_pagetag', function(name) {
-  return this.page.tags.map(tag => tag.name).join(',');
+hexo.extend.helper.register('join_pagetag', function (name) {
+  return this.page.tags.map((tag) => tag.name).join(',');
 });
 
 /*
  * 期間ページ
  */
-hexo.extend.helper.register('summary_all_term', function() {
+hexo.extend.helper.register('summary_all_term', function () {
   const posts = this.site.posts;
 
-  const total = posts.map(post => getSNSCnt(post.permalink)).reduce((acc, cur) => acc + cur);
-  const authors = posts.map(post => post.author).flat().unique().length;
-  const tw = posts.map(post => getTwitterCnt(post.permalink)).reduce((acc, cur) => acc + cur);
-  const fb = posts.map(post => getFacebookCnt(post.permalink)).reduce((acc, cur) => acc + cur);
-  const hatebu = posts.map(post => getHatebuCnt(post.permalink)).reduce((acc, cur) => acc + cur);
-  const pocket = posts.map(post => getPocketCnt(post.permalink)).reduce((acc, cur) => acc + cur);
+  const total = posts.map((post) => getSNSCnt(post.permalink)).reduce((acc, cur) => acc + cur);
+  const authors = posts
+    .map((post) => post.author)
+    .flat()
+    .unique().length;
+  const tw = posts.map((post) => getTwitterCnt(post.permalink)).reduce((acc, cur) => acc + cur);
+  const fb = posts.map((post) => getFacebookCnt(post.permalink)).reduce((acc, cur) => acc + cur);
+  const hatebu = posts.map((post) => getHatebuCnt(post.permalink)).reduce((acc, cur) => acc + cur);
+  const pocket = posts.map((post) => getPocketCnt(post.permalink)).reduce((acc, cur) => acc + cur);
 
   return {
     total: total,
@@ -53,19 +66,22 @@ hexo.extend.helper.register('summary_all_term', function() {
     twitter: tw,
     facebook: fb,
     hatebu: hatebu,
-    pocket: pocket
+    pocket: pocket,
   };
 });
 
-hexo.extend.helper.register('summary_yearly_term', function(year) {
-  const posts = this.site.posts.filter(post => post.date.format("YYYY") == year.toString());
+hexo.extend.helper.register('summary_yearly_term', function (year) {
+  const posts = this.site.posts.filter((post) => post.date.format('YYYY') == year.toString());
 
-  const total = posts.map(post => getSNSCnt(post.permalink)).reduce((acc, cur) => acc + cur);
-  const authors = posts.map(post => post.author).flat().unique().length;
-  const tw = posts.map(post => getTwitterCnt(post.permalink)).reduce((acc, cur) => acc + cur);
-  const fb = posts.map(post => getFacebookCnt(post.permalink)).reduce((acc, cur) => acc + cur);
-  const hatebu = posts.map(post => getHatebuCnt(post.permalink)).reduce((acc, cur) => acc + cur);
-  const pocket = posts.map(post => getPocketCnt(post.permalink)).reduce((acc, cur) => acc + cur);
+  const total = posts.map((post) => getSNSCnt(post.permalink)).reduce((acc, cur) => acc + cur);
+  const authors = posts
+    .map((post) => post.author)
+    .flat()
+    .unique().length;
+  const tw = posts.map((post) => getTwitterCnt(post.permalink)).reduce((acc, cur) => acc + cur);
+  const fb = posts.map((post) => getFacebookCnt(post.permalink)).reduce((acc, cur) => acc + cur);
+  const hatebu = posts.map((post) => getHatebuCnt(post.permalink)).reduce((acc, cur) => acc + cur);
+  const pocket = posts.map((post) => getPocketCnt(post.permalink)).reduce((acc, cur) => acc + cur);
 
   return {
     total: total,
@@ -73,21 +89,24 @@ hexo.extend.helper.register('summary_yearly_term', function(year) {
     twitter: tw,
     facebook: fb,
     hatebu: hatebu,
-    pocket: pocket
+    pocket: pocket,
   };
 });
 
 // 月ページの統計。年ページ（summary_yearly_term）と同じ構成 (#2227)
-hexo.extend.helper.register('summary_monthly_term', function(year, month) {
+hexo.extend.helper.register('summary_monthly_term', function (year, month) {
   const ym = year.toString() + month.toString().padStart(2, '0');
-  const posts = this.site.posts.filter(post => post.date.format("YYYYMM") === ym);
+  const posts = this.site.posts.filter((post) => post.date.format('YYYYMM') === ym);
 
-  const total = posts.map(post => getSNSCnt(post.permalink)).reduce((acc, cur) => acc + cur);
-  const authors = posts.map(post => post.author).flat().unique().length;
-  const tw = posts.map(post => getTwitterCnt(post.permalink)).reduce((acc, cur) => acc + cur);
-  const fb = posts.map(post => getFacebookCnt(post.permalink)).reduce((acc, cur) => acc + cur);
-  const hatebu = posts.map(post => getHatebuCnt(post.permalink)).reduce((acc, cur) => acc + cur);
-  const pocket = posts.map(post => getPocketCnt(post.permalink)).reduce((acc, cur) => acc + cur);
+  const total = posts.map((post) => getSNSCnt(post.permalink)).reduce((acc, cur) => acc + cur);
+  const authors = posts
+    .map((post) => post.author)
+    .flat()
+    .unique().length;
+  const tw = posts.map((post) => getTwitterCnt(post.permalink)).reduce((acc, cur) => acc + cur);
+  const fb = posts.map((post) => getFacebookCnt(post.permalink)).reduce((acc, cur) => acc + cur);
+  const hatebu = posts.map((post) => getHatebuCnt(post.permalink)).reduce((acc, cur) => acc + cur);
+  const pocket = posts.map((post) => getPocketCnt(post.permalink)).reduce((acc, cur) => acc + cur);
 
   return {
     total: total,
@@ -95,7 +114,7 @@ hexo.extend.helper.register('summary_monthly_term', function(year, month) {
     twitter: tw,
     facebook: fb,
     hatebu: hatebu,
-    pocket: pocket
+    pocket: pocket,
   };
 });
 
@@ -104,12 +123,15 @@ hexo.extend.helper.register('summary_monthly_term', function(year, month) {
  */
 // 記事の集合に対する反響の合計。カテゴリ・タグ・絞り込み後の一覧で共用する
 function summaryOf(posts) {
-  const total = posts.map(post => getSNSCnt(post.permalink)).reduce((acc, cur) => acc + cur);
-  const authors = posts.map(post => post.author).flat().unique().length;
-  const tw = posts.map(post => getTwitterCnt(post.permalink)).reduce((acc, cur) => acc + cur);
-  const fb = posts.map(post => getFacebookCnt(post.permalink)).reduce((acc, cur) => acc + cur);
-  const hatebu = posts.map(post => getHatebuCnt(post.permalink)).reduce((acc, cur) => acc + cur);
-  const pocket = posts.map(post => getPocketCnt(post.permalink)).reduce((acc, cur) => acc + cur);
+  const total = posts.map((post) => getSNSCnt(post.permalink)).reduce((acc, cur) => acc + cur);
+  const authors = posts
+    .map((post) => post.author)
+    .flat()
+    .unique().length;
+  const tw = posts.map((post) => getTwitterCnt(post.permalink)).reduce((acc, cur) => acc + cur);
+  const fb = posts.map((post) => getFacebookCnt(post.permalink)).reduce((acc, cur) => acc + cur);
+  const hatebu = posts.map((post) => getHatebuCnt(post.permalink)).reduce((acc, cur) => acc + cur);
+  const pocket = posts.map((post) => getPocketCnt(post.permalink)).reduce((acc, cur) => acc + cur);
 
   return {
     total: total,
@@ -117,12 +139,14 @@ function summaryOf(posts) {
     twitter: tw,
     facebook: fb,
     hatebu: hatebu,
-    pocket: pocket
+    pocket: pocket,
   };
 }
 
-hexo.extend.helper.register('summary_category', function(category) {
-  return summaryOf(this.site.posts.filter(post => post.categories.map(c => c.name).includes(category)));
+hexo.extend.helper.register('summary_category', function (category) {
+  return summaryOf(
+    this.site.posts.filter((post) => post.categories.map((c) => c.name).includes(category)),
+  );
 });
 
 hexo.extend.helper.register('summary_posts', summaryOf);
@@ -130,15 +154,18 @@ hexo.extend.helper.register('summary_posts', summaryOf);
 /*
  * タグ個別ページ
  */
-hexo.extend.helper.register('summary_tag', function(category) {
-  const posts = this.site.posts.filter(post => post.tags.map(t => t.name).includes(category));
+hexo.extend.helper.register('summary_tag', function (category) {
+  const posts = this.site.posts.filter((post) => post.tags.map((t) => t.name).includes(category));
 
-  const total = posts.map(post => getSNSCnt(post.permalink)).reduce((acc, cur) => acc + cur);
-  const authors = posts.map(post => post.author).flat().unique().length;
-  const tw = posts.map(post => getTwitterCnt(post.permalink)).reduce((acc, cur) => acc + cur);
-  const fb = posts.map(post => getFacebookCnt(post.permalink)).reduce((acc, cur) => acc + cur);
-  const hatebu = posts.map(post => getHatebuCnt(post.permalink)).reduce((acc, cur) => acc + cur);
-  const pocket = posts.map(post => getPocketCnt(post.permalink)).reduce((acc, cur) => acc + cur);
+  const total = posts.map((post) => getSNSCnt(post.permalink)).reduce((acc, cur) => acc + cur);
+  const authors = posts
+    .map((post) => post.author)
+    .flat()
+    .unique().length;
+  const tw = posts.map((post) => getTwitterCnt(post.permalink)).reduce((acc, cur) => acc + cur);
+  const fb = posts.map((post) => getFacebookCnt(post.permalink)).reduce((acc, cur) => acc + cur);
+  const hatebu = posts.map((post) => getHatebuCnt(post.permalink)).reduce((acc, cur) => acc + cur);
+  const pocket = posts.map((post) => getPocketCnt(post.permalink)).reduce((acc, cur) => acc + cur);
 
   return {
     total: total,
@@ -146,6 +173,6 @@ hexo.extend.helper.register('summary_tag', function(category) {
     twitter: tw,
     facebook: fb,
     hatebu: hatebu,
-    pocket: pocket
+    pocket: pocket,
   };
 });

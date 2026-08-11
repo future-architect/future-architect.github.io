@@ -17,7 +17,7 @@
  * checkout 時刻になり、デプロイのたびに全記事が更新済み扱いになるため。
  */
 
-const {full_url_for} = require('hexo-util');
+const { full_url_for } = require('hexo-util');
 
 // テーマのリンク色（css-src/_variables.styl の color-link）。Feedly が購読画面の装飾に使う
 const ACCENT_COLOR = '258fb8';
@@ -57,7 +57,7 @@ function categoriesOf(post) {
   return post.categories.toArray().concat(post.tags.toArray());
 }
 
-function buildAtom({title, subtitle, siteUrl, feedUrl, icon, largeIcon, posts}) {
+function buildAtom({ title, subtitle, siteUrl, feedUrl, icon, largeIcon, posts }) {
   const updated = posts.length ? posts[0].date.toISOString() : new Date(0).toISOString();
   let xml = `<?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:webfeeds="http://webfeeds.org/rss/1.0">
@@ -83,14 +83,16 @@ function buildAtom({title, subtitle, siteUrl, feedUrl, icon, largeIcon, posts}) 
     <author><name>${esc(post.author || title)}</name></author>
     <content type="html">${cdata(feedContent(post.content))}</content>
     <summary type="html">${esc(summaryOf(post))}</summary>
-${categoriesOf(post).map((c) => `    <category term="${esc(c.name)}" scheme="${esc(c.permalink)}"/>`).join('\n')}
+${categoriesOf(post)
+  .map((c) => `    <category term="${esc(c.name)}" scheme="${esc(c.permalink)}"/>`)
+  .join('\n')}
   </entry>
 `;
   }
   return xml + '</feed>\n';
 }
 
-function buildRss2({title, subtitle, siteUrl, feedUrl, icon, largeIcon, posts}) {
+function buildRss2({ title, subtitle, siteUrl, feedUrl, icon, largeIcon, posts }) {
   const updated = posts.length ? posts[0].date.toDate().toUTCString() : new Date(0).toUTCString();
   let xml = `<?xml version="1.0" encoding="utf-8"?>
 <rss version="2.0"
@@ -121,18 +123,23 @@ function buildRss2({title, subtitle, siteUrl, feedUrl, icon, largeIcon, posts}) 
       <pubDate>${post.date.toDate().toUTCString()}</pubDate>
       <description>${esc(summaryOf(post))}</description>
       <content:encoded>${cdata(feedContent(post.content))}</content:encoded>
-${categoriesOf(post).map((c) => `      <category domain="${esc(c.permalink)}">${esc(c.name)}</category>`).join('\n')}
+${categoriesOf(post)
+  .map((c) => `      <category domain="${esc(c.permalink)}">${esc(c.name)}</category>`)
+  .join('\n')}
     </item>
 `;
   }
-  return xml + `  </channel>
+  return (
+    xml +
+    `  </channel>
 </rss>
-`;
+`
+  );
 }
 
 hexo.extend.generator.register('feed', (locals) => {
   const config = hexo.config;
-  const feedCfg = Object.assign({limit: 25, icon: 'feed_icon.png'}, config.feed);
+  const feedCfg = Object.assign({ limit: 25, icon: 'feed_icon.png' }, config.feed);
   const posts = locals.posts.sort('-date').toArray().slice(0, feedCfg.limit);
 
   const opts = {
@@ -146,8 +153,14 @@ hexo.extend.generator.register('feed', (locals) => {
   };
 
   const results = [
-    {path: 'atom.xml', data: buildAtom(Object.assign({feedUrl: full_url_for.call(hexo, 'atom.xml')}, opts))},
-    {path: 'rss2.xml', data: buildRss2(Object.assign({feedUrl: full_url_for.call(hexo, 'rss2.xml')}, opts))},
+    {
+      path: 'atom.xml',
+      data: buildAtom(Object.assign({ feedUrl: full_url_for.call(hexo, 'atom.xml') }, opts)),
+    },
+    {
+      path: 'rss2.xml',
+      data: buildRss2(Object.assign({ feedUrl: full_url_for.call(hexo, 'rss2.xml') }, opts)),
+    },
   ];
 
   // カテゴリ別フィード（#2294）。パスはカテゴリページ配下の
@@ -159,13 +172,15 @@ hexo.extend.generator.register('feed', (locals) => {
     const path = category.path + 'atom.xml';
     results.push({
       path,
-      data: buildAtom(Object.assign({}, opts, {
-        title: `${category.name} カテゴリ | ${config.title}`,
-        subtitle: `${category.name} カテゴリの記事一覧`,
-        siteUrl: full_url_for.call(hexo, category.path),
-        feedUrl: full_url_for.call(hexo, path),
-        posts: categoryPosts,
-      })),
+      data: buildAtom(
+        Object.assign({}, opts, {
+          title: `${category.name} カテゴリ | ${config.title}`,
+          subtitle: `${category.name} カテゴリの記事一覧`,
+          siteUrl: full_url_for.call(hexo, category.path),
+          feedUrl: full_url_for.call(hexo, path),
+          posts: categoryPosts,
+        }),
+      ),
     });
   }
 

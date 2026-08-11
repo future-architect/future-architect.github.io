@@ -23,12 +23,17 @@ const BLOCKS = [
   // ビルド時SVG化した mermaid 図（#1955）。foreignObject 内のラベルを数えない
   /<svg\b[\s\S]*?<\/svg>/gi,
   /<script\b[\s\S]*?<\/script>/gi,
-  /<style\b[\s\S]*?<\/style>/gi
+  /<style\b[\s\S]*?<\/style>/gi,
 ];
 
 const ENTITIES = {
-  '&nbsp;': ' ', '&amp;': '&', '&lt;': '<', '&gt;': '>',
-  '&quot;': '"', '&#39;': "'", '&apos;': "'"
+  '&nbsp;': ' ',
+  '&amp;': '&',
+  '&lt;': '<',
+  '&gt;': '>',
+  '&quot;': '"',
+  '&#39;': "'",
+  '&apos;': "'",
 };
 
 function countChars(html) {
@@ -42,7 +47,7 @@ function countChars(html) {
   // 残った要素を落とす。ブロック要素は前後が繋がらないよう空白に置き換える
   text = text.replace(/<[^>]*>/g, ' ');
 
-  text = text.replace(/&(?:nbsp|amp|lt|gt|quot|#39|apos);/g, m => ENTITIES[m]);
+  text = text.replace(/&(?:nbsp|amp|lt|gt|quot|#39|apos);/g, (m) => ENTITIES[m]);
   // 上で拾えなかった数値参照・名前付き参照はまとめて1文字とみなす
   text = text.replace(/&#?\w+;/g, '*');
 

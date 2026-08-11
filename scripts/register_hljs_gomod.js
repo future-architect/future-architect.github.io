@@ -24,44 +24,44 @@
 
 const hljs = require('highlight.js');
 
-hljs.registerLanguage('gomod', function() {
+hljs.registerLanguage('gomod', function () {
   return {
     name: 'Go Module',
     aliases: ['go.mod', 'gowork', 'go.work'],
     case_insensitive: false,
     keywords: {
-      keyword: 'module go require replace exclude retract toolchain tool godebug use'
+      keyword: 'module go require replace exclude retract toolchain tool godebug use',
     },
     contains: [
       hljs.COMMENT('//', '$'),
       {
         // v1.19.0 / v2.0.0-rc.1 / v0.0.0-20240101120000-abcdef123456 / v1.0.0+incompatible
         className: 'type',
-        begin: /\bv\d+\.\d+\.\d+(?:-[\w.]+(?:-[0-9a-f]+)?)?(?:\+incompatible)?\b/
+        begin: /\bv\d+\.\d+\.\d+(?:-[\w.]+(?:-[0-9a-f]+)?)?(?:\+incompatible)?\b/,
       },
       {
         // モジュールパス。ホスト名を含む形（github.com/foo/bar）だけを拾い、
         // 単なる単語を巻き込まないようにする
         className: 'string',
-        begin: /\b[\w.-]+\.[a-z]{2,}(?:\/[\w.~-]+)+/
+        begin: /\b[\w.-]+\.[a-z]{2,}(?:\/[\w.~-]+)+/,
       },
       {
         // toolchain go1.27.0 のようなツールチェイン名。
         // 先に拾わないと、後続の数値ルールが「27.0」だけを掴んでしまう
         className: 'number',
-        begin: /\bgo\d+\.\d+(?:\.\d+)?(?:rc\d+|beta\d+)?\b/
+        begin: /\bgo\d+\.\d+(?:\.\d+)?(?:rc\d+|beta\d+)?\b/,
       },
       {
         // replace の矢印
         className: 'operator',
-        begin: /=>/
+        begin: /=>/,
       },
       {
         // go 1.27 や toolchain の数値
         className: 'number',
-        begin: /\b\d+\.\d+(?:\.\d+)?\b/
-      }
-    ]
+        begin: /\b\d+\.\d+(?:\.\d+)?\b/,
+      },
+    ],
   };
 });
 
@@ -71,7 +71,9 @@ hljs.registerLanguage('gomod', function() {
 // ビルドを失敗させて気づけるようにする
 const alias = require('hexo-util/highlight_alias.json');
 if (!alias || !alias.aliases || !Array.isArray(alias.languages)) {
-  throw new Error('hexo-util の highlight_alias.json の形が想定と異なる。gomod の登録方法を見直すこと');
+  throw new Error(
+    'hexo-util の highlight_alias.json の形が想定と異なる。gomod の登録方法を見直すこと',
+  );
 }
 if (!alias.languages.includes('gomod')) alias.languages.push('gomod');
 for (const name of ['gomod', 'go.mod', 'gowork', 'go.work']) {

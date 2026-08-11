@@ -8,12 +8,12 @@ const { imageSize } = require('image-size');
 
 const currentDir = process.cwd();
 
-hexo.extend.helper.register("image_size_attribute", (path) => {
+hexo.extend.helper.register('image_size_attribute', (path) => {
   if (!path) {
-    return '';   // pathが未定義の場合や空の場合は空文字を返す
+    return ''; // pathが未定義の場合や空の場合は空文字を返す
   }
 
-  const fullPath = currentDir + "/source/" + path;
+  const fullPath = currentDir + '/source/' + path;
   const buffer = readFileSync(fullPath);
   const dimensions = imageSize(buffer);
 

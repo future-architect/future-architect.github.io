@@ -2,8 +2,8 @@
 
 // markdown-itのインスタンスを初期化
 var md = require('markdown-it')({
-  html: true,      // HTMLタグを許可
-  linkify: true,   // URLのようなテキストを自動でリンクに変換
+  html: true, // HTMLタグを許可
+  linkify: true, // URLのようなテキストを自動でリンクに変換
 });
 
 /**
@@ -25,25 +25,25 @@ function renderFootnotes(text) {
   const reFootnoteIndex = /\[\^([\w-]+)\]/g;
 
   // 1. インライン形式の脚注 [^name](content) を処理
-  text = text.replace(reInlineFootnote, function(match, name, content) {
+  text = text.replace(reInlineFootnote, function (match, name, content) {
     footnotesByName[name] = { content: content.trim() };
     return '[^' + name + ']'; // 本文からは内容を削除し、参照のみ残す
   });
 
   // 2. 脚注の定義部分 [^name]: content を処理
-  text = text.replace(reFootnoteContent, function(match, name, content) {
+  text = text.replace(reFootnoteContent, function (match, name, content) {
     footnotesByName[name] = { content: content.trim() };
     return ''; // 本文から脚注定義を削除
   });
 
   // 3. 本文中の脚注参照をスキャンし、出現順のリストを作成
   const seen = {};
-  text.replace(reFootnoteIndex, function(match, name) {
+  text.replace(reFootnoteIndex, function (match, name) {
     // 未処理かつ定義が存在する脚注のみをリストに追加
     if (!seen[name] && footnotesByName[name]) {
       orderedFootnotes.push({
         name: name,
-        content: footnotesByName[name].content
+        content: footnotesByName[name].content,
       });
       seen[name] = true;
     }
@@ -56,7 +56,7 @@ function renderFootnotes(text) {
   }
 
   // 4. 本文中の脚注参照 [^name] をHTMLタグに置換
-  text = text.replace(reFootnoteIndex, function(match, name) {
+  text = text.replace(reFootnoteIndex, function (match, name) {
     let index = -1;
     for (let i = 0; i < orderedFootnotes.length; i++) {
       if (orderedFootnotes[i].name === name) {
@@ -72,7 +72,7 @@ function renderFootnotes(text) {
   });
 
   // 5. 脚注リストのHTMLを生成
-  orderedFootnotes.forEach(function(footNote, i) {
+  orderedFootnotes.forEach(function (footNote, i) {
     const index = i + 1; // 脚注番号は1から始まる連番
     html += `<li id="fn:${footNote.name}">`;
     html += `<span style="vertical-align: top; padding-right: 10px;">${index}.</span>`;
@@ -94,7 +94,7 @@ function renderFootnotes(text) {
 }
 
 // Hexoフィルターに登録
-hexo.extend.filter.register('before_post_render', function(data) {
+hexo.extend.filter.register('before_post_render', function (data) {
   if (data.layout === 'post' || data.layout === 'page') {
     data.content = renderFootnotes(data.content);
   }

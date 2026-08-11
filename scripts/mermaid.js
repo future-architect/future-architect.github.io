@@ -23,7 +23,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const {fenceRegExp, hashOf, CACHE_DIR} = require('./lib/mermaid');
+const { fenceRegExp, hashOf, CACHE_DIR } = require('./lib/mermaid');
 
 // hexo-mermaid-lastest 1.1.1 が付けていたものと同一（フォールバックの挙動を変えない）
 const MERMAID_SCRIPT = `<script type="module"> import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';	mermaid.initialize({startOnLoad: true, flowchart: {curve: 'linear'}}); </script>`;
@@ -39,29 +39,37 @@ function readSvg(hash) {
   return fs.existsSync(file) ? fs.readFileSync(file, 'utf8').trim() : null;
 }
 
-hexo.extend.filter.register('before_post_render', (data) => {
-  if (ignore(data)) return;
-  let matched = false;
-  let missing = 0;
-  data.content = data.content.replace(fenceRegExp(), (raw, start, quote, lang, source, endQuote, end) => {
-    matched = true;
-    const hash = hashOf(source);
-    if (!fs.existsSync(path.join(CACHE_DIR, `${hash}.svg`))) missing++;
-    return `${start}<pre class="mermaid" data-mermaid="${hash}">${source}</pre>${end}`;
-  });
-  if (matched) {
-    data.content += `\n\n${MERMAID_SCRIPT}`;
-  }
-  // SVG化し忘れはフォールバックで表示できてしまい気づけないため、ここで知らせる。
-  // このフィルタは新規・編集した記事のレンダリング時に必ず通る
-  // （db.json にキャッシュ済みの記事では出ないが、書いた本人の環境では必ず出る）
-  if (missing > 0) {
-    hexo.log.warn(
-      'mermaid: %s に SVG キャッシュ未生成の図が %d 件あります。`make mermaid` を実行してコミットしてください（それまではブラウザ描画で表示されます）',
-      data.source, missing
+hexo.extend.filter.register(
+  'before_post_render',
+  (data) => {
+    if (ignore(data)) return;
+    let matched = false;
+    let missing = 0;
+    data.content = data.content.replace(
+      fenceRegExp(),
+      (raw, start, quote, lang, source, endQuote, end) => {
+        matched = true;
+        const hash = hashOf(source);
+        if (!fs.existsSync(path.join(CACHE_DIR, `${hash}.svg`))) missing++;
+        return `${start}<pre class="mermaid" data-mermaid="${hash}">${source}</pre>${end}`;
+      },
     );
-  }
-}, 9);
+    if (matched) {
+      data.content += `\n\n${MERMAID_SCRIPT}`;
+    }
+    // SVG化し忘れはフォールバックで表示できてしまい気づけないため、ここで知らせる。
+    // このフィルタは新規・編集した記事のレンダリング時に必ず通る
+    // （db.json にキャッシュ済みの記事では出ないが、書いた本人の環境では必ず出る）
+    if (missing > 0) {
+      hexo.log.warn(
+        'mermaid: %s に SVG キャッシュ未生成の図が %d 件あります。`make mermaid` を実行してコミットしてください（それまではブラウザ描画で表示されます）',
+        data.source,
+        missing,
+      );
+    }
+  },
+  9,
+);
 
 hexo.extend.filter.register('after_render:html', (str) => {
   if (typeof str !== 'string' || str.indexOf('data-mermaid="') === -1) return str;
@@ -71,7 +79,7 @@ hexo.extend.filter.register('after_render:html', (str) => {
       const svg = readSvg(hash);
       if (svg === null) return block; // フォールバック: 従来どおりブラウザで描画
       return `<div class="mermaid-svg" data-mermaid="${hash}">${svg}</div>`;
-    }
+    },
   );
   // 全図をSVG化できたページでは mermaid.js の読み込み自体が不要になる
   if (out.indexOf('<pre class="mermaid"') === -1) {

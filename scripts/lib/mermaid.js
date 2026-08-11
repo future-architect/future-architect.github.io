@@ -48,8 +48,8 @@ function toKrokiSource(source) {
   }
   if (typeof fm !== 'object' || fm === null) fm = {};
   fm.config = Object.assign({}, fm.config);
-  fm.config.flowchart = Object.assign({curve: 'linear'}, fm.config.flowchart);
+  fm.config.flowchart = Object.assign({ curve: 'linear' }, fm.config.flowchart);
   return `---\n${yaml.dump(fm)}---\n${source.slice(m[0].length)}`;
 }
 
-module.exports = {fenceRegExp, hashOf, toKrokiSource, CACHE_DIR};
+module.exports = { fenceRegExp, hashOf, toKrokiSource, CACHE_DIR };

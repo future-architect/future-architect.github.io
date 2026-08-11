@@ -1,6 +1,6 @@
 'use strict';
 
-const {getSNSCnt} = require('./sns');
+const { getSNSCnt } = require('./sns');
 
 /**
  * 記事リストの li マークアップを組み立てる。
@@ -14,18 +14,16 @@ const {getSNSCnt} = require('./sns');
  */
 
 // 反響が0のときは何も出さない。0と表示されると寂しく見えるため
-const snsLabel = permalink => {
+const snsLabel = (permalink) => {
   const n = getSNSCnt(permalink);
   return n > 0 ? `<span class="snscount">&#9825;${n}</span>` : '';
 };
 
 // 公開から30日以内なら NEW を付ける
-const newLabel = date => {
+const newLabel = (date) => {
   const threshold = new Date();
   threshold.setDate(threshold.getDate() - 30);
-  return threshold.toISOString() <= date.toISOString()
-    ? `<span class="newitem">NEW</span>`
-    : '';
+  return threshold.toISOString() <= date.toISOString() ? `<span class="newitem">NEW</span>` : '';
 };
 
 /**
@@ -38,9 +36,10 @@ const newLabel = date => {
 const postListItem = (post, itemClass, titleAttr, withThumb = false, rank = null) => {
   const attr = (titleAttr === undefined ? post.lede : titleAttr) || '';
   const rankLabel = rank === null ? '' : `<span class="post-list-rank">${rank}</span>`;
-  const body = `<a href="/${post.path}" title="${attr}">${post.title}</a>`
-    + `${newLabel(post.date)}`
-    + `<span class="post-meta"><span class="post-meta-date">${post.date.format('YYYY.MM.DD')}</span>${snsLabel(post.permalink)}</span>`;
+  const body =
+    `<a href="/${post.path}" title="${attr}">${post.title}</a>` +
+    `${newLabel(post.date)}` +
+    `<span class="post-meta"><span class="post-meta-date">${post.date.format('YYYY.MM.DD')}</span>${snsLabel(post.permalink)}</span>`;
   if (!withThumb) {
     return `<li class="${itemClass}">${rankLabel}${body}</li>`;
   }
@@ -52,4 +51,4 @@ const postListItem = (post, itemClass, titleAttr, withThumb = false, rank = null
   return `<li class="${itemClass} post-list-item-thumb">${rankLabel}${thumb}<div class="post-list-body">${body}</div></li>`;
 };
 
-module.exports = {snsLabel, newLabel, postListItem};
+module.exports = { snsLabel, newLabel, postListItem };
