@@ -151,7 +151,7 @@ Redmineのリポジトリタブを選択して以下のような画面が表示�
 
 [Github](https://github.com/future-architect/redmine_gitlab_adapter)からダウンロード可能ですのでぜひお試しください。Pull Requestもお待ちしております。
 
-----------------------------
+---
 **TIGコアテクノロジーユニット**
 
 TIGコアテクノロジーユニットでは、現在チームメンバーを募集しています。
