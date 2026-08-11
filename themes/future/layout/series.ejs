@@ -1,0 +1,60 @@
+<div class="container">
+  <%- partial('_partial/breadcrumb', {items: [
+        {label: 'ホーム', url: '/'},
+        {label: '連載'}
+      ]}) %>
+
+  <section id="main" class="margin-top-30">
+
+    <h1 class="list-page margin-bottom-20">連載一覧</h1>
+
+    <%# 統計は h1 直下。/tags/・/categories/ と同じ流儀 (#2211) %>
+    <% const series = all_series(); %>
+    <ul class="summary">
+      <li><span class="summary-count"><%= series.length %></span><br><span class="summary-label">連載数</span></li>
+      <li><span class="summary-count"><%= series.reduce((sum, s) => sum + s.total, 0) %></span><br><span class="summary-label">投稿</span></li>
+    </ul>
+
+    <%# h1「連載一覧」と重ならない語にする（categories.ejs の流儀） %>
+    <%- partial('_partial/section-heading', {id: 'series', text: 'すべての連載'}) %>
+    <p class="section-note">※最終更新の年ごとに、更新が新しい順。リンク先は各連載の索引記事です</p>
+    <%# 最終更新の年ごとに枠で束ねる。枠と小ラベルは詳細ページの
+        「累計/直近1年」パネル（summary-panel）と同じ見た目に揃える %>
+    <% const byYear = new Map(); %>
+    <% series.forEach(function(s){
+         const y = date(s.latest, 'YYYY');
+         if (!byYear.has(y)) byYear.set(y, []);
+         byYear.get(y).push(s);
+       }); %>
+    <% const years = [...byYear.keys()]; %>
+    <% years.forEach(function(year, yi){ %>
+    <section class="summary-panel series-year <%= yi === years.length - 1 ? 'footer-gap' : '' %>">
+      <span class="summary-panel-label"><%= year %>年</span>
+      <%# .series-panels がパネルの横並びレイアウトを持つ（トップの「連載から探す」と同じ部品） %>
+      <div class="series-panels row g-4">
+        <% byYear.get(year).forEach(function(s){ %>
+        <div class="col-12 col-md-6 col-lg-4">
+          <div class="article-card series-panel h-100">
+            <% if (s.index.thumbnail) { %>
+            <a href="<%- url_for(s.index.path) %>" title="<%= s.name %>" class="img_wrap panel-thumb">
+              <img src="<%= s.index.thumbnail %>" alt="" width="200" height="135" loading="lazy">
+            </a>
+            <% } else { %>
+            <%# サムネの無い連載は同じ大きさの空き枠で行頭を揃える（post_list.js と同じ流儀） %>
+            <span class="panel-thumb panel-thumb-empty"></span>
+            <% } %>
+            <div class="panel-body">
+              <a href="<%- url_for(s.index.path) %>" class="panel-title"><%= s.name %></a>
+              <%# 期間は連載の活動期間（初回〜最新）。単月で終わった連載は1つだけ名乗る %>
+              <% const first = date(s.first, 'YYYY.MM'); const latest = date(s.latest, 'YYYY.MM'); %>
+              <div class="panel-meta">全<%= s.total %>本・<%= first === latest ? first : first + ' 〜 ' + latest %></div>
+            </div>
+          </div>
+        </div>
+        <% }) %>
+      </div>
+    </section>
+    <% }) %>
+
+  </section>
+</div>
