@@ -194,7 +194,7 @@ docker run -it --rm -p "8000:8000" pytest
 
 うまくいきました。manylinux1であれば、distrolessでも動作することが確認できました。機械学習系もそこそこいけるんじゃないでしょうか？
 
-<img src="/images/2020/20200514/1.png" alt="フューチャーのロゴ画像を表示したブラウザ" widht="1684" height="1202" loading="lazy" class="img-middle-size">
+<img src="/images/2020/20200514/1.png" alt="フューチャーのロゴ画像を表示したブラウザ" width="1684" height="1202" loading="lazy" class="img-middle-size">
 
 ## まとめ
 

@@ -14,7 +14,7 @@ author: 山本竜玄
 lede: "PostgreSQL 18の新機能と、あわせて基礎的な使い方まで記載します。"
 ---
 
-<img src="/images/2025/20251008a/top.jpg" alt="" width="800" heihgt="664">
+<img src="/images/2025/20251008a/top.jpg" alt="" width="800" height="664">
 
 本記事は、[PostgreSQL18連載](/articles/20251006a/)の2本目の記事です。
 
