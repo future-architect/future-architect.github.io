@@ -122,7 +122,7 @@ func main() {
 
 結果として、この対応以降は同様のTCP通信が確立できなくなる事象は発生しておらず、期待した動作を得ることができました。
 
-<img src="/images/2022/20220607a/after.png" alt="毎回TCPコネクションをオープン・クローズする" width="872" height="462" loading="lazy">
+<img src="/images/2022/20220607a/after.png" alt="毎回TCPコネクションをオープン・クローズする" width="696" height="564" loading="lazy">
 
 ## まとめ
 

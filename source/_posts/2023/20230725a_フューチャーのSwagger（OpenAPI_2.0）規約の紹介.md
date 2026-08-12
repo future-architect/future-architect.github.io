@@ -15,7 +15,7 @@ author: 真野隼記
 lede: "フューチャーの有志メンバーでSwagger（OpenAPI Specification Version 2.0）のコーディング規約を作りました。"
 ---
 
-<img src="/images/2023/20230725a/top.png" alt="" width="409" height="11" loading="lazy">
+<img src="/images/2023/20230725a/top.png" alt="" width="409" height="118" loading="lazy">
 
 ## はじめに
 

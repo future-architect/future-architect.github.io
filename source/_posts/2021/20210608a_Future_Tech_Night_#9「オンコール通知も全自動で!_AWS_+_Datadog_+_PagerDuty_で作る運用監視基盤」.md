@@ -47,7 +47,7 @@ lede: "「オンコール通知も全自動で! AWS + Datadog + PagerDuty で作
 
 <img src="/images/2021/20210608a/image_7.png" alt="Datadog" width="1200" height="492" loading="lazy">
 
-<img src="/images/2021/20210608a/image_8.png" alt="PagerDuty" width="120" height="285" loading="lazy">
+<img src="/images/2021/20210608a/image_8.png" alt="PagerDuty" width="1200" height="285" loading="lazy">
 
 ## まとめ
 

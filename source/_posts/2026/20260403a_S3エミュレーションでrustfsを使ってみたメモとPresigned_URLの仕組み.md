@@ -80,7 +80,7 @@ volumes:
 
 管理画面は動作も軽快だしなかなか良いですね。今まで触ったことのあるウェブを使ったファイル管理画面の中では一番スピードが速くて体験が良いですね。
 
-<img src="/images/2026/20260403a/screenshot_console.png" alt="" width="1200" height="816" loading="lazy">
+<img src="/images/2026/20260403a/screenshot_console.png" alt="" width="1137" height="713" loading="lazy">
 
 ## Presigned URL
 
@@ -129,7 +129,7 @@ volumes:
 
 サービスにアクセスするのに使うURLに「誰が」というのを明らかにするキーIDと期限が付与されて、シークレットアクセスキーを使って署名されます。署名されているので期限や誰が、といった情報の改ざんは許しません。
 
-<img src="/images/2026/20260403a/screenshot_presigned_url.png" alt="スクリーンショット 2026-03-31 18.26.14.png" width="1200" height="523" loading="lazy">
+<img src="/images/2026/20260403a/screenshot_presigned_url.png" alt="スクリーンショット 2026-03-31 18.26.14.png" width="656" height="361" loading="lazy">
 
 クライアントはそのURLを使ってS3からファイルをダウンロードしたり、ファイルをアップロードします。S3(ここではrustfs)はその署名をみて、改竄されていないことの確認とともに、誰が署名したのかを確認します。ブラウザ自身はクレデンシャルを持っていなくても、その署名をもとにして認可制御が行われ、読み書きが成功するという流れです。
 

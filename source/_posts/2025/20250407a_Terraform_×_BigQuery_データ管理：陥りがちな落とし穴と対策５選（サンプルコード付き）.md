@@ -15,7 +15,7 @@ author: 大前七奈
 lede: "Terraformは、インフラ構築をコードで管理できる強力なツールですが、BigQueryのデータ管理においては、特有の課題に直面することがあります。本記事では、TerraformでBigQueryを扱う際に陥りやすい落とし穴と、データ管理の品質を高めるための対策について、サンプルコードを交えながら解説します。"
 ---
 
-<img src="/images/2025/20250407a/terraform_bigquery.png" alt="" width="800" height="411">
+<img src="/images/2025/20250407a/terraform_bigquery.png" alt="" width="800" height="441">
 
 [Terraform 連載2025](/articles/20250331a/)の5日目です。
 

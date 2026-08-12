@@ -13,7 +13,7 @@ thumbnail: /images/2021/20210713a/thumbnail.png
 author: 伊藤真彦
 lede: "2021/6/25（金）にFuture Tech Night #12～Goで始めるサーバレスファーストという選択肢～を開催しました。私はサーバレスの概要から実際に業務でサーバレスアーキテクチャを行っての経験談をお話ししました。"
 ---
-<img src="/images/2021/20210713a/top.png" alt="" width="600" height="281" loading="lazy">
+<img src="/images/2021/20210713a/top.png" alt="" width="500" height="281" loading="lazy">
 
 TIGの伊藤真彦です。
 

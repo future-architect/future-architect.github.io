@@ -120,7 +120,7 @@ AWSの認定試験ではよく変な日本語の問題があるとよく言わ�
 
 AWS認定試験に合格すると、いくつかの特典を受けることができます。
 
-<img src="/images/2021/20210818b/image.png" alt="合格後の特典" width="425" height="136" loading="lazy">
+<img src="/images/2021/20210818b/image.png" alt="合格後の特典" width="425" height="146" loading="lazy">
 
 * 50％ Discount on your next Exam
   * 次回受ける認定試験の受験料が半額となる。

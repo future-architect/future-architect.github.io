@@ -104,11 +104,11 @@ Spring Initializrを使ってSpring Nativeを依存関係に追加してプロ�
 
 ### コンテナを走らせる。
 
-<img src="/images/2021/20210909a/image_2.png" alt="image.png" width="1200" height="765" loading="lazy">
+<img src="/images/2021/20210909a/image_2.png" alt="image.png" width="1200" height="465" loading="lazy">
 
 0.076秒で起動しました。
 
-<img src="/images/2021/20210909a/image_3.png" alt="image.png" width="1200" height="642" loading="lazy" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;">
+<img src="/images/2021/20210909a/image_3.png" alt="image.png" width="1200" height="245" loading="lazy" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;">
 
 動いているようです。
 

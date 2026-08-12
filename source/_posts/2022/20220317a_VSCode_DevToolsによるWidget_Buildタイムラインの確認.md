@@ -116,7 +116,7 @@ class PageState extends State<Page> with TickerProviderStateMixin {
 
 画面はこのようになります。Overlayされたグラフの上段がRaster(GPU)スレッド, 下段がUIスレッドを表しています。16msおきに補助ラインが引かれていますが、[おおよそ16msを超えるFrameは描画されずにJankとなります](https://docs.flutter.dev/perf/rendering/ui-performance#interpreting-the-graphs)。UIスレッド側に多くのJankが見られることから、この実装には課題がありそうだと分かります。
 
-<img src="/images/2022/20220317a/83854e5c-c719-6331-6f55-ef03e48c3359.gif" alt="" width="560" height="2000" loading="lazy">
+<img src="/images/2022/20220317a/83854e5c-c719-6331-6f55-ef03e48c3359.gif" alt="" width="960" height="2000" loading="lazy">
 
 Frame実行時間のタイムラインを見ても、UIグラフに赤色のJank（slow frame）が多くなっています。
 <img src="/images/2022/20220317a/test1.png" alt="test1.png" width="1200" height="141" loading="lazy">

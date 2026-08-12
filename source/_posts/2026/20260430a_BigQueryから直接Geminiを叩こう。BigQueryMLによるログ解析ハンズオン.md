@@ -117,7 +117,7 @@ endpoint = 'gemini-2.5-flash'
 
 クエリを実行すると、指定したデータセットの直下にモデルが作成されます。
 
-<img src="/images/2026/20260430a/モデル.png" alt="モデル" width="600" height="388" loading="lazy">
+<img src="/images/2026/20260430a/モデル.png" alt="モデル" width="1200" height="676" loading="lazy">
 
 ## モデルの利用
 

@@ -35,7 +35,7 @@ MONETマーケットプレイスでは、APIを利用するために、APIキー
 
 **X-MONET-APIKey**を用いたAPIの認証ができていれば、あとは各商品ページのエンドポイントの情報を元にAPIを利用していくだけです。
 （APIの利用・認証の詳しい手順については、MONETマーケットプレイスの[ディベロッパーガイド](https://developer.monet-technologies.co.jp/docs?tab=service-2)を参照ください）。。
-<img src="/images/2021/20210517a/api_endpoint.png" alt="API定義画面" width="532" height="552" loading="lazy">
+<img src="/images/2021/20210517a/api_endpoint.png" alt="API定義画面" width="907" height="889" loading="lazy">
 
 ## APIを使ってアプリを作成
 

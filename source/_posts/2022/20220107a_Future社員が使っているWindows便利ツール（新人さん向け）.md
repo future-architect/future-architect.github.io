@@ -22,7 +22,7 @@ lede: "2020年4月入社の青柳です。タイトルにある通り便利ツ�
 
 ## everything
 
-<img src="/images/2022/20220107a/everything2.gif" alt="everything" width="1160" height="428" loading="lazy">
+<img src="/images/2022/20220107a/everything2.gif" alt="everything" width="634" height="428" loading="lazy">
 
 https://forest.watch.impress.co.jp/library/software/everything/
 
