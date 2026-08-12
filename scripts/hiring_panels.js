@@ -4,7 +4,7 @@
 // スクロール量を抑えるため2枠だけ表示する。1枠目は採用ページ固定で、
 // 2枠目はオウンドメディア2種から記事ごとに1つを選ぶ。
 // ガイドライン類は採用コマーシャルではないのでここには出さず、
-// /guidelines/ のポータルが入口を担う (#2295)
+// /specials/guidelines/ のポータルが入口を担う (#2295)
 
 const recruitPanel = {
   url: 'https://www.future.co.jp/recruit/recruit/rec-career/',

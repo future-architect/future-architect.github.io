@@ -156,4 +156,8 @@ bootstrap-subset → metronic → theme-styles.styl の順で `/css/site.css` �
 ## その他
 
 - URL の付け替え（タグ→カテゴリの統合、タグの名寄せ）は `_config.yml` の `alias` に記述する
+- **特設・固定ページはルート直下に置かず `/specials/` 配下に切る**（#2344）。
+  GitHub Pages のプロジェクトサイトが `future-architect.github.io/<リポジトリ名>/` に生えるため、
+  ルート直下のパスは将来のリポジトリ名と衝突しうる（/arch-guidelines/ 等は既に別リポジトリが占有）。
+  `tags/` `categories/` 等の既存コア機能パスは既得として維持する
 - 画像圧縮は pngquant / jpegoptim（`jpegoptimall.bat`）を月次で回す運用。詳細は README.md
