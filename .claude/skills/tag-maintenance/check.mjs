@@ -1,7 +1,8 @@
 // source/_data/tag_ontology.yml の整合性チェック (#2292)
 //
-// エラー（exit 1）: broader 先の未登録、循環
-// 情報: 使われていないノード、高頻度なのに未登録のタグ、統合候補（ほぼ重複）
+// エラー（exit 1）: broader / versionOf 先の未登録、循環
+// 情報: 使われていないノード、高頻度なのに未登録のタグ、統合候補（ほぼ重複）、
+//       バージョン同義の導出結果（scripts/version_tags.js と同じ規則。誤爆の目視確認用）
 //
 // 実行: node .claude/skills/tag-maintenance/check.mjs
 import fs from 'node:fs';
@@ -40,8 +41,13 @@ for (const year of fs.readdirSync(postsDir)) {
 const errors = [];
 const infos = [];
 
-// ---- 1) broader 先が未登録 ----
+// ---- 1) broader / versionOf 先が未登録 ----
 for (const [name, node] of Object.entries(ontology)) {
+  if (node && typeof node.versionOf === 'string') {
+    // versionOf ノードは同義先に吸収されるので broader を持たない
+    if (!(node.versionOf in ontology)) errors.push(`${name}: versionOf 先「${node.versionOf}」が未登録`);
+    continue;
+  }
   const broader = node && node.broader;
   if (!Array.isArray(broader)) {
     errors.push(`${name}: broader が配列でない（根タグは broader: [] と書く）`);
@@ -76,15 +82,38 @@ for (const name of Object.keys(ontology)) {
   }
 }
 
-// ---- 4) 高頻度なのに未登録（増分追記の候補）----
+// ---- 4) バージョン同義の導出（scripts/version_tags.js と同じ規則）----
+// 誤爆（数字込みで別概念の名前）が現れていないか目視確認するために全ペアを出す
+const VERSIONED = /^(.+?)(\d+(?:\.\d+)+|\d{2,})$/;
+const stemOf = name => {
+  const node = ontology[name];
+  if (node && node.notVersion) return null;
+  if (node && node.versionOf) return node.versionOf;
+  const m = VERSIONED.exec(name);
+  if (!m) return null;
+  return tagPosts.has(m[1]) ? m[1] : null;
+};
+const versionsByStem = new Map();
+for (const t of tagPosts.keys()) {
+  const stem = stemOf(t);
+  if (!stem || stem === t) continue;
+  if (!versionsByStem.has(stem)) versionsByStem.set(stem, []);
+  versionsByStem.get(stem).push(t);
+}
+for (const [stem, versions] of [...versionsByStem.entries()].sort((a, b) => b[1].length - a[1].length)) {
+  infos.push(`バージョン同義: ${stem} ⇐ ${versions.sort().join('、')}（版違いでなければ notVersion: true で除外する）`);
+}
+
+// ---- 5) 高頻度なのに未登録（増分追記の候補）----
+// バージョンタグは同義展開で語幹に吸収されるので、登録を求めない
 const unregistered = [...tagPosts.entries()]
-  .filter(([t, posts]) => posts.length >= REGISTER_THRESHOLD && !(t in ontology))
+  .filter(([t, posts]) => posts.length >= REGISTER_THRESHOLD && !(t in ontology) && !stemOf(t))
   .sort((a, b) => b[1].length - a[1].length);
 for (const [t, posts] of unregistered) {
   infos.push(`未登録: ${t}（${posts.length}記事）。broader を判断して tag_ontology.yml に追記する`);
 }
 
-// ---- 5) 統合候補（ほぼ重複、オントロジー上の祖先関係は除外）----
+// ---- 6) 統合候補（ほぼ重複、オントロジー上の祖先関係は除外）----
 const ancestors = name => {
   const acc = new Set();
   const queue = [name];
