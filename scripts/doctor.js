@@ -268,6 +268,24 @@ hexo.extend.helper.register('doctor_ontology', function() {
     }
   }
 
+  // バージョン同義（scripts/version_tags.js と同じ規則）。語幹ノードに「版」として出す
+  const VERSIONED = /^(.+?)(\d+(?:\.\d+)+|\d{2,})$/;
+  const stemOf = name => {
+    const node = ontology[name];
+    if (node && node.notVersion) return null;
+    if (node && node.versionOf) return node.versionOf;
+    const m = VERSIONED.exec(name);
+    if (!m) return null;
+    return tagInfo.has(m[1]) ? m[1] : null;
+  };
+  const versionsByStem = new Map();
+  for (const name of tagInfo.keys()) {
+    const stem = stemOf(name);
+    if (!stem || stem === name) continue;
+    if (!versionsByStem.has(stem)) versionsByStem.set(stem, []);
+    versionsByStem.get(stem).push(name);
+  }
+
   // 系統（自分＋子孫）のユニーク記事数。複数親経由で同じ記事を
   // 二重に数えないよう、本数ではなく記事IDの集合で持つ
   const familyMemo = new Map();
@@ -291,13 +309,18 @@ hexo.extend.helper.register('doctor_ontology', function() {
       posts: info ? info.ids.size : 0,
       family: familyIds(name, new Set([name])).size,
       otherParents: ((ontology[name] || {}).broader || []).filter(p => p !== parentName),
+      versions: (versionsByStem.get(name) || [])
+        .sort((a, b) => (a < b ? 1 : -1)) // 新しい版を先に（名前の降順で近似）
+        .map(v => ({name: v, path: tagInfo.get(v).path, posts: tagInfo.get(v).ids.size})),
       children: (children.get(name) || [])
         .map(c => build(c, name))
         .sort((a, b) => b.family - a.family || (a.name < b.name ? -1 : 1)),
     };
   };
 
-  const roots = Object.keys(ontology).filter(n => !hasParent.has(n));
+  // versionOf ノード（Vue3 等）は語幹の「版」として出すので、木や独立タグには数えない
+  const roots = Object.keys(ontology)
+    .filter(n => !hasParent.has(n) && !(ontology[n] && ontology[n].versionOf));
   const trees = roots.filter(n => children.has(n))
     .map(n => build(n, null))
     .sort((a, b) => b.family - a.family || (a.name < b.name ? -1 : 1));
