@@ -1,0 +1,4 @@
+---
+title: フューチャーのガイドライン
+layout: guidelines
+---
