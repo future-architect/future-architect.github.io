@@ -39,7 +39,7 @@ lede: "プロキシが存在するネットワーク内で、Androidエミュレ
 
 最終的な構成は次のようになります。
 
-<img src="/images/2023/20231026a/env.png" alt="" width="945" height="529" loading="lazy">
+<img src="/images/2023/20231026a/env.png" alt="" width="800" height="353" loading="lazy">
 
 なお、開発環境はWindows。プロキシは認証つきで、独自の証明書を利用する前提とします。
 
@@ -205,5 +205,5 @@ void main() async {
 [PostPix](https://postpix.jp/)はFlutterで作成しています。ぜひダウンロードのほどお願いします！
 
 <a  target="_blank" rel="noopener"  class="linkable_img" title="PostPix | 旅行を通じた、ノスタルジックエクスペリエンスサービス" href="https://postpix.jp/">
-    <img src="/images/2023/20231026a/PostPix2.png" alt="" width="1200" height="1067" loading="lazy">
+    <img src="/images/2023/20231026a/PostPix2.png" alt="" width="1834" height="942" loading="lazy">
 </a>

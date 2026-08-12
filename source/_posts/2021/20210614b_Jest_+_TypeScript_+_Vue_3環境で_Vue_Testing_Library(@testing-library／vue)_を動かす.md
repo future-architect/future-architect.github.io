@@ -142,7 +142,7 @@ No issues found.
 
 ブラウザで `http://localhost:8080/` を開くと以下のページが表示されます。
 
-<img src="/images/2021/20210614b/image.png" alt="Vue起動画面" height="1200" width="993" loading="lazy">
+<img src="/images/2021/20210614b/image.png" alt="Vue起動画面" height="993" width="1200" loading="lazy">
 
 ### Jestの単体テストを動かす
 

@@ -156,7 +156,7 @@ Quick Join フォーム上で `ACM Professional Membership – $75`（25%オフ�
 
 加入時に登録したEmailアドレスと **完全一致** させる必要があります。`is on file, but has no associated ACM Account` という表示が出れば正常です（=「会員登録はされているが、ログイン用アカウントはまだ無い」状態）。
 
-<img src="/images/2026/20260513a/b48eddd4-47a9-429c-a403-7856c13a926a.png" alt="" width="400" height="218" loading="lazy">
+<img src="/images/2026/20260513a/b48eddd4-47a9-429c-a403-7856c13a926a.png" alt="" width="1200" height="872" loading="lazy">
 
 #### Step 8. パスワードと Security Question の設定
 
@@ -217,7 +217,7 @@ Username（または `<username>@acm.org`）と、Step 8 で設定したパス�
 
 また、`<username>@acm.org` での SSO ログインにより、スマホアプリからも O'Reilly 本が読み放題になります。
 
-<img src="/images/2026/20260513a/79b22982-d5f8-4492-bed6-71e3ea50c672.png" alt="" width="499" height="414" loading="lazy">
+<img src="/images/2026/20260513a/79b22982-d5f8-4492-bed6-71e3ea50c672.png" alt="" width="1200" height="1243" loading="lazy">
 
 ## 加入後の設定
 

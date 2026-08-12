@@ -182,7 +182,7 @@ module.exports = {
 
 ### ESLint + Airbnb config
 
-<img src="/images/2021/20210616a/image_9.png" alt="Airbnb Config" width="1200" height="399" loading="lazy">
+<img src="/images/2021/20210616a/image_9.png" alt="Airbnb Config" width="1200" height="463" loading="lazy">
 
 Airbnb Configも見てみます、バケーションレンタルで有名なあの[Airbnb](https://www.airbnb.jp/)ですね。
 

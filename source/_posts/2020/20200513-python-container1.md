@@ -55,7 +55,7 @@ Pythonユーザーは基本的にAlpineを選んではいけません。いろ�
 
 アプリケーションはDjangoのチュートリアルの最初の1ステップだけ作ったものをuwsgiを使ってデプロイすることを想定します。フォルダ＆ファイル構成はこんな感じ。
 
-<img src="/images/2020/20200513/1.png" alt="フォルダ＆ファイル構成" width="794" height="1178" loading="lazy" class="img-middle-size">
+<img src="/images/2020/20200513/1.png" alt="フォルダ＆ファイル構成" width="794" height="1138" loading="lazy" class="img-middle-size">
 
 依存パッケージは今回はこれだけです。ただこのファイルは開発環境を設定するときに書くぐらいですね。あまり重要ではないです。
 
