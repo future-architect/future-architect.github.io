@@ -31,6 +31,7 @@ TIG 所属の多賀です。
 Go の map のソート順は不定であることは、よく言われることかなと思います。
 (言語仕様にも明記されています。)
 
+<!-- markdownlint-disable-next-line MD001 -- 引用元（Go 言語仕様書）の見出しレベルをそのまま写している -->
 > #### Map types
 >
 > A map is **an unordered group** of elements of one type, called the element type, indexed by a set of unique keys of another type, called the key type. The value of an uninitialized map is nil.
