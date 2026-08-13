@@ -136,7 +136,7 @@ terraform show -json ./terraform.tfplan > ./terraform.tfplan.json
 
 ### Terraform Validatorの実行
 
-これで準備は整いました。Terraform Validatorの実行を行います。
+これで準備は整いました。Terraform Validatorを実行します。
 
 ```bash
 $ terraform-validator validate --policy-path=${POLICY_PATH} ./terraform.tfplan.json
@@ -201,7 +201,7 @@ No violations found
 * VPC Service Control
   * 有効化プロジェクトの指定
 
-どのような制限をかけることができるかイメージできたでしょうか。実はこちらに用意されていないものでも、Custom Policyとして自身でポリシールールを記述することもできます。詳細は[こちら](https://github.com/forseti-security/policy-library/blob/master/docs/constraint_template_authoring.md)
+どのような制限をかけることができるかイメージできたでしょうか。実はこちらに用意されていないものでも、Custom Policyとして自身でポリシールールも記述できます。詳細は[こちら](https://github.com/forseti-security/policy-library/blob/master/docs/constraint_template_authoring.md)
 
 ## 実際の運用
 

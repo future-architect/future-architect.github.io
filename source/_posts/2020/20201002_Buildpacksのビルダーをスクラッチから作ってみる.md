@@ -108,7 +108,7 @@ Buildpacksを使って作った実行イメージですが、
 
 ### 空のBuildpack
 
-順番的にはまずはBuildpackです。既存のBuilderに対してオリジナルのBuildpackを適用することもできそうですが(stackを既存のものを指定して、pack build時に--buildpackで個別に読み込み)、理解のためにゼロから作ります。
+順番的にはまずはBuildpackです。既存のBuilderに対してオリジナルのBuildpackを適用できそうですが(stackを既存のものを指定して、pack build時に--buildpackで個別に読み込み)、理解のためにゼロから作ります。
 
 buildpackの構成要素は4つ。bin/buildスクリプトと、bin/detectスクリプト、そしてtoml形式の設定ファイル（ファイル名は任意だが、ここではbuildpack.tomlとする）と、パッケージ化のためのtomlファイル（これもファイル名は任意だが、empty-package.tomlとする）。
 

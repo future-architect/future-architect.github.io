@@ -198,7 +198,7 @@ https://future-architect.github.io/articles/20190604/
 
 コードはまず、OpenCensus経由でStackdriver Traceに連携します。
 
-`trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()})` はテスト用に毎回トレースを行うような指定です。通常は毎回実施するとコストが高いため、動作確認時以外は設定しないほうが良いと思います。
+`trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()})` はテスト用に毎回トレースするような指定です。通常は毎回実施するとコストが高いため、動作確認時以外は設定しないほうが良いと思います。
 
 ```go 初期化処理
 var client *http.Client

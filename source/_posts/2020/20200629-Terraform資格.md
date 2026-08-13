@@ -28,7 +28,7 @@ lede: "5/24に受験したHashiCorpから出た資格の1つである、Terrafor
 - **英語**
   - そこそこ読めるけど、話す経験はほとんどない（海外経験なし）
 
-私はフューチャーに入社して以来GCP+Terraformというコンビでインフラの作成および管理を行っていました。途中で、Google CloudのProfessional Cloud Architectを取得して、今回が2個目の資格チャレンジになります。後述しますが試験の言語が英語なので、私にとってはある意味１番のネックでした。そのため、英語の大事さを痛感した試験にもなっています。
+私はフューチャーに入社して以来GCP+Terraformというコンビでインフラを作成・管理していました。途中で、Google CloudのProfessional Cloud Architectを取得して、今回が2個目の資格チャレンジになります。後述しますが試験の言語が英語なので、私にとってはある意味１番のネックでした。そのため、英語の大事さを痛感した試験にもなっています。
 
 ## HashiCorp Certified: Terraform Associate とは
 

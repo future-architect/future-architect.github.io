@@ -21,7 +21,7 @@ lede: "普段は、Terraform を使っているのですが、ふとCloud Deploy
 
 [Cloud Deployment Manager](https://cloud.google.com/deployment-manager) とは、GCP のリソースをYAML で宣言的に記述し、デプロイできるサービスです。要は、AWS のCloudFormation などにあたるサービスです。
 
-ちなみにですが、Cloud Deployment Manager は、テンプレートをPython やJinja2 を使って、パラメータ化することもできます。ざっくりですが、以下にCloud Deployment Manager と似たサービスをクラウド毎に記載します。
+ちなみにですが、Cloud Deployment Manager は、テンプレートをPython やJinja2 を使って、パラメータ化もできます。ざっくりですが、以下にCloud Deployment Manager と似たサービスをクラウド毎に記載します。
 
 |                  | GCP                        | AWS                | AWS                          | Alibaba Cloud                  |
 |------------------|----------------------------|--------------------|------------------------------|--------------------------------|
@@ -116,7 +116,7 @@ test-vm  compute.v1.instance  IN_PREVIEW  []      CREATE_OR_ACQUIRE
 
 <img src="/images/2020/20200219/photo_20200219_01.png" loading="lazy">
 
-ブラウザ上からデプロイすることも可能ですが、`gcloud`コマンドから実行したいと思います。
+ブラウザ上からデプロイも可能ですが、`gcloud`コマンドから実行したいと思います。
 [update](https://cloud.google.com/sdk/gcloud/reference/deployment-manager/deployments/update)を指定し、`DEPLOYMENT_NAME`を指定します（ここではtest）
 
 ```bash
@@ -181,7 +181,7 @@ Waiting for delete [xxx]...done.
 Delete operation xxx completed successfully.
 ```
 
-これでGCE の作成から削除までの一連の操作を行いました。
+これでGCE の作成から削除までの一連の操作をしました。
 
 ## 複数のVM インスタンスを作成
 
@@ -273,7 +273,7 @@ test-vm-02  compute.v1.instance  COMPLETED  []
 context.properties['zone'],
 ```
 
-また、デプロイメント固有の環境変数を指定することもできます。
+また、デプロイメント固有の環境変数の指定もできます。
 環境変数の呼び出し方は、以下の構文を使用することでプロジェクトID を取得します。
 詳細な環境変数については、[こちら](https://cloud.google.com/deployment-manager/docs/configuration/templates/use-environment-variables?hl=ja)を参考にしてください。
 
@@ -427,7 +427,7 @@ test-vm-02             compute.v1.instance  COMPLETED  []
 
 ## エラーメモ
 
-gcloud コマンドからデプロイした際に何かしらのエラーが発生したとします。コード修正後に以下のように再度<font color="LightCoral">"create"</font>を実行すると<font color="LightCoral">"already exists and cannot be created"</font>というエラーが発生します。
+gcloud コマンドからデプロイした際に何かしらのエラーが発生したとします。コード修正後に以下のように再度<font color="LightCoral">"create"</font>すると<font color="LightCoral">"already exists and cannot be created"</font>というエラーが発生します。
 
 原因は、失敗したとしても中途半端にデプロイは作られてしまうため、既にあるといったエラーが発生します。
 

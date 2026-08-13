@@ -478,7 +478,7 @@ func configureAPI(api *myapp.MyApplicationAPI) http.Handler {
 
 これで入力されたパラメータがSwaggerで定義したスキーマと異なる場合は、`400 Bad Request` を返すことができました。
 
-一方で、エラー時のレスポンスボディは `{"code":400, "mesasge": "xxx"}` といった形式になります。[実装はこのあたり](https://github.com/go-openapi/errors/blob/master/api.go#L84)になります。もし、レスポンスボディのレイアウトを変更したいときは、自分でカスタムのerrorHandlerを設定することもできます。
+一方で、エラー時のレスポンスボディは `{"code":400, "mesasge": "xxx"}` といった形式になります。[実装はこのあたり](https://github.com/go-openapi/errors/blob/master/api.go#L84)になります。もし、レスポンスボディのレイアウトを変更したいときは、自分でカスタムのerrorHandlerを設定できます。
 
 ```go go-swaggerでのハンドリングのカスタマイズ
 func configureAPI(api *myapp.MyApplicationAPI) http.Handler {

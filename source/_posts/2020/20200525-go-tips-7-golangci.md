@@ -28,7 +28,7 @@ Goのコード品質のベースラインを上げる目的で[golangci-lint](ht
 * 既にあるコードベースにgolangci-lintを新たに適用しようとした場合
 * 何らかの理由でbaseブランチ(develop, master etc...)にlint issueが大量に混入してしまった場合
 
-このような場合、いったんbaseブランチに存在しているlint issueを無視して開発を進め、あとでまとめてlint issueの改修を行うというのか定石かと思います。
+このような場合、いったんbaseブランチに存在しているlint issueを無視して開発を進め、あとでまとめてlint issueを改修するというのか定石かと思います。
 
 さて、この暫定対応をしている最中でも、lint issueが混入し続ける可能性があります。既存の大量のlint issueに埋もれて、開発中に新たに生み出してしまったlint issueに気づきにくいためです。
 

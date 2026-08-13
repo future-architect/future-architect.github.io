@@ -47,7 +47,7 @@ go get -u github.com/go-swagger/go-swagger/cmd/swagger
 
 Dockerコンテナ以外は概ね開発環境のOSによる入手経路の違い程度の認識で差し支えないと思います。詳しくは[Installing](https://goswagger.io/install.html)を確認してください。
 
-[リリースページ](https://github.com/go-swagger/go-swagger/releases/tag/v0.25.0)からお使いのOSに応じた実行ファイルをダウンロードしてインストールすることも可能です。
+[リリースページ](https://github.com/go-swagger/go-swagger/releases/tag/v0.25.0)からお使いのOSに応じた実行ファイルをダウンロードしてインストールも可能です。
 
 アプリケーションをコンテナイメージの上で実行する場合、公式のコンテナイメージを[マルチステージビルド](https://matsuand.github.io/docs.docker.jp.onthefly/develop/develop-images/multistage-build/)に用いる事も可能ですね、夢が広がります。
 方法は様々ですが、インストール後にswaggerコマンドが利用可能になります。(コンテナ形式での導入を除く)
@@ -105,7 +105,7 @@ URLのクエリパラメータに`name`を持たせることができる。
 レスポンスのbodyに単一の文字列が返ってくる。
 ...という事が`swagger.yaml`の内容から推測できます。
 
-作成したファイルはOpenAPI Previewで確認することが可能です。[Chrome拡張](https://chrome.google.com/webstore/detail/openapi-preview/ijjbiodnicjakhbfkffnlbekpgnmmggo?hl=en-GB)、[vscode向けのプラグイン](https://marketplace.visualstudio.com/items?itemName=zoellner.openapi-preview)などで利用可能です。[editor.swagger.io](https://editor.swagger.io/)のようなウェブサイトとしても公開されています。
+作成したファイルはOpenAPI Previewで確認できます。[Chrome拡張](https://chrome.google.com/webstore/detail/openapi-preview/ijjbiodnicjakhbfkffnlbekpgnmmggo?hl=en-GB)、[vscode向けのプラグイン](https://marketplace.visualstudio.com/items?itemName=zoellner.openapi-preview)などで利用可能です。[editor.swagger.io](https://editor.swagger.io/)のようなウェブサイトとしても公開されています。
 [vimプラグイン](https://github.com/xavierchow/vim-swagger-preview)もありますね...素晴らしい。
 
 <img src="/images/2020/20200824/open_api_preview.jpg" loading="lazy">

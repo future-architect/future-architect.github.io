@@ -100,7 +100,7 @@ bq ls --format=pretty GOOGLE_CLOUD_PROJECT:BIGQUERY_DATASET
 
 ### BigQueryに読み込ませる
 
-こちらでは公開プロジェクトのデータを使ってバリアントの分析を行います。データを用いるプロジェクトは[Illumina Platinum Genomes](https://www.illumina.com/platinumgenomes.html)、テーブル名は`platinum_genomes_deepvariant_variants_20180823`になります。実際のテーブルを５件出力しました。
+こちらでは公開プロジェクトのデータを使ってバリアントを分析します。データを用いるプロジェクトは[Illumina Platinum Genomes](https://www.illumina.com/platinumgenomes.html)、テーブル名は`platinum_genomes_deepvariant_variants_20180823`になります。実際のテーブルを５件出力しました。
 <img src="/images/2020/20200210/photo_20200210_02.png" loading="lazy">
 
 実際に流すクエリは以下になります。
