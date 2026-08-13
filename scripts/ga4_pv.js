@@ -59,8 +59,9 @@ function recommendLimit(count) {
 
 // 指定した記事の中から PV の多い順に取り出す。カテゴリ・タグの一覧ページで
 // 「よく読まれている記事」を出すのに使う（#2033 / #2034）。
-// limit を省略すると記事数に応じた件数になる
-hexo.extend.helper.register('popular_posts_in', function (posts, limit) {
+// limit を省略すると記事数に応じた件数になる。
+// decay に 'linear' を渡すと経過年ペナルティが線形（≒年平均PV）になる
+hexo.extend.helper.register('popular_posts_in', function (posts, limit, decay) {
   if (limit === undefined) limit = recommendLimit(posts.length);
   if (limit === 0) return '';
   // PV は累積なので、古い記事ほど有利になる。経過年数で割って、
@@ -70,12 +71,16 @@ hexo.extend.helper.register('popular_posts_in', function (posts, limit) {
   // 2乗にする（1年落ち=1/2、2年=1/5、4年=1/17）。著者ページで古い記事
   // ばかりが並ぶと、その著者が最近書けていないように見えてしまうし、
   // この業界では数年前の記事は十分古い。効きの強さをページの種類
-  // （カテゴリ・タグ・著者）で分けることはしない (#2174)
+  // （カテゴリ・タグ・著者）で分けることはしない (#2174)。
+  // 例外は全期間アーカイブ (#2407)。ここは「歴代の定番」を見せる場なので
+  // 線形（1年=1/2、4年=1/5）に緩め、露出期間の不公平だけを補正して古典を残す。
+  // 2乗のままだと実質直近人気になり、ホームの年間人気と顔ぶれが完全に重複した
   const YEAR = 365 * 24 * 60 * 60 * 1000;
   const now = Date.now();
   const score = (post) => {
     const years = (now - post.date.valueOf()) / YEAR;
-    return getGA4PV('/' + post.path) / (1 + years * years);
+    const penalty = decay === 'linear' ? 1 + years : 1 + years * years;
+    return getGA4PV('/' + post.path) / penalty;
   };
 
   const ranked = posts
