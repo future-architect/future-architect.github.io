@@ -232,41 +232,47 @@ hexo.extend.helper.register('category_stats', function (name) {
 });
 
 /**
- * カテゴリページの年別投稿数 (#2423)。
+ * カテゴリページの半期別投稿数 (#2423)。
  *
- * 粒度が年なのは、どのカテゴリでも読める唯一の刻みだから。四半期にすると
- * VR（20本）や認証認可（24本）は空白の棒が並ぶだけになる。年なら
- * 「AIDD が 2025 年に立ち上がった」「VR が細く続いている」まで見える。
- * /authors/ の「年別 著者数の推移」・/tags/ の「年別 新規タグ数の推移」とも
- * 語彙が揃う。
+ * 刻みは上期（1〜6月）・下期（7〜12月）。当社の決算期が暦年なので、
+ * 社内の期の感覚とそのまま揃う。四半期にすると VR（20本）や
+ * 認証認可（24本）は空白の棒が並ぶだけになるが、半期なら
+ * 「AIDD が2025年に立ち上がった」「VR が散発的に続いている」まで読める。
  *
- * 描画は CSS だけで行う（テンプレート側）。棒は多くても11本程度で、
+ * 描画は CSS だけで行う（テンプレート側）。棒は多くても22本で、
  * この1枚のために echarts（gzip 約330KB）をカテゴリページへ持ち込む
  * 価値はない。mermaid の JS を削った #1955 と逆行させない。
  *
- * 初投稿の年から今年までを埋める。投稿の無い年は 0 のまま出して、
+ * 初投稿の年から今年までを埋める。投稿の無い期は 0 のまま出して、
  * 途切れを隠さない（投稿の無い月をダミーカードで見せる #2219 と同じ）。
+ * 年ラベルは年に1つでよいので、年ごとに2本ずつの組で返す。
  */
 hexo.extend.helper.register('category_yearly_chart', function (name) {
   const category = this.site.categories.findOne({ name });
   if (!category) return null;
 
-  const byYear = new Map();
+  const byHalf = new Map(); // "2026/1"（上期）-> 本数
   category.posts.forEach((post) => {
-    const y = post.date.year();
-    byYear.set(y, (byYear.get(y) || 0) + 1);
+    const key = `${post.date.year()}/${post.date.month() < 6 ? 1 : 2}`;
+    byHalf.set(key, (byHalf.get(key) || 0) + 1);
   });
-  if (byYear.size === 0) return null;
+  if (byHalf.size === 0) return null;
 
-  const start = Math.min(...byYear.keys());
+  const start = Math.min(...[...byHalf.keys()].map((k) => +k.split('/')[0]));
   const end = new Date().getFullYear();
-  const bars = [];
+  const groups = [];
+  let max = 0;
   for (let y = start; y <= end; y++) {
-    bars.push({ year: y, count: byYear.get(y) || 0 });
+    const halves = [1, 2].map((h) => {
+      const count = byHalf.get(`${y}/${h}`) || 0;
+      if (count > max) max = count;
+      return { half: h, label: h === 1 ? '上期' : '下期', count };
+    });
+    groups.push({ year: y, halves });
   }
   return {
-    bars,
-    max: Math.max(...bars.map((b) => b.count)),
+    groups,
+    max,
     // 棒は /categories/ の積み上げ棒と同じ、そのカテゴリの色で塗る。
     // 対応表に無い新設カテゴリは無彩色で出す（警告は category_colors が出す）
     color: CATEGORY_COLORS[name] || '#6e7074',
