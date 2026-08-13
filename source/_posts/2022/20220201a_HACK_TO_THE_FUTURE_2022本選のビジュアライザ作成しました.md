@@ -5,7 +5,6 @@ postid: a
 tags:
   - AtCoder
   - 競技プログラミング
-  - コンテスト
 categories:
   - Frontend
 thumbnail: /images/2022/20220201a/thumbnail.png

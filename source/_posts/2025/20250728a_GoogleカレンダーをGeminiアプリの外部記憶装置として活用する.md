@@ -4,7 +4,6 @@ date: 2025/07/28 00:00:00
 postid: a
 tags:
   - Gemini
-  - AI
   - 生成AI
   - Googleカレンダー
 categories:

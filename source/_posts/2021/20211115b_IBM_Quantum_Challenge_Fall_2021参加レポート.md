@@ -4,8 +4,8 @@ date: 2021/11/15 00:00:01
 postid: b
 tags:
   - ハッカソン
-  - コンテスト
   - 参加レポート
+  - 参戦記
 categories:
   - Programming
 thumbnail: /images/2021/20211115b/thumbnail.png

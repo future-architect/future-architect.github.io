@@ -6,7 +6,6 @@ tags:
   - ChatGPT
   - embedding
   - SentenceTransformers
-  - AI
 categories:
   - DataScience
 series: "夏の自由研究2023"

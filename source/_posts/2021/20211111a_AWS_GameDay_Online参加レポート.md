@@ -4,9 +4,8 @@ date: 2021/11/11 00:00:00
 postid: a
 tags:
   - AWS
-  - コンテスト
-  - 参戦記
   - 参加レポート
+  - 参戦記
 categories:
   - Infrastructure
 thumbnail: /images/2021/20211111a/thumbnail.png

@@ -3,7 +3,6 @@ title: "Transformerの文章生成の仕組みを理解する"
 date: 2025/02/26 00:00:00
 postid: a
 tags:
-  - AI
   - LLM
   - Transformer
   - 論文紹介
