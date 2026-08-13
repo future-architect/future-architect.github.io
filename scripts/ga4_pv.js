@@ -94,7 +94,8 @@ hexo.extend.helper.register('popular_posts_in', function (posts, limit) {
       return (
         `<div class="col-12 col-md-6"><div class="article-card post-panel h-100">${thumb}` +
         `<div class="panel-body"><a href="/${post.path}" class="panel-title">${post.title}</a>` +
-        `<div class="panel-meta">${post.date.format('YYYY.MM.DD')}${snsLabel(post.permalink)}</div>` +
+        // 推薦カードの日付は鮮度の目安なので年月まで (#2404)
+        `<div class="panel-meta">${post.date.format('YYYY.MM')}${snsLabel(post.permalink)}</div>` +
         `</div></div></div>`
       );
     })
