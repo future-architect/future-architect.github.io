@@ -33,13 +33,14 @@
  * 名前の一致は共起と違って決定的な関係なので、件数による裏付けは要らない。
  * 兄弟が1つでも、移動先が1本でも出す。読者にとって Go1.26 の隣に Go1.27 が
  * あるのは自明で、薄い結果でも期待が裏切られない。
- * 実データでは Go1.16〜1.27 / インターン2020〜2026 / GoogleCloudNext /
- * PostgreSQL17,18 / NLP2024,2025 の5系列が拾え、束ね間違いは無かった。
+ * 接頭辞そのもののタグ（無印: Go / GoogleCloudNext）も同じ系列に含める
+ * (#2355)。親ページに子の一覧が出て、子ページには親が系列の先頭に出る。
+ * 実データでは Go / インターン / GoogleCloudNext / Terraform / PostgreSQL /
+ * NLP の6系列（無印含む）が拾え、束ね間違いは無かった。
  *
  * 兄弟は表示数の上限にも数えない。共起と枠を奪い合う理屈が無いためで、
- * 上限に含めると Go1.27 から Go に戻る導線が兄弟に押し出されてしまう。
- * 兄弟を持つタグは709件中25件しかなく、最も多い Go1.xx でも
- * 兄弟11 + 共起2 の13件にしかならないので、際限なく増えることもない。
+ * 最も多い無印 Go のページでも兄弟12（Go1.16〜1.27）なので、
+ * 際限なく増えることもない。
  *
  * リンク先は単にそのタグのページで、2タグの AND 検索はしない。
  * 組み合わせの数だけページが増えるうえ、読者の行動としても
@@ -100,6 +101,14 @@ function build(site) {
     });
   });
 
+  // 接頭辞そのもののタグ（無印: Go / GoogleCloudNext / NLP など）も同じ系列に
+  // 含める (#2355)。無印は VERSIONED に合わないため、収集後にここで足す。
+  // 実データで無印を持つ系列は6つ（Go / GoogleCloudNext / インターン /
+  // Terraform / NLP / PostgreSQL）で、いずれも意味的に正しい親子だった
+  for (const [stem, members] of families) {
+    if (total.has(stem)) members.push(stem);
+  }
+
   const co = new Map(); // "A\u0000B" -> 共起数
   for (const names of postTags.values()) {
     const sorted = [...new Set(names)].sort();
@@ -131,15 +140,17 @@ hexo.extend.helper.register('related_tags', function (tagName) {
   const own = total.get(tagName);
   if (!own) return [];
 
-  // 同じ系列のタグ。共起では見えない関係なので、件数で足切りせず全部出す
-  const stem = family(tagName);
+  // 同じ系列のタグ。共起では見えない関係なので、件数で足切りせず全部出す。
+  // 無印タグ（Go / GoogleCloudNext）のページでは自分が接頭辞そのもの (#2355)
+  const stem = family(tagName) || (families.has(tagName) ? tagName : null);
   const siblings = (stem ? families.get(stem) || [] : [])
     .filter((name) => name !== tagName)
     .map((name) => ({
       name,
       path: path.get(name),
       posts: total.get(name),
-      version: versionKey(name),
+      // 無印（親）はバージョンを持たないので先頭に置く。系列全体への入口のため
+      version: VERSIONED.test(name) ? versionKey(name) : Infinity,
       sibling: true,
     }))
     .sort((a, b) => b.version - a.version); // 新しいバージョンを先に
