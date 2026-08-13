@@ -330,3 +330,77 @@ hexo.extend.helper.register('doctor_ontology', function() {
 
   return {trees, standalone, nodeCount: Object.keys(ontology).length};
 });
+
+/**
+ * 外部リンクの明示チェック (#2346)。
+ *
+ * ルール: サイトの導線で、リンクテキストから外部と読めないリンクには
+ * 「（外部サイト）」を付ける。ブランド名・メディア名を名乗るリンクと、
+ * 枠の見出しが一括で名乗る枠（アドベントカレンダー（Qiita））は対象外。
+ * 記事本文は対象外（技術記事の参照は94%が外部で、マークは情報にならない）。
+ *
+ * テーマの ejs と、ラベルをデータで持つ hiring パネルを走査する。
+ * 判定できない範囲: href が EJS 変数のリンク（現状 corporate_url のみで、
+ * テキストが URL そのものなので自明）、scripts が生成する Tech Cast
+ * （枠の見出しがポッドキャスト名を名乗る）
+ */
+const LINK_TEXT_EXEMPT = [
+  '外部サイト', // 明示済み
+  // ブランド・メディア名を名乗っているもの
+  'connpass',
+  'Youtube',
+  'YouTube',
+  'Qiita',
+  'Feedly',
+  'X(旧Twitter)',
+  '公式note',
+  'LEAD TO THE FUTURE',
+  // X のフォローボタン。ブランドはアイコンが名乗る (#2036)
+  'フォロー',
+];
+const LINK_EXEMPT_FILES = [
+  // 枠の見出し「アドベントカレンダー（Qiita）」が一括で外部を名乗る
+  '_widget/advent-calendar.ejs',
+];
+
+hexo.extend.helper.register('doctor_external_links', function () {
+  const fs = require('fs');
+  const path = require('path');
+  const layoutDir = path.join(__dirname, '..', 'themes', 'future', 'layout');
+  const findings = [];
+
+  const textOf = (inner) => inner.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+
+  const scan = (file, content) => {
+    // EJS 式は先に落とす。href の式が引用符を含むと属性の切り出しが壊れる
+    const flat = content.replace(/<%[\s\S]*?%>/g, '');
+    for (const m of flat.matchAll(/<a\b[^>]*href="(https?:\/\/[^"]+)"[^>]*>([\s\S]*?)<\/a/g)) {
+      const text = textOf(m[2]);
+      if (!text) continue; // アイコンだけのリンクは aria-label 側で名乗る
+      if (LINK_TEXT_EXEMPT.some((w) => text.includes(w))) continue;
+      findings.push({ file, text });
+    }
+  };
+
+  const walk = (dir) => {
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      const p = path.join(dir, e.name);
+      if (e.isDirectory()) walk(p);
+      else if (e.name.endsWith('.ejs')) {
+        const rel = path.relative(layoutDir, p).replace(/\\/g, '/');
+        if (LINK_EXEMPT_FILES.includes(rel)) continue;
+        scan(rel, fs.readFileSync(p, 'utf8'));
+      }
+    }
+  };
+  walk(layoutDir);
+
+  // hiring パネルはラベルをデータで持つ（scripts/hiring_panels.js）
+  const hiring = fs.readFileSync(path.join(__dirname, 'hiring_panels.js'), 'utf8');
+  for (const m of hiring.matchAll(/label: '([^']+)'/g)) {
+    if (LINK_TEXT_EXEMPT.some((w) => m[1].includes(w))) continue;
+    findings.push({ file: 'scripts/hiring_panels.js', text: m[1] });
+  }
+
+  return findings;
+});
