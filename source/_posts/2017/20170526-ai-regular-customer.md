@@ -5,7 +5,6 @@ postid: ""
 tags:
   - Python
   - 機械学習
-  - AI
   - 顔認証
   - OpenCV
   - クラスタリング

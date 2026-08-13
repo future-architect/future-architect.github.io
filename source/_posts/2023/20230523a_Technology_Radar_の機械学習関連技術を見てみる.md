@@ -4,7 +4,6 @@ date: 2023/05/23 00:00:00
 postid: a
 tags:
   - 機械学習
-  - AI
   - MLOps
 categories:
   - DataScience

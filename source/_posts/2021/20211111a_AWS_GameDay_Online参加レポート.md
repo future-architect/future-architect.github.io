@@ -4,8 +4,6 @@ date: 2021/11/11 00:00:00
 postid: a
 tags:
   - AWS
-  - コンテスト
-  - 参戦記
   - 参加レポート
 categories:
   - Infrastructure
