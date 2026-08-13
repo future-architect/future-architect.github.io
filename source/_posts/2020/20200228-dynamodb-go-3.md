@@ -325,9 +325,3 @@ DynamoDBのConditional Expressionsほど万能では無いですが、多くの�
 
 機能上はGo CDKもかなりガンバっていると感じます。DynamoDBアクセスする際の有力な選択肢となりうるのではないでしょうか？ ぜひ、私達のチームでも機を見て実戦投入してみてチャレンジしてみたいと思います。
 
----
-[DynamoDB×Go連載企画](/tags/DynamoDB%C3%97Go/)以外にも多くの連載企画があります。特にGo Cloud連載が今回のテーマに近いです。
-
-* [Go Cloud 連載](/tags/GoCDK/)
-* [GCP 連載](/articles/20200202/)
-* [Auth0 連載](/tags/Auth0/)
