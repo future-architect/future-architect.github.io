@@ -240,7 +240,7 @@ t2: tuple[str] = ("Monty", "Python's", "Flying", "Circus")
 l: list[str] = ["Monty", "Python", "and", "the", "Holy", "Grail"]
 ```
 
-タプルで同じ型の要素を任意長持つインスタンスに適合する型を書くには、ellipsis演算子（``...``)を使います。
+タプルで同じ型の要素を任意長持つインスタンスに適合する型を書くには、ellipsis演算子（``...``）を使います。
 
 ```py
 t: tuple[str, ...] = ("Monty", "Python's", "Flying", "Circus")

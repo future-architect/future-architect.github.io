@@ -376,7 +376,7 @@ tcpdump: listening on ens4, link-type EN10MB (Ethernet), capture size 262144 byt
 >05:28:31.596564 IP (tos 0x0, ttl 64, id 831, offset 0, flags [DF], proto UDP (17), length 78)
     10.0.0.2.43466 > 169.254.169.254.53: [bad udp cksum 0x5e4a -> 0x143a!] 35627+ [1au] A? registry.terraform.io. ar: . OPT UDPsize=512 (50)
 05:28:31.596653 IP (tos 0×0, ttl 64, id 27444, offset 0, flags [DF], proto UDP (17), length 78)
-    10.0.0.2.58257 > 169.254.169.254.53: [bad udp cksum 0×5e4a -> 0×126e!] 14384+ [1au] AAAA? registry.terraform.io. ar: . OPT UDPsize=512 (50
+    10.0.0.2.58257 > 169.254.169.254.53: [bad udp cksum 0×5e4a -> 0×126e!] 14384+ [1au] AAAA? registry.terraform.io. ar: . OPT UDPsize=512 (50)
 
 今度はdigコマンドを利用して`registry.terraform.io`を名前解決してみます。
 すると先ほどの`tcpdump -n -vv dst port 443`コマンドを実行して出力されたIPアドレス`18.65.202.87`が存在することがわかりました。

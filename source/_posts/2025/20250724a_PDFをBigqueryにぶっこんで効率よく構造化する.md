@@ -11,7 +11,7 @@ categories:
 series: "AI Tips"
 thumbnail: /images/2025/20250724a/thumbnail.png
 author: 大前七奈
-lede: "Google Agent Development KitやLangChainエコシステムを触る機会が増える中で、多くの企業や研究機関、政府機関が、契約書、報告書、マニュアル、論文、請求書などの重要な情報をPDF形式で保存・配布していることに改めて注目しています。これらの膨大な情報源から、LLM（大規模言語モデル)が直接情報にアクセスし、理解できるようになることは、実用的なAIソリューションを構築する上で不可欠だと考えています。"
+lede: "Google Agent Development KitやLangChainエコシステムを触る機会が増える中で、多くの企業や研究機関、政府機関が、契約書、報告書、マニュアル、論文、請求書などの重要な情報をPDF形式で保存・配布していることに改めて注目しています。これらの膨大な情報源から、LLM（大規模言語モデル）が直接情報にアクセスし、理解できるようになることは、実用的なAIソリューションを構築する上で不可欠だと考えています。"
 ---
 <img src="/images/2025/20250724a/Gemini_Generated_Image_gwxj4tgwxj4tgwxj_(1).png" alt="" width="1200" height="1200" loading="lazy">
 
@@ -21,7 +21,7 @@ lede: "Google Agent Development KitやLangChainエコシステムを触る機会
 
 最近、[Google Agent Development Kit](https://google.github.io/adk-docs/)や[LangChain](https://python.langchain.com/docs/introduction/)エコシステムを触る機会が増える中で、多くの企業や研究機関、政府機関が、契約書、報告書、マニュアル、論文、請求書などの重要な情報をPDF形式で保存・配布していることに改めて注目しています。
 
-これらの膨大な情報源から、LLM（大規模言語モデル)が直接情報にアクセスし、理解できるようになることは、実用的なAIソリューションを構築する上で不可欠だと考えています。
+これらの膨大な情報源から、LLM（大規模言語モデル）が直接情報にアクセスし、理解できるようになることは、実用的なAIソリューションを構築する上で不可欠だと考えています。
 
 ## PDFとは
 

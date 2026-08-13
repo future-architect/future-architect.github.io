@@ -44,7 +44,7 @@ https://medium.com/flutter/learning-flutters-new-navigation-and-routing-system-7
 * statefulとstatelessでウィジェットを作り分ける必要がある
 * buildメソッドはReactのrender
 * builderという言葉はVueのslot的な、特定のライフサイクルで呼ばれてビューの一部を返す何か←某握力王の人に教えてもらいました
-* debug(）関数でconsole.logに出力できる
+* debug()関数でconsole.logに出力できる
 
 ### 最小のRouter
 
@@ -162,7 +162,7 @@ flutter build web --web-renderer=html --source-maps
 
 ビルド結果は``build/web``フォルダに出力されます。
 
-一見、CanvasKitもHTMLもファイルサイズがほとんど変わらない（3.4MBと3.5MB)のですが、CanvasKitでビルドすると、CanvasKitの本体のwasmのビルド済みのファイルをネット越しにダウンロードしているようです。これが2MBぐらいあるみたいですし、もしかしたらプロキシが必要なイントラネットで利用とか考えると、外部依存はないに越したことはありません。
+一見、CanvasKitもHTMLもファイルサイズがほとんど変わらない（3.4MBと3.5MB）のですが、CanvasKitでビルドすると、CanvasKitの本体のwasmのビルド済みのファイルをネット越しにダウンロードしているようです。これが2MBぐらいあるみたいですし、もしかしたらプロキシが必要なイントラネットで利用とか考えると、外部依存はないに越したことはありません。
 
 ```js main.dart.js
 14151:$2:function(a,b){return"https://unpkg.com/canvaskit-wasm@0.25.1/bin/"+a},

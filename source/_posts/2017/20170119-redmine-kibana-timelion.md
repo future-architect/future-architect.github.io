@@ -108,17 +108,17 @@ EVMを使うことで多角的にプロジェクトを把握できますね。
 
 (a)ELKをダウンロード
 
-- [Elastic Search Download URL](https://www.elastic.co/jp/downloads/elasticsearch](https://www.elastic.co/jp/downloads/elasticsearch)
+- [Elastic Search Download URL](https://www.elastic.co/jp/downloads/elasticsearch)
 - →前回の構築時から最新版が出ているため（2017/1/19時点）私の場合は、「elasticsearch-5.1.2.zip」をダウンロードしました。
 
 (b) Kibanaをダウンロード
 
-- [Kibana Download URL](https://www.elastic.co/downloads/kibana](https://www.elastic.co/downloads/kibana)
+- [Kibana Download URL](https://www.elastic.co/downloads/kibana)
   - →私の場合は、 `kibana-5.1.2-windows-x86.zip` をダウンロードしました。
 
 (c) Logstashをダウンロード
 
-- [Logstash Download URL](https://www.elastic.co/downloads/logstash](https://www.elastic.co/downloads/logstash)
+- [Logstash Download URL](https://www.elastic.co/downloads/logstash)
   - →私の場合は、 `logstash-5.1.2.zip` をダウンロードしました。
 
 (d) 「c:\elastic」というフォルダを作成

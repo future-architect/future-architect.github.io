@@ -33,7 +33,7 @@ PostgreSQLには高速にファイルの読み込みを行うCOPY FROMがある�
 * `COPY`と`\COPY`がある。
 * `COPY`はDBサーバーのローカルファイルとのやりとり（`COPY FROM`でテーブルへのローカルファイルからの読み込み、`COPY TO`でテーブルからのローカルファイルへの書き込み）ができる
 * pg_dumpは内部で`COPY FROM/TO`を使っているらしい。`COPY FROM STDIN`とか`COPY TO STDOUT`を使ってローカルにファイルを転送している？
-* `\COPY`はクライアント／サーバー間でも利用可能。INSERTを並べたSQLよりも11倍高速。INSERTをまとめて1つのトランザクションで処理するのと比べても3倍以上高速（[この記事](https://www.citusdata.com/blog/2017/11/08/faster-bulk-loading-in-postgresql-with-copy/)参照)
+* `\COPY`はクライアント／サーバー間でも利用可能。INSERTを並べたSQLよりも11倍高速。INSERTをまとめて1つのトランザクションで処理するのと比べても3倍以上高速（[この記事](https://www.citusdata.com/blog/2017/11/08/faster-bulk-loading-in-postgresql-with-copy/)参照）
 
 2種類あるけど特に使い分けとか考える必要はなさそうです。
 

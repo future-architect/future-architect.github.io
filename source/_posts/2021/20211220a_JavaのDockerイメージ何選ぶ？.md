@@ -90,7 +90,7 @@ OSはベースはAmazon Linuxで、Alpineも提供されています。
 
 ### IBM Java
 
-昔からJavaでは名を馳せていたIBMです。OpenJ9はIBMの成果ですが、ここではなくてAdoptOpenJDK側での提供となっています（そちらはDeprecatedですが)。
+昔からJavaでは名を馳せていたIBMです。OpenJ9はIBMの成果ですが、ここではなくてAdoptOpenJDK側での提供となっています（そちらはDeprecatedですが）。
 
 Javaのバージョンは8, 9, 11で、なぜか9が入っています。それぞれJDKとJREを提供しているほか、Small Footprint JRE（SFJ）というさらにコンパクトなJREが提供されているのが特徴です。
 

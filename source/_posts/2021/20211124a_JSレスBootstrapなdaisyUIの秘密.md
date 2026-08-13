@@ -19,7 +19,7 @@ lede: "最近、趣味開発でフロントエンドをいじる場合とか、R
 
 これにESLintとPrettierを入れて完了です。何かすごい便利、というよりもJSON設定ファイルいじりを最小にして、手間最小な必要十分なところを狙っています。eslint-config-prettierを入れた後に"prettier"ってESLintの設定に足すところだけは設定ファイルの修正が必要です。
 
-UI部品は[MUI](https://mui.com/)（以前のMaterial UI)を使ったり、Web Componentsベースのものとかいろいろ試していましたが、最近お気に入りなのは[daisyUI](https://daisyui.com/)です。
+UI部品は[MUI](https://mui.com/)（以前のMaterial UI）を使ったり、Web Componentsベースのものとかいろいろ試していましたが、最近お気に入りなのは[daisyUI](https://daisyui.com/)です。
 
 <img src="/images/2021/20211124a/スクリーンショット_2021-11-17_19.39.55.png" alt="daisyUIトップページ" width="1200" height="842">
 

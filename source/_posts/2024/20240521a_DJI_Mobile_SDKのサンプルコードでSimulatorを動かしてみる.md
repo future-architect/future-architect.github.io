@@ -62,7 +62,7 @@ https://github.com/dji-sdk/Mobile-SDK-Android/tree/master
 
 ### ３（開発PC）サンプリコード内にAPIキーを入力
 
-AndroidManifest.xml（パス：Sample Code/app/src/main/main)
+AndroidManifest.xml（パス：Sample Code/app/src/main/main）
 
 <img src="/images/2024/20240521a/image_4.png" alt="image.png" width="1200" height="405" loading="lazy">
 

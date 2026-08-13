@@ -101,7 +101,7 @@ lede: "皆さん、こんにちは。Future Engineer Camp 2020に参加しまし
 * Table Driven Test(TDT)の仕方
   * コードが書きやすいし、読みやすい
 * DynamoDBや、LambdaなどのAWS技術の理解
-  * DynamoDB(NoSQL）のキーの種類、特徴
+  * DynamoDB(NoSQL)のキーの種類、特徴
 
 綺麗なコーディングや、テストは、趣味での開発ではおろそかになりがちですが、しっかりと学べたと思います。
 続いて、開発面です。

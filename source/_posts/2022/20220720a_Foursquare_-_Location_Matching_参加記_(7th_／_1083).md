@@ -11,7 +11,7 @@ categories:
 series: "地図・GIS・位置特定"
 thumbnail: /images/2022/20220720a/thumbnail.png
 author: 金子剛士
-lede: "先日Kaggleで開催された「Foursquare - Location Matching」コンペ(以下4sqコンペ)に社外の知人共にチームで参加し、1083チーム中7位をとりました。（初の金メダルでKaggle Competitions Masterになりました！)本記事では参加記として以下の内容を紹介します。"
+lede: "先日Kaggleで開催された「Foursquare - Location Matching」コンペ(以下4sqコンペ)に社外の知人共にチームで参加し、1083チーム中7位をとりました。（初の金メダルでKaggle Competitions Masterになりました！）本記事では参加記として以下の内容を紹介します。"
 eyecatch: /images/2022/20220720a/4sq_overview.png
 ---
 本記事は[「地図・GIS・位置特定に関する連載」](/articles/20220719a/)二日目の記事です。昨日の[「郵便番号・住所・緯度経度の体系について」](/articles/20220719b/)の記事も、今回の記事とは直接つながってはいませんが、参考になる部分もあるのでぜひご覧ください。
@@ -20,7 +20,7 @@ eyecatch: /images/2022/20220720a/4sq_overview.png
 
 こんにちは、Strategic AI Group所属の金子です。普段は推薦に関連する実装やデータ分析を行っています。
 
-先日Kaggleで開催された[「Foursquare - Location Matching」コンペ](https://www.kaggle.com/competitions/foursquare-location-matching/overview)(以下4sqコンペ)に社外の知人共にチームで参加し、1083チーム中7位をとりました（初の金メダルでKaggle Competitions Masterになりました！ )
+先日Kaggleで開催された[「Foursquare - Location Matching」コンペ](https://www.kaggle.com/competitions/foursquare-location-matching/overview)(以下4sqコンペ)に社外の知人共にチームで参加し、1083チーム中7位をとりました（初の金メダルでKaggle Competitions Masterになりました！ ）
 
 本記事では参加記として以下の内容を紹介します。
 

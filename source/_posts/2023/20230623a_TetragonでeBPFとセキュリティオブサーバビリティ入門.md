@@ -36,7 +36,7 @@ eBPFそのものの実態は、カーネルのイベントをトリガーとし�
 
 eBPFを使ったツールを開発する場合、eBPFプログラムそのものと、それをカーネルのイベントソースにアタッチしてeBPFとデータをやり取りするユーザスペースのコードを書く必要があります。
 
-実際にeBPFのサンプルプログラムを動かしてみましょう。サンプルプログラムには[BCC](https://github.com/iovisor/bcc) (BPF Compiler Collection）という、Python/LuaでeBPFを扱うことのできるツールを使います。インストール方法は[こちら](https://github.com/iovisor/bcc/blob/master/INSTALL.md)が参考になります。
+実際にeBPFのサンプルプログラムを動かしてみましょう。サンプルプログラムには[BCC](https://github.com/iovisor/bcc) (BPF Compiler Collection)という、Python/LuaでeBPFを扱うことのできるツールを使います。インストール方法は[こちら](https://github.com/iovisor/bcc/blob/master/INSTALL.md)が参考になります。
 
 次はHello Worldプログラムです。
 

@@ -61,7 +61,7 @@ OpenTelemtryはその名の通り「テレメトリー」のためのソフト�
 * [トレースのログ出力内容](https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/trace/semantic_conventions)
 
 ログのエラーレベルについても[ガイドライン](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/data-model.md#severity-fields
-)が作られています。まだまだログの実装自体は行われていませんが、このあたり、言語やロギングライブラリによっても指標はバラバラでした。エラーレベル自体はそこまでブレることはないですが（CRITICALとかがあったりなかったりはあるが）、どのようなキーですか？（LEVEL？ SEVERITY？ )とかも違っていました。そのため、ログ収集基盤を作った時に何をエラーとして通知するかは毎回手作りしていたと思いますが、指標が決まってくるとデフォルトでいい感じに動くようになってくるでしょう。ということで、各言語の次世代ロギングライブラリを作ってOSS界隈で名前を売りたい会社は今がチャンスと言えます。
+)が作られています。まだまだログの実装自体は行われていませんが、このあたり、言語やロギングライブラリによっても指標はバラバラでした。エラーレベル自体はそこまでブレることはないですが（CRITICALとかがあったりなかったりはあるが）、どのようなキーですか？（LEVEL？ SEVERITY？）とかも違っていました。そのため、ログ収集基盤を作った時に何をエラーとして通知するかは毎回手作りしていたと思いますが、指標が決まってくるとデフォルトでいい感じに動くようになってくるでしょう。ということで、各言語の次世代ロギングライブラリを作ってOSS界隈で名前を売りたい会社は今がチャンスと言えます。
 
 以前、[Future Tech Nightでローカルで動くログビューア](https://future-architect.github.io/articles/20210427b/)を試しに作って発表しました。これも構造化ロギングを前提としたものですが、アプリケーションログ出力が平準化されるなら、少ない設定でいい感じに動くビューアーとかも開発しやすくなりますね。
 
@@ -95,7 +95,7 @@ AWSはコレクター向けのものがあるので、アプリのエクスポ�
 
 というのも、インターフェースは同じであっても、[gorilla/mux](https://github.com/open-telemetry/opentelemetry-go-contrib/blob/main/instrumentation/github.com/gorilla/mux/otelmux/mux.go#L120-L130)のエクスポーターは、contextに入っているgorilla/mux専用のデータにアクセスしてパス情報をとってきているからです。
 
-では標準ライブラリの[net/http向けのエクスポータ](https://github.com/open-telemetry/opentelemetry-go-contrib/tree/main/instrumentation/net/http)が使えるかというと、これもそのままでは使えません。net/httpのエクスポータはスパン名をミドルウェア作成時に固定値（ここでは``"Hello"``)で渡す必要があります。
+では標準ライブラリの[net/http向けのエクスポータ](https://github.com/open-telemetry/opentelemetry-go-contrib/tree/main/instrumentation/net/http)が使えるかというと、これもそのままでは使えません。net/httpのエクスポータはスパン名をミドルウェア作成時に固定値（ここでは``"Hello"``）で渡す必要があります。
 
 ```go
 otelHandler := otelhttp.NewHandler(http.HandlerFunc(helloHandler), "Hello")
@@ -103,7 +103,7 @@ otelHandler := otelhttp.NewHandler(http.HandlerFunc(helloHandler), "Hello")
 http.Handle("/hello", otelHandler)
 ```
 
-エンドポイントごとに別の名前を設定したい場合は、これをベースにchiのミドルウェアを作るとしたら（net/httpのexporterラッパー)次のようにエンドポイントごとに設定が必要ですし、URLのパスとスパン名と同じような名前を二度書かないといけないのはクールじゃないですね。
+エンドポイントごとに別の名前を設定したい場合は、これをベースにchiのミドルウェアを作るとしたら（net/httpのexporterラッパー）次のようにエンドポイントごとに設定が必要ですし、URLのパスとスパン名と同じような名前を二度書かないといけないのはクールじゃないですね。
 
 ```go
 // net/httpを使うとイマイチ
