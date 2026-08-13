@@ -288,8 +288,3 @@ gureguなどサードパーティ製のライブラリの利用と迷ってい�
 
 それでは、明日の投稿もお楽しみに。
 
-[DynamoDB×Go連載企画](/tags/DynamoDB%C3%97Go/)以外にも多くの連載企画があります。特にGo Cloud連載が今回のテーマに近いです。
-
-* [Go Cloud 連載](/tags/GoCDK/)
-* [GCP 連載](/articles/20200202/)
-* [Auth0 連載](/tags/Auth0/)
