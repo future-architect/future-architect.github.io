@@ -1,8 +1,14 @@
 'use strict';
 
-// 関連記事の最大表示件数
-// 記事が長文化する傾向にあるため、記事末尾のスクロール量を抑える目的で絞っている
-const maxCount = 3;
+// 関連記事の件数 (#2356)。
+// 記事が長文化する傾向にあるため、常に見せるのは3件に絞り、
+// 続きは details で畳んでクリックで開けるようにする（参照記事と同じ作り）。
+// 畳む側の候補はタグ由来（スコア有り）だけ。実測では4位以下に
+// カテゴリ補填（同カテゴリのSNS人気順で、関連の根拠が無い）や
+// 汎用タグの同点帯のノイズが混ざり、スコアの絶対値では切れなかったため、
+// しきい値ではなく出所で絞る
+const DISPLAY_COUNT = 3;
+const MORE_COUNT = 5;
 const { getSNSCnt } = require('./lib/sns');
 const { postListItem } = require('./lib/post_list');
 const { navLinkedPaths } = require('./lib/series');
@@ -66,54 +72,72 @@ function buildTokenIndex(site) {
 }
 
 /**
- * 上位から maxCount 本選ぶ。ただし同じ連載の記事で全部は埋めない。
+ * 上位から表示分＋畳み分を選ぶ。ただし同じ連載の記事で埋めない。
  *
- * 3枠すべてが同じ連載になると、連載ナビと索引で辿れる範囲しか出ず、
- * 関連記事の枠から得られる導線がゼロになる。少なくとも1枠は連載の外から取る。
+ * 同じ連載は索引・前後ナビで辿れるため、関連記事の枠を使う価値が低い。
+ * 全体で2枠まで（畳み分を増やす前の「3枠中最低1枠は連載の外」の実質値を、
+ * 総数を増やしても変えない）。
  *
- * 逆に締め出しはしない。テーマが自由な連載（春の入門祭りなど）では、
+ * 締め出しはしない。テーマが自由な連載（春の入門祭りなど）では、
  * 同じ連載でも独立した記事なので、関連が強ければ出す価値がある。
  */
 function pickRelatedPosts(posts, series) {
-  if (!series) return posts.slice(0, maxCount);
+  const total = DISPLAY_COUNT + MORE_COUNT;
+  if (!series) return posts.slice(0, total);
 
+  const SAME_SERIES_MAX = 2;
   const picked = [];
   const deferred = [];
   for (const p of posts) {
-    if (picked.length >= maxCount) break;
+    if (picked.length >= total) break;
     const sameSeries = p.series === series;
-    if (sameSeries && picked.filter((x) => x.series === series).length >= maxCount - 1) {
+    if (sameSeries && picked.filter((x) => x.series === series).length >= SAME_SERIES_MAX) {
       deferred.push(p);
       continue;
     }
     picked.push(p);
   }
   // 連載の外から埋まらなかったときは、抑えた分を戻す
-  return picked.concat(deferred).slice(0, maxCount);
+  return picked.concat(deferred).slice(0, total);
 }
 
 // HTMLを生成するロジックを共通関数として外に切り出す
 function generateRelatedPostsHtml(posts, series) {
   posts = pickRelatedPosts(posts, series);
-  const count = Math.min(maxCount, posts.length);
-  if (count === 0) {
+
+  let visible = posts.slice(0, DISPLAY_COUNT);
+  // 畳み分はタグ由来（スコア有り）だけ。カテゴリ補填は表の3件を埋める保険で、
+  // 開いてまで見せる関連の根拠が無い
+  let more = posts.slice(DISPLAY_COUNT).filter((p) => p.score);
+  // 残り1件なら畳む意味がない（参照記事の畳みと同じ扱い）
+  if (more.length === 1) {
+    visible = visible.concat(more);
+    more = [];
+  }
+
+  if (visible.length === 0) {
     return `<p class="related-posts-none">No related post.</p>`;
   }
 
-  let result = '';
-  for (let i = 0; i < count; i++) {
-    const related = posts[i];
-    if (related) {
-      const scoreText = related.score ? `スコア: ${related.score.toFixed(4)}` : '';
-      const titleAttr = `${related.lede} ${scoreText}`.trim();
-      // マークアップは lib/post_list.js に集約している
-      result += postListItem(related, 'related-posts-item', titleAttr, true);
-    }
-  }
+  // マークアップは lib/post_list.js に集約している
+  const item = (related) => {
+    const scoreText = related.score ? `スコア: ${related.score.toFixed(4)}` : '';
+    const titleAttr = `${related.lede} ${scoreText}`.trim();
+    return postListItem(related, 'related-posts-item', titleAttr, true);
+  };
+
+  // 語彙と作りはランキング・参照記事の畳みに揃える (#2249)
+  const moreHtml = more.length
+    ? `
+    <details class="related-posts-more">
+      <summary>残り ${more.length}本を表示</summary>
+      <ul class="related-post-link">${more.map(item).join('')}</ul>
+    </details>`
+    : '';
 
   return `
     <div class="widget">
-      <ul class="related-post-link">${result}</ul>
+      <ul class="related-post-link">${visible.map(item).join('')}</ul>${moreHtml}
     </div>`;
 }
 
@@ -254,8 +278,8 @@ hexo.extend.helper.register('list_related_posts', function () {
       (a.path < b.path ? -1 : a.path > b.path ? 1 : 0),
   );
 
-  // 4. 記事数がmaxCountに満たない場合はカテゴリから補填
-  if (relatedPosts.length < maxCount) {
+  // 4. 表示分（3件）に満たない場合はカテゴリから補填。畳み分は補填しない
+  if (relatedPosts.length < DISPLAY_COUNT) {
     const postsToFill = getCategoryRelatedPosts(this, post, isExcluded);
     postsToFill.forEach((p) => {
       if (relatedPosts.findIndex((rp) => rp._id === p._id) === -1) {
