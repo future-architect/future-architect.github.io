@@ -6,7 +6,7 @@ tags:
   - Mermaid.js
   - Tips
 categories:
-  - Programming
+  - DevOps
 thumbnail: /images/2026/20260612a/thumbnail.png
 author: 真野隼記
 lede: "Mermaid.js で図を書こうと Mermaid Live Editor を開いたはいいものの、思いの外色々なボタンがあって機能を使いこなせない！と感じている人も多いのではないでしょうか。そんな人に役立つかもしれない知識を、Tipsという形で9つまとめました。"
