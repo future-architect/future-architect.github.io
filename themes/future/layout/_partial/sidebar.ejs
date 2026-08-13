@@ -2,6 +2,10 @@
 <%# data-nosnippet: サイドバー（検索窓・目次・カテゴリ・Tech Cast・アドベント
     カレンダー）は全ページ共通または本文の再掲で、スニペットに出す価値が無い (#2359) %>
 <div data-nosnippet>
+<%# 特設ページは本文が page.content でなくレイアウト側にあるため toc() が使えない。
+    レイアウトから specialsToc（[{id, text}]）を受け取って目次を組む (#2345)。
+    目次を出すページではページ内移動が主なので、カテゴリ一覧は出さない %>
+<% const sToc = (typeof specialsToc === 'undefined') ? null : specialsToc; %>
 <% if (!is_post()) { %>
 <form id="cse-search-box" action="https://google.com/cse" class="search-wrapper">
   <input type="text" name="q" placeholder="検索" />
@@ -18,6 +22,16 @@
   <%- toc(page.content, {list_number:false, max_depth:4}) %>
 </section>
 <% } %>
+<% if (sToc) { %>
+<section class="toc-section">
+  <h2 class="margin-top-30">目次</h2>
+  <ol class="toc">
+    <% sToc.forEach(function(item){ %>
+    <li class="toc-item toc-level-2"><a class="toc-link" href="#<%= item.id %>"><span class="toc-text"><%= item.text %></span></a></li>
+    <% }) %>
+  </ol>
+</section>
+<% } %>
 <%# カテゴリは記事ページでは出さない。記事を読んでいる最中のサイドバーでは
     目次と並んで導線が競合し、本文から目を逸らすノイズになる。
     記事からの回遊は、記事末の「関連記事」「この記事を参照している記事」が担う %>
@@ -26,7 +40,7 @@
     別の軸の一覧を並べても意図がぼやける。検索窓は上で常に出している。
     カテゴリのページには残す。絞り込みの結果であると同時に、
     別のカテゴリへ移る導線を兼ねているため %>
-<% if (!is_tag() && !page.author) { %>
+<% if (!is_tag() && !page.author && !sToc) { %>
 <section class="category">
 <h2 class="margin-top-30">カテゴリー</h2>
 <%- partial('_widget/category.ejs') %>
