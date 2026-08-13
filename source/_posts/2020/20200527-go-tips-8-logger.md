@@ -4,10 +4,10 @@ date: 2020/05/27 10:36:36
 postid: ""
 tags:
   - Go
-  - GoTips連載
   - ログ
 categories:
   - Programming
+series: "Go Tips"
 thumbnail: /images/2020/20200527/thumbnail.png
 author: 澁川喜規
 lede: "Go tipsということで、シンプルネタを投稿します。

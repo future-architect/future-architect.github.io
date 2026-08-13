@@ -5,9 +5,9 @@ postid: ""
 tags:
   - Go
   - GoLand
-  - GoTips連載
 categories:
   - Programming
+series: "Go Tips"
 thumbnail: /images/2020/20200519/thumbnail.png
 author: 真野隼記
 lede: "今回はGoでアプリ開発するときにお世話になっている人が多い、GolandのTipsを紹介します。"

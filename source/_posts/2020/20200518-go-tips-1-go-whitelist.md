@@ -4,11 +4,11 @@ date: 2020/05/18 09:55:52
 postid: ""
 tags:
   - Go
-  - GoTips連載
   - プロキシ
   - Tips
 categories:
   - Programming
+series: "Go Tips"
 thumbnail: /images/2020/20200518/thumbnail.png
 author: 宮崎将太
 lede: "ホワイトリストProxy申請するときのGo依存ライブラリURLドメインの調べ方を記載します。"
@@ -18,7 +18,7 @@ lede: "ホワイトリストProxy申請するときのGo依存ライブラリURL
 
 ## はじめに
 
-[Go Tips連載](/tags/GoTips連載/)の第1弾目です。
+Go Tips連載の第1弾目です。
 
 TIG DXユニットの宮崎です。これまでRuby、Java中心に仕事をしてきましたが、ここ1年は某鉄道会社のID連携基盤サーバサイドをGolangで作っています。今回はGo Tips連載の第1回として、ホワイトリストProxy申請するときのGo依存ライブラリURLドメインの調べ方を記載します。
 

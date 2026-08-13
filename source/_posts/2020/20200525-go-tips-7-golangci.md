@@ -4,10 +4,10 @@ date: 2020/05/25 09:30:35
 postid: ""
 tags:
   - Go
-  - GoTips連載
   - Linter
 categories:
   - Programming
+series: "Go Tips"
 thumbnail: /images/2020/20200525/thumbnail.png
 author: 佐藤尚至
 lede: "今回はgolangci-lintを取り上げます。Goのコード品質のベースラインを上げる目的でgolngci-lintというlintアグリゲーターを利用されているかたも多いかと思います。コードベースがlint issueのないクリーンな状態に保たれていることが望ましいのですが、必ずしもそういった状態を維持できるとはかぎりません。"
