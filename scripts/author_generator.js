@@ -144,9 +144,11 @@ hexo.extend.helper.register('list_authors', function (year = 'all') {
     // 同じ定義。マークは記事一覧の NEW（.newitem）と同じ表現
     const yearNum = Number(year);
     const isNewIn = (author) => Math.min(...yearsByAuthor.get(author)) === yearNum;
+    // NEW は名前と同じ行（アンカー内の名前直後）に置く。リンクの外に置くと
+    // 2行目の件数の隣に折り返され、「件数が新しい」ように読めてしまう
     authorMapper = (author) => `
       <li class="author-list-item">
-        <a class="author-list-link" href="/authors/${author_to_url.call(this, author)}">${author}</a>${isNewIn(author) ? '<span class="newitem">NEW</span>' : ''}
+        <a class="author-list-link" href="/authors/${author_to_url.call(this, author)}">${author}${isNewIn(author) ? '<span class="newitem">NEW</span>' : ''}</a>
         <span class="author-list-count">${count_posts(author)} 件</span>
       </li>`;
   }
