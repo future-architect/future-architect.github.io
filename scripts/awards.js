@@ -18,7 +18,7 @@ hexo.extend.helper.register('author_awards', function (author) {
   const years = rows
     .filter((r) => r.author === author)
     .map((r) => r.year)
-    .sort();
+    .sort((a, b) => b - a); // 新しい年を先に
   if (years.length === 0) return null;
   return { years, hallOfFame: years.length >= HALL_OF_FAME_WINS };
 });
