@@ -139,10 +139,16 @@ hexo.extend.helper.register('list_authors', function (year = 'all') {
         </li>`;
     };
   } else {
-    // 年指定の場合のロジック (従来通り)
+    // 年指定: その年が初投稿の著者に NEW を付ける (#2413)。
+    // 「1本目を踏み出してくれた新しい寄稿者数/年」という運営のキーメトリクスと
+    // 同じ定義。マークは記事一覧の NEW（.newitem）と同じ表現
+    const yearNum = Number(year);
+    const isNewIn = (author) => Math.min(...yearsByAuthor.get(author)) === yearNum;
+    // NEW は名前と同じ行（アンカー内の名前直後）に置く。リンクの外に置くと
+    // 2行目の件数の隣に折り返され、「件数が新しい」ように読めてしまう
     authorMapper = (author) => `
       <li class="author-list-item">
-        <a class="author-list-link" href="/authors/${author_to_url.call(this, author)}">${author}</a>
+        <a class="author-list-link" href="/authors/${author_to_url.call(this, author)}">${author}${isNewIn(author) ? '<span class="newitem">NEW</span>' : ''}</a>
         <span class="author-list-count">${count_posts(author)} 件</span>
       </li>`;
   }
@@ -162,6 +168,19 @@ hexo.extend.helper.register('count_authors', function (year = 'all') {
       ? this.site.posts
       : this.site.posts.filter((post) => post.date.format('YYYY') === year);
   return posts.map((post) => post.author).unique().length;
+});
+
+// その年が初投稿の著者数 (#2413)。振り返り記事で毎年数えている
+// 「1本目を踏み出してくれた新しい寄稿者数」と同じ定義
+hexo.extend.helper.register('count_new_authors', function (year) {
+  const yearNum = Number(year);
+  const firstYear = new Map();
+  this.site.posts.forEach((post) => {
+    const y = post.date.year();
+    const prev = firstYear.get(post.author);
+    if (prev === undefined || y < prev) firstYear.set(post.author, y);
+  });
+  return [...firstYear.values()].filter((y) => y === yearNum).length;
 });
 
 // 著者ページの傾向表示用 (#2082)。よく投稿するカテゴリ（上位3）と

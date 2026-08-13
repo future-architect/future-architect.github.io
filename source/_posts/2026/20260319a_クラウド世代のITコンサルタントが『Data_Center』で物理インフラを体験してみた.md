@@ -9,7 +9,7 @@ tags:
 categories:
   - Infrastructure
 thumbnail: /images/2026/20260319a/thumbnail.png
-author: 片岡 久人
+author: 片岡久人
 lede: "今回は『Data Center』というゲームがリリースされ、一部界隈で話題になっていたので、プレイした感想をお話できればと思います。"
 ---
 ## 1. はじめに
