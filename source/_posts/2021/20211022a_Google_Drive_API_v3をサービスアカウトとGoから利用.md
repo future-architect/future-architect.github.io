@@ -41,7 +41,7 @@ Google Drive APIを使うための[認証方式](https://cloud.google.com/docs/a
 
 <img src="/images/2021/20211022a/Google_Drive_APIの有効化.png" alt="Google_Drive_APIの有効化.png" width="1200" height="640" loading="lazy">
 
-続いて、[APIとサービスにある、Google Drive APIの認証情報](https://console.cloud.google.com/apis/api/drive.googleapis.com/credentials)タブから、「認証情報を作成」をクリックして、サービスアカウントの作成を行います。今回は適当に、google-drive-exampleという名前にしました。
+続いて、[APIとサービスにある、Google Drive APIの認証情報](https://console.cloud.google.com/apis/api/drive.googleapis.com/credentials)タブから、「認証情報を作成」をクリックして、サービスアカウントを作成します。今回は適当に、google-drive-exampleという名前にしました。
 
 <img src="/images/2021/20211022a/認証情報を作成.png" alt="認証情報を作成.png" width="1200" height="470" loading="lazy">
 

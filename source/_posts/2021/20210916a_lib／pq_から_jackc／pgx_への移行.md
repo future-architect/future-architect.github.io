@@ -35,7 +35,7 @@ https://github.com/lib/pq#status
 ## 使い方の比較
 
 lib/pq （およびdatabase/sql）と pgx の使い方を比較していきます。
-pgxはドライバだけでなく database/sql 相当の機能も備えており、これ単体で使用することが可能です。
+pgxはドライバだけでなく database/sql 相当の機能も備えており、これ単体で使用できます。
 
 ### 接続
 
@@ -165,7 +165,7 @@ func invalidQueryPgx() error {
 
 ## pgx の便利機能をつかう
 
-pgx にはLoggerを設定することが可能です。
+pgx にはLoggerを設定できます。
 
 次のコードは pgx に zerolog を設定する例です。コネクションプールの作成時に設定します。
 
@@ -219,7 +219,7 @@ func batch() error {
 
 ## pgx と database/sql をあわせてつかう
 
-[sqlx](https://github.com/jmoiron/sqlx) や [SQLBoiler](https://github.com/volatiletech/sqlboiler) など、 database/sql に依存するライブラリを使用する場合、pgx のドライバ (https://pkg.go.dev/github.com/jackc/pgx/v4@v4.13.0/stdlib) のみを利用することが可能です。
+[sqlx](https://github.com/jmoiron/sqlx) や [SQLBoiler](https://github.com/volatiletech/sqlboiler) など、 database/sql に依存するライブラリを使用する場合、pgx のドライバ (https://pkg.go.dev/github.com/jackc/pgx/v4@v4.13.0/stdlib) のみを利用できます。
 
 この連載で紹介された [ent](https://github.com/ent/ent) でも使用可能です。
 https://entgo.io/docs/sql-integration/#use-pgx-with-postgresql
@@ -242,7 +242,7 @@ uri := "postgres://postgres:password@postgres/postgres?sslmode=disable"
 
 ```
 
-`stdlib.RegisterConnConfig()` を使えば、Loggerなどを設定することも可能です。
+`stdlib.RegisterConnConfig()` を使えば、Loggerなどの設定もできます。
 
 ```go
 uri := "postgres://postgres:password@postgres/postgres?sslmode=disable"
