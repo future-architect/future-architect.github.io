@@ -22,7 +22,13 @@
  * ただし共起では「同じ仲間だが同じ記事には付かない」関係が見えない。
  * Go1.26 と Go1.27 の共起は0本で、バージョン違いは排他的に付くため原理的に
  * 検出できない。そこで名前の形（末尾の数字を外した接頭辞が一致する）から
- * 兄弟を拾い、共起の結果より前に置く。
+ * 兄弟を拾い、共起の結果の後ろに置く。
+ *
+ * 並びを共起→兄弟にしているのは、先頭の一等地を非自明な発見に使うため
+ * (#2357)。Terraform → IaC のような共起の関係は見て初めて気づくが、
+ * Go1.26 の隣の Go1.27 は名前だけで関係が自明なので、末尾でも見落とされない。
+ * 逆に先頭へ置くと、兄弟が多いタグ（Go1.xx は11個）で一等地を占拠して
+ * 発見を後ろへ押し出してしまう。
  *
  * 名前の一致は共起と違って決定的な関係なので、件数による裏付けは要らない。
  * 兄弟が1つでも、移動先が1本でも出す。読者にとって Go1.26 の隣に Go1.27 が
@@ -125,7 +131,7 @@ hexo.extend.helper.register('related_tags', function (tagName) {
   const own = total.get(tagName);
   if (!own) return [];
 
-  // 同じ系列のタグ。共起では見えない関係なので、件数で足切りせず先に置く
+  // 同じ系列のタグ。共起では見えない関係なので、件数で足切りせず全部出す
   const stem = family(tagName);
   const siblings = (stem ? families.get(stem) || [] : [])
     .filter((name) => name !== tagName)
@@ -167,5 +173,5 @@ hexo.extend.helper.register('related_tags', function (tagName) {
   // 同点は名前で決める（決着が無いとビルドごとに並びが変わる）
   const score = (r) => r.co * Math.log(1 + r.lift);
   rows.sort((a, b) => score(b) - score(a) || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
-  return siblings.concat(rows.slice(0, MAX_CO_TAGS));
+  return rows.slice(0, MAX_CO_TAGS).concat(siblings);
 });
