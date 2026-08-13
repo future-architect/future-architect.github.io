@@ -9,7 +9,7 @@ tags:
   - 登壇レポート
   - カンファレンス
 categories:
-  - DevOps
+  - Programming
 thumbnail: /images/2020/20201010/thumbnail.png
 author: 伊藤真彦
 lede: "TIGの伊藤真彦です先日Go Conference’20 in Autumn SENDAIに登壇させていただきました、リモート登壇の為残念ながら現地には行きませんでした。発表資料はこちらです。"
