@@ -79,7 +79,7 @@ lede: "Go 1.27 で標準ライブラリに追加されたuuidパッケージを�
 ## コマンド
 
 ```sh
-make s      # ローカルサーバ（http://localhost:4000）
+make s      # ローカルサーバ（http://localhost:4000、ライブリロード付き。hexo-server-live）
 make g      # 静的ファイル生成（public/）
 make clean  # キャッシュ・生成物の削除
 make fix    # textlint --fix（source/_posts 配下）
