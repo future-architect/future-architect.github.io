@@ -9,7 +9,9 @@
 const recruitPanel = {
   url: 'https://www.future.co.jp/recruit/recruit/rec-career/',
   title: 'フューチャー採用情報',
-  label: 'フューチャー採用ページ',
+  // 「採用ページ」はブログ内のページとも読めるため外部であることを名乗る (#2346)。
+  // note・LEAD TO THE FUTURE は外部メディア名を名乗っているので付けない
+  label: 'フューチャー採用ページ（外部サイト）',
   image: '/career_official.jpg',
   lede: '私たちは、多様なバックグラウンドを持つ人材が集まってこそ、より強い組織になると考えています。',
 };
