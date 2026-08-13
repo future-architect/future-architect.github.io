@@ -94,6 +94,51 @@ function navTitle(title, name) {
   return title;
 }
 
+/**
+ * 系統（バージョン・年で続いていく連載）の前後 (#2383)。
+ *
+ * 「数字の連続を除いた名前が同じ」連載を同一系統とみなし、数字の数値順に繋ぐ
+ * （Go1.26リリース → Go1.27リリース、春の入門祭り2025 → 春の入門祭り2026）。
+ * 実データでは11系統48連載がこの規則で繋がり、誤りは無かった。
+ *
+ * 命名規則で繋がらない継続（改名した企画など）は
+ * source/_data/series_succession.yml の next で明示し、
+ * 名前が偶然同じ形になるだけの連載は standalone: true で系統から外す
+ */
+function successionMaps(site, groups) {
+  const data = (site.data && site.data.series_succession) || {};
+  const famKey = (name) => name.replace(/\d+(?:\.\d+)*/g, '#');
+  // 1.27 -> 1027（桁上げ1000）。文字列比較だと 1.9 > 1.27 になる
+  // （related_tags.js の versionKey と同じ理由）。名前に数字が複数あれば連結する
+  const numKey = (name) =>
+    (name.match(/\d+(?:\.\d+)*/g) || [])
+      .flatMap((v) => v.split('.'))
+      .reduce((acc, n) => acc * 1000 + Number(n), 0);
+
+  const fams = new Map();
+  for (const name of groups.keys()) {
+    if (data[name] && data[name].standalone) continue;
+    const key = famKey(name);
+    if (key === name) continue; // 数字を含まない連載は系統を作らない
+    if (!fams.has(key)) fams.set(key, []);
+    fams.get(key).push(name);
+  }
+  const nextOf = new Map();
+  for (const list of fams.values()) {
+    list.sort((a, b) => numKey(a) - numKey(b));
+    for (let i = 0; i + 1 < list.length; i++) nextOf.set(list[i], list[i + 1]);
+  }
+  // 明示された継続は自動導出より優先する
+  for (const [name, node] of Object.entries(data)) {
+    if (node && typeof node.next === 'string' && groups.has(name) && groups.has(node.next)) {
+      nextOf.set(name, node.next);
+    }
+  }
+  const prevOf = new Map();
+  for (const [a, b] of nextOf) prevOf.set(b, a);
+  return { nextOf, prevOf };
+}
+
 let cache = null;
 
 function build(site) {
@@ -105,12 +150,23 @@ function build(site) {
     groups.get(post.series).push(post);
   });
 
+  const { nextOf, prevOf } = successionMaps(site, groups);
+  // 系統リンクの行き先は索引記事（無ければ先頭の記事）。/series/ 一覧と同じ規則
+  const destOf = (name) => {
+    const posts = groups.get(name);
+    const index = posts.find((p) => p.tags && p.tags.some((t) => t.name === 'インデックス'));
+    return { name, path: (index || posts[0]).path };
+  };
+
   const series = new Map(); // 記事のパス -> その記事から見た連載
   for (const [name, posts] of groups) {
     const index = posts.find((p) => p.tags && p.tags.some((t) => t.name === 'インデックス'));
 
     // 落とすのはナビの表示だけ。記事の title そのものは触らない
     const nav = posts.map((p) => ({ path: p.path, title: navTitle(p.title, name) }));
+
+    const prevSeries = prevOf.has(name) ? destOf(prevOf.get(name)) : null;
+    const nextSeries = nextOf.has(name) ? destOf(nextOf.get(name)) : null;
 
     posts.forEach((post, i) => {
       const entry = {
@@ -119,6 +175,8 @@ function build(site) {
         index: index && index !== post ? index : null,
         prev: i > 0 ? nav[i - 1] : null,
         next: i < posts.length - 1 ? nav[i + 1] : null,
+        prevSeries,
+        nextSeries,
       };
       // ナビが既にリンクしている記事。関連記事・被参照記事から落とすのに使う
       entry.linked = new Set(
