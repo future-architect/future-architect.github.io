@@ -348,3 +348,17 @@ hexo.extend.helper.register('doctor_external_links', function () {
 
   return findings;
 });
+
+/**
+ * カテゴリの一言説明（source/_data/categories.yml #2405）の突き合わせ。
+ * 説明の無いカテゴリ（新設時の書き忘れ）と、カテゴリとして実在しない
+ * 説明（改名・統合後の消し忘れやタイプミス）を両方向で検出する。
+ */
+hexo.extend.helper.register('doctor_category_descriptions', function () {
+  const described = new Set(Object.keys((this.site.data && this.site.data.categories) || {}));
+  const actual = new Set(this.site.categories.map((c) => c.name));
+  return {
+    missing: [...actual].filter((name) => !described.has(name)).sort(),
+    orphaned: [...described].filter((name) => !actual.has(name)).sort(),
+  };
+});
