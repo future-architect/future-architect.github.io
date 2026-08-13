@@ -17,6 +17,12 @@ Hexo 7.3 製の静的サイトで、GitHub Pages にホスティングされて�
 | `themes/future/_config.yml` | テーマ設定（メニュー、GA4 プロパティ、SNSリンク） |
 | `_profile.yml` | 著者プロフィール（about / twitter_id / github_id） |
 
+コードの置き場所は **URL ではなく部品の種別**で決める。
+`layout/` 直下＝ページ種、`_partial/`＝共有部品、`_widget/`＝サイドバー、`scripts/`＝機能単位＋`lib/`。
+URL は読者向け、コード配置は保守者向けの分類なので、鏡合わせにすると URL を変えるたびにコード移動が要る。
+`/specials/` のような名前空間を切っても `layout/specials/` は作らない。
+同じ系統のレイアウトが3〜4本に増えて見通しが悪くなったら、そのとき分ける（#2369）。
+
 ## 記事の書き方
 
 ファイル名は `source/_posts/<年>/YYYYMMDD<postid>_<タイトル>.md`。
