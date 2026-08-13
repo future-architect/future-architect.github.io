@@ -22,3 +22,24 @@ hexo.extend.helper.register('author_awards', function (author) {
   if (years.length === 0) return null;
   return { years, hallOfFame: years.length >= HALL_OF_FAME_WINS };
 });
+
+// /authors/ の表彰一覧 (#2409)。受賞バッジは著者ページにしか出ないため、
+// 顔ぶれを一覧で見る場所をここで作る。新人賞などの部門が増えたら
+// awards.yml に kind フィールドを足して拡張する
+hexo.extend.helper.register('awards_list', function () {
+  const rows = (this.site.data && this.site.data.awards) || [];
+  const byYear = new Map();
+  const wins = new Map();
+  for (const r of rows) {
+    if (!byYear.has(r.year)) byYear.set(r.year, []);
+    byYear.get(r.year).push(r.author);
+    wins.set(r.author, (wins.get(r.author) || 0) + 1);
+  }
+  const years = [...byYear.entries()]
+    .sort((a, b) => b[0] - a[0])
+    .map(([year, authors]) => ({ year, authors }));
+  const hallOfFame = [...wins.entries()]
+    .filter(([, n]) => n >= HALL_OF_FAME_WINS)
+    .map(([author, n]) => ({ author, wins: n }));
+  return { years, hallOfFame };
+});
