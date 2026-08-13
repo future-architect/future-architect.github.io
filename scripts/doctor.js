@@ -187,12 +187,12 @@ hexo.extend.helper.register('doctor_checks', function () {
  * 見るためのツリー。複数親のノードはそれぞれの親の下に重複して出す
  * （DAG を1本の木に潰すと片方の系統から見えなくなる）。
  */
-hexo.extend.helper.register('doctor_ontology', function() {
+hexo.extend.helper.register('doctor_ontology', function () {
   const ontology = (this.site.data && this.site.data.tag_ontology) || {};
 
   const tagInfo = new Map(); // タグ名 -> {path, ids}
-  this.site.tags.forEach(tag => {
-    tagInfo.set(tag.name, {path: tag.path, ids: new Set(tag.posts.map(p => p._id))});
+  this.site.tags.forEach((tag) => {
+    tagInfo.set(tag.name, { path: tag.path, ids: new Set(tag.posts.map((p) => p._id)) });
   });
 
   const children = new Map();
@@ -207,7 +207,7 @@ hexo.extend.helper.register('doctor_ontology', function() {
 
   // バージョン同義（scripts/version_tags.js と同じ規則）。語幹ノードに「版」として出す
   const VERSIONED = /^(.+?)(\d+(?:\.\d+)+|\d{2,})$/;
-  const stemOf = name => {
+  const stemOf = (name) => {
     const node = ontology[name];
     if (node && node.notVersion) return null;
     if (node && node.versionOf) return node.versionOf;
@@ -245,27 +245,30 @@ hexo.extend.helper.register('doctor_ontology', function() {
       path: info ? info.path : null, // タグとして実在しない概念ノードはリンク先が無い
       posts: info ? info.ids.size : 0,
       family: familyIds(name, new Set([name])).size,
-      otherParents: ((ontology[name] || {}).broader || []).filter(p => p !== parentName),
+      otherParents: ((ontology[name] || {}).broader || []).filter((p) => p !== parentName),
       versions: (versionsByStem.get(name) || [])
         .sort((a, b) => (a < b ? 1 : -1)) // 新しい版を先に（名前の降順で近似）
-        .map(v => ({name: v, path: tagInfo.get(v).path, posts: tagInfo.get(v).ids.size})),
+        .map((v) => ({ name: v, path: tagInfo.get(v).path, posts: tagInfo.get(v).ids.size })),
       children: (children.get(name) || [])
-        .map(c => build(c, name))
+        .map((c) => build(c, name))
         .sort((a, b) => b.family - a.family || (a.name < b.name ? -1 : 1)),
     };
   };
 
   // versionOf ノード（Vue3 等）は語幹の「版」として出すので、木や独立タグには数えない
-  const roots = Object.keys(ontology)
-    .filter(n => !hasParent.has(n) && !(ontology[n] && ontology[n].versionOf));
-  const trees = roots.filter(n => children.has(n))
-    .map(n => build(n, null))
+  const roots = Object.keys(ontology).filter(
+    (n) => !hasParent.has(n) && !(ontology[n] && ontology[n].versionOf),
+  );
+  const trees = roots
+    .filter((n) => children.has(n))
+    .map((n) => build(n, null))
     .sort((a, b) => b.family - a.family || (a.name < b.name ? -1 : 1));
-  const standalone = roots.filter(n => !children.has(n))
-    .map(n => build(n, null))
+  const standalone = roots
+    .filter((n) => !children.has(n))
+    .map((n) => build(n, null))
     .sort((a, b) => b.posts - a.posts || (a.name < b.name ? -1 : 1));
 
-  return {trees, standalone, nodeCount: Object.keys(ontology).length};
+  return { trees, standalone, nodeCount: Object.keys(ontology).length };
 });
 
 /**
@@ -306,7 +309,11 @@ hexo.extend.helper.register('doctor_external_links', function () {
   const layoutDir = path.join(__dirname, '..', 'themes', 'future', 'layout');
   const findings = [];
 
-  const textOf = (inner) => inner.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+  const textOf = (inner) =>
+    inner
+      .replace(/<[^>]*>/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
 
   const scan = (file, content) => {
     // EJS 式は先に落とす。href の式が引用符を含むと属性の切り出しが壊れる

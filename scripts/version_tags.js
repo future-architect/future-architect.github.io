@@ -21,13 +21,13 @@
 
 const VERSIONED = /^(.+?)(\d+(?:\.\d+)+|\d{2,})$/;
 
-hexo.extend.filter.register('before_generate', async function() {
+hexo.extend.filter.register('before_generate', async function () {
   const data = this.locals.get('data') || {};
   const ontology = data.tag_ontology || {};
 
-  const tagNames = new Set(this.model('Tag').map(t => t.name));
+  const tagNames = new Set(this.model('Tag').map((t) => t.name));
 
-  const stemOf = name => {
+  const stemOf = (name) => {
     const node = ontology[name];
     if (node && node.notVersion) return null;
     if (node && node.versionOf) return node.versionOf;
@@ -38,7 +38,7 @@ hexo.extend.filter.register('before_generate', async function() {
   };
 
   for (const post of this.model('Post').toArray()) {
-    const names = post.tags.map(t => t.name);
+    const names = post.tags.map((t) => t.name);
     const add = new Set();
     for (const n of names) {
       const stem = stemOf(n);

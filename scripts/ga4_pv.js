@@ -28,21 +28,23 @@ hexo.extend.helper.register('get_ga4_pv', (url) => {
 hexo.extend.helper.register('recent_popular_tags', function (limit = 10, minRecent = 3) {
   const YEAR = 365 * 24 * 60 * 60 * 1000;
   const now = Date.now();
-  return this.site.tags
-    .map((tag) => {
-      const recent = tag.posts.toArray().filter((p) => now - p.date.valueOf() <= YEAR);
-      return {
-        name: tag.name,
-        path: tag.path,
-        count: tag.length,
-        recent: recent.length,
-        pv: recent.reduce((sum, p) => sum + getGA4PV('/' + p.path), 0),
-      };
-    })
-    .filter((t) => t.recent >= minRecent && t.pv > 0)
-    // 同点は名前で決める（決着が無いとビルドごとに並びが変わる）
-    .sort((a, b) => b.pv - a.pv || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
-    .slice(0, limit);
+  return (
+    this.site.tags
+      .map((tag) => {
+        const recent = tag.posts.toArray().filter((p) => now - p.date.valueOf() <= YEAR);
+        return {
+          name: tag.name,
+          path: tag.path,
+          count: tag.length,
+          recent: recent.length,
+          pv: recent.reduce((sum, p) => sum + getGA4PV('/' + p.path), 0),
+        };
+      })
+      .filter((t) => t.recent >= minRecent && t.pv > 0)
+      // 同点は名前で決める（決着が無いとビルドごとに並びが変わる）
+      .sort((a, b) => b.pv - a.pv || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
+      .slice(0, limit)
+  );
 });
 
 // 推薦の件数は記事数から決める。推薦が全記事の半分を超えると
@@ -94,7 +96,8 @@ hexo.extend.helper.register('popular_posts_in', function (posts, limit) {
       return (
         `<div class="col-12 col-md-6"><div class="article-card post-panel h-100">${thumb}` +
         `<div class="panel-body"><a href="/${post.path}" class="panel-title">${post.title}</a>` +
-        `<div class="panel-meta">${post.date.format('YYYY.MM.DD')}${snsLabel(post.permalink)}</div>` +
+        // 推薦カードの日付は鮮度の目安なので年月まで (#2404)
+        `<div class="panel-meta">${post.date.format('YYYY.MM')}${snsLabel(post.permalink)}</div>` +
         `</div></div></div>`
       );
     })

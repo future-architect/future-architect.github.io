@@ -39,7 +39,9 @@ const postListItem = (post, itemClass, titleAttr, withThumb = false, rank = null
   const body =
     `<a href="/${post.path}" title="${attr}">${post.title}</a>` +
     `${newLabel(post.date)}` +
-    `<span class="post-meta"><span class="post-meta-date">${post.date.format('YYYY.MM.DD')}</span>${snsLabel(post.permalink)}</span>`;
+    // 関連記事・ランキングの日付は鮮度の目安なので年月まで (#2404)。
+    // 日まで出すのは、日付が並びの座標になる時系列リストと記事自身だけ
+    `<span class="post-meta"><span class="post-meta-date">${post.date.format('YYYY.MM')}</span>${snsLabel(post.permalink)}</span>`;
   if (!withThumb) {
     return `<li class="${itemClass}">${rankLabel}${body}</li>`;
   }
