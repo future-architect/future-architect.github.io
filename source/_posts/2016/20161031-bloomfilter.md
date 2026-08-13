@@ -24,7 +24,7 @@ DBにおける処理はSQLによって記述しますが、データの取得す
 
 SQLのパフォーマンスを見るにあたっては上記の内部処理について正しく理解する必要があります。
 
-本Blogでは、重要なアルゴリズムであるにもかかわらず、まとまった情報が少ないSQL実行時におけるブルームフィルタ(Bloom Filter)についてOracleをもとに紹介を行います。
+本Blogでは、重要なアルゴリズムであるにもかかわらず、まとまった情報が少ないSQL実行時におけるブルームフィルタ(Bloom Filter)についてOracleをもとに紹介します。
 
 Bloom Filterは結合処理を効率化するために、結合の前段階で利用される技術になります。
 
@@ -52,7 +52,7 @@ Bloom Filterの概要は他サイトを参照してください。
 
 ## 3. サンプルスキーマ
 
-今回の説明は、Oracleのサンプルスキーマを用いて説明を行います。
+今回の説明は、Oracleのサンプルスキーマを用いて説明します。
 説明に必要なカラム以外は省略しています。
 
 [Oracle Database Sample Schemas](
@@ -350,7 +350,7 @@ Predicate Information (identified by operation id):
 
 <br />
 
-ここでのポイントは(5)において転送データの削減を行っているところにあります。
+ここでのポイントは(5)において転送データを削減しているところにあります。
 実行計画でのLINE#21を見ると、3つのBloom Filter(BF0000,BF0001,BF0002)を同時に利用してデータを絞り込んでいるのが分かります。
 
 > `filter(SYS_OP_BLOOM_FILTER_LIST(SYS_OP_BLOOM_FILTER(:BF0003,"SALES"."CUST_ID"),SYS_OP_BLOOM_FILTER(:BF0002,"SALES"."PROD_ID"),SYS_OP_BLOOM_FILTER(:BF0001,"SALES"."TIME_ID")))`
