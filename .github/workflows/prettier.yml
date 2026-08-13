@@ -1,0 +1,38 @@
+# prettier の整形漏れを PR で検出する (#2307)。
+# 対象は JS（scripts/**/*.js とルートの *.mjs）だけ。記事 Markdown・EJS・Stylus は
+# .prettierignore で除外している。lint-staged（make lint）は手動実行のため
+# 通し忘れが起き、導入から数日で3ファイル漏れた実績がある。
+# paths フィルタにより、記事だけの PR ではこのジョブ自体が走らない。
+name: prettier
+
+on:
+  pull_request:
+    paths:
+      - "scripts/**"
+      - "*.mjs"
+      - ".prettierrc"
+      - ".prettierignore"
+      - "package.json"
+      - ".github/workflows/prettier.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run prettier --check
+        run: npx --no-install prettier --check "scripts/**/*.js" "*.mjs"
