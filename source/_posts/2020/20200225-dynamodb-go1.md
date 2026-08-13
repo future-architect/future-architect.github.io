@@ -277,7 +277,3 @@ go run main.go
 
 [DynamoDB×Go連載企画](/tags/DynamoDB%C3%97Go/) の1本目でした。次は武田さんの[AWS SDKによるDynamoDBの基本操作](/articles/20200227/)です。
 
-DynamoDB×Go以外にも多くの連載企画があります。特にGo Cloud連載が今回のテーマに近いです。
-
-* [Go Cloud 連載](/tags/GoCDK/)
-* [Auth0 連載](/tags/Auth0/)
