@@ -22,3 +22,38 @@ hexo.extend.helper.register('author_awards', function (author) {
   if (years.length === 0) return null;
   return { years, hallOfFame: years.length >= HALL_OF_FAME_WINS };
 });
+
+// /authors/ の表彰一覧 (#2409)。受賞バッジは著者ページにしか出ないため、
+// 顔ぶれを一覧で見る場所をここで作る。新人賞などの部門が増えたら
+// awards.yml に kind フィールドを足して拡張する。
+//
+// 返すのは2つ。hall は殿堂入り（3回受賞）で、年1回の表彰の主役なので
+// 一覧では大きく扱う。years は年ごとの受賞者で、殿堂入りの人も
+// その年の記録として含める（記録から人を抜くと年の顔ぶれが嘘になる）。
+// nth はその年時点の累計受賞回数
+hexo.extend.helper.register('awards_list', function () {
+  const rows = (this.site.data && this.site.data.awards) || [];
+  const yearsByAuthor = new Map();
+  for (const r of rows.slice().sort((a, b) => a.year - b.year)) {
+    if (!yearsByAuthor.has(r.author)) yearsByAuthor.set(r.author, []);
+    yearsByAuthor.get(r.author).push(r.year);
+  }
+
+  const byYear = new Map();
+  for (const r of rows) {
+    if (!byYear.has(r.year)) byYear.set(r.year, []);
+    const nth = yearsByAuthor.get(r.author).indexOf(r.year) + 1;
+    byYear.get(r.year).push({ name: r.author, nth });
+  }
+  const years = [...byYear.entries()]
+    .sort((a, b) => b[0] - a[0])
+    .map(([year, authors]) => ({ year, authors }));
+
+  const hall = [...yearsByAuthor.entries()]
+    .filter(([, ys]) => ys.length >= HALL_OF_FAME_WINS)
+    // 到達が早い順（同数なら名前）に並べる
+    .sort((a, b) => a[1][HALL_OF_FAME_WINS - 1] - b[1][HALL_OF_FAME_WINS - 1])
+    .map(([author, ys]) => ({ author, years: ys, wins: ys.length }));
+
+  return { hall, years };
+});
