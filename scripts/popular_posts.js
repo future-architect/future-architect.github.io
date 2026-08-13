@@ -1,12 +1,11 @@
 'use strict';
 
-const { getSNSCnt } = require('./lib/sns');
 const { postListItem } = require('./lib/post_list');
 
 const fs = require('fs');
 const gaCache = JSON.parse(fs.readFileSync('ga_cache.json', 'utf-8'));
 
-// ランキング（トレンド・年間人気・SNS人気）の表示件数。
+// ランキング（トレンド・年間人気）の表示件数。
 // 記事が長文化する傾向にあるため、トップページのスクロール量を抑える目的で絞り、
 // 11位以下は details で畳んで25位まで辿れるようにする (#2249)。
 // details ならJSを足さずに済む（参照記事の畳みと同じ作り）
@@ -127,12 +126,4 @@ hexo.extend.helper.register('popular_posts', function (term = 'weekly') {
       ? [RANKING_DISPLAY_COUNT, RANKING_MAX_COUNT, RANKING_YEARLY_MAX_COUNT]
       : [RANKING_DISPLAY_COUNT, RANKING_MAX_COUNT];
   return rankingList(popularPosts, caps);
-});
-
-hexo.extend.helper.register('sns_popular_posts', function () {
-  const allPosts = this.site.posts.data;
-  allPosts.sort((a, b) => getSNSCnt(b.permalink) - getSNSCnt(a.permalink));
-  const popularPost = allPosts.slice(0, RANKING_MAX_COUNT);
-
-  return rankingList(popularPost);
 });
