@@ -231,6 +231,48 @@ hexo.extend.helper.register('category_stats', function (name) {
   return category ? buildCategoryStats.call(this, category) : null;
 });
 
+/**
+ * カテゴリページの年別投稿数 (#2423)。
+ *
+ * 粒度が年なのは、どのカテゴリでも読める唯一の刻みだから。四半期にすると
+ * VR（20本）や認証認可（24本）は空白の棒が並ぶだけになる。年なら
+ * 「AIDD が 2025 年に立ち上がった」「VR が細く続いている」まで見える。
+ * /authors/ の「年別 著者数の推移」・/tags/ の「年別 新規タグ数の推移」とも
+ * 語彙が揃う。
+ *
+ * 描画は CSS だけで行う（テンプレート側）。棒は多くても11本程度で、
+ * この1枚のために echarts（gzip 約330KB）をカテゴリページへ持ち込む
+ * 価値はない。mermaid の JS を削った #1955 と逆行させない。
+ *
+ * 初投稿の年から今年までを埋める。投稿の無い年は 0 のまま出して、
+ * 途切れを隠さない（投稿の無い月をダミーカードで見せる #2219 と同じ）。
+ */
+hexo.extend.helper.register('category_yearly_chart', function (name) {
+  const category = this.site.categories.findOne({ name });
+  if (!category) return null;
+
+  const byYear = new Map();
+  category.posts.forEach((post) => {
+    const y = post.date.year();
+    byYear.set(y, (byYear.get(y) || 0) + 1);
+  });
+  if (byYear.size === 0) return null;
+
+  const start = Math.min(...byYear.keys());
+  const end = new Date().getFullYear();
+  const bars = [];
+  for (let y = start; y <= end; y++) {
+    bars.push({ year: y, count: byYear.get(y) || 0 });
+  }
+  return {
+    bars,
+    max: Math.max(...bars.map((b) => b.count)),
+    // 棒は /categories/ の積み上げ棒と同じ、そのカテゴリの色で塗る。
+    // 対応表に無い新設カテゴリは無彩色で出す（警告は category_colors が出す）
+    color: CATEGORY_COLORS[name] || '#6e7074',
+  };
+});
+
 // 関連カテゴリ (#2200)。独自の採点は持ち込まず、ページに出ている2つの規則の
 // 合成で定める: このカテゴリの「よく使われるタグ」（上位5）が、他に
 // 「よく使われているカテゴリ」（タグページと同じ 2本以上かつ10%以上）。
