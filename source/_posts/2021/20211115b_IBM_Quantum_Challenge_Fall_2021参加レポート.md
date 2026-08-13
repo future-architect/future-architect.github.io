@@ -5,6 +5,7 @@ postid: b
 tags:
   - ハッカソン
   - 参加レポート
+  - 参戦記
 categories:
   - Programming
 thumbnail: /images/2021/20211115b/thumbnail.png

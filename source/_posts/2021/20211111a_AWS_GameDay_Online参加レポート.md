@@ -5,6 +5,7 @@ postid: a
 tags:
   - AWS
   - 参加レポート
+  - 参戦記
 categories:
   - Infrastructure
 thumbnail: /images/2021/20211111a/thumbnail.png

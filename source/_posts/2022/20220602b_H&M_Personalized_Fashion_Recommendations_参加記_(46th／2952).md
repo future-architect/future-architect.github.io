@@ -5,7 +5,7 @@ postid: b
 tags:
   - Kaggle
   - TensorFlow
-  - 参加レポート
+  - 参戦記
 categories:
   - DataScience
 thumbnail: /images/2022/20220602b/thumbnail.png
