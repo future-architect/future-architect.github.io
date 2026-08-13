@@ -88,7 +88,7 @@ gcloud functions deploy ReceiveEvent --project <project-id> \
 
 ### 3. Cloud Schedulerの設定
 
-最後にスケジューラの設定を行います。
+最後にスケジューラを設定します。
 
 今回は仮に、「毎日21時」に停止することにします。タイムゾーンをUTCにしたい場合は適時書き換えください。
 
@@ -110,7 +110,7 @@ gcloud beta scheduler jobs create pubsub shutdown-workday \
 
 ## こぼれ話（ツール設計について）
 
-このGCP停止ツールの特徴として、Goの[GCP SDK](https://godoc.org/cloud.google.com/go)経由でインスタンスの制御を行っています。
+このGCP停止ツールの特徴として、Goの[GCP SDK](https://godoc.org/cloud.google.com/go)経由でインスタンスを制御しています。
 
 これには理由があって、当初は、インフラ構築をTerraformで行っていたため、インスタンスのステータスを[override variables](https://www.terraform.io/docs/configuration/override.html)で上書いた上で、terraform applyによって停止させる想定でした。
 この方式だと、既存のTerraform資産を活かしつつ手堅く実装できるんじゃないかという目論見です。
