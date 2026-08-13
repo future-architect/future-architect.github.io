@@ -249,7 +249,7 @@ Installation finished successfully.
 進捗状況は、パーセンテージと容量で表示されます。
 <img src="/images/2020/20201120/Replication-8%.png" loading="lazy">
 
-補足ですが、登録されたマシン毎に、レプリケーションサーバーのスペックを変更することも可能です。
+補足ですが、登録されたマシン毎に、レプリケーションサーバーのスペックの変更も可能です。
 変更については「REPLICATION SETTINGS」から可能です。
 今回は、レプリケーションサーバーのインスタンスタイプを「t3.medium」に変更してみます。
 <img src="/images/2020/20201120/ReplicationSettings-Machines.png" loading="lazy">
@@ -282,8 +282,8 @@ Installation finished successfully.
 
 ## ターゲットマシンの設定
 
-データのレプリケーションが完了したら、ターゲットマシンの設定を行います。
-登録されたマシンのページにある「BLUE PRINT」から設定を行います。
+データのレプリケーションが完了したら、ターゲットマシンを設定します。
+登録されたマシンのページにある「BLUE PRINT」から設定します。
 <img src="/images/2020/20201120/Machine-BLUE_PRINT.png" loading="lazy">
 AWSに移行後のEC2は、ここで設定した内容で起動されます。
 

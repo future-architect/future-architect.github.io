@@ -403,7 +403,7 @@ State path: terraform.tfstate
 
 apply成功です！
 
-awscliを用いて、各リソースの追加を確認することもできます。
+awscliを用いて、各リソースの追加を確認できます。
 
 ```bash
 # S3

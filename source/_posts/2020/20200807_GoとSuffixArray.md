@@ -121,7 +121,7 @@ suffix: anana, match: an
 
 https://play.golang.org/p/JFNugaoB26N
 
-このパターンマッチングは元の文字列 T の長さを $n$ として、マッチングしたい文字列 P の長さを $m$ とすると $O(m \log n)$ 時間でマッチングできます。Go の [sort.Search](https://golang.org/pkg/sort/#Search) 関数はソートされた配列やスライスに対して条件を満たす最小の index を二分探索できます。上記の実装では、suffix における prefix の先頭 `len(p)` 文字目までの部分文字列とマッチングしたい文字列 `p` を [strings.Compare](https://golang.org/pkg/strings/#Compare) で比較し、結果が 0 以上と 1 となる最小の index  [^3]を探索しています。Suffix Array に対して二分探索を行うことによって、パターンマッチングするときは、元の文字列の長さに対して、対数時間でおさえることができます。
+このパターンマッチングは元の文字列 T の長さを $n$ として、マッチングしたい文字列 P の長さを $m$ とすると $O(m \log n)$ 時間でマッチングできます。Go の [sort.Search](https://golang.org/pkg/sort/#Search) 関数はソートされた配列やスライスに対して条件を満たす最小の index を二分探索できます。上記の実装では、suffix における prefix の先頭 `len(p)` 文字目までの部分文字列とマッチングしたい文字列 `p` を [strings.Compare](https://golang.org/pkg/strings/#Compare) で比較し、結果が 0 以上と 1 となる最小の index  [^3]を探索しています。Suffix Array に対して二分探索することによって、パターンマッチングするときは、元の文字列の長さに対して、対数時間でおさえることができます。
 
 ## Suffix Array の構築
 

@@ -174,7 +174,7 @@ type Item struct {
 ```
 
 `UpdateBuilder`, `ExpressionBuilder` を利用して、更新式を作成します。
-`ConditionBuilder` を利用して更新条件を指定することもできます。
+`ConditionBuilder` を利用して更新条件も指定できます。
 
 ### Delete
 

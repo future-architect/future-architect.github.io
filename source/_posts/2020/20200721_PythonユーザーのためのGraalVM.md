@@ -152,7 +152,7 @@ Please note: This Python implementation is in the very early stages, and can run
 
 デフォルトはnativeモードでAoTコンパイルをします。CPythonと変わらない感覚で使えます。JVMモードにするとJITコンパイルになりますが、ちょっとしたコードはこちらの方が時間がかかるようになります。ただ、Jythonのコードを実行するにはJVMモードでないとダメです。
 
-アプリへの組み込みの場合、Jythonで提供していたクラスをそのまま提供しているわけではないため、いろいろ変更を行う必要があります。[そのためのドキュメント](https://www.graalvm.org/docs/reference-manual/embed/#Function_Python)も公開されています。JythonでPythonをスクリプトとして提供していたアプリからすると、変更の手間は必要なものの、Python以外にもJavaScriptやRubyも動くようになるので、乗り換えるメリットはあります。Python 2系を止めることもできますし。
+アプリへの組み込みの場合、Jythonで提供していたクラスをそのまま提供しているわけではないため、いろいろ変更する必要があります。[そのためのドキュメント](https://www.graalvm.org/docs/reference-manual/embed/#Function_Python)も公開されています。JythonでPythonをスクリプトとして提供していたアプリからすると、変更の手間は必要なものの、Python以外にもJavaScriptやRubyも動くようになるので、乗り換えるメリットはあります。Python 2系を止めることもできますし。
 
 ### パフォーマンス
 

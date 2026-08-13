@@ -42,7 +42,7 @@ export AWS_SECRET_ACCESS_KEY=dummy
 export AWS_REGION=ap-northeast-1
 ```
 
-ターミナルでGoのテスト実行やアプリ起動を行う場合は、上記をそのまま動かせばよいだけですが、Goland上でDebug実行するときなどは大変です。なぜなら `Run Configurations` で心を込めてポチポチ環境変数を設定する必要があるからです。とても面倒だと思いました。
+ターミナルでGoのテストやアプリを実行・起動する場合は、上記をそのまま動かせばよいだけですが、Goland上でDebug実行するときなどは大変です。なぜなら `Run Configurations` で心を込めてポチポチ環境変数を設定する必要があるからです。とても面倒だと思いました。
 
 <img src="/images/2020/20200519/photo_20200519_01.png" loading="lazy">
 

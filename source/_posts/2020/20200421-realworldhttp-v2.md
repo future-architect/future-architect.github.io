@@ -12,10 +12,10 @@ categories:
   - Infrastructure
 thumbnail: /images/2020/20200421/thumbnail.jpeg
 author: 澁川喜規
-lede: "Real World HTTP 第2版が2020/04/20に出版されました。第2版が出版されるというのは、初版をみなさまが買ってくださったおかげです。どうもありがとうございます。紙媒体は先行入荷する書店さんではすでに入っているようです。オライリーのウェブサイトから電子版を購入することもできます。"
+lede: "Real World HTTP 第2版が2020/04/20に出版されました。第2版が出版されるというのは、初版をみなさまが買ってくださったおかげです。どうもありがとうございます。紙媒体は先行入荷する書店さんではすでに入っているようです。オライリーのウェブサイトから電子版も購入できます。"
 ---
 
-[Real World HTTP 第2版](https://www.oreilly.co.jp/books/9784873119038/)が2020/04/20出版されました。第2版が出版されるというのは、初版をみなさまが買ってくださったおかげです。どうもありがとうございます。紙媒体は先行入荷する書店さんではすでに入っているようです。オライリーのウェブサイトから電子版を購入することもできます。
+[Real World HTTP 第2版](https://www.oreilly.co.jp/books/9784873119038/)が2020/04/20出版されました。第2版が出版されるというのは、初版をみなさまが買ってくださったおかげです。どうもありがとうございます。紙媒体は先行入荷する書店さんではすでに入っているようです。オライリーのウェブサイトから電子版も購入できます。
 
 <blockquote class="twitter-tweet"><p lang="ja" dir="ltr">4/17新刊『Real World HTTP　第2版 歴史とコードに学ぶインターネットとウェブ技術』オライリー（978-4-87311-903-8）渋川よしき 著◆「オライリー」棚にて展開中！Webテクノロジーの基礎となるHTTPの仕様を網羅的に学べる学習書が内容を充実させて改訂！ <a href="https://t.co/k86zXGaHe9">pic.twitter.com/k86zXGaHe9</a></p>&mdash; 書泉ブックタワーコンピュータ書 (@shosen_bt_pc) <a href="https://twitter.com/shosen_bt_pc/status/1251037915582312448?ref_src=twsrc%5Etfw">April 17, 2020</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 

@@ -71,7 +71,7 @@ func main() {
 }
 ```
 
-hasCopyright 関数は io.Reader を受け取る関数でした。もちろん以下のように [*os.File](https://golang.org/pkg/os/#File) 構造体を受け取って処理することもできます。しかしこのようにすると、引数には *os.File 構造体を受け取る必要があり、テストケースごとにファイルを作成しないといけません。
+hasCopyright 関数は io.Reader を受け取る関数でした。もちろん以下のように [*os.File](https://golang.org/pkg/os/#File) 構造体を受け取って処理できます。しかしこのようにすると、引数には *os.File 構造体を受け取る必要があり、テストケースごとにファイルを作成しないといけません。
 
 ```go 非推奨な引数のとり方
 // 非推奨: 具象の構造体を引数に取る関数
@@ -387,7 +387,7 @@ testFilePath := tempDir + "/" + "test.txt"
 
 ファイルパス関連で問題の1つとして UNIX 系 OS と Windows でパスのセパレータが異なるという問題があります。UNIX 系 OS ではセパレータが `/` であって Windows では `\` という話です。通常、この手のスクリプトを UNIX 系 OS と Windows の両方で動作させることは少ないと思うので、問題になることはあまりないと思いますが、[path/filepath](https://golang.org/pkg/path/filepath/) パッケージを用いるとマルチプラットフォームで扱うことができスマートです。パス/filepath パッケージは対象の OS で定義されているファイルパスと互換性のある方法でファイルパスを操作できるユーティリティを提供しているパッケージです。
 
-以下はカレントディレクトリ直下に一時的なディレクトリ tempxxxx を作成して、その一時ディレクトリにファイルを生成する実装例です。ファイルパスの結合に [filepath.Join](https://golang.org/pkg/path/filepath/#Join) を用いています。以下の実装では tempDir と test.txt を Join していますが、3 つ以上の文字列を Join することも可能です。
+以下はカレントディレクトリ直下に一時的なディレクトリ tempxxxx を作成して、その一時ディレクトリにファイルを生成する実装例です。ファイルパスの結合に [filepath.Join](https://golang.org/pkg/path/filepath/#Join) を用いています。以下の実装では tempDir と test.txt を Join していますが、3 つ以上の文字列も Join できます。
 
 ```go main.go
 package main

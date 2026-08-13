@@ -24,7 +24,7 @@ AWS StepFunctionsとLambdaを活用してバッチ処理を行う記事です。
 
 ## サーバレスのバッチ処理
 
-そんな中で、バッチ処理（定時起動やユーザの非同期イベントで処理を行うジョブ）に関してはLambdaではなくECSなどを採用することが多いと思います。理由としてはやはり [LambdaのTimeout時間が最大で15分](https://aws.amazon.com/jp/blogs/news/aws-lambda-timeout-15min/)  [^1] であるためです。また、ECSも非同期タスク起動ではなく常駐にしてHTTPリクエストなどでイベントを待ち受けるタイプに関しては、[ALBであれば4000秒（約66分）](https://docs.aws.amazon.com/ja_jp/elasticloadbalancing/latest/application/application-load-balancers.html#connection-idle-timeout)  [^1]なため、1h超えの処理時間になりうる機能は採用できないでしょう。ALBではなくNLBを採用するとこの制約からは逃げられるので、SecurityGroupなどの考えがややALBと異なりますがこちらを採用するチームもいらっしゃると思います。もしくは次の [ecs-run-task](https://docs.aws.amazon.com/cli/latest/reference/ecs/run-task.html) で非同期にECSコンテナを呼び出している、という方式をとることも多いのでは無いでしょうか？ 定期実行であれば、ECS Scheduled Tasksを利用することもできるので便利ですよね。
+そんな中で、バッチ処理（定時起動やユーザの非同期イベントで処理を行うジョブ）に関してはLambdaではなくECSなどを採用することが多いと思います。理由としてはやはり [LambdaのTimeout時間が最大で15分](https://aws.amazon.com/jp/blogs/news/aws-lambda-timeout-15min/)  [^1] であるためです。また、ECSも非同期タスク起動ではなく常駐にしてHTTPリクエストなどでイベントを待ち受けるタイプに関しては、[ALBであれば4000秒（約66分）](https://docs.aws.amazon.com/ja_jp/elasticloadbalancing/latest/application/application-load-balancers.html#connection-idle-timeout)  [^1]なため、1h超えの処理時間になりうる機能は採用できないでしょう。ALBではなくNLBを採用するとこの制約からは逃げられるので、SecurityGroupなどの考えがややALBと異なりますがこちらを採用するチームもいらっしゃると思います。もしくは次の [ecs-run-task](https://docs.aws.amazon.com/cli/latest/reference/ecs/run-task.html) で非同期にECSコンテナを呼び出している、という方式をとることも多いのでは無いでしょうか？ 定期実行であれば、ECS Scheduled Tasksも利用できるので便利ですよね。
 
  [^1]: 2020/04/26時点の話です。将来的に伸びる可能性が高いとは思っています。
 
@@ -83,13 +83,13 @@ AWSのドキュメントから引っ張って来ましたが、 `TotalSegments` 
 
 例としてTotalSegments、Segmentを指定した場合のDynamoDB ScanのGo実装の例です。TotalSegmentsを`4`にする場合は、total=4にし、segに0,1,2,3指定した実行すれば排他的にデータを取得できます。何かしらのPartitionKeyとSortKeyを設定してGSIで上手くデータを分割すると言った考慮なしに利用できるため非常に便利だと思います。
 
-アクセス方法を書いていきます。最初にDynamoDBを初期化しておきます。必要に応じて各種Config設定を行います。
+アクセス方法を書いていきます。最初にDynamoDBを初期化しておきます。必要に応じて各種Configを設定します。
 
 ```go
 var db = dynamodb.New(session.Must(session.NewSession(aws.NewConfig().WithRegion("ap-northeast-1"))))
 ```
 
-先ほど初期化したdbに対してデータ操作を行います。`TotalSegments`, `Segment` の指定が分割のキーとなります。
+先ほど初期化したdbに対してデータを操作します。`TotalSegments`, `Segment` の指定が分割のキーとなります。
 
 ```go Segment指定の実装例
 func ScanSegment(ctx context.Context, total, seg int64, startKey map[string]*dynamodb.AttributeValue) ([]Resp, map[string]*dynamodb.AttributeValue, error) {
@@ -184,7 +184,7 @@ func main() {
 
 しかし、[BatchWriteItemの仕様](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_BatchWriteItem.html)としてバッチの **部分的な書き込み成功** が発生することがありえます。テーブル名の指定など基本的なところが失敗していれば、全件失敗になるのですが、書き込みスループット超過エラーであれば `UnprocessedItems` としてレスポンスに含まれ、そのItemは書き込み失敗になります。最初はmjkと思い、いまでもmjkって思ってます。
 
-そのため、下記の実装例のように、実行結果から `UnprocessedItems` を取り出し未処理の件数が0になるまで繰り返してBatchWrite要求を行う必要があります。
+そのため、下記の実装例のように、実行結果から `UnprocessedItems` を取り出し未処理の件数が0になるまで繰り返してBatchWriteを要求する必要があります。
 
 ```go BatchPut時のUnprocessedItemsを考慮した実装例
 func BatchPut(ctx context.Context, puts []Output) error {

@@ -36,7 +36,7 @@ lede: "皆さんは競技プログラミングをやったことはあります�
 
 [AtCoder](https://atcoder.jp/home) は日本の競技プログラミング運営サイトです。ほぼ毎週末に開催される ABC(AtCoder Beginner Contest) をはじめとして、多種多様なコンテストが無料で受けられます。さらにオープンなコンテストの過去問は **すべて無償公開** されています。
 
-[AtCoder Problems](https://kenkoooo.com/atcoder/#/table/) は AtCoder の過去問を集めて、ユーザごとの提出・解答状況の管理や難易度推定を行っているサードパーティーのサイトです。ここにバーチャルコンテスト開催機能があり、今回はこちらを利用しました。
+[AtCoder Problems](https://kenkoooo.com/atcoder/#/table/) は AtCoder の過去問を集めて、ユーザごとの提出・解答状況を管理し難易度を推定しているサードパーティーのサイトです。ここにバーチャルコンテスト開催機能があり、今回はこちらを利用しました。
 
 バーチャルコンテスト参加にあたっては双方にアカウントを作成して AtCoder Problems 側での連携設定が必要となります。 AtCoder Problems は GitHub アカウント連携でしかアカウントを生成できず、GitHub アカウントがない人は GitHub アカウントの新規作成が必要になります。運営だけでなく、**参加者も全員必要なのでアカウントを作成してもらいましょう。**
 双方にログインできたら、AtCoder Problems 側で Account → Account Info に AtCoder User ID を入力して Update すれば連携設定完了です。念のため、過去のコンテストから任意の過去問に提出してしばらく待ち、結果が反映されていることを確認すると完璧です。

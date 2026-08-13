@@ -192,7 +192,7 @@ https://console.cloudendure.com/#/signIn
 
 CloudEndurteは、プロジェクトという単位で管理が可能です。登録直後は、「Default Project」のみ存在します。
 
-この「Default Project」だけで管理することも可能ですが、移行先のAWSアカウントが複数存在する場合や、複数のベンダーで移行を行う場合には、プロジェクトの分割が有効です。なお、1つのCloudEndureアカウントで管理可能なプロジェクトの最大数は100です。
+この「Default Project」だけで管理もできますが、移行先のAWSアカウントが複数存在する場合や、複数のベンダーで移行する場合には、プロジェクトの分割が有効です。なお、1つのCloudEndureアカウントで管理可能なプロジェクトの最大数は100です。
 
 プロジェクトの作成は、サイドメニュー上部の「＋」マークから作成が可能です。今回は「CloudEndure-Test」というプロジェクトを作成します。
 <img src="/images/2020/20201021/01_06_プロジェクト作成.png" loading="lazy">
@@ -230,7 +230,7 @@ IAM Userの作成手順は、以下のURLを参照ください。
 
 #### REPLICATION SETTINGS
 
-ここでは、移行元環境と移行先環境の選択と、レプリケーションサーバーの設定を行います。
+ここでは、移行元環境と移行先環境を選択し、レプリケーションサーバーを設定します。
 
 ##### Migration Source
 
@@ -260,7 +260,7 @@ AWSやオンプレミス環境、その他クラウド環境にあるサーバ�
 
 ##### Replication Servers
 
-プロジェクト全体のレプリケーションサーバーの設定を行います。
+プロジェクト全体のレプリケーションサーバーを設定します。
 
 ※移行元のサーバー毎に設定も可能です。
 　CloudEndureエージェントをインストールしてからとなる為、次回の記事で記載します。
@@ -312,7 +312,7 @@ AWSやオンプレミス環境、その他クラウド環境にあるサーバ�
 
 ###### Choose how data is sent from the CloudEndure Agent to the Replication Servers ※この項目はオプションです。
 
-CloudEndureエージェントからレプリケーションサーバーへのデータ送信方法を設定します。「Use VPN or DirectConnect (using a private IP)」チェックボックスをオンにした場合、PrivateIPアドレスを使用した通信となります。VPNやDirectConnect経由で通信を行う場合はチェックボックスをオンにしてください。
+CloudEndureエージェントからレプリケーションサーバーへのデータ送信方法を設定します。「Use VPN or DirectConnect (using a private IP)」チェックボックスをオンにした場合、PrivateIPアドレスを使用した通信となります。VPNやDirectConnect経由で通信する場合はチェックボックスをオンにしてください。
 <img src="/images/2020/20201021/Use_VPN_or_DirectConnect_(using_a_private_IP).png" loading="lazy">
 また、PublicIPの無効化の設定が選択可能になります。要件に応じて設定してください。
 

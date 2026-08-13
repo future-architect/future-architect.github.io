@@ -32,7 +32,7 @@ Webページの閲覧や情報の検索に使用するブラウザに、自身�
 
 皆さんもお気に入りのものを追加して日々の業務で使用されているのではないでしょうか？ 拡張機能はChrome以外のブラウザ（IE、Firefox等）でも存在し、アドオンとかextensionという言い方もしますよね。
 
-この拡張機能、Google Storeから好きなものを追加できますが、自分で作成することもできるのです。
+この拡張機能、Google Storeから好きなものを追加できますが、自分でも作成できるのです。
 
 * What are extensions?: https://developer.chrome.com/extensions
 * 拡張機能とは何か？ : https://developer.mozilla.org/ja/docs/Mozilla/Add-ons/WebExtensions/What_are_WebExtensions

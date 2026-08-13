@@ -41,7 +41,7 @@ CORSとは **オリジン間リソース共有**（Cross-Origin Resource Sharing
 
 ## CORSのプリフライトリクエストについて
 
-もし、Web APIのリクエストに `x-api-key` のようなフィールドを用いて認証を行っている場合は、CORSの仕様では実際のHTTPリクエストを行う前に、 **プリフライトリクエスト** という、 **OPTIONS** メソッドでサーバに要求が行われます。
+もし、Web APIのリクエストに `x-api-key` のようなフィールドを用いて認証している場合は、CORSの仕様では実際のHTTPリクエストを行う前に、 **プリフライトリクエスト** という、 **OPTIONS** メソッドでサーバに要求が行われます。
 
 <img src="/images/2020/20200717/preflight_correct.png" loading="lazy">
 
@@ -49,7 +49,7 @@ CORSとは **オリジン間リソース共有**（Cross-Origin Resource Sharing
 
 上図ですが、OPTIONSメソッドには、`Origin`、`Access-Control-Request-Method`、`Access-Control-Request-Headers` のリクエストヘッダが含まれ（1番上の矢印）、それに対してサーバ側が`Access-Control-Allow-Origin`にリクエストされたオリジンの値、`Access-Control-Allow-Methods`に先ほどのメソッドを含めた値、`Access-Control-Allow-Headers`に先ほど要求が合ったヘッダの名称を含めてレスポンスする必要があります（2番目の矢印）。上記の条件を満たせば、ブラウザは通常のメインのリクエストをサーバに要求します（3,4番目の矢印）
 
-CORSに対しては、上記のmozillaの記事や、tomoyukilabsさんのQiitaにある[CORSまとめ](https://qiita.com/tomoyukilabs/items/81698edd5812ff6acb34)も網羅的でオススメです。CORSは必ずプリフライトリクエストが飛ぶのではなく、条件によっては「単純リクエスト」と呼ばれる簡易的な認証を行う場合もあるなど細かい仕様は学びがあります。そもそもなんでCORSという決まり事があるかというと、[同一オリジンポリシー](https://developer.mozilla.org/ja/docs/Web/Security/Same-origin_policy)があって、なぜ同一オリジンポリシーが存在するかというと、ユーザーの情報を他サイトに漏れてしまわないようにといったセキュリティ上の理由が上げられます。
+CORSに対しては、上記のmozillaの記事や、tomoyukilabsさんのQiitaにある[CORSまとめ](https://qiita.com/tomoyukilabs/items/81698edd5812ff6acb34)も網羅的でオススメです。CORSは必ずプリフライトリクエストが飛ぶのではなく、条件によっては「単純リクエスト」と呼ばれる簡易的な認証をする場合もあるなど細かい仕様は学びがあります。そもそもなんでCORSという決まり事があるかというと、[同一オリジンポリシー](https://developer.mozilla.org/ja/docs/Web/Security/Same-origin_policy)があって、なぜ同一オリジンポリシーが存在するかというと、ユーザーの情報を他サイトに漏れてしまわないようにといったセキュリティ上の理由が上げられます。
 
 ## GoでのCORS設定例
 
@@ -153,5 +153,5 @@ WAFの変更後のルール：
 最後までお付き合いいただき、ありがとうございます。ちょっとしたネタでしたが、少しでもReal World HTTPなドタバタが伝わったら幸いです。
 
 * もしCORS周りで問題が起こったら、ブラウザの設定でプリフライトリクエストも表示すると調査が捗る
-* リクエストヘッダを利用したAPI Key認証を行う場合、全てのHTTPメソッドを対象にするのではなく、OPTIONSは通しておく
-* WAFで上記の認証を行う場合は、そういった除外設定ができるか確認しておく
+* リクエストヘッダを利用したAPI Key認証をする場合、全てのHTTPメソッドを対象にするのではなく、OPTIONSは通しておく
+* WAFで上記の認証をする場合は、そういった除外設定ができるか確認しておく

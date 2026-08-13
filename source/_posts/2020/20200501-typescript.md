@@ -13,7 +13,7 @@ author: 澁川喜規
 lede: "プロダクションコードでたくさんRedux周りにもreducerなどを実装しなくてはいけなくなったときの次のステップとして、Redux Toolkitの紹介をします。"
 ---
 
-前日の丸野さんが[Reduxを分かりやすく解説してみた](/articles/20200429/)というReduxの基本的な紹介を行いました。Reduxはコンパクトなライブラリながらよく考えられた仕組みです。Jetpack ComposeやらFlutterやら、ReactインスパイアなGUIフレームワークも増えているので、JavaScript（TypeScriptではなく） + Reduxをやってみるのは、ウェブに限らず、今後のユーザーインターフェース関連のコードを触るための理解力向上には良いと思います。
+前日の丸野さんが[Reduxを分かりやすく解説してみた](/articles/20200429/)というReduxの基本的な紹介をしました。Reduxはコンパクトなライブラリながらよく考えられた仕組みです。Jetpack ComposeやらFlutterやら、ReactインスパイアなGUIフレームワークも増えているので、JavaScript（TypeScriptではなく） + Reduxをやってみるのは、ウェブに限らず、今後のユーザーインターフェース関連のコードを触るための理解力向上には良いと思います。
 
 本エントリーは、プロダクションコードでたくさんRedux周りにもreducerなどを実装しなくてはいけなくなったときの次のステップとして、Redux Toolkitの紹介をします。
 
@@ -63,7 +63,7 @@ Reduxを使ったアプリケーションの心臓部のReducerとstoreです。
 
 ### TypeScriptを使おうとした場合
 
-TypeScriptだとactionやstateの型定義を行い、コードの中で矛盾がないか確認したいですよね？ いくつか型定義を追加する必要がでてきます。入りきらないので折り返しました。blockdiagのfolded初めて使って見ました。
+TypeScriptだとactionやstateを型定義し、コードの中で矛盾がないか確認したいですよね？ いくつか型定義を追加する必要がでてきます。入りきらないので折り返しました。blockdiagのfolded初めて使って見ました。
 
 <img src="/images/2020/20200501/3.png" loading="lazy">
 
