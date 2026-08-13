@@ -19,7 +19,7 @@ Pythonでお仕事する前提で、現在のところで自分が最適と考�
 * パッケージ管理や開発環境整備でPoetryを使う
 * 今時はコードフォーマッター、静的チェックは当たり前ですよね？
 * コマンドでテスト実行、コードチェックとか実行とかができる（CI/CD等を考えて）
-* VSCodeでもコマンドで実行しているのと同じコードチェックが可能(ここコンフリクトすると困る）
+* VSCodeでもコマンドで実行しているのと同じコードチェックが可能(ここコンフリクトすると困る)
 * デプロイはDockerイメージ
 * コンテナのデプロイ環境でコンテナに割り当てられたCPU能力を比較的引き出せて、スケールさせたら線形にパフォーマンスアップできるようなasyncioを前提とした環境構築
 
@@ -265,7 +265,7 @@ CMD ["/opt/app/.venv/bin/gunicorn", "-w", "1", "-k", "uvicorn.workers.UvicornWor
 
 上記のライブラリ群を使う限り、ビルドイメージはslimで大丈夫ですし、追加のパッケージインストールも不要です。asyncpgはCythonで作られていますが、manylinux1なバイナリが提供されているのでDebian系のイメージを使う限りはCコンパイラは不要（slimなイメージのままで大丈夫）です。また、同期接続な[PyMySQL](https://pypi.org/project/PyMySQL/)もpure Pythonなのでそのままで大丈夫です。型チェックの書き方さえPython3.7でよければDistroless化も簡単です。
 
-PostgreSQLで、同期接続の[psycopg2](https://pypi.org/project/psycopg2/)を使う場合にlibpq5（とlibxml2)が必要となりますし、Cコンパイラも必要になるので、ビルドイメージをslimじゃないものにして、次のコードを実行イメージのFROMのところに入れておきます。ビルドイメージのslimじゃないbusterイメージには最初からlibpq5-devとかも入っているので追加インストールは実行イメージ側だけで大丈夫です。
+PostgreSQLで、同期接続の[psycopg2](https://pypi.org/project/psycopg2/)を使う場合にlibpq5（とlibxml2）が必要となりますし、Cコンパイラも必要になるので、ビルドイメージをslimじゃないものにして、次のコードを実行イメージのFROMのところに入れておきます。ビルドイメージのslimじゃないbusterイメージには最初からlibpq5-devとかも入っているので追加インストールは実行イメージ側だけで大丈夫です。
 
 ```Docker Dockerfile
 # ここはビルド用のコンテナ

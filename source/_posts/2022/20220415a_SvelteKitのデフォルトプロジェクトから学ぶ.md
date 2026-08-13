@@ -131,7 +131,7 @@ export const get: RequestHandler = async () => {
 
 <img src="/images/2022/20220415a/スクリーンショット_2022-04-10_9.40.11.png" alt="API" width="1200" height="412" loading="lazy">
 
-アンダースコアで除外できることは[プライベートモジュール](https://kit.svelte.dev/docs/routing#private-modules)で説明されていました。ピリオドもプライベート扱い（`.well-known`を除く)とのこと。
+アンダースコアで除外できることは[プライベートモジュール](https://kit.svelte.dev/docs/routing#private-modules)で説明されていました。ピリオドもプライベート扱い（`.well-known`を除く）とのこと。
 
 ### メソッドオーバーライド
 

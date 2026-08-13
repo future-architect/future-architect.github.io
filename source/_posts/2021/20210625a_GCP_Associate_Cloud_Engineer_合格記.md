@@ -25,7 +25,7 @@ GCP認定資格のAssociate Cloud Engineerという資格を取得したので�
 
 ## Asociate Cloud Engineerとは？
 
-GCPで提供される各サービス(GCE, GKE, BigQuery...など）の基本的な使い方・使い所を問われる、GCP認定資格の中でもエントリーレベルの試験です。以下に公式の試験概要が記載されています。
+GCPで提供される各サービス(GCE, GKE, BigQuery...など)の基本的な使い方・使い所を問われる、GCP認定資格の中でもエントリーレベルの試験です。以下に公式の試験概要が記載されています。
 
 [Associate Cloud Engineer](https://cloud.google.com/certification/cloud-engineer?hl=ja)
 

@@ -129,7 +129,7 @@ export const testReducer = ({ testStateA = "", testStateB = "" } = {}, action) =
 4. **ReactとReduxの連携しStore内のStateをComponentで参照する**
 
 最後に、ご紹介したコード例全体像はこちらです。
-(※今回はComponent、ActionCreater、Reducerをそれぞれ別ファイルで作成しています）。
+(※今回はComponent、ActionCreater、Reducerをそれぞれ別ファイルで作成しています)。
 
 ```js Test.js
 // Component

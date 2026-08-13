@@ -86,7 +86,7 @@ containerdの機能はpluggableです。例えば 下半分くらいを担当す
 
 今回着目するイメージの展開やファイルシステムを管理するコンポーネントは[Snapshotter](https://github.com/containerd/containerd/blob/main/docs/snapshotters/README.md)と呼ばれ、これも差し替え可能になっています。
 
-デフォルトはoverlayfsですが、lazy pull対応のsnapshotter([Remote Snapshotter](https://github.com/containerd/containerd/blob/main/docs/remote-snapshotter.md)といいます）に差し替えることでその機能を利用する形です。
+デフォルトはoverlayfsですが、lazy pull対応のsnapshotter([Remote Snapshotter](https://github.com/containerd/containerd/blob/main/docs/remote-snapshotter.md)といいます)に差し替えることでその機能を利用する形です。
 
 Snapshotterはデーモンとして起動させunix domain socketごしにcontainerdと通信します。
 
@@ -98,7 +98,7 @@ Snapshotterはデーモンとして起動させunix domain socketごしにcontai
 
 なので、Remote Snapshotterは初回起動時は必要なファイルだけをpullしてプロセスを開始してしまいます。レジストリはFUSEを介してマウントしておき都度取得する、という仕組みです。
 
-ところでコンテナイメージのレイヤーのフォーマットであるtar.gzにおいては、全てのファイルを展開せずに特定のファイルのみにアクセスし取得する、ということができません。イメージのレイヤー内のすべてのファイルがtarにアーカイブgzipで圧縮されており団子状態なためです（Seekableではないという言い方をします)。
+ところでコンテナイメージのレイヤーのフォーマットであるtar.gzにおいては、全てのファイルを展開せずに特定のファイルのみにアクセスし取得する、ということができません。イメージのレイヤー内のすべてのファイルがtarにアーカイブgzipで圧縮されており団子状態なためです（Seekableではないという言い方をします）。
 
 ということでRemote Snapshotterを使うにはコンテナイメージをSeekableなイメージに変換する必要があったり、どのファイルがどのレイヤーのどのオフセットに含まれているのかのインデックスをメタデータとして持たせたりする必要があります。
 

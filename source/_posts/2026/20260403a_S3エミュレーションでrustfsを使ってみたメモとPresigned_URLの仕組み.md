@@ -137,6 +137,6 @@ volumes:
 
 ## まとめ
 
-S3以外もいろいろ必要となる場合は他のAWSエミュレータ（[moto](https://github.com/getmoto/moto)とか[floci](https://github.com/hectorvent/floci)とか)の方が良いかもしれませんが、今回はS3だけが欲しかったのでrustfsを選んでみて使ってみたメモでした。
+S3以外もいろいろ必要となる場合は他のAWSエミュレータ（[moto](https://github.com/getmoto/moto)とか[floci](https://github.com/hectorvent/floci)とか）の方が良いかもしれませんが、今回はS3だけが欲しかったのでrustfsを選んでみて使ってみたメモでした。
 
 今まではminioを考えずに使っていましたが、今回別のものを検討してrustfsを使ってみました。seaweedfsとかも良さそうでしたが、filterとかたくさんコンテナが必要そうだったので1つで済むrustfsにしました。コンテナのメモリ消費90MBぐらいですね。動きも軽快なので今後も使ってみようと思いました。

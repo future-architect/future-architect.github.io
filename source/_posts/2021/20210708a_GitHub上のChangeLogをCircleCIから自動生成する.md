@@ -36,7 +36,7 @@ ChangeLogとは、機能拡張や不具合修正の内容などをユーザー�
 リモートリポジトリにGitHubを利用されている場合、リポジトリの `Releases` ページにChangeLogを作成できます。
 `CHANGELOG.md`というファイルに追記していく事例もよく目にします。
 
-[future-architect/vuls](https://github.com/future-architect/vuls)もChangelog（リリースノート)を付けています。
+[future-architect/vuls](https://github.com/future-architect/vuls)もChangelog（リリースノート）を付けています。
 
 https://github.com/future-architect/vuls/releases
 

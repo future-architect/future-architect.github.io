@@ -131,7 +131,7 @@ resource "aws_security_group" "web" {
 }
 ```
 
-例では、dynamicを単発で利用し、セキュリティグループのインバウンドを許可する設定をしています（例は[Terraformerとしてコードを書いて思うこと](/articles/20211029a/)の例を一部改変したものです)この例であれば、dynamic内部のネストが深くならないため、当てはめていくパラメータも容易に想像がつきやすいものだと感じます。
+例では、dynamicを単発で利用し、セキュリティグループのインバウンドを許可する設定をしています（例は[Terraformerとしてコードを書いて思うこと](/articles/20211029a/)の例を一部改変したものです）この例であれば、dynamic内部のネストが深くならないため、当てはめていくパラメータも容易に想像がつきやすいものだと感じます。
 
 一方、公式でも記載されているdynamicブロックを[複数ネストさせるケース](https://developer.hashicorp.com/terraform/language/expressions/dynamic-blocks#multi-level-nested-block-structures)をみてみます。(以下、公式より引用)
 
