@@ -22,33 +22,15 @@ function matchableTag(name) {
   return name.length >= 4;
 }
 
-// 数が多い受け皿カテゴリ。カテゴリ運用のルールとして、ここへ寄せる提案はしない
-// （何でも Programming / DevOps に見えてしまうため、具体的なカテゴリへ
-// 移す方向だけを提案する）
-const SUGGEST_IGNORE = new Set(['Programming', 'DevOps']);
+// カテゴリ提案（leave-one-out のタグ投票）は廃止した。
+// タグ共起は「そのタグ群が普段いるカテゴリ」しか測れず記事の主題を見ないため、
+// 一括監査（#2286 / #2288 / 2026-08-13 の /doctor 掃討）では精度25%、
+// しかも票の高さが正しさと逆相関で、しきい値では直せなかった。
+// 監査のネタ出しとしての役目は上記3回で回収済み
 
 hexo.extend.helper.register('doctor_checks', function () {
   const posts = this.site.posts.sort('-date');
 
-  // タグ→カテゴリの分布。提案の判定は記事自身の票を抜いて行う（leave-one-out）。
-  // 自分の票が入ると、小さいタグでは現状カテゴリが常に勝って検出できない
-  const tagCat = new Map(); // タグ -> (カテゴリ -> 記事数)
-  const tagN = new Map();
-  const catSize = new Map(); // カテゴリ -> 記事数
-  posts.forEach((post) => {
-    const cat = post.categories.first();
-    if (!cat) return;
-    catSize.set(cat.name, (catSize.get(cat.name) || 0) + 1);
-    post.tags.forEach((tag) => {
-      if (tag.name === 'インデックス') return;
-      if (!tagCat.has(tag.name)) tagCat.set(tag.name, new Map());
-      const dist = tagCat.get(tag.name);
-      dist.set(cat.name, (dist.get(cat.name) || 0) + 1);
-      tagN.set(tag.name, (tagN.get(tag.name) || 0) + 1);
-    });
-  });
-
-  const suggestions = [];
   const untagged = [];
   const overTagged = [];
   const missingByTag = new Map(); // タグ名 -> {path, posts: []}
@@ -81,50 +63,7 @@ hexo.extend.helper.register('doctor_checks', function () {
       overTagged.push({ title: post.title, path: post.path, count: tagNames.length });
     }
 
-    // 2) カテゴリ提案
-    const actualCat = post.categories.first();
-    if (actualCat) {
-      const score = new Map();
-      tagNames.forEach((name) => {
-        if (name === 'インデックス') return;
-        const n = tagN.get(name) || 0;
-        if (n < 4) return; // 自票を抜くと3本未満。判断材料にしない
-        for (const [c, cnt] of tagCat.get(name)) {
-          const loo = c === actualCat.name ? cnt - 1 : cnt;
-          score.set(c, (score.get(c) || 0) + loo / (n - 1));
-        }
-      });
-      if (score.size) {
-        const ranked = [...score.entries()].sort((a, b) => b[1] - a[1]);
-        // 受け皿カテゴリへ寄せる提案はしない（運用ルール）
-        const candidate = ranked.find(([c]) => c !== actualCat.name && !SUGGEST_IGNORE.has(c));
-        const actualScore = score.get(actualCat.name) || 0;
-        if (candidate) {
-          const [predName, predScore] = candidate;
-          // 迷ったら数の少ない専門カテゴリへ寄せる、という運用ルールを写す。
-          // 大きいカテゴリから小さいカテゴリへの提案でも、現状票を明確に
-          // （0.5票以上）上回るときだけ出す。同着・僅差の提案は
-          // 「どちらでも良い」と言っているだけで情報が無い。
-          // 逆方向は2倍以上の票を要求する。緩めすぎると数百件になりレビューできない
-          const toSmaller = (catSize.get(predName) || 0) < (catSize.get(actualCat.name) || 0);
-          const pass = toSmaller
-            ? predScore >= actualScore + 0.5 && predScore >= 1.0
-            : predScore >= 2 * actualScore && predScore >= 1.5;
-          if (pass) {
-            suggestions.push({
-              title: post.title,
-              path: post.path,
-              actual: actualCat.name,
-              suggested: predName,
-              predScore: Math.round(predScore * 10) / 10,
-              actualScore: Math.round(actualScore * 10) / 10,
-            });
-          }
-        }
-      }
-    }
-
-    // 3) タイトルにタグ名を含むのに、そのタグが付いていない
+    // 2) タイトルにタグ名を含むのに、そのタグが付いていない
     const has = new Set(tagNames);
     for (const t of allTagNames) {
       if (has.has(t.name)) continue;
@@ -154,7 +93,6 @@ hexo.extend.helper.register('doctor_checks', function () {
     }
   });
 
-  suggestions.sort((a, b) => b.predScore - a.predScore);
   overTagged.sort((a, b) => b.count - a.count);
   const missing = [...missingByTag.entries()]
     .map(([name, v]) => ({ name, path: v.path, posts: v.posts }))
@@ -234,7 +172,6 @@ hexo.extend.helper.register('doctor_checks', function () {
   singleUse.sort((x, y) => y.lonelyPair - x.lonelyPair || (x.name < y.name ? -1 : 1));
 
   return {
-    suggestions,
     untagged,
     overTagged,
     missing,
