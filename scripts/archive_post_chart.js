@@ -48,8 +48,7 @@ const generatePostsSeries = (posts, year) => {
   // 同じページの「カテゴリ別」タブと軸の長さが食い違う (#2430)
   if (year) {
     const now = new Date();
-    const monthCount =
-      Number(year) === now.getFullYear() ? now.getMonth() + 1 : 12;
+    const monthCount = Number(year) === now.getFullYear() ? now.getMonth() + 1 : 12;
     const counts = new Array(monthCount).fill(0);
     target.forEach((post) => {
       const m = post.date.month();

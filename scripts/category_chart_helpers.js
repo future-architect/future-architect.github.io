@@ -127,8 +127,7 @@ hexo.extend.helper.register('get_monthly_category_data', function (year) {
   // 同じページの「週別」タブ（posts_stack_series）と軸の長さが食い違い、
   // タブを切り替えるたびに棒の幅と位置が変わっていた (#2430)
   const now = new Date();
-  const monthCount =
-    Number(year) === now.getFullYear() ? now.getMonth() + 1 : 12;
+  const monthCount = Number(year) === now.getFullYear() ? now.getMonth() + 1 : 12;
 
   const byCat = new Map(); // カテゴリ -> 月ごとの配列
   this.site.posts.forEach((post) => {
