@@ -231,6 +231,54 @@ hexo.extend.helper.register('category_stats', function (name) {
   return category ? buildCategoryStats.call(this, category) : null;
 });
 
+/**
+ * カテゴリページの半期別投稿数 (#2423)。
+ *
+ * 刻みは上期（1〜6月）・下期（7〜12月）。当社の決算期が暦年なので、
+ * 社内の期の感覚とそのまま揃う。四半期にすると VR（20本）や
+ * 認証認可（24本）は空白の棒が並ぶだけになるが、半期なら
+ * 「AIDD が2025年に立ち上がった」「VR が散発的に続いている」まで読める。
+ *
+ * 描画は CSS だけで行う（テンプレート側）。棒は多くても22本で、
+ * この1枚のために echarts（gzip 約330KB）をカテゴリページへ持ち込む
+ * 価値はない。mermaid の JS を削った #1955 と逆行させない。
+ *
+ * 初投稿の年から今年までを埋める。投稿の無い期は 0 のまま出して、
+ * 途切れを隠さない（投稿の無い月をダミーカードで見せる #2219 と同じ）。
+ * 年ラベルは年に1つでよいので、年ごとに2本ずつの組で返す。
+ */
+hexo.extend.helper.register('category_yearly_chart', function (name) {
+  const category = this.site.categories.findOne({ name });
+  if (!category) return null;
+
+  const byHalf = new Map(); // "2026/1"（上期）-> 本数
+  category.posts.forEach((post) => {
+    const key = `${post.date.year()}/${post.date.month() < 6 ? 1 : 2}`;
+    byHalf.set(key, (byHalf.get(key) || 0) + 1);
+  });
+  if (byHalf.size === 0) return null;
+
+  const start = Math.min(...[...byHalf.keys()].map((k) => +k.split('/')[0]));
+  const end = new Date().getFullYear();
+  const groups = [];
+  let max = 0;
+  for (let y = start; y <= end; y++) {
+    const halves = [1, 2].map((h) => {
+      const count = byHalf.get(`${y}/${h}`) || 0;
+      if (count > max) max = count;
+      return { half: h, label: h === 1 ? '上期' : '下期', count };
+    });
+    groups.push({ year: y, halves });
+  }
+  return {
+    groups,
+    max,
+    // 棒は /categories/ の積み上げ棒と同じ、そのカテゴリの色で塗る。
+    // 対応表に無い新設カテゴリは無彩色で出す（警告は category_colors が出す）
+    color: CATEGORY_COLORS[name] || '#6e7074',
+  };
+});
+
 // 関連カテゴリ (#2200)。独自の採点は持ち込まず、ページに出ている2つの規則の
 // 合成で定める: このカテゴリの「よく使われるタグ」（上位5）が、他に
 // 「よく使われているカテゴリ」（タグページと同じ 2本以上かつ10%以上）。
