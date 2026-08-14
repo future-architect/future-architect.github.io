@@ -12,14 +12,14 @@ categories:
   - Infrastructure
 thumbnail: /images/2021/20211115a/thumbnail.png
 author: 伊藤真彦
-lede: "AWS S3を利用してファイルをアップロード、ダウンロードするフロントエンドアプリケーションの実装を行ったのですが、その際ハマったポイントがいくつかあったのでまとめます。AWSの機能をローカル環境で模擬するツールでお馴染みのLocalStackですが、AWS S3の機能も模擬できるようになっています。"
+lede: "AWS S3を利用してファイルをアップロード、ダウンロードするフロントエンドアプリケーションを実装したのですが、その際ハマったポイントがいくつかあったのでまとめます。AWSの機能をローカル環境で模擬するツールでお馴染みのLocalStackですが、AWS S3の機能も模擬できるようになっています。"
 ---
 
 <img src="/images/2021/20211115a/localstack-readme-header.png" alt="" width="675" height="271">
 
 TIGの伊藤真彦です。
 
-AWS S3を利用してファイルをアップロード、ダウンロードするフロントエンドアプリケーションの実装を行ったのですが、その際ハマったポイントがいくつかあったのでまとめます。
+AWS S3を利用してファイルをアップロード、ダウンロードするフロントエンドアプリケーションを実装したのですが、その際ハマったポイントがいくつかあったのでまとめます。
 
 ## LocalStackでS3を利用する
 
@@ -64,7 +64,7 @@ AWS S3には[署名付きURL](https://docs.aws.amazon.com/ja_jp/AmazonS3/latest/
 
 この機能により、S3のセキュリティ設定を緩めることなく、外部WebサイトやアプリケーションからS3バケットへのアクセスが可能になります。
 
-**LocalStackでも署名付きURLを利用する事は可能ですが、いくつか独自の注意点があり、見落とすと上手く動かずに苦戦する事になります。**
+**LocalStackでも署名付きURLを利用できますが、いくつか独自の注意点があり、見落とすと上手く動かずに苦戦する事になります。**
 
 ## 署名の計算でエラーが発生する
 
@@ -80,7 +80,7 @@ LocalStackのS3では、`AWS_SECRET_ACCESS_KEY`、`AWS_SECRET_ACCESS_KEY`が明�
 [LocalStackの実装](https://github.com/localstack/awscli-local/blob/53876fbb7dcc75868402cc5593ab36db87c4c66d/bin/awslocal#L113-L119)を見るとわかりやすいかもしれません。
 `os.environ.get`で環境変数を参照し、無い場合のデフォルト値は`test`になっています。
 
-ここで気を付けなければならないのは署名付きURLの発行を行うロジックで利用するAWS SDKの`AWS_ACCESS_KEY_ID`、`AWS_SECRET_ACCESS_KEY`が一致している必要があるということです。一般的にはバックエンドAPIの実装でS3を利用するSDKを利用するケースが多いと思います。
+ここで気を付けなければならないのは署名付きURLを発行するロジックで利用するAWS SDKの`AWS_ACCESS_KEY_ID`、`AWS_SECRET_ACCESS_KEY`が一致している必要があるということです。一般的にはバックエンドAPIの実装でS3を利用するSDKを利用するケースが多いと思います。
 
 そこで参照している`AWS_ACCESS_KEY_ID`、`AWS_SECRET_ACCESS_KEY`がLocalStackで参照しているものと一致していないと署名の計算結果が一致せずに`SignatureDoesNotMatch`エラーが発生します。
 
