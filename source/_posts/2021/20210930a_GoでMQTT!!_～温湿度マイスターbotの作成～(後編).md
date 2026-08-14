@@ -13,7 +13,7 @@ categories:
   - IoT
 thumbnail: /images/2021/20210930a/thumbnail.png
 author: 宮永崇史
-lede: "AWS IoTを使用したMQTTのチュートリアルはAWS公式からも詳細なハンズオン記事が出ています。本記事はこちらのハンズオンを基にGo言語を使用してMQTTによる通信を行いました。(公式の記事はPythonで実装されています。)"
+lede: "AWS IoTを使用したMQTTのチュートリアルはAWS公式からも詳細なハンズオン記事が出ています。本記事はこちらのハンズオンを基にGo言語を使用してMQTTで通信しました。(公式の記事はPythonで実装されています。)"
 mathjax: true
 ---
 
@@ -33,7 +33,7 @@ AWS IoTを使用したMQTTのチュートリアルはAWS公式からも詳細な
 
 * *[AWS IoT Core の設定 :: AWS IoT Core 初級 ハンズオン](https://aws-iot-core-for-beginners.workshop.aws/phase3/step1.html)*
 
-本記事はこちらのハンズオンを基にGo言語を使用してMQTTによる通信を行いました。(公式の記事はPythonで実装されています。)
+本記事はこちらのハンズオンを基にGo言語を使用してMQTTで通信しました。(公式の記事はPythonで実装されています。)
 
 最終的には室内の快適な温湿度を教えてくれる「温湿度マイスターbot」を作成します。
 
@@ -78,7 +78,7 @@ AWS IoTで受信したデータをDynamoDBに登録する方法は公式に詳�
 
 #### ルールの作成
 
-作成したテーブルにデータを送信するため、AWS IoT ルールの作成を行います。
+作成したテーブルにデータを送信するため、AWS IoT ルールを作成します。
 
 AWS IoTコンソール上Act>Ruleからルールの新規作成が行えます。SQLバージョンの使用は2016-03-23を使用しました。From句には **「2. AWS IoTを使用してRaspberryPiからのPublish動作確認」** の実装にてに定義したトピック名を記載してください。
 
@@ -537,7 +537,7 @@ if __name__ == "__main__":
 
 ## まとめ
 
-GoとAWS IoTを使用してMQTT通信を行いました。
+GoとAWS IoTを使用してMQTT通信しました。
 
 AWS IoTを使用したのは初めてだったのですが、公式のドキュメントやチュートリアルが非常に丁寧であったため、簡単に実装できました。
 

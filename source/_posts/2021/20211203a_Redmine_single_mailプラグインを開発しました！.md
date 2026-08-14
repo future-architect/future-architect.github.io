@@ -91,7 +91,7 @@ end
 ```
 
 一方Redmine_single_mailプラグインでは、クラスメソッドdeliver_issue_addで通知対象ユーザをループせずに、直接メール送信メソッドissue_addに処理させます。
-そしてインスタンスメソッドissue_addで、toの関連ユーザとccのウォッチャーユーザをそれぞれ設定し、単一メールで送信を行います。
+そしてインスタンスメソッドissue_addで、toの関連ユーザとccのウォッチャーユーザをそれぞれ設定し、単一メールで送信します。
 
 ```php Redmine_single_mailプラグインソースの抜粋
 # Notifies users about a new issue.

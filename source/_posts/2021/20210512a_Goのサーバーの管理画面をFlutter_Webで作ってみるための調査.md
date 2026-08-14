@@ -321,7 +321,7 @@ class KenAll extends StatefulWidget {
 }
 ```
 
-実サーバーアクセスと表示を行う部分はこちらです。フィールドの入力が7文字になったらサーバーアクセスを行い、取得してきた情報をStateに入れています。
+実際にサーバーアクセスして表示する部分はこちらです。フィールドの入力が7文字になったらサーバーアクセスを行い、取得してきた情報をStateに入れています。
 
 ```dart lib/main.dart
 class _KenAllState extends State<KenAll> {
@@ -418,7 +418,7 @@ class _KenAllState extends State<KenAll> {
 }
 ```
 
-このHTTPアクセスには外部パッケージが必要なため、pubspec.yamlとHTTPリクエストを送っているコードへのimportの追加を行いま。
+このHTTPアクセスには外部パッケージが必要なため、pubspec.yamlとHTTPリクエストを送っているコードへimportを追加します。
 
 ```yaml:pubspec.yaml
 dependencies:

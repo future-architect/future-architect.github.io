@@ -450,7 +450,7 @@ type User struct {
 ```
 
 このStructに、[gomodifytags](https://github.com/fatih/gomodifytags) によって `boil` タグを追加します。
-`openapi.yml` の `x-oapi-codegen-extra-tags` を利用すると任意のタグを付与することも可能ですが、ひとつひとつのフィールドに追加するのは漏れが出そうだったので、gomodifytagsを使っています。
+`openapi.yml` の `x-oapi-codegen-extra-tags` を利用すると任意のタグの付与もできますが、ひとつひとつのフィールドに追加するのは漏れが出そうだったので、gomodifytagsを使っています。
 
 ```go
 package model

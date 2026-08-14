@@ -156,7 +156,7 @@ type ResponseBody struct {
 }
 ```
 
-それでは、鍵の開閉を行う関数`executeSesame3`を実装します。関数内で指定された引数`signPtr`、`apiPtr`、`uuidPtr`はPythonから渡されることを想定しています。`C.`を指定することで`cgo`内の関数を使用できます。
+それでは、鍵を開閉する関数`executeSesame3`を実装します。関数内で指定された引数`signPtr`、`apiPtr`、`uuidPtr`はPythonから渡されることを想定しています。`C.`を指定することで`cgo`内の関数を使用できます。
 
 ここで1つ注意が必要です。`cgo`を利用する際はメソッドの上のコメントを関数名にそろえる必要があります。
 

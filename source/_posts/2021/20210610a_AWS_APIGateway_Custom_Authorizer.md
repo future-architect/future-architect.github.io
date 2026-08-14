@@ -29,9 +29,9 @@ OSSのAPIGatewayであるKongを触ったことがある方ならば、[JWT Plug
 
 SinglePageApplicationやモバイルアプリなど、ClientになるFront-endがサーバと分離されたシステム構成の場合、`Client (RelyingParty)` と `APIサーバ (ResourceServer)` を両方セキュアにする必要があります。
 
-`RelyingParty` の場合、KeycloakやAuth0など認証基盤が提供するライブラリや、OIDCに準拠したライブラリを使えば割と簡単にセキュアにすることが可能です。
+`RelyingParty` の場合、KeycloakやAuth0など認証基盤が提供するライブラリや、OIDCに準拠したライブラリを使えば割と簡単にセキュアにできます。
 
-一方、`ResourceServer` にはAuthorizerを実装する必要があります。Authorizerはサーバの内部のMiddleware層などに実装することも可能ですが、複数のAPIサーバが存在してて、1つのAPIGatewayでEndpointを集中管理する場合にAuthorizerをLambdaとして一本実装することにより、開発やデプロイなどにメリットをもたらすことができます。
+一方、`ResourceServer` にはAuthorizerを実装する必要があります。Authorizerはサーバの内部のMiddleware層などにも実装できますが、複数のAPIサーバが存在してて、1つのAPIGatewayでEndpointを集中管理する場合にAuthorizerをLambdaとして一本実装することにより、開発やデプロイなどにメリットをもたらすことができます。
 
 この度はそのAuthorizerを実装するにあたって、いくつか考慮すべきポイントについて触れて行こうと思います。
 
@@ -121,7 +121,7 @@ Lambda関数の出力(戻り値)により、以下のようにAPIに送られて
 
 APIリクエストのToken検証が完了し認証ができたら、次はそのユーザーがリクエストしたエンドポイントにアクセス可能かをチェックする認可処理が必要になります。
 
-認可、アクセスコントロールはJWTのClaimsの値に入っているユーザの属性やロールとAPIエンドポイントのパスなどを対照することにより制御することが可能です。
+認可、アクセスコントロールはJWTのClaimsの値に入っているユーザの属性やロールとAPIエンドポイントのパスなどを対照することにより制御できます。
 
 ロジックについては認証基盤の設定やそのシステムの固有の考え方などによりRole-BasedAccessControl、Attribute-BasedAccessControlなど、様々なやり方があります。こういったロジックは自由度の高い領域なのでここでは参考程度にKeycloakやAuth0などで想定しているアクセスコントロールについてのリンクだけを貼っておきます。
 
@@ -169,7 +169,7 @@ APIリクエストしたユーザが誰なのかを表現します。リクエ�
 
 ##### Authorizer Context
 
-Principal IDと同じように後続のLambda関数などに渡すことができる任意の値です(Principal IDもContextの一部)。APIのレスポンスを出し分けするために必要な任意の情報をkey-value形式でセットすることが可能です。一見Mapオブジェクトにも見えますが、ValueとしてはNumber・String・BooleanのみでObjectやArrayなどの入れ子構造は使えません。
+Principal IDと同じように後続のLambda関数などに渡すことができる任意の値です(Principal IDもContextの一部)。APIのレスポンスを出し分けするために必要な任意の情報をkey-value形式でセットできます。一見Mapオブジェクトにも見えますが、ValueとしてはNumber・String・BooleanのみでObjectやArrayなどの入れ子構造は使えません。
 
 ## さいごに
 
