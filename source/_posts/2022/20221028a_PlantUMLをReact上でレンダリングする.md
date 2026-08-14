@@ -143,7 +143,7 @@ User }o--o{ Job
 
 検索すると、[テキストエンコーディング](https://plantuml.com/ja/text-encoding)のページがありました。ここを見ると、UTF-8でエンコードしろ、とあります。あと興味深かったのはBrotli圧縮形式にも対応しているとのこと。まあBrotliはnpmで検索しても使いやすいPure JS版はなかったのでDeflateのままにしておきます。
 
-JavaScriptのオリジナルのUTF-16をUTF-8にするのは`TextEncoding`を使います。次のように圧縮の前に変換を実行するようにすれば日本語も通るようになります。
+JavaScriptのオリジナルのUTF-16をUTF-8にするのは`TextEncoding`を使います。次のように圧縮の前に変換するようにすれば日本語も通るようになります。
 
 ```diff tsx
 - const bin = pako.deflateRaw(unescape(encodeURIComponent(src)));
@@ -155,7 +155,7 @@ JavaScriptのオリジナルのUTF-16をUTF-8にするのは`TextEncoding`を使
 
 ## plantuml.com以外のサーバー対応
 
-これまでのコードは、plantuml.comの変換サーバーを使って表示を行っていました。何度もリクエストを送ってしまうのは申し訳ないので、ローカルで建てたサーバーなど、別サーバーも使えるようにします。
+これまでのコードは、plantuml.comの変換サーバーを使って表示していました。何度もリクエストを送ってしまうのは申し訳ないので、ローカルで建てたサーバーなど、別サーバーも使えるようにします。
 
 まずはローカルサーバーを起動します。　Dockerを使うのが簡単ですね。
 

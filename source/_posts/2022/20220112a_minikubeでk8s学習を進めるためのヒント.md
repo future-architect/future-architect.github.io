@@ -160,7 +160,7 @@ NAME            CLASS    HOSTS   ADDRESS        PORTS   AGE
 test-ingress    <none>   *       192.168.49.2   80      13m
 ```
 
-[ingress-dns](https://minikube.sigs.k8s.io/docs/handbook/addons/ingress-dns/) addonを使えば、Ingressで設定したホスト名をホストサーバから解決することが可能らしいです。ちょっと試せていないですが、参考までに。
+[ingress-dns](https://minikube.sigs.k8s.io/docs/handbook/addons/ingress-dns/) addonを使えば、Ingressで設定したホスト名をホストサーバから解決できるらしいです。ちょっと試せていないですが、参考までに。
 
 ## Horizontal Pod Autoscaler
 

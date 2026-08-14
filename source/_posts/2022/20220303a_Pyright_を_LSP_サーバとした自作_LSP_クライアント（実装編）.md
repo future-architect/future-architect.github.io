@@ -10,7 +10,7 @@ categories:
   - Programming
 thumbnail: /images/2022/20220303a/thumbnail.png
 author: 空閑康太
-lede: "Pyright を LSP サーバとした自作クライアントを実装しますが、その前に経緯について説明します。アルバイトの前は、Future のインターン Engineer Camp で Python のソースコード解析に取り組んでいました。当時は Python の AST モジュールを活用する方針で、それ以外は自前で解析を行っていました。アルバイトでも引き続き解析に取り組んでいますが、次第に型推論などの技術が必要になってきており、全てを自前で実装することは困難な状況です。"
+lede: "Pyright を LSP サーバとした自作クライアントを実装しますが、その前に経緯について説明します。アルバイトの前は、Future のインターン Engineer Camp で Python のソースコード解析に取り組んでいました。当時は Python の AST モジュールを活用する方針で、それ以外は自前で解析していました。アルバイトでも引き続き解析に取り組んでいますが、次第に型推論などの技術が必要になってきており、全てを自前で実装することは困難な状況です。"
 ---
 
 <img src="/images/2022/20220303a/PyrightLarge.png" alt="" width="565" height="234">
@@ -19,7 +19,7 @@ lede: "Pyright を LSP サーバとした自作クライアントを実装しま
 
 こんにちは、Future でアルバイトをしている空閑と申します。本記事ではタイトルの通り、Pyright を LSP (Language Server Protocol) サーバとした自作クライアントを実装しますが、その前に経緯について説明します。本節では実装については触れません。
 
-アルバイトの前は、Future のインターン Engineer Camp で Python のソースコード解析に取り組んでいました。そのときの様子は、[Engineer Camp2021: Python の AST モジュールを使ってクラス構造を可視化する](/articles/20211019a/) で触れています。当時は Python の AST モジュールを活用する方針で、それ以外は自前で解析を行っていました。アルバイトでも引き続き解析に取り組んでいますが、次第に型推論などの技術が必要になってきており、全てを自前で実装することは困難な状況です。そこで現在は、既存のツールを拡張する方針を取っています。
+アルバイトの前は、Future のインターン Engineer Camp で Python のソースコード解析に取り組んでいました。そのときの様子は、[Engineer Camp2021: Python の AST モジュールを使ってクラス構造を可視化する](/articles/20211019a/) で触れています。当時は Python の AST モジュールを活用する方針で、それ以外は自前で解析していました。アルバイトでも引き続き解析に取り組んでいますが、次第に型推論などの技術が必要になってきており、全てを自前で実装することは困難な状況です。そこで現在は、既存のツールを拡張する方針を取っています。
 
 ツールの候補としては、Mypy および Pyright が挙がりましたが、検討の結果（[Mypy と Pyright の解析比較](/articles/20220301a/)）Pyright を拡張することにしています。Pyright は Pylance 上での実行を前提としているため、入力補完などで使う、型チェックにとどまらない情報を取得できることが理由の1つです。また、Pyright には LSP での実装が存在するため、これを利用することで、Pyright 本体の実装に手を加える必要がなく、システムを疎結合に保てます。
 
@@ -203,7 +203,7 @@ main();
 
 ### DidChangeWorkspaceFolders Notification
 
-ワークスペースフォルダを変更するメソッドを実装します。これを実行することで、解析対象のフォルダを変更できます。`InitializeParams` 同様に `DidChangeWorkspaceFoldersParams` を実装します。プロパティは多いですが、単にワークスペースとして認識するフォルダの追加と削除を行っているだけです。また、DidChangeWorkspaceFolders Notification はデフォルトではサーバ側から認識されないため、`InitializeParams.capabilities` にワークスペース機能があることを記載します。詳細は、[Pyright を LSP サーバとした自作 LSP クライアント（調査編）](/articles/20220302a/)で解説しています。
+ワークスペースフォルダを変更するメソッドを実装します。これを実行することで、解析対象のフォルダを変更できます。`InitializeParams` 同様に `DidChangeWorkspaceFoldersParams` を実装します。プロパティは多いですが、単にワークスペースとして認識するフォルダを追加・削除しているだけです。また、DidChangeWorkspaceFolders Notification はデフォルトではサーバ側から認識されないため、`InitializeParams.capabilities` にワークスペース機能があることを記載します。詳細は、[Pyright を LSP サーバとした自作 LSP クライアント（調査編）](/articles/20220302a/)で解説しています。
 
 ```ts client.ts
 import ...
