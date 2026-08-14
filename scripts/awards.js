@@ -23,7 +23,14 @@ hexo.extend.helper.register('article_award', function (post) {
     .replace(/^articles\//, '')
     .replace(/\/$/, '');
   const row = rows.find((r) => r.article && String(r.article) === id);
-  return row ? { year: row.year, author: row.author } : null;
+  if (!row) return null;
+  // メダルの色は著者のその年時点の受賞回数で決まる（灰→銅→金）。
+  // 一覧・著者ページと同じ規則にする (#2409)
+  const years = rows
+    .filter((r) => r.author === row.author)
+    .map((r) => r.year)
+    .sort((a, b) => a - b);
+  return { year: row.year, author: row.author, nth: years.indexOf(row.year) + 1 };
 });
 
 hexo.extend.helper.register('author_awards', function (author) {
