@@ -136,7 +136,7 @@ err := pie.Render(chart.PNG, buffer)
 
 #### GetMetricsWidgetImage API
 
-はじめ、円グラフを作成しようと探していた際に[GetMetricsWidgetImage](https://docs.aws.amazon.com/ja_jp/AmazonCloudWatch/latest/APIReference/API_GetMetricWidgetImage.html)というAPIを知りました。このAPIを利用して前日との利用料の差額を出している記事なども見つけましたが、このAPIは利用料金の円グラフ化はできるのですが、**対象となるデータはCloudWatchで監視できるリソースのみ**であり、GetCostAndUsageAPIで取得できる全てのデータを対象とすることはできなかったため採用を見送りました。
+はじめ、円グラフを作成しようと探していた際に[GetMetricsWidgetImage](https://docs.aws.amazon.com/ja_jp/AmazonCloudWatch/latest/APIReference/API_GetMetricWidgetImage.html)というAPIを知りました。このAPIを利用して前日との利用料の差額を出している記事なども見つけましたが、このAPIは利用料金の円グラフ化はできるのですが、**対象となるデータはCloudWatchで監視できるリソースのみ**であり、GetCostAndUsageAPIで取得できる全てのデータを対象にできなかったため採用を見送りました。
 
 私自身、初めはグラフ作成に必要なデータを送れば円グラフを作成して返してくれるAPIだと思っていたのですが、上述の通り、Cloudwatchの監視メトリクスをグラフ化するためのAPIであり、汎用的にグラフ作成に用いるAPIではありませんでした。
 
