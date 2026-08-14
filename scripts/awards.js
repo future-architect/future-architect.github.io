@@ -13,6 +13,26 @@
 // 3回受賞で殿堂入り（2022年に澁川さんが最速で到達した運用ルール）
 const HALL_OF_FAME_WINS = 3;
 
+// 受賞記事のバッジ (#2422)。awards.yml の行に article（URL の記事ID。
+// 例: 20240726a）を書くと、その記事にバッジが出る。
+// 表彰は人に贈られるもので、対象記事の記録が残っていない年もあるため、
+// article は任意。書かなければ著者ページの表彰表示だけが出る
+hexo.extend.helper.register('article_award', function (post) {
+  const rows = (this.site.data && this.site.data.awards) || [];
+  const id = String(post.path || '')
+    .replace(/^articles\//, '')
+    .replace(/\/$/, '');
+  const row = rows.find((r) => r.article && String(r.article) === id);
+  if (!row) return null;
+  // メダルの色は著者のその年時点の受賞回数で決まる（灰→銅→金）。
+  // 一覧・著者ページと同じ規則にする (#2409)
+  const years = rows
+    .filter((r) => r.author === row.author)
+    .map((r) => r.year)
+    .sort((a, b) => a - b);
+  return { year: row.year, author: row.author, nth: years.indexOf(row.year) + 1 };
+});
+
 hexo.extend.helper.register('author_awards', function (author) {
   const rows = (this.site.data && this.site.data.awards) || [];
   const years = rows
