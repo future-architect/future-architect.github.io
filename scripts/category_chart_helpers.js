@@ -247,12 +247,10 @@ hexo.extend.helper.register('category_stats', function (name) {
  * 途切れを隠さない（投稿の無い月をダミーカードで見せる #2219 と同じ）。
  * 年ラベルは年に1つでよいので、年ごとに2本ずつの組で返す。
  */
-hexo.extend.helper.register('category_yearly_chart', function (name) {
-  const category = this.site.categories.findOne({ name });
-  if (!category) return null;
-
+/** 記事の集合を半期の棒に均す。カテゴリページとタグページで共用する */
+function halfYearBars(posts) {
   const byHalf = new Map(); // "2026/1"（上期）-> 本数
-  category.posts.forEach((post) => {
+  posts.forEach((post) => {
     const key = `${post.date.year()}/${post.date.month() < 6 ? 1 : 2}`;
     byHalf.set(key, (byHalf.get(key) || 0) + 1);
   });
@@ -270,13 +268,52 @@ hexo.extend.helper.register('category_yearly_chart', function (name) {
     });
     groups.push({ year: y, halves });
   }
-  return {
-    groups,
-    max,
+  return { groups, max, filledHalves: byHalf.size };
+}
+
+hexo.extend.helper.register('category_yearly_chart', function (name) {
+  const category = this.site.categories.findOne({ name });
+  if (!category) return null;
+  const bars = halfYearBars(category.posts.toArray());
+  if (!bars) return null;
+  return Object.assign(bars, {
     // 棒は /categories/ の積み上げ棒と同じ、そのカテゴリの色で塗る。
     // 対応表に無い新設カテゴリは無彩色で出す（警告は category_colors が出す）
     color: CATEGORY_COLORS[name] || '#6e7074',
-  };
+  });
+});
+
+/**
+ * タグページの半期別投稿数 (#2434)。刻みと描画はカテゴリページと同じ (#2423)。
+ *
+ * ただしタグは数が桁違い（約700）で、1〜4本のタグが半分以上を占める。
+ * 棒が数本立つだけのグラフは「いつ書かれたか」を示すが、それは直下の
+ * 記事一覧の日付と同じ情報でしかない。5本以上あり、かつ投稿のある期が
+ * 2つ以上（＝時間の中で動きがある）タグにだけ出す。
+ *
+ * 色はそのタグが最も多く使われているカテゴリ。/tags/ の「年別 新規タグ数の
+ * 推移」が同じ規則で塗っており、読者はタグと色の対応を既に見ている。
+ */
+const TAG_CHART_MIN_POSTS = 5;
+const TAG_CHART_MIN_HALVES = 2;
+
+hexo.extend.helper.register('tag_yearly_chart', function (name) {
+  const tag = this.site.tags.findOne({ name });
+  if (!tag || tag.length < TAG_CHART_MIN_POSTS) return null;
+  const bars = halfYearBars(tag.posts.toArray());
+  if (!bars || bars.filledHalves < TAG_CHART_MIN_HALVES) return null;
+
+  const catCount = new Map();
+  tag.posts.forEach((post) => {
+    post.categories.forEach((c) => catCount.set(c.name, (catCount.get(c.name) || 0) + 1));
+  });
+  // 同数の決着が無いとビルドごとに色が変わる
+  const dominant = [...catCount.entries()].sort(
+    (a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1),
+  )[0];
+  return Object.assign(bars, {
+    color: (dominant && CATEGORY_COLORS[dominant[0]]) || '#6e7074',
+  });
 });
 
 // 関連カテゴリ (#2200)。独自の採点は持ち込まず、ページに出ている2つの規則の
