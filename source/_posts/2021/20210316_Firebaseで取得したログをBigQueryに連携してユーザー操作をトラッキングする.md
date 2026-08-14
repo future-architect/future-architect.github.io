@@ -40,7 +40,7 @@ lede: "[CP連載2021も折り返しの6本目です！陽光麗らかなある�
 
 * [Serverless連載4: Firebase CrashlyticsでAndroidアプリのエラーログをさくっと収集する](/articles/20200330/)
 
-各機能はFirebase Consoleを介してGUIで閲覧、操作することが可能です。
+各機能はFirebase Consoleを介してGUIで閲覧・操作できます。
 今回はその中の`Google Analytics for Firebase`を用いてAndroidアプリの操作ログを取得していきます。
 
 ## Google Analytics for Firebaseとは
@@ -137,7 +137,7 @@ Firebaseで扱うログはオブジェクト形式をしており、上記ログ
 
 ※実際にはデフォルトのパラメータも含まれるため、paramの数はもっと多いです。またevent_nameと並列で、timestampなど諸々の値もデフォルトで送信されます。
 
-paramやevent_nameは任意に指定することもできますし、Firebaseが用意している定数クラスを用いることもできます。
+paramやevent_nameは任意に指定できますし、Firebaseが用意している定数クラスを用いることもできます。
 
 * [Paramの一覧](https://firebase.google.com/docs/reference/android/com/google/firebase/analytics/FirebaseAnalytics.Param?hl=ja)
 * [Eventの一覧](https://firebase.google.com/docs/reference/android/com/google/firebase/analytics/FirebaseAnalytics.Event?hl=ja)

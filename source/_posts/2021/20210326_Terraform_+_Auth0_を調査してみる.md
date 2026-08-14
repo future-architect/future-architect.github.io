@@ -20,7 +20,7 @@ Auth0がHashiCorpとのパートナーシップを結び、TerraformでAuth0リ�
 
 https://auth0.com/blog/partners-with-hashicorp-terraform/
 
-今回はTerraformで既存のAuth0リソースを移行するという観点で調査を行いました。
+今回はTerraformで既存のAuth0リソースを移行するという観点で調査しました。
 
 ## Auth0とは
 
@@ -311,7 +311,7 @@ Terraformの組み込み関数`replace`を使えば、同一のファイルを�
 }
 ```
 
-以下の様にリソース定義を行います。
+以下の様にリソースを定義します。
 
 ```sh
 resource "auth0_rule" "set_env" {
@@ -350,7 +350,7 @@ resource "auth0_rule" "set_env" {
 
 ## まとめ
 
-今回はTerraform + Auth0の環境構築について、既存のAuth0環境の移行を観点として調査を行いました。
+今回はTerraform + Auth0の環境構築について、既存のAuth0環境の移行を観点として調査しました。
 
 調査結果をまとめると、
 

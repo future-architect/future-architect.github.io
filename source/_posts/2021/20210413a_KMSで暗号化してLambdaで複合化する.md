@@ -204,7 +204,7 @@ resource "aws_lambda_function" "kms_lambda" {
 }
 ```
 
-手動で設定を行う場合は環境変数の設定から暗号化設定を有効化します。
+手動で設定する場合は環境変数の設定から暗号化設定を有効化します。
 <img src="/images/2021/20210413a/lambda.png" alt="環境変数の編集画面" loading="lazy">
 
 ### Lambda で復号化

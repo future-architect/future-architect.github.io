@@ -91,7 +91,7 @@ VPC Peeringとは、異なるVPC間の通信を実現するためのサービス
 VPCのコンソール画面からピアリング接続を設定します。
 <img src="/images/2021/20210831a/vpc_peering_atob01.png" alt="vpc_peering_atob01.png" width="736" height="524" loading="lazy">
 
-設定後、アクションメニューバーから承諾を行う必要がある点に注意です。
+設定後、アクションメニューバーから承諾する必要がある点に注意です。
 <img src="/images/2021/20210831a/vpc_peering_atob02.png" alt="vpc_peering_atob02.png" width="972" height="195" loading="lazy">
 
 再度、分析してみましょう。
@@ -141,9 +141,9 @@ Internal AからVPC Peeringに対するルーティング設定が不足して�
 黒字で記載している箇所は今回意識しなかった箇所です。
 
 - EC2のENI：
-  - EC2が通信を行うためのインターフェースです。ENIがないとEC２は通信を行うことができません。EC2を作成したタイミングで合わせて払い出されています。
+  - EC2が通信するためのインターフェースです。ENIがないとEC２は通信できません。EC2を作成したタイミングで合わせて払い出されています。
 - VPCのACL：
-  - VPCの単位でNWの制御を行うためのサービスです。セキュリティグループ同様にセキュリティを高める目的で利用します。
+  - VPCの単位でNWを制御するためのサービスです。セキュリティグループ同様にセキュリティを高める目的で利用します。
 
 参考：[AWSのネットワークインターフェース「ENI」とは](https://business.ntt-east.co.jp/content/cloudsolution/column-14.html)
 参考：[Amazon VPCのネットワークACLについて](https://dev.classmethod.jp/articles/amazon-vpc-acl/)

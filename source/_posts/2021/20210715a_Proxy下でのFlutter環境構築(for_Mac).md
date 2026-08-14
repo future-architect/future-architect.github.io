@@ -31,7 +31,7 @@ TIG DXユニットでアルバイトをしている齋藤です。
 
 基本的にはFlutter公式の[Install](https://flutter.dev/docs/get-started/install)に沿ってインストールを進めていきます。
 
-予め、`flutter pub get`で必要になるProxyに関する設定を行います。.zshrc等に設定を追記します。
+予め、`flutter pub get`で必要になるProxyに関する設定をします。.zshrc等に設定を追記します。
 
 ```sh
 # 認証なしの場合
@@ -67,7 +67,7 @@ flutter doctor
 
 ## Android Studioのインストール
 
-IDEのAndroid Studioの設定を行います。Android Studioが未インストールならば、[Android Studio のインストール](https://developer.android.com/studio/install?hl=ja) に沿ってインストールします。
+IDEのAndroid Studioを設定します。Android Studioが未インストールならば、[Android Studio のインストール](https://developer.android.com/studio/install?hl=ja) に沿ってインストールします。
 
 続いて起動画面で「Configure」→「Plugins」を選択して開き、Flutterを検索し、Flutter Pluginをインストールします。同時にDart Pluginもインストールされます。
 
@@ -101,7 +101,7 @@ Flutterのプロジェクトを作成します。このとき、Android Studio�
 Exception in thread "main" java.io.IOException: Unable to tunnel through proxy. Proxy returns "HTTP/1.1 407 Proxy Authentication Required"
 ```
 
-これは途中`gradlew assembleDebug`を実行するときのエラーなので、gradleでのProxy設定を行います。`~/.gradle/gradle.properties`において
+これは途中`gradlew assembleDebug`を実行するときのエラーなので、gradleでProxyを設定します。`~/.gradle/gradle.properties`において
 
 ```gradle
 systemProp.http.proxyHost=http://proxy.example.com
@@ -146,4 +146,4 @@ A problem occurred configuring root project 'android'.
 
 ## まとめ
 
-Proxyがある環境下でMac上にFlutterの環境構築について紹介いたしました。Proxy環境下での環境構築は厄介なことになりがちですが、適切な設定を行い、素敵な開発ライフを送っていただければと思います。
+Proxyがある環境下でMac上にFlutterの環境構築について紹介いたしました。Proxy環境下での環境構築は厄介なことになりがちですが、適切に設定し、素敵な開発ライフを送っていただければと思います。

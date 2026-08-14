@@ -121,7 +121,7 @@ https://docs.aws.amazon.com/sdk-for-go/api/service/dynamodb/expression/
 	}
 ```
 
-もちろんAND, ORをネスト化することもできます。`Artist` が `Blue` のときは `Year` が `2021` 年であると追加します。
+もちろんAND, ORもネスト化できます。`Artist` が `Blue` のときは `Year` が `2021` 年であると追加します。
 
 ```go ネストした条件
 	filt := expression.Name("Artist").Equal(expression.Value("Red")).

@@ -11,11 +11,11 @@ categories:
   - Infrastructure
 thumbnail: /images/2021/20210924a/thumbnail.png
 author: 真野隼記
-lede: "Gateway+Lambda という構成でWebAPI開発を行う際、ちょっと便利に使える疎通方法をまとめます。API GatewayですがPublicなエンドポイントがあれば curlコマンドやPostmanを用いての動作検証も容易だと思います。"
+lede: "Gateway+Lambda という構成でWebAPIを開発する際、ちょっと便利に使える疎通方法をまとめます。API GatewayですがPublicなエンドポイントがあれば curlコマンドやPostmanを用いての動作検証も容易だと思います。"
 ---
 ## はじめに
 
-TIG DXユニットの真野です。AWSのAPI Gateway+Lambda という構成でWeb API開発を行う際、ちょっと便利に使える疎通方法をまとめます。
+TIG DXユニットの真野です。AWSのAPI Gateway+Lambda という構成でWeb APIを開発する際、ちょっと便利に使える疎通方法をまとめます。
 
 ## 背景
 

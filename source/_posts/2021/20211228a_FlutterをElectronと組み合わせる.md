@@ -45,7 +45,7 @@ Flutter on Desktopのエコシステムが充実するまでの繋ぎとして�
 
 ### Electron向けの資産を活かしたい
 
-ビジネス要件的にどうしても必要な、Electronに向け最適化されたJavaScript、TypeScript製モジュールがありました。これらの資産をDart向けに作り直す必要をなくす、という意味でFlutter on Electronという組み合わせが実現できないかな、という検証を行ったという背景もあります。
+ビジネス要件的にどうしても必要な、Electronに向け最適化されたJavaScript、TypeScript製モジュールがありました。これらの資産をDart向けに作り直す必要をなくす、という意味でFlutter on Electronという組み合わせが実現できないかな、という検証をしたという背景もあります。
 
 あまり頼りすぎるとFlutter on Desktopに本格移行する難易度が跳ね上がりますが、この組み合わせであれば既存の資産や豊富なnpmモジュールを活用できます。
 

@@ -106,7 +106,7 @@ ADサーバーのAD LDAP Connectorで指定した情報が取れていること�
 
 ### Salesforceのアカウント準備
 
-SSOの前提として、Auth0のドメイン設定を行う必要があります。
+SSOの前提として、Auth0のドメインを設定する必要があります。
 
 ### Salesforce側にADとSSOさせたいユーザを作成
 
