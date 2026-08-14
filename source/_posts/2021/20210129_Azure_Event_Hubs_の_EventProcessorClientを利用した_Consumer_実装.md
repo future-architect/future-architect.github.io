@@ -29,7 +29,7 @@ Azure が提供されている Event Hubs の Consumer 処理実装の EventProc
 
 ## Event Hubs とは
 
-Azure が提供している、大規模データを貯めて配信することが可能な Pub/Sub モデルのマネージドサービスです。
+Azure が提供している、大規模データを貯めて配信できる Pub/Sub モデルのマネージドサービスです。
 
 [Azure Event Hubs とは - ビッグ データ インジェスト サービス - Azure Event Hubs | Microsoft Docs](https://docs.microsoft.com/ja-jp/azure/event-hubs/event-hubs-about)
 
@@ -50,7 +50,7 @@ Publisher は namespace と  event hub を指定して、メッセージを送�
 
 ## Offset 管理
 
-Pub/Sub 系のサービスの、Consumer 実装を行う際に、メッセージをどこまで取得したかを管理すること(= offset 管理) が重要になります。
+Pub/Sub 系のサービスの Consumer を実装する際に、メッセージをどこまで取得したかを管理すること(= offset 管理) が重要になります。
 (アプリが突然止まったり、デプロイで停止したりと継続して取れ続けるとは限らないかなと思います。)
 Event Hubs では offset は `Consumer group` の `partition` 単位で管理されます。
 
@@ -67,7 +67,7 @@ Consumer group とは、複数の Consumer をまとめて扱う単位で、Even
 
 ## EventProcessorClient
 
-Consumber group 別の offset 管理を行う実装として、 `EventProcessorClient` が一部 Azure SDK( [azure-messaging-eventhubs](https://github.com/Azure/azure-sdk-for-java/tree/master/sdk/eventhubs/azure-messaging-eventhubs) )にて提供されています。こちらを利用することで、offset 管理をした上で漏れなくメッセージ取得処理を行うことができます。また他のメリットとして、複数台の Consumer 間で負荷を分散して、メッセージを重複することなく、取得する機能も持っています。処理のスケールのため Consumer の台数を増やしたいケースでは、Consumer 間で同じメッセージを取得しないような仕組みづくりが大変ですが、SDK側でよしなにやってくれて便利です。
+Consumber group 別に offset を管理する実装として、 `EventProcessorClient` が一部 Azure SDK( [azure-messaging-eventhubs](https://github.com/Azure/azure-sdk-for-java/tree/master/sdk/eventhubs/azure-messaging-eventhubs) )にて提供されています。こちらを利用することで、offset 管理をした上で漏れなくメッセージ取得処理を行うことができます。また他のメリットとして、複数台の Consumer 間で負荷を分散して、メッセージを重複することなく、取得する機能も持っています。処理のスケールのため Consumer の台数を増やしたいケースでは、Consumer 間で同じメッセージを取得しないような仕組みづくりが大変ですが、SDK側でよしなにやってくれて便利です。
 
 ちなみに、旧版の`EventProcessorHost` (`azure-eventhubs` )でも同様のことができますが、他 API との実装の一貫性のために新版への移行が推奨されています。([参考](https://github.com/Azure/azure-sdk-for-java/blob/master/sdk/servicebus/azure-messaging-servicebus/migration-guide.md#migration-benefits))
 
@@ -95,7 +95,7 @@ az://${Blob名}/${namespace}/${event hub}/${consumer group}/checkpoint/${partiti
 
 ownership の担当者ID、 checkpoint の offset値 は Blob のメタデータとして管理されています。
 
-Azure SDK 内で、メタデータ値を参照/更新することで、複数台のConsumer 間で連携して処理を行うことができるようになっています。Azure SDK 側で提供されている処理は Blob Storage を利用していますが、 `Checkpointstore` interface として切り出されているため、他の Storage (S3, GCS, インメモリ) でも実装することは可能です。
+Azure SDK 内で、メタデータ値を参照/更新することで、複数台のConsumer 間で連携して処理を行うことができるようになっています。Azure SDK 側で提供されている処理は Blob Storage を利用していますが、 `Checkpointstore` interface として切り出されているため、他の Storage (S3, GCS, インメモリ) でも実装できます。
 [azure-sdk-for-java/CheckpointStore.java at master · Azure/azure-sdk-for-java](https://github.com/Azure/azure-sdk-for-java/blob/master/sdk/eventhubs/azure-messaging-eventhubs/src/main/java/com/azure/messaging/eventhubs/CheckpointStore.java)
 
 #### 対応SDK

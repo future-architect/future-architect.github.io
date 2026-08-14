@@ -54,7 +54,7 @@ AWSには資格試験が11種類存在します(AWS 認定 Alexa スキルビル
 
 ## Udemy教材
 
-資格試験の問題集を学習サイトのUdemyで購入することが可能です。
+資格試験の問題集を学習サイトのUdemyで購入できます。
 
 [こちらの問題集](https://www.udemy.com/course/aws-solutions-architect-professional-practice-exams-amazon/)が最も高評価です。
 
