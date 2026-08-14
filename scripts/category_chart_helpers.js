@@ -308,9 +308,7 @@ hexo.extend.helper.register('tag_yearly_chart', function (name) {
     post.categories.forEach((c) => catCount.set(c.name, (catCount.get(c.name) || 0) + 1));
   });
   // 同数の決着が無いとビルドごとに色が変わる
-  const dominant = [...catCount.entries()].sort(
-    (a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1),
-  )[0];
+  const dominant = [...catCount.entries()].sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1))[0];
   return Object.assign(bars, {
     color: (dominant && CATEGORY_COLORS[dominant[0]]) || '#6e7074',
   });
