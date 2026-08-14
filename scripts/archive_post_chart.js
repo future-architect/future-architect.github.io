@@ -43,6 +43,21 @@ const generatePostsSeries = (posts, year) => {
     : posts;
   if (target.length === 0) return [];
 
+  // 年ページは1月から（今年は現在の月まで、過去の年は12月まで）を必ず並べる。
+  // 投稿のある月だけにすると、月が抜けて期間が詰まって見えるうえ、
+  // 同じページの「カテゴリ別」タブと軸の長さが食い違う (#2430)
+  if (year) {
+    const now = new Date();
+    const monthCount =
+      Number(year) === now.getFullYear() ? now.getMonth() + 1 : 12;
+    const counts = new Array(monthCount).fill(0);
+    target.forEach((post) => {
+      const m = post.date.month();
+      if (m < monthCount) counts[m]++;
+    });
+    return counts.map((count, i) => ({ groupKey: `${i + 1}月`, count }));
+  }
+
   const quarterOf = (date) =>
     `${date.format('YYYY')}年${Math.ceil(Number(date.format('MM')) / 3)}Q`;
   const unit = year ? 'month' : 'quarter';

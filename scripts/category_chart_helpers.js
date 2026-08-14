@@ -122,16 +122,24 @@ hexo.extend.helper.register('category_colors', function () {
 
 // 指定年の月別 × カテゴリ別の投稿数 (#2171)
 hexo.extend.helper.register('get_monthly_category_data', function (year) {
-  const byCat = new Map(); // カテゴリ -> 12ヶ月分の配列
+  // 今年はまだ来ていない月を出さない。月の探索リンク（archive.ejs）と同じ規則。
+  // 12ヶ月固定にすると、今年のグラフに未来の空欄が並ぶうえ、
+  // 同じページの「週別」タブ（posts_stack_series）と軸の長さが食い違い、
+  // タブを切り替えるたびに棒の幅と位置が変わっていた (#2430)
+  const now = new Date();
+  const monthCount =
+    Number(year) === now.getFullYear() ? now.getMonth() + 1 : 12;
+
+  const byCat = new Map(); // カテゴリ -> 月ごとの配列
   this.site.posts.forEach((post) => {
     if (String(post.date.year()) !== String(year)) return;
     const cat = post.categories.first();
     if (!cat) return;
-    if (!byCat.has(cat.name)) byCat.set(cat.name, new Array(12).fill(0));
-    byCat.get(cat.name)[post.date.month()]++;
+    if (!byCat.has(cat.name)) byCat.set(cat.name, new Array(monthCount).fill(0));
+    if (post.date.month() < monthCount) byCat.get(cat.name)[post.date.month()]++;
   });
   const months = [];
-  for (let m = 1; m <= 12; m++) months.push(`${m}月`);
+  for (let m = 1; m <= monthCount; m++) months.push(`${m}月`);
   // 並びはその年の多い順ではなく、全期間ページと同じサイト累計の多い順で
   // 固定する。年ごとに入れ替わると、年を移動したとき凡例と積み上げの
   // 色の位置が動いて比較しにくい (#2201)
