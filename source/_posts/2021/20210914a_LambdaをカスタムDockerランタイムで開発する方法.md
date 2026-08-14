@@ -146,7 +146,7 @@ CLIで構築する場合は下記のコマンドでリポジトリを作成し�
 aws ecr create-repository --repository-name myapp
 ```
 
-terraformで記載することも可能です。
+terraformで記載できます。
 
 ```sh ecr_repository.tf
 resource "aws_ecr_repository" "myapp" {
@@ -200,11 +200,11 @@ resource "aws_lambda_function" "myapp" {
 aws lambda update-function-code --profile myprofile --function-name myapp --image-uri ${AWS_ACCOUNT}.dkr.ecr.${REGION}.amazonaws.com/myapp:latest
 ```
 
-コンテナイメージのタグやダイジェストをコンテナイメージの内容を更新する度に厳密に管理する事も可能ですが、今のところ常に`latest`での運用に落ち着いています。
+コンテナイメージのタグやダイジェストをコンテナイメージの内容を更新する度に厳密に管理できますが、今のところ常に`latest`での運用に落ち着いています。
 
 ### コンテナイメージをローカル環境でデバッグする
 
-AWS Lambdaで動く要件を満たしたコンテナが作成されているかをローカル環境で確認することは可能です。逆に作成したアプリケーションコンテナ単体では動作しません。
+AWS Lambdaで動く要件を満たしたコンテナが作成されているかをローカル環境で確認できます。逆に作成したアプリケーションコンテナ単体では動作しません。
 
 [Lambda Runtime Interface Emulator](https://aws.amazon.com/jp/blogs/news/new-for-aws-lambda-container-image-support/)との組み合わせでコンテナを起動することでローカル環境でのデバッグが可能になります。
 
