@@ -1,0 +1,37 @@
+<%# 半期別の投稿数グラフ（#2423 / #2434）。カテゴリページとタグページで共用する。
+    棒は多くても22本なので CSS だけで描く。この1枚のために echarts を
+    読み込ませない（タグページは約700ページある）。
+    呼び出し: partial('half-bars', {chart: <helper の戻り値>, label: '<何の>'}) %>
+<ul class="half-bars" aria-label="<%= label %>の半期別投稿数">
+  <% chart.groups.forEach(function(g){ %>
+  <%# 年ラベルは年に1つで足りるので、上期・下期を組にして年で束ねる %>
+  <li class="half-bar-group">
+    <span class="half-bar-pair">
+      <% g.halves.forEach(function(h){ %>
+      <%# 棒の高さは最大の期を 100% とした相対値。0本の期も棒を出さずに枠だけ
+          残し、途切れを隠さない。数値は棒の上に出し、期の別とカテゴリの内訳は
+          読み上げ・ホバー用に title で補う %>
+      <span class="half-bar" title="<%= g.year %>年 <%= h.label %> <%= h.count %>本<%= h.segments.length > 1 ? '（' + h.segments.map(function(s){ return s.name + ' ' + s.count }).join('、') + '）' : '' %>">
+        <span class="half-bar-value"><%= h.count %></span>
+        <span class="half-bar-fill" style="height: <%= h.count === 0 ? 0 : Math.round((h.count / chart.max) * 100) %>%">
+          <%# 積み上げの内訳。高さはその棒の中での割合。並びは凡例と同じ順で、
+              下から積む（column-reverse）ので先頭が最下段になる %>
+          <% h.segments.forEach(function(s){ %>
+          <span class="half-bar-seg" style="height: <%= (s.count / h.count) * 100 %>%; background: <%= s.color %>"></span>
+          <% }) %>
+        </span>
+      </span>
+      <% }) %>
+    </span>
+    <span class="half-bar-label"><%= g.year %></span>
+  </li>
+  <% }) %>
+</ul>
+<%# 凡例は内訳があるとき（タグページ）だけ。カテゴリページは1色なので要らない %>
+<% if (chart.legend && chart.legend.length) { %>
+<ul class="half-bars-legend">
+  <% chart.legend.forEach(function(l){ %>
+  <li><span class="half-bars-legend-swatch" style="background: <%= l.color %>"></span><%= l.name %> <%= l.count %>本</li>
+  <% }) %>
+</ul>
+<% } %>

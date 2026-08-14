@@ -254,14 +254,18 @@ hexo.extend.helper.register('category_stats', function (name) {
  * 途切れを隠さない（投稿の無い月をダミーカードで見せる #2219 と同じ）。
  * 年ラベルは年に1つでよいので、年ごとに2本ずつの組で返す。
  */
-hexo.extend.helper.register('category_yearly_chart', function (name) {
-  const category = this.site.categories.findOne({ name });
-  if (!category) return null;
-
-  const byHalf = new Map(); // "2026/1"（上期）-> 本数
-  category.posts.forEach((post) => {
+/** 記事の集合を半期の棒に均す。カテゴリページとタグページで共用する */
+function halfYearBars(posts) {
+  const byHalf = new Map(); // "2026/1"（上期）-> {count, byCat}
+  posts.forEach((post) => {
     const key = `${post.date.year()}/${post.date.month() < 6 ? 1 : 2}`;
-    byHalf.set(key, (byHalf.get(key) || 0) + 1);
+    if (!byHalf.has(key)) byHalf.set(key, { count: 0, byCat: new Map() });
+    const bucket = byHalf.get(key);
+    bucket.count++;
+    // カテゴリは第1のものだけ数える。複数カテゴリを全部積むと
+    // 合計が投稿数と合わなくなる（著者ページのチャートと同じ規則）
+    const cat = post.categories && post.categories.length ? post.categories.first().name : '未分類';
+    bucket.byCat.set(cat, (bucket.byCat.get(cat) || 0) + 1);
   });
   if (byHalf.size === 0) return null;
 
@@ -271,19 +275,90 @@ hexo.extend.helper.register('category_yearly_chart', function (name) {
   let max = 0;
   for (let y = start; y <= end; y++) {
     const halves = [1, 2].map((h) => {
-      const count = byHalf.get(`${y}/${h}`) || 0;
+      const bucket = byHalf.get(`${y}/${h}`);
+      const count = bucket ? bucket.count : 0;
       if (count > max) max = count;
-      return { half: h, label: h === 1 ? '上期' : '下期', count };
+      return {
+        half: h,
+        label: h === 1 ? '上期' : '下期',
+        count,
+        byCat: bucket ? bucket.byCat : new Map(),
+      };
     });
     groups.push({ year: y, halves });
   }
-  return {
-    groups,
-    max,
-    // 棒は /categories/ の積み上げ棒と同じ、そのカテゴリの色で塗る。
-    // 対応表に無い新設カテゴリは無彩色で出す（警告は category_colors が出す）
-    color: CATEGORY_COLORS[name] || '#6e7074',
-  };
+  return { groups, max, filledHalves: byHalf.size };
+}
+
+// 対応表に無い新設カテゴリは無彩色で出す（警告は category_colors が出す）
+const colorOf = (name) => CATEGORY_COLORS[name] || '#6e7074';
+
+/**
+ * 半期の棒をカテゴリ別の積み上げに割る。
+ *
+ * 積む順（＝凡例の順）はサイト累計の多い順で固定する。期ごとの多い順に
+ * すると、同じカテゴリの色が棒の中で上下し、期をまたいだ比較ができない
+ * （年ページ・月ページの積み上げと同じ規則 #2201）。
+ */
+function stackByCategory(bars, siteOrder) {
+  const used = new Map(); // カテゴリ -> 合計本数（凡例に出す）
+  bars.groups.forEach((g) => {
+    g.halves.forEach((h) => {
+      h.segments = siteOrder
+        .filter((name) => h.byCat.has(name))
+        .map((name) => {
+          const count = h.byCat.get(name);
+          used.set(name, (used.get(name) || 0) + count);
+          return { name, count, color: colorOf(name) };
+        });
+    });
+  });
+  bars.legend = siteOrder
+    .filter((name) => used.has(name))
+    .map((name) => ({ name, count: used.get(name), color: colorOf(name) }));
+  return bars;
+}
+
+hexo.extend.helper.register('category_yearly_chart', function (name) {
+  const category = this.site.categories.findOne({ name });
+  if (!category) return null;
+  const bars = halfYearBars(category.posts.toArray());
+  if (!bars) return null;
+  // カテゴリページでは内訳の軸が無いので、全体をそのカテゴリの色で塗る
+  bars.groups.forEach((g) => {
+    g.halves.forEach((h) => {
+      h.segments = h.count ? [{ name, count: h.count, color: colorOf(name) }] : [];
+    });
+  });
+  return bars;
+});
+
+/**
+ * タグページの半期別投稿数 (#2434)。刻みと描画はカテゴリページと同じ (#2423)。
+ *
+ * ただしタグは数が桁違い（約700）で、1〜4本のタグが半分以上を占める。
+ * 棒が数本立つだけのグラフは「いつ書かれたか」を示すが、それは直下の
+ * 記事一覧の日付と同じ情報でしかない。5本以上あり、かつ投稿のある期が
+ * 2つ以上（＝時間の中で動きがある）タグにだけ出す。
+ *
+ * 棒はカテゴリ別の積み上げにする。タグは複数のカテゴリにまたがるので、
+ * 「このタグがどの分野で書かれてきたか」「その構成が時期で変わったか」まで
+ * 読める。色は他ページと同じくカテゴリ名で固定 (#2170)。
+ */
+const TAG_CHART_MIN_POSTS = 5;
+const TAG_CHART_MIN_HALVES = 2;
+
+hexo.extend.helper.register('tag_yearly_chart', function (name) {
+  const tag = this.site.tags.findOne({ name });
+  if (!tag || tag.length < TAG_CHART_MIN_POSTS) return null;
+  const bars = halfYearBars(tag.posts.toArray());
+  if (!bars || bars.filledHalves < TAG_CHART_MIN_HALVES) return null;
+
+  const siteOrder = this.site.categories
+    .toArray()
+    .sort((a, b) => b.length - a.length || (a.name < b.name ? -1 : 1))
+    .map((c) => c.name);
+  return stackByCategory(bars, siteOrder);
 });
 
 // 関連カテゴリ (#2200)。独自の採点は持ち込まず、ページに出ている2つの規則の
