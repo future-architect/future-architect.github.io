@@ -12,13 +12,13 @@ categories:
 series: "GCP2021"
 thumbnail: /images/2021/20210323/thumbnail.png
 author: 齋場俊太朗
-lede: "Cloud Spannerのローカル開発環境をdocker-composeでサクッと立ち上げる手順を紹介します。Cloud Spannerを用いた開発を行う方、また興味あるから少し触ってみたいという方にもおすすめです。簡単にCloud Spanner について紹介させていただきます。"
+lede: "Cloud Spannerのローカル開発環境をdocker-composeでサクッと立ち上げる手順を紹介します。Cloud Spannerを用いて開発する方、また興味あるから少し触ってみたいという方にもおすすめです。簡単にCloud Spanner について紹介させていただきます。"
 ---
 ## はじめに
 
 こんにちは、TIGの齋場です。[GCP連載2021](/articles/20210307/)の第11弾です。
 
-本記事では、Cloud Spannerのローカル開発環境をdocker-composeでサクッと立ち上げる手順を紹介します。Cloud Spannerを用いた開発を行う方、また興味あるから少し触ってみたいという方にもおすすめです。
+本記事では、Cloud Spannerのローカル開発環境をdocker-composeでサクッと立ち上げる手順を紹介します。Cloud Spannerを用いて開発する方、また興味あるから少し触ってみたいという方にもおすすめです。
 
 ## Cloud Spannerとは
 

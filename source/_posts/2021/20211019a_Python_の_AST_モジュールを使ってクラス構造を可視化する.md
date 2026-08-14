@@ -142,7 +142,7 @@ https://docs.python.org/ja/3/library/ast.html#ast.NodeVisitor.generic_visit
 
 <img src="/images/2021/20211019a/graph_sample.PNG" alt="graph_sample.PNG" width="1036" height="661" loading="lazy">
 
-AST はディレクトリ構造までは表現しないため、今回は以下の手順で解析を行います。
+AST はディレクトリ構造までは表現しないため、今回は以下の手順で解析します。
 
 1. Node 定義
 2. ディレクトリ構造解析

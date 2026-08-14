@@ -106,7 +106,7 @@ array(['price', 'category_name_Men/T-shirts',
        'brand_name_PUMA', 'brand_name_adidas'], dtype=object)
 ```
 
-今回追加されたget_feature_names_out()はscikit-learnでデータ変換を行い、pandasのデータフレームに再度変換したい場合などに便利です。
+今回追加されたget_feature_names_out()はscikit-learnでデータを変換し、pandasのデータフレームに再度変換したい場合などに便利です。
 
 ```python
 pd.DataFrame(preprocessor.transform(X), columns=preprocessor.get_feature_names_out())

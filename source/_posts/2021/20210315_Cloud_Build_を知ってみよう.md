@@ -61,9 +61,9 @@ Cloud Build は、GCP が提供するビルドを行うサービスです。
 
 ### ソース
 
-例えば、ソースは、以下から選択することが可能です。
+例えば、ソースは、以下から選択できます。
 
-基本的にGitHub 連携が良いと思います。また、Cloud Source Repositories をメインのソース管理として利用することも可能ですが、機能面で劣るので利用ケースは少ないと思っています。
+基本的にGitHub 連携が良いと思います。また、Cloud Source Repositories もメインのソース管理として利用できますが、機能面で劣るので利用ケースは少ないと思っています。
 
 * GitHub（プルリクやPush をトリガに起動可能）
 * Bitbucket + Cloud Source Repositories
@@ -71,7 +71,7 @@ Cloud Build は、GCP が提供するビルドを行うサービスです。
 
 ### ビルド
 
-ビルドは、ユーザが自由にビルドステップを作成して実行することも可能ですし、Cloud Build やコミュニティが提供するビルドステップを利用できます。
+ビルドは、ユーザが自由にビルドステップを作成して実行もできますし、Cloud Build やコミュニティが提供するビルドステップを利用できます。
 
 * [Cloud Build が提供するビルドステップ](https://github.com/GoogleCloudPlatform/cloud-builders)
 * [コミュニティが提供するビルドステップ](https://github.com/GoogleCloudPlatform/cloud-builders-community)
@@ -81,7 +81,7 @@ Cloud Build は、GCP が提供するビルドを行うサービスです。
 #### ビルドステップ
 
 ビルドステップは、Cloud Build に実行させたいアクションを定義します。
-構成ファイル名は、デフォルト`cloudbuild.yaml`ですが、ビルドコマンド実行時にオプション`-config`で任意のファイル名を指定することも可能です。
+構成ファイル名は、デフォルト`cloudbuild.yaml`ですが、ビルドコマンド実行時にオプション`-config`で任意のファイル名も指定できます。
 以下にサンプルを記載します。
 
 ```yaml
@@ -187,7 +187,7 @@ Cloud Build は、GitHub からソースを取得し、ビルドを実行し、�
 
 CIOps と同様にビルドを実行し、Container Registry にコンテナイメージにPush するところは同様の流れです。アプリのリポジトリの変更を検知して、マニフェストリポジトリにプルリクを行います。
 
-Argo CD は、ポーリングもしくはWebhook により、反映を行います。
+Argo CD は、ポーリングもしくはWebhook により、反映します。
 
 <img src="/images/2021/20210315/image_3.png" loading="lazy">
 

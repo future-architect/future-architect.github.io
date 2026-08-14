@@ -188,7 +188,7 @@ JSON タブを選択して以下を入力してください。
 
 <img src="/images/2021/20211001a/image_3.png" alt="image.png" width="1200" height="455" loading="lazy">
 
-以上の設定を行うことでAWS Lambda作成時に「既存のロール」から作成したロールを付与することが可能となります。(今回は「my」という名前のロールを作成しています。)
+以上を設定することでAWS Lambda作成時に「既存のロール」から作成したロールを付与できるようになります。(今回は「my」という名前のロールを作成しています。)
 
 #### AWS Lambdaの作成
 
@@ -253,7 +253,7 @@ Alexa Home Skillを作成する前にAmazon　Developerアカウントを作成�
 スキル作成画面では以下の項目を選択してください。「スマートホーム」「ユーザー定義のプロビジョニング」です。
 <img src="/images/2021/20211001a/image_6.png" alt="image.png" width="1010" height="891" loading="lazy">
 
-スキルの作成は以上で完了です。次にAlexa Home SkillとAWS Lambdaの連携を行います。
+スキルの作成は以上で完了です。次にAlexa Home SkillとAWS Lambdaを連携します。
 
 ### 4. Alexa Home SkillとAWS Lambda、 AWS IoTを連携する
 
@@ -270,7 +270,7 @@ Alexa Home Skillを作成する前にAmazon　Developerアカウントを作成�
 作成が完了するとクライアントIDとクライアントシークレットの2つが発行されます。
 この2つは後程使用するので、手元にメモしておきましょう。
 
-ここで一度Alexa Developerコンソールに戻って設定を行います。
+ここで一度Alexa Developerコンソールに戻って設定します。
 以下、Wikiに記載されている手順です。
 
 > * Lambda ARN default = enter your Lambda ARN noted from the previous step
@@ -298,7 +298,7 @@ Alexa Home Skillを作成する前にAmazon　Developerアカウントを作成�
 
 Alexaのリダイレクト先のURLには3つのURLが記載されていると思います。
 
-こちらは後の工程で使用するため、手元にメモしておきます(保存後に確認することもできます)。
+こちらは後の工程で使用するため、手元にメモしておきます(保存後に確認もできます)。
 
 <img src="/images/2021/20211001a/skill2.png" alt="skill2.png" width="1200" height="735" loading="lazy">
 
@@ -405,13 +405,13 @@ def send_command() :
 
 ### 6. Alexaアプリと連携する
 
-Alexaアプリを起動し、「デバイス>スマートホームスキル」と進むと先ほど作成したスキルが表示されます。スキルを有効化し、デバイスの探索を行ってください。Lambad関数が正しく記述できている場合はデバイスの探索が無事完了し、「温湿度マイスター」が登録されているはずです。
+Alexaアプリを起動し、「デバイス>スマートホームスキル」と進むと先ほど作成したスキルが表示されます。スキルを有効化し、デバイスを探索してください。Lambad関数が正しく記述できている場合はデバイスの探索が無事完了し、「温湿度マイスター」が登録されているはずです。
 
 <img src="/images/2021/20211001a/alexa2.png" alt="alexa2.png" width="1200" height="958" loading="lazy">
 
 それでは最後にAlexaアプリ上で「その他>定型アクション」より、「アレクサ、不快指数は？」という呼びかけをトリガーとして「温湿度マイスターを起動する」アクションを作成します。
 
-続く章ではローカルで実行するワーカーの実装を行います。
+続く章ではローカルで実行するワーカーを実装します。
 
 ### 7. ローカルのスクリプトを実行し、Alexaをしゃべらせる
 

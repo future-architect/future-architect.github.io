@@ -53,7 +53,7 @@ Google Hangoutsとの関連は以下のようになっています（[Wikipedia�
 
 などがあります。
 
-今回はその中から、非同期メッセージの送信機能を持つIncoming Webhookを使用し、Goでメッセージを送信するアプリケーションの実装を行います。
+今回はその中から、非同期メッセージの送信機能を持つIncoming Webhookを使用し、Goでメッセージを送信するアプリケーションを実装します。
 
 ## 1. Google ChatでWebhookの設定をする
 

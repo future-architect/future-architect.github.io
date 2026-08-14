@@ -21,13 +21,13 @@ lede: "今回はAWSサービスのうちの一つAWS IoTを使用してRaspberry
 
 こんにちは。TIG/DXユニット所属の宮永です。
 
-今回はAWSサービスのうちの1つAWS IoTを使用してRaspberryPiとのMQTTによる通信を行います。
+今回はAWSサービスのうちの1つAWS IoTを使用してRaspberryPiとMQTTで通信します。
 
 AWS IoTを使用したMQTTのチュートリアルはAWS公式からも詳細なハンズオン記事が出ています。
 
 * *[AWS IoT Core の設定 :: AWS IoT Core 初級 ハンズオン](https://aws-iot-core-for-beginners.workshop.aws/phase3/step1.html)*
 
-本記事はこちらのハンズオンを基にGo言語を使用してMQTTによる通信を行いました。(公式の記事はPythonで実装されています。)
+本記事はこちらのハンズオンを基にGo言語を使用してMQTTで通信しました。(公式の記事はPythonで実装されています。)
 
 最終的には室内の快適な温湿度を教えてくれる「温湿度マイスターbot」を作成します。
 <img src="/images/2021/20210929a/image.png" alt="image.png" width="647" height="457" loading="lazy">

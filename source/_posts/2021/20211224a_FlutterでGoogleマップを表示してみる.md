@@ -194,7 +194,7 @@ GoogleMap(
 
 ## 地図に線を引く
 
-Google Mapsウィジェットは[polylinesプロパティ](https://pub.dev/documentation/google_maps_flutter/latest/google_maps_flutter/GoogleMap/polylines.html)で２点間のルート情報を表示することもできます。
+Google Mapsウィジェットは[polylinesプロパティ](https://pub.dev/documentation/google_maps_flutter/latest/google_maps_flutter/GoogleMap/polylines.html)で２点間のルート情報も表示できます。
 
 ```dart main.dart
 Set<Marker> _markers = {
@@ -598,7 +598,7 @@ class MapRoute {
 ## まとめ
 
 * Flutterにはチーム公式のGoogle Mapsライブラリが存在する
-* ルートの計算を行うにはDirections APIを活用する
+* ルートを計算するにはDirections APIを活用する
 * Flutter on the WebはCORS対策の必要性がある
 * ウィジェットの組み合わせなどは公式サンプルが参考になる
 
