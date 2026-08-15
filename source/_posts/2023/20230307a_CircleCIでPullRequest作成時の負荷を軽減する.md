@@ -320,8 +320,6 @@ CircleCIのOnly build pull requests
 <img src="/images/2023/20230307a/image_2.png" alt="image.png" width="1200" height="569" loading="lazy">
 
 ::: note warn
-<span class="fa fa-fw fa-exclamation-circle"></span>
-
 GitHubアカウントのユーザー名
 add_label.shでは、author.nameがスペースで区切られていないことを想定しています。
 アカウント名にスペースが含まれる場合は、author.nameを別にリクエストして変数に格納するなどしてください。

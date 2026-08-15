@@ -69,10 +69,9 @@ https://github.com/future-architect/tftarget/releases
 
 冒頭で述べたように、複数人で開発し、各人が個別に定義したリソースに影響を与えずに開発を進める際に役立ちます。`terraform target`を簡単に実行したい場面全般で利用価値があるおもいます。
 
-<div class="note alert" style="background: #feebee; padding:16px; margin:24px 12px; border-radius:8px;">
-  <span class="fa fa-fw fa-times-circle"></span>
+::: note alert
 動作検証はAWS環境でしか行っていないため、GCPやAzure環境で利用する際は事前に動作確認をお願いします。
-</div>
+:::
 
 ## 3 tftargetのインストール方法
 
