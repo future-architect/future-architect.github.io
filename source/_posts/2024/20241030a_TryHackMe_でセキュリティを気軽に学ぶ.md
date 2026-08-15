@@ -52,7 +52,7 @@ TryHackMe は大きく Learn と Practice に分かれています。Learn は
 - **Module**：Nmap などのツールや暗号技術などの概念を学ぶ Room の集まり
 - **Learning Path**：特定の目的に沿って一連の Module に取り組む学習コース
 
-からなります。Learning Path で１つずつステップアップすることも、Module 単位でツールをつまみ食いすることもできます。以下の画像は Learning Path の一部です。Penetration、SOC、Red Teaming などがあります。
+からなります。Learning Path で１つずつステップアップすることも、Module 単位でツールをつまみ食いもできます。以下の画像は Learning Path の一部です。Penetration、SOC、Red Teaming などがあります。
 
 <img src="/images/2024/20241030a/image.png" alt="" width="1200" height="671" loading="lazy">
 
@@ -392,7 +392,7 @@ Progress Time: 00:00:49 <=====================================                  
 <img src="/images/2024/20241030a/MrRobotCTF_editor.png" alt="MrRobotCTF_editor.png" width="1200" height="625" loading="lazy">
 
 ::: note info
-**リバースシェル**は、ターゲットから自分のローカルマシンに向けた接続を行う仕組みです。サーバは基本的に外部から内部への通信は厳しく制限しますが、内部から外部への通信は比較的ゆるい場合が多いです。
+**リバースシェル**は、ターゲットから自分のローカルマシンに向けた接続をする仕組みです。サーバは基本的に外部から内部への通信は厳しく制限しますが、内部から外部への通信は比較的ゆるい場合が多いです。
 そこで、ローカルマシンではあるポート（今回は`12345`） で接続を Listen しておきます。ターゲットマシンに侵入後、リバースシェルのプログラムにこのIP・ポートへ接続する設定をして、このプログラムが実行されるように仕込みます。プログラムが実行されると、ローカルマシンへの接続が発生して、ターゲットマシンのシェルを取得できます。
 :::
 
