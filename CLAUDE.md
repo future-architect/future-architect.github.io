@@ -100,6 +100,11 @@ make mermaid # mermaid 図のSVGキャッシュ更新（Docker必須、記事の
 - `.textlintrc`: `preset-ja-technical-writing` + `spellcheck-tech-word`。一文200文字まで、漢字連続10文字まで。感嘆符・疑問符と弱い表現は許容
   - 誤検知は `.textlintrc` の `filters.allowlist.allow` に単語を追加して黙らせる
   - `spellcheck-tech-word` は「インターフェース→インタフェース」「% → ％」など表記統一を強制する
+  - **`no-mix-dearu-desumasu` は無効**（#2381）。文体は「である」「ですます」どちらでもよく、
+    段落単位で切り替える書き方（数学の証明、脚注、エッセイ、分析メモ）を許容する。
+    このルールは `です／ます／である` の明示マーカーしか数えず `〜だ。` `〜する。` を
+    どちらにも数えないため、常体の記事を「ですます調が多数」と誤判定する。
+    全記事3,186件のうち本当の混在は12件だけだった
 - `.markdownlint-cli2.jsonc`: 行長・生URL・インラインHTMLなどは無効化済み
 - PR には reviewdog が textlint を回し、変更行にレビューコメントを付ける（`.github/workflows/reviewdog.yml`）
 
