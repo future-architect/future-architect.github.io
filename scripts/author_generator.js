@@ -232,52 +232,6 @@ hexo.extend.helper.register('post_author_link', function (post) {
   return `<li class="blog-info-item">${link}</li>`;
 });
 
-// 著者ページの月別投稿数チャート用データ (#2135 / #2138 / #2140)。
-// カテゴリごとの積み上げにするため {months, series} を JSON で返す
-hexo.extend.helper.register('author_monthly_chart', function (name) {
-  const posts = this.site.posts.filter((post) => [].concat(post.author || []).includes(name));
-  // month(YYYY/MM) -> category -> count
-  const byMonth = new Map();
-  const catTotal = new Map();
-  let min = null;
-  let max = null;
-  posts.forEach((post) => {
-    const ym = post.date.format('YYYY/MM');
-    if (!min || ym < min) min = ym;
-    if (!max || ym > max) max = ym;
-    // カテゴリは第1のものだけ数える。複数カテゴリを全部積むと
-    // 合計が投稿数と合わなくなる
-    const cat = post.categories && post.categories.length ? post.categories.first().name : '未分類';
-    catTotal.set(cat, (catTotal.get(cat) || 0) + 1);
-    if (!byMonth.has(ym)) byMonth.set(ym, new Map());
-    const m = byMonth.get(ym);
-    m.set(cat, (m.get(cat) || 0) + 1);
-  });
-  if (!min) return JSON.stringify({ months: [], series: [] });
-
-  // 軸は暦年に揃える。開始は初投稿年の1月、終了は最終投稿年の12月 (#2140)。
-  // 投稿月そのままだと数ヶ月分しか無い著者の軸が中途半端な月で
-  // 始まり・止まりして見栄えが悪い。全著者を同じ規則にする
-  const startY = +min.slice(0, 4);
-  const endY = +max.slice(0, 4);
-  const months = [];
-  for (let y = startY; y <= endY; y++) {
-    for (let m = 1; m <= 12; m++) {
-      months.push(`${y}/${String(m).padStart(2, '0')}`);
-    }
-  }
-
-  // 積み上げの並びは合計の多いカテゴリから。凡例の順もこれに従う
-  const cats = [...catTotal.entries()].sort((a, b) => b[1] - a[1]).map(([c]) => c);
-  const series = cats.map((cat) => ({
-    name: cat,
-    type: 'bar',
-    stack: 'total',
-    data: months.map((ym) => (byMonth.get(ym) && byMonth.get(ym).get(cat)) || 0),
-  }));
-  return JSON.stringify({ months, series });
-});
-
 /*
  * 著者一覧ページ
  */

@@ -354,11 +354,33 @@ hexo.extend.helper.register('tag_yearly_chart', function (name) {
   const bars = halfYearBars(tag.posts.toArray());
   if (!bars || bars.filledHalves < TAG_CHART_MIN_HALVES) return null;
 
-  const siteOrder = this.site.categories
+  return stackByCategory(bars, siteCategoryOrder.call(this));
+});
+
+/** 積み上げの順（＝凡例の順）はサイト累計の多い順で固定する (#2201) */
+function siteCategoryOrder() {
+  return this.site.categories
     .toArray()
     .sort((a, b) => b.length - a.length || (a.name < b.name ? -1 : 1))
     .map((c) => c.name);
-  return stackByCategory(bars, siteOrder);
+}
+
+/**
+ * 著者ページの半期別投稿数 (#2443)。タグページ (#2434) と同じ、カテゴリ別の
+ * 積み上げ。刻みを月から半期に変えたのは、CSS で描くためと、カテゴリ・タグ
+ * ページと粒度を揃えるため（#2432 の方向）。
+ *
+ * 月のままだと最長の著者で132点あり、CSS の棒では細すぎて読めない。
+ * 半期なら最長でも22点で、活動期間の山と休止期間はそのまま見える。
+ *
+ * 著者ページは327ページある。この1枚のために echarts（gzip 約330KB）を
+ * 全ページへ配る必要はない。
+ */
+hexo.extend.helper.register('author_half_chart', function (name) {
+  const posts = this.site.posts.filter((p) => [].concat(p.author || []).includes(name)).toArray();
+  const bars = halfYearBars(posts);
+  if (!bars) return null;
+  return stackByCategory(bars, siteCategoryOrder.call(this));
 });
 
 // 関連カテゴリ (#2200)。独自の採点は持ち込まず、ページに出ている2つの規則の

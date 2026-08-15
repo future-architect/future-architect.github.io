@@ -62,53 +62,15 @@
     <%- get_profile(page.author) %>
     <%# 並びはカテゴリ・タグページの「統計 → よく読まれている記事 → 新着」に
         揃える (#2191)。月別投稿数のグラフは統計の一種とみなして統計の直後に置く %>
-    <%# 見出しは他のチャートと同じ「◯別 △の推移」の型 (#2212) %>
-    <%- partial('_partial/section-heading', {id: 'trend', text: '月別 投稿数の推移'}) %>
-    <div id="chart" style="width:100%;min-height:250px"></div>
-    <script src="https://cdn.jsdelivr.net/npm/echarts@5.1.2/dist/echarts.min.js" integrity="sha384-QqZssazD9IzPiEJz2lyFewTMgYObqDWxBfCX5k5E4n4fH7ygMIqp6A6Ek8HIrRyQ" crossorigin="anonymous"></script>
-    <script type="text/javascript">
-      <%# カテゴリごとの積み上げ棒 (#2138)。期間の穴埋めと軸の下限12ヶ月は
-          ヘルパー側（author_monthly_chart）が持つ (#2140) %>
-      const chartData = <%- author_monthly_chart(page.author) %>;
-      const catColors = <%- category_colors() %>;
-      <%# 軸が12ヶ月以下（投稿の少ない著者）なら月ラベルが全部読めるので毎月出す。
-          長期の著者は潰れるため年の変わり目だけにする (#2135) %>
-      const monthlyLabels = chartData.months.length <= 12;
-      let myChart = echarts.init(document.getElementById('chart'));
-      let option = {
-        <%# タイトルは直上の h2 が担うので、チャート内では重ねない %>
-        title: {},
-        legend: {},
-        tooltip: {
-            trigger: 'axis'
-        },
-        <%# 既定の grid.left 10% で右へズレて見える。軸ラベル込みで左端に寄せる %>
-        grid: { left: 0, right: '2%', containLabel: true },
-        toolbox: {},
-        xAxis: {
-            type: 'category',
-            boundaryGap: true,
-            data: chartData.months,
-            axisLabel: {
-              interval: 0,
-              formatter: (value, index) => monthlyLabels
-                ? value
-                : ((index === 0 || value.endsWith('/01')) ? value.slice(0, 4) + '年' : '')
-            }
-        },
-        yAxis: {
-            type: 'value',
-            <%# 投稿数は整数。自動目盛だと 0.5 刻みが出ることがある %>
-            minInterval: 1,
-            <%# 上限は最低3。月1本の著者が天井に張り付いて見えるのを避ける %>
-            max: value => Math.max(3, value.max)
-        },
-        <%# 色はカテゴリ名で固定 (#2170)。系列順に任せると著者ごとに
-            同じカテゴリの色が変わってしまう %>
-        series: chartData.series.map(s => Object.assign({}, s, { itemStyle: { color: catColors[s.name] } }))
-      };
-      myChart.setOption(option);
-    </script>
+    <%# 見出しは他のチャートと同じ「◯別 △の推移」の型 (#2212)。
+        棒は CSS だけで描く。著者ページは327あり、この1枚のために
+        echarts を全ページへ配らない (#2443) %>
+    <% const ac = author_half_chart(page.author); %>
+    <% if (ac) { %>
+    <%- partial('_partial/section-heading', {id: 'trend', text: '半期別 投稿数の推移'}) %>
+    <p class="list-page-note">※上期（1〜6月）・下期（7〜12月）ごとの投稿数。棒の内訳はカテゴリ</p>
+    <%- partial('_partial/half-bars', {chart: ac, label: page.author + ' さん'}) %>
+    <% } %>
     <%# その著者の中でよく読まれている記事。タグ・カテゴリページと同じく
         新着一覧の直前に置き、ページ間でコンテンツ構成を揃える (#2189)。
         順位・件数の規則は共有ヘルパー（popular_posts_in）側 %>
