@@ -9,7 +9,7 @@ categories:
   - VR
 thumbnail: /images/2024/20240906a/thumbnail.png
 author: 山本力世
-lede: "WWDC2024: visionOS向けエンタープライズAPIのご紹介 よりvisionOS 2.0からはEnterprise APIという、企業向けのAPIを利用することができます。ただし、利用するにはAppleへ申請し、承認されると送られてくるライセンスファイルをプロジェクト内に含めてビルドする必要がありますので、利用までの一連の手続きをまとめておきたいと思います。"
+lede: "WWDC2024: visionOS向けエンタープライズAPIのご紹介 よりvisionOS 2.0からはEnterprise APIという、企業向けのAPIを利用できます。ただし、利用するにはAppleへ申請し、承認されると送られてくるライセンスファイルをプロジェクト内に含めてビルドする必要がありますので、利用までの一連の手続きをまとめておきたいと思います。"
 ---
 <img src="/images/2024/20240906a/スクリーンショット_2024-09-05_16.04.34.png" alt="" width="604" height="345" loading="lazy">
 
@@ -17,7 +17,7 @@ lede: "WWDC2024: visionOS向けエンタープライズAPIのご紹介 よりvis
 
 ---
 
-visionOS 2.0からはEnterprise APIという、企業向けのAPIを利用することができます。
+visionOS 2.0からはEnterprise APIという、企業向けのAPIを利用できます。
 
 ただし、利用するにはAppleへ申請し、承認されると送られてくるライセンスファイルをプロジェクト内に含めてビルドする必要がありますので、利用までの一連の手続きをまとめます。
 
@@ -76,7 +76,7 @@ TeamがPersonal TeamやNoneに設定されていると候補に出てこない�
 AppleからEnterprise APIを使った例が示されていますのでそれを参考に作成してみましょう。
 [Locating and decoding barcodes in 3D space](https://developer.apple.com/documentation/visionos/locating-and-decoding-barcodes-in-3d-space)
 
-上記例はImmersiveView.swiftについてしか示されていないので、あらかじめvisionOSアプリの新規プロジェクトを作成し、その中のImmersiveView.swiftの内容を上記ページに記載されている内容に置き換えます。その後、上記に書いてきているEnterprise API を使う手順を全て行い、ビルドし実行すると実機にて動作を確認（コード状に黄緑色の四角い面が重なったアニメーションが表示され、コンソールにデコードされた値が表示されます）することができます。
+上記例はImmersiveView.swiftについてしか示されていないので、あらかじめvisionOSアプリの新規プロジェクトを作成し、その中のImmersiveView.swiftの内容を上記ページに記載されている内容に置き換えます。その後、上記に書いてきているEnterprise API を使う手順を全て行い、ビルドし実行すると実機にて動作を確認（コード状に黄緑色の四角い面が重なったアニメーションが表示され、コンソールにデコードされた値が表示されます）できます。
 
 ちなみに検出できるコードのサイズはQRコードの場合だと2,3cm以上ないとダメなようです。
 

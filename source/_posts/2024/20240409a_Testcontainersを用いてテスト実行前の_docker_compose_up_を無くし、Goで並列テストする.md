@@ -199,7 +199,7 @@ Testcontainers経由での起動ですが、DDLが20ファイルほどでだい�
 
 DBのような外部プロセスのサービスを、全テストで共有していた場合は、同じテーブルを複数のテストで書き換え競合してテストが落ちることを回避するために、同時実行数を1に抑えるため、`go test` に `-p 1` オプションを加えていましたが、これを無くせるのは嬉しいです。
 
-Testcontainersを利用する前は、ローカル実行用の、Dockerfile, compose.yaml とTestcontainersのコードとのダブルメンテが嫌だなと感じていましたが、上記の利便性が大きいのでいつの間にか素直に受け入れられています。Testcontainersにも[Dockerfileやcompose.yaml を利用するAPI](https://golang.testcontainers.org/features/build_from_dockerfile/)があるので、工夫すればダブルメンテ無しでメリットを享受することもできるかもしれませんが、私は未検証です。
+Testcontainersを利用する前は、ローカル実行用の、Dockerfile, compose.yaml とTestcontainersのコードとのダブルメンテが嫌だなと感じていましたが、上記の利便性が大きいのでいつの間にか素直に受け入れられています。Testcontainersにも[Dockerfileやcompose.yaml を利用するAPI](https://golang.testcontainers.org/features/build_from_dockerfile/)があるので、工夫すればダブルメンテ無しでメリットを享受できるかもしれませんが、私は未検証です。
 
 また、テスト毎にコンテナを起動するメリットは、他のパッケージのテストが副作用を起こし、まれにテストが落ちるパターンのフレーキーテスト（Flaky Test：実行結果が不安定なテストのこと）を発生させにくくするメリットもあるかと思います。例えば、テスト実行前に、前提とするマスタデータが別のパッケージのテスト（特に自分以外の開発者の作業で行われた場合）で書き換えられていたりして、地味にハマるケースは回避できるでしょう。
 

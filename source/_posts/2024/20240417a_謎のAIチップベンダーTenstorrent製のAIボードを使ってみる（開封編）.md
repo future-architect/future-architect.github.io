@@ -50,7 +50,7 @@ Tenstorrent社が開発した、AI推論アクセラレーションチップで�
 
 ## セットアップ
 
-[Tenstorrent社のサイトにあるセットアップ手順](https://docs.tenstorrent.com/tenstorrent/add-in-boards-and-cooling-kits/grayskull-tm-e75-e150)を元に設定を行います。
+[Tenstorrent社のサイトにあるセットアップ手順](https://docs.tenstorrent.com/tenstorrent/add-in-boards-and-cooling-kits/grayskull-tm-e75-e150)を元に設定します。
 
 今回は、手元にあった下記環境で試してみました。
 
@@ -78,7 +78,7 @@ TT-SMI: ファームウェア画面
 
 ## おわりに
 
-開封編ということで、パッケージ内容の確認とセットアップ、システム管理ツールによるハードウェアとソフトウェアの状態の確認を行いました。
+開封編ということで、パッケージ内容を確認してセットアップし、システム管理ツールでハードウェアとソフトウェアの状態を確認しました。
 
 ~~次回以降では、サンプルプログラムの紹介やアーキテクチャーの解説などを行っていきたいと思います。~~
 
