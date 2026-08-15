@@ -40,7 +40,7 @@ AWS、Google Cloud、Azureなど、日進月歩で新しいサービス、新機
 
 [^1]: 他にも `file` や `remote-exec` のProvisionerがあります。過去にはChef、Habitat、Puppet、Salt Masterless のProvisionerがあったようですが、 Terraform v0.15.0で削除されたようです。
 
-通常は `terraform apply`で呼ばれるスクリプトを定義できますが、 `when=destory` と合わせると `terraform destroy` に対応させることもできます。さらにがんばるなら `null_resource`の`triggers` で実行スクリプトなどのハッシュ値を管理しておくことで、実行スクリプトに更新をトリガーにすることもできます（もちろん、実行スクリプトは冪等に作る必要があります）。書き出してみると複雑に見えますが、大部分は `local-exec` で初期作成時に呼び出すスクリプトを作れば事足りることが多いため、こだわらず簡易的にリソースをTerraform管理下に置くときは、よく使われると思います。
+通常は `terraform apply`で呼ばれるスクリプトを定義できますが、 `when=destory` と合わせると `terraform destroy` にも対応させられます。さらにがんばるなら `null_resource`の`triggers` で実行スクリプトなどのハッシュ値を管理しておくことで、実行スクリプトに更新をトリガーにすることもできます（もちろん、実行スクリプトは冪等に作る必要があります）。書き出してみると複雑に見えますが、大部分は `local-exec` で初期作成時に呼び出すスクリプトを作れば事足りることが多いため、こだわらず簡易的にリソースをTerraform管理下に置くときは、よく使われると思います。
 
 ```tf local-execイメージ
 resource "null_resource" "my_custom_resource" {

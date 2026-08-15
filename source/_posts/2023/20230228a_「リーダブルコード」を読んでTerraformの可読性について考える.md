@@ -43,7 +43,7 @@ Terraformは[HCL](https://github.com/hashicorp/hcl2)(HashiCorp **Configuration**
 
 ## 7章　制御フローを読みやすくする
 
-ここで取り上げられている内容は、条件式やループなど、ソースコードを簡単にすることも複雑にすることもできることについて言及されています。
+ここで取り上げられている内容は、条件式やループなど、ソースコードを簡単にも複雑にもできることについて言及されています。
 Terraformにおいては、if文やgotoなどは存在はしません。ですが、countやfor文、dynamic構文など繰り返し処理など通常のTerraformのリソース定義に追加できるfunctionsが存在します。これらについて考えていきます。
 
 ### count
