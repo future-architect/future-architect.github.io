@@ -463,7 +463,7 @@ try (SqlAgent agent = config.agent()) {
 
 #### MERGE
 
-PKによるレコードの検索を行い、レコードがない場合はINSERT、ある場合はUPDATEします。
+PKでレコードを検索し、レコードがない場合はINSERT、ある場合はUPDATEします。
 
 ```java
 try (SqlAgent agent = config.agent()) {
