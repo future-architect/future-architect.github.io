@@ -63,8 +63,7 @@ brew install orangekame3/tap/stree
 
 ## 使い方
 
-::: note warn
-**前提**
+::: note warn 前提
 aws cliで利用するconfig及びcredentialsは事前に設定しておく必要があります。
 :::
 

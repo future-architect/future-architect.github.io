@@ -27,9 +27,7 @@ AIって便利ですよね。新しい分野の学習にAIは欠かせなくな�
 
 ## Terraformの基本とメリット
 
-::: note tip
-**Terraformとは何か？（AIの回答）**
-
+::: note tip Terraformとは何か？（AIの回答）
 Terraformとは、インフラストラクチャをコードとして管理（IaC: Infrastructure as Code）し、自動構築や安全なバージョン管理を可能にするオープンソースのツールです。
 
 なぜTerraformが必要なのかというと、手作業によるサーバー構築の手間や設定ミス（ヒューマンエラー）を徹底的に排除し、「いつでも、誰が実行しても、全く同じ環境を再現できる（冪等性）」という状態を作り出せるからです。
@@ -64,9 +62,7 @@ Providerに関する公式ドキュメントのURLを教えてもらって自分
 
 ん？？ ではTerraform自体はなにしてるんでしょう？
 
-::: note tip
-**Terraform本体は何をしているのか？（AIの回答）**
-
+::: note tip Terraform本体は何をしているのか？（AIの回答）
 結論から言うと、Terraform本体（Terraform Core）は、理想の設計図（コード）と現在の状況（tfstate）を見比べて「次に何をすべきかの計画（差分）」を計算し、Providerに的確な指示を出す「現場監督」の役割を担っています。
 
 なぜなら、Providerが「AWS専用の作業員」や「GCP専用の作業員」だとすれば、誰かが「システム全体の設計図を読み解き、現在の進捗を確認し、どの作業員にどういう順番で動いてもらうか」を取り仕切る必要があるからです。
@@ -135,9 +131,7 @@ Terraform Planしたときに確認できる内容ですが、これもTerraform
 さて新しい疑問が出てきたのでさらに深堀りしていきます。
 Terraform Coreの重要な役割である「状態管理」と「計画の実行」についてもAIに聞き、公式ドキュメントで裏付けを取りました。
 
-::: note tip
-**状態管理（Resource state management）とは？（AIの回答）**
-
+::: note tip 状態管理（Resource state management）とは？（AIの回答）
 「現実のインフラが今どうなっているか」をTerraform本体が記憶しておく仕組み
 
 結論から言うと、状態管理（Resource state management）は、Terraform本体（Core）が `terraform.tfstate` というファイルを使って、自分が過去に作成したリソースの現在の状態を追跡・記憶しておく重要な役割です。
@@ -152,9 +146,7 @@ Terraform Coreの重要な役割である「状態管理」と「計画の実行
 
 :::
 
-::: note tip
-**計画の実行（Plan execution）とは？（AIの回答）**
-
+::: note tip 計画の実行（Plan execution）とは？（AIの回答）
 理想と現実の「差分」を計算し、Providerに正しい順番で指示を出す仕組み
 
 計画の実行（Plan execution）とは、Terraform本体（Core）がコード（理想）とState（現実）の差分から「どのリソースを、どういう順番で作成・変更・削除するか」という手順書を作成し、それを実行する役割のことです。
