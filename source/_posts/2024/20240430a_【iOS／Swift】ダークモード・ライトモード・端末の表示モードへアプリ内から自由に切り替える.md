@@ -57,7 +57,7 @@ enum DisplayMode: String {
 
 続いて、アプリ全体に対して、表示モードを適用させたいと思います。
 
-このときに、[.preferredColorScheme](https://developer.apple.com/documentation/swiftui/view/preferredcolorscheme(_:))と三項演算子を用いて条件分岐を行います。
+このときに、[.preferredColorScheme](https://developer.apple.com/documentation/swiftui/view/preferredcolorscheme(_:))と三項演算子を用いて条件分岐します。
 `displayMode`が`.system`のときに、nilを返すことでシステムのデフォルトの設定を反映できるようにしています。また、`displayMode`が`.system`ではないときは、`diplayMode`が'.dark'であるときは、[ColorScheme](https://developer.apple.com/documentation/swiftui/colorscheme)の`.dark`が適用され、そうでないときは`.light`が適用されます。
 
 ```swift

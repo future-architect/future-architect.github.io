@@ -22,7 +22,7 @@ ElasticsearchからOpenSearchに移行した際のGo用クライアントの実�
 
 ## 背景
 
-ElasticsearchからOpenSearchへの移行を行った際に、利用するGoのクライアントもElasticsearch用のものからOpenSearch用に変更しました。
+ElasticsearchからOpenSearchへ移行した際に、利用するGoのクライアントもElasticsearch用のものからOpenSearch用に変更しました。
 
 このクライアントに関しては実装例が少なく、公式ドキュメントも情報が足りない印象を受けました。時にはどのような型のデータを入れていいかドキュメントを見ても分からず、クライアントのリポジトリのコードを読み、ようやく分かったということもありました。
 

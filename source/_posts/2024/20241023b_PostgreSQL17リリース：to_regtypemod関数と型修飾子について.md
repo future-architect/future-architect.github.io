@@ -83,7 +83,7 @@ https://pgpedia.info/t/to_regtypemod.html
 
 (※執筆時点ではPostgreSQLの公式ドキュメントにないので、pgpediaを引用させていただいています)
 
-`to_regtypemod`は、PostgreSQL 17で新たに追加されたシステム関数で、文字列で指定されたデータ型から型修飾子（typemod）を取得することができます。
+`to_regtypemod`は、PostgreSQL 17で新たに追加されたシステム関数で、文字列で指定されたデータ型から型修飾子（typemod）を取得できます。
 
 例えば、VARCHAR(32)やNUMERIC(5, 2)のようなデータ型には、文字列の長さ(32の部分)や数値の精度(5の部分)・スケール(2の部分)が指定されています。to_regtypemodは、これらの修飾子を内部表現の形式で返す関数です。
 
@@ -262,13 +262,13 @@ CONTEXT:  invalid type name "!"
 
 型修飾子（typemod）は、PostgreSQLのデータ型に追加の制約を付与するための仕組みです。
 
-データ型そのものだけでは、例えばNUMERICを指定しても最大長までは許容されてしまうので、実際の用途に合わせたデータのサイズや精度、その他の具体的な制約を表現することができません。型修飾子は、これらの制約を定義するために用いられます。
+データ型そのものだけでは、例えばNUMERICを指定しても最大長までは許容されてしまうので、実際の用途に合わせたデータのサイズや精度、その他の具体的な制約を表現できません。型修飾子は、これらの制約を定義するために用いられます。
 
 実際にNUMERIC型を例に挙動を確認していきます。
 
 https://www.postgresql.jp/document/16/html/datatype-numeric.html
 
-NUMERIC型では、型修飾子としてprecisionとscaleを指定可能で、省略することも可能です。
+NUMERIC型では、型修飾子としてprecisionとscaleを指定可能で、省略もできます。
 
 ```sql
 -- サンプルテーブルの作成
@@ -419,7 +419,7 @@ printTypmod(const char *typname, int32 typmod, Oid typmodout)
 上記は関連部分の抜粋ですが、
 
 `typmodout`で指定されている関数を呼び出して、`typmod`からの文字列へ変換をしているようです。
-この`typmodout`については、以下のように`pg_attribute`テーブルと`pg_type`テーブルを結合することで確認することができます。
+この`typmodout`については、以下のように`pg_attribute`テーブルと`pg_type`テーブルを結合することで確認できます。
 
 今回は例として、atttypmod=327686のものを確認します。
 
@@ -548,7 +548,7 @@ https://www.postgresql.org/message-id/DF2324CA-2673-4ABE-B382-26B5770B6AA3@justa
 
 ## 4. まとめ
 
-PostgreSQL 17で新規に追加された`to_regtypemod`関数では、文字列('numeric(5,2)'のようなもの)から型修飾子(typemod)を直接取得することができます。
+PostgreSQL 17で新規に追加された`to_regtypemod`関数では、文字列('numeric(5,2)'のようなもの)から型修飾子(typemod)を直接取得できます。
 
 従来の方法では、実際にデータベースに登録して`pg_attribute`テーブルと`pg_type`テーブルなどを組み合わせて取得するであったり、正規表現を工夫するなどの方法も考えられますが、いささか煩雑です。
 
