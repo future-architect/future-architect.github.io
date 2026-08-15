@@ -47,7 +47,7 @@ Terraformについても、社内の複数プロジェクトで利用されて�
 
 #### [②環境を分離する方法](https://future-architect.github.io/arch-guidelines/documents/forTerraform/terraform_guidelines.html#%E7%92%B0%E5%A2%83%E5%88%86%E9%9B%A2)
 
-Terraformでは本番、検証といった環境の分離を行う方法がいくつかありますが、実際にどのレベルで分離することが最適なのかをガイドライン作成の際に検討を重ねてまとめています。
+Terraformでは本番、検証といった環境を分離する方法がいくつかありますが、実際にどのレベルで分離することが最適なのかをガイドライン作成の際に検討を重ねてまとめています。
 本ガイドラインでは、ディレクトリで分離する方法を推奨案としています。
 
 #### [③開発フロー](https://future-architect.github.io/arch-guidelines/documents/forTerraform/terraform_guidelines.html#%E9%96%8B%E7%99%BA%E3%83%95%E3%83%AD%E3%83%BC)

@@ -201,9 +201,9 @@ LINE 10: ... price NUMERIC GENERATED ALWAYS AS ( base_price - discount_a...
 DETAIL:  A generated column cannot reference another generated column.
 ```
 
-こちらもエラーになります。「他の生成列を参照することはできません」という内容です。デジャブ感があるのは、「生成列で自分自身の列を参照できるか」節でもこのメッセージを見たためです。格納生成列、仮想生成列のどちらも同じ結果になります。
+こちらもエラーになります。「他の生成列を参照できません」という内容です。デジャブ感があるのは、「生成列で自分自身の列を参照できるか」節でもこのメッセージを見たためです。格納生成列、仮想生成列のどちらも同じ結果になります。
 
-ドキュメントにも、 `The generation expression can refer to other columns in the table, but not other generated columns.`（生成式はテーブル内の他の列を参照できますが、他の生成列を参照することはできません。）とあるので、記載通りの挙動です。
+ドキュメントにも、 `The generation expression can refer to other columns in the table, but not other generated columns.`（生成式はテーブル内の他の列を参照できますが、他の生成列を参照できません。）とあるので、記載通りの挙動です。
 
 ### 5. 計算途中でnull値が混入したらどうなるか
 
@@ -398,7 +398,7 @@ CREATE TABLE t_order_detail (
 ERROR:  primary keys on virtual generated columns are not supported
 ```
 
-これはエラーになりました。仮想生成列のPKはサポートされていないようです。仮想生成列はインデックスを使えないため、PKにできないのでしょう。これについては先程の式インデックスで代替することはできません。ただし、式インデックスは、一意制約とNOT NULL制約を付与できるので、類似の機能を持たせることはできます。
+これはエラーになりました。仮想生成列のPKはサポートされていないようです。仮想生成列はインデックスを使えないため、PKにできないのでしょう。これについては先程の式インデックスで代替できません。ただし、式インデックスは、一意制約とNOT NULL制約を付与できるので、類似の機能を持たせることはできます。
 
 注意として式インデックスでは、 `:::txt` による型変換が使えず `CAST()` で変換するなど微妙にクセがあることです。
 
@@ -558,7 +558,7 @@ CREATE TABLE t_order (
 
 ### 13. 生成列の定義変更はできるか
 
-[ドキュメント](https://www.postgresql.org/docs/18/sql-altertable.html)を読む限り、生成列の定義を直接変更することはできないように思えます（文法の読み取りが間違っていたらご指摘ください）。
+[ドキュメント](https://www.postgresql.org/docs/18/sql-altertable.html)を読む限り、生成列の定義を直接変更できないように思えます（文法の読み取りが間違っていたらご指摘ください）。
 
 そのため、一度そのカラムを削除してから作り直すことになると思われます。例えば、先程の `email_lower` をいう検索専用の生成列を、さらに前後の空白をトリムする処理を追加します。
 

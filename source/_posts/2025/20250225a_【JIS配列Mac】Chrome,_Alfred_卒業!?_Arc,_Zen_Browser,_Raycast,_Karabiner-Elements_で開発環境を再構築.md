@@ -82,7 +82,7 @@ Macの環境構築に着手して、まず初めに思ったのが「あれ、�
 
 クリックを「弱い」に設定したのは「[Mac のトリプリクリック](https://support.apple.com/ja-jp/guide/mac-help/mchlp1378/mac)」の検知感度を上げるためです。
 
-Mac のテキスト選択には、ダブルクリックで「単語の選択」が、トリプリクリックで「段落の選択」が可能です。ある文章の全体をコピーしたい時に、Chrome 拡張機能の「[Copy on Select](https://chromewebstore.google.com/detail/copy-on-select/kdfngfkkopeoejecmfejlcpblohnbael)」などの選択範囲をクリップボードに貼り付ける機能を有効化してから、トラックパッドを3連打してテキスト行全体を選択すれば、クリップボードへの文章の取り込みが一瞬で完了します。トラックバッドでスクロールしながら、気になった場所はトリプルクリックでクリップボードに貼り付け、（後に紹介する）Raycast でクリップボードの履歴管理を行うまでがワンセットです。
+Mac のテキスト選択には、ダブルクリックで「単語の選択」が、トリプリクリックで「段落の選択」が可能です。ある文章の全体をコピーしたい時に、Chrome 拡張機能の「[Copy on Select](https://chromewebstore.google.com/detail/copy-on-select/kdfngfkkopeoejecmfejlcpblohnbael)」などの選択範囲をクリップボードに貼り付ける機能を有効化してから、トラックパッドを3連打してテキスト行全体を選択すれば、クリップボードへの文章の取り込みが一瞬で完了します。トラックバッドでスクロールしながら、気になった場所はトリプルクリックでクリップボードに貼り付け、（後に紹介する）Raycast でクリップボードの履歴を管理するまでがワンセットです。
 
 ## ターミナル
 
@@ -272,7 +272,7 @@ https://x.com/joshm/status/1849889202164334786
 
 <img src="/images/2025/20250225a/zen.png" alt="zen" loading="lazy">
 
-Zen Browser は設定を「日本語」に変更することが可能です。
+Zen Browser は設定を「日本語」に変更できます。
 
 Zen Browser（左）とArc（右）を並べてみると、見栄えはほとんど同じです。
 
@@ -293,7 +293,7 @@ Zen Browser の各種機能を動かしていると、Essentials（サイドバ�
 
 ## キーマッピング
 
-JIS配列Macはデフォルトで「Emacs キーバインド（[Mac のキーボードショートカット](https://support.apple.com/ja-jp/102650)）」が使えるため、あらためてキー配置を変える必要性はありませんでした。しかしながら、**JIS配列のMacを最大限に活用する** ために「[Karabiner-Elements](https://karabiner-elements.pqrs.org/)」をインストールして「[Advanced Keymap for JIS Keyboard: Project “UTILITY”](https://ke-complex-modifications.pqrs.org/#advanced_keymap_utility)」の設定を行いました。
+JIS配列Macはデフォルトで「Emacs キーバインド（[Mac のキーボードショートカット](https://support.apple.com/ja-jp/102650)）」が使えるため、あらためてキー配置を変える必要性はありませんでした。しかしながら、**JIS配列のMacを最大限に活用する** ために「[Karabiner-Elements](https://karabiner-elements.pqrs.org/)」をインストールして「[Advanced Keymap for JIS Keyboard: Project “UTILITY”](https://ke-complex-modifications.pqrs.org/#advanced_keymap_utility)」を設定しました。
 
 本章の設定内容は「[Karabiner-Elements Advent Calendar 2023](https://qiita.com/advent-calendar/2023/karabiner-elements)」で紹介された方法を踏襲しました。このアドベントカレンダー内では、以下の引用通りに「JIS配列Macは反則的」という点が紹介されています。
 

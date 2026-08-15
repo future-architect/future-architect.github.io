@@ -26,7 +26,7 @@ CI/CDを狙ったサプライチェーン攻撃が増えている昨今、デプ
 
 ## Notary v2とは
 
-[Notary](https://notaryproject.dev/)は、コンテナイメージにデジタル署名を行い、その真正性（誰が作ったか）と完全性（改ざんされていないか）を保証し、CLI実装が [Notation](https://github.com/notaryproject/notation) です。Notaryは現在v2です。特徴として署名データをイメージと同じレジストリ内に保存することがあり、これによりポータビリティが高いと言われます。v1時代はレジストリをまたいでイメージを移動させると、署名が失われるという課題があったそうで、再設計されたためv2になったそうです。
+[Notary](https://notaryproject.dev/)は、コンテナイメージにデジタル署名し、その真正性（誰が作ったか）と完全性（改ざんされていないか）を保証し、CLI実装が [Notation](https://github.com/notaryproject/notation) です。Notaryは現在v2です。特徴として署名データをイメージと同じレジストリ内に保存することがあり、これによりポータビリティが高いと言われます。v1時代はレジストリをまたいでイメージを移動させると、署名が失われるという課題があったそうで、再設計されたためv2になったそうです。
 
 * 参考: [Community Collaboration on Notary v2 | Docker](https://www.docker.com/blog/community-collaboration-on-notary-v2/)
 
@@ -250,7 +250,7 @@ Error: signature verification failed: artifact "localhost:5000/suji-tooranaiyo@s
 
 ## さいごに
 
-Notary v2 のCLI実装である、Notationを使ってコンテナイメージを署名と、検証を行いました。
+Notary v2 のCLI実装である、Notationを使ってコンテナイメージの署名と検証をしました。
 
 署名および検証はNotationのコマンドで容易に実行でき少し拍子抜けしました。難しいポイントは鍵の管理かと思いますが、それもNotationの AWS Signerプラグインなどを上手く活用することで、マネージドサービス側に寄せられると運用も楽になるのだろうと推測しています。
 

@@ -71,7 +71,7 @@ lede: ".NET MAUIでiOS向けアプリを開発中、WebアプリからiOSアプ�
 
 <img src="/images/2025/20250527b/image_4.png" alt="image.png" width="1200" height="420" loading="lazy">
 
-※ カスタムドメインを使用することも可能ですが、今回はスキップします。
+※ カスタムドメインの使用もできますが、今回はスキップします。
 
 静的サイトを有効化すると、`$Web` フォルダができます。
 
@@ -171,7 +171,7 @@ MauiプロジェクトのPlatformフォルダのIOSフォルダ直下に `Entitl
 </plist>
 ```
 
-`Entitlements.plist` を作りたくない人はcsprjで設定することもできます。
+`Entitlements.plist` を作りたくない人はcsprjで設定もできます。
 
 以下は、[Apple universal links](https://learn.microsoft.com/ja-jp/dotnet/maui/macios/universal-links?view=net-maui-9.0)より引用したコードです。
 

@@ -204,7 +204,7 @@ ANALYZE childs;
 
 この案は、 `n_distinct` を実際のユニーク値に近い値に直接書き換えてしまおう、というアプローチです。
 
-PostgreSQL では、`n_distinct` の値を直接上書きすることも可能です。
+PostgreSQL では、`n_distinct` の値を直接上書きもできます。
 詳しくは [ALTER TABLE のドキュメント > `SET (attribute_option)` の項](https://www.postgresql.jp/docs/17/sql-altertable.html) を参照してください。
 
 ```sql
@@ -221,7 +221,7 @@ ANALYZE childs;
 この案は、「ヒント句」を用いて特定のクエリに対してスキャン方法を強制するアプローチです。
 
 `pg_hint_plan` は、ユーザー側で実行計画を制御するためのツールです。
-`pg_hint_plan` というエクステンションを導入した上で、SQLコメント内にヒント句 (/*+ IndexScan(childs) */ など) を書くことで、スキャン方法や JOIN の方法を強制することができます。
+`pg_hint_plan` というエクステンションを導入した上で、SQLコメント内にヒント句 (/*+ IndexScan(childs) */ など) を書くことで、スキャン方法や JOIN の方法を強制できます。
 詳細は [`pg_hint_plan` のドキュメント > スキャン方法](https://pg-hint-plan.readthedocs.io/ja/latest/hint_table.html#hints-for-scan-methods) などを参照してください。
 
 ```sql
@@ -348,7 +348,7 @@ else
 - `f1` が相当大きくないと、上限が `n` の整数倍で抑えられてしまう
   - 例えば、 `f1=(9/10)*n` だった場合、 `n_distinct` ≦ `10d`≦ `10n`
 
-以下のページの著者も同様の課題を報告しており、 「`n_distinct=d*N/n` というナイーブな式の方が精度が高いのでは」と提言を行っています。
+以下のページの著者も同様の課題を報告しており、 「`n_distinct=d*N/n` というナイーブな式の方が精度が高いのでは」と提言しています。
 https://www.postgresql.org/message-id/4338f834-dee9-2eb8-0577-10abe9d39e2d%40postgrespro.ru
 
 この式をそのまま利用することは難しいと思いますが、少なくとも `d` がある程度大きいのであれば、上記のナイーブな式を用いた方が精度が良くなるのではないかと感じました。

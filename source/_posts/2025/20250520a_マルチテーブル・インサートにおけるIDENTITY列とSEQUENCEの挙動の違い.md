@@ -20,7 +20,7 @@ lede: "OracleDBにおける主要な採番方法であるSEQUENCEとIDENTITY列�
 
 ## はじめに
 
-こんにちは、Cyber Security Innovation Group（以降CSIG）の姫路康太郎です。2025年2月から新卒としてプロジェクトに配属され、認可整理のチームでアジャイル開発を行っています。
+こんにちは、Cyber Security Innovation Group（以降CSIG）の姫路康太郎です。2025年2月から新卒としてプロジェクトに配属され、認可整理のチームでアジャイル開発をしています。
 
 本記事ではまず、OracleDBにおける主要な採番方法であるSEQUENCEとIDENTITY列について、基本的な使い方を説明します。続いて、複数のテーブルへ同時にデータを投入する際に利用できるOracleDB特有のマルチテーブル・インサート構文 (`INSERT ALL`) における、それぞれの採番の実装方法と挙動の違いに焦点を当てて解説します。
 
