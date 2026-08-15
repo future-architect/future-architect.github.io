@@ -80,7 +80,7 @@ Kongは設定の保存先としてDBを使うのでPostgreSQLもインストー�
 
 Kongはデフォルトで
 
-- Port 8001：あらゆるエンティティ設定を行うのAdminAPI
+- Port 8001：あらゆるエンティティ設定をするのAdminAPI
 - Port 8000：実際トラフィックをさばくProxy
 
 に分かれています。
@@ -118,7 +118,7 @@ curl -X POST http://localhost:8001/plugins -d "name=jwt"
 curl -i http://localhost:8000/mock/requests # 401 Unauthorized
 ```
 
-今回はJWTプラグインをGlobalに設定しますが、特定のServiceやRouteに限定して設定することも可能です。
+今回はJWTプラグインをGlobalに設定しますが、特定のServiceやRouteに限定して設定もできます。
 
 ### Consumer
 
@@ -185,6 +185,6 @@ curl http://localhost:8000/mock/requests -H "Authorization: Bearer eyJhbGciOiJS.
 
 といった感じで簡単に触ってみましたが、いかがだったでしょうか。
 
-今回は割愛しましたが、`exp`Claimで有効期限をチェックすることも可能ですし、設定の`config.key_claim_name`とプラグインを適用するRoute/Serviceを調整する機能を組み合わせることで認可機能を実装することも可能です。
+今回は割愛しましたが、`exp`Claimで有効期限のチェックもできますし、設定の`config.key_claim_name`とプラグインを適用するRoute/Serviceを調整する機能を組み合わせることで認可機能の実装もできます。
 
 個人的にはどのアカウントからのリクエストかわかるように、ペイロードの`sub`など一部のClaimを後ろにヘッダーとして流せる機能があったら良かったなとも思いましたが、例えば[こういったカスタムプラグイン](https://docs.konghq.com/hub/yesinteractive/kong-jwt2header/)を組み合わせることでなんとかなりそうです。

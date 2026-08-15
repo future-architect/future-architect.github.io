@@ -255,9 +255,9 @@ Microsoft社から引き取った段ボールを開梱し筐体を取り出し�
 
 今回の実効容量は、2台とも80TBにほど近い値でした。100GB程度の個体差はありましたが、ほとんど気にならない差でした。[Docs:実効容量](https://learn.microsoft.com/ja-jp/azure/databox/data-box-overview#features-and-specifications)では80TBとされていますが、ほぼ正確な値と思って良さそうです。
 
-次にData Box側の初期設定を行います。
+次にData Box側の初期設定をします。
 
-今回の手順では、Data#1~3ポートへのIPアドレス割り当てとNFSの接続許可設定を実行していきます。
+今回の手順では、Data#1~3ポートへのIPアドレス割り当てとNFSの接続許可設定をしていきます。
 
 ### Data BoxへのIP割り当て
 
