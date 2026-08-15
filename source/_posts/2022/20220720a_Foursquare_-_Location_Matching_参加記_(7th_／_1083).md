@@ -18,7 +18,7 @@ eyecatch: /images/2022/20220720a/4sq_overview.png
 
 ## はじめに
 
-こんにちは、Strategic AI Group所属の金子です。普段は推薦に関連する実装やデータ分析を行っています。
+こんにちは、Strategic AI Group所属の金子です。普段は推薦に関連する実装やデータ分析をしています。
 
 先日Kaggleで開催された[「Foursquare - Location Matching」コンペ](https://www.kaggle.com/competitions/foursquare-location-matching/overview)(以下4sqコンペ)に社外の知人共にチームで参加し、1083チーム中7位をとりました（初の金メダルでKaggle Competitions Masterになりました！ ）
 
@@ -59,10 +59,10 @@ Foursquareは位置を共有するSNS等を提供する企業です。現在は�
 ## 解法のサマリ
 
 前回紹介した[H&Mコンペ](https://future-architect.github.io/articles/20220602b/)でもそうでしたが、600,000 x 600,000 の組み合わせについてすべて正確に評価することは難しいです。
-そこで、今回は以下の3つのパートで予測を行いました。
+そこで、今回は以下の3つのパートで予測しました。
 
 * 全候補から大まかに候補を絞り込むretrieval part
-* 二点間のペアに対して正確な予測を行うpredict part
+* 二点間のペアに対して正確に予測するpredict part
 * ペアをグラフとして扱い後処理で精度を上げるpostprocess part
 
 <img src="/images/2022/20220720a/4sq_overview.png" alt="4sq_overview" width="851" height="432" loading="lazy">
@@ -102,18 +102,18 @@ nameについてはたくさんの言語が混じっており、かつ日本語�
 
 ##### addressの欠損値の補完
 
-addressについては3.についてのみ、NNモデルに入れるため欠損値の補完を行いました。
+addressについては3.についてのみ、NNモデルに入れるため欠損値を補完しました。
 具体的には全レコードについて、addressがNaNでないものからhaversine距離で近傍3か所のaddressを連結して、embedding学習用の前処理としました。
 
 #### 地名のカテゴリ変数化と前処理
 
 city, state, countryはカテゴリ変数として扱うことにしました。countryは欠損値を"NAN"で埋めたうえでカテゴリ変数化、cityとstateについては出現回数上位約2000を代表として平均の緯度経度を計算し、欠損値、もしくは上位2000以外のcityとstateを上位2000との近傍で埋めました。
 
-また、cities1000という1000人以上の人口がいる市を集めたデータセットを用いて緯度経度から地名を求め、geo_nameという名前のカテゴリ変数にしました。これもまた出現数上位2000のどれかに割り振られるよう調整を行いました。
+また、cities1000という1000人以上の人口がいる市を集めたデータセットを用いて緯度経度から地名を求め、geo_nameという名前のカテゴリ変数にしました。これもまた出現数上位2000のどれかに割り振られるよう調整しました。
 
 #### categoriesの前処理
 
-categoriesは1つの列にカンマ区切りで複数のカテゴリが入っていました。そこでカンマ区切りで分割し、RaggedTensorとして扱いました。また、categoriesに何も入っていない場合は"nan"のカテゴリで補完しました。後述のカテゴリ予測モデルを作った後は"nan"の行に予測を行い、カテゴリを1つ追加しました。
+categoriesは1つの列にカンマ区切りで複数のカテゴリが入っていました。そこでカンマ区切りで分割し、RaggedTensorとして扱いました。また、categoriesに何も入っていない場合は"nan"のカテゴリで補完しました。後述のカテゴリ予測モデルを作った後は"nan"の行を予測し、カテゴリを1つ追加しました。
 
 #### URL/Phoneの正規化
 
@@ -140,7 +140,7 @@ URLについては[urllib](https://docs.python.org/ja/3/library/urllib.parse.htm
 
 ##### embeddingの評価
 
-embeddingの評価としてデータごとに近傍を取得し、precision@16 (≒ maxIoU)を計算して評価を行いました。
+embeddingの評価としてデータごとに近傍を取得し、precision@16 (≒ maxIoU)を計算して評価しました。
 ベースラインとしてUniversal Sentence Encoderでのコサイン類似度の近傍と、haversine距離の近傍を用意しました。
 
 |近傍の取得方法|precision@16|precision@32|
@@ -191,7 +191,7 @@ retrieval パートではGPU上で全組み合わせの計算ができる高速�
 #### 候補生成
 
 作成したembeddingやhaversine距離を元に1つのサンプルにつき32の候補を作成しLightGBMでの学習・予測に用いました。
-候補生成は以下の5つの方法を用いました。これらはTensorFlowを用いてGPU上で計算を行ったので、全組み合わせについて愚直に計算できました。
+候補生成は以下の5つの方法を用いました。これらはTensorFlowを用いてGPU上で計算したので、全組み合わせについて愚直に計算できました。
 
 |番号|処理の種類|取得数|
 |-|-|-|
@@ -203,7 +203,7 @@ retrieval パートではGPU上で全組み合わせの計算ができる高速�
 
 ##### haversine距離とembeddingのコサイン類似度を用いた重回帰による近傍
 
-2についてはhaversine距離の対数と各embeddingのコサイン類似度から重回帰を行いました。重回帰の学習はロジスティック回帰で行うよりも、正例がより高いスコアになるようランク学習を行うことでよりよい重回帰の係数を得ることができました。
+2についてはhaversine距離の対数と各embeddingのコサイン類似度から重回帰しました。重回帰の学習はロジスティック回帰で行うよりも、正例がより高いスコアになるようランク学習することでよりよい重回帰の係数を得ることができました。
 
 ##### Bag of Words一致度による近傍
 
@@ -219,7 +219,7 @@ Bag of Wordsベクトルをl2正規化した際のコサイン類似度と、pre
 
 ##### 候補生成の精度
 
-この5つの手法で非対称な候補生成を行った結果、
+この5つの手法で非対称に候補生成した結果、
 
 |近傍の取得方法|maxIoU(≒precision@32)|
 |---------------|--------|
@@ -232,7 +232,7 @@ Bag of Wordsベクトルをl2正規化した際のコサイン類似度と、pre
 
 #### 概要
 
-predict パートでは、ある地点(query)とその候補(candidate)の1:1の間の特徴量を追加し、LightGBMで二値分類を行いました。
+predict パートでは、ある地点(query)とその候補(candidate)の1:1の間の特徴量を追加し、LightGBMで二値分類しました。
 今回のデータはPOIのペアを持たないデータも多く、False Positiveが悪影響を与えやすかったので、それらを防ぐ工夫も検討しました。
 
 #### 特徴量生成
@@ -254,7 +254,7 @@ ROUGEは文章要約タスクの良しあしを測るのにつかわれること
 
 ##### 学習データ
 
-学習はLightGBMを用い、特徴量の評価時はpidで分割した5foldでの計算、提出時は全データを用いてiteration数を決め打ちで学習を行いました。
+学習はLightGBMを用い、特徴量の評価時はpidで分割した5foldでの計算、提出時は全データを用いてiteration数を決め打ちで学習しました。
 
 ##### sample weight
 
@@ -269,7 +269,7 @@ dev_data_df["weight"] = dev_data_df["weight"] / dev_data_df["weight"].mean()
 
 ##### LightGBMのハイパーパラメータ
 
-LightGBMの基本的なハイパーパラメータはnum_leavesが2^12が最適で、学習率は0.1と高く、2000iterationsまで学習を行いました。これでもpidで分割したバリデーションデータでのAUCが上昇し続けました。
+LightGBMの基本的なハイパーパラメータはnum_leavesが2^12が最適で、学習率は0.1と高く、2000iterationsまで学習しました。これでもpidで分割したバリデーションデータでのAUCが上昇し続けました。
 
 細かいパラメータとして、"max_bin_by_feature"を設定しました。LightGBMは学習の前に連続値をヒストグラムに変換し、最大でも255のbinにしてしまうのでそれ以上のカテゴリ数があると押しつぶされてしまいます。そこで、K-meansのラベルとcategoriesのラベルは255より大きな値になるように一部のカテゴリのmax_binを緩和するよう設定しました。"bin_construct_sample_cnt"は初期のヒストグラムを作るときのパラメータで、これを小さくすると精度が少し下がる代わりに学習前のヒストグラム構築におけるメモリと時間を節約できます。学習環境によってこれを変更しました。すべてのパラメータは以下の通りです。
 
@@ -294,7 +294,7 @@ lgb_params = {
 
 ##### 予測
 
-予測は500iterationのモデルを用いた時点で予測時に合計1時間以上かかることが分かったため、[cumlのForestInference](https://docs.rapids.ai/api/cuml/stable/api.html#cuml.ForestInference)を活用しGPU上での予測を行いました。これにより100倍近くの高速化がされ、2000, 3000iterationのモデルを用いても実行時間内に予測を終えられました。LightGBMはfloat64で境界値やleaf valueを持つ一方、ForestInferenceはfloat32で計算を行うので若干の精度低下はあるものの、それ以上の高速化の恩恵を受けたため採用しました。
+予測は500iterationのモデルを用いた時点で予測時に合計1時間以上かかることが分かったため、[cumlのForestInference](https://docs.rapids.ai/api/cuml/stable/api.html#cuml.ForestInference)を活用しGPU上で予測しました。これにより100倍近くの高速化がされ、2000, 3000iterationのモデルを用いても実行時間内に予測を終えられました。LightGBMはfloat64で境界値やleaf valueを持つ一方、ForestInferenceはfloat32で計算するので若干の精度低下はあるものの、それ以上の高速化の恩恵を受けたため採用しました。
 
 ### Postprocess パート
 
@@ -303,7 +303,7 @@ Postpeocessパートでは、グラフとして予測されたペアをつなげ
 #### 概要
 
 ペア同士の予測値を出した後は、一定の閾値を元にUnionFindで頂点同士を連結しグラフを構築しました。
-各グラフに対して、NetworkXを用い、媒介中心性を元にした辺の排除を行った後、頂点間の距離が2以内の頂点のみを予測のペアとして出力を行いました。
+各グラフに対して、NetworkXを用い、媒介中心性を元にした辺を排除した後、頂点間の距離が2以内の頂点のみを予測のペアとして出力しました。
 
 ## テクニック集
 
@@ -343,7 +343,7 @@ embeddingをGPUに配置することで実質29GBのメモリを使えること�
 
 ## リーク問題について
 
-今回のコンペは参加者が推論を行うコードを提出すると、参加者が直接見ることのできないtestデータで評価を行われPublicとPrivateのリーダーボードが更新されました。しかし、コンペ終了後運営のミスによってtestデータの67％がtrainデータと一致していた可能性が参加者から指摘されました。(trainデータのnameと緯度経度が完全一致するレコードについてLB上で検証が行われました。)7/19時点で全提出について重複を排除したデータについて再評価が行われ、一部のチームに追加の賞金が支払われることが決まりました。
+今回のコンペは参加者が推論するコードを提出すると、参加者が直接見ることのできないtestデータで評価されPublicとPrivateのリーダーボードが更新されました。しかし、コンペ終了後運営のミスによってtestデータの67％がtrainデータと一致していた可能性が参加者から指摘されました。(trainデータのnameと緯度経度が完全一致するレコードについてLB上で検証が行われました。)7/19時点で全提出について重複を排除したデータについて再評価が行われ、一部のチームに追加の賞金が支払われることが決まりました。
 
 このリークにより金圏付近までの解法の良しあしの比較が困難になってしまいました。ただ、リークがあったにしろ上位の解法は納得のできるもので、私自身も自身の解法は他にも活用できる自信を持っています。このリークによって上位の解法の価値がなくなったわけではないことについて、理解が広まればいいなと考えています。
 
@@ -359,7 +359,7 @@ embeddingをGPUに配置することで実質29GBのメモリを使えること�
 ## リンク
 
 * [7th place solution(discussion)](https://www.kaggle.com/competitions/foursquare-location-matching/discussion/335800): コンペ終了後に投稿したdiscussion、解法について質問があればこちらのdiscussionへどうぞ
-* [7th place solution inference(inference notebook)](https://www.kaggle.com/code/nadare/7th-place-solution-inference): コンペで提出を行った推論用notebook
+* [7th place solution inference(inference notebook)](https://www.kaggle.com/code/nadare/7th-place-solution-inference): コンペで提出した推論用notebook
 * [Let's discuss how to correspond to the name and address of each language!](https://www.kaggle.com/competitions/foursquare-location-matching/discussion/336148): 各言語ごとの自然言語の前処理についてより詳しく説明したdiscussion
 * [W2V & haversine NN baseline[Training/Inference]](https://www.kaggle.com/code/nadare/w2v-haversine-nn-baseline-training-inference): コンペ中に公開したsentencepieceを用いた候補生成のnotebook
 * [word tour experiment](https://www.kaggle.com/code/nadare/word-tour-experiment): word tourをFood101で実験したnotebook

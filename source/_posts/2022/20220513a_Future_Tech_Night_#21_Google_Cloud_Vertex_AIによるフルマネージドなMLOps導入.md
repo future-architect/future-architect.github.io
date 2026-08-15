@@ -47,7 +47,7 @@ Vertex AIとはGoogle Cloud Platformにおける必要なMLツールがすべて
 フルマネージド型のコンピューティング環境で、JupyterLabの環境を数クリックで構築できます。
 本サービスの大きな利点としては、複数のデータサイエンティストが利用する環境をパッケージやマシンスペックについて統一できることと、必要な性能に合わせてマシンスペックを変更できる点です。
 
-また、Pythonだけでなくパッケージが導入済みのイメージや、自身で作成したイメージを用いて構築することも可能です。
+また、Pythonだけでなくパッケージが導入済みのイメージや、自身で作成したイメージを用いても構築できます。
 
 <img src="/images/2022/20220513a/image_3.png" alt="Vertex AI WorkBench" width="800" height="450" loading="lazy">
 
@@ -74,7 +74,7 @@ Pipelineは複数のコンポーネントから構成されており、デフォ
 * VertexAIは、TerraformのようなlaCで構築は可能でしょうか？
   → 2022/5現在、Terraformで全てのサービスを用意することは難しいのが現状です。WorkBenchはAI Platformのコードをできますが、パイプライン等は別途用意することが必要です。
 * データサイエンティストが共通で使う社内ライブラリがあったときにWorkbenchの環境で社内ライブラリが使えるように環境構築できますか？
-  → 各自が作成したDockerイメージをArtifact RegistryにPushしておくことで、WorkBench構築時に選択することが可能です。
+  → 各自が作成したDockerイメージをArtifact RegistryにPushしておくことで、WorkBench構築時に選択できます。
 * vertex AIを利用する際、ローカルマシンの環境をうまく組み合わせてコストを抑えられたり出来ますか？
   → Vertex AI Pipelineに関してですが、ローカルモード等といったシステムは現時点では存在しない認識です。
 * 実験管理に関して、mlflow等で自分で作るよりVertex AI Pipelineに任せたほうが楽なんでしょうか。

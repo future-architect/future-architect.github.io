@@ -30,7 +30,7 @@ Mypy や Pyright は Python の静的解析ツールとして有名ですが、�
 
 ## 実験概要
 
-Mypy、Pyright はともに `reveal_type(expr)` という機能があります。これを解析対象のコードに挿入すると、実行時点での `expr` の型情報を表示できます。Mypy、Pyright の両者で同一コードに解析を行いその結果を比較します。以下、コード中ではコメントで `reveal_type` の結果を記録し、`reveal_type` 自体の記述は省略します。
+Mypy、Pyright はともに `reveal_type(expr)` という機能があります。これを解析対象のコードに挿入すると、実行時点での `expr` の型情報を表示できます。Mypy、Pyright の両者で同一コードを解析し、その結果を比較します。以下、コード中ではコメントで `reveal_type` の結果を記録し、`reveal_type` 自体の記述は省略します。
 
 ### 実験 1: 再代入
 
@@ -89,7 +89,7 @@ def func(a: int):  # Type of "func" is "(a: int) -> int"
     return a       # Type of "a" is "int"
 ```
 
-引数の型から推論をすれば `func` は明らかに `(int) -> int` となりますが、Mypy は推論を行わないようになっており、戻り値の型が `Any` になります。
+引数の型から推論をすれば `func` は明らかに `(int) -> int` となりますが、Mypy は推論しないようになっており、戻り値の型が `Any` になります。
 
 ### 実験 4: 戻り値の型チェック
 
