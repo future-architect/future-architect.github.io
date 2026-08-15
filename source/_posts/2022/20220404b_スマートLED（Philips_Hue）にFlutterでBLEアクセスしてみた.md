@@ -35,7 +35,7 @@ Hue LEDのBluetoothの仕様ですが公式は存在しないようです。そ�
 * https://gist.github.com/shinyquagsire23/f7907fdf6b470200702e75a30135caf3
 * https://github.com/npaun/philble
 
-1つ目のgistを見てもBLEをよくしらない人からするとサッパリだと思うので補足します。BLE論理的な構造は以下のように、あるDeviceには複数のServiceが紐づいており、その配下にCharacteristicと呼ばれる構造で管理されています。この構成によってデータのやり取りを行います。ServiceもCharacteristicも特定のためにUUIDを用いています。
+1つ目のgistを見てもBLEをよくしらない人からするとサッパリだと思うので補足します。BLE論理的な構造は以下のように、あるDeviceには複数のServiceが紐づいており、その配下にCharacteristicと呼ばれる構造で管理されています。この構成によってデータをやり取りします。ServiceもCharacteristicも特定のためにUUIDを用いています。
 
 <img src="/images/2022/20220404b/ble_strucutre.png" alt="ble_strucutre.png" width="791" height="441" loading="lazy">
 
@@ -43,7 +43,7 @@ Hue LEDのBluetoothの仕様ですが公式は存在しないようです。そ�
 
 ## Flutter実装
 
-さきほど紹介したPhilipsHue/flutter_reactive_bleを用いてBLE通信を行います。`scanForDevices()` が周囲のBLE端末を検出するAPIです。デバイスの特定ですが、device名が `Hue Lamp` だったのでそれで特定しています。複数のLED操作を行う際はそれぞれ別名で管理するなど工夫すると良いでしょう。実際にデバイスに接続するためには`connectToDevice()` を用います。
+さきほど紹介したPhilipsHue/flutter_reactive_bleを用いてBLE通信します。`scanForDevices()` が周囲のBLE端末を検出するAPIです。デバイスの特定ですが、device名が `Hue Lamp` だったのでそれで特定しています。複数のLEDを操作する際はそれぞれ別名で管理するなど工夫すると良いでしょう。実際にデバイスに接続するためには`connectToDevice()` を用います。
 
 実際の処理は `QualifiedCharacteristic()` で送信データを作成し、 `writeCharacteristicWithoutResponse()` でBLEに通信しています。途中で出ているUUIDはgistのシートを参考にしました。製品固定です。
 

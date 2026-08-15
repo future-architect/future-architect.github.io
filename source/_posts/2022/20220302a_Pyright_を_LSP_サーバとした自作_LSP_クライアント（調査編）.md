@@ -12,11 +12,11 @@ categories:
   - Programming
 thumbnail: /images/2022/20220302a/thumbnail.png
 author: 空閑康太
-lede: "Language Server Protocol の理解として、Pyright を LSP サーバとした自作クライアントの作成を行いました。その際、Pyright に解析を行わせるための初期化方法がドキュメントには書かれていなかったので、VSCode 拡張用のクライアントをトレースして調査することにしました"
+lede: "Language Server Protocol の理解として、Pyright を LSP サーバとした自作クライアントを作成しました。その際、Pyright に解析させるための初期化方法がドキュメントには書かれていなかったので、VSCode 拡張用のクライアントをトレースして調査することにしました"
 ---
 ## はじめに
 
-Language Server Protocol の理解として、Pyright を LSP サーバとした自作クライアントの作成を行いました（[Pyright を LSP サーバとした自作 LSP クライアント（実装編）](/articles/20220303a/)）。その際、Pyright に解析を行わせるための初期化方法がドキュメントには書かれていなかったので、VSCode 拡張用のクライアントをトレースして調査することにしました。
+Language Server Protocol の理解として、Pyright を LSP サーバとした自作クライアントを作成しました（[Pyright を LSP サーバとした自作 LSP クライアント（実装編）](/articles/20220303a/)）。その際、Pyright に解析させるための初期化方法がドキュメントには書かれていなかったので、VSCode 拡張用のクライアントをトレースして調査することにしました。
 
 ## 調査方法
 

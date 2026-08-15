@@ -201,7 +201,7 @@ docker compose up --build
 ```
 
 起動が確認できたらLocalStackの準備も完了です。
-次にAWS CLIの設定を行います。
+次にAWS CLIを設定します。
 
 ### AWS CLIの設定
 

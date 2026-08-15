@@ -95,7 +95,7 @@ var (
 )
 ```
 
-そしてexample.goをインプットファイルにして自動生成を実行。
+そしてexample.goをインプットファイルにして自動生成します。
 
 ```sh
 reguerr generate -f example.go

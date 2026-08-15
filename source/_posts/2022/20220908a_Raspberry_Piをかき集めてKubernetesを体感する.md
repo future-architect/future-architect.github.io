@@ -10,7 +10,7 @@ categories:
 series: "夏の自由研究2022"
 thumbnail: /images/2022/20220908a/thumbnail.png
 author: 岸下優介
-lede: "業務でGKE（Google Kubernetes Engine）を利用することがあるのですが、Kubernetesの挙動や仕組みなど如何せん理解が難しいです。そこで今回は、自分の手でイチからKubernetesを構築することで勉強しようと思ったのが本記事のモチベーションです。ちょうど自宅にRaspberry Piが3台あったのでRaspberry Piでクラスタを構築していこうと思います。基本的には以下の記事を参考に設定を行っていき、自分の理解を深めるために解説を挟みながら書いていこうと思います。"
+lede: "業務でGKE（Google Kubernetes Engine）を利用することがあるのですが、Kubernetesの挙動や仕組みなど如何せん理解が難しいです。そこで今回は、自分の手でイチからKubernetesを構築することで勉強しようと思ったのが本記事のモチベーションです。ちょうど自宅にRaspberry Piが3台あったのでRaspberry Piでクラスタを構築していこうと思います。基本的には以下の記事を参考に設定していき、自分の理解を深めるために解説を挟みながら書いていこうと思います。"
 ---
 
 [夏の自由研究ブログ連載2022](/articles/20220822a/) の10本目です。
@@ -21,7 +21,7 @@ TIG 岸下です。業務でGKE（Google Kubernetes Engine）を利用するこ�
 
 そこで今回は、自分の手でイチからKubernetesを構築することで勉強しようと思ったのが本記事のモチベーションです。
 
-ちょうど自宅にRaspberry Piが3台あったのでRaspberry Piでクラスタを構築していこうと思います。基本的には以下の記事を参考に設定を行っていき、自分の理解を深めるために解説を挟みながら書いていこうと思います。
+ちょうど自宅にRaspberry Piが3台あったのでRaspberry Piでクラスタを構築していこうと思います。基本的には以下の記事を参考に設定していき、自分の理解を深めるために解説を挟みながら書いていこうと思います。
 
 参考：[RaspberryPi 4 にUbuntu20.04 をインストールして、Kubernetes を構築してコンテナを動かす](https://qiita.com/yasthon/items/c29d0b9ce34d66eab3ec)
 
@@ -118,7 +118,7 @@ ifconfig
 
 #### SSHの設定（デスクトップPC）
 
-IPアドレスの固定化が完了したので、ここからはSSHで操作を行うようにします。
+IPアドレスの固定化が完了したので、ここからはSSHで操作するようにします。
 
 **※SSHは利用しなくても設定できますが、3台分のラズパイのディスプレイを切り替える作業のストレスが無くなります。**
 
@@ -250,7 +250,7 @@ sudo localectl set-keymap jp106
 
 ### Kubernetes周り
 
-ここからKubernetes周りの設定を行っていきます。
+ここからKubernetes周りを設定していきます。
 基本はkubeadmの設定に沿っていきます。
 
 参考：[kubeadmのインストール](https://kubernetes.io/ja/docs/setup/production-environment/tools/kubeadm/install-kubeadm/)
@@ -372,7 +372,7 @@ kubeletを理解する前に、クラスターの全体像をまず理解する�
 で、kubeletですが図を見ると各ワーカーノードの中にkubeletが存在し、ワーカーノードの中で使われることがわかります。どこで使われるかがわかったところでkubeletの機能についてまとめていきます。
 
 - kubeletは、各ノード上で実行される主要な”ノードエージェント”
-  - ”エージェント”なので各ノードの中での仲介者で、Podの起動・管理を行う
+  - ”エージェント”なので各ノードの中での仲介者で、Podを起動・管理する
 - kubeletは、PodSpecの観点から動作する
   - PodSpecはPodに関する様々な情報（例えばコンテナの名前やimage）を載せたYAML or JSONファイル
   - PodSpec通りにコンテナが実行・動作されているかを確認することでPodを管理する
@@ -395,7 +395,7 @@ Kubernetesを利用する際に、cgroupのmemoryを有効化する必要があ�
 参考：[Linuxカーネルのコンテナ機能［2］ ─cgroupとは？（その1）](https://gihyo.jp/admin/serial/01/linux_containers/0003)
 参考：[Kubernetes で cgroup がどう利用されているか](https://valinux.hatenablog.com/entry/20210114)
 
-cgroupはControle Groupの略で、プロセスをグループ化して、そのグループ内に存在するプロセスに対して共通の管理を行うために使われます。例としては、ホストOSが持つCPUやメモリなどのリソースに対して、グループごとに制限をかけることができます。
+cgroupはControle Groupの略で、プロセスをグループ化して、そのグループ内に存在するプロセスに対して共通の管理をするために使われます。例としては、ホストOSが持つCPUやメモリなどのリソースに対して、グループごとに制限をかけることができます。
 
 kubeletの説明の中でPodSpecの話が出てきました。PodSpecのファイルではPod内のコンテナに関する情報を書くわけですが、この中でCPUやメモリの量も制限する（`resources`の`limits`）ことが可能です。正にここでcgroupが使われていて、ラズパイの計算リソースに対して、例えば計算リソースをそこまで必要としないPodに対しては制限をすることで、ラズパイのリソースを無駄に食い潰さないようにできます。
 
@@ -444,7 +444,7 @@ memory  7       107     1
 ### コントロールプレーンノードの初期化（マスターノードのラズパイのみ）
 
 先程も出てきましたが、コントロールプレーンノード＝マスターノードです。
-マスターノードにて操作を行っていきます。
+マスターノードにて操作していきます。
 
 ```sh
 sudo kubeadm init --apiserver-advertise-address=192.168.1.101 --pod-network-cidr=10.244.0.0/16
@@ -482,7 +482,7 @@ systemctl restart containerd
 
 ### 環境変数と入力補完の設定（マスターノードのラズパイのみ）
 
-kubectlをroot以外のユーザーでも実行できるようにするために、以下の設定を行っていきます。
+kubectlをroot以外のユーザーでも実行できるようにするために、以下を設定していきます。
 
 ```sh
 # ホームディレクトリに.kubeディレクトリを作成
@@ -531,7 +531,7 @@ kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.13.5/confi
 kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
 ```
 
-起動の確認を行います。
+起動を確認します。
 
 ```sh terminal
 kubectl get pod -n metallb-system
@@ -755,7 +755,7 @@ HOSTNAME : work01
 ```
 
 アクセスするたびに接続先が変わっていることから、ロードバランシングされていることが見受けられます。
-同じネットワーク内につながっているPCであれば、ブラウザから上記アドレスへアクセスすることも可能です。
+同じネットワーク内につながっているPCであれば、ブラウザから上記アドレスへアクセスもできます。
 
 ### 可用性を体感する
 

@@ -99,7 +99,7 @@ ParDo1を実行する際に、各BundleはWorkerに渡され、並列に実行�
 
 <img src="/images/2022/20220920a/Bundleの並列処理.svg" alt="Bundleの並列処理" loading="lazy">
 
-PCollectionに含まれるelementよりも小さく分割することはできないため、Bundle数の最大はPCollectionのelement数です。
+PCollectionに含まれるelementよりも小さく分割できないため、Bundle数の最大はPCollectionのelement数です。
 
 <img src="/images/2022/20220920a/最も細かくBundleに分割した例.svg" alt="最も細かくBundleに分割した例" loading="lazy">
 
@@ -113,7 +113,7 @@ _※Splittable ParDoを使えば、1つのelementを複数のBundleで処理で�
 
 <img src="/images/2022/20220920a/Transform間に従属関係がある場合.svg" alt="Transform間に従属関係がある場合" loading="lazy">
 
-RunnerがParDo1を適用前と後でBundleの再構成を行わない場合、各Bundleは同じWorkerでParDo1とParDo2を適用されます。
+RunnerがParDo1を適用前と後でBundleを再構成しない場合、各Bundleは同じWorkerでParDo1とParDo2を適用されます。
 
 <img src="/images/2022/20220920a/各Bundleは同じWorkerで処理される.svg" alt="各Bundleは同じWorkerで処理される" loading="lazy">
 

@@ -160,7 +160,7 @@ generatorに指定できる引数は以下のコマンドで確認できます�
 docker run --rm openapitools/openapi-generator-cli list
 ```
 
-また、生成されるパッケージ名はデフォルトで`openapi_server`となりますが、以下のようにパッケージ名を明示的に指定することもできます。
+また、生成されるパッケージ名はデフォルトで`openapi_server`となりますが、以下のようにパッケージ名の明示的な指定もできます。
 
 ```bash
 docker run --rm -v ${PWD}:/local openapitools/openapi-generator-cli generate -i /local/openapi.yaml -g python-flask -o /local --package-name test_package
@@ -295,7 +295,7 @@ paths:
 
 このファイルには自動生成時に上書きを禁止するディレクトリやファイルを指定します。
 
-例えば`controllers`や`test`のファイルは自動生成を行うたびに中身が初期化されてしまうため、ここに追記します。
+例えば`controllers`や`test`のファイルは自動生成するたびに中身が初期化されてしまうため、ここに追記します。
 
 ちなみに手動で新規作成したファイルはそのまま残るため、ここに追加する必要はありません。
 

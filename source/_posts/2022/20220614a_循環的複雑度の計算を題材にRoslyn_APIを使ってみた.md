@@ -11,7 +11,7 @@ thumbnail: /images/2022/20220614a/thumbnail.png
 author: 山田修路
 lede: "循環的複雑度の計算を題材に、Roslynを用いてVB.NETに対する解析コードをC#で書いてみました。本記事では、メソッド単位の循環的複雑度の計算を、クエリメソッドを用いて構文木を走査する方法とVisualBasicSyntaxWalkerを継承したクラスを用いて構文木を走査する方法の2通りの方法を紹介します。"
 ---
-TIG コアテクノロジーユニットの山田です。ソースやドキュメントを解析してファクト分析を行う仕事をしています。
+TIG コアテクノロジーユニットの山田です。ソースやドキュメントを解析してファクト分析する仕事をしています。
 
 今回は循環的複雑度の計算を題材に、Roslynを用いてVisual Basic.NETに対する解析コード[^1]をC#で書いてみました。本記事では、メソッド単位の循環的複雑度の計算を、クエリメソッドを用いて構文木を走査する方法とVisualBasicSyntaxWalkerを継承したクラスを用いて構文木を走査する方法の2通りの方法を紹介します。それぞれの方法の特徴は以下の通りです。
 
@@ -24,7 +24,7 @@ TIG コアテクノロジーユニットの山田です。ソースやドキュ�
 
 ## Roslynとは
 
-Roslynとは.NET Compiler Platformのコードネームで、コード解析ツール構築のためのAPIを持つコンパイラです[^2] [^3]。Roslynが提供しているAPIを用いることで簡単に静的解析を行うことが出来ます。Microsoft公式で開発されているため、安心感がありますね。
+Roslynとは.NET Compiler Platformのコードネームで、コード解析ツール構築のためのAPIを持つコンパイラです[^2] [^3]。Roslynが提供しているAPIを用いることで簡単に静的解析ができます。Microsoft公式で開発されているため、安心感がありますね。
 
 ## 循環的複雑度について
 
@@ -327,9 +327,9 @@ static Dictionary<string, int> CalcCyclomaticComplexityBySyntaxWalker(SyntaxTree
 Roslynを使うことで（Solutionや）Projectを簡単に読み込み、解析できることがわかりました。
 C#の循環的複雑度もノードの型が違うだけで、ほぼ同じ形で作ることができます。
 
-今回の記事とは関係ないですが、C#だと [Scripting API](https://github.com/dotnet/roslyn/blob/main/docs/wiki/Scripting-API-Samples.md) により、C#のコードをevalすることが可能なのですが、[VB.NETのScripting APIは開発中止になった](https://github.com/dotnet/roslyn/issues/6897#issuecomment-462433349)ようなので今後使える見込みはなさそうです。
+今回の記事とは関係ないですが、C#だと [Scripting API](https://github.com/dotnet/roslyn/blob/main/docs/wiki/Scripting-API-Samples.md) により、C#のコードをevalできるのですが、[VB.NETのScripting APIは開発中止になった](https://github.com/dotnet/roslyn/issues/6897#issuecomment-462433349)ようなので今後使える見込みはなさそうです。
 
-[^1]: [vblang/spec at main · dotnet/vblang · GitHub](https://github.com/dotnet/vblang/tree/main/spec) でantlrのgrammarが配布されているのですが、これを使ってparseすることはできないようでした。
+[^1]: [vblang/spec at main · dotnet/vblang · GitHub](https://github.com/dotnet/vblang/tree/main/spec) でantlrのgrammarが配布されているのですが、これを使ってparseできないようでした。
 
 [^2]: [GitHub - dotnet/roslyn: The Roslyn .NET compiler provides C# and Visual Basic languages with rich code analysis APIs.](https://github.com/dotnet/roslyn)
 

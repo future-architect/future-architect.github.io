@@ -142,7 +142,7 @@ AWS Greengrassの環境構築はssh接続できれば問題ありませんので
 ## AWS Greengrassのインストール
 
 AWS Greengrassは2022年4月現在v1とv2の２つあります。
-今回はCPU　ARM64 【AArch64】環境でdockerを使用したかったためv1の環境構築を行います。
+今回はCPU　ARM64 【AArch64】環境でdockerを使用したかったためv1の環境を構築します。
 v2では　ARM64 【AArch64】のdocker環境はサポートされていないようです。
 
 なお、以下の環境構築ではTinker Board上にdocker及び、docker-composeがインストールされていることを想定しています。
@@ -342,7 +342,7 @@ zip -r hello_world_python_lambda.zip greengrasssdk greengrassHelloWorld.py
 
 <img src="/images/2022/20220407a/image_12.png" alt="Lambdaのエイリアス" width="813" height="369" loading="lazy">
 
-クラウド上へのLambda関数のデプロイが完了したらコンテナに向けてコードの更新を行います。
+クラウド上へのLambda関数のデプロイが完了したらコンテナに向けてコードを更新します。
 Greengrassのグループから「Lambdaの追加」を選択します。
 
 <img src="/images/2022/20220407a/image_13.png" alt="Lambda追加" width="930" height="806" loading="lazy">

@@ -145,7 +145,7 @@ cudnnSetFilter4dDescriptor(filter_desc_.get(), CUDNN_DATA_FLOAT, CUDNN_TENSOR_NC
 
 ### 5. バイアス記述子の準備
 
-畳込み処理後に加算するバイアスの準備を行います。バイアスは1次元ベクトルなので、テンソルの記述子を流用します。
+畳込み処理後に加算するバイアスを準備します。バイアスは1次元ベクトルなので、テンソルの記述子を流用します。
 
 <img src="/images/2022/20220413a/バイアス.png" alt="バイアス" width="1200" height="409" loading="lazy">
 
