@@ -37,7 +37,7 @@ GitHub: https://github.com/locustio/locust
 
 ## 構築
 
-では早速、検証を行うための環境を構築していきます。必要なものは以下です。
+では早速、検証するための環境を構築していきます。必要なものは以下です。
 
 - Google Cloud環境
   - GKE

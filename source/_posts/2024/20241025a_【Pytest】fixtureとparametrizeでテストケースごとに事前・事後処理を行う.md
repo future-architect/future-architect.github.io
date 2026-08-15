@@ -16,7 +16,7 @@ lede: "Pythonのテストではpytestを使うことが多く、その中で「�
 
 はじめまして。Technology Inovation Group (TIG) の原田と申します。
 
-以前はGoを使ってアプリ開発を行っていたのですが、ここ最近はPythonを書くことが多いです。
+以前はGoを使ってアプリ開発していたのですが、ここ最近はPythonを書くことが多いです。
 Pythonのテストでは[pytest](https://docs.pytest.org/en/stable/)を使うことが多く、その中で「テストケースごとに違うデータを事前準備したい」というモチベーションが発生したので、pytestを使用して実装していきます。
 
 ## 前提
@@ -218,7 +218,7 @@ def test_hoge_function(db_setup, expected):  # 引数にfixtureを渡す
     assert result == expected
 ```
 
-`fixture`で`parametrize`からの変数を受け取る場合、引数に`request`をとり、`request.param`とすることでアクセスすることができます。
+`fixture`で`parametrize`からの変数を受け取る場合、引数に`request`をとり、`request.param`とすることでアクセスできます。
 
 ::: note warn
 重要: `parametrize`で渡される変数にアクセスするには`request.param`でアクセスする
@@ -332,7 +332,7 @@ FAILED test_main.py::test_hoge_function[case3] - AssertionError: assert 'test_in
 - `parametrize`で`fixture`に変数を渡す際には`indirect`に指定する
 - `fixture`で`parametrize`から渡される変数にアクセスするには`request.param`でアクセスする
 
-`parametrize`と`fixture`をうまく使用することで、テスト処理と準備処理を分離し、すっきりとした見通しの良いテストコードを整備することができます。
+`parametrize`と`fixture`をうまく使用することで、テスト処理と準備処理を分離し、すっきりとした見通しの良いテストコードを整備できます。
 
 `parametrize`と`fixture`を同時に使用する際の書き方について少し沼にはまったので、記事にしました。
 

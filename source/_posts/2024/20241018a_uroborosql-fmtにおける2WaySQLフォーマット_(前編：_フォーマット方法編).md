@@ -27,7 +27,7 @@ uroborosql-fmtの基本的な情報は以下の記事を参照してください
 
 uroborosql-fmtは[uroborosql](https://future-architect.github.io/uroborosql-doc/)、[go-twowaysql](/articles/20210803a/)、[doma](https://doma.readthedocs.io/en/latest/)といった[2WaySQL](https://future-architect.github.io/uroborosql-doc/background/)に対応しています。
 
-2WaySQLとはそのまま実行することもでき、アプリケーションで読み込んでバインドパラメータの指定などをして実行することも出来ます。このように2つの実行方法があることから2WaySQLと呼ばれます
+2WaySQLとはそのまま実行もでき、アプリケーションで読み込んでバインドパラメータの指定などをして実行することも出来ます。このように2つの実行方法があることから2WaySQLと呼ばれます
 
 ```sql  分岐とバインドパラメータを含む2WaySQLの例 (uroborosql)
 select
@@ -79,9 +79,9 @@ where
 ;
 ```
 
-このようなSQLは2WaySQLとしては正しいですが、通常のSQL構文としては不正（where句の内部の`and`が不足）であり、通常のSQLパーサではパースすることができません。そのため、先述した方法ではフォーマットが行えません。
+このようなSQLは2WaySQLとしては正しいですが、通常のSQL構文としては不正（where句の内部の`and`が不足）であり、通常のSQLパーサではパースできません。そのため、先述した方法ではフォーマットが行えません。
 
-解決方法として主に以下の二つが考えられます。
+解決方法として主に以下の2つが考えられます。
 
 1. 入力SQLのIF文を解析して複数のSQLを生成し、それらのSQLをフォーマット後にマージする
 2. 2WaySQLに対応したパーサを作成する

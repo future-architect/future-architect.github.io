@@ -219,7 +219,7 @@ func stopTracking() {
 
 #### updateMotionData(_ motion: CMDeviceMotion) async
 
-モーションデータの取得、更新を行うメソッド。
+モーションデータを取得・更新するメソッド。
 
 ```swift
 private func updateMotionData(_ motion: CMDeviceMotion) async {
@@ -231,9 +231,9 @@ private func updateMotionData(_ motion: CMDeviceMotion) async {
     }
 ```
 
-UI更新を安全に行うために、`MainActor.run`内でUIの更新を行うことでUIスレッドの競合が発生しないようにしています。
+UIを安全に更新するために、`MainActor.run`内でUIを更新することでUIスレッドの競合が発生しないようにしています。
 
-取得した姿勢データ`attitude`を使用して、`pitch`、`roll`、`yaw`の更新を行います。
+取得した姿勢データ`attitude`を使用して、`pitch`、`roll`、`yaw`を更新します。
 
 ### Viewに反映させる
 

@@ -23,7 +23,7 @@ EC2・RDSなどAWS主要サービスの機能・役割に対する知識はあ�
 （上記の知識がないという方はまず[こちら](https://aws.amazon.com/jp/blogs/news/2024-aws-beginner-learning/)を参考に学習を進めることをオススメします！）
 
 ::: note info
-本記事ではAWS Cloud Quest: **Cloud Practitioner** に絞って解説を行います。
+本記事ではAWS Cloud Quest: **Cloud Practitioner** に絞って解説します。
 :::
 
 ## AWS Cloud Questとは
@@ -51,7 +51,7 @@ AWS Cloud Questでは以下の基礎的なサービスや概念について学�
 * Amazon EC2 Auto Scaling
 * ELB
 
-またゲームの後半では、複数のサービスを組み合わせてソリューションの構築を行います。
+またゲームの後半では、複数のサービスを組み合わせてソリューションを構築します。
 
 それではさっそくAWS Cloud Questをプレイする準備に入っていきましょう。
 
@@ -144,7 +144,7 @@ AWS Cloud Questでは、街の中で困っている人達の課題をAWSのク�
 
 ### サービスを用いて解決
 
-ここでは **「学習」「計画」「実践」「DIY」** のフェーズに分かれてソリューションの構築を行っていきます。
+ここでは **「学習」「計画」「実践」「DIY」** のフェーズに分かれてソリューションを構築していきます。
 
 #### 学習
 

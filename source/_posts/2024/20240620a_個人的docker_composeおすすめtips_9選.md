@@ -118,7 +118,7 @@ Dockerfileでも指定できますが、[docker-compose.ymlでも指定可能](h
 
 コンテナに対しコマンドを実行し終了コードなどによりヘルスチェックができます。
 
-ヘルスチェックを利用することで依存関係の設定、サービス完了まで待機でサービスが `healthy`になるまで待機することが可能です。
+ヘルスチェックを利用することで依存関係の設定、サービス完了まで待機でサービスが `healthy`になるまで待機できます。
 
 ```yaml compose.yaml
 healthcheck:
@@ -158,7 +158,7 @@ services:
 
 ## サービス完了まで待機
 
-`docker compose up`に`--wait`オプションを利用することで、ヘルスチェックが設定されたサービスが定常状態になるまで待機することが可能です(執筆時点では`--wait`オプションは[ドキュメントに記載されていません](https://docs.docker.jp/engine/reference/commandline/compose_up.html))。
+`docker compose up`に`--wait`オプションを利用することで、ヘルスチェックが設定されたサービスが定常状態になるまで待機できます(執筆時点では`--wait`オプションは[ドキュメントに記載されていません](https://docs.docker.jp/engine/reference/commandline/compose_up.html))。
 
 以前はワンショットのサービスには `--wait`が効かないバグがありましたが[v2.7.0で修正](https://docs.docker.com/compose/release-notes/#270)されたようです。
 
@@ -166,7 +166,7 @@ services:
 
 ## サービスをグループ化
 
-[profiles](https://docs.docker.com/compose/profiles/)という機能を利用し、複数のサービスをまとめて起動・終了などをすることが可能です。
+[profiles](https://docs.docker.com/compose/profiles/)という機能を利用し、複数のサービスをまとめて起動・終了などができます。
 
 以前から`depends_on`で依存関係を指定することで依存したサービスをまとめて立ち上げることができていましたが、profilesによって依存関係がないサービスもまとめて立ち上げることが可能になりました。
 
