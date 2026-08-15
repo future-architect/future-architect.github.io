@@ -133,7 +133,7 @@ https://cloud.google.com/composer/docs/composer-2/troubleshooting-dags?hl=ja#zom
 ### WorkerやSchedulerの初期値
 
 Cloud Composer環境を構築する際、WorkerやSchedulerのCPUコア数やメモリを予め決める必要があります（もちろん、後から変更できます）。
-その場合、実装予定のDAGの数をある程度想定し、それらDAGを並列に実行したい数やタスクを並列に実行したい数から以下のように逆算することができます。
+その場合、実装予定のDAGの数をある程度想定し、それらDAGを並列に実行したい数やタスクを並列に実行したい数から以下のように逆算できます。
 
 <img src="/images/2025/20250206a/Screen_Shot_2020-02-04_at_3.36.36_PM.max-1400x1400.png" alt="Screen_Shot_2020-02-04_at_3.36.36_PM.max-1400x1400.png" width="1200" height="1339" loading="lazy">
 
