@@ -15,30 +15,39 @@
         <li><span class="summary-count"><%= checks.nearDuplicates.length %></span><br><span class="summary-label">統合候補のタグ</span></li>
         <li><span class="summary-count"><%= checks.categoryDupTags.length %></span><br><span class="summary-label">カテゴリと同名のタグ</span></li>
         <li><span class="summary-count"><%= checks.singleUse.length %></span><br><span class="summary-label">1記事タグ</span></li>
+        <% const dormant = doctor_dormant_authors(); %>
+        <li><span class="summary-count"><%= dormant.length %></span><br><span class="summary-label">投稿が途切れた著者</span></li>
       </ul>
 
-      <h2 class="bottom-content-header">タグが1つも無い記事</h2>
-      <% if (checks.untagged.length) { %>
-      <ul class="doctor-list">
-        <% checks.untagged.forEach(function(p){ %>
-        <li><a href="<%- url_for(p.path) %>"><%= p.title %></a></li>
-        <% }) %>
-      </ul>
-      <% } else { %>
-      <p>該当なし</p>
-      <% } %>
-
-      <h2 class="bottom-content-header">タグが付きすぎている記事</h2>
-      ※10タグ以上を見直し候補として出しています（記事あたりのタグ数の中央値は3）
-      <% if (checks.overTagged.length) { %>
-      <ul class="doctor-list">
-        <% checks.overTagged.forEach(function(p){ %>
-        <li><a href="<%- url_for(p.path) %>"><%= p.title %></a> <span class="doctor-note"><%= p.count %>タグ</span></li>
-        <% }) %>
-      </ul>
-      <% } else { %>
-      <p>該当なし</p>
-      <% } %>
+      <%# タグ無しと付けすぎは、どちらも件数の少ない「記事単位の粗さ」の検査。
+          縦に積むと1件ずつのために画面を1つ使うので、2つの節を横に並べる %>
+      <div class="doctor-cols">
+        <section>
+          <h2 class="bottom-content-header">タグが1つも無い記事</h2>
+          <% if (checks.untagged.length) { %>
+          <ul class="doctor-list">
+            <% checks.untagged.forEach(function(p){ %>
+            <li><a href="<%- url_for(p.path) %>"><%= p.title %></a></li>
+            <% }) %>
+          </ul>
+          <% } else { %>
+          <p>該当なし</p>
+          <% } %>
+        </section>
+        <section>
+          <h2 class="bottom-content-header">タグが付きすぎている記事</h2>
+          ※10タグ以上を見直し候補として出しています（記事あたりのタグ数の中央値は3）
+          <% if (checks.overTagged.length) { %>
+          <ul class="doctor-list">
+            <% checks.overTagged.forEach(function(p){ %>
+            <li><a href="<%- url_for(p.path) %>"><%= p.title %></a><span class="doctor-note-inline"><%= p.count %>タグ</span></li>
+            <% }) %>
+          </ul>
+          <% } else { %>
+          <p>該当なし</p>
+          <% } %>
+        </section>
+      </div>
 
       <h2 class="bottom-content-header">ほぼ重なるタグ（統合候補）</h2>
       ※片方の記事すべてがもう片方にも付いていて、差が2本以内のペア。実質同じ集合に2つの名前が付いています。Go1.27 ⊆ Go のような差の大きい健全な階層は出しません
@@ -146,11 +155,35 @@
         <% }) %>
       </div>
       <ul class="doctor-list">
-        <li>
+        <%# 投稿が途切れた著者の列と同じ扱い。数十件が横に流れるので、
+            区切りの「、」ではなく行間と余白で分ける (#2418) %>
+        <li class="doctor-inline-row">
           <span class="doctor-note">親も子も無い根タグ（<%= onto.standalone.length %>件）</span>
-          <% onto.standalone.forEach(function(n, i){ %><a href="<%- url_for(n.path) %>"><%= n.name %></a><span class="ontology-count"><%= n.posts %>本<%= (n.versions || []).length ? '・版' + n.versions.length : '' %></span><%= i < onto.standalone.length - 1 ? '、' : '' %><% }) %>
+          <% onto.standalone.forEach(function(n){ %><a href="<%- url_for(n.path) %>"><%= n.name %></a><span class="ontology-count doctor-note-inline"><%= n.posts %>本<%= (n.versions || []).length ? '・版' + n.versions.length : '' %></span><% }) %>
         </li>
       </ul>
+
+      <h2 class="bottom-content-header">投稿が途切れている著者</h2>
+      ※今年まだ投稿が無く、最後の投稿が昨年か一昨年の著者。声をかけると再開してくれるかもしれない候補です（/authors/ に <code>*</code> / <code>**</code> で出していたものの移設。読者向けのページには凡例の無い記号を置かない #2418）
+      <%# 累計本数でまとめて横に並べる。本数が同じ人は声かけの重みも同じなので、
+          1人1行にするより「何本書いた人が何人いるか」が一目で分かる。
+          並びは本数の多い順。区切りの「、」は使わず間隔で分ける %>
+      <% if (dormant.length) { %>
+      <% const dormantCounts = [...new Set(dormant.map(d => d.count))].sort((a, b) => b - a); %>
+      <ul class="doctor-list">
+        <% dormantCounts.forEach(function(c){ %>
+        <% const members = dormant.filter(d => d.count === c); %>
+        <li class="doctor-inline-row">
+          <span class="doctor-note"><%= c %>本（<%= members.length %>名）</span>
+          <%# 最終投稿年は名前の直後に添える。行を折らないインラインの注記にする
+              （.doctor-note は display:block で1件ごとに改行されてしまう）%>
+          <% members.forEach(function(d){ %><a href="<%- url_for('authors/' + d.name + '/') %>"><%= d.name %></a><span class="doctor-note-inline"><%= d.last %>年</span><% }) %>
+        </li>
+        <% }) %>
+      </ul>
+      <% } else { %>
+      <p>該当なし</p>
+      <% } %>
 
       <h2 class="bottom-content-header">カテゴリの説明の抜け・食い違い</h2>
       ※カテゴリの一言説明は <code>source/_data/categories.yml</code>（#2405）。新設カテゴリの説明漏れと、実在しないカテゴリの説明（改名・統合後の消し忘れ）を両方向で照合します
@@ -184,16 +217,16 @@
       <h2 class="bottom-content-header">タイトルにタグ名を含むのに、そのタグが付いていない記事</h2>
       ※英数3文字・和文4文字未満のタグ名は一般語に当たりやすいので照合していません
       <ul class="doctor-list">
+        <%# 畳まない。運営が上から順に見て潰していく作業リストなので、
+            開く操作を挟むと候補の全体量が掴めない %>
         <% checks.missing.forEach(function(m){ %>
         <li>
-          <details>
-            <summary><a href="<%- url_for(m.path) %>"><%= m.name %></a>（<%= m.posts.length %>記事）</summary>
-            <ul>
-              <% m.posts.forEach(function(p){ %>
-              <li><a href="<%- url_for(p.path) %>"><%= p.title %></a></li>
-              <% }) %>
-            </ul>
-          </details>
+          <a href="<%- url_for(m.path) %>"><%= m.name %></a><span class="doctor-note-inline"><%= m.posts.length %>記事</span>
+          <ul>
+            <% m.posts.forEach(function(p){ %>
+            <li><a href="<%- url_for(p.path) %>"><%= p.title %></a></li>
+            <% }) %>
+          </ul>
         </li>
         <% }) %>
       </ul>
