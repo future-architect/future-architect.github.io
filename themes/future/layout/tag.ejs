@@ -44,12 +44,45 @@
     <% } %>
     <% if (page.current === 1) { %>
     <%# 統計の直下にグラフ。全ページ同じ並びにする (#2211)。
-        記事の少ないタグでは出さない（条件は tag_yearly_chart 側）%>
-    <% const tyc = tag_yearly_chart(page.tag); %>
-    <% if (tyc) { %>
-    <%- partial('_partial/section-heading', {id: 'trend', text: '半期別 投稿数の推移'}) %>
-    <p class="list-page-note">※上期（1〜6月）・下期（7〜12月）ごとの投稿数。棒の内訳はカテゴリ</p>
-    <%- partial('_partial/half-bars', {chart: tyc, label: page.tag + ' タグ'}) %>
+        記事の少ないタグでは出さない（条件は tag_monthly_chart 側）。
+        見出し・軸・色は著者ページの月別チャートと同じ作りにする %>
+    <% const tagChart = tag_monthly_chart(page.tag); %>
+    <% if (tagChart) { %>
+    <%- partial('_partial/section-heading', {id: 'trend', text: '月別 投稿数の推移'}) %>
+    <div id="chart" style="width:100%;min-height:250px"></div>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.1.2/dist/echarts.min.js" integrity="sha384-QqZssazD9IzPiEJz2lyFewTMgYObqDWxBfCX5k5E4n4fH7ygMIqp6A6Ek8HIrRyQ" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      const chartData = <%- tagChart %>;
+      const catColors = <%- category_colors() %>;
+      <%# 軸が12ヶ月以下（投稿の少ないタグ）なら月ラベルが全部読めるので毎月出す。
+          長期のタグは潰れるため年の変わり目だけにする（著者ページと同じ #2135）%>
+      const monthlyLabels = chartData.months.length <= 12;
+      echarts.init(document.getElementById('chart')).setOption({
+        <%# タイトルは直上の h2 が担うので、チャート内では重ねない %>
+        title: {},
+        legend: {},
+        tooltip: { trigger: 'axis' },
+        <%# 既定の grid.left 10% で右へズレて見える。軸ラベル込みで左端に寄せる %>
+        grid: { left: 0, right: '2%', containLabel: true },
+        xAxis: {
+          type: 'category',
+          boundaryGap: true,
+          data: chartData.months,
+          axisLabel: {
+            interval: 0,
+            formatter: (value, index) => monthlyLabels
+              ? value
+              : ((index === 0 || value.endsWith('/01')) ? value.slice(0, 4) + '年' : '')
+          }
+        },
+        <%# 投稿数は整数。自動目盛だと 0.5 刻みが出ることがある。
+            上限は最低3で、月1本のタグが天井に張り付いて見えるのを避ける %>
+        yAxis: { type: 'value', minInterval: 1, max: value => Math.max(3, value.max) },
+        <%# 色はカテゴリ名で固定 (#2170)。系列順に任せるとページごとに
+            同じカテゴリの色が変わってしまう %>
+        series: chartData.series.map(s => Object.assign({}, s, { itemStyle: { color: catColors[s.name] } }))
+      });
+    </script>
     <% } %>
     <%# そのタグの中でよく読まれている記事。新着より前に置く。
         絞り込んだ直後の読者がまず知りたいのは「定番はどれか」であって、

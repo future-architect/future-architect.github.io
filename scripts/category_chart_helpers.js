@@ -334,31 +334,67 @@ hexo.extend.helper.register('category_yearly_chart', function (name) {
 });
 
 /**
- * タグページの半期別投稿数 (#2434)。刻みと描画はカテゴリページと同じ (#2423)。
+ * タグページの月別投稿数 (#2434)。刻み・描画とも著者ページと同じにする。
+ *
+ * CSS で描いていたが echarts に戻した。ツールチップの即時表示と凡例での
+ * 絞り込みが無いぶん、CSS 版は読み手の使い勝手が落ちていた。グラフは
+ * echarts に統一する。
  *
  * ただしタグは数が桁違い（約700）で、1〜4本のタグが半分以上を占める。
  * 棒が数本立つだけのグラフは「いつ書かれたか」を示すが、それは直下の
- * 記事一覧の日付と同じ情報でしかない。5本以上あり、かつ投稿のある期が
+ * 記事一覧の日付と同じ情報でしかない。5本以上あり、かつ投稿のある月が
  * 2つ以上（＝時間の中で動きがある）タグにだけ出す。
  *
- * 棒はカテゴリ別の積み上げにする。タグは複数のカテゴリにまたがるので、
+ * 積み上げはカテゴリ別。タグは複数のカテゴリにまたがるので、
  * 「このタグがどの分野で書かれてきたか」「その構成が時期で変わったか」まで
- * 読める。色は他ページと同じくカテゴリ名で固定 (#2170)。
+ * 読める。色は他ページと同じくカテゴリ名で固定 (#2170)、積む順と凡例の順は
+ * サイト累計の多い順で固定する (#2201)。
  */
 const TAG_CHART_MIN_POSTS = 5;
-const TAG_CHART_MIN_HALVES = 2;
+const TAG_CHART_MIN_MONTHS = 2;
 
-hexo.extend.helper.register('tag_yearly_chart', function (name) {
+hexo.extend.helper.register('tag_monthly_chart', function (name) {
   const tag = this.site.tags.findOne({ name });
   if (!tag || tag.length < TAG_CHART_MIN_POSTS) return null;
-  const bars = halfYearBars(tag.posts.toArray());
-  if (!bars || bars.filledHalves < TAG_CHART_MIN_HALVES) return null;
 
-  const siteOrder = this.site.categories
+  const byMonth = new Map(); // "YYYY/MM" -> Map(カテゴリ -> 本数)
+  let min = null;
+  let max = null;
+  tag.posts.forEach((post) => {
+    const ym = post.date.format('YYYY/MM');
+    if (!min || ym < min) min = ym;
+    if (!max || ym > max) max = ym;
+    // カテゴリは第1のものだけ数える。複数カテゴリを全部積むと
+    // 合計が投稿数と合わなくなる（著者ページのチャートと同じ規則）
+    const cat = post.categories && post.categories.length ? post.categories.first().name : '未分類';
+    if (!byMonth.has(ym)) byMonth.set(ym, new Map());
+    const m = byMonth.get(ym);
+    m.set(cat, (m.get(cat) || 0) + 1);
+  });
+  if (byMonth.size < TAG_CHART_MIN_MONTHS) return null;
+
+  // 軸は暦年に揃える。開始は初投稿年の1月、終了は最終投稿年の12月 (#2140)
+  const startY = +min.slice(0, 4);
+  const endY = +max.slice(0, 4);
+  const months = [];
+  for (let y = startY; y <= endY; y++) {
+    for (let m = 1; m <= 12; m++) {
+      months.push(`${y}/${String(m).padStart(2, '0')}`);
+    }
+  }
+
+  const series = this.site.categories
     .toArray()
     .sort((a, b) => b.length - a.length || (a.name < b.name ? -1 : 1))
-    .map((c) => c.name);
-  return stackByCategory(bars, siteOrder);
+    .map((c) => c.name)
+    .filter((cat) => [...byMonth.values()].some((m) => m.has(cat)))
+    .map((cat) => ({
+      name: cat,
+      type: 'bar',
+      stack: 'total',
+      data: months.map((ym) => (byMonth.get(ym) && byMonth.get(ym).get(cat)) || 0),
+    }));
+  return JSON.stringify({ months, series });
 });
 
 // 関連カテゴリ (#2200)。独自の採点は持ち込まず、ページに出ている2つの規則の
