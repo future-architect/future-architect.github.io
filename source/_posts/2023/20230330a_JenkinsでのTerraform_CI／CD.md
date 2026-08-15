@@ -449,7 +449,7 @@ Terraformプラグインをインストールしている状態だと、Global T
 
 ### Terraformジョブ管理フォルダの作成
 
-ここまでの設定で、Jenkins上でTerraformを実行する環境が整ったので、Terraform実行ジョブ管理フォルダの作成を行っていきます。
+ここまでの設定で、Jenkins上でTerraformを実行する環境が整ったので、Terraform実行ジョブ管理フォルダを作成していきます。
 
 「新規ジョブ作成」をクリックします。
 
@@ -469,7 +469,7 @@ ConfigurationでGeneralから
 
 ### Terraform planジョブの作成
 
-terraformフォルダが作成されたので、terraform planジョブの作成を行っていきます。
+terraformフォルダが作成されたので、terraform planジョブを作成していきます。
 「新規アイテムの作成」をクリックします。
 <img src="/images/2023/20230330a/jenkins_job_setting_10.png" alt="" width="1200" height="894" loading="lazy">
 
@@ -483,8 +483,8 @@ ConfigurationでGeneralから
 
 <img src="/images/2023/20230330a/jenkins_job_setting_3.png" alt="jenkins_job_setting_3.png" width="923" height="410" loading="lazy">
 
-Branch SorucesでGitHubとの連携の設定を行っていきます。
-Credentialsから「追加」をクリックし、GitHub認証情報の設定を行います。
+Branch SorucesでGitHubとの連携を設定していきます。
+Credentialsから「追加」をクリックし、GitHub認証情報を設定します。
 
 <img src="/images/2023/20230330a/jenkins_job_setting_4.png" alt="jenkins_job_setting_4.png" width="849" height="608" loading="lazy">
 

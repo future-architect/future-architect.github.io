@@ -10,7 +10,7 @@ categories:
   - Security
 thumbnail: /images/2023/20230119a/thumbnail.png
 author: 岸下優介
-lede: "Google CloudのVPC Service Controlsを利用して、リソースへのアクセス制御を行う方法についてTerraformコード付きで紹介していきます。昨今では、個人情報漏洩のニュースが尽きません。少し古いデータではありますが..."
+lede: "Google CloudのVPC Service Controlsを利用して、リソースへのアクセス制御をする方法についてTerraformコード付きで紹介していきます。昨今では、個人情報漏洩のニュースが尽きません。少し古いデータではありますが..."
 ---
 ## はじめに
 
@@ -31,7 +31,7 @@ VPC Service Controlsを利用することによって、Google Cloudのリソー
 
 例えば、BigQueryやCloud Storageに個人を特定できる情報（例：身長、体重、性別、年齢）や画像が置かれている場合、VPC Service Controlsを利用することで**それらのリソースに限られた人間のみがアクセス可能**となります。
 
-また境界の内外におけるデータ移動を制御することが可能なため、データが境界の外へ持ち出されることも防ぎます（境界を超える通信はデフォルトでブロックされます）。
+また境界の内外におけるデータ移動を制御できるため、データが境界の外へ持ち出されることも防ぎます（境界を超える通信はデフォルトでブロックされます）。
 
 <img src="/images/2023/20230119a/a864e1b2-7cd3-c69c-bf63-fe2b21622b6d.png" alt="" width="1200" height="640" loading="lazy">
 
@@ -54,7 +54,7 @@ VPC Service Controlsはそれに加えて、境界全体への上り（Ingress�
 
 ### Organizationの設定が必要
 
-VPC Service Controlを始めるにはOrganizationが必要となります。Organizationの設定にはドメインが必要となるため、Google Domainなどで取得する（年間1200円～）必要があります。もし、既にドメインをお持ちの場合はサブドメインを作って、それをOrganizationへ適用することも可能です。
+VPC Service Controlを始めるにはOrganizationが必要となります。Organizationの設定にはドメインが必要となるため、Google Domainなどで取得する（年間1200円～）必要があります。もし、既にドメインをお持ちの場合はサブドメインを作って、それをOrganizationへ適用できます。
 
 Organizationの作成方法は以下を参考にするとよいです。
 [GCP で組織を作成して共有 VPC 構築 - 1.ドメイン取得](https://qiita.com/suzuyui/items/947867f52897417ee31b#1-%E3%83%89%E3%83%A1%E3%82%A4%E3%83%B3%E5%8F%96%E5%BE%97)
@@ -80,7 +80,7 @@ resource "google_access_context_manager_access_policy" "access_policy" {
 
 ### ID制御をやってみる
 
-ID制御を行ってみます。
+ID制御をしてみます。
 通常は画像のようにBigQueryのDataset, tableを見ることができます。
 
 <img src="/images/2023/20230119a/da83249a-b466-c2eb-8ea7-9e5fe5e9abfc.jpeg" alt="" width="894" height="396" loading="lazy">
@@ -282,8 +282,8 @@ bq query --use_legacy_sql=false --project_id <YOUR_PROJECT_ID>  'select worker_i
 
 <img src="/images/2023/20230119a/27b0c988-2a46-cf62-d7c1-910a171c2e00.png" alt="" width="925" height="338" loading="lazy">
 
-このようにアクセスレベルでは個々のIPやアカウントを利用した細かい制御を行うことができます。
-他にもOSの指定（有料）、スクリーンロックを要求するなどを設定することも可能です。
+このようにアクセスレベルでは個々のIPやアカウントを利用した細かい制御ができます。
+他にもOSの指定（有料）、スクリーンロックを要求するなどを設定できます。
 
 ## 応用編
 
