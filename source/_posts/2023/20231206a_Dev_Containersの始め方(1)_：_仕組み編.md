@@ -20,7 +20,7 @@ PyCon APAC 2023でDev Containersで発表してきました。写真はスタッ
 
 <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vTwNT6bUGRiLwk2e8sgug_DQak4qUavSA5_XW32CrWKdJHyFVprWT9qosUJrtuRNItxAF94QHGVSv_i/embed?start=false&loop=false&delayms=3000" frameborder="0" width="95%" height="569" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
 
-個人的には、バイナリ互換とか仮想マシンってあんまり興味なくて、多くの人が努力して作り上げてきたソースコード互換のアプリでWindows/macOS/Linuxでネイティブで動く、という世界観が好きだったりするのですが、仕事柄、開発環境をまるっと配るというのも調べておきたいな、ということで、「俺はやらないぞ」という気持ちでいたDev Containersに触れてみて、仕組みとか使い方とか調べてみたのでそれのまとめです。
+個人的には、バイナリ互換とか仮想マシンってあんまり興味がありません。多くの人が努力して作り上げてきたソースコード互換のアプリでWindows/macOS/Linuxでネイティブで動く、という世界観が好きだったりします。ただ、仕事柄、開発環境をまるっと配るというのも調べておきたいな、ということで、「俺はやらないぞ」という気持ちでいたDev Containersに触れてみました。仕組みとか使い方とか調べてみたのでそれのまとめです。
 
 ## 普通のDockerとも違うDev Containersの仕組み
 
@@ -41,7 +41,7 @@ VDIでもGitHub Codespacesなんかだとエディタはローカルのブラウ
 
 ソースコードなどもローカル側が主で、そのコピーがDockerにコピーされます。実際にエディタが編集するのはコンテナ内部にコピーされたファイルだったりする（変更はローカルに同期される）のですが、基本的に通常のローカル開発と感覚はほとんど変わりません。⌘ + JとかCtrl + Jでターミナルを開くと、Docker内部に繋がっている以外は操作感覚は変わらないです。
 
-いくつかネットで記事を見ると、いろいろコンテナを作り込んでいる記事とかも見かけるのですが、さぞ、特別なコンテナなんだろう、と[いくつかMicrosoft謹製のDev Containers用のコンテナ定義](https://github.com/microsoft/vscode-dev-containers/tree/main/containers)を辿ってみたのですが、ユーザーを作ったり、するぐらいで、一見すると特別なことをしているようには見えません。[エディタ類とかjqとかはデフォルトで入れてくれて、便利です](https://github.com/microsoft/vscode-dev-containers/blob/main/containers/debian/.devcontainer/library-scripts/common-debian.sh#L77)。
+いくつかネットで記事を見ると、いろいろコンテナを作り込んでいる記事とかも見かけます。さぞ、特別なコンテナなんだろう、と[いくつかMicrosoft謹製のDev Containers用のコンテナ定義](https://github.com/microsoft/vscode-dev-containers/tree/main/containers)を辿ってみたのですが、ユーザーを作ったりするぐらいで、一見すると特別なことをしているようには見えません。[エディタ類とかjqとかはデフォルトで入れてくれて、便利です](https://github.com/microsoft/vscode-dev-containers/blob/main/containers/debian/.devcontainer/library-scripts/common-debian.sh#L77)。
 
 実は、Dockerの外でいろいろ作り込まれているのがこのDev Containersです。
 
