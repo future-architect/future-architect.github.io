@@ -56,7 +56,7 @@ LLM自体やLLMを活用したシステムを開発していく場合、MLOpsチ
 
 以前に[LLM開発のフロー](/articles/20230912a/)で紹介した通り、LLM開発は大きく「モデルを用意する（学習）フェーズ」と「モデルの能力を引き出す（推論）フェーズ」に分けられます。モデル開発の段階は「モデルを用意する（学習）フェーズ」に相当します。
 
-「モデルを用意する（学習）フェーズ」では、従来のML開発と同様、データ収集からモデル選定、様々なハイパーパラメータで実験・評価を行い、モデルを開発していきます。
+「モデルを用意する（学習）フェーズ」では、従来のML開発と同様、データ収集からモデル選定、様々なハイパーパラメータで実験・評価し、モデルを開発していきます。
 
 モデルを用意する方法は大きく分けて
 
@@ -168,7 +168,7 @@ AWSやAzure、GCPなどのクラウドサービスでは、「大量なデータ
 
 ### \[2\] Argilla
 
-[Argilla](https://docs.argilla.io/en/latest/)は、RLHF用に「人力で集めるデータの入力・出力の評価」を円滑にするための管理を行ってくれるプラットフォームです。\
+[Argilla](https://docs.argilla.io/en/latest/)は、RLHF用に「人力で集めるデータの入力・出力の評価」を円滑にするための管理をしてくれるプラットフォームです。\
 
 例えば、人力で集めるデータとは、[こちら](https://huggingface.co/datasets/kunishou/databricks-dolly-15k-ja)にあるような指示文(instruction)、参考情報(input)、理想の回答(output)がセットになったものや、複数のLLMからの出力にランク付けをした結果等です。
 
@@ -190,7 +190,7 @@ AWSやGCPなどのクラウドサービスでは、LLM開発のための学習�
 * GCP
   * [T5X](https://t5x.readthedocs.io/en/latest/)とVertex AIを用いてLLMを学習させることができます（[参考](https://github.com/GoogleCloudPlatform/t5x-on-vertex-ai)）
 * Azure
-  * Azure Machine LearningでLLMの学習が可能です（[参考](https://learn.microsoft.com/ja-jp/azure/machine-learning/overview-what-is-azure-machine-learning)）。[Prompt Flow](https://learn.microsoft.com/ja-jp/azure/machine-learning/prompt-flow/get-started-prompt-flow)（後述）を利用することで、LLM自体の開発を含めたLLMを用いたサービスの開発を行うことができます
+  * Azure Machine LearningでLLMの学習が可能です（[参考](https://learn.microsoft.com/ja-jp/azure/machine-learning/overview-what-is-azure-machine-learning)）。[Prompt Flow](https://learn.microsoft.com/ja-jp/azure/machine-learning/prompt-flow/get-started-prompt-flow)（後述）を利用することで、LLM自体の開発を含めたLLMを用いたサービスを開発できます
 
 ### \[4\] MLflow
 
@@ -255,7 +255,7 @@ LangChainの公式Docsに、[Aimを用いたLangChainのトラッキングの例
 
 [toxic-bert](https://huggingface.co/unitary/toxic-bert)はコメントの有害レベルの分類や有害なコメントの分類（どのような有害さを持っているか）が可能なモデルです。LLMの出力の監視に利用できます。
 
-複数言語で学習済みのモデルが公開されていますが、日本語での学習済みモデルはないようです。しかし、学習用のコードは公開されているため、データセットを用意すれば日本語に対応したモデルも作成することもできるでしょう。
+複数言語で学習済みのモデルが公開されていますが、日本語での学習済みモデルはないようです。しかし、学習用のコードは公開されているため、データセットを用意すれば日本語に対応したモデルも作成できるでしょう。
 
 ### \[10\] Moderation
 
@@ -425,13 +425,13 @@ SKでは、LLMを特定のタスクを実行する関数(Semantic Function)と�
 
 ### \[25\] Guardrails AI
 
-[Guardrails AI](https://shreyar.github.io/guardrails/)はLLMの出力に対して、構造検証、型検証、品質検証を行うことができるPythonライブラリです。
+[Guardrails AI](https://shreyar.github.io/guardrails/)はLLMの出力に対して、構造検証、型検証、品質検証ができるPythonライブラリです。
 
 Guardrails AIには以下のような出力検証機能があります。
 
-* 生成されたテキストに偏りがないか、生成されたコードにバグがないかなどの意味的な検証を行う
+* 生成されたテキストに偏りがないか、生成されたコードにバグがないかなどの意味的な検証をする
 * バリデーションが失敗した場合、修正アクション（LLMに再びプロンプトを入力する等）を実行する
-* 構造や型（JSONなど）の検証を行う
+* 構造や型（JSONなど）を検証する
 
 ## LLMシステム構成例
 

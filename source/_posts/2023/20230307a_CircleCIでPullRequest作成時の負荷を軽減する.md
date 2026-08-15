@@ -192,11 +192,11 @@ workflows:
       - add-label
 ```
 
-`-gh/setup`でGitHub CLIの初期設定を行います。この際のCicleCIの環境変数に`GITHUB_TOKEN`の設定が必要です。
+`-gh/setup`でGitHub CLIを初期設定します。この際のCicleCIの環境変数に`GITHUB_TOKEN`の設定が必要です。
 
 ::: note info
 GITHUB_TOKENの権限
-GITHUB＿TOKENの権限はPullRequestに対して操作を行うためrepoの権限が必要です。[GITHUB_TOKENのアクセス許可](https://docs.github.com/ja/actions/security-guides/automatic-token-authentication#permissions-for-the-github_token)
+GITHUB＿TOKENの権限はPullRequestを操作するためrepoの権限が必要です。[GITHUB_TOKENのアクセス許可](https://docs.github.com/ja/actions/security-guides/automatic-token-authentication#permissions-for-the-github_token)
 :::
 
 GitHub CLIのセットアップ完了後ブランチにチェックアウトします。
