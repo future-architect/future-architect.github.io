@@ -197,7 +197,7 @@ WantedBy=multi-user.target
 
 ### WSLでの設定例
 
-WSL上で自動的にプロキシ設定しないようにwsl.confを設定します。
+WSL上で自動的にプロキシ設定しないよう、wsl.confを設定します。
 
 ```toml
 # %USERPROFILE%\.wslconfig
