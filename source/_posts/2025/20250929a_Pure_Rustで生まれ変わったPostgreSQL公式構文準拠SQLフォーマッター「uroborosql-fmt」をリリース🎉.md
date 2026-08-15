@@ -72,13 +72,13 @@ uroborosql-fmt v0.1.0ではパーサーとして [tree-sitter-sql](https://githu
 - 公式パーサーから移植しているので、パーサー自体は全てのPostgreSQL文法に対応している
 - 公式の構文定義ファイルからRust製パーサーを自動生成しているため、文法の追従が容易
 - 全てのPostgreSQL文法に対応しているにも関わらず、バイナリサイズが約6MBとコンパクト
-- Pure Rust (C言語を含まない) であるため、wasm-bindgenを用いてwasmにコンパイルすることができる
+- Pure Rust (C言語を含まない) であるため、wasm-bindgenを用いてwasmにコンパイルできる
 
 この変更によって、新規構文サポートのためのパースプロセスの改善工数は**ゼロ**になり、フォーマットプロセスの改善のみで新規構文をサポートできるようになりました :tada:
 
 <img src="/images/2025/20250929a/image.png" alt="image.png" width="1070" height="456" loading="lazy">
 
-パーサーの動作は以下のデモページから確認することができます。
+パーサーの動作は以下のデモページから確認できます。
 
 - [PostgreSQL CST Parser](https://tanzaku.github.io/postgresql-cst-parser/)
 
@@ -90,7 +90,7 @@ uroborosql-fmt v0.1.0ではパーサーとして [tree-sitter-sql](https://githu
 
 ## 利用方法
 
-現在以下の3種類の方法で利用することができます。
+現在以下の3種類の方法で利用できます。
 
 1. ブラウザツール
 1. VSCode拡張
@@ -139,7 +139,7 @@ uroborosql-fmt v0.1.0ではパーサーとして [tree-sitter-sql](https://githu
 
 ## 今後の展望
 
-今後は対応構文の拡張とLinter機能の開発を行う予定です。
+今後は対応構文の拡張とLinter機能を開発する予定です。
 
 Linter機能は具体的に、以下のような警告・エラーをVSCode上で表示する機能を想定しています。
 

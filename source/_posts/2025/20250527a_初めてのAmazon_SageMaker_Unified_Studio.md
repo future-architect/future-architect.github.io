@@ -12,7 +12,7 @@ categories:
 series: "春の入門祭り2025"
 thumbnail: /images/2025/20250527a/thumbnail.png
 author: 中神孝士
-lede: "カタログ管理やデータ活用を行うツールとしてAmazon SageMaker Unified Studioの調査・検証を行ったので触ってみた所感やポイントなどつらつらとこの記事に書いていこうと思います。"
+lede: "カタログ管理やデータ活用を行うツールとしてAmazon SageMaker Unified Studioを調査・検証したので触ってみた所感やポイントなどつらつらとこの記事に書いていこうと思います。"
 ---
 
 [春の入門祭り2025](/articles/20250413a/)の24本目の記事です。
@@ -21,7 +21,7 @@ lede: "カタログ管理やデータ活用を行うツールとしてAmazon Sag
 
 こんにちは、TIG中神です。
 
-カタログ管理やデータ活用ツールとしてAmazon SageMaker Unified Studioの調査・検証を行ったので触ってみた所感やポイントなどつらつらとまとめます。
+カタログ管理やデータ活用ツールとしてAmazon SageMaker Unified Studioを調査・検証したので触ってみた所感やポイントなどつらつらとまとめます。
 
 ## Amazon SageMaker Unified Studioとは？
 
