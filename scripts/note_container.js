@@ -41,10 +41,15 @@ hexo.extend.filter.register('before_post_render', function (data) {
     // インデントを削除したコンテンツをMarkdownとして正しくレンダリング
     const renderedContent = hexo.render.renderSync({ text: unindentedContent, engine: 'markdown' });
 
+    // クラス名に note- を付ける。tip/info/warn/alert のような一般語をそのまま使うと
+    // 他のCSSと衝突する。実際 alert は bootstrap の .alert に当たっていた (#2486)。
+    // アイコンの fa-check-circle も Font Awesome 由来の名前で、実体（警告なら
+    // 感嘆符、tip なら電球）と合っていなかったため役割名にする
+    //
     // コードブロックとして認識されてしまわないよう、インデントされないよう愚直に文字列結合
     let html =
-      `<div class="note-container ${className}">` +
-      `<span class="fa-check-circle"></span>` +
+      `<div class="note-container note-${className}">` +
+      `<span class="note-icon"></span>` +
       `<div>${renderedContent.trim()}</div>` +
       `</div>`;
 
