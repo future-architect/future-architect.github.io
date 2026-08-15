@@ -103,6 +103,81 @@ h4 {
 .article-entry summary {
   font-size: 1.2em;
 }
+
+/* 本文中の折りたたみをグレーの枠で囲む (#2457)。畳まれた中身があることが
+   形で分かるようにする。作りはモバイル目次の箱（.toc-mobile）と同じ。
+   Zenn は中身を専用の要素で包んで枠を分けているが、Hexo の出力は
+   summary と中身が直接並ぶだけなので、枠は details 自身に持たせ、
+   中身の左右の余白は子要素のマージンで作る（コードブロックの地を
+   枠いっぱいに広げないため padding ではなく margin）。
+   記事末尾の関連記事などの折りたたみは .article-entry の外なので影響しない */
+.article-entry details {
+  margin: 24px 0;
+  /* 全体指定の details { padding-bottom: 24px } を打ち消す */
+  padding-bottom: 0;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+}
+.article-entry details > summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  /* 既定の三角は位置を制御できないので消し、回転させられる疑似要素に置き換える */
+  list-style: none;
+  transition: background-color 0.15s ease;
+}
+.article-entry details > summary::-webkit-details-marker {
+  display: none;
+}
+.article-entry details > summary::before {
+  content: "";
+  width: 0;
+  height: 0;
+  flex-shrink: 0;
+  border-left: 6px solid #767676;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  transition: transform 0.2s ease;
+}
+.article-entry details[open] > summary::before {
+  transform: rotate(90deg);
+}
+.article-entry details > summary:hover {
+  background-color: #f5f5f5;
+}
+.article-entry details[open] > summary {
+  border-bottom: 1px solid #e0e0e0;
+}
+.article-entry details > :not(summary) {
+  margin-left: 14px;
+  margin-right: 14px;
+}
+.article-entry details > summary + * {
+  margin-top: 12px;
+}
+.article-entry details > :last-child {
+  margin-bottom: 12px;
+}
+
+/* 開閉を高さのアニメーションで見せる。対応ブラウザだけの上乗せで、
+   未対応なら今までどおり即座に開く。
+   interpolate-size は継承するので details に置き、サイト全体には広げない */
+/* Stylus は selector(...) の中の :: を解釈できずパースに失敗するので、
+   条件は unquote で文字列のまま渡す */
+@supports unquote('selector(details::details-content)') {
+  .article-entry details {
+    interpolate-size: allow-keywords;
+  }
+  .article-entry details::details-content {
+    block-size: 0;
+    overflow: hidden;
+    transition: block-size 0.18s ease, content-visibility 0.18s allow-discrete;
+  }
+  .article-entry details[open]::details-content {
+    block-size: auto;
+  }
+}
 .article-entry li p {
   font-size: 1em;
 }
@@ -1087,9 +1162,29 @@ code {
 .blog-item .blog-item-img {
   margin: 6px 0 25px;
 }
+/* 左の線は border ではなく疑似要素のバーにして、両端を丸める (#2457)。
+   border-left では角を丸められない。
+   中の段落の外側マージンを消すのは、線を文字の高さに合わせるため。
+   マージンが残ると線だけが上下に伸びて、引用が実際より長く見える */
 .blog-item blockquote {
-  padding: 2px 0 2px 16px;
-  border-left: 4px solid #d9d9d9;
+  position: relative;
+  padding: 2px 0 2px 20px;
+}
+.blog-item blockquote::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  border-radius: 2px;
+  background: #d9d9d9;
+}
+.blog-item blockquote > :first-child {
+  margin-top: 0;
+}
+.blog-item blockquote > :last-child {
+  margin-bottom: 0;
 }
 .blog-item .blog-info {
   margin: 20px 0;
@@ -1118,6 +1213,21 @@ code {
   text-underline-offset: 3px;
 }
 
+
+/* 脚注は本文と地続きに見えていた。区切り線が inline-block のせいで
+   中途半端な幅で止まり、本文との間隔も hr の 1rem しか無かった (#2457)。
+   ブロックにして線を本文幅いっぱいに引き、本文との間を h2 の前と同じだけ空ける */
+#footnotes {
+  display: block;
+  margin-top: 48px;
+}
+#footnotes hr {
+  margin: 0 0 16px;
+  border: 0;
+  border-top: 1px solid #ECEBEB;
+  background: none;
+  opacity: 1;
+}
 
 #footnotelist li {
   padding-top: 0.2em;
