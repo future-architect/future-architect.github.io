@@ -203,7 +203,7 @@ terraform version
 
 今回出力されたDesign bundleのREADMEを見る限り、Handoff機能は、Claude DesignによりHTML/CSS/JSで作成されたデザインプロトタイプを、Claude Codeなどのコーディングエージェントに渡してそのままWeb UIとして実装することを想定しているようです。
 
-具体的には、デザインプロトタイプをWeb UIとして実装する旨が記載されたREADME.mdをClaude Design側が自動で作成しており、Claude Codeはその指示を読み取り実装を行う、という仕組みです（README.mdはOPTIONSの"Download zip instead"からzipダウンロードすると確認できます）。
+具体的には、デザインプロトタイプをWeb UIとして実装する旨が記載されたREADME.mdをClaude Design側が自動で作成しており、Claude Codeはその指示を読み取り実装する、という仕組みです（README.mdはOPTIONSの"Download zip instead"からzipダウンロードすると確認できます）。
 
 今回の目的はWeb UIの実装ではなく、設計資料に記載されたAWS構成をTerraformコードへ落とし込むことです。そのため、READMEの指示には従わずHTML内の設計内容を読み取ってTerraformコードを生成するよう、以下の通り追加で指示しました。
 
@@ -227,7 +227,7 @@ Claude Code側でDesign bundleを取得できない旨のエラーが出たた�
 
 <img src="/images/2026/20260501a/スクリーンショット_2026-04-30_15.19.59.png" alt="スクリーンショット_2026-04-30_15.19.59.png" width="1200" height="781" loading="lazy">
 
-気を取り直して、以下のプロンプトでTerraformコード作成の指示を行います。
+気を取り直して、以下のプロンプトでTerraformコード作成を指示します。
 
 ```txt prompt.txt
 designbundle/配下に格納されている設計スライドとAWS構成図をもとに、Terraformコードを作成してください。

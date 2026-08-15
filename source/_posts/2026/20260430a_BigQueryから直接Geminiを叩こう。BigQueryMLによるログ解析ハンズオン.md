@@ -86,7 +86,7 @@ BigQueryコンソールの「データ 追加」 > 「Vertex AI」のデータ�
 
 <img src="/images/2026/20260430a/外部データソース設定.png" alt="外部データソース設定" width="1038" height="962" loading="lazy">
 
-作成した接続はBigQueryコンソールの「接続」で確認することができます。
+作成した接続はBigQueryコンソールの「接続」で確認できます。
 
 <img src="/images/2026/20260430a/サイドバーの接続を、接続を確認.png" alt="サイドバーの接続を、接続を確認" width="1200" height="436" loading="lazy">
 

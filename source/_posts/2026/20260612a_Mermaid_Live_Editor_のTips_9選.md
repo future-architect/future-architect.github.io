@@ -240,7 +240,7 @@ flowchart LR
 [![](https://mermaid.ink/img/pako:eNp...)](https://mermaid.live/edit#pako:eNp...)
 ```
 
-便利な反面、社外秘の情報を扱うなど固くしたい場合は、これらのボタンを押さないといったチーム方針も考えられます。逆に技術ブログなど最初から公開前提の図であれば、mermaid.ink の URL にクエリパラメータを足して画像フォーマットや解像度を調整することもできます。パラメータの詳細は [mermaid.ink の README](https://github.com/jihchi/mermaid.ink) を参照してください。
+便利な反面、社外秘の情報を扱うなど固くしたい場合は、これらのボタンを押さないといったチーム方針も考えられます。逆に技術ブログなど最初から公開前提の図であれば、mermaid.ink の URL にクエリパラメータを足して画像フォーマットや解像度の調整もできます。パラメータの詳細は [mermaid.ink の README](https://github.com/jihchi/mermaid.ink) を参照してください。
 
 完全に閉じた環境で図を画像化したい場合は、CLI の `mmdc`（[mermaid-cli](https://github.com/mermaid-js/mermaid-cli)）をローカルで回すのが現実的です。
 

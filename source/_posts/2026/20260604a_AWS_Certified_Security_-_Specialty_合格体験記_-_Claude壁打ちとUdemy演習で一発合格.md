@@ -96,7 +96,7 @@ AWS認定試験の全体像は[AWS認定の公式ページ](https://aws.amazon.c
 
 ### インシデントの初動調査は「読み取り専用権限」で行う
 
-侵害が疑われる環境を調査するとき、誤操作による証拠破壊を防ぐため、読み取り専用権限のIAMロール/アカウントで初動調査を行うのがベストプラクティスです。
+侵害が疑われる環境を調査するとき、誤操作による証拠破壊を防ぐため、読み取り専用権限のIAMロール/アカウントで初動調査するのがベストプラクティスです。
 
 AWS公式の[AWS Security Incident Response User Guide - Prepare access to AWS accounts](https://docs.aws.amazon.com/security-ir/latest/userguide/prepare-access-to-accounts.html)でも、インシデント対応チームには事前に最小権限のアクセスを割り当てておく(provision least privilege access in advance)ことが推奨されています。読み取り専用調査の出発点として代表的なのは、セキュリティ設定メタデータの参照に特化した [`SecurityAudit`](https://docs.aws.amazon.com/aws-managed-policy/latest/reference/SecurityAudit.html) と、全AWSサービスのリソース・基本メタデータを横断的に参照できる [`ViewOnlyAccess`](https://docs.aws.amazon.com/aws-managed-policy/latest/reference/ViewOnlyAccess.html) です。これらを起点に、組織のニーズへ合わせて権限を絞り込みます。試験のためというより普段のロール設計でそのまま使える話で、調査時の操作ミスを権限制御で未然に防ぐ、という観点が一番の学びでした。
 

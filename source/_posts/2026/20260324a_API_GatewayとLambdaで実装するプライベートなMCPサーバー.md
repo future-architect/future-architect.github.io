@@ -25,11 +25,11 @@ Strategic AI Group/MLOpsチームでアルバイトをしている木村です�
 
 最終的には以下のようにDifyからMCPサーバーにアクセスできます。
 
-以下のツールではこんにちはに対してHELLOを返すcalculate_helloというmcpツール、計算について、足し算、掛け算、引き算を行うcalculate_add,calculate_product,calculate_subというmcpツールが使われています。
+以下のツールではこんにちはに対してHELLOを返すcalculate_helloというmcpツール、計算について、足し算、掛け算、引き算をするcalculate_add,calculate_product,calculate_subというmcpツールが使われています。
 
 <img src="/images/2026/20260324a/image.png" alt="image.png" width="844" height="724" loading="lazy">
 
-これを応用してWeb検索を行ったり、Googleカレンダーに予定を自動で入れることができます。
+これを応用してWeb検索したり、Googleカレンダーに予定を自動で入れることができます。
 
 ## 本記事のキーテクノロジー
 
