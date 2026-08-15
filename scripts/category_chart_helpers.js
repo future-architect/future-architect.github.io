@@ -239,126 +239,118 @@ hexo.extend.helper.register('category_stats', function (name) {
 });
 
 /**
- * カテゴリページの半期別投稿数 (#2423)。
+ * 記事の集合を月ごとに均し、echarts の x 軸（months）と月別の内訳を返す。
+ * カテゴリページとタグページで共用する。
  *
- * 刻みは上期（1〜6月）・下期（7〜12月）。当社の決算期が暦年なので、
- * 社内の期の感覚とそのまま揃う。四半期にすると VR（20本）や
- * 認証認可（24本）は空白の棒が並ぶだけになるが、半期なら
- * 「AIDD が2025年に立ち上がった」「VR が散発的に続いている」まで読める。
- *
- * 描画は CSS だけで行う（テンプレート側）。棒は多くても22本で、
- * この1枚のために echarts（gzip 約330KB）をカテゴリページへ持ち込む
- * 価値はない。mermaid の JS を削った #1955 と逆行させない。
- *
- * 初投稿の年から今年までを埋める。投稿の無い期は 0 のまま出して、
- * 途切れを隠さない（投稿の無い月をダミーカードで見せる #2219 と同じ）。
- * 年ラベルは年に1つでよいので、年ごとに2本ずつの組で返す。
+ * 開始は初投稿年の1月に揃える（数ヶ月しか無い対象の軸が中途半端な月から
+ * 始まらないように #2140）。終了は現在月。最終投稿年の12月までにすると、
+ * 今も書かれている対象では未来の空欄が並び、書かれなくなった対象では
+ * 「いつから止まっているか」が軸から消える。
+ * 予約投稿（_config.yml の future: true）で未来日付の記事があるときは、
+ * その月まで伸ばして棒が切れないようにする。
  */
-/** 記事の集合を半期の棒に均す。カテゴリページとタグページで共用する */
-function halfYearBars(posts) {
-  const byHalf = new Map(); // "2026/1"（上期）-> {count, byCat}
+function monthlyBuckets(posts) {
+  const byMonth = new Map(); // "YYYY/MM" -> Map(カテゴリ -> 本数)
+  let min = null;
+  let max = null;
   posts.forEach((post) => {
-    const key = `${post.date.year()}/${post.date.month() < 6 ? 1 : 2}`;
-    if (!byHalf.has(key)) byHalf.set(key, { count: 0, byCat: new Map() });
-    const bucket = byHalf.get(key);
-    bucket.count++;
+    const ym = post.date.format('YYYY/MM');
+    if (!min || ym < min) min = ym;
+    if (!max || ym > max) max = ym;
     // カテゴリは第1のものだけ数える。複数カテゴリを全部積むと
     // 合計が投稿数と合わなくなる（著者ページのチャートと同じ規則）
     const cat = post.categories && post.categories.length ? post.categories.first().name : '未分類';
-    bucket.byCat.set(cat, (bucket.byCat.get(cat) || 0) + 1);
+    if (!byMonth.has(ym)) byMonth.set(ym, new Map());
+    const m = byMonth.get(ym);
+    m.set(cat, (m.get(cat) || 0) + 1);
   });
-  if (byHalf.size === 0) return null;
+  if (!min) return null;
 
-  const start = Math.min(...[...byHalf.keys()].map((k) => +k.split('/')[0]));
-  const end = new Date().getFullYear();
-  const groups = [];
-  let max = 0;
-  for (let y = start; y <= end; y++) {
-    const halves = [1, 2].map((h) => {
-      const bucket = byHalf.get(`${y}/${h}`);
-      const count = bucket ? bucket.count : 0;
-      if (count > max) max = count;
-      return {
-        half: h,
-        label: h === 1 ? '上期' : '下期',
-        count,
-        byCat: bucket ? bucket.byCat : new Map(),
-      };
-    });
-    groups.push({ year: y, halves });
+  const now = new Date();
+  const nowYm = `${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}`;
+  const endYm = max > nowYm ? max : nowYm;
+  const months = [];
+  for (let y = +min.slice(0, 4); y <= +endYm.slice(0, 4); y++) {
+    for (let m = 1; m <= 12; m++) {
+      const ym = `${y}/${String(m).padStart(2, '0')}`;
+      if (ym > endYm) break;
+      months.push(ym);
+    }
   }
-  return { groups, max, filledHalves: byHalf.size };
+  return { byMonth, months };
 }
 
-// 対応表に無い新設カテゴリは無彩色で出す（警告は category_colors が出す）
-const colorOf = (name) => CATEGORY_COLORS[name] || '#6e7074';
-
-/**
- * 半期の棒をカテゴリ別の積み上げに割る。
- *
- * 積む順（＝凡例の順）はサイト累計の多い順で固定する。期ごとの多い順に
- * すると、同じカテゴリの色が棒の中で上下し、期をまたいだ比較ができない
- * （年ページ・月ページの積み上げと同じ規則 #2201）。
- */
-function stackByCategory(bars, siteOrder) {
-  const used = new Map(); // カテゴリ -> 合計本数（凡例に出す）
-  bars.groups.forEach((g) => {
-    g.halves.forEach((h) => {
-      h.segments = siteOrder
-        .filter((name) => h.byCat.has(name))
-        .map((name) => {
-          const count = h.byCat.get(name);
-          used.set(name, (used.get(name) || 0) + count);
-          return { name, count, color: colorOf(name) };
-        });
-    });
-  });
-  bars.legend = siteOrder
-    .filter((name) => used.has(name))
-    .map((name) => ({ name, count: used.get(name), color: colorOf(name) }));
-  return bars;
-}
-
-hexo.extend.helper.register('category_yearly_chart', function (name) {
-  const category = this.site.categories.findOne({ name });
-  if (!category) return null;
-  const bars = halfYearBars(category.posts.toArray());
-  if (!bars) return null;
-  // カテゴリページでは内訳の軸が無いので、全体をそのカテゴリの色で塗る
-  bars.groups.forEach((g) => {
-    g.halves.forEach((h) => {
-      h.segments = h.count ? [{ name, count: h.count, color: colorOf(name) }] : [];
-    });
-  });
-  return bars;
-});
-
-/**
- * タグページの半期別投稿数 (#2434)。刻みと描画はカテゴリページと同じ (#2423)。
- *
- * ただしタグは数が桁違い（約700）で、1〜4本のタグが半分以上を占める。
- * 棒が数本立つだけのグラフは「いつ書かれたか」を示すが、それは直下の
- * 記事一覧の日付と同じ情報でしかない。5本以上あり、かつ投稿のある期が
- * 2つ以上（＝時間の中で動きがある）タグにだけ出す。
- *
- * 棒はカテゴリ別の積み上げにする。タグは複数のカテゴリにまたがるので、
- * 「このタグがどの分野で書かれてきたか」「その構成が時期で変わったか」まで
- * 読める。色は他ページと同じくカテゴリ名で固定 (#2170)。
- */
-const TAG_CHART_MIN_POSTS = 5;
-const TAG_CHART_MIN_HALVES = 2;
-
-hexo.extend.helper.register('tag_yearly_chart', function (name) {
-  const tag = this.site.tags.findOne({ name });
-  if (!tag || tag.length < TAG_CHART_MIN_POSTS) return null;
-  const bars = halfYearBars(tag.posts.toArray());
-  if (!bars || bars.filledHalves < TAG_CHART_MIN_HALVES) return null;
-
-  const siteOrder = this.site.categories
+/** 積む順（＝凡例の順）はサイト累計の多い順で固定する (#2201) */
+function siteCategoryOrder() {
+  return this.site.categories
     .toArray()
     .sort((a, b) => b.length - a.length || (a.name < b.name ? -1 : 1))
     .map((c) => c.name);
-  return stackByCategory(bars, siteOrder);
+}
+
+/**
+ * カテゴリページの月別投稿数 (#2423)。刻み・描画とも著者ページ・タグページと
+ * 揃えて echarts の月別チャートにする。
+ *
+ * カテゴリページでは内訳の軸が無い（全部そのカテゴリ）ので、系列は1本。
+ * 色は /categories/ の積み上げ棒と同じ、そのカテゴリの色で塗る。
+ */
+hexo.extend.helper.register('category_monthly_chart', function (name) {
+  const category = this.site.categories.findOne({ name });
+  if (!category) return null;
+  const buckets = monthlyBuckets(category.posts.toArray());
+  if (!buckets) return null;
+  const { byMonth, months } = buckets;
+  const series = [
+    {
+      name,
+      type: 'bar',
+      data: months.map((ym) => {
+        const m = byMonth.get(ym);
+        return m ? [...m.values()].reduce((a, b) => a + b, 0) : 0;
+      }),
+    },
+  ];
+  return JSON.stringify({ months, series });
+});
+
+/**
+ * タグページの月別投稿数 (#2434)。刻み・描画とも著者ページと同じにする。
+ *
+ * CSS で描いていたが echarts に戻した。ツールチップの即時表示と凡例での
+ * 絞り込みが無いぶん、CSS 版は読み手の使い勝手が落ちていた。グラフは
+ * echarts に統一する。
+ *
+ * ただしタグは数が桁違い（約700）で、1〜4本のタグが半分以上を占める。
+ * 棒が数本立つだけのグラフは「いつ書かれたか」を示すが、それは直下の
+ * 記事一覧の日付と同じ情報でしかない。5本以上あり、かつ投稿のある月が
+ * 2つ以上（＝時間の中で動きがある）タグにだけ出す。
+ *
+ * 積み上げはカテゴリ別。タグは複数のカテゴリにまたがるので、
+ * 「このタグがどの分野で書かれてきたか」「その構成が時期で変わったか」まで
+ * 読める。色は他ページと同じくカテゴリ名で固定 (#2170)、積む順と凡例の順は
+ * サイト累計の多い順で固定する (#2201)。
+ */
+const TAG_CHART_MIN_POSTS = 5;
+const TAG_CHART_MIN_MONTHS = 2;
+
+hexo.extend.helper.register('tag_monthly_chart', function (name) {
+  const tag = this.site.tags.findOne({ name });
+  if (!tag || tag.length < TAG_CHART_MIN_POSTS) return null;
+  const buckets = monthlyBuckets(tag.posts.toArray());
+  if (!buckets || buckets.byMonth.size < TAG_CHART_MIN_MONTHS) return null;
+  const { byMonth, months } = buckets;
+
+  const series = siteCategoryOrder
+    .call(this)
+    .filter((cat) => [...byMonth.values()].some((m) => m.has(cat)))
+    .map((cat) => ({
+      name: cat,
+      type: 'bar',
+      stack: 'total',
+      data: months.map((ym) => (byMonth.get(ym) && byMonth.get(ym).get(cat)) || 0),
+    }));
+  return JSON.stringify({ months, series });
 });
 
 // 関連カテゴリ (#2200)。独自の採点は持ち込まず、ページに出ている2つの規則の
