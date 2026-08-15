@@ -1,15 +1,5 @@
 'use strict';
 
-// 上限はその年の実データに合わせる。年ごとに投稿ペースが違うため、
-// 固定にすると棒が潰れる年と余白だらけの年ができる。
-// 目盛が半端にならないよう 5 刻みに切り上げる
-hexo.extend.helper.register('max_posts', function (year) {
-  const acc = generatePostsSeries(this.site.posts, year);
-  const peak = Math.max(0, ...acc.map((item) => item.count));
-  const step = year ? 5 : 10;
-  return Math.max(step * 2, Math.ceil(peak / step) * step);
-});
-
 hexo.extend.helper.register('generate_posts_series_x', function (year) {
   const acc = generatePostsSeries(this.site.posts, year);
   return acc.map((e) => `'${e.groupKey}'`).join(',');
