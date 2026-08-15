@@ -9,7 +9,7 @@ tags:
   - GoogleCloudNext2024
   - Gemini
 categories:
-  - Infrastructure
+  - Cloud
 thumbnail: /images/2024/20240802a/thumbnail.jpg
 author: 岸下優介
 lede: "8/1-8/2にパシフィコ横浜で開催されているGoogle Cloud Next Tokyo '24に同じプロジェクトのメンバー数名で参加してきました。"

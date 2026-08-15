@@ -7,7 +7,7 @@ tags:
   - スキルアップ
   - 社内勉強会
 categories:
-  - Infrastructure
+  - Cloud
 thumbnail: /images/2021/20211008b/thumbnail.jpg
 author: 川村英之
 lede: "みなさん、Azureの勉強をどうやっていますか？本を買う、Webで情報収集、有料のセミナーなど様々な方法がありますが、Microsoft Learnはご存じでしょうか？私事ですが、このサイトを利用することでAzureの知識を身につけ、資格取得にもつなげることができました。"

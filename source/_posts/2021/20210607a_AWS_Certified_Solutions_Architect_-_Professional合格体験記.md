@@ -6,7 +6,7 @@ tags:
   - 合格記
   - AWS
 categories:
-  - Infrastructure
+  - Cloud
 thumbnail: /images/2021/20210607a/thumbnail.png
 author: 伊藤真彦
 lede: "AWS Certified Solutions Architect - Professionalを受験し合格できました。合格までの学習方法を共有します。"

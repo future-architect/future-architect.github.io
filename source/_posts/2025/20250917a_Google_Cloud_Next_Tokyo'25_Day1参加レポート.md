@@ -8,7 +8,7 @@ tags:
   - GoogleCloudNext2025
   - 参加レポート
 categories:
-  - Infrastructure
+  - Cloud
 thumbnail: /images/2025/20250917a/thumbnail.png
 author:  片岡久人
 lede: "2025年8月5日に開催された「Google Cloud Next Tokyo '25」のDay1に参加してきました。このようなイベントへの参加は初めてであり、どんなものかあまり想像できていませんでしたが、勉強になり楽しめたイベントでしたので、所感の共有ができればと思います。"

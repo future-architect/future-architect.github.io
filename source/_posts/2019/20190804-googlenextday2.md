@@ -9,7 +9,7 @@ tags:
   - GoogleCloudNext2019
   - カンファレンス
 categories:
-  - Infrastructure
+  - Cloud
 author: 村田靖拓
 lede: "Google Cloud Next ’19 in Tokyo Day2 にチームメンバーで参加しましたので参加レポートをお送りします。"
 ---

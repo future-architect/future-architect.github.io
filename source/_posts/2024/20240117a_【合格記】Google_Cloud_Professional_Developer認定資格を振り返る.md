@@ -6,7 +6,7 @@ tags:
   - GoogleCloud
   - 合格記
 categories:
-  - Infrastructure
+  - Cloud
 thumbnail: /images/2024/20240117a/thumbnail.png
 author: 岸下優介
 lede: "Developer力を試すべくProfessional Developer認定資格を受験し、無事に合格を果たすことができました。"

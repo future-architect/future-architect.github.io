@@ -10,7 +10,7 @@ tags:
   - AIエージェント
   - 参加レポート
 categories:
-  - Infrastructure
+  - Cloud
 thumbnail: /images/2025/20250826a/thumbnail.jpg
 author: 村井 俊介
 lede: "2025年8月5日に開催されたGoogle Cloud Next Tokyo'25に参加してきましたので、当日の様子をレポートします！"

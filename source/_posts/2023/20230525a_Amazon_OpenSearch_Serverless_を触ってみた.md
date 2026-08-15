@@ -8,7 +8,7 @@ tags:
   - 全文検索
   - AWS
 categories:
-  - Infrastructure
+  - Cloud
 series: "春の入門祭り2023"
 thumbnail: /images/2023/20230525a/thumbnail.png
 author: 齊藤英比古

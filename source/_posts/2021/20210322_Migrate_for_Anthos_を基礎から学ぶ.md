@@ -7,7 +7,7 @@ tags:
   - クラウドマイグレーション
   - Anthos
 categories:
-  - Infrastructure
+  - Cloud
 series: "GCP2021"
 thumbnail: /images/2021/20210322/thumbnail.png
 author: 村田靖拓

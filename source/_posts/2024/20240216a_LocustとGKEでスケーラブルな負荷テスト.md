@@ -7,7 +7,7 @@ tags:
   - GoogleCloud
   - 負荷テスト
 categories:
-  - Infrastructure
+  - Cloud
 thumbnail: /images/2024/20240216a/thumbnail.png
 author: 岸下優介
 lede: "負荷テストツールであるLocustとGKEを組み合わせて負荷テストを体感します。Kubernetesの柔軟なスケールアップ・ダウン能力によって、負荷の大きさを変えながらテストを行うことが可能となります。"

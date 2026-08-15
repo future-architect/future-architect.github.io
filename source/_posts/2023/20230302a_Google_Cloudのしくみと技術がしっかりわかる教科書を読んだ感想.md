@@ -8,7 +8,7 @@ tags:
   - 入門
   - BigQuery
 categories:
-  - Infrastructure
+  - Cloud
 series: "読書感想文"
 thumbnail: /images/2023/20230302a/thumbnail.png
 author: 藤戸四恩

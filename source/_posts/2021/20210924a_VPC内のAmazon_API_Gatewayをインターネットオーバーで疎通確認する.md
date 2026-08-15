@@ -8,7 +8,7 @@ tags:
   - Go
   - VPC
 categories:
-  - Infrastructure
+  - Cloud
 thumbnail: /images/2021/20210924a/thumbnail.png
 author: 真野隼記
 lede: "Gateway+Lambda という構成でWebAPIを開発する際、ちょっと便利に使える疎通方法をまとめます。API GatewayですがPublicなエンドポイントがあれば curlコマンドやPostmanを用いての動作検証も容易だと思います。"

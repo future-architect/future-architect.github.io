@@ -2,14 +2,14 @@
 title: "AWS Certified Solutions Architect - Professional 合格体験記 - 最難関を攻めて一発合格"
 date: 2026/08/13 00:00:00
 postid: a
-tag:
+tags:
   - AWS
   - 合格記
   - DR
   - S3
   - VPC
-category:
-  - Infrastructure
+categories:
+  - Cloud
 thumbnail: /images/2026/20260813a/thumbnail.png
 author: 棚井龍之介
 lede: "Cyber Security Innovation Group、FutureVulsチームの棚井です。2026年7月25日に「AWS Certified Solutions Architect - Professional 」を受験し、812点/1000点（合格ラインは750点）で一発合格しました。"

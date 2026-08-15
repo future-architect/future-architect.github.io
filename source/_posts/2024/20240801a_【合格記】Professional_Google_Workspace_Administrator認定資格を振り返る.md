@@ -8,7 +8,7 @@ tags:
   - PGWA
   - 全冠
 categories:
-  - Infrastructure
+  - Cloud
 thumbnail: /images/2024/20240801a/thumbnail.png
 author: 岸下優介
 lede: "Google Cloud認定資格全冠を目指すべく、Professional Cloud DevOps Engineer 認定資格（PCDE）を受けてきました。無事に合格することができたので、本記事ではざっくりとした所感を書いていきたいと思います"

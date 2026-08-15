@@ -6,7 +6,7 @@ tags:
   - GoogleCloud
   - 合格記
 categories:
-  - Infrastructure
+  - Cloud
 thumbnail: /images/2022/20220411a/thumbnail.png
 author: 伊藤太斉
 lede: "2022/2/4にGoogle CloudのProfessional Cloud Architectの再認定に合格したので、前回受験からの差分や受験にあたっての勉強について書いていきます。技術ブログでは以前に合格体験記をいくつか出しているので、そちらも是非みていただければと思います。有効期限が迫ってくると、メールで再認定を受ける旨が送られてきます。"

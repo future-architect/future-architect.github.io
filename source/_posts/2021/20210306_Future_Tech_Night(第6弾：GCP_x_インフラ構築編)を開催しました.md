@@ -7,7 +7,7 @@ tags:
   - 登壇レポート
   - TechNight
 categories:
-  - Infrastructure
+  - Cloud
 thumbnail: /images/2021/20210306/thumbnail.png
 author: 村田靖拓
 lede: "先日2021.01.29にオンラインにてFuture Tech Nightという社外勉強会を開催しました。第6弾はGCP×インフラというテーマで事例を紹介しました。1. メディア業界変革編2. MaaS ビジネス編3. 船舶IoT Platform編"

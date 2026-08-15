@@ -9,7 +9,7 @@ tags:
   - 技術選定
   - S3
 categories:
-  - Infrastructure
+  - Cloud
 series: "GlyphFeeds"
 thumbnail: /images/2020/20200916/thumbnail.png
 author: 出口豊

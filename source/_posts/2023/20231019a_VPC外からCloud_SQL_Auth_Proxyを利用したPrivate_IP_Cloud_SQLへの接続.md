@@ -9,7 +9,7 @@ tags:
   - プロキシ
   - VPC
 categories:
-  - Infrastructure
+  - Cloud
 thumbnail: /images/2023/20231019a/thumbnail.png
 author: 岸下優介
 lede: "Private IPしか持たないCloud SQLへ接続する方法として、Cloud SQL Auth Proxyを利用した接続方法について紹介致します。"

@@ -6,7 +6,7 @@ tags:
   - S3
   - AWS
 categories:
-  - Infrastructure
+  - DataEngineering
 series: "データエンジニアリング"
 thumbnail: /images/2026/20260702a/thumbnail.png
 author: 鈴木風真

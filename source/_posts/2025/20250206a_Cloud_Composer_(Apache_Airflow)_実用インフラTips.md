@@ -7,7 +7,7 @@ tags:
   - GoogleCloud
   - Tips
 categories:
-  - Infrastructure
+  - Cloud
 thumbnail: /images/2025/20250206a/thumbnail.png
 author: 岸下優介
 lede: "Apache Airflowはワークフロー管理サービスで、スケジュールされた時間に一連の処理を行ってくれる便利なサービスです。"

@@ -8,7 +8,7 @@ tags:
   - AWS
   - リトライ
 categories:
-  - Infrastructure
+  - Cloud
 thumbnail: /images/2023/20230526a/thumbnail.png
 author: 原木翔
 lede: "AWS Kinesis Data StreamとAWS Lambdaを組み合わせたデータストリーミングを扱うシステムで、Lambdaが処理に失敗した場合のリカバリー運用を考える機会がありました。一般的に、Kinesisのようなメッセージングやイベント駆動型のシステムでは、DLQという仕組みを設けます。"
