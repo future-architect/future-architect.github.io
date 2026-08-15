@@ -187,7 +187,7 @@ spec:
 
 作成したポリシーがmonitoringのnamespaceにおけるPVCリソースの削除を防止するかを確認します。
 
-今回は、削除されたGrafanaのPVC`storage-kube-prometheus-stack-grafana-0`を対象にアプリケーションを削除してもPVCが残っているかの検証とDELETE以外のリクエストは問題なく承認されるかの検証を行います。
+今回は、削除されたGrafanaのPVC`storage-kube-prometheus-stack-grafana-0`を対象にアプリケーションを削除してもPVCが残っているかと、DELETE以外のリクエストは問題なく承認されるかを検証します。
 
 ### ArgoCDによる削除
 
@@ -222,7 +222,7 @@ kubectl delete pvc -n monitoring storage-kube-prometheus-stack-grafana-0
 ### ArgoCDによるPVCの作成
 
 先ほどの検証で、削除リクエストが想定通り拒否されることが確認できました。
-では、削除以外のリクエストは承認されるかをPVCリソースのデプロイ（作成リクエスト）で検証を行います。
+では、削除以外のリクエストは承認されるかをPVCリソースのデプロイ（作成リクエスト）で検証します。
 
 まず、`storage-kube-prometheus-stack-grafana-0`を削除した状態が以下の通りです。
 
@@ -297,7 +297,7 @@ kube-prometheus-stackにSyncをかけてPVCをデプロイします。
 
 ラベルは複数個管理できるため、Parametersフィールドの定義もラベルを複数個管理できるようにarray型で定義しています。
 
-また、削除用のラベルが複数個でも対応するように、配列の減算を用います。上記では、Constraintで定義したラベルをすべて含んでいたら、`delete_labels`の要素が0になり、含んでいなければ、要素が1以上になります。今回は、Constraintで定義したラベルをすべて含む場合に削除リクエストを承認するので、`count(delete_labels) > 0`で比較を行っています。
+また、削除用のラベルが複数個でも対応するように、配列の減算を用います。上記では、Constraintで定義したラベルをすべて含んでいたら、`delete_labels`の要素が0になり、含んでいなければ、要素が1以上になります。今回は、Constraintで定義したラベルをすべて含む場合に削除リクエストを承認するので、`count(delete_labels) > 0`で比較しています。
 
 ### Constraint（削除用ラベル）
 
@@ -316,7 +316,7 @@ spec:
     labels: ["delete-pvc"] # 削除用ラベルを追加
 ```
 
-上記では、ラベルを1つ設定していますが、2つ以上設定することもできます。
+上記では、ラベルを1つ設定していますが、2つ以上でも設定できます。
 
 以上で、PVCリソースに`delete-pvc`というラベルを含んでいれば、削除リクエストが承認されます。
 これにより、想定外なPVCの削除がなくなり、ポリシーを外すことなくいつでもPVCリソースが削除可能な環境になりました。

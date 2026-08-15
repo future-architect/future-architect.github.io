@@ -167,7 +167,7 @@ region = us-east-1
 stree my-bucket/test/dir2 -l
 ```
 
-特別な事情でエンドポイントやリージョンを変更する場合もあるかと思いますので、`--region(-r)` フラグと`--endpoint(-e)`でオーバーライドすることもできます。
+特別な事情でエンドポイントやリージョンを変更する場合もあるかと思いますので、`--region(-r)` フラグと`--endpoint(-e)`でもオーバーライドできます。
 
 ```sh
 stree my-bucket/test/dir2 -r us-east-1 -e http://localhost:4537

@@ -41,7 +41,7 @@ lede: "GKE を利用したWebアプリケーションのGoogleアカウント認
 ## 全体アーキテクチャ図
 
 以下が全体アーキテクチャ図になります。
-GKE/NetworkなどのGoogle Cloudのリソース構築に関しては慣れ親しんでいるTerraformを利用して作成しました。OAuth同意画面に関しては外部公開する場合は、APIから作成することはできない ([公式ドキュメント記載](https://cloud.google.com/iap/docs/programmatic-oauth-clients?hl=ja]))ので、コンソール画面から設定しました。
+GKE/NetworkなどのGoogle Cloudのリソース構築に関しては慣れ親しんでいるTerraformを利用して作成しました。OAuth同意画面に関しては外部公開する場合は、APIから作成できない ([公式ドキュメント記載](https://cloud.google.com/iap/docs/programmatic-oauth-clients?hl=ja]))ので、コンソール画面から設定しました。
 
 <img src="/images/2023/20230113a/architecture.drawio.png" alt="architecture.drawio.png" width="1151" height="429" loading="lazy">
 
@@ -192,7 +192,7 @@ Load Balancerに設定したドメインに対してアクセスを行うと、�
 
 ## Cloud IAPの設定を追加
 
-上記の状態ではだれでもアクセスすることが可能なため、セキュアな状態ではありません。
+上記の状態ではだれでもアクセスできるため、セキュアな状態ではありません。
 ここでCloud IAPの設定を追加してみましょう。
 
 ### OAuth同意画面の作成
@@ -356,7 +356,7 @@ Load Balancerに設定したドメインに対してアクセスを行うと、C
 
 <img src="/images/2023/20230113a/5-IAPアクセスなし①.png" alt="5-IAPアクセスなし①.png" width="469" height="557" loading="lazy">
 
-本GoogleアカウントはCloud IAPのアクセスできる権限(**IAP で保護されたウェブアプリ ユーザー**)を持っていないため、画面にアクセスすることはできません。
+本GoogleアカウントはCloud IAPのアクセスできる権限(**IAP で保護されたウェブアプリ ユーザー**)を持っていないため、画面にアクセスできません。
 <img src="/images/2023/20230113a/5-IAPアクセスなし②.png" alt="5-IAPアクセスなし②.png" width="426" height="455" loading="lazy">
 
 ### Cloud IAP認証対象アカウントでのアクセス確認
