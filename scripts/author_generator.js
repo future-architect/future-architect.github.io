@@ -106,38 +106,14 @@ hexo.extend.helper.register('list_authors', function (year = 'all') {
   let authorMapper;
 
   if (year === 'all') {
-    // 全期間表示の場合のロジック
-    const currentYear = new Date().getFullYear(); // 今年 (2025)
-    const lastYear = currentYear - 1; // 昨年 (2024)
-    const twoYearsAgo = currentYear - 2; // 2年前 (2023)
-
-    // 特定の年に著者の投稿があるかチェックするヘルパー
-    const hasPostsInYear = (author, checkYear) => {
-      const years = yearsByAuthor.get(author);
-      return years ? years.has(checkYear) : false;
-    };
-
-    authorMapper = (author) => {
-      let suffix = '';
-      const hasNoPostsThisYear = !hasPostsInYear(author, currentYear);
-
-      // 今年の投稿実績がない著者のみを対象にサフィックスを判定
-      if (hasNoPostsThisYear) {
-        // 条件(拡張): 昨年実績があるか -> '**'を付与
-        if (hasPostsInYear(author, lastYear)) {
-          suffix = '**';
-          // 条件: 2年前に実績があるか -> '*'を付与
-        } else if (hasPostsInYear(author, twoYearsAgo)) {
-          suffix = '*';
-        }
-      }
-
-      return `
+    // 名前の後ろに付けていた * / **（投稿が途切れている著者の印）は /doctor/ へ移した (#2418)。
+    // 凡例がページのどこにも無く、読者には意味が読めない記号になっていた。
+    // 「そろそろ声をかけると再開してくれるかも」は運営の関心なので置き場所は /doctor/
+    authorMapper = (author) => `
         <li class="author-list-item">
-          <a class="author-list-link" href="/authors/${author_to_url.call(this, author)}">${author}${suffix}</a>
+          <a class="author-list-link" href="/authors/${author_to_url.call(this, author)}">${author}</a>
           <span class="author-list-count">${count_posts(author)} 件</span>
         </li>`;
-    };
   } else {
     // 年指定: その年が初投稿の著者に NEW を付ける (#2413)。
     // 「1本目を踏み出してくれた新しい寄稿者数/年」という運営のキーメトリクスと

@@ -351,6 +351,42 @@ hexo.extend.helper.register('doctor_external_links', function () {
 
 /**
  * カテゴリの一言説明（source/_data/categories.yml #2405）の突き合わせ。
+ * 投稿が途切れている著者 (#2418)。/authors/ の全期間タブで名前の後ろに
+ * ** / * を付けていたものの移設。凡例がページのどこにも無く、読者には
+ * 意味が読めない記号だった。「そろそろ声をかけると再開してくれるかも」は
+ * 運営の関心なので、読者向けの一覧ではなくこちらに置く。
+ *
+ * 今年まだ投稿が無く、最後の投稿が昨年か一昨年の著者を返す。
+ * それより古い著者は「途切れている」ではなく「離れた」なので出さない
+ * （声かけの候補として現実的な範囲に絞る）。
+ */
+hexo.extend.helper.register('doctor_dormant_authors', function () {
+  const thisYear = new Date().getFullYear();
+  const byAuthor = new Map(); // 著者 -> {years:Set, count}
+  this.site.posts.forEach((post) => {
+    // 共著の旧記事は author が配列
+    [].concat(post.author || []).forEach((name) => {
+      if (!name) return;
+      if (!byAuthor.has(name)) byAuthor.set(name, { years: new Set(), count: 0 });
+      const entry = byAuthor.get(name);
+      entry.years.add(post.date.year());
+      entry.count++;
+    });
+  });
+
+  const rows = [];
+  for (const [name, entry] of byAuthor) {
+    if (entry.years.has(thisYear)) continue;
+    const last = Math.max(...entry.years);
+    const gap = thisYear - last;
+    if (gap === 1 || gap === 2) rows.push({ name, last, count: entry.count, gap });
+  }
+  // 表示は本数でまとめるので本数の多い順。同数なら最近まで書いていた人を先に
+  rows.sort((a, b) => b.count - a.count || a.gap - b.gap || (a.name < b.name ? -1 : 1));
+  return rows;
+});
+
+/**
  * 説明の無いカテゴリ（新設時の書き忘れ）と、カテゴリとして実在しない
  * 説明（改名・統合後の消し忘れやタイプミス）を両方向で検出する。
  */
