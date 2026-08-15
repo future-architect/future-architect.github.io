@@ -1,7 +1,8 @@
 <%# 投稿数チャートの縦軸。echarts の option 内で
-    yAxis: <パーシャルの出力>, として使う。
+    yAxis: <この部品>, として使い、series には積み上げ前の系列配列の式を渡す
+    （例: partial('_partial/chart-yaxis-count', {series: 'chartData.series'})）。
 
-    上限は実データの最大を5の倍数へ切り上げる（8本なら10、11本なら15）。
+    上限は積み上げの最大を5の倍数へ切り上げる（8本なら10、11本なら15）。
     目盛も5刻みで固定する。ページを移っても目盛が揃い、棒の高さを
     そのまま見比べられる。自動目盛だと 0.5 刻みや3刻みが出て、
     ページごとに基準が変わっていた（#2466）。
@@ -9,4 +10,12 @@
 
     軸の規則を1箇所でしか決めないための共有部品。タグ・カテゴリ・著者・月の
     4ページに同じ式が散ると、片方だけ直して基準がズレる %>
-{ type: 'value', min: 0, interval: 5, max: value => Math.max(5, Math.ceil(value.max / 5) * 5) }
+(function (series) {
+  const peak = series.length
+    ? Math.max(0, ...series[0].data.map((_, i) => series.reduce((n, s) => n + (s.data[i] || 0), 0)))
+    : 0;
+  const max = Math.max(5, Math.ceil(peak / 5) * 5);
+  <%# 上限5のページだけは5刻みだと目盛が0と5の2本になり、棒が何本を指すのか
+      読めない。ここは1刻みにして補助線を足す（上限が5の倍数なのは変わらない）%>
+  return { type: 'value', min: 0, max: max, interval: max === 5 ? 1 : 5 };
+})(<%- series %>)
