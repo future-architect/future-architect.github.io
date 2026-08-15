@@ -20,7 +20,7 @@ lede: "FlutterとTensorFlow Liteを使ったモバイル画像識別について
 
 ## TensorFlow Liteとは
 
-近年ではご存じの方も多くなってきたかと思いますが、[TensorFlow](https://www.tensorflow.org/?hl=ja)はGoogle社が開発を行っているディープラーニングを行うためのフレームワークの一種です。
+近年ではご存じの方も多くなってきたかと思いますが、[TensorFlow](https://www.tensorflow.org/?hl=ja)はGoogle社が開発しているディープラーニングを行うためのフレームワークの一種です。
 TensorFlowを使えば、
 
 - 画像識別
@@ -30,9 +30,9 @@ TensorFlowを使えば、
 
 などのAI処理を手軽に行うことができます。
 
-ただ、TensorFlowそのままだと計算コストが非常に高く、リアルタイムで推論を行うにはGPUが必須となってきます。そこで、TensorFlowには[TensorFlow Lite](https://www.tensorflow.org/lite?hl=ja)（TFLite）と呼ばれるエッジデバイス・モバイル向けのフレームワークが公開されております。
+ただ、TensorFlowそのままだと計算コストが非常に高く、リアルタイムで推論するにはGPUが必須となってきます。そこで、TensorFlowには[TensorFlow Lite](https://www.tensorflow.org/lite?hl=ja)（TFLite）と呼ばれるエッジデバイス・モバイル向けのフレームワークが公開されております。
 
-TFLiteはCPU上で演算を行うことに特化しており、スマホなどのモバイル端末上でもほぼリアルタイム（CPU次第）でAI処理を行うことが可能となります。
+TFLiteはCPU上で演算することに特化しており、スマホなどのモバイル端末上でもほぼリアルタイム（CPU次第）でAI処理を行うことが可能となります。
 
 ## なぜTFLiteだとCPU上で演算可能なのか
 
@@ -89,7 +89,7 @@ flutter:
 tflite_flutterを使用する前にTFliteの動的ライブラリをワークフォルダにインストールする必要があります。
 [Initial setup : Add dynamic libraries to your app](https://pub.dev/packages/tflite_flutter#important-initial-setup--add-dynamic-libraries-to-your-app)
 
-使用PCがLinuxであれば`install.sh`、Windowsであれば`install.bat`を↑のpub.devページからダウンロードして、Flutterのプロジェクトフォルダに置いてください。置いた後、コマンドラインから`sh install.sh`や`insatall.bat`を入力してファイルの実行を行ってください。あとはよしなにやってくれます。
+使用PCがLinuxであれば`install.sh`、Windowsであれば`install.bat`を↑のpub.devページからダウンロードして、Flutterのプロジェクトフォルダに置いてください。置いた後、コマンドラインから`sh install.sh`や`insatall.bat`を入力してファイルを実行してください。あとはよしなにやってくれます。
 
 ### 画像識別クラス（classifier.dart）
 
@@ -128,7 +128,7 @@ tflite_flutterを使用する前にTFliteの動的ライブラリをワークフ
   final NormalizeOp _preProcessNormalizeOp = NormalizeOp(0, 1);
 ```
 
-まずは推論に使われる変数の宣言を行っています。
+まずは推論に使われる変数を宣言しています。
 中身はコード内のコメントの通りで、注意する点としては
 
 - コンストラクタ内で後から変数の初期化を行うため`late`を指定
@@ -285,11 +285,11 @@ AIモデルの中では、画像の色合いや配色パターンの特徴から
   }
 ```
 
-画像を取得するための`ImagePicker`や推論を行うための`Classifer`を事前に変数として定義しておきます。
+画像を取得するための`ImagePicker`や推論するための`Classifer`を事前に変数として定義しておきます。
 
-また、image_pickerを使って画像の取得を行います。
+また、image_pickerを使って画像を取得します。
 カメラで画像を撮るのも、ギャラリーから取得するのも`source`が違うだけで処理は同じです。
-`setState`で`_storedImage`に`File`を代入し、この段階で`predict()`を呼び出して推論を行います。
+`setState`で`_storedImage`に`File`を代入し、この段階で`predict()`を呼び出して推論します。
 `predict()`は後ほど説明します。
 
 また、`initState()`内で`Classifier`のコンストラクタを呼び出し、初期化します。
@@ -321,9 +321,9 @@ AIモデルの中では、画像の色合いや配色パターンの特徴から
   }
 ```
 
-ここでは、入力された画像に対して`_classifier`を用いて推論を行います。
+ここでは、入力された画像に対して`_classifier`を用いて推論します。
 
-入力画像は`Image`型なので、デコードを行います。ここで`_storedImage`はnull許容型として定義しているため、`!`をつけることでnullではないことを明記します。推論結果からは`confidence`（確信度）を取り出します。
+入力画像は`Image`型なので、デコードします。ここで`_storedImage`はnull許容型として定義しているため、`!`をつけることでnullではないことを明記します。推論結果からは`confidence`（確信度）を取り出します。
 
 今回の場合だと、0.5をしきい値としてホットドッグかそうではないかを判断しています。学習に使った画像数が数十枚なので、かなりガバガバです笑。
 

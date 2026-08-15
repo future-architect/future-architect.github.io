@@ -22,7 +22,7 @@ lede: "Rust製SQLフォーマッタであるuroborosql-fmtのVSCode拡張機能�
 
 こんにちは、Futureでアルバイトをしている川渕です。
 
-アルバイトの前はFutureのインターンシップでRust製SQLフォーマッタであるuroborosql-fmtの作成を行っていました(その時の記事は[こちら](/articles/20220916b/))。
+アルバイトの前はFutureのインターンシップでRust製SQLフォーマッタであるuroborosql-fmtを作成していました(その時の記事は[こちら](/articles/20220916b/))。
 
 本記事ではそのフォーマッタをVSCodeの拡張機能化した方法について説明します。
 
@@ -350,7 +350,7 @@ AND	SBJ.GRADE		>	/*grade*/50	-- 成績が50点以上
 
 #### 0. CI.ymlの作成
 
-もしnapi-rsプロジェクト作成時にGitHub Actionsを有効にしていなかった場合はこちらの作業を行ってください。
+もしnapi-rsプロジェクト作成時にGitHub Actionsを有効にしていなかった場合はこちらの作業をしてください。
 
 1. 適当なディレクトリで`napi new`
 1. パッケージ名、ディレクトリ名は適当に入力
@@ -609,7 +609,7 @@ connection.onExecuteCommand((params) => {
 
 ## 拡張機能のパッケージ化
 
-vsceというツールを使用してパッケージ化を行います。vsceとはVSCode拡張機能のパッケージ化、公開、管理を行うことができるCLIツールです。
+vsceというツールを使用してパッケージ化を行います。vsceとはVSCode拡張機能のパッケージ化、公開、管理ができるCLIツールです。
 
 ::: note warn
 <p>本記事では拡張機能の公開については説明しません。</p>
