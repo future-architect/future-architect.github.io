@@ -222,7 +222,7 @@ opa exec --decision "/example/allow" -b ./bundle.tar.gz  input_cli.json
 
 出力結果はJSONで、`.result`キーに入っています。この中には、呼び出し時に渡したinputのファイルとresultが配列として入ります。
 
-ちなみに、`/example/allow`ではなく、`example`の中身全体を受け取りたい項目として指定することもできます。
+ちなみに、`/example/allow`ではなく、`example`の中身全体を受け取りたい項目として指定もできます。
 
 ```sh
 opa exec --decision "/example" -b ./bundle.tar.gz  input_cli.json
