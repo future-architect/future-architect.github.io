@@ -357,7 +357,7 @@ oreilly: https://api.oreilly.com/api/content-discovery/v1/mcp/ (HTTP) - ✓ Conn
 
 > O'Reilly MCP で `software supply chain attack` を、直近12ヶ月の書籍・記事に絞って5件取得してください。
 
-これだけで、Claude Code が `search-oreilly-content` を呼び出し、`date_range` を直近12ヶ月、`content_types` を `books, articles`、`order_by` を `date_published` に設定した検索を実行してくれます。
+これだけで、Claude Code が `search-oreilly-content` を呼び出し、`date_range` を直近12ヶ月、`content_types` を `books, articles`、`order_by` を `date_published` に設定して検索してくれます。
 
 <img src="/images/2026/20260513a/10-mcp-search-result.png" alt="10-mcp-search-result.png" width="1200" height="684" loading="lazy">
 
