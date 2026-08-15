@@ -224,7 +224,7 @@ manifestファイルの適用自体は踏み台サーバから実行していま
 
 現状の状態だと
 
-1. アプリケーションコードの変更を行う（ローカル）。
+1. アプリケーションコードを変更する（ローカル）。
 2. GitHubへ変更をPushする（ローカル）。
 3. docker buildコマンドの実行を行いイメージを作成する（ローカル）
 4. docker pushコマンドを実行し、Artifact RegistoryへイメージをPushする（ローカル）
@@ -237,7 +237,7 @@ GitHubへのPushをトリガーに上記の手順の3~5を自動化したいた�
 
 #### GitHubとの連携
 
-CloudBuildとGitHub（プライベートリポジトリ）を連携するためには画面での認証手続きが生じるため、一旦Terraformでは作成せず手動で設定を行いました。
+CloudBuildとGitHub（プライベートリポジトリ）を連携するためには画面での認証手続きが生じるため、一旦Terraformでは作成せず手動で設定しました。
 手動で設定が完了した後、terraform importコマンドを利用してコード管理するようにします。
 
 Google Cloudコンソール画面から「Cloud Build」をクリック→「トリガー」をクリック→「トリガーを作成」をクリックします。
@@ -368,7 +368,7 @@ GKE Control Planeとmy-stg-environment-vpcを接続しているVPC Peeringのカ
 
 CloudBuildのprivate poolのCIDR(192.168.3.0/24)をmy-stg-environment-vpcに、GKE Control PlaneのCIDR(192.168.64.0/28)をsample-build-vpcにそれぞれ広報したいので、my-stg-environment-vpcとsample-build-vpcをHA VPNで接続します。
 
-VPC PeeringでそれぞれのVPCを接続することもできますが、VPC Peeringは推移的ピアリングをサポートしていないため、CloudBuildのprivate poolのCIDR(192.168.3.0/24)とGKE Control PlaneのCIDR(192.168.64.0/28)をそれぞれのVPCへ広報できません。
+VPC PeeringでそれぞれのVPCの接続もできますが、VPC Peeringは推移的ピアリングをサポートしていないため、CloudBuildのprivate poolのCIDR(192.168.3.0/24)とGKE Control PlaneのCIDR(192.168.64.0/28)をそれぞれのVPCへ広報できません。
 
 まず、HA VPN Gatewayを作成します。
 my-stg-environment-vpcに「ha-vpn-my-stg-environment-tky-gw」、sample-build-vpcに「ha-vpn-sample-build-vpc-tky-gw」を作成します。
