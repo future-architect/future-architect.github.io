@@ -48,7 +48,7 @@ lede: "Go 1.27 で標準ライブラリに追加されたuuidパッケージを�
 ---
 ```
 
-- `categories` は既存の語彙から選ぶ。使用実績（記事数）: Programming 327 / Frontend 134 / DevOps 133 / Culture 129 / DataScience 100 / Cloud 77 / DB 69 / Infrastructure 69 / IaC 57 / Mobile 57 / IoT 52 / Business 49 / Management 48 / DataEngineering 44 / AIDD 44 / Security 36 / 認証認可 24 / VR 20
+- `categories` は既存の語彙から選ぶ。使用実績（記事数）: Programming 327 / Frontend 134 / DevOps 133 / Culture 129 / DataScience 100 / Cloud 75 / Infrastructure 70 / DB 69 / IaC 57 / Mobile 57 / IoT 52 / Business 49 / Management 48 / DataEngineering 45 / AIDD 44 / Security 36 / 認証認可 24 / VR 20
   - `AI` は `AIDD` に、`Design` は `UI/UX` タグに統合済み。`_config.yml` の `alias` で転送している
   - 基盤系4カテゴリの境界（#2057 / #2461）: **基盤をコードで書く話は `IaC`**（Terraform / Ansible / CDK 等）、
     **マネージドサービスそのものの使い方・設計は `Cloud`**（S3 の署名付きURL、VPC Endpoint の要否、Pub/Sub の概念）、
