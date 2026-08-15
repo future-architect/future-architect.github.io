@@ -256,15 +256,11 @@ jobs:
           path: htmlcov/
 ```
 
-::: note info
-**Shallow Clone とは？**
-
+::: note info Shallow Clone とは？
 "Gitリポジトリをクローン（複製）する際に、リポジトリの完全な履歴を取得する" という意味です。通常、CI/CD環境ではビルド時間を短縮するために、Gitリポジトリの最新のコミットから数個分だけを取得する「シャロークローン」が行われることがあります。例えば、「最新の1コミットだけ取得する」といった設定です。これにより、ダウンロードするデータ量が減り、クローンにかかる時間が短縮されます。GitHub Actionsの actions/checkout アクションでは、デフォルトでシャロークローン（fetch-depth: 1、つまり最新の1コミットのみ）が行われます。これを無効化（fetch-depth: 0）することで、SonarCloud (や SonarQube) は、ソースコードを静的解析する際に、コードの変更履歴を深く分析でき、より多くの有益な情報を提供します。
 :::
 
-::: note info
-**ワークフローファイルのカスタマイズ**
-
+::: note info ワークフローファイルのカスタマイズ
 トリガー (on:): どのブランチへの push や pull_request で実行したいか、または特定のタグが作成されたときなど、実行条件を細かく設定できます。
 :::
 
@@ -314,9 +310,7 @@ sonar.python.coverage.reportPaths=coverage.xml
 # sonar.verbose=true # 詳細ログ (デバッグ用)
 ```
 
-::: note warn
-**記載する上での注意点**
-
+::: note warn 記載する上での注意点
 完成したワークフローがパースの影響で誤認識され回らなかった時がありました。
 
 <img src="/images/2025/20250619a/image.png" alt="image.png" width="1156" height="242" loading="lazy">

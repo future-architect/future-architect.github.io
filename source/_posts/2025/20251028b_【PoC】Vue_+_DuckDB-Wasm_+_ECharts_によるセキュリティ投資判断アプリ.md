@@ -143,8 +143,7 @@ security-invest@0.0.0 /home/user01/security-invest
 
 ※DuckDB APIは 1.29.0と1.30.0でAPIの仕様変更があり、事前によく確認してから利用することをお勧めします。
 
-::: note info
-**ソフトウェアサプライチェーン問題**
+::: note info ソフトウェアサプライチェーン問題
 npmは汚染されやすいという話を聞いたことがありますか？
 
 ```sh
