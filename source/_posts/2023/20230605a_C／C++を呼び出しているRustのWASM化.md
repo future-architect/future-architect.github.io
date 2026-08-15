@@ -52,7 +52,7 @@ Rust: 1.67.1
 
 そこで、WebAssembly(wasm)という「ブラウザ上で動くバイナリコードの新しいフォーマット(仕様)」が開発されました。wasmは現在Firefox、Chrome、Safari、Edge等の主要なブラウザの全てに対応しており、Google, Microsoft, Mozilla, Appleによって仕様が策定され開発が進められています。
 
-基本的に直接記述ではなく、C/C++やRust、Golang、TypeScriptなどからコンパイルされます。wasmはJavaScriptを補完する目的で開発されており、JavaScriptから呼び出すことで実行できます。また、wasmからJavaScriptの機能にアクセスすることもできます。
+基本的に直接記述ではなく、C/C++やRust、Golang、TypeScriptなどからコンパイルされます。wasmはJavaScriptを補完する目的で開発されており、JavaScriptから呼び出すことで実行できます。また、wasmからJavaScriptの機能にアクセスもできます。
 
 wasmはCPUの活用、起動の高速化から、ネイティブアプリ並の速度で動作すると言われており、実際に多くのアプリケーションでwasmが使用されています。
 
@@ -427,7 +427,7 @@ napi-rsを用いてNodeアドオン化して拡張機能に載せたフォーマ
 
 ## 最適化検証
 
-Rustの[最適化レベル](https://doc.rust-lang.org/cargo/reference/profiles.html)を変更してサイズ、速度の調査を行います。検証方法は速度検証と同様です。
+Rustの[最適化レベル](https://doc.rust-lang.org/cargo/reference/profiles.html)を変更してサイズ、速度を調査します。検証方法は速度検証と同様です。
 
 ### 検証結果
 
