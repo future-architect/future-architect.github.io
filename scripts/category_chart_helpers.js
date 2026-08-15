@@ -354,7 +354,9 @@ hexo.extend.helper.register('tag_yearly_chart', function (name) {
   const bars = halfYearBars(tag.posts.toArray());
   if (!bars || bars.filledHalves < TAG_CHART_MIN_HALVES) return null;
 
-  return stackByCategory(bars, siteCategoryOrder.call(this));
+  return Object.assign(stackByCategory(bars, siteCategoryOrder.call(this)), {
+    granularity: 'half',
+  });
 });
 
 /** 積み上げの順（＝凡例の順）はサイト累計の多い順で固定する (#2201) */
@@ -366,21 +368,57 @@ function siteCategoryOrder() {
 }
 
 /**
- * 著者ページの半期別投稿数 (#2443)。タグページ (#2434) と同じ、カテゴリ別の
- * 積み上げ。刻みを月から半期に変えたのは、CSS で描くためと、カテゴリ・タグ
- * ページと粒度を揃えるため（#2432 の方向）。
+ * 著者ページの月別投稿数 (#2443)。刻みは従来どおり月のまま。
+ * 描画だけ echarts から CSS に移す（著者ページは327あり、この1枚のために
+ * gzip 約330KB を全ページへ配る必要はない）。
  *
- * 月のままだと最長の著者で132点あり、CSS の棒では細すぎて読めない。
- * 半期なら最長でも22点で、活動期間の山と休止期間はそのまま見える。
+ * 軸は暦年に揃える。開始は初投稿年の1月、終了は最終投稿年の12月 (#2140)。
+ * 投稿月そのままだと数ヶ月分しか無い著者の軸が中途半端な月で始まり・止まって
+ * 見栄えが悪い。全著者を同じ規則にする。
  *
- * 著者ページは327ページある。この1枚のために echarts（gzip 約330KB）を
- * 全ページへ配る必要はない。
+ * 棒はカテゴリ別の積み上げ (#2138)。年ラベルは年に1つでよいので、
+ * 12ヶ月を1組にして年で束ねて返す（半期グラフと同じ形）。
  */
-hexo.extend.helper.register('author_half_chart', function (name) {
+hexo.extend.helper.register('author_monthly_chart', function (name) {
   const posts = this.site.posts.filter((p) => [].concat(p.author || []).includes(name)).toArray();
-  const bars = halfYearBars(posts);
-  if (!bars) return null;
-  return stackByCategory(bars, siteCategoryOrder.call(this));
+  if (posts.length === 0) return null;
+
+  const byMonth = new Map(); // "2026/8" -> {count, byCat}
+  let minY = null;
+  let maxY = null;
+  posts.forEach((post) => {
+    const y = post.date.year();
+    if (minY === null || y < minY) minY = y;
+    if (maxY === null || y > maxY) maxY = y;
+    const key = `${y}/${post.date.month() + 1}`;
+    if (!byMonth.has(key)) byMonth.set(key, { count: 0, byCat: new Map() });
+    const bucket = byMonth.get(key);
+    bucket.count++;
+    // カテゴリは第1のものだけ数える。複数カテゴリを全部積むと
+    // 合計が投稿数と合わなくなる
+    const cat = post.categories && post.categories.length ? post.categories.first().name : '未分類';
+    bucket.byCat.set(cat, (bucket.byCat.get(cat) || 0) + 1);
+  });
+
+  const groups = [];
+  let max = 0;
+  for (let y = minY; y <= maxY; y++) {
+    const months = [];
+    for (let m = 1; m <= 12; m++) {
+      const bucket = byMonth.get(`${y}/${m}`);
+      const count = bucket ? bucket.count : 0;
+      if (count > max) max = count;
+      months.push({
+        label: `${m}月`,
+        count,
+        byCat: bucket ? bucket.byCat : new Map(),
+      });
+    }
+    groups.push({ year: y, halves: months });
+  }
+  return Object.assign(stackByCategory({ groups, max }, siteCategoryOrder.call(this)), {
+    granularity: 'month',
+  });
 });
 
 // 関連カテゴリ (#2200)。独自の採点は持ち込まず、ページに出ている2つの規則の
