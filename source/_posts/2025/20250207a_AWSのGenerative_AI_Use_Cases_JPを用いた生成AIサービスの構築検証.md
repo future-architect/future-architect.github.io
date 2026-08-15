@@ -13,14 +13,14 @@ categories:
   - AIDD
 thumbnail: /images/2025/20250207a/thumbnail.png
 author: 小川智也
-lede: "AWSを用いた生成AIアプリケーションの実装として、Generative AI Use Cases JP についての検証を行いました。"
+lede: "AWSを用いた生成AIアプリケーションの実装として、Generative AI Use Cases JP についての検証をしました。"
 ---
 
 ## はじめに
 
 こんにちは、SAIG/MLOpsチームでアルバイトをしている小川です。
 
-AWSを用いた生成AIアプリケーションの実装として、Generative AI Use Cases JP (略称:GenU)についての検証を行いました。
+AWSを用いた生成AIアプリケーションの実装として、Generative AI Use Cases JP (略称:GenU)についての検証をしました。
 
 ::: note warn
 ※担当チーム都合で、記事の公開が執筆次期から期間を空けてしまいました。
@@ -29,7 +29,7 @@ AWSを用いた生成AIアプリケーションの実装として、Generative A
 
 ## 検証内容
 
-生成AIを簡単に素早く使いたいという要望を実現するために検証を行いました。GenUにはCloudFormationを用いて実装する方法と、CDKを用いて実装する方法があり、これらの違いは以下のようになっています。
+生成AIを簡単に素早く使いたいという要望を実現するために検証しました。GenUにはCloudFormationを用いて実装する方法と、CDKを用いて実装する方法があり、これらの違いは以下のようになっています。
 
 - CloudFormationは数クリックで簡単に構築しユースケースを体験したい方向け
 - CDKはソースコードを確認してカスタマイズしたい方向け
@@ -128,7 +128,7 @@ CloudFormationを使用して構築し、RAGを有効化すると、上図のデ
 
 #### KendraとS3の連携
 
-Amazon Kendraに移動し、[KendraとS3の連携](https://catalog.workshops.aws/generative-ai-use-cases-jp/ja-JP/add-data/kendra/integrate-with-kendra)の手順に従って作業を進めました。このリンクにわかりやすい手順が紹介されているため、詳細な手順に関しては省略します。Kendraには、generative-ai-use-cases-index という名前の Kendra インデックスが作成されており、先ほどのS3のデータソースと連携されています。現時点では先ほどアップロードしたオブジェクトはKendraインデックスと同期していないため、同期させる必要があります。Sync nowというボタンを押すことで同期が可能です。また、今回のように手動で同期させるのではなく、スケジュールを設定することで同期を自動化することもできます。
+Amazon Kendraに移動し、[KendraとS3の連携](https://catalog.workshops.aws/generative-ai-use-cases-jp/ja-JP/add-data/kendra/integrate-with-kendra)の手順に従って作業を進めました。このリンクにわかりやすい手順が紹介されているため、詳細な手順に関しては省略します。Kendraには、generative-ai-use-cases-index という名前の Kendra インデックスが作成されており、先ほどのS3のデータソースと連携されています。現時点では先ほどアップロードしたオブジェクトはKendraインデックスと同期していないため、同期させる必要があります。Sync nowというボタンを押すことで同期が可能です。また、今回のように手動で同期させるのではなく、スケジュールを設定することで同期の自動化もできます。
 
 ## 実装したアプリ画面
 
@@ -166,7 +166,7 @@ Amazon Kendraに移動し、[KendraとS3の連携](https://catalog.workshops.aws
 
 しかし、CloudFormationで作成したアプリケーションはCDKを用いて作成したアプリケーションのバージョンより古いという欠点があります(2024/12/18現在)。
 
-そのため、AgentチャットというAPIと連携して様々なタスクを行う機能など、一部実装できない機能があります。Web検索の結果を用いたチャットはAgentチャット機能を用いて実装するため、CloudFormationを用いた場合はその実装をすることはできません。
+そのため、AgentチャットというAPIと連携して様々なタスクを行う機能など、一部実装できない機能があります。Web検索の結果を用いたチャットはAgentチャット機能を用いて実装するため、CloudFormationを用いた場合はその実装はできません。
 
 また、このアプリケーションのリポジトリを確認すると継続的なアップデートが行われています。そのため、今後新しい機能が実装されることを考えると、CDKを用いて実装した方がより多くの機能を実装できます。
 
@@ -232,7 +232,7 @@ RAGチャット(Knowledge Bases)を有効化するときのコストの試算で
 
 ## まとめ
 
-今回はGenUについて、CloudFormationでの構築がどれぐらい簡単に行えるのかに重点を置いて検証を行いました。検証を通して、CloudFormationを用いると数クリックで以下の機能を持つ生成AIチャットアプリケーションが簡単に構築できることがわかりました。
+今回はGenUについて、CloudFormationでの構築がどれぐらい簡単に行えるのかに重点を置いて検証しました。検証を通して、CloudFormationを用いると数クリックで以下の機能を持つ生成AIチャットアプリケーションが簡単に構築できることがわかりました。
 
 ### 機能一覧
 
