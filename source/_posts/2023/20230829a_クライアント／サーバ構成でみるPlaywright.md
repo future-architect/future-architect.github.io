@@ -10,17 +10,17 @@ categories:
 series: "Playwright"
 thumbnail: /images/2023/20230829a/thumbnail.png
 author: 武田大輝
-lede: "Playwrightはさまざまな言語でテストを記述することが可能です。このような他言語展開を可能にしているPlaywrightのアーキテクチャについて調べてみました。"
+lede: "Playwrightはさまざまな言語でテストを記述できます。このような他言語展開を可能にしているPlaywrightのアーキテクチャについて調べてみました。"
 ---
 
 [Playwright連載](/articles/20230821a/)6日目です。
 
 ## はじめに
 
-Playwrightはさまざまな言語でテストを記述することが可能です。
+Playwrightはさまざまな言語でテストを記述できます。
 
 [公式ドキュメント](https://playwright.dev/docs/languages)を見ると [JavaScript/TypeScript](https://github.com/microsoft/playwright) をはじめとし、[Python](https://github.com/microsoft/playwright-python) / [Java](https://github.com/microsoft/playwright-java) / [.Net](https://github.com/microsoft/playwright-dotnet) がサポートされていることがわかります。
-そのほかにも[Go](https://github.com/playwright-community/playwright-go)や[Ruby](https://github.com/YusukeIwaki/playwright-ruby-client)といった言語もサードパーティ製の実装によって利用することが可能です。
+そのほかにも[Go](https://github.com/playwright-community/playwright-go)や[Ruby](https://github.com/YusukeIwaki/playwright-ruby-client)といった言語もサードパーティ製の実装によって利用できます。
 
 このように幅広い言語をサポートしているのは利用者としてとても嬉しいことです。
 
@@ -40,9 +40,9 @@ Playwrightはさまざまな言語でテストを記述することが可能で�
 
 <img src="/images/2023/20230829a/Playwright_Architecture.drawio.png" alt="Playwright_Architecture" width="800" height="320" loading="lazy">
 
-サーバ側はWebSocketまたは標準入出力の口をもち、クライアントからのリクエストに応じて各ブラウザに対しての操作を実行します。クライアント側はテストスクリプトに応じてサーバに対してリクエストを送信します。
+サーバ側はWebSocketまたは標準入出力の口をもち、クライアントからのリクエストに応じて各ブラウザに対して操作します。クライアント側はテストスクリプトに応じてサーバに対してリクエストを送信します。
 
-図を見ればわかるとおり、クライアント側はPlaywrightが定めるリクエスト/レスポンスの形式に従ってWebSocket通信を行うことができればE2Eテストが実行なため、複数言語のサポートが容易となっています。
+図を見ればわかるとおり、クライアント側はPlaywrightが定めるリクエスト/レスポンスの形式に従ってWebSocket通信できればE2Eテストが実行なため、複数言語のサポートが容易となっています。
 
 クライアント／サーバ構成のE2Eテストツールと聞くと[Selenium](https://www.selenium.dev/)が有名ですが、こちらも同じく複数の言語をサポートするよう設計されています。
 

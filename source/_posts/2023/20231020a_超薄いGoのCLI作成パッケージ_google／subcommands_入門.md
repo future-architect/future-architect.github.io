@@ -226,7 +226,7 @@ commands:
 
 ## グループ化
 
-subcommandsに登録する際、第2引数にgroup名を登録することが可能です。以下の様に書き換えます。
+subcommandsに登録する際、第2引数にgroup名を登録できます。以下の様に書き換えます。
 
 ```diff
 func main() {
