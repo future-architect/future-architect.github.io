@@ -23,7 +23,7 @@ lede: "新しいSQLフォーマッターであるuroboroSQL-fmtをリリース�
 
 ## 弊社でのSQLフォーマッター開発の取り組み
 
-元々弊社では[uroboroSQL Formatter](/articles/20170228/)（以下uroboroSQL Formatterを旧版、uroboroSQL-fmtを新版と呼ぶ）というSQLフォーマッターを公開していました。旧版は
+元々弊社では[uroboroSQL Formatter](/articles/20170228/)（以下uroboroSQL Formatterを旧版、uroboroSQL-fmtを新版と呼ぶ）というSQLフォーマッターを公開していました。旧版は…
 
 - 字句解析して得られたトークンを基にフォーマットするという設計になっていたため、SELECT句のエイリアス補完といった文法を考慮する必要のある機能の追加が困難
 - Pythonで書かれておりVSCodeの拡張機能として動作させるのが難しい
@@ -224,7 +224,7 @@ wasm版は[こちらのデモ](https://future-architect.github.io/uroborosql-fmt
     ```
 
 1. SQLファイルを開き、コマンドパレットから`Format Document`か、`format sql`を実行してください
-  `format sql`では選択範囲のフォーマットをサポートしています
+  `format sql`では選択範囲のフォーマットをサポートしています。
 
 #### フォーマットの設定方法
 
@@ -281,4 +281,4 @@ wasm版は[こちらのデモ](https://future-architect.github.io/uroborosql-fmt
 
 まだまだ枯れておらずフォーマットできないことも多いです。元のSQLを壊していないか検証するロジックは入っていますが、意図しない変更が入っていないか確認お願いします。不具合や要望等ございましたらお気軽にissueやPRいただければと思います。
 
-※ ライセンスはBSLですが競合会社含め開発環境での利用は自由ですので、お気軽に使用ください
+※ ライセンスはBSLですが競合会社含め開発環境での利用は自由ですので、お気軽に使用ください。

@@ -411,7 +411,7 @@ LlamaIndexを用いることで、
 
 ### \[23\] Azure Cache for Redis
 
-[Azure Cache for Redis](https://azure.microsoft.com/products/cache)も会話履歴を保存する際に利用できます。通常はインメモリキャッシュとして使用することが想定されますが、データ永続化の機能を利用することでNoSQLのDBとしても利用できます
+[Azure Cache for Redis](https://azure.microsoft.com/products/cache)も会話履歴を保存する際に利用できます。通常はインメモリキャッシュとして使用することが想定されますが、データ永続化の機能を利用することでNoSQLのDBとしても利用できます。
 
 （[参考](https://qiita.com/nohanaga/items/18baccb843b4148e6a77#3-%E3%83%81%E3%83%A3%E3%83%83%E3%83%88%E5%B1%A5%E6%AD%B4%E3%81%AE%E6%A4%9C%E7%B4%A2azure-cache-for-redis)）。
 

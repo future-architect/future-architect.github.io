@@ -156,7 +156,7 @@ ADD CONSTRAINT reservations_20241102_exclude EXCLUDE USING GIST (
 );
 ```
 
-テーブルの状態は以下です
+テーブルの状態は以下です。
 
 ```sh \d+結果
 postgres=# \d+ reservations

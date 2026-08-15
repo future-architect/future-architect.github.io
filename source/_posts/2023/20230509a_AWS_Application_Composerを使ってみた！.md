@@ -91,7 +91,7 @@ AWS Application Composer は追加料金なしで使用できます。
 - 主要サービスは使える
 - 主要地域で使える
 
-という特徴がApplication Composerにはあると分かったため、個人的に
+という特徴がApplication Composerにはあると分かったため、個人的に…
 
 - シンプルな構成のサービスを爆速で作りたい人
 - AWSインフラの構築練習をしてみたい人

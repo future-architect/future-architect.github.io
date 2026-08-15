@@ -271,7 +271,7 @@ JSON から `template.json` を作成し、SAM CLI が Lambda を認識できる
 3. **Go バイナリをビルド**
    `GOOS=linux GOARCH=amd64 go build` で Lambda 実行環境（Linux/x86_64）向けにクロスコンパイルする
 4. **バイナリを SAM のビルドディレクトリにコピー**
-`.aws-sam/build/` に配置することで `sam local invoke` が使える状態にする
+`.aws-sam/build/` に配置することで `sam local invoke` が使える状態にする。
 
 ```sh
 # 生成されるファイル

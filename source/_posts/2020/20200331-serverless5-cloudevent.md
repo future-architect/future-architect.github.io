@@ -22,7 +22,7 @@ lede: "サーバレス連載企画の第5回はCloudEvents(https://cloudevents.i
 
 サーバレス連載企画の第5回は[CloudEvents](https://cloudevents.io/)を取り上げたいと思います。
 
-※本記事は2020.03.31時点の情報を元に執筆しています
+※本記事は2020.03.31時点の情報を元に執筆しています。
 
 ## CloudEventsとは？
 

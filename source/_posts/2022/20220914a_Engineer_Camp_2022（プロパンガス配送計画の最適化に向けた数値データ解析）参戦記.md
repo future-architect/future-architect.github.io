@@ -140,4 +140,4 @@ AWS周りの知識をインターン後にしっかり学びたいです。Git�
 自分の都合により、初日を欠席して参加する形となりましたが、温かく迎え入れていただいて嬉しかったです。
 メンターの宮本さんをはじめ、技術的にサポートしていただいたプロジェクトの皆様、毎週懇談をしていただいたHRの皆様、このような貴重な機会をありがとうございました。
 
-アイキャッチの画像は <a href="https://pixabay.com/ja/users/stroganova-2345018/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=6935480">Marina Stroganova</a>による<a href="https://pixabay.com/ja//?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=6935480">Pixabay</a>を利用しました
+アイキャッチの画像は <a href="https://pixabay.com/ja/users/stroganova-2345018/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=6935480">Marina Stroganova</a>による<a href="https://pixabay.com/ja//?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=6935480">Pixabay</a>を利用しました。

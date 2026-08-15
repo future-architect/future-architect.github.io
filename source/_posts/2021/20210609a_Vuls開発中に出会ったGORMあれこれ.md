@@ -42,7 +42,7 @@ Reference: [future-architect/vuls](https://github.com/future-architect/vuls)
 
 原因を調査すると、Vulsと連携してDebian Security Trackerの情報を取り扱うgost([knqyf263/gost](https://github.com/knqyf263/gost))にあることが分かりました。詳しくは、追加された機能([gost#47](https://github.com/knqyf263/gost/pull/47))によってDBに保存したDebianに関するCVE情報を取得する部分が増加したことでした。
 
-パフォーマンスを改善しなければ、この機能は導入できないということになりました。そのため、EXPLAINしてINDEXを確認したりなどをして、解決策を色々探していました
+パフォーマンスを改善しなければ、この機能は導入できないということになりました。そのため、EXPLAINしてINDEXを確認したりなどをして、解決策を色々探していました。
 
 その中で、2020年8月にGORM 2.0がリリースされていることを思い出しました。Release Noteによると、GORM v2はフルスクラッチされており、パフォーマンスが改善されているそうなのです。
 

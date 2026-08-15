@@ -91,7 +91,7 @@ BigQuery
 
 ## 手順1: Google Cloud インフラ構築
 
-この手順はGoogle CloudのCloud Shellで実行します
+この手順はGoogle CloudのCloud Shellで実行します。
 
 ### 1-1. 環境変数の設定
 
@@ -595,7 +595,7 @@ Workspace Events API のサブスクリプションは **最大7日間** で期�
 
 ### 4-2. BigQuery でデータ確認
 
-スプレッドシートを保存してから数秒〜数十秒後に、BigQuery でデータを確認できます
+スプレッドシートを保存してから数秒〜数十秒後に、BigQuery でデータを確認できます。
 
 ```sql
 -- データセットのテーブルを確認

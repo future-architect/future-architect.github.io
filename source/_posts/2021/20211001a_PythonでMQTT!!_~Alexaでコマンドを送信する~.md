@@ -329,7 +329,7 @@ Alexaのリダイレクト先のURLには3つのURLが記載されていると�
 
 編集するのはlambda.pyのみです。
 
-上記のリポジトリを編集したコードを
+上記のリポジトリを編集したコードを…
 
 * [lambda\-alexa/python at main · orangekame3/lambda\-alexa](https://github.com/orangekame3/lambda-alexa/tree/main/python)
 
@@ -463,12 +463,12 @@ if __name__ == '__main__':
     client.loop_forever()
 ```
 
-AWS LambdaからPublishされたメッセージを受信した際に
+AWS LambdaからPublishされたメッセージを受信した際に…
 
 * [GoでMQTT\!\!　～温湿度マイスターbotの作成～\(前編\) \| フューチャー技術ブログ](/articles/20210929a/)
 * [GoでMQTT\!\!　～温湿度マイスターbotの作成～\(後編\) \| フューチャー技術ブログ](/articles/20210930a/)
 
-で作成した
+で作成した。
 
 「温湿度マイスターbot」のワーカーを起動しています。worker()の戻り値は温湿度情報の最新値および不快指数です。
 

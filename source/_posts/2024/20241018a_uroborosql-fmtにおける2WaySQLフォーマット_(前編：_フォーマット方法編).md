@@ -27,7 +27,7 @@ uroborosql-fmtの基本的な情報は以下の記事を参照してください
 
 uroborosql-fmtは[uroborosql](https://future-architect.github.io/uroborosql-doc/)、[go-twowaysql](/articles/20210803a/)、[doma](https://doma.readthedocs.io/en/latest/)といった[2WaySQL](https://future-architect.github.io/uroborosql-doc/background/)に対応しています。
 
-2WaySQLとはそのまま実行もでき、アプリケーションで読み込んでバインドパラメータの指定などをして実行することも出来ます。このように2つの実行方法があることから2WaySQLと呼ばれます
+2WaySQLとはそのまま実行もでき、アプリケーションで読み込んでバインドパラメータの指定などをして実行することも出来ます。このように2つの実行方法があることから2WaySQLと呼ばれます。
 
 ```sql  分岐とバインドパラメータを含む2WaySQLの例 (uroborosql)
 select

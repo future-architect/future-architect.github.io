@@ -82,7 +82,7 @@ https://www.elastic.co/jp/blog/elastic-and-amazon-reach-agreement-on-trademark-i
 
 - https://aws.amazon.com/jp/opensearch-service/features/serverless/
 
-公式ページでは、以下の情報がまとまっています
+公式ページでは、以下の情報がまとまっています。
 
 #### リソース
 

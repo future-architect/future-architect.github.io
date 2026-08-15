@@ -23,7 +23,7 @@ https://shibukawa.github.io/md2sql/
 
 ## GoをWASM化する
 
-もともとCLIツールは作っておりました。CLIのメインは[cmd/md2sql/main.go](https://github.com/shibukawa/md2sql/blob/main/cmd/md2sql/main.go)で作っていました。この中でやっていることは
+もともとCLIツールは作っておりました。CLIのメインは[cmd/md2sql/main.go](https://github.com/shibukawa/md2sql/blob/main/cmd/md2sql/main.go)で作っていました。この中でやっていることは…
 
 * kingpin.v2のオプションパース
 * 指定されたファイルを読み込み(あるいは標準入力)

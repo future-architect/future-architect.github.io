@@ -89,7 +89,7 @@ Packerを代用しようとする場合は、踏み台や、特定のサーバ�
 
 ## Ansibleコマンドを実行したくない
 
-インフラの管理方法として、Terraform + Ansibleは王道すぎるくらい王道なやり方だと思っていますし、コード管理している方はだいたいその2つをメインとして利用しているのではないでしょうか？ なので、手順としては
+インフラの管理方法として、Terraform + Ansibleは王道すぎるくらい王道なやり方だと思っていますし、コード管理している方はだいたいその2つをメインとして利用しているのではないでしょうか？ なので、手順としては…
 
 - Terraformでリソースを作成
 - Ansibleでミドルウェアを設定する
@@ -117,7 +117,7 @@ hoge-project
                  |- main.yaml
 ```
 
-このディレクトリ構成もおそらくTerraform + Ansibleの組み合わせの時にはオーソドックスではないでしょうか？ ここで、`compute_instance.tf`は
+このディレクトリ構成もおそらくTerraform + Ansibleの組み合わせの時にはオーソドックスではないでしょうか？ ここで、`compute_instance.tf`は…
 
 ```tf compute_instance.tf
 resource "google_compute_instance" "instance" {
@@ -151,7 +151,7 @@ resource "google_compute_instance" "instance" {
 }
 ```
 
-と書きました。`metadata`でインスタンスに埋め込む公開鍵を設定しています。そして最終段にある
+と書きました。`metadata`でインスタンスに埋め込む公開鍵を設定しています。そして最終段にある。
 
 ```tf
   provisioner "local-exec" {

@@ -16,7 +16,7 @@ lede: "現在業務では直接開発をする機会はないのですが、業�
 
 <img src="/images/2020/20200625/top.png" class="img-small-size" loading="lazy">
 
-[春の入門祭り](/articles/20200529/)の第19弾です
+[春の入門祭り](/articles/20200529/)の第19弾です。
 
 ## はじめに
 

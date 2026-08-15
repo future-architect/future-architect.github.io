@@ -198,7 +198,7 @@ Nationality (担当者国籍):
 Time of pickup (受取時刻):
 Car number plate (自動車登録番号):
 
-また、希望受取日は、複数決めておくとその後の調整がスムーズです。私が利用した際は、Microsoftから日程変更の依頼が来ました
+また、希望受取日は、複数決めておくとその後の調整がスムーズです。私が利用した際は、Microsoftから日程変更の依頼が来ました。
 
 受取日が決定すると、Azure Portalで認証コードが発行され、azure-noreply@microsoft.comから受取準備が完了した旨のメール（以下、参照）が送付されます。
 
@@ -225,7 +225,7 @@ Car number plate (自動車登録番号):
 Microsoft社から引き取った段ボールを開梱し筐体を取り出したら、次はData Boxの起動と初期設定作業に移ります。
 [Docs:機能と仕様](https://learn.microsoft.com/ja-jp/azure/databox/data-box-overview#features-and-specifications)にありますが、Data Boxの重さは23Kg、サイズは309.0 mm x 430.4 mm x 502.0 mmです。
 
-大人一人でギリギリ設置可能な大きさ・重さですが、複数名で行うとより安全でしょう
+大人一人でギリギリ設置可能な大きさ・重さですが、複数名で行うとより安全でしょう。
 
 ### Data Boxの起動
 
@@ -247,7 +247,7 @@ Microsoft社から引き取った段ボールを開梱し筐体を取り出し�
 おまけではありますが、ここでデバイスの実効容量の確認も済ませると良いです。
 
 ログイン後に表示されるダッシュボード中央の[Connect and copy]にて、その時点の空き容量（Free Space）と使用済み容量（Used Space）が表示されます。
-※キャプチャはデータコピー最中のものです
+※キャプチャはデータコピー最中のものです。
 
 <img src="/images/2022/20221108a/【1号機】ダッシュボード.jpg" alt="【1号機】ダッシュボード.jpg" width="1200" height="583" loading="lazy">
 
@@ -358,7 +358,7 @@ $ df -h
 >\~~~中略~~~
 >ストレージ アカウント内の root フォルダーに直接ファイルをコピーすることはできません。
 
-[Docs:Data Boxに接続する](https://learn.microsoft.com/ja-jp/azure/databox/data-box-deploy-copy-data-via-nfs#connect-to-data-box)で推奨されているように、デフォルトのディレクトリの1階層下に新たなディレクトリ（以下、コンテナー用ディレクトリ）を作成し、そこにデータをコピーする必要があります
+[Docs:Data Boxに接続する](https://learn.microsoft.com/ja-jp/azure/databox/data-box-deploy-copy-data-via-nfs#connect-to-data-box)で推奨されているように、デフォルトのディレクトリの1階層下に新たなディレクトリ（以下、コンテナー用ディレクトリ）を作成し、そこにデータをコピーする必要があります。
 
 >ブロック BLOB およびページ BLOB の共有の下に作成したフォルダーは、データが BLOB としてアップロードされるコンテナーになります。
 
@@ -366,7 +366,7 @@ $ df -h
 今回はデフォルトのコンテナー配下にファイル及びディレクトリを配置する想定だったため、以下手順でディレクトリを作成していきます。
 
 ※Data Boxを2台同時に使用するため、管理上の都合でコンテナ用ディレクトリ配下に更に1階層ディレクトリを作成していますが、特に必要ではありません。
-ユーザー/オーナーは
+ユーザー/オーナーは…
 
 ```sh
 $ mkdir -m 755 /mnt/databox1/<containername>
@@ -426,7 +426,7 @@ cp -prf /<転送元ファイルパス> /mnt/databox2/<containername>/databox2/<�
 有効容量の80TBいっぱいにコピーしたい場合、24時間休まずシリアル実行すると、8日前後で完了する計算です。
 
 今回はシリアル実行でしたが、コピー完了までに1台あたり8\~9日かかりました。
-[Docs:Data Boxの制限](https://learn.microsoft.com/ja-jp/azure/databox/data-box-limits#data-box-limits)には10セッションまで同時接続できるとあるので
+[Docs:Data Boxの制限](https://learn.microsoft.com/ja-jp/azure/databox/data-box-limits#data-box-limits)には10セッションまで同時接続できるとあるので…
 
 >Data Box では、NFS 共有上で最大 10 のクライアント接続が同時にサポートされます。
 

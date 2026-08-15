@@ -161,7 +161,7 @@ cy.should('テストタイプ')
 cy.should('テストタイプ', 比較値)
 ```
 
-例：指定の文字列が表示されていることをチェックする
+例：指定の文字列が表示されていることをチェックする。
 
 ```javascript
 cy.contains('Gogle').should('exist');

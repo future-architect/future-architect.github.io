@@ -24,7 +24,7 @@ lede: "チームの輪読会でKuberntes完全ガイドを読みました。 k8s
 
 そのため、手を動かしつつ勉強したいところですが、クラウドプロバイダーが提供するマネージドk8sはコストが高めで気分的にほいほい使えないところがあります。となるとローカル環境でk8sを用意したくなります。
 
-k8s完全ガイドでは[minikube](https://github.com/kubernetes/minikube)だったり[kind](https://kind.sigs.k8s.io/)だったりが紹介されています
+k8s完全ガイドでは[minikube](https://github.com/kubernetes/minikube)だったり[kind](https://kind.sigs.k8s.io/)だったりが紹介されています。
 
 ## ローカル環境もそれなりにめんどくさい
 

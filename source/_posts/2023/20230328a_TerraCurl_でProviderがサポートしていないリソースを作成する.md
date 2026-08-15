@@ -188,7 +188,7 @@ qiita_article_response = "6410f22e585d0907005e"
 
 <img src="/images/2023/20230328a/response.png" alt="" width="1200" height="924" loading="lazy">
 
-※URLまでキャプチャに載せていますが、テスト投稿した記事は削除済みです
+※URLまでキャプチャに載せていますが、テスト投稿した記事は削除済みです。
 
 ## Destoryする時どうするの？
 

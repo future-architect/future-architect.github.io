@@ -126,7 +126,7 @@ done
 ここで気を付けたいのがCloud SQL Auth Proxyの実行コマンドで`--address`を指定する際に、`127.0.0.1`と指定してしまうとlocalhostからの接続しか受け付けなくなってしまいます。今回はDB Bastion外から接続する必要があるため、`0.0.0.0`で指定しております。
 
 作成したStartup scriptはDB Bastion VM構築時に`startup-script`として指定しましょう。
-また、ネットワークタグ：`tags`も設定しておきます
+また、ネットワークタグ：`tags`も設定しておきます。
 
 ```sh compute_instance.tf
 resource "google_compute_instance" "db_bastion" {

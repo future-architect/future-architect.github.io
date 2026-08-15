@@ -341,7 +341,7 @@ Difyの xAI(Grok) プラグインには [`langgenius/x`](https://marketplace.dif
 
 **認証設定**
 
-「認証なし」と表示されているボタンを選択して、環境変数に登録したGrokのAPIキーを登録します
+「認証なし」と表示されているボタンを選択して、環境変数に登録したGrokのAPIキーを登録します。
 
 - 認証タイプ: APIキー
 - API認証タイプ: Bearer

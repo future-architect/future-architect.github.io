@@ -76,7 +76,7 @@ wg.Wait()
 Duration: 19927.45 ms   Billed Duration: 19928 ms   Memory Size: 512 MB Max Memory Used: 206
 ```
 
-と喜んでいましたが、ログをよく見ると
+と喜んでいましたが、ログをよく見ると…
 
 ```text
 dial tcp xxx.xxx.xxx.xxx:443: socket: too many open files

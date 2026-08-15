@@ -48,7 +48,7 @@ Kaggle上で開かれている初心者向けのコンペティションであ�
 
 ## 4章、5章の自然言語処理パートについて
 
-4章、5章では、機械学習用くずし字データセット、[KMNIST](http://codh.rois.ac.jp/kmnist/)を題材として、画像処理を学びます。EfficientNetV2をベースラインとして用い、そこから
+4章、5章では、機械学習用くずし字データセット、[KMNIST](http://codh.rois.ac.jp/kmnist/)を題材として、画像処理を学びます。EfficientNetV2をベースラインとして用い、そこから…
 
 * Data Augmentation
 * Snapshot Ensemble

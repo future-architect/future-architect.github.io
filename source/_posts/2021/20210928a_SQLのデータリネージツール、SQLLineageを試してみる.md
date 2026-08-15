@@ -24,7 +24,7 @@ TIG DXユニット真野です。[Python連載](/articles/20210927b/)の2本目�
 
 DWHのようなデータ基盤を整える上で必要になってくる概念で、保持するデータの発生源や、どのシステムがどう加工して保存されたかと言った流れを追跡できるようにすることです。データのトレーサビリティとも言うかなと思います。追跡可能にすることで、異常データの追跡（要はどこのETL処理で考慮漏れがでたりバグっちゃったのか）や依存関係などを捉えることができます。何かしらの分析にそのデータを利用すべきかどうかの重要な材料になるのは間違いないでしょう。システム開発においての影響度調査などにも便利かもしれませんね。
 
-以下のページなどが参考になるかと思います
+以下のページなどが参考になるかと思います。
 
 * [データ ウェアハウス用のデータリネージ システム - Google Cloud](https://cloud.google.com/architecture/architecture-concept-data-lineage-systems-in-a-data-warehouse?hl=ja)
 * [BigQuery 向けにデータリネージ システムを構築 - Google Cloud](https://cloud.google.com/blog/ja/products/data-analytics/architecting-a-data-lineage-system-for-bigquery)

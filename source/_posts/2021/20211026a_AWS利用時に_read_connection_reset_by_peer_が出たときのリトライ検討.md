@@ -31,7 +31,7 @@ DynamoDBやKinesis Data Streamsなどを利用するサービスをそれなり�
       read: connection reset by peer
 ```
 
-ここで疑問に思ったのは、少なくてもAWS SDK for Goを使っている限りは必要に応じてデフォルトでリトライをしてくれているはずです。下記のドキュメントでは通常は3回のリトライを実施してくれるとあります
+ここで疑問に思ったのは、少なくてもAWS SDK for Goを使っている限りは必要に応じてデフォルトでリトライをしてくれているはずです。下記のドキュメントでは通常は3回のリトライを実施してくれるとあります。
 
 * [Retries and Timeouts | AWS SDK for Go V2](https://aws.github.io/aws-sdk-go-v2/docs/configuring-sdk/retries-timeouts/)
 

@@ -194,7 +194,7 @@ sudo vi /etc/hosts
 
 ##### 余談
 
-以下はKubernetesの設定とは関係のない話なので余談ですが、ターミナル上で
+以下はKubernetesの設定とは関係のない話なので余談ですが、ターミナル上で…
 
 ```sh terminal
 ssh work01.example.com

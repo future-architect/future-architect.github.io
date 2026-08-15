@@ -33,7 +33,7 @@ Google Cloud 認定資格関連の過去記事：
 [GCP Professional Cloud Network Engineer に合格しました](https://future-architect.github.io/articles/20200902/)
 [GCP Associate Cloud Engineer 合格記](https://future-architect.github.io/articles/20210625a/)
 
-皆さんの協力のおかげで残りの合格記は
+皆さんの協力のおかげで残りの合格記は…
 
 - Cloud Database Engineer
 - Cloud DevOps Engineer

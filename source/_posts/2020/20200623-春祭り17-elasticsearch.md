@@ -194,7 +194,7 @@ curlコマンドを使ってバシバシ叩いてみましょう。
 
 登録された内容を確認してみましょう。
 ドキュメントを指定して参照するには、`～/{インデックス名}/{ドキュメントタイプ名}/{ドキュメントid}`と指定してリクエストします。
-ドキュメントidとは、先ほどのレスポンスの **"_id"** です
+ドキュメントidとは、先ほどのレスポンスの **"_id"** です。
 
 ```sh
 > curl -X GET "http://localhost:9200/my_index/my_type/D4DCxnIB33lDYAWdACgJ?pretty" -H "Content-Type":"application/json"

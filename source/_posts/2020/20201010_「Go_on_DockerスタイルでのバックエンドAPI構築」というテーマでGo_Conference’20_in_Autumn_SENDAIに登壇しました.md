@@ -14,7 +14,7 @@ thumbnail: /images/2020/20201010/thumbnail.png
 author: 伊藤真彦
 lede: "TIGの伊藤真彦です先日Go Conference’20 in Autumn SENDAIに登壇させていただきました、リモート登壇の為残念ながら現地には行きませんでした。発表資料はこちらです。"
 ---
-TIGの伊藤真彦です
+TIGの伊藤真彦です。
 
 先日[Go Conference’20 in Autumn SENDAI](https://sendai.gocon.jp/)に登壇させていただきました、リモート登壇の為残念ながら現地には行きませんでした。
 
@@ -24,7 +24,7 @@ TIGの伊藤真彦です
 
 <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vR3m62c-Q6szPVIml4qpn-t79ZW-NNw90LuhseLrRgYEBKyCo4JkCNALodajt9kJPEtX4Tk8XP2R5RI/embed?start=false&loop=false&delayms=10000" frameborder="0" width="100%" height="569px" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
 
-[Youtubeのアーカイブ](https://www.youtube.com/watch?v=rHontd51R3A)としても確認いただけます
+[Youtubeのアーカイブ](https://www.youtube.com/watch?v=rHontd51R3A)としても確認いただけます。
 
 ## 補足
 

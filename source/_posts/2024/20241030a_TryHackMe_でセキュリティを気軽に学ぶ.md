@@ -31,11 +31,9 @@ lede: TryHackMe に関するブログや、最近このようなセキュリテ�
 
 このような脆弱性の攻撃や防御の手法について、例えば SQL Injection や XSS などの用語を、基本情報技術者試験や参考書などで見かけることがあると思います。しかし、これらの技術を試してみるという実践経験はなかなか積めず、知識で留まっていることは多いと思います。
 
-<div class="note alert" style="background: #feebee; padding:16px; margin:24px 12px; border-radius:8px;"><span class="fa fa-fw fa-check-circle"></span>
-
+::: note alert
 悪用の意図の有無によらず、他社の所有するサーバへ上記のような攻撃行為を試行することは「[不正アクセス行為の禁止等に関する法律](https://www.soumu.go.jp/main_sosiki/cybersecurity/kokumin/basic/legal/09/)」などに抵触する恐れがあります。絶対にやめましょう。
-
-</div>
+:::
 
 そのようなお悩みを解決するために、安心安全にサイバーセキュリティのスキルを向上させることができるオンライン学習プラットフォームの１つが [TryHackMe](https://tryhackme.com/) です。
 
@@ -47,7 +45,7 @@ lede: TryHackMe に関するブログや、最近このようなセキュリテ�
 
 TryHackMe には無料で利用できる Room があります。有料プラン（月間or年間）を契約してより深く学習していくこともできます。
 
-TryHackMe は大きく Learn と Practice に分かれています。Learn は
+TryHackMe は大きく Learn と Practice に分かれています。Learn は…
 
 - **Module**：Nmap などのツールや暗号技術などの概念を学ぶ Room の集まり
 - **Learning Path**：特定の目的に沿って一連の Module に取り組む学習コース
@@ -91,7 +89,7 @@ TryHackMe にはブラウザ上で仮想環境を作れる [AttackBox](https://h
   - 完全上位互換ではないです
   - より技術を深く理解したい場合は HackTheBox の方が良さそうです
 
-私個人の感想としては、勉強になぞらえると
+私個人の感想としては、勉強になぞらえると…
 
 - TryHackMe は教科書+章末問題・問題集
 - HackTheBox は参考書・問題集

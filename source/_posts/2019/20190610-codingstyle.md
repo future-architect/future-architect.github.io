@@ -211,7 +211,7 @@ if (condition1) {
 }
 ```
 
-[AFTER] elseを無くし、早期リターンする
+[AFTER] elseを無くし、早期リターンする。
 
 ```js
 if (condition1) {

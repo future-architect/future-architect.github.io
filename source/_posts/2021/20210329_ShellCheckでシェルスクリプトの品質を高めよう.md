@@ -151,7 +151,7 @@ if [[ -n "{$foo}" ]]
           ^-- SC2157: Argument to -n is always true due to literal strings.
 ```
 
-正しくは
+正しくは…
 
 ```sh
 #!/bin/bash

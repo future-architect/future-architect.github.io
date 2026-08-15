@@ -34,7 +34,7 @@ Gitリポジトリ登録機能ですが、Redmineサーバ上で直接Gitリポ�
 
 <img src="/images/2021/20210908a/1.png" alt="1.png" width="507" height="320" loading="lazy">
 
-（2）リポジトリサーバをNFSマウントしRedmineサーバ上から直接参照できるようにする
+（2）リポジトリサーバをNFSマウントしRedmineサーバ上から直接参照できるようにする。
 
 <img src="/images/2021/20210908a/2.png" alt="2.png" width="514" height="326" loading="lazy">
 

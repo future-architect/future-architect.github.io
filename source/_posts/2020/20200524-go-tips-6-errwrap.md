@@ -118,7 +118,7 @@ func main() {
 }
 ```
 
-※Go Playgroundでサンプルを載せようと思いましたが、importでTimeoutになったので諦めました
+※Go Playgroundでサンプルを載せようと思いましたが、importでTimeoutになったので諦めました。
 
 ## 対応方法
 
