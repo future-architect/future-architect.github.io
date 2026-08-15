@@ -133,13 +133,13 @@ Transformerは入力された文章（自然言語）のまま扱うことがで
 
 ### [埋め込み(Embedding)](https://pytorch.org/docs/stable/generated/torch.nn.Embedding.html)
 
-Tokenizerで得たTokenの潜在表現を抽出します。例えば「`[1234, 654, 58295, 219, 179]`」のようなTokenを「`[[1.0, 0.2, ..., 0.3], [0.4, 0.2, ..., 1.0], [0.2, 0.2, ..., 0.1], [0.5, 0.3, ..., 0.7], [0.9, 0.2, ..., 0.1]]`」のように、各Tokenの値をD次元に拡張します。そうすることで、類似した意味を持つTokenを同じ方向や、同じ大きさのベクトルとして表現することができます。
+Tokenizerで得たTokenの潜在表現を抽出します。例えば「`[1234, 654, 58295, 219, 179]`」のようなTokenを「`[[1.0, 0.2, ..., 0.3], [0.4, 0.2, ..., 1.0], [0.2, 0.2, ..., 0.1], [0.5, 0.3, ..., 0.7], [0.9, 0.2, ..., 0.1]]`」のように、各Tokenの値をD次元に拡張します。そうすることで、類似した意味を持つTokenを同じ方向や、同じ大きさのベクトルとして表現できます。
 
 Embeddingは事前に学習された重みを利用することもあります。
 
 ### [線形/全結合(Linear/Fully Connected)](https://pytorch.org/docs/stable/generated/torch.nn.Linear.html)
 
-学習可能なパラメータを利用して入力した潜在表現を変換します。学習可能なパラメータの数は調整することができ、この調整次第で変換後の次元数を増減させることができます。
+学習可能なパラメータを利用して入力した潜在表現を変換します。学習可能なパラメータの数は調整でき、この調整次第で変換後の次元数を増減させることができます。
 
 ### 位置符号化(Positional Encoding)
 
@@ -192,7 +192,7 @@ Transformerでは「自己注意(Self-Attention)」と「相互注意(Cross-Atte
 
 ### [ReLU:Rectified Linear Unit](https://paperswithcode.com/method/relu)
 
-非線形変換を行う関数です。0以下の入力を0にするだけのシンプルな関数です。ReLUの傾きは0か1なので、層を増やしても勾配を消失させにくい特性があります。（最近は活性化関数として使われることが少なくなりましたが、[Sigmoid](https://paperswithcode.com/method/sigmoid-activation)関数は傾きの範囲が0~0.25で、層が増えると勾配が0になってしまう「勾配消失問題」が発生します。）
+非線形変換する関数です。0以下の入力を0にするだけのシンプルな関数です。ReLUの傾きは0か1なので、層を増やしても勾配を消失させにくい特性があります。（最近は活性化関数として使われることが少なくなりましたが、[Sigmoid](https://paperswithcode.com/method/sigmoid-activation)関数は傾きの範囲が0~0.25で、層が増えると勾配が0になってしまう「勾配消失問題」が発生します。）
 
 ### [Softmax](https://paperswithcode.com/method/softmax)
 
