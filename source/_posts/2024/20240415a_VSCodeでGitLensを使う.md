@@ -31,7 +31,7 @@ lede: "VSCodeの拡張機能である「GitLens — Supercharge Git in VS Code�
 
 ソフトウェアエンジニアであれば、エディタとの付き合いは絶対に外せないポイントです。私の場合は、「生成系AIとの連携があるか？」と「開発支援ツールが整備されているか」を判断軸としています。
 
-「GitHub Copilot」との連携があり、私がこれまで利用してきたエディタは
+「GitHub Copilot」との連携があり、私がこれまで利用してきたエディタは…
 
 * [JetBrains](https://www.jetbrains.com/)
 * [VSCode（Visual Studio Code）](https://code.visualstudio.com/)
@@ -203,11 +203,11 @@ Inline Bar Blameをファイル内のコードブロック単位で表示しま�
 
 <img src="/images/2024/20240415a/コメント_2024-04-15_100132.png" alt="" width="1200" height="396" loading="lazy">
 
-`func main() {` （指定した行）の差分を表示すると
+`func main() {` （指定した行）の差分を表示すると…
 
 <img src="/images/2024/20240415a/コメント_2024-04-15_095101.png" alt="" width="1200" height="825" loading="lazy">
 
-`main.go`（指定したファイル）の差分を表示すると
+`main.go`（指定したファイル）の差分を表示すると…
 
 <img src="/images/2024/20240415a/コメント_2024-04-15_095031.png" alt="" width="1200" height="819" loading="lazy">
 

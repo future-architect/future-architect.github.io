@@ -46,7 +46,7 @@ Sesame3は[CANDY HOUSE JAPAN](https://jp.candyhouse.co/)が開発、販売して
 
 ## 3. 必要なもの
 
-実装に使用したものを列挙します
+実装に使用したものを列挙します。
 
 ### 3.1. ハード
 
@@ -70,7 +70,7 @@ Sesame3は[CANDY HOUSE JAPAN](https://jp.candyhouse.co/)が開発、販売して
 Sesame3を動かすWeb APIは[こちら](https://dash.candyhouse.co/login)からAPI_TOKENを発行してください。
 API_TOKENの発行の方法は[こちら](https://zenn.dev/key3/articles/6c1c2841d7a8a2)のブログが参考になりました。
 
-施錠/解錠に必要な情報は
+施錠/解錠に必要な情報は…
 
 - API_TOKEN
 - UUID

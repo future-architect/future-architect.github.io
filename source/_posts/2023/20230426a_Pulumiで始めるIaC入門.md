@@ -77,7 +77,7 @@ Pulumiは以下の構成をとります。詳しくは[公式ドキュメント]
 - Resource：インフラリソースを構成するオブジェクト。オブジェクトのプロパティ（設定値）に関しては、Inputs/OutPutsによりの別のオブジェクトで利用することが可能
 - Stack：Programをデプロイした後のインスタンス。同一のProgramから開発環境/検証環境など、用途に応じて複数の環境用にインスタンスを作成が可能
 
-とにかく、触ってみないと理解できないので、さっそくさわってみたいとおもいます
+とにかく、触ってみないと理解できないので、さっそくさわってみたいとおもいます。
 
 ## Pulumiを使用してGoogle Cloudのリソースを作ってみる
 
@@ -96,7 +96,7 @@ v3.64.0
 ### 言語ランタイムのインストール
 
 Pulumiでは、Goを利用しようと思うのでGoをインストールします。
-こちらは[公式ドキュメント](https://go.dev/dl/)を参照ください
+こちらは[公式ドキュメント](https://go.dev/dl/)を参照ください。
 
 ```sh
 $ go version
@@ -249,7 +249,7 @@ $ tree
 ```
 
 main.goの見ていきましょう。
-このPulumiのプログラムは
+このPulumiのプログラムは…
 
 - USリージョンにGCSバケットを作成
 - GCSバケット名をExportする
@@ -724,7 +724,7 @@ Pulumi Cloudを確認すると、dev stackが削除されていることが確�
 ## [外伝] Pulumi AI
 
 ちょうど一週間ほど前に、自然言語からIaC（インフラ構成コード）を自動生成する「Pulumi AI」を含む、AIを活用した新サービス群「Pulumi Insights」が発表されました。
-タイムリーな内容なので、本記事でも試してみたいと思います
+タイムリーな内容なので、本記事でも試してみたいと思います。
 
 https://www.publickey1.jp/blog/23/pulumipulumi_aiawsazurecloudflarekubernetesdatadog130infra-as-code.html
 

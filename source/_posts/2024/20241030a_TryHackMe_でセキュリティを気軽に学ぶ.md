@@ -47,7 +47,7 @@ lede: TryHackMe に関するブログや、最近このようなセキュリテ�
 
 TryHackMe には無料で利用できる Room があります。有料プラン（月間or年間）を契約してより深く学習していくこともできます。
 
-TryHackMe は大きく Learn と Practice に分かれています。Learn は
+TryHackMe は大きく Learn と Practice に分かれています。Learn は…
 
 - **Module**：Nmap などのツールや暗号技術などの概念を学ぶ Room の集まり
 - **Learning Path**：特定の目的に沿って一連の Module に取り組む学習コース
@@ -91,7 +91,7 @@ TryHackMe にはブラウザ上で仮想環境を作れる [AttackBox](https://h
   - 完全上位互換ではないです
   - より技術を深く理解したい場合は HackTheBox の方が良さそうです
 
-私個人の感想としては、勉強になぞらえると
+私個人の感想としては、勉強になぞらえると…
 
 - TryHackMe は教科書+章末問題・問題集
 - HackTheBox は参考書・問題集

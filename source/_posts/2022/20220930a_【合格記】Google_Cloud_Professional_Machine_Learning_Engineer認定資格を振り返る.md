@@ -20,7 +20,7 @@ lede: "先日、Google Cloudの認定資格であるProfessional Machine Learnin
 
 先日、Google Cloudの認定資格である[Professional Machine Learning Engineer認定資格](https://cloud.google.com/certification/machine-learning-engineer)を受験し、取得できました。
 また、今回はリモート試験にて受験をしてみました。
-この記事では
+この記事では…
 
 - Professional Machine Learning Engineer認定資格の合格に至った学習過程
 - リモート試験体験記

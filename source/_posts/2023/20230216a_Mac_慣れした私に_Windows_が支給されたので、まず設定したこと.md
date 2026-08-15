@@ -132,7 +132,7 @@ Mac と同じ入力方法での英数/かな変換のため、キーボード的
 | --- | ------------ | -------------------- | ------------------------------- | ---------- |
 | 2   | zh,zj,zk,zl  | zh,zj,zk,zl          | zh:←<br> zj:↓<br> zk:↑<br> zl:→ | AutoHotkey |
 
-矢印文字の入力として、Mac では「zh,zj,zk,zl」という便利なショートカットがあります。例えば「→」という文字を入力したいとき、通常ならば
+矢印文字の入力として、Mac では「zh,zj,zk,zl」という便利なショートカットがあります。例えば「→」という文字を入力したいとき、通常ならば…
 
 - ローマ字で「migi」と入力
 - 変換で「右」が最初にヒット
@@ -142,7 +142,7 @@ Mac と同じ入力方法での英数/かな変換のため、キーボード的
 
 <img src="/images/2023/20230216a/auk_1.png" alt="auk_1.png" width="1200" height="637" loading="lazy">
 
-ダンロードするバージョンとして「v1.1」と「v2.0」の 2 つ候補があります。GitHub のリポジトリを確認したところ、メジャーアップデートとなる v2.0 は [2022 年 12 月 20 日にリリース](https://github.com/AutoHotkey/AutoHotkey/releases)されています。文法改善に伴い後方互換性を捨てたことで v1 系で動作していたスクリプトは一部修正が必要になるようです。ネットの情報としては v1 系のサンプルが多い（最近のリリースというのもあり、v2 系の日本語情報はほとんど見つからない）のですが、それほど複雑な文法を入れる見込みはない点と、AutoHotkey のトップページのメッセージには
+ダンロードするバージョンとして「v1.1」と「v2.0」の 2 つ候補があります。GitHub のリポジトリを確認したところ、メジャーアップデートとなる v2.0 は [2022 年 12 月 20 日にリリース](https://github.com/AutoHotkey/AutoHotkey/releases)されています。文法改善に伴い後方互換性を捨てたことで v1 系で動作していたスクリプトは一部修正が必要になるようです。ネットの情報としては v1 系のサンプルが多い（最近のリリースというのもあり、v2 系の日本語情報はほとんど見つからない）のですが、それほど複雑な文法を入れる見込みはない点と、AutoHotkey のトップページのメッセージには…
 
 > AutoHotkey has been released and will be considered the default/main version. We are in a transition period: the website and forums will be updated accordingly. Please see the [announcement](https://www.autohotkey.com/boards/viewtopic.php?f=24&t=112989) for more information.
 
@@ -152,7 +152,7 @@ Mac と同じ入力方法での英数/かな変換のため、キーボード的
 
 <img src="/images/2023/20230216a/auk_2.png" alt="auk_2.png" width="689" height="440" loading="lazy">
 
-`New Script` にてファイル情報の入力・選択が求められるので、今回は
+`New Script` にてファイル情報の入力・選択が求められるので、今回は…
 
 - ファイル名は　 tech_blog.ahk（拡張子は `.ahk` にする）
 - 保存場所はデスクトップ
@@ -190,14 +190,14 @@ VSCode では AutoHotkey 専用の拡張機能 [AutoHotkey Plus Plus](https://ma
 :*:zl::→
 ```
 
-キーバインドの設定は
+キーバインドの設定は…
 
 ```text
 ::<入力する文字列>::<出力する文字列>
 ```
 
 の文法により定義していきます。
-先頭文字 `::` と `:*:` の違いは、[チュートリアルのサンプル](https://www.autohotkey.com/docs/v2/Tutorial.htm#s24) に
+先頭文字 `::` と `:*:` の違いは、[チュートリアルのサンプル](https://www.autohotkey.com/docs/v2/Tutorial.htm#s24) に…
 
 > ::btw::by the way ; Replaces "btw" with "by the way" as soon as you press an [default ending character](https://www.autohotkey.com/docs/v2/Hotstrings.htm#EndChars).
 > :\*:btw::by the way ; Replaces "btw" with "by the way" without needing an ending character.

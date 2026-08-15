@@ -219,7 +219,7 @@ func main() {
 }
 ```
 
-上記のLambdaを実行すると、以下のようなログが出力されます
+上記のLambdaを実行すると、以下のようなログが出力されます。
 
 ```log
 2020-03-26T10:15:05.546+09:00 START RequestId: 8f41435e-5caa-4feb-a1ea-d1f1d6d56811 Version: $LATEST

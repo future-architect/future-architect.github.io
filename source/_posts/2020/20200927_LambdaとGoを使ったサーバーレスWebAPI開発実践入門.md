@@ -95,7 +95,7 @@ Default output format [None]: json
 
 AWS上に構築するインフラはTerraformで使います。一時的な動作確認で使うリソースの場合GUIでポチポチリソースを作成しても問題ないですが、業務でインフラを構築する場合はAWS CloudFormationやTerraformを使うことが一般的です。GUIでポチポチする際に暗黙的に作成されるリソースもしっかり把握していきましょう。
 
-Terraformに関しては
+Terraformに関しては…
 
 * [はじめてのTerraform 0.12 ～環境構築～](/articles/20190816/)
 * [はじめてのTerraform 0.12 ～実践編～](/articles/20190816/)
@@ -661,7 +661,7 @@ go get github.com/jessevdk/go-flags
 
 準備が整ったので、ハンドラの実装をしていきましょう。
 
-まずは `db.go` を実装してDynamoDBに接続します。ローカルでの開発の場合は `4566` ポートで起動しているLocalStackに接続します。DynamoDBのGoのクライアントライブラリは
+まずは `db.go` を実装してDynamoDBに接続します。ローカルでの開発の場合は `4566` ポートで起動しているLocalStackに接続します。DynamoDBのGoのクライアントライブラリは…
 
 * [`aws/aws-sdk-go`](https://github.com/aws/aws-sdk-go)
 * [`guregu/dynamo`](https://github.com/guregu/dynamo)

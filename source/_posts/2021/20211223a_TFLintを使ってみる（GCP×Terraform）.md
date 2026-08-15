@@ -210,7 +210,7 @@ $ tflint
 
 ### 2. 利用しているTerraformのバージョンとTFLintを揃える必要がある
 
-[Compatibility with Terraform](https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/compatibility.md)のドキュメントに記載がある通り、TFLintはTerraformを内蔵しています。そのため、利用しているTerraformのバージョンに合わせて、該当バージョンのTFLintを利用する必要がある
+[Compatibility with Terraform](https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/compatibility.md)のドキュメントに記載がある通り、TFLintはTerraformを内蔵しています。そのため、利用しているTerraformのバージョンに合わせて、該当バージョンのTFLintを利用する必要がある。
 
 直近のバージョン対応表をあげます。
 
@@ -242,7 +242,7 @@ plugin "google" {
 }
 ```
 
-※Projectは、providerのprojectを参照している
+※Projectは、providerのprojectを参照している。
 
 ```tf example.tf
 provider "google" {

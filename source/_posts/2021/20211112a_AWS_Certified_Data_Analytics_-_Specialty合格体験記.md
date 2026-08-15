@@ -50,7 +50,7 @@ Amazon EMRはソリューションアーキテクトでも出題されるサー�
 
 * Amazon Kinesis
 * Amazon Managed Streaming for Apache Kafka
-各ユースケースにおいてData StreamsとData Firehoseどちらが適切かを理解する事が特に重要です
+各ユースケースにおいてData StreamsとData Firehoseどちらが適切かを理解する事が特に重要です。
 
 ### データ活用
 

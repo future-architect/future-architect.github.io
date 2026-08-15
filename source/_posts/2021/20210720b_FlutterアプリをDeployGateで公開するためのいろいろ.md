@@ -47,7 +47,7 @@ iOSは``ios/Runner/Info.plist``に次のタグのペアを書きます。
 * [flutterでアプリアイコンをデフォルトから変更する方法](https://zenn.dev/kyo9bo/articles/196e949cc9dd3a)
 * [【Flutter】スプラッシュ画面(Splash Screen)を一瞬で実装する](https://yaba-blog.com/flutter-splash-screen/)
 
-適当に絵を描きました
+適当に絵を描きました。
 
 <img src="/images/2021/20210721b/スクリーンショット_2021-07-19_19.28.14.png" alt="適当な絵" loading="lazy">
 

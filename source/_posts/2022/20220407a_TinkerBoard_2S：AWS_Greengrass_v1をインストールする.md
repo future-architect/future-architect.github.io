@@ -15,7 +15,7 @@ lede: "ASUSが販売しているシングルボードコンピュータTinekr Bo
 ---
 <img src="/images/2022/20220407a/tinker.png" alt="tinker.png" width="945" height="287" loading="lazy">
 
-[電子工作/IoT連載](/articles/20220404a/) の4本目です
+[電子工作/IoT連載](/articles/20220404a/) の4本目です。
 
 ## はじめに
 
@@ -130,7 +130,7 @@ Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
 有線LANを接続した状態で引き続きセットアップを行います。
 
 SSH接続します。
-ログイン名linaroとなっているので
+ログイン名linaroとなっているので…
 
 ```bash
 ssh linaro@<IPaddress>

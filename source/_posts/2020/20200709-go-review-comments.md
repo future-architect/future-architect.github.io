@@ -55,13 +55,13 @@ Goを初めて使うよってメンバーも多いので、インプット情報
 * **[go-cloudのCoding Conventions](https://github.com/google/go-cloud/blob/master/internal/docs/design.md#coding-conventions)**
   * 短いですが、GoCDKというライブラリの規約が書いてありました
 
-もし、利用しているWebApplicationFrameworkがgo-swaggerであれば
+もし、利用しているWebApplicationFrameworkがgo-swaggerであれば…
 
 * [go-swaggerを用いたWebアプリケーション開発Tips19選](/articles/20200630/)
 
 も軽く見てもらっています。
 
-また、新しい言語を学ぶ際はいつもより多めにググると思いますが、以下の注意点を伝えています
+また、新しい言語を学ぶ際はいつもより多めにググると思いますが、以下の注意点を伝えています。
 
 * Go 1.12以前はgo modがなくてプロジェクト周りで古い情報があったりするので、go modじゃないglide/depなどのツールを紹介しているページは検索でひっかかっても読まないこと
 * GOPATHについて説明しているページも古いから読まない

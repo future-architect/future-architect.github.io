@@ -73,7 +73,7 @@ resource "google_monitoring_alert_policy" "tfer--projects--project-name--alertPo
 
 ### セキュリティに気をつけたい
 
-Cloud Monitoringにはアラート設定をしたときに、その通知先をメールやSlackにできます。しかし、SlackのTokenやメールアドレス自体をコード上にハードコードすることは避けなければいけません。Tokenなどを守る方法としては
+Cloud Monitoringにはアラート設定をしたときに、その通知先をメールやSlackにできます。しかし、SlackのTokenやメールアドレス自体をコード上にハードコードすることは避けなければいけません。Tokenなどを守る方法としては…
 
 - tfvarsで逃す
 - Vaultを使う

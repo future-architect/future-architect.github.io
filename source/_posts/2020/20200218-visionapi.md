@@ -193,7 +193,7 @@ curl -H 'Content-Type:application/json' -d '{"requests":[{"image":{"source":{"im
 }
 ```
 
-descriptionだけ抜き出して整理すると
+descriptionだけ抜き出して整理すると…
 
 |description  |日本語  |
 |---|---|
@@ -234,7 +234,7 @@ curl -H 'Content-Type:application/json' -d '{"requests":[{"image":{"source":{"im
 }
 ```
 
-解析したテキストを整理すると
+解析したテキストを整理すると…
 
 |text|
 |---|

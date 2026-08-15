@@ -111,7 +111,7 @@ RESTfullとかRESTishな方針でWebA PIの横断検索を設計する際にチ�
 
 2021/05/01時点ではDraftフェーズですが、何度かHTTP SEARCH メソッドの仕様検討があるようです。
 
-簡単に言うと、GETのように参照（検索）の意味を持つSEARCHメソッドで、条件はPOSTのようにリクエストボディに記載できます
+簡単に言うと、GETのように参照（検索）の意味を持つSEARCHメソッドで、条件はPOSTのようにリクエストボディに記載できます。
 
 * https://tools.ietf.org/html/draft-snell-search-method-02
   * Expiresが2021/03/06なので、もう無効になっているので注意です。過去には00, 01版もあり定期的に検討されていそう

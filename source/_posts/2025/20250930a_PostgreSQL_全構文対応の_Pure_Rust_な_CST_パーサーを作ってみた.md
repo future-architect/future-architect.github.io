@@ -88,7 +88,7 @@ PostgreSQL のパーサー[^5]はこのような構成だと認識していま�
 
 ### 1. PostgreSQL のソースにパッチ適用
 
-PostgreSQL の素の字句解析器ではコメントはスキップされてしまうため、コメントもトークン化できるよう PostgreSQL のソースに [libpg_query](https://github.com/pganalyze/libpg_query/tree/17-latest) のパッチを適用しました
+PostgreSQL の素の字句解析器ではコメントはスキップされてしまうため、コメントもトークン化できるよう PostgreSQL のソースに [libpg_query](https://github.com/pganalyze/libpg_query/tree/17-latest) のパッチを適用しました。
 
 ### 2. 字句解析器の C のソースを porting
 
@@ -257,7 +257,7 @@ xnstart			[nN]{quote}
 ### 2. bison の定義ファイルの構造
 
 bison の定義ファイルは以下のような構造になっています。
-※ PostgreSQL の定義ファイルの雰囲気を理解できる最低限の内容に絞っています
+※ PostgreSQL の定義ファイルの雰囲気を理解できる最低限の内容に絞っています。
 
 ```c
 %{

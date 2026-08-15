@@ -180,7 +180,7 @@ if __name__ == "__main__":
     main()
 ```
 
-例えば、以下のようなinput.txtに対して、上のコードを実行すると
+例えば、以下のようなinput.txtに対して、上のコードを実行すると…
 
 ```text input.txt
 Hello World!
@@ -196,7 +196,7 @@ hoge hoge
 9
 ```
 
-Apache Beamのパイプライン処理はLinuxコマンドのパイプライン処理と同じように
+Apache Beamのパイプライン処理はLinuxコマンドのパイプライン処理と同じように…
 
 ```bash
 Pipeline | PTransform1 | PTransform2 | ...

@@ -28,7 +28,7 @@ lede: "2019年4月入社_FRX_DigitalLibraryチームの丸野です。研修修�
 ## そもそもReduxって何か
 
 Reduxとは、React.jsで使用するstateつまりアプリケーションの状態を管理するフレームワークです
-簡単にReduxの概念の下記に図式化してみました
+簡単にReduxの概念の下記に図式化してみました。
 
 <img src="/images/2020/20200429/1.png" alt="Redux概念図" loading="lazy">
 
@@ -39,7 +39,7 @@ Reduxとは、React.jsで使用するstateつまりアプリケーションの�
 
 ## Reduxのデータフロー
 
-では上記で示した概略図をもとにReduxのデータフローをそれぞれ説明していきたいと思います
+では上記で示した概略図をもとにReduxのデータフローをそれぞれ説明していきたいと思います。
 
 ### （1）ActionCreatorsによってActionを生成する
 

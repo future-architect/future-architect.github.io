@@ -60,7 +60,7 @@ Doctor summary (to see all details, run flutter doctor -v):
 
 ## ウィジェット開発
 
-StatelessWidgetで作っていきます
+StatelessWidgetで作っていきます。
 
 `lib/main.dart` に実装します。
 

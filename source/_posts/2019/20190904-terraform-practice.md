@@ -19,7 +19,7 @@ lede: "入社以降ずっと触ってきたTerraformについての様々な流�
 
 そんなわけで、様々なTerraformの流派を紹介し、各流派がどのようなパターンに向いているのか(はたまた不向きなのか)の個人的見解をまとめてみました。
 
-※本記事中のサンプルコードはすべて Terraform `0.12`、 provider `google cloud` で解説してます
+※本記事中のサンプルコードはすべて Terraform `0.12`、 provider `google cloud` で解説してます。
 
 ## Terraformとは？
 

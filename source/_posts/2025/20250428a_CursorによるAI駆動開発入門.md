@@ -151,11 +151,11 @@ Cursorの初期設定ではModel選択が「Auto」になっています。Curso
 > Free users receive 2000 suggestions at no cost. Pro and Business plans receive unlimited suggestions.
 > https://docs.cursor.com/tab/overview
 
-タブ補完の詳しいモデルや仕組みは分かっていないのですが、コンテキストをもとに文章を生成しているようです。例えば、ここまでブログを書いてきた段階で
+タブ補完の詳しいモデルや仕組みは分かっていないのですが、コンテキストをもとに文章を生成しているようです。例えば、ここまでブログを書いてきた段階で…
 
 > 私の名前は
 
-と打つと..
+と打つと.。
 
 > 私の名前は小橋です。
 

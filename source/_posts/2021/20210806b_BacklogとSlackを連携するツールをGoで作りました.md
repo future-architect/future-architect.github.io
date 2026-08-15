@@ -83,7 +83,7 @@ type SearchCondition struct {
 
 ### BacklogのAPIキーの取得方法
 
-[公式のリファレンス](https://support-ja.backlog.com/hc/ja/articles/360035641754-API%E3%81%AE%E8%A8%AD%E5%AE%9A)を参照してください
+[公式のリファレンス](https://support-ja.backlog.com/hc/ja/articles/360035641754-API%E3%81%AE%E8%A8%AD%E5%AE%9A)を参照してください。
 
 ### Slackの連携URL
 

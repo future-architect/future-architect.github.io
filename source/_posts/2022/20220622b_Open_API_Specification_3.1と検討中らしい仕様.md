@@ -92,7 +92,7 @@ Swaggerから Open API Specificationへの切り替えですが、 2015年にSwa
 
 リポジトリを見ると[v3.1.1](https://github.com/OAI/OpenAPI-Specification/tree/v3.1.1-dev)と[v3.2.0](https://github.com/OAI/OpenAPI-Specification/tree/v3.2.0-dev) が推進のように見えます。[v3.2.0はマイルストーン](https://github.com/OAI/OpenAPI-Specification/milestone/12)が切られていて、3つのIssueが紐づいていました。また [Post 3.0のラベル](https://github.com/OAI/OpenAPI-Specification/labels/Post%203.0%20Proposal) もあります。
 
-関連Issueを読んでいて面白かった部分を紹介します
+関連Issueを読んでいて面白かった部分を紹介します。
 
 ### （1）[Investigate possibility of removing the constraint that paths must start with "/" #2327](https://github.com/OAI/OpenAPI-Specification/issues/2327)
 
@@ -155,7 +155,7 @@ components:
 
 ### （3）[Support for path parameters which can contain slashes #892](https://github.com/OAI/OpenAPI-Specification/issues/892)
 
-パスパラメータにスラッシュ `/` を許容してほしいという要望です。背景としては
+パスパラメータにスラッシュ `/` を許容してほしいという要望です。背景としては…
 
 * `/resources/123`
 * `/resources/123/action`

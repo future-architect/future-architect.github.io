@@ -115,7 +115,7 @@ lede:
 |2     | Relational型 | 制限的で可能 | Relational Database Service(AWS/Azure/GCP/Oracle Cloud) |
 |3     | Relational型 | 可能        | Oracle-RAC (Oracle Cloud) |
 
-(※1)SpannerはRelation型が自然かと思いますが、本記事ではコアアーキテクチャに注目するためKVSと分類しました
+(※1)SpannerはRelation型が自然かと思いますが、本記事ではコアアーキテクチャに注目するためKVSと分類しました。
 
 今回のテーマのスケーラブルデータベースですが、冒頭「全ての要件を満たせる「万能」なアーキテクチャが存在しない」ということを書きましたが、Oracle RACは例外といってもいいかもしれません。しかしながら、
 

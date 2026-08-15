@@ -55,7 +55,7 @@ with open(sys.argv[1], "r", encoding="utf-8") as src:
     print("End Function")
 ```
 
-次のようなスクリプトを変換してみます
+次のようなスクリプトを変換してみます。
 
 ```powershell hello.ps1
 Write-Host "ハロー"

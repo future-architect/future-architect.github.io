@@ -42,13 +42,13 @@ Prompt Flowを動かすには、`Python 3.9`あるいは`Python 3.10`以上が�
 
 ### 2. Prompt Flowライブラリのインストール
 
-以下のコマンドで`promptflow`,`promptflow-tools`のライブラリをインストールします
+以下のコマンドで`promptflow`,`promptflow-tools`のライブラリをインストールします。
 
 ```sh
 pip install promptflow promptflow-tools
 ```
 
-インストールが完了したら以下のコマンドでpromptflowのバージョンが出力されます
+インストールが完了したら以下のコマンドでpromptflowのバージョンが出力されます。
 
 ```Python
 # (例) "0.1.0b5"

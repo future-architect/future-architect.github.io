@@ -22,7 +22,7 @@ lede: "Terraform 連載ということで、そういえば、実装コードは
 
 こんにちは。CSIG（Cyber Security Innovation Group）の棚井です。
 
-Terraform 連載ということで
+Terraform 連載ということで…
 
 * そういえば、実装コードは Go で書かれていたな
 * コマンドの使い方はインフラエンジニアの皆様が書いてくれるはずなので、コードリーディングしようかな
@@ -268,7 +268,7 @@ coverage: 36.7% of statements
 ok      github.com/hashicorp/terraform  0.049s
 ```
 
-上記ログには
+上記ログには…
 
 > coverage: 36.7% of statements
 
@@ -460,7 +460,7 @@ on linux_amd64
 
 まずはプログラムの始まりとなる「エントリーポイント」を探します。
 
-Go であれば
+Go であれば…
 
 * main.go
 * func main() {...}
@@ -702,7 +702,7 @@ if ExperimentsAllowed() {
 // experimental features are not available.
 ```
 
-コメントの内容に従うと、`terraform` のビルド時に
+コメントの内容に従うと、`terraform` のビルド時に…
 
 ```sh
 go install -ldflags="-X 'main.experimentsAllowed=yes'"
