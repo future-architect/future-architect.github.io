@@ -338,7 +338,7 @@ Input タイプは、string、choice、boolean、environment　などが存在�
 * 参考: [GitHub Actions: Input types for manual workflows](https://docs.github.com/en/actions/learn-github-actions/contexts#inputs-context)
 
 ワークフローを手動実行する際に`env`を指定したい場合は、`environment`を利用します。
-利用する際は、事前に[Settings] > [Environments]で設定を行います。
+利用する際は、事前に[Settings] > [Environments]で設定します。
 
 <img src="/images/2023/20230405a/image_3.png" alt="image.png" width="1200" height="658" loading="lazy">
 

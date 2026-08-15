@@ -118,9 +118,9 @@ plan, apply 等の各種作業をクラウド上でできるようになりま�
 イメージとしては Git の PR 上で ChatOps 的に [plan, apply 等](https://www.runatlantis.io/docs/using-atlantis.html) の実行を行えるツールといったものになりそうですかね！
 個人的には、plan には成功したけれど apply で失敗する…。といったこともまあまあ起こりうるのかなーと思っているので、main に merge されたら apply するというよりかは、PR 上で apply まで担保できるようにするといった運用が取れるのはなかなか良さそうなのカナーと思いました。
 
-さらに [独自のロックの機構](https://www.runatlantis.io/docs/locking.html) も持っているようで、この機能によりチーム単位で修正を行う際でも安全に plan や apply を行えそうです。
+さらに [独自のロックの機構](https://www.runatlantis.io/docs/locking.html) も持っているようで、この機能によりチーム単位で修正する際でも安全に plan や apply を行えそうです。
 このロックは、もちろんリポジトリ単位ではなくディレクトリ単位や Terraform Workspace 単位でロックがかかるようになっているようです（そもそもどのようなディレクトリ構成の Terraform を扱えるかは [こちら](https://www.runatlantis.io/docs/requirements.html#repository-structure) に記載があります）。。
-GitHub Actions 等でもいわゆる ChatOps 的な運用を実現することは可能ではあるのですが、なかなかここまで厳密なロックの機構を実現するのは難しそうなのかなと思います。
+GitHub Actions 等でもいわゆる ChatOps 的な運用は実現できるのですが、なかなかここまで厳密なロックの機構を実現するのは難しそうなのかなと思います。
 
 その他詳細は、[ドキュメント](https://www.runatlantis.io/docs/) を参照してください。
 
@@ -147,7 +147,7 @@ GitHub Actions 等でもいわゆる ChatOps 的な運用を実現すること�
 基本的に今回の用途であれば、以下の2つの Actions を使用してワークフローを組むとよさそうです。
 
 - [setup terraform](https://github.com/hashicorp/setup-terraform): Terraform をよしなに扱えるようにする Action。
-- [google auth](https://github.com/google-github-actions/auth): Google Cloud の認証を行う Action（Wokload Identity による認証とサービスアカウントのキーを使った認証のどちらにも対応している様子）。
+- [google auth](https://github.com/google-github-actions/auth): Google Cloud を認証する Action（Wokload Identity による認証とサービスアカウントのキーを使った認証のどちらにも対応している様子）。
 
 GitHub Actions では、[こちら](https://docs.github.com/en/actions/using-workflows/triggering-a-workflow) のように様々なトリガーが設定できます。また、先ほどのパスの概念も用いれば柔軟に運用はできそうですね！
 
@@ -191,7 +191,7 @@ Terraform を設定する際の example もいくつか [公開されていま�
 
 次にやることは、 [Secret Management の設定](https://pipecd.dev/docs-dev/user-guide/managing-application/secret-management/) です。Secret Management とは、各種秘匿情報を Git 上で管理できるようにするための機能です。
 
-上記の Terraform Application の例を参照すると、 [credentials ディレクトリ](https://github.com/pipe-cd/examples/tree/master/terraform/simple/.credentials) があり、そこでコマンド実行用の Service Account のキー配置を行っているようですね。ただセキュリティの観点からそのままキーを Git の管理下に置くことはできないため、この Secret Management の機能を利用して適切に暗号化の処理を行なっているようです。
+上記の Terraform Application の例を参照すると、 [credentials ディレクトリ](https://github.com/pipe-cd/examples/tree/master/terraform/simple/.credentials) があり、そこでコマンド実行用の Service Account のキーを配置しているようですね。ただセキュリティの観点からそのままキーを Git の管理下に置くことはできないため、この Secret Management の機能を利用して適切に暗号化の処理を行なっているようです。
 
 #### その他
 
@@ -235,14 +235,14 @@ PR 上でのプレビューもあり、運用のイメージもしやすいで�
 
 #### Cost Estimation
 
-[**Cost Estimation**](https://developer.hashicorp.com/terraform/cloud-docs/cost-estimation) は、コストの見積もりを行い、可視化する機能です。
+[**Cost Estimation**](https://developer.hashicorp.com/terraform/cloud-docs/cost-estimation) は、コストを見積もり、可視化する機能です。
 ※ 現在 Cloud Team & Governance 以上のプランでのみ使える機能です。
 
 なかなか魅力的な機能ではありそうですが、**サポートされるリソースに関しては、[制限があるよう](https://developer.hashicorp.com/terraform/cloud-docs/cost-estimation#supported-resources) なのでそちらは注意が必要そうです。**
 
 #### Drift Detection
 
-[**Drift Detection**](https://www.hashicorp.com/campaign/drift-detection-for-terraform-cloud) は、差分検知を行い、差分があれば可視化、必要に応じて通知を飛ばせる機能です（GitOps の原則 #4 を実現するための機能とも言えますね！）。
+[**Drift Detection**](https://www.hashicorp.com/campaign/drift-detection-for-terraform-cloud) は、差分を検知し、差分があれば可視化、必要に応じて通知を飛ばせる機能です（GitOps の原則 #4 を実現するための機能とも言えますね！）。
 ※ 現在 Cloud Business 以上のプランでのみ使える機能です。
 
 ## Atlantis を使った GitOps

@@ -120,7 +120,7 @@ pipでインストールしたらすぐに終わりました。
 
 ## Raspberry Pi →Arduinoへシリアル通信
 
-Raspberry PiとArduinoの準備が大体整ったので試しにシリアル通信を行ってみます。
+Raspberry PiとArduinoの準備が大体整ったので試しにシリアル通信してみます。
 以下のような文字列送信用のPythonを用意します。
 
 ::: note info

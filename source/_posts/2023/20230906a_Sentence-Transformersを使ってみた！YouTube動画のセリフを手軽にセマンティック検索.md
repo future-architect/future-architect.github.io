@@ -84,7 +84,7 @@ Sentence-Transformersのフレームワークが[huggingface](https://huggingfac
 
 https://simpleneighbors.readthedocs.io/en/latest/
 
-コーパスの項目に対して最近傍検索を実行するための簡単なインターフェースです。
+コーパスの項目に対して最近傍検索するための簡単なインターフェースです。
 `Annoy`、`Sklearn`、`BruteForcePurePython`の3つのバックエンドをサポートしていますが、`Annoy`が推奨していますので、それも一緒にインストールします。
 
 ```sh

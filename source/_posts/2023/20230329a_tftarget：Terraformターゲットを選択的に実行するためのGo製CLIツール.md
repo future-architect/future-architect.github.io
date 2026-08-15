@@ -27,7 +27,7 @@ lede: "Terraformのtargetオプションを簡単に実行するためのCLIツ�
 
 ### Terraformのtarget指定に関する課題
 
-チームで開発を行っている際、Terraformのtargetオプションを使ってリソースを適用するケースはしばしばあるかと思います。
+チームで開発している際、Terraformのtargetオプションを使ってリソースを適用するケースはしばしばあるかと思います。
 
 私のチームでは、環境を本番環境、検証環境、開発環境の3つに分けています。本番環境と検証環境では、差分が出ないようにtargetオプションを使用せず、常にクラウド環境とTerraformの記述が同期された状態に保っています。
 
@@ -67,7 +67,7 @@ https://github.com/future-architect/tftarget/releases
 
 ### どのようなシチュエーションで役立つか
 
-冒頭で述べたように、複数人で開発を行い、各人が個別に定義したリソースに影響を与えずに開発を進める際に役立ちます。`terraform target`を簡単に実行したい場面全般で利用価値があるおもいます。
+冒頭で述べたように、複数人で開発し、各人が個別に定義したリソースに影響を与えずに開発を進める際に役立ちます。`terraform target`を簡単に実行したい場面全般で利用価値があるおもいます。
 
 <div class="note alert" style="background: #feebee; padding:16px; margin:24px 12px; border-radius:8px;">
   <span class="fa fa-fw fa-times-circle"></span>
@@ -167,7 +167,7 @@ Flags:
 tftarget apply -f create
 ```
 
-このオプションは、複数のアクションを指定することはできません。そのため、以下のようなコマンドはエラーとなります。
+このオプションは、複数のアクションを指定できません。そのため、以下のようなコマンドはエラーとなります。
 
 ```shell
 tftarget apply -f create destroy
@@ -215,8 +215,8 @@ https://github.com/future-architect/tftarget/issues
 
 ### tftargetが解決する問題点
 
-tftargetを使用することで、簡単に`terraform target`を実行できます。特に、複数のメンバーが開発を行う際、各メンバーが定義したリソースを破壊することなく、安全に運用できるようになります。
+tftargetを使用することで、簡単に`terraform target`を実行できます。特に、複数のメンバーが開発する際、各メンバーが定義したリソースを破壊することなく、安全に運用できるようになります。
 
 ### 今後の展望やアップデート予定
 
-現在、tftargetはAWS環境でのみ動作検証が行われています。今後は、GCPやAzureでの動作確認や改善を行っていく予定です。
+現在、tftargetはAWS環境でのみ動作検証が行われています。今後は、GCPやAzureでの動作確認や改善をしていく予定です。

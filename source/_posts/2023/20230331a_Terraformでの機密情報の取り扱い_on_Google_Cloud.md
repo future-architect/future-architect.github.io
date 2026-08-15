@@ -104,7 +104,7 @@ sopsはmozillaが開発している暗号化ツールです。
 
 https://github.com/mozilla/sops
 
-YAML、JSON、ENV、INI、BINARYフォーマットに対応し、Google CLoud KMS、AWS KMS、Azure Key Vault、age、PGPにて利用することが可能です。
+YAML、JSON、ENV、INI、BINARYフォーマットに対応し、Google CLoud KMS、AWS KMS、Azure Key Vault、age、PGPにて利用できます。
 
 ### sops-provider
 
@@ -164,7 +164,7 @@ resource "google_kms_key_ring_iam_policy" "key_ring_iam" {
 sops --input-type json --encrypt --gcp-kms projects/<PROJECT_ID>/locations/global/keyRings/test-key-ring/cryptoKeys/test-key secrets/test-apikey.json > secrets/test-apikey_encrypted.json
 ```
 
-今回、sops-providerを利用して自動で復号化を行うため、providerの追加を行います（terraform initを忘れずに）。
+今回、sops-providerを利用して自動で復号化するため、providerを追加します（terraform initを忘れずに）。
 
 ```tf versions.tf
 terraform {

@@ -163,7 +163,7 @@ https://developer.hashicorp.com/terraform/cli/commands/apply#parallelism-n
 
 https://developer.hashicorp.com/terraform/cli/commands/fmt#usage
 
-`fmt` コマンドはその名の通り、記述のコード整形を行うコマンドですが、そのオプションに `-recursive` というものがあります。オプションなしではカレントディレクトリ内のファイルのみを対象としますが、 `-recursive` をつけることで、サブディレクトリも含め、再帰的にフォーマットを実行してくれます。
+`fmt` コマンドはその名の通り、記述のコードを整形するコマンドですが、そのオプションに `-recursive` というものがあります。オプションなしではカレントディレクトリ内のファイルのみを対象としますが、 `-recursive` をつけることで、サブディレクトリも含め、再帰的にフォーマットを実行してくれます。
 
 私の携わっていたプロジェクトでは、CI/CDにて `terraform fmt -recursive -check` を実施し、pushされたものが全ファイルフォーマットされていなければエラーとして弾くWorkflowを構築していました。複数人でTerraformを記載する際にコードの一貫性を担保するためにも、ぜひ導入しておきましょう。
 

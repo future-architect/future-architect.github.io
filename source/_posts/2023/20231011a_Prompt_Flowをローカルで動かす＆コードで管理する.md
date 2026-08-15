@@ -125,7 +125,7 @@ pf flow test --flow my-simple-flow
 
 ### 1. Connectionの設定
 
-まずはConnection（接続）の設定を行います。
+まずはConnection（接続）を設定します。
 
 任意のディレクトリ上で、接続先を定義するYAMLファイルを作成します（ここでは`connection-azure-openai.yaml`という名前で作成）
 
@@ -290,7 +290,7 @@ Outputsの欄に出力が表示されます。
 
 ### 5. フローの一括実行
 
-複数の入力を一括で実行することもできます。
+複数の入力の一括実行もできます。
 
 まずは`flow.dag.yaml`ファイルを編集し、`default: 東京はどこの国の都市？`の行をコメントアウトします。
 

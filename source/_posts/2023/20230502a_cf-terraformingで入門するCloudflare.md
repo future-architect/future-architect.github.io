@@ -150,7 +150,7 @@ your Terraform state and will henceforth be managed by Terraform.
 
 ### その他
 
-cf-terraformingは、公式の[Supported Resources](https://github.com/cloudflare/cf-terraforming#supported-resources)に記載があるように、Cloudflareの全てのリソースに対して対応しているわけではありません。ただ、Terraformの管理下としたい場合の選択肢としては、Terraformが元来機能として有している`terraform import`コマンドもあり、ほとんどカバーすることが可能です。
+cf-terraformingは、公式の[Supported Resources](https://github.com/cloudflare/cf-terraforming#supported-resources)に記載があるように、Cloudflareの全てのリソースに対して対応しているわけではありません。ただ、Terraformの管理下としたい場合の選択肢としては、Terraformが元来機能として有している`terraform import`コマンドもあり、ほとんどカバーできます。
 
 ## まとめ
 

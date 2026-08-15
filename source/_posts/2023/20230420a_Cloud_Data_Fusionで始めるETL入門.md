@@ -103,7 +103,7 @@ Studio画面の構成を大きく3つに分けて説明します。
 プラグインは大きく分けて、以下のような種類が用意されています。
 
 * Source：　起点となるデータソースを指定するプラグイン
-* Transform・Analytics：各種データ変換を行うプラグイン
+* Transform・Analytics：各種データを変換するプラグイン
 * Sink：データの流れの終端として、データの格納先を指定するプラグイン
 * Conditions and Actions：データ変換とは関係ない何らかのアクション（ファイル移動や削除 等）を行えるプラグイン
 * Error Handlers and Alerts：エラーハンドリングを行うプラグイン
@@ -144,7 +144,7 @@ GCS Propertiesをクリックすると以下のような画面が表示されま
 
 データ加工は主に、Wranglerと呼ばれるプラグインで行います。
 
-Wranglerでは、記載されたDirectivesを元にデータ加工を行います。
+Wranglerでは、記載されたDirectivesを元にデータを加工します。
 （個人的にこれがCloud Data Fusionの一番便利な機能だと思っています）。
 
 <img src="/images/2023/20230420a/image_9.png" alt="" width="1200" height="559" loading="lazy">

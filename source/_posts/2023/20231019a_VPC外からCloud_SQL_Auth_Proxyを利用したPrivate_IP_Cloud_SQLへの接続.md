@@ -123,7 +123,7 @@ EOF"
 done
 ```
 
-ここで気を付けたいのがCloud SQL Auth Proxyの実行コマンドで`--address`を指定する際に、`127.0.0.1`と指定してしまうとlocalhostからの接続しか受け付けなくなってしまいます。今回はDB Bastion外から接続を行う必要があるため、`0.0.0.0`で指定しております。
+ここで気を付けたいのがCloud SQL Auth Proxyの実行コマンドで`--address`を指定する際に、`127.0.0.1`と指定してしまうとlocalhostからの接続しか受け付けなくなってしまいます。今回はDB Bastion外から接続する必要があるため、`0.0.0.0`で指定しております。
 
 作成したStartup scriptはDB Bastion VM構築時に`startup-script`として指定しましょう。
 また、ネットワークタグ：`tags`も設定しておきます
@@ -188,4 +188,4 @@ postgres=>
 
 本記事ではプライベートIPしか持たないCloud SQLインスタンスに対して、インスタンスが存在するVPCの外からCloud SQL Auth Proxyを介して接続する方法を紹介しました。
 
-Cloud SQL Auth Proxy自体、全くキャッチアップなく簡単に使えて非常に便利なサービスです。[Cloud SQL Auth Proxy Docker イメージを使用した SQL サーバー クライアントの接続](https://cloud.google.com/sql/docs/sqlserver/connect-docker?hl=ja)で説明されているようにDockerとして起動することも可能なので、自身の要件に合わせて構成してみて下さい。
+Cloud SQL Auth Proxy自体、全くキャッチアップなく簡単に使えて非常に便利なサービスです。[Cloud SQL Auth Proxy Docker イメージを使用した SQL サーバー クライアントの接続](https://cloud.google.com/sql/docs/sqlserver/connect-docker?hl=ja)で説明されているようにDockerとして起動もできるので、自身の要件に合わせて構成してみて下さい。

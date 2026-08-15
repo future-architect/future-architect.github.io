@@ -53,7 +53,7 @@ getByLabel('検索', { exact: true })
 - 検索フォームをクリックする
 - 「トマト」と入力する
 
-を実際に操作します。すると、`codegen`コマンド実行時にブラウザとは別に開くもう1つのウィンドウ（Playwright Inspector）にて、上記の操作を実行するテストコードが自動生成されました。
+を実際に操作します。すると、`codegen`コマンド実行時にブラウザとは別に開くもう1つのウィンドウ（Playwright Inspector）にて、上記の操作をするテストコードが自動生成されました。
 
 <img src="/images/2023/20230824a/image_2.png" alt="" width="879" height="336" loading="lazy">
 

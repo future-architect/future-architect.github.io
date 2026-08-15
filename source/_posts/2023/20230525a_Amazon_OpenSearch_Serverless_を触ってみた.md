@@ -151,7 +151,7 @@ https://www.elastic.co/jp/blog/elastic-and-amazon-reach-agreement-on-trademark-i
    <img src="/images/2023/20230525a/image_6.png" alt="image.png" width="1200" height="382" loading="lazy"><br>
    DevToolsの画面が開くので好きにAPIを実行しちゃってください。
    <img src="/images/2023/20230525a/image_7.png" alt="image.png" width="1200" height="275" loading="lazy"><br>
-   - 試しに[デベロッパーガイドのチュートリアル](https://docs.aws.amazon.com/ja_jp/opensearch-service/latest/developerguide/serverless-getting-started.html#serverless-gsg-index)の「ステップ3: データをアップロードして検索する」にならってインデックスの作成を行う
+   - 試しに[デベロッパーガイドのチュートリアル](https://docs.aws.amazon.com/ja_jp/opensearch-service/latest/developerguide/serverless-getting-started.html#serverless-gsg-index)の「ステップ3: データをアップロードして検索する」にならってインデックスを作成する
    以下を入力し、列の右側に再生ボタンのようなアイコンが出るのでクリック
 
    ```json

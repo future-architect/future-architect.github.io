@@ -440,7 +440,7 @@ $ PGTZ=UTC PGPASSWORD=pass psql -h localhost -p 5432 -U postgres -c 'select * fr
 
 セッションのタイムゾーンを、DBから取得した`timestampz`の列データを`time.Time`に適用してくれないなら、どこに影響するのかという疑問ですよね。
 
-最もわかりやすい影響しそうな箇所は、「文字列」↔ `timestampz` にSQL 側で変換を行う場合でしょう。
+最もわかりやすい影響しそうな箇所は、「文字列」↔ `timestampz` にSQL 側で変換する場合でしょう。
 
 具体例をあげると、SQL側で以下のような `timestampz` の項目を `to_char` で文字列に変換する場合には、セッションで有効なタイムゾーンが利用されます（この例だと `Asia/Tokyo` を利用していますね）。
 

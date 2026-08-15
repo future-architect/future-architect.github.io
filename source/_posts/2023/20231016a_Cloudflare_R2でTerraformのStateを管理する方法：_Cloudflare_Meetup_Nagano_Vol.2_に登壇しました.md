@@ -35,7 +35,7 @@ https://github.com/kaedemalu/cf-teraform-handson
 
 TerraformのStateは一般的にはクラウドプロバイダーが提供するストレージサービスで管理します。例えばAWSであればS3、Google CloudであればGCSのようなものです。
 
-この時に、S3にホストさせるのであればいかのようなブロックを書いてBackendの設定を行います。
+この時に、S3にホストさせるのであればいかのようなブロックを書いてBackendを設定します。
 
 ```sh
 terraform {
@@ -136,7 +136,7 @@ terraform {
 }
 ```
 
-これで、無事R2でState管理をできるようになり、リソース作成を行うと、実際にStateファイル(`default.state`)が配置されたり、更新されることがわかりました。そのため、現在のS3互換のAPIサポート状況でも問題なく利用できることがわかりました。
+これで、無事R2でState管理をできるようになり、リソースを作成すると、実際にStateファイル(`default.state`)が配置されたり、更新されることがわかりました。そのため、現在のS3互換のAPIサポート状況でも問題なく利用できることがわかりました。
 
 ## ほかの登壇内容
 
@@ -144,7 +144,7 @@ terraform {
 
 当日のハンズオン資料：[Cloudflare AI Gateway を試してみた](https://zenn.dev/kameoncloud/articles/ee68d54bcadf90)
 
-今回はイベント当時ベータ版であるAI Gatewayを経由して、Cloudflare WorkersからOpenAI(Chat GPT)にリクエストを実行するハンズオンでした。今回はOpenAIでしたが、プロキシするサービスはこれ以外にも複数選択することが可能で、これはマルチクラウドで使うことが考えられるCloudflareならではと感じたサービスでした。
+今回はイベント当時ベータ版であるAI Gatewayを経由して、Cloudflare WorkersからOpenAI(Chat GPT)にリクエストを実行するハンズオンでした。今回はOpenAIでしたが、プロキシするサービスはこれ以外にも複数選択でき、これはマルチクラウドで使うことが考えられるCloudflareならではと感じたサービスでした。
 
 ハンズオンを通して、Workersの手軽さはもちろん、デプロイに利用するWranglerも含めてしっかり整っていることを感じました。また、ハンズオンの時間が少々余ったので、ほかのハンズオン資料として、[Cloudflare Workers AI のハンズオン手順](https://zenn.dev/kameoncloud/articles/707b3b623bdb87)も試してみました。これはCloudflareのエッジポイントに配置されているGPUをWorkersで利用し、推論などを行うハンズオンでした。そのため、
 

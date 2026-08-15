@@ -361,7 +361,7 @@ def pipeline():
     train_task = train_op(preprocess_task.output).add_node_selector_constraint("cloud.google.com/gke-accelerator", "NVIDIA_TESLA_A100").set_gpu_limit(4)
 ```
 
-また、`CustomJob.jobSpec.workerPoolSpecs`から指定することもできます。
+また、`CustomJob.jobSpec.workerPoolSpecs`からの指定もできます。
 
 ```python
 from kfp.v2 import compiler, components, dsl
@@ -450,7 +450,7 @@ def pipeline() -> None:
 
 ### パイプラインを定期実行するには？
 
-パイプラインの定期実行はCloud Schedulerを利用することで可能です。
+パイプラインの定期実行はCloud Schedulerを利用すればできます。
 
 パイプラインの定期実行までの流れは以下のようになります。
 
@@ -557,7 +557,7 @@ gcloud scheduler jobs create http run-pipeline \
 
 ユーザ→パイプライン、コンポーネント→コンポーネント
 
-パイプライン実行時に引数を渡すには、`aiplatform.PipelineJob`の`parameter_values`を指定することで可能です。辞書型で変数名と値のペアで渡すことができます。あとは`argparse`などを利用すれば、コマンドライン引数からパイプラインのパラメータを入力できます。
+パイプライン実行時に引数を渡すには、`aiplatform.PipelineJob`の`parameter_values`を指定すればできます。辞書型で変数名と値のペアで渡すことができます。あとは`argparse`などを利用すれば、コマンドライン引数からパイプラインのパラメータを入力できます。
 
 ```python
 import argparse
@@ -704,7 +704,7 @@ def train(..., model: Output[Model], ...) -> None:
     ...
 ```
 
-また、Dockerベースの場合には、コンポーネントの仕様を定義したyamlファイルの`outputs`に記述することでできます。
+また、Dockerベースの場合には、コンポーネントの仕様を定義したyamlファイルの`outputs`に記述すればできます。
 
 ```yaml
 name: train
@@ -798,7 +798,7 @@ Vertex AI PipelinesのGUIから行う場合は、パイプライン一覧のペ�
 Vertex AI Experimentsから行う場合は、サイドバーの「テスト」から見たいexperimentを選ぶと、以下のように比較ができます。
 <img src="/images/2023/20230213a/experiment_2.png" alt="experiment.png" width="752" height="318" loading="lazy">
 <img src="/images/2023/20230213a/compare_pipelines_in_vertex_ai_experiments.png" alt="compare_pipelines_in_vertex_ai_experiments.png" width="1200" height="258" loading="lazy">
-また、Pythonスクリプトでターミナル上から比較することも可能です。以下のスクリプトを実行することで対象のexperiment内のパイプラインを比較できます。
+また、Pythonスクリプトでターミナル上からの比較も可能です。以下のスクリプトを実行することで対象のexperiment内のパイプラインを比較できます。
 
 ```python
 import google.cloud.aiplatform as aip

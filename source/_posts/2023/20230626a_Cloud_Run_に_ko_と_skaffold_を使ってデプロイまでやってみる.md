@@ -299,7 +299,7 @@ run:
 
 こちらに出てくる DeliveryPipeline や、Target といった用語は先ほど説明したものと同じです。
 
-`kind: DeliveryPipeline` は、名前の通りデリバリーを行ううえでのパイプラインの設定を行うもので、`kind: Target` は、デプロイ先の設定を行うものになります。
+`kind: DeliveryPipeline` は、名前の通りデリバリーを行ううえでのパイプラインを設定するもので、`kind: Target` は、デプロイ先を設定するものになります。
 
 上記の設定は、最小限のものになるので必要に応じて [こちら](https://cloud.google.com/deploy/docs/config-files) を参考にしてパイプラインの設定を追加するとよさそうです（カナリアデプロイをできるようにする設定はこの後行います）。
 
