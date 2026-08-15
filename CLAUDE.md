@@ -162,6 +162,7 @@ bootstrap-subset → metronic → theme-styles.styl の順で `/css/site.css` �
   | 本文見出し h1〜h5 | `2.0 / 1.85 / 1.7 / 1.55 / 1.4em` = 26 / 24.05 / 22.1 / 20.15 / 18.2px | 〃 |
   | 一覧ページの見出し `.list-page` | 記事タイトルと同じ（`.article-title` と同一ルール） | 〃 |
   | 一覧ページの統計（数値 / ラベル） | `clamp(17px, 1rem + 0.4vw, 20px)` / 12px | 〃 |
+  | 目次の項目（`.toc-section ol`。サイドバー・モバイル共通） | 14px（字下げの `1em` もこの値に追従する） | 〃 |
   | 脚注（`#footnotelist li`） | `1em` = 13px | 〃 |
   | 記事概要文 `.lede`（一覧 / We're hiring カード） | `1.2em` = 15.6px / 継承 = 13px | 〃 |
   | 特設ページの本文 `.specials-text` | `1.2em` = 15.6px（`.article-entry` 外なので明示） | 〃 |
