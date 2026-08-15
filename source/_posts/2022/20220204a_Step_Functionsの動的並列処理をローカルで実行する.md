@@ -212,7 +212,7 @@ Step Functionsを実行するときにはログも確認しながらデバッグ
 docker compose up --build
 ```
 
-次にAWS CLIの設定を行います。
+次にAWS CLIを設定します。
 
 ## AWS CLIの設定
 
@@ -236,7 +236,7 @@ aws_access_key_id = test
 aws_secret_access_key = test
 ```
 
-次にLambdaの実装を行います。
+次にLambdaを実装します。
 
 ## Lambdaの実装
 
@@ -404,7 +404,7 @@ def lambda_handler(event, context) -> dict:
     return handler.main()
 ```
 
-ScatterLambdaでは、ファイルの分割を行います。
+ScatterLambdaでは、ファイルを分割します。
 
 ```python scatter.py
 import json
@@ -931,7 +931,7 @@ make stepfunctions
 ```
 
 実行するとLocalStackのログで各Lambdaが処理を開始しているのを確認できます。
-ターミナルの右反面でステートマシンの作成、実行、消去を行っています。
+ターミナルの右反面でステートマシンを作成、実行、消去しています。
 ターミナルの左半面はLocalStackで書き出されるログです。
 よく見るとScatterLambdaで後続のSegmentLambdaに渡した`segment_definitions`や、`segment_results`なども出力されていることがわかります。
 ログを確認したい方はコンテナ起動時に`-d`オプションを付けずに起動してください。

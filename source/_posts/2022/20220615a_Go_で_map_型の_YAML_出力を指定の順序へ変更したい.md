@@ -134,11 +134,11 @@ func main() {
 上記記載の通り、map のソート順はライブラリ側で固定化されているので、map 型のままだと難しそうです。
 map 型の他に、key/value 形式でソート順が固定されているデータ構造としては、 struct が該当すると考え、map → struct の変換をすれば良いのではと思いつきました。
 
-ですが、map は任意の key/value 値になるため、コンパイル前に struct を定義することはできません。
+ですが、map は任意の key/value 値になるため、コンパイル前に struct を定義できません。
 そのため、map の key/value 値を元にして、実行時に struct を生成することにしました。
 
 また、YAML 形式へ変換する実装を map → struct への変換処理にカスタマイズしたいです。
-変換処理を独自カスタマイズするには、[go-yaml/yaml.v3](https://github.com/go-yaml/yaml) の場合は `Marshaler` interface を実装することで可能です。
+変換処理を独自カスタマイズするには、[go-yaml/yaml.v3](https://github.com/go-yaml/yaml) の場合は `Marshaler` interface を実装できます。
 
 [yaml/yaml.go at v3 · go-yaml/yaml · GitHub](https://github.com/go-yaml/yaml/blob/v3/yaml.go#L50)
 
