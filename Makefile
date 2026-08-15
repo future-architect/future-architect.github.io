@@ -15,6 +15,9 @@ fix:
 g:
 	node_modules/.bin/hexo g
 
+css:
+	node css.mjs
+
 mermaid:
 	node mermaid_svg.mjs
 
