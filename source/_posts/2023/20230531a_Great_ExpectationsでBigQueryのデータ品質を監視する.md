@@ -400,7 +400,7 @@ Type [n] to see the next page or [p] for the previous. When you're ready to sele
 To continue editing this suite, run jupyter notebook <現在のディレクトリ>/great_expectations/uncommitted/edit_exp_suite_test.ipynb
 ```
 
-JSONファイルを直接編集することもできますが、複雑なため、Notebook形式やPythonのAPI経由で編集することをお勧めします（[公式Docs参考](https://docs.greatexpectations.io/docs/guides/expectations/how_to_create_and_edit_expectations_with_instant_feedback_from_a_sample_batch_of_data)）
+JSONファイルの直接編集もできますが、複雑なため、Notebook形式やPythonのAPI経由で編集することをお勧めします（[公式Docs参考](https://docs.greatexpectations.io/docs/guides/expectations/how_to_create_and_edit_expectations_with_instant_feedback_from_a_sample_batch_of_data)）
 
 ### GCPにおける構成例は？
 
@@ -420,7 +420,7 @@ JSONファイルを直接編集することもできますが、複雑なため�
 
 多すぎて把握出来ていませんが、[公式コミュニティ](https://greatexpectations.io/expectations/)に既存のExpectationsが300個以上あります。
 
-Expectationを自作することも可能であり、カスタマイズ性は非常に高いです（[公式Docs参考](https://docs.greatexpectations.io/docs/guides/expectations/creating_custom_expectations/overview)）
+Expectationの自作も可能であり、カスタマイズ性は非常に高いです（[公式Docs参考](https://docs.greatexpectations.io/docs/guides/expectations/creating_custom_expectations/overview)）
 
 ## 5. おわりに
 
