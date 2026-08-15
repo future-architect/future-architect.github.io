@@ -32,10 +32,10 @@ lede: "2022年1月28日にFuture Tech Night #19 AWS CodePipelineと新聞向けC
 
 以下が、パイプライン構築時にはまったことやTips等の抜粋です。
 
-- ECS on EC2でAWSVPCモードを使用する場合は、タスクごとにENIがアタッチされるため、インスタンスタイプによっては許容されているENI数を超えてしまい、タスクが立ち上がらないことがあります。その対策としてAWSVPC Trunking制限緩和申請を行うことでインスタンスで許容されるENI数の上限を大幅に引き上げることができます。
+- ECS on EC2でAWSVPCモードを使用する場合は、タスクごとにENIがアタッチされるため、インスタンスタイプによっては許容されているENI数を超えてしまい、タスクが立ち上がらないことがあります。その対策としてAWSVPC Trunking制限緩和申請することでインスタンスで許容されるENI数の上限を大幅に引き上げることができます。
 - CodeBuild実行時にDocker HubからイメージをPullする構成になっていると「error pulling image configuration: toomanyrequests:Too Many Requests」とrate-limitエラーになってしまうので、ECR Publicを使用してイメージをpullするようにしました。
 - CapacityProviderの設定を入れている場合、CodeDeployで使用する「appspec.yml」に「CapacityProviderStrategy」の設定を記載しないと、Blue/Greenデプロイが完了した際に構築時に設定したはずの「CapacityProviderStrategy」の設定が消えてしまい、タスクがAZに分散されず偏る事象が発生しました。
-- Blue/Greenデプロイが、サービスのAutoScalingをサポートしていないため、CodeDeployのイベントフックを利用してデプロイ前後にサービスのAutoScalingの停止と再開を実行するLambdaを実行する必要があります。
+- Blue/Greenデプロイが、サービスのAutoScalingをサポートしていないため、CodeDeployのイベントフックを利用してデプロイ前後にサービスのAutoScalingを停止・再開するLambdaを実行する必要があります。
 
 ## 感想
 

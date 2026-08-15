@@ -21,7 +21,7 @@ lede: "Google Workspace Admin SDKのDirectory APIを使った開発を行いま�
 
 TIG DXユニットの岸下です。2022年2月にキャリア入社して、早4ヶ月経ちました。時が流れるのは早いですね。
 
-参加しているプロジェクトで、Google Workspace Admin SDKのDirectory APIを使った開発を行いました。
+参加しているプロジェクトで、Google Workspace Admin SDKのDirectory APIを使って開発しました。
 
 本記事では、[失敗談をテーマにした連載](/articles/20220601a/)として、APIを利用した際に500エラーを頻発させてしまった件について執筆していこうと思います。
 
