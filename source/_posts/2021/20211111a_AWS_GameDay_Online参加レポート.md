@@ -7,7 +7,7 @@ tags:
   - 参加レポート
   - 参戦記
 categories:
-  - Infrastructure
+  - Cloud
 thumbnail: /images/2021/20211111a/thumbnail.png
 author: 伊藤真彦
 lede: "先日社内の同じチームの加藤さんに誘っていただき、チームメンバーと4人でAWS GameDay Inlineに参加させていただきました。今回は参加レポートを書きます。"

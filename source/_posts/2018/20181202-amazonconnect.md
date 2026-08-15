@@ -7,7 +7,7 @@ tags:
   - ハンズオン
   - コールセンター
 categories:
-  - Infrastructure
+  - Cloud
 thumbnail: /images/2018/20181202/thumbnail.jpeg
 author: 市川諒
 lede: "AmazonConnect BootCampセッションでハンズオン受けた知識を活かし、実際にコールセンターを作ってみました"

@@ -7,7 +7,7 @@ tags:
   - 合格記
   - PCDE
 categories:
-  - Infrastructure
+  - Cloud
 thumbnail: /images/2024/20240731a/thumbnail.png
 author: 岸下優介
 lede: "Google Cloud認定資格全冠を目指すべく、Professional Cloud DevOps Engineer 認定資格（PCDE）を受けてきました。無事に合格することができたので、本記事ではざっくりとした所感を書いていきたいと思います。"

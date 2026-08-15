@@ -9,7 +9,7 @@ tags:
   - 署名付きURL
   - CORS
 categories:
-  - Infrastructure
+  - Cloud
 thumbnail: /images/2021/20211115a/thumbnail.png
 author: 伊藤真彦
 lede: "AWS S3を利用してファイルをアップロード、ダウンロードするフロントエンドアプリケーションを実装したのですが、その際ハマったポイントがいくつかあったのでまとめます。AWSの機能をローカル環境で模擬するツールでお馴染みのLocalStackですが、AWS S3の機能も模擬できるようになっています。"

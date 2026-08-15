@@ -8,7 +8,7 @@ tags:
   - TechNight
   - 登壇レポート
 categories:
-  - Infrastructure
+  - Cloud
 thumbnail: /images/2021/20210910a/thumbnail.png
 author: 伊藤太斉
 lede: "Future Tech Night #15への登壇レポートと、内容についての解説です。"

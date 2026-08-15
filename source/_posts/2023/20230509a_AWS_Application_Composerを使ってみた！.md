@@ -7,7 +7,7 @@ tags:
   - ノーコード
   - サーバーレス
 categories:
-  - Infrastructure
+  - Cloud
 series: "春の入門祭り2023"
 thumbnail: /images/2023/20230509a/thumbnail.png
 author: 佐藤更星

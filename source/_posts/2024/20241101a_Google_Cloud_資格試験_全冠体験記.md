@@ -7,7 +7,7 @@ tags:
   - 合格記
   - 全冠
 categories:
-  - Infrastructure
+  - Cloud
 thumbnail: /images/2024/20241101a/thumbnail.jpg
 author: 逆瀬川滉大
 lede: "Google Cloud 資格試験の全冠が完了したので、体験記の記載です"

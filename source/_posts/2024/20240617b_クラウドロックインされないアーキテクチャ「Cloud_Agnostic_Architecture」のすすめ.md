@@ -8,7 +8,7 @@ tags:
   - アーキテクチャ
   - ベンダーロックイン
 categories:
-  - Infrastructure
+  - Cloud
 series: "Qiitaアドベントカレンダー2024"
 thumbnail: /images/2024/20240617b/thumbnail.png
 author: 武田大輝

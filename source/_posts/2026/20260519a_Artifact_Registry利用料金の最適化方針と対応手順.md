@@ -6,7 +6,7 @@ tags:
   - Terraform
   - GoogleCloud
 categories:
-  - Infrastructure
+  - Cloud
 series: "Terraform2026"
 thumbnail: /images/2026/20260519a/thumbnail.png
 author: 大江悠斗

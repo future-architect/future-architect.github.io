@@ -7,7 +7,7 @@ tags:
   - 合格記
   - ネットワーク
 categories:
-  - Infrastructure
+  - Cloud
 thumbnail: /images/2021/20211013b/thumbnail.png
 author: 伊藤真彦
 lede: "来たる11月13日にGo Conference 2021 Autumnに、技術ブログでもお馴染みの澁川さん、辻さんと共に登壇させていただくことになりました。楽しい発表になるように頑張ります。宣伝を挟みましたが、AWS Certified Advanced Networking - Specialtyに合格しましたので、今回も合格体験記を書きます。"

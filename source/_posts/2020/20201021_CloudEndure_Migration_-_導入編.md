@@ -7,7 +7,7 @@ tags:
   - CloudEndure
   - クラウドマイグレーション
 categories:
-  - Infrastructure
+  - Cloud
 thumbnail: /images/2020/20201021/thumbnail.png
 author: 八巻達紀
 lede: "2020年1月中途入社、TIGの八巻です。現在、クラウドリフトのプロジェクトにて、オンプレミス環境のサーバーをクラウドへ移行するため、AWSの移行サービスであるCloudEndureについて調査しました。"

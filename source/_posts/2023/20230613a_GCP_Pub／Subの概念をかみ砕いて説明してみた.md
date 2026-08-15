@@ -7,7 +7,7 @@ tags:
   - GoogleCloud
   - 初心者向け
 categories:
-  - Infrastructure
+  - Cloud
 thumbnail: /images/2023/20230613a/thumbnail.png
 author: 添田瑛介
 lede: "PubSubについて噛み砕いて説明していきます。今後PubSubを使用した開発をする方の助けになれればと思います。"

@@ -7,7 +7,7 @@ tags:
   - Session-Manager
   - 踏み台
 categories:
-  - Infrastructure
+  - Cloud
 author: 村瀬善則
 lede: "世の中コンテナ化の流れでEC2インスタンスを直接利用する機会が減ってきていますが、まだまだサーバにSSH接続する機会もあるかと思います。今回はSSH相当の処理をよりセキュアに行えるSession Managerについて調査・検証してみました。"
 ---

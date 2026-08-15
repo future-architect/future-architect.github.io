@@ -9,7 +9,7 @@ tags:
   - CLI
   - Go
 categories:
-  - Infrastructure
+  - Cloud
 thumbnail: /images/2023/20230926a/thumbnail.png
 author: 宮永崇史
 lede: "S3バケットをtreeするCLIコマンドを紹介します。"

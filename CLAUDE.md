@@ -48,12 +48,16 @@ lede: "Go 1.27 で標準ライブラリに追加されたuuidパッケージを�
 ---
 ```
 
-- `categories` は既存の語彙から選ぶ。使用実績（記事数）: Programming 327 / Infrastructure 145 / Frontend 134 / DevOps 131 / Culture 131 / DataScience 100 / DB 69 / Mobile 57 / IaC 57 / IoT 52 / Business 48 / Management 47 / DataEngineering 44 / AIDD 44 / Security 36 / 認証認可 24 / VR 20
+- `categories` は既存の語彙から選ぶ。使用実績（記事数）: Programming 326 / Frontend 134 / DevOps 133 / Culture 129 / DataScience 100 / Cloud 76 / DB 69 / Infrastructure 69 / IaC 57 / Mobile 57 / IoT 52 / Business 49 / Management 48 / DataEngineering 44 / AIDD 44 / Security 36 / 認証認可 24 / VR 20
   - `AI` は `AIDD` に、`Design` は `UI/UX` タグに統合済み。`_config.yml` の `alias` で転送している
-  - 基盤系3カテゴリの境界（#2057）: **基盤をコードで書く話は `IaC`**（Terraform / Ansible / CDK 等）、
-    **基盤そのものの設計・構築は `Infrastructure`**（クラウド・ネットワーク・OS）、
+  - 基盤系4カテゴリの境界（#2057 / #2461）: **基盤をコードで書く話は `IaC`**（Terraform / Ansible / CDK 等）、
+    **マネージドサービスそのものの使い方・設計は `Cloud`**（S3 の署名付きURL、VPC Endpoint の要否、Pub/Sub の概念）、
+    **ネットワーク・OS・ミドルウェアは `Infrastructure`**（オンプレ含む）、
     **作った後を回す仕組みは `DevOps`**（CI/CD・コンテナ・監視・保守運用）。
-    どのクラウドかは場所であって主題ではないので、カテゴリではなくタグ（AWS / GoogleCloud）が担う
+    `Cloud` に入るのはクラウドのサービス自体が主題のときだけで、
+    クラウドの上で何をしたかが主題なら従来どおりその主題のカテゴリに置く
+    （Terraform で書いた → IaC、データ基盤 → DataEngineering、CI/CD → DevOps）。
+    どのクラウドかは場所であって主題ではないので、AWS / GoogleCloud の別はタグが担う
   - AIDD と DataScience の境界（#2293）: **生成AI・LLM を道具として使う話は `AIDD`**
     （アプリ・エージェント開発、プロンプト、活用Tips、社内展開）、
     **モデル・データそのものが主題なら `DataScience`**（モデル開発・学習・評価、NLP研究、学会・論文、データ分析）。

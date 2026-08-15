@@ -10,7 +10,7 @@ tags:
   - DynamoDB
   - Go
 categories:
-  - Infrastructure
+  - Cloud
 series: "サーバレス2020"
 thumbnail: /images/2020/20200722/thumbnail.png
 author: 加部達郎

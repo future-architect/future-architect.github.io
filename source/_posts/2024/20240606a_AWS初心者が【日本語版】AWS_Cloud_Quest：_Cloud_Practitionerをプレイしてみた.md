@@ -7,7 +7,7 @@ tags:
   - 初心者向け
   - ネットワーク
 categories:
-  - Infrastructure
+  - Cloud
 thumbnail: /images/2024/20240606a/thumbnail.png
 author: 平井隆太
 lede: AWS Cloud Questの魅力や使い方、そして実際にプレイしてみた感想をAWS初学者の目線でお伝えします。

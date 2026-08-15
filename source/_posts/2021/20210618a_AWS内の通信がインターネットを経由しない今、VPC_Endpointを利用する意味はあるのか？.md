@@ -8,7 +8,7 @@ tags:
   - VPC
   - 技術選定
 categories:
-  - Infrastructure
+  - Cloud
 thumbnail: /images/2021/20210618a/thumbnail.png
 author: 村瀬善則
 lede: "AWS内の通信においてインターネットを経由しないことが最近になって公式ドキュメントに明記されたことを受け、改めてVPC Endpointの必要性について調べてみました。"

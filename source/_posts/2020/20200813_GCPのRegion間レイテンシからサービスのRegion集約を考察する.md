@@ -7,7 +7,7 @@ tags:
   - ネットワーク
   - Terraform
 categories:
-  - Infrastructure
+  - Cloud
 series: "夏の自由研究2020"
 thumbnail: /images/2020/20200813/thumbnail.png
 author: 西田好孝

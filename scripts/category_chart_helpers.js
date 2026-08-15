@@ -80,6 +80,9 @@ const CATEGORY_COLORS = {
   Programming: '#5470c6',
   DevOps: '#91cc75',
   Infrastructure: '#fac858',
+  // Infrastructure から分かれたので、隣り合っても混ざらない色にする (#2461)。
+  // Culture の淡い水色 #73c0de より濃く倒して区別する
+  Cloud: '#2f9fd0',
   Frontend: '#ee6666',
   Culture: '#73c0de',
   DataScience: '#3ba272',

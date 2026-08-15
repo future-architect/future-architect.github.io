@@ -10,7 +10,7 @@ tags:
   - トラブルシュート
   - ハンズオン
 categories:
-  - Infrastructure
+  - Cloud
 thumbnail: /images/2021/20210831a/thumbnail.png
 author: 加藤周平
 lede: "AWS初心者にとって、最初に躓きやすい部分がNWの構築かと思います。インスタンス立ててみたけど、これってどうやると他のノードと通信できるんだっけ？なんとなく通信できたけど、なんでだ？といった辺り、なんとなく有耶無耶なままにしていませんか。今回は2020年12月にローンチされたReachability Analyzerを利用して、AWS初心者向けのNW構築ハンズオン-Internal編-をやってみたいと思います。"

@@ -6,7 +6,7 @@ tags:
   - GoogleCloud
   - TextToSpeech
 categories:
-  - Infrastructure
+  - Cloud
 series: "GCP2021"
 thumbnail: /images/2021/20210312/thumbnail.png
 author: 村瀬善則

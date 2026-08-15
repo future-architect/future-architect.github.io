@@ -7,7 +7,7 @@ tags:
   - データ移行
   - クラウドマイグレーション
 categories:
-  - Infrastructure
+  - Cloud
 series: "秋のブログ週間2022"
 thumbnail: /images/2022/20221108a/thumbnail.JPG
 author: 一ノ瀬秀都
