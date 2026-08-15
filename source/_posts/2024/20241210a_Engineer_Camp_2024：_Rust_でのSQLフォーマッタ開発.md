@@ -14,11 +14,11 @@ categories:
   - DB
 thumbnail: /images/2024/20241210a/thumbnail.gif
 author: 仲泰志
-lede: "Engineer Camp 2024 に参加した仲です。今回のインターンシップではRust製SQLフォーマッタの開発を行いました。この記事では、期間中に取り組んだ内容について紹介します！]"
+lede: "Engineer Camp 2024 に参加した仲です。今回のインターンシップではRust製SQLフォーマッタを開発しました。この記事では、期間中に取り組んだ内容について紹介します！]"
 ---
 ## はじめに
 
-Engineer Camp 2024 に参加した仲です。今回のインターンシップではRust製SQLフォーマッタの開発を行いました。この記事では、期間中に取り組んだ内容について紹介します！
+Engineer Camp 2024 に参加した仲です。今回のインターンシップではRust製SQLフォーマッタを開発しました。この記事では、期間中に取り組んだ内容について紹介します！
 
 過去の関連インターン記事はこちらです：
 
@@ -31,7 +31,7 @@ Engineer Camp 2024 に参加した仲です。今回のインターンシップ�
 
 私が参加したコースは [（2）Rust製SQLフォーマッタの開発](https://note.com/future_event/n/nf586b6248ef9#c1363421-2c55-4738-b345-676c2d4ea9be) です。Rust製のSQLフォーマッタである uroboroSQL-fmt やVSCode拡張等の周辺ツールに対し、不具合修正や機能追加を実施しました。
 
-開発対象である [uroboroSQL-fmt](https://github.com/future-architect/uroborosql-fmt) は、フューチャーのSQLコーディング規約に基づいてコード整形を行うフォーマッタです。詳細は[新しいSQLフォーマッターであるuroboroSQL\-fmtをリリースしました](/articles/20231120a/)の記事をご覧ください。
+開発対象である [uroboroSQL-fmt](https://github.com/future-architect/uroborosql-fmt) は、フューチャーのSQLコーディング規約に基づいてコードを整形するフォーマッタです。詳細は[新しいSQLフォーマッターであるuroboroSQL\-fmtをリリースしました](/articles/20231120a/)の記事をご覧ください。
 
 - https://github.com/future-architect/uroborosql-fmt
 
@@ -74,7 +74,7 @@ uroboroSQL-fmtにはVSCode拡張機能が存在します。
 
 そこで、今回追加したexport機能により、VSCodeの設定編集UIで作成した設定からフォーマッタ用の設定ファイルを出力し、各リポジトリに配布して共有することが可能となります。
 
-また、VSCodeで[`uroborosql-fmt.configurationFilePath`](https://github.com/future-architect/vscode-uroborosql-fmt?tab=readme-ov-file#settings) を設定すれば、プロジェクトのルートにない設定ファイルを参照することもできます。
+また、VSCodeで[`uroborosql-fmt.configurationFilePath`](https://github.com/future-architect/vscode-uroborosql-fmt?tab=readme-ov-file#settings) を設定すれば、プロジェクトのルートにない設定ファイルも参照できます。
 
 <img src="/images/2024/20241210a/usecase-1-share.png" alt="usecase-1-share.png" width="1200" height="618" loading="lazy">
 
@@ -267,4 +267,4 @@ Rust と静的解析をやりたいという動機で参加したインターン
 
 ## さいごに
 
-インターンではRust製SQLフォーマッタの開発を行いました。関わっていただいた社員のみなさん、そして同じインターン生のみなさんにもとても感謝しています。ありがとうございました！
+インターンではRust製SQLフォーマッタを開発しました。関わっていただいた社員のみなさん、そして同じインターン生のみなさんにもとても感謝しています。ありがとうございました！

@@ -64,7 +64,7 @@ Google Cloud 認定資格関連の過去記事：
   - エラーバジェットに基づいたリリース計画
 - インシデント発生時の対応方法
   - ステークホルダーへの情報共有
-  - インシデント対応を行うための各種ロール設定
+  - インシデントに対応するための各種ロール設定
     - Incident Commander
     - Operation Lead
     - Communication Lead
