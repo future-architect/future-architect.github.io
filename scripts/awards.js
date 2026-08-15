@@ -73,7 +73,13 @@ hexo.extend.helper.register('awards_list', function () {
     .filter(([, ys]) => ys.length >= HALL_OF_FAME_WINS)
     // 到達が早い順（同数なら名前）に並べる
     .sort((a, b) => a[1][HALL_OF_FAME_WINS - 1] - b[1][HALL_OF_FAME_WINS - 1])
-    .map(([author, ys]) => ({ author, years: ys, wins: ys.length }));
+    // 表示は新しい受賞が先 (#2451)。nth は昇順の位置で決まるので、
+    // 並べ替える前に年へ埋めておく
+    .map(([author, ys]) => ({
+      author,
+      years: ys.map((year, i) => ({ year, nth: i + 1 })).reverse(),
+      wins: ys.length,
+    }));
 
   return { hall, years };
 });
