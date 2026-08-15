@@ -35,7 +35,12 @@ const newLabel = (date) => {
  */
 const postListItem = (post, itemClass, titleAttr, withThumb = false, rank = null) => {
   const attr = (titleAttr === undefined ? post.lede : titleAttr) || '';
-  const rankLabel = rank === null ? '' : `<span class="post-list-rank">${rank}</span>`;
+  // 上位3件だけ見た目を変えるので、順位そのものではなく「上位かどうか」を
+  // クラスで渡す。順位ごとにクラスを増やすと CSS 側が順位の知識を持つことになる
+  const rankLabel =
+    rank === null
+      ? ''
+      : `<span class="post-list-rank${rank <= 3 ? ' post-list-rank-top' : ''}">${rank}</span>`;
   const body =
     `<a href="/${post.path}" title="${attr}">${post.title}</a>` +
     `${newLabel(post.date)}` +
