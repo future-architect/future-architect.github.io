@@ -284,7 +284,7 @@ error: failed to emit precompiled header '.../BridgingHeader.pch' for bridging h
 error: 'inttypes.h' file not found
 ```
 
-そこで、Swiftコンパイラに`sysroot`を明示的に指定することで解決を行いました。
+そこで、Swiftコンパイラに`sysroot`を明示的に指定することで解決しました。
 
 `CMakeLists.txt`に以下を追加します。
 

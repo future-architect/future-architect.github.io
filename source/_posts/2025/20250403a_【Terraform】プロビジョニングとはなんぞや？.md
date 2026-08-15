@@ -82,7 +82,7 @@ IT領域におけるプロビジョニングとは、ハードウェアやネッ
 
 ### ユーザプロビジョニング(user provisioning)
 
-アイデンティティアクセス管理（IAM:identity and access management）の一種で、ユーザアカウントの作成、変更、削除、およびアクセス権の管理を行うプロセスです。このプロセスの例として[ロールベースアクセス制御（RBAC:role-based access control）](https://ja.wikipedia.org/wiki/%E3%83%AD%E3%83%BC%E3%83%AB%E3%83%99%E3%83%BC%E3%82%B9%E3%82%A2%E3%82%AF%E3%82%BB%E3%82%B9%E5%88%B6%E5%BE%A1)があります。
+アイデンティティアクセス管理（IAM:identity and access management）の一種で、ユーザアカウントを作成、変更、削除し、アクセス権を管理するプロセスです。このプロセスの例として[ロールベースアクセス制御（RBAC:role-based access control）](https://ja.wikipedia.org/wiki/%E3%83%AD%E3%83%BC%E3%83%AB%E3%83%99%E3%83%BC%E3%82%B9%E3%82%A2%E3%82%AF%E3%82%BB%E3%82%B9%E5%88%B6%E5%BE%A1)があります。
 
 ### クラウドプロビジョニング(cloud provisioning)
 
@@ -107,7 +107,7 @@ IT領域におけるプロビジョニングとは、ハードウェアやネッ
 
 余談:
 
-Terraformは「プロビジョニングツール」、[Ansible](https://www.redhat.com/en/ansible-collaborative)は「構成管理ツール」と認識していたのですが、Terraformでパラメータを調整することは可能ですし、Ansibleでシステムを新規追加することも可能なので、TerraformとAnsibleともに「プロビジョニングツール」であり「構成管理ツール」でもあると感じました。（TerraformとAnsibleの違いの説明は「[Ansible vs. Terraform: What's the difference?](https://mediacenter.ibm.com/media/Ansible+vs.+Terraform%3A+Whats+the+difference/1_uhhi903l)」がわかりやすかったです。Terraformでは宣言型で記述し、状態を管理するためのライフサイクルを持っているようです。対してAnsibleでは宣言型と手続き型のハイブリッド(本質的には手続き型)で記述し、ライフサイクルを持たないようです。）
+Terraformは「プロビジョニングツール」、[Ansible](https://www.redhat.com/en/ansible-collaborative)は「構成管理ツール」と認識していたのですが、Terraformでパラメータを調整できますし、Ansibleでシステムの新規追加もできるので、TerraformとAnsibleともに「プロビジョニングツール」であり「構成管理ツール」でもあると感じました。（TerraformとAnsibleの違いの説明は「[Ansible vs. Terraform: What's the difference?](https://mediacenter.ibm.com/media/Ansible+vs.+Terraform%3A+Whats+the+difference/1_uhhi903l)」がわかりやすかったです。Terraformでは宣言型で記述し、状態を管理するためのライフサイクルを持っているようです。対してAnsibleでは宣言型と手続き型のハイブリッド(本質的には手続き型)で記述し、ライフサイクルを持たないようです。）
 
 ## さいごに
 
