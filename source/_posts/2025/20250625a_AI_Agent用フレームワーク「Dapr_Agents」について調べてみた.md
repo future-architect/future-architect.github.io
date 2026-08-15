@@ -128,7 +128,7 @@ GitHub などで PR を作成したことをトリガーにユニットテスト
 
 文字列に直してプロンプトに埋め込むという力技もできますが、せっかくなので `@tool` デコレーターを使用しましょう。
 
-Dapr Agents では `@tool` デコレーターを指定することでエージェントが参照する情報を指定することができます。LLM に OpenAPI を採用した場合、内部では Functional Calling を呼んでいます。
+Dapr Agents では `@tool` デコレーターを指定することでエージェントが参照する情報を指定できます。LLM に OpenAPI を採用した場合、内部では Functional Calling を呼んでいます。
 
 下記は OpenAPI の仕様書を取得する処理です。
 
@@ -363,7 +363,7 @@ Dapr Agents 以外にもマルチエージェントを見越したフレーム�
 [^4]: [Consistently, the most successful implementations use simple, composable patterns rather than complex frameworks.](https://www.anthropic.com/engineering/building-effective-agents)
 [^5]: [ReAct: Synergizing Reasoning and Acting in Language Models](https://arxiv.org/abs/2210.03629)
 [^6]: [How we built our multi-agent research system](https://www.anthropic.com/engineering/built-multi-agent-research-system)
-[^7]: Dapr Agents でシンプルに LLM を呼びたい場合は、 `@task` デコレーターで事足ります。戻り値の型も自動で設定されるようです。しかし、tools を使用できないので独自の `Agent` クラスを実装しました。ただし標準の AgentBase クラスでは OpenAI からのレスポンスを構造体で強制することができないので、独自に `StructuredToolCallAgent` を拡張実装しています。この辺、開発が進んで解決されると嬉しいですね。
+[^7]: Dapr Agents でシンプルに LLM を呼びたい場合は、 `@task` デコレーターで事足ります。戻り値の型も自動で設定されるようです。しかし、tools を使用できないので独自の `Agent` クラスを実装しました。ただし標準の AgentBase クラスでは OpenAI からのレスポンスを構造体で強制できないので、独自に `StructuredToolCallAgent` を拡張実装しています。この辺、開発が進んで解決されると嬉しいですね。
 
 ## 参考: 最終的に作ったワークフロー
 

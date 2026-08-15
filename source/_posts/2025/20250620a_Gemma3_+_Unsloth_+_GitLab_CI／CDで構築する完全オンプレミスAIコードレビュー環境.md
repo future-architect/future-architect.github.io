@@ -222,7 +222,7 @@ curl -L "https://packages.gitlab.com/install/repositories/runner/gitlab-runner/s
 sudo apt-get install gitlab-runner
 ```
 
-インストール後は、Runnerの登録を行っていきます。ブラウザの画面上で、以下の操作をします。
+インストール後は、Runnerを登録していきます。ブラウザの画面上で、以下の操作をします。
 
 1. GitLab の **Admin Area > Runners** に移動
 2. **Create instance runner** をクリック
@@ -239,7 +239,7 @@ sudo apt-get install gitlab-runner
   - Maximum job timeout: `7200` (2時間、秒単位)
   - Run untagged jobs: チェックを入れる
 
-Runner作成後、登録用のトークンが画面上に表示されます。それをもとに、以下のようにコンソールから登録を行います。
+Runner作成後、登録用のトークンが画面上に表示されます。それをもとに、以下のようにコンソールから登録します。
 
 ```bash
 sudo gitlab-runner register \
@@ -1134,7 +1134,7 @@ if __name__ == "__main__":
 
 ### AIコードレビューシステムの実装
 
-ファインチューニング済みのGemma3を使用して、実際のコードレビューを自動実行するようにしていきます。GitLab CI/CD環境でMerge Request作成時に自動レビューを行い、結果をアーティファクトとして保存します。
+ファインチューニング済みのGemma3を使用して、実際のコードレビューを自動実行するようにしていきます。GitLab CI/CD環境でMerge Request作成時に自動レビューし、結果をアーティファクトとして保存します。
 
 #### 推論最適化による高速化
 
@@ -1146,7 +1146,7 @@ if __name__ == "__main__":
 
 #### git diffとの連携による自動レビュー
 
-GitLab CI環境では、`git diff`コマンドでコード変更差分を取得し、AIレビューを実行します。
+GitLab CI環境では、`git diff`コマンドでコード変更差分を取得し、AIレビューします。
 
 ```bash
 # 前回コミットとの差分を取得
@@ -1557,7 +1557,7 @@ ai_code_review:
 <img src="/images/2025/20250620a/image_3.png" alt="image.png" width="852" height="364" loading="lazy">
 </div>
 
-`prepare_training_data`ではGitLabからのデータ収集を行っています。ログを出力させると、以下のようになります。
+`prepare_training_data`ではGitLabからデータを収集しています。ログを出力させると、以下のようになります。
 
 無事リポジトリからデータが取得できています。
 

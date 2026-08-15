@@ -344,7 +344,7 @@ EXPLAIN VERBOSE SELECT name, age FROM users WHERE city = 'Tokyo';
 
 ### BUFFERS
 
-BUFFERSオプションは、バッファの使用状況を表示します。PostgreSQL 18では、EXPLAIN ANALYZEを使うと自動的にバッファ情報が含まれるようになりましたが、明示的に指定することもできます。
+BUFFERSオプションは、バッファの使用状況を表示します。PostgreSQL 18では、EXPLAIN ANALYZEを使うと自動的にバッファ情報が含まれるようになりましたが、明示的な指定もできます。
 
 ```sql
 EXPLAIN (ANALYZE, BUFFERS)
@@ -577,7 +577,7 @@ SELECT * FROM large_table;
 (6 rows)
 ```
 
-ANALYZEを使う場合はデフォルトでサマリーが表示されますが、明示的に制御することもできます。Planning TimeとExecution Timeの合計時間が確認できます。
+ANALYZEを使う場合はデフォルトでサマリーが表示されますが、明示的な制御もできます。Planning TimeとExecution Timeの合計時間が確認できます。
 
 ### MEMORY
 
