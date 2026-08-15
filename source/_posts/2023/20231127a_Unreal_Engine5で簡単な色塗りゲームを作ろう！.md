@@ -148,7 +148,7 @@ WASDで移動、Spaceキーでジャンプ、マウスでカメラ操作が行�
 
 画面右の`詳細`画面上部にある`トランスフォーム`で位置を調整できます。
 
-今回は
+今回は…
 
 * 位置をそれぞれ`(x, y, z) = (0, 0, 50)`
 * 拡大縮小をそれぞれ`(x, y, z) = (1.2, 1.2, 0.2)`
@@ -199,7 +199,7 @@ WASDで移動、Spaceキーでジャンプ、マウスでカメラ操作が行�
 それでは実際に`Trigger`に触れたら、キューブのマテリアル(色)を変えるようなBlueprintを組んでみましょう。
 `BP_Cube`を再度開きます。
 
-BP_Cubeを既に閉じてしまっている場合は
+BP_Cubeを既に閉じてしまっている場合は…
 
 * `Ctrl+Space`でコンテンツドロワーを開き、`MyStruff`から`BP_Cube`を選択
 * ビューポートの任意のキューブを選択して、`Ctrl+E`
@@ -248,7 +248,7 @@ ColoringMapに戻ってみると、すべてのキューブにマテリアルが
 `Set Material`を設置したら、どのマテリアルに変更したいのかを決める必要があります。
 `Set Material`内の`Material`から今回は`M_Ground_Grass`を選択します。
 
-これで
+これで…
 
 1. キャラクターがCubeのTriggerと重なったら(Event ActorBeginOverlap)
 2. `Static Mesh Component`のマテリアルを`M_Ground_Grass`に変更する(Set Material)

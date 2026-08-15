@@ -34,7 +34,7 @@ WebAssembly/Emscriptenに入門した際の流れや気付きについて紹介�
 
 ## 1. WebAssemblyの概要
 
-WebAssemblyは
+WebAssemblyは…
 
 - CやRustなどで書いたコードから生成できる
 - ウェブ上でJavaScriptと一緒に動く

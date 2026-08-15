@@ -22,7 +22,7 @@ AWS SDK for Goを用いてAWS Lambdaを実装する際に、共通的に行い�
 
 ## 前提知識
 
-AWS SDK for GoでLambdaを実装するにあたり、[関数ハンドラは複数のシグネチャを許容](https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/golang-handler.html)して、そのうち引数に `context.Context` を取るのは以下の4パターンです。この記事では便宜的に1~4で採番してパターン名を入れています
+AWS SDK for GoでLambdaを実装するにあたり、[関数ハンドラは複数のシグネチャを許容](https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/golang-handler.html)して、そのうち引数に `context.Context` を取るのは以下の4パターンです。この記事では便宜的に1~4で採番してパターン名を入れています。
 
 ```go
 // No.1 プレーンパターン

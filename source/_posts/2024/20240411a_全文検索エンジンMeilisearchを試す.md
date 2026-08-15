@@ -85,7 +85,7 @@ docker run -it --rm \
 
 試しに当ブログサイトのインデックスを作成してみます。
 
-基本的にはAPIを叩いて [インデックス](https://www.meilisearch.com/docs/learn/core_concepts/indexes) に [ドキュメント](https://www.meilisearch.com/docs/learn/core_concepts/documents) を登録します (cf. [ドキュメントを登録するAPIのリファレンス](https://www.meilisearch.com/docs/reference/api/documents#add-or-replace-documents)) が、webサイトのスクレイピングツールである [docs-scraper](https://github.com/meilisearch/docs-scraper) が公式に提供されているのでこれを使ってみます。このツールはwebサイトをクローリングしてインデックスを作成してくれるので、設定さえ用意すれば汎用的に使えそうです。なお、docs-scraperのREADMEには
+基本的にはAPIを叩いて [インデックス](https://www.meilisearch.com/docs/learn/core_concepts/indexes) に [ドキュメント](https://www.meilisearch.com/docs/learn/core_concepts/documents) を登録します (cf. [ドキュメントを登録するAPIのリファレンス](https://www.meilisearch.com/docs/reference/api/documents#add-or-replace-documents)) が、webサイトのスクレイピングツールである [docs-scraper](https://github.com/meilisearch/docs-scraper) が公式に提供されているのでこれを使ってみます。このツールはwebサイトをクローリングしてインデックスを作成してくれるので、設定さえ用意すれば汎用的に使えそうです。なお、docs-scraperのREADMEには…
 
 > 🚨 IMPORTANT NOTICE: Reduced Maintenance & Support 🚨
 

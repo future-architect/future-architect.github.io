@@ -57,7 +57,7 @@ resource "cloudflare_r2_bucket" "maintenance" {
 
 ### パブリックアクセス設定
 
-Cloudflare R2の設定画面からパブリックアクセス設定の「ドメインに接続」をクリックし、Cloudflareで管理しているドメインを利用して任意のドメインを入力します
+Cloudflare R2の設定画面からパブリックアクセス設定の「ドメインに接続」をクリックし、Cloudflareで管理しているドメインを利用して任意のドメインを入力します。
 
 <img src="/images/2024/20240531a/r2_setting_1.jpg" alt="r2_setting_1.jpg" width="1176" height="841" loading="lazy">
 

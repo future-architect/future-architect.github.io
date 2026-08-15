@@ -366,7 +366,7 @@ $ curl -H "Authorization: Bearer <トークン>" localhost:8080/hello-oidc
 {"message":"hello"}
 ```
 
-あえて失敗させるケースでの挙動を見てみます
+あえて失敗させるケースでの挙動を見てみます。
 
 ```sh
 # Authorizationヘッダなしで動かすケース

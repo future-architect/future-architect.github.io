@@ -63,7 +63,7 @@ Cloud Runは独自でエンドポイントが生成され、それをCNAMEとし
 
 今回、Cloud RunはVPC接続されたCloud SQLに繋ぎに行く必要があるため、Cloud Run自身も漏れず、VPCに接続しないといけません。このようなVPC内部にあるサービスに対して、サーバーレスサービスが接続したい場合には、[サーバーレスVPCコネクタ](https://cloud.google.com/vpc/docs/serverless-vpc-access?hl=ja)を利用します。
 
-サーバーレスVPCコネクタを作成する時は
+サーバーレスVPCコネクタを作成する時は…
 
 - `/28`のサブネットを準備する
 - コネクタで稼働するインスタンススペックを決定する

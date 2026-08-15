@@ -32,7 +32,7 @@ AWS IoTを使用したMQTTのチュートリアルはAWS公式からも詳細な
 最終的には室内の快適な温湿度を教えてくれる「温湿度マイスターbot」を作成します。
 <img src="/images/2021/20210929a/image.png" alt="image.png" width="647" height="457" loading="lazy">
 
-なお、本記事で作成したコードは
+なお、本記事で作成したコードは…
 
 * *[orangekame3/go\-mqtt](https://github.com/orangekame3/go-mqtt)*
 * *[orangekame3/th\-meisterBot](https://github.com/orangekame3/th-meisterBot)*

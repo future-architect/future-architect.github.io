@@ -315,7 +315,7 @@ CircleCIのOnly build pull requests
 今回CircleCIの発火はPullRequestが作成されている状態を想定しています。そのためリリースフローに支障がない場合は[こちら](https://circleci.com/docs/oss/#only-build-pull-requests)に記載のOnly build pull requestの設定をONにすることをおすすめします
 :::
 
-▼成功すると以下のようにPR作成時にブランチ名にしたがってラベルの付与とPR作成者の自動アサインができます
+▼成功すると以下のようにPR作成時にブランチ名にしたがってラベルの付与とPR作成者の自動アサインができます。
 
 <img src="/images/2023/20230307a/image_2.png" alt="image.png" width="1200" height="569" loading="lazy">
 

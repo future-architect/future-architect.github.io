@@ -53,7 +53,7 @@ Pythonベースのdbt-coreと異なり、SQLをデータウェアハウスに送
 - クエリを実行せずにインラインCTEをプレビュー
 - ホバーでモデルのメタデータを表示 などなど
 
-詳しくは、[dbt VS Code拡張機能](https://marketplace.visualstudio.com/items?itemName=dbtLabsInc.dbt)の紹介動画がありますので、ご参考ください
+詳しくは、[dbt VS Code拡張機能](https://marketplace.visualstudio.com/items?itemName=dbtLabsInc.dbt)の紹介動画がありますので、ご参考ください。
 
 ## 移行方法
 

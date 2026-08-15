@@ -191,7 +191,7 @@ $ go vet -vettool=`which awslambdahandler` main.go
 
 - `awslambdahandler` のインストール
 
-インストールは
+インストールは…
 
 ```bash
 go install github.com/d-tsuji/awslambdahandler/cmd/awslambdahandler@latest

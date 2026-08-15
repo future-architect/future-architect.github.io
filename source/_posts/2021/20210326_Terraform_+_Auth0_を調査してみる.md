@@ -320,7 +320,7 @@ resource "auth0_rule" "set_env" {
 }
 ```
 
-このように書く事でdev環境では
+このように書く事でdev環境では…
 
 ```js set-env.js
  function setEnv(user, context, callback) {
@@ -333,7 +333,7 @@ resource "auth0_rule" "set_env" {
 }
 ```
 
-として、test環境では
+として、test環境では…
 
 ```js set-env.js
  function setEnv(user, context, callback) {

@@ -77,7 +77,7 @@ sandbox/
   └ lambda.zip
 ```
 
-各ファイルは `$ touch <filename>` などを利用して生成してください、Lambdaの中身にまでは踏み込まないので、lambda.zip は 以下の hello.go を build & zip化して生成お願いします
+各ファイルは `$ touch <filename>` などを利用して生成してください、Lambdaの中身にまでは踏み込まないので、lambda.zip は 以下の hello.go を build & zip化して生成お願いします。
 
 ```go hello.go
 package main
@@ -194,7 +194,7 @@ providerは `aws` ですが、以下4つの引数をtrueに設定することで
 
 providerがawsの場合、各awsサービスのendpointsをカスタマイズ可能です。endpointsの向き先を調整することにより、ローカル完結のterraform環境が実現可能という訳です。
 
-localstackは [2020-09-15リリース](https://github.com/localstack/localstack#announcements) から
+localstackは [2020-09-15リリース](https://github.com/localstack/localstack#announcements) から…
 > all services are now exposed via the edge service (port 4566) only
 
 なので、endpointsのURLは全て `http://localhost:4566` になります。
@@ -207,7 +207,7 @@ backendとproviderの定義は完了したので、次は各種リソースを�
 
 <img src="/images/2020/20201113/Screen_Shot_2020-10-29_at_15.12.54.png" loading="lazy">
 
-上記構成をterraform定義するのに必要なresourceはこちらです
+上記構成をterraform定義するのに必要なresourceはこちらです。
 
 - aws_kinesis_stream
 - aws_lambda_event_source_mapping
@@ -217,7 +217,7 @@ backendとproviderの定義は完了したので、次は各種リソースを�
 - aws_iam_role_policy_attachment
 - aws_s3_bucket
 
-Terraform自体の説明は本記事の目的ではないので、一気に追加します
+Terraform自体の説明は本記事の目的ではないので、一気に追加します。
 
 ```tf terraform resources.tf
 resource "aws_kinesis_stream" "local_stream" {
@@ -303,13 +303,13 @@ resource "aws_s3_bucket" "local_archive" {
 }
 ```
 
-以上により、plan/apply の準備は完了です
+以上により、plan/apply の準備は完了です。
 
 ### 3. Localstackにterraform plan/apply
 
 #### まずは terraform init から
 
-新しいディレクトリでterraformを使う場合は、まずは `$ terraform init` して、backend と provider を設定します
+新しいディレクトリでterraformを使う場合は、まずは `$ terraform init` して、backend と provider を設定します。
 
 ```bash
 $ terraform init

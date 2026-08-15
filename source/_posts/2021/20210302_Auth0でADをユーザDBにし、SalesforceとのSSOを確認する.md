@@ -34,7 +34,7 @@ lede: "エンタープライズの領域ではAD認証が多く利用されて�
 ### 設定追加
 
 `メニュー　-> Connections -> Enterprise -> Active Directory / LDAP -> CREATE CONNECTION`
-メニューからConnectorを追加し、今回は2つのオプションを有効にしています
+メニューからConnectorを追加し、今回は2つのオプションを有効にしています。
 
 * Use Windows Integrated Auth (Kerberos)
 Auth0はWindows統合認証（Kerberos認証）に対応しており、WindowsでAD認証でログインしており、かつ `IP Ranges` のIPでログインすると認証をスキップできます。

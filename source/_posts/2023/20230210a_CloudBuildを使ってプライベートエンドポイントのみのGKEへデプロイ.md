@@ -210,7 +210,7 @@ spec:
 
 manifestファイルの適用自体は踏み台サーバから実行しています。
 
-ここまで構築するとドメインに対してアクセスすると以下のキャプチャのように
+ここまで構築するとドメインに対してアクセスすると以下のキャプチャのように…
 
 - Hello, world!
 - Version:1.0.0
@@ -222,7 +222,7 @@ manifestファイルの適用自体は踏み台サーバから実行していま
 
 ## CloudBuildの作成
 
-現状の状態だと
+現状の状態だと…
 
 1. アプリケーションコードを変更する（ローカル）。
 2. GitHubへ変更をPushする（ローカル）。
@@ -253,14 +253,14 @@ Google Cloudコンソール画面から「Cloud Build」をクリック→「ト
 
 <img src="/images/2023/20230210a/1-CloudBuild②.png" alt="1-CloudBuild②.png" width="979" height="884" loading="lazy">
 
-リポジトリに接続画面で
+リポジトリに接続画面で…
 
 - ソースを選択：GitHub (Cloud Build GitHubアプリ)
 を選択し、「続行」をクリックする。
 
 <img src="/images/2023/20230210a/1-CloudBuild③.png" alt="1-CloudBuild③.png" width="579" height="938" loading="lazy">
 
-Sign in to GitHub to continue to Google Cloud Buildの画面で
+Sign in to GitHub to continue to Google Cloud Buildの画面で…
 
 - Username or email address：自身のGitHubアカウントのユーザ名
 - Password：自身のGitHubアカウントのパスワード
@@ -277,7 +277,7 @@ Google Cloud Build by Google Cloud Build would like permission toの画面の「
 
 <img src="/images/2023/20230210a/1-CloudBuild⑥.png" alt="1-CloudBuild⑥.png" width="572" height="903" loading="lazy">
 
-Install Google Cloud Buildの画面から
+Install Google Cloud Buildの画面から…
 
 - Only Select repositories：Cloud Buildと連携したいリポジトリ
 を入力し、「Install」をクリックします。
@@ -377,14 +377,14 @@ my-stg-environment-vpcに「ha-vpn-my-stg-environment-tky-gw」、sample-build-v
 
 次に、それぞれのHA VPN Gatewayに対応するVPN Tunnelを作成します。
 
-ha-vpn-my-stg-environment-tky-gwに
+ha-vpn-my-stg-environment-tky-gwに…
 
 - 「ha-vpn-my-stg-environment-tky-tunnel-0」
 - 「ha-vpn-my-stg-environment-tky-tunnel-1」
 
 を
 
-ha-vpn-sample-build-vpc-tky-gwに
+ha-vpn-sample-build-vpc-tky-gwに…
 
 - 「ha-vpn-sample-build-vpc-tky-tunnel-0」
 - 「ha-vpn-sample-build-vpc-tky-tunnel-1」

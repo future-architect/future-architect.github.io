@@ -383,7 +383,7 @@ sudo cat /var/lib/jenkins/secrets/initialAdminPassword
 Jenkinsが推奨しているPluginをインストールされるまで待ちます。
 <img src="/images/2023/20230330a/jenkins_setting_3.png" alt="" width="993" height="915" loading="lazy">
 
-次に、Jenkins初期Admin Userの設定を求められるので
+次に、Jenkins初期Admin Userの設定を求められるので…
 
 - ユーザ名
 - パスワード
@@ -459,7 +459,7 @@ Terraformプラグインをインストールしている状態だと、Global T
 ジョブ名「terraform」と入力し、「フォルダ」を選択し、「OK」を入力します。
 <img src="/images/2023/20230330a/jenkins_job_setting_8.png" alt="" width="1200" height="893" loading="lazy">
 
-ConfigurationでGeneralから
+ConfigurationでGeneralから…
 
 - 表示名：terraform
 - 説明：terraform planジョブとterraform applyジョブを管理します
@@ -476,7 +476,7 @@ terraformフォルダが作成されたので、terraform planジョブを作成
 ジョブ名「terraform-plan」と入力し、「Multibranch Pipeline」を選択し、「OK」と入力します。
 <img src="/images/2023/20230330a/jenkins_job_setting_2.png" alt="" width="1200" height="894" loading="lazy">
 
-ConfigurationでGeneralから
+ConfigurationでGeneralから…
 
 - 表示名：terraform-plan
 - 説明：terraform planを実行するジョブです。
@@ -488,7 +488,7 @@ Credentialsから「追加」をクリックし、GitHub認証情報を設定し
 
 <img src="/images/2023/20230330a/jenkins_job_setting_4.png" alt="jenkins_job_setting_4.png" width="849" height="608" loading="lazy">
 
-Folder Credentials Providerで
+Folder Credentials Providerで…
 
 - Domain：グローバルドメイン
 - 種類：ユーザ名とパスワード
@@ -500,14 +500,14 @@ Folder Credentials Providerで
 <img src="/images/2023/20230330a/jenkins_job_setting_5.png" alt="" width="948" height="712" loading="lazy">
 
 上記設定後、Credentialsに設定したCredentialが表示されるので選択します。
-Repository Scan - Deprecated Visualization　から
+Repository Scan - Deprecated Visualization　から…
 
 - Owner：Githubユーザ名
 - Repository：対象リポジトリ
 
 を選択します。
 
-Behavioursは
+Behavioursは…
 
 - Strategy：All branches
 
@@ -515,7 +515,7 @@ Behavioursは
 
 <img src="/images/2023/20230330a/jenkins_job_setting_6.png" alt="" width="888" height="845" loading="lazy">
 
-Build Configurationから
+Build Configurationから…
 
 - Mode：by Jenkinsfile
 - script Path：Jenkinsfileが存在するパス

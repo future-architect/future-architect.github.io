@@ -85,7 +85,7 @@ https://github.com/ml-explore/mlx-swift-examples/tree/main/Applications/LLMEval
 
 次に実際にAppStoreに公開されているVision Proで利用できる（他のAppleデバイスにも対応してます）アプリをいくつかあげておきます。
 
-注）これらのアプリは私や当社が何らか動作や利用について何ら保障するものではありません
+注）これらのアプリは私や当社が何らか動作や利用について何ら保障するものではありません。
 
 - [AI Pro - AIチャットボット助手](https://apps.apple.com/jp/app/ai-pro-ai%E3%83%81%E3%83%A3%E3%83%83%E3%83%88%E3%83%9C%E3%83%83%E3%83%88%E5%8A%A9%E6%89%8B/id6477226962)
   - 「1.クラウド上のLLMを利用する方法」の例

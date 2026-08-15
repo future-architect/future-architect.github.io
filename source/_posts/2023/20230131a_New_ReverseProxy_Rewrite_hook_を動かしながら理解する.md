@@ -154,7 +154,7 @@ RFC のリンクを貼ってもらえているので、ちょっとだけ内容�
 >
 > 上記以外で HTTP/1.1 にて定義されたヘッダーは end-to-end 側に含まれます。
 
-ちなみに、issue 内では
+ちなみに、issue 内では…
 
 > RFC 2616, section 13.5.1 specified a list of hop-by-hop headers which HTTP proxies should not forward.
 > RFC 2616 セクション 13.5.1 は、プロキシサーバがフォワーディングすべきでない hop-by-hop ヘッダーのリストを定義している
@@ -387,7 +387,7 @@ X-Forwarded-For: 127.0.0.1
 ```
 
 こまで来てやっと、Proposal タイトルの「ReverseProxy can remove headers added by Director」について説明できます。
-Proposal で提起された問題箇所を引用すると
+Proposal で提起された問題箇所を引用すると…
 
 > For example, if an inbound request contains a Connection: forwarded header, then any Forwarded header added by the Director will not be sent to the backend. This is probably surprising; under some circumstances, it may be a security vulnerability.
 > 例えば、もしインバウンドリクエストが「Connection: forwarded」のヘッダーを保持している場合、Director により追加された Forwarded ヘッダーは、バックエンド側に送信されません。これはおそらく驚くべきことであり、ある状況下においてはセキュリティ上の脆弱性かもしれません。

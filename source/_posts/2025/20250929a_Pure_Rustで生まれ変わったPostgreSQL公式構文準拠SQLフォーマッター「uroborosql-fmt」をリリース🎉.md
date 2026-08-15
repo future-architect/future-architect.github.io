@@ -32,7 +32,7 @@ lede: "roborosql-fmtの新バージョンv1.0.0をリリースしました。当
 
 詳しい利用方法は[利用方法の章](#利用方法)で説明しています。
 
-※ uroborosql-fmtのライセンスはBUSLですが、競合会社含め開発環境での利用は自由ですのでお気軽にご使用ください
+※ uroborosql-fmtのライセンスはBUSLですが、競合会社含め開発環境での利用は自由ですのでお気軽にご使用ください。
 
 また、今回のアップデートについては、以下のシリーズ記事でも詳しく解説しています。
 
@@ -118,7 +118,7 @@ uroborosql-fmt v0.1.0ではパーサーとして [tree-sitter-sql](https://githu
     ```
 
 1. SQLファイルを開き、コマンドパレットから`Format Document`か、`format sql`を実行してください
-`format sql`では選択範囲のフォーマットをサポートしています
+`format sql`では選択範囲のフォーマットをサポートしています。
 
 <img src="/images/2025/20250929a/image_4.png" alt="image.png" width="1200" height="705" loading="lazy">
 

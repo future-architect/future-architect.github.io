@@ -124,7 +124,7 @@ AndroidManifest.xml（パス：Sample Code/app/src/main/main）
 <img src="/images/2024/20240521a/image_12.png" alt="image.png" width="1200" height="753" loading="lazy">
 
 - 「Simulator」＞「Start Simulating」を押すと、Simulatorが立ち上がる
-※ファイアウォールを無効化にする必要！ そうしないとRCからの信号が到達できない
+※ファイアウォールを無効化にする必要！ そうしないとRCからの信号が到達できない。
 
 <img src="/images/2024/20240521a/image_13.png" alt="image.png" width="1200" height="750" loading="lazy">
 

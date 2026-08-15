@@ -30,7 +30,7 @@ Space Apps Challenge では、25チームに絞られた後に一般投票が行
 
 ## 投票方法
 
-投票サイトにアクセスします
+投票サイトにアクセスします。
 
 **【投票サイト】**
 **https://2016.spaceappschallenge.org/**

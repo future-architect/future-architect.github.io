@@ -51,7 +51,7 @@ t1 = PythonOperator(
 )
 ```
 
-SLA 違反をした Task が発生した場合、以下2パターンで通知をできます
+SLA 違反をした Task が発生した場合、以下2パターンで通知をできます。
 
 - Email
 - sla_miss_callback (Function) の任意実装

@@ -72,7 +72,7 @@ english.stop     german.stop      nepali.stop      russian.stop     turkish.stop
 
 Goでは分かち書きのライブラリとして定評のある[github.com/ikawaha/kagome/v2](https://pkg.go.dev/github.com/ikawaha/kagome/v2)を使います。
 
-kagomeではこんな感じではこんな感じに
+kagomeではこんな感じではこんな感じに…
 
 ```sh
 $ kagome

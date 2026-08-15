@@ -88,7 +88,7 @@ Google Hangoutsは任意の値をスレッドIDとできるためRedmineチケ�
 
 [README](https://github.com/future-architect/redmine_slack_integration/blob/master/README.md)を参照してください。
 
-(フューチャー社内連絡)利用の際はコンシェルジュで依頼ください
+(フューチャー社内連絡)利用の際はコンシェルジュで依頼ください。
 
 ### 2. Slack APP新規作成
 

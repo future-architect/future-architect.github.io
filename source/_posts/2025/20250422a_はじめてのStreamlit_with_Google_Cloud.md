@@ -39,20 +39,20 @@ Streamlitは、Pythonを使って簡単にインタラクティブなWebアプ�
 
 ### Google Cloud Notebooks インスタンスの作成
 
-まずはStreamlitアプリを開発するためのGoogle Cloud Notebooksインスタンスを作成します
+まずはStreamlitアプリを開発するためのGoogle Cloud Notebooksインスタンスを作成します。
 
 1. Vertex AI Workbench に移動
 Google Cloud Consoleのナビゲーションメニューから「Vertex AI」>「Workbench」に移動します。見つからない場合は検索ウィンドウでVertex AIを検索して直接移動してくださいね
 
 2. 新しいノートブックの作成
-Viewで「インスタンス」を指定し、「新規作成」をクリックし、適切な環境を選択します
+Viewで「インスタンス」を指定し、「新規作成」をクリックし、適切な環境を選択します。
 
 3. ノートブックを開く
-インスタンスが作成され、準備が完了したら、「JupyterLab を開く」をクリックします
+インスタンスが作成され、準備が完了したら、「JupyterLab を開く」をクリックします。
 
 ### Streamlit アプリの開発
 
-JupyterLabが開いたら、新しいPythonファイルを作成し、Streamlitアプリのコードを記述します
+JupyterLabが開いたら、新しいPythonファイルを作成し、Streamlitアプリのコードを記述します。
 
 1. 新しい Python ファイルの作成
    JupyterLabのランチャー（または「ファイル」>「新規」>「Python 3」）を開き、新しいIPython Notebookを作成します
@@ -77,7 +77,7 @@ JupyterLabが開いたら、新しいPythonファイルを作成し、Streamlit�
    ```
 
 4. Python ファイルとして保存
-  「ファイル」>「名前を付けて保存」を選択し、ファイル名を `app.py` として保存します
+  「ファイル」>「名前を付けて保存」を選択し、ファイル名を `app.py` として保存します。
 
 ## Dockerイメージをプッシュ
 
@@ -117,11 +117,11 @@ Cloud Notebooksインスタンス内でDockerイメージをビルドし、Artif
 
 #### Artifact Registry API の有効化
 
-まだ有効にしていない場合は、Google Cloud Console で Artifact Registry API を有効にします
+まだ有効にしていない場合は、Google Cloud Console で Artifact Registry API を有効にします。
 
 #### Artifact Registry リポジトリの作成
 
-Google Cloud Console または `gcloud` コマンドを使用して、Docker イメージを保存する Artifact Registry リポジトリを作成します。リージョン（例: `asia-northeast1`）とリポジトリ形式（`Docker`）を指定します
+Google Cloud Console または `gcloud` コマンドを使用して、Docker イメージを保存する Artifact Registry リポジトリを作成します。リージョン（例: `asia-northeast1`）とリポジトリ形式（`Docker`）を指定します。
 
 ```sh
 gcloud artifacts repositories create <repository-name> \
@@ -158,7 +158,7 @@ docker build -t asia-northeast1-docker.pkg.dev/sample-project/test-repository/my
 gcloud auth configure-docker <hostname-list>
 ```
 
-`hostname-list`は、認証ヘルパー構成に追加するリポジトリ ホスト名のカンマ区切りのリストで、Artifact Registryのホスト名はロケーションと紐付いているため、`<location>-docker.pkg.dev`という形になります
+`hostname-list`は、認証ヘルパー構成に追加するリポジトリ ホスト名のカンマ区切りのリストで、Artifact Registryのホスト名はロケーションと紐付いているため、`<location>-docker.pkg.dev`という形になります。
 
 ```sh コマンド例
 gcloud auth configure-docker asia-northeast1-docker.pkg.dev
@@ -225,7 +225,7 @@ Cloud Runにデプロイされました。
 
 <img src="/images/2025/20250422a/image_4.png" alt="" width="993" height="508" loading="lazy">
 
-このようなアノテーションツールも作成できます。Cloud上で動かすことでツールやデータを一括管理できるため、一歩進んだPythonの業務利用ができます。このツールではPlotlyと組み合わせて、ラベルを入力する度にインタラクティブに左下のグラフが更新されるようにしています。※Plotlyについては参考資料の記事を参考にしてください
+このようなアノテーションツールも作成できます。Cloud上で動かすことでツールやデータを一括管理できるため、一歩進んだPythonの業務利用ができます。このツールではPlotlyと組み合わせて、ラベルを入力する度にインタラクティブに左下のグラフが更新されるようにしています。※Plotlyについては参考資料の記事を参考にしてください。
 
 <img src="/images/2025/20250422a/sample_tool.avif" width="1400" height="927" loading="lazy">
 

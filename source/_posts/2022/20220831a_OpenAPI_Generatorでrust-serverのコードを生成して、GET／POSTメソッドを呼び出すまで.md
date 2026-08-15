@@ -258,7 +258,7 @@ cargo add tokio clap env_logger tokio_openssl
 
 改めて`cargo run`で実行すると、`localhost:8080`にサーバーが立ちます。
 
-サーバーを立てて以下のようにcurlでGETをしてみると
+サーバーを立てて以下のようにcurlでGETをしてみると…
 
 ```bash
 curl localhost:8080/ip

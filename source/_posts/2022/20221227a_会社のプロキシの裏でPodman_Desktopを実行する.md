@@ -59,7 +59,7 @@ generateResolvConf = false
 wsl --shutdown
 ```
 
-次は/etc/resolv.confを編集します
+次は/etc/resolv.confを編集します。
 
 ```bash
 $ wsl -d podman-machine-default

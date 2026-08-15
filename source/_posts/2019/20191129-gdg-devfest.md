@@ -36,7 +36,7 @@ Terraformを当社に入社して以来3ヶ月弱触ってきて、せっかく�
 
 <script async class="speakerdeck-embed" data-id="fea7b09893e0479cb2f4d5a969c43e70" data-ratio="1.33333333333333" src="//speakerdeck.com/assets/embed.js"></script>
 
-内容を要約すると
+内容を要約すると…
 
 - Terraformについての説明
 - Terraformを使ってGCEインスタンスを立てる
@@ -75,7 +75,7 @@ Terraformを当社に入社して以来3ヶ月弱触ってきて、せっかく�
 #### パネルトーク ~災害とIT~
 
 こちらのセッションでは、まだ皆さんの記憶にも新しい10月の台風の被害から考える、ITをどう災害に用いていくか、また今回の台風では実際に何が役に立ったのかなどを共有していきました。
-パネルトーク中で話題になったツールは
+パネルトーク中で話題になったツールは…
 
 - [Google 災害情報マップ](https://www.google.org/crisismap/japan?hl=ja&gl=jp)
 - [国土地理院](https://maps.gsi.go.jp/#13/36.680751/138.285317/&base=std&ls=std%7C20191012typhoon19_chikumagawa_1016do_sokuho&blend=0&disp=11&lcd=seamlessphoto&vs=c0j0h0k0l0u0t0z0r0s1m0f0&vs2=f0&sync=1&base2=ort&ls2=ort%7Cexperimental_anno&disp2=11&lcd2=experimental_jhj)

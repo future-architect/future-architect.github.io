@@ -93,7 +93,7 @@ No changes. Your infrastructure matches the configuration.
 
 Stateを直接操作することはあまり推奨されないですが、今回はこの選択をとりました。
 
-操作イメージとしては以下のような手順です
+操作イメージとしては以下のような手順です。
 
 <img src="/images/2024/20240314a/terraform_merge.drawio.png" alt="terraform_merge.drawio.png" width="427" height="429" loading="lazy">
 

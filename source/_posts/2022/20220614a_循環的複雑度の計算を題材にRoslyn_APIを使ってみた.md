@@ -101,7 +101,7 @@ End Class
 
 ## 環境構築
 
-下記ツールをインストールします
+下記ツールをインストールします。
 
 * .NET 6.0 SDK
 * Visual Studio Code

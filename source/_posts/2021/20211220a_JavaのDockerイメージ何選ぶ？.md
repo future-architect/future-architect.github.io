@@ -36,7 +36,7 @@ OpenJDKでパッチも上流のプロジェクトで管理されているので�
 
 ## DockerのJDKディストリビューション
 
-今、きちんとメンテナンスされていそうな公式イメージ系は次の5つかと思います
+今、きちんとメンテナンスされていそうな公式イメージ系は次の5つかと思います。
 
 * https://hub.docker.com/_/eclipse-temurin
 * https://hub.docker.com/_/openjdk

@@ -32,7 +32,7 @@ lede: "9/2に開催された「Grafana Meetup Japan #6｜どうする？Grafana�
 
 ### Alloyの導入の時に考えたこと
 
-AlloyはHCL(HashiCorp Configuration Language)に近い記法で書くことができ、個人的には馴染みが良かったのですが、実際の環境や運用を考えてみると
+AlloyはHCL(HashiCorp Configuration Language)に近い記法で書くことができ、個人的には馴染みが良かったのですが、実際の環境や運用を考えてみると…
 
 - アプリケーション
   - Java

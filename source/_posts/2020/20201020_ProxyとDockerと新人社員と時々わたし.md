@@ -237,7 +237,7 @@ export NODE_TLS_REJECT_UNAUTHORIZED=0
 ```
 
 コマンドごとに個別に設定ファイルを書いたり、
-実行時に指定もできます
+実行時に指定もできます。
 
 ```bash
 # gemで実行時にProxyを設定する場合

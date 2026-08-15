@@ -193,7 +193,7 @@ if __name__ == "__main__":
 ### Cloud ShellでPythonの環境構築
 
 次にCloud ShellのPython環境を構築していきます。
-まず、Python 3.8の環境を準備します。ターミナル上で
+まず、Python 3.8の環境を準備します。ターミナル上で…
 
 ```bash
 pyenv install 3.8.13
@@ -250,7 +250,7 @@ PredictionResult(example=array([5.2, 4.1, 1.5, 0.1]), inference=0)
 ## DataflowでGPUを使う際の事前準備と基本的な使い方
 
 DataflowでGPUを使用したい場合（例えば機械学習モデルの推論など）には、Dockerと組み合わせることでGPUを使用できます。
-基本的な流れは[Datflowの事前準備と基本的な使い方](#datflowの事前準備と基本的な使い方)と同じです。違いはDockerイメージの準備とパイプラインに追加で渡すオプションが増えることくらいです。ここでは
+基本的な流れは[Datflowの事前準備と基本的な使い方](#datflowの事前準備と基本的な使い方)と同じです。違いはDockerイメージの準備とパイプラインに追加で渡すオプションが増えることくらいです。ここでは…
 
 1. Dockerイメージの準備
 2. GPU使用時のオプション
@@ -492,7 +492,7 @@ gcloud builds submit --config build.yaml
 ### Cloud ShellでPythonの環境構築
 
 次にCloud ShellのPython環境を構築していきます。
-まず、Python 3.7の環境を準備します。ターミナル上で
+まず、Python 3.7の環境を準備します。ターミナル上で…
 
 ```bash
 pyenv install 3.7.13
@@ -753,7 +753,7 @@ python predict_iris_dataflow_pubsub2bq.py \
 export GOOGLE_APPLICATION_CREDENTIALS="{jsonファイルまでのpath}"
 ```
 
-で、PythonファイルからPub/SubにPublishできるようになります。それが終わったら
+で、PythonファイルからPub/SubにPublishできるようになります。それが終わったら…
 
 ```bash
 python publish_iris_local2pubsub.py \
@@ -768,7 +768,7 @@ python publish_iris_local2pubsub.py \
 BigQueryの画面からクエリを実行して結果を確認します。クエリは下図の赤枠の部分を順にクリックして
 <img src="/images/2022/20220920b/make_query.png" alt="make_query.png" width="702" height="486" loading="lazy">
 
-開いたエディタに
+開いたエディタに…
 
 ```SQL
 SELECT * FROM `{プロジェクトID}.{データセットの名前}.{テーブルの名前}` LIMIT 1000

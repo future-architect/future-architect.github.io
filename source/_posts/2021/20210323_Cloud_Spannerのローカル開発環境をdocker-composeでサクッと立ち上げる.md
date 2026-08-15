@@ -78,7 +78,7 @@ gcloud CLIとdockerイメージでの提供がありますが、今回はdocker-
 ### spanner-cliによるSpanner接続方法
 
 さっそくcliで接続してみましょう。
-※ インスタンス、データベースが作成されるまで十数秒待つ必要があります
+※ インスタンス、データベースが作成されるまで十数秒待つ必要があります。
 
 ```console
 $ docker-compose exec spanner-cli spanner-cli -p test-project -i test-instance -d test-database
@@ -134,7 +134,7 @@ spanner> select * from Singers;
 
 ## 解説
 
-ざっくりサンプルコードの解説をさせていただきます
+ざっくりサンプルコードの解説をさせていただきます。
 
 ### ファイル構成
 
@@ -159,7 +159,7 @@ spanner> select * from Singers;
 
 <img src="/images/2021/20210323/image_2.png" loading="lazy">
 
-Spannerエミュレータ本体`spanner`とCLIアクセス用の`spanner-cli`は常駐プロセスとして起動し続け、それ以外のコンテナはコマンド実行後に正常終了します
+Spannerエミュレータ本体`spanner`とCLIアクセス用の`spanner-cli`は常駐プロセスとして起動し続け、それ以外のコンテナはコマンド実行後に正常終了します。
 
 ```yaml
 version: '3'
@@ -224,7 +224,7 @@ services:
       command: ['sh', '-c', 'echo this container keep running && tail -f /dev/null']
 ```
 
-以下、補足になります
+以下、補足になります。
 
 * wrenchコンテナは`restart: on-failure`と設定しています
   * wrenchはSpannerインスタンス作成後に実行したいのですが、docker-composeの起動制御が複雑になるので、失敗→再起動→再実行 するようになっています

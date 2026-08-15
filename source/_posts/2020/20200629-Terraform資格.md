@@ -61,7 +61,7 @@ lede: "5/24に受験したHashiCorpから出た資格の1つである、Terrafor
 
 ### 申し込み
 
-[試験概要](https://www.hashicorp.com/certification/terraform-associate/)のページから申し込みます。試験自体はQuestionmarkというところが代理で行うようです。順を追っていくことで、アカウントの登録や試験ができるようになっています。試験の購入については現段階では
+[試験概要](https://www.hashicorp.com/certification/terraform-associate/)のページから申し込みます。試験自体はQuestionmarkというところが代理で行うようです。順を追っていくことで、アカウントの登録や試験ができるようになっています。試験の購入については現段階では…
 
 - Terraform Associate
 - Vault Associate

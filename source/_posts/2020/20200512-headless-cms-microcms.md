@@ -14,10 +14,10 @@ lede: "TIG DXチーム　アルバイターの三村です．今回はHeadlessCM
 ---
 ## はじめに
 
-はじめまして！ TIG DXチーム　アルバイターの三村です．
+はじめまして！ TIG DXチーム　アルバイターの三村です。
 
 普段は大学院生をしておりフューチャーには [AtCoder Jobs](https://jobs.atcoder.jp/) 経由でアルバイト採用していただき，5月でちょうど1年になります！ ありがとう[AtCoder](https://atcoder.jp/)!!
-これまで
+これまで…
 
 - Vue.jsでのフロントエンド画面作成
 - Docker上でlocalstackを用いたAWS用の技術検証
@@ -25,37 +25,37 @@ lede: "TIG DXチーム　アルバイターの三村です．今回はHeadlessCM
 - Pythonで性能検証用のダミー時系列データの生成
 
 などなどアルバイターですが幅広く様々なタスクをやらせてもらいました．
-そして今回はHeadlessCMSを利用したタスクをやることになりました．私自身HeadlessCMSどころかCMSを聞いたことすら無かったので，初めてCMS使ってみるにあたって感じたことを共有出来たらと思い本記事を作成させていただいております．
+そして今回はHeadlessCMSを利用したタスクをやることになりました．私自身HeadlessCMSどころかCMSを聞いたことすら無かったので，初めてCMS使ってみるにあたって感じたことを共有出来たらと思い本記事を作成させていただいております。
 
 ## そもそもCMSって？
 
-CMSは**Content Management System**の頭文字を取った略称で，文字通り「コンテンツを管理するシステム」のことです．
+CMSは**Content Management System**の頭文字を取った略称で，文字通り「コンテンツを管理するシステム」のことです。
 
 例えば素朴にwebコンテンツを作成しようとした場合，画面だけでもHTMLやCSS等の技術的なスキルが必要となります．一方でCMSを利用してwebコンテンツを作成すれば，技術的なスキルに依存することなくコンテンツの作成に注力できます．
-すなわちコンテンツ作成者は技術的なことは懸念せずにコンテンツの作成，管理にだけリソースが割くことができて嬉しいです．
+すなわちコンテンツ作成者は技術的なことは懸念せずにコンテンツの作成，管理にだけリソースが割くことができて嬉しいです。
 
-具体的なCMSサービスには[WordPress](https://ja.wordpress.org/)が挙げられます．
+具体的なCMSサービスには[WordPress](https://ja.wordpress.org/)が挙げられます。
 
 ## HeadlessCMS
 
-HeadlessCMSとはWikipediaに以下のようにあります．
+HeadlessCMSとはWikipediaに以下のようにあります。
 
 >Whereas a traditional CMS typically combines the content and presentation layers of a website, a headless CMS is just the content component and focuses entirely on the administrative interface for content creators, the facilitation of content workflows and collaboration, and the organization of content into taxonomies. It doesn’t concern itself with presentation layers, templates, site structure, or design, but rather stores its content in pure format and provides access to other components (e.g. delivery front ends, analytics tools, etc.) through stateless or loosely coupled APIs.
 
 [Wikipedia](https://en.wikipedia.org/wiki/Headless_content_management_system) より引用
 
-要約すると以下のような感じでしょうか．
+要約すると以下のような感じでしょうか。
 
 >従来のCMSがウェブサイトのコンテンツとプレゼンテーション層を組み合わせたものであるのに対し，HeadlessCMSはコンテンツの構成要素のみに焦点を当てている．プレゼンテーションレイヤー，テンプレート，サイト構造，デザインには関心がなく純粋な形式でコンテンツを保存しステートレスなAPIを通じて他のコンポーネントへのアクセスを提供する．
 
-すなわち，HeadlessCMSはフロントエンドとバックエンドを切り離して設計します．フロントエンドとバックエンド間はAPIを通じてコンテンツのやり取りをします．これによりフロントエンド側はデザインやレイアウトが固定されず高い自由度で開発が行えます．
+すなわち，HeadlessCMSはフロントエンドとバックエンドを切り離して設計します．フロントエンドとバックエンド間はAPIを通じてコンテンツのやり取りをします．これによりフロントエンド側はデザインやレイアウトが固定されず高い自由度で開発が行えます。
 
-これが前述のWordPressに代表されるCMSとの違いです．
+これが前述のWordPressに代表されるCMSとの違いです。
 
 ### HeadlessCMSサービスの比較
 
 HeadlessCMSは数多くのサービスが存在しています．
-ここでは代表的な3つのサービスの [butterCMS](https://buttercms.com/)， [contentful](https://www.contentful.com/)， [microCMS](https://microcms.io/) を比較してみたいと思います．
+ここでは代表的な3つのサービスの [butterCMS](https://buttercms.com/)， [contentful](https://www.contentful.com/)， [microCMS](https://microcms.io/) を比較してみたいと思います。
 
 調査日: **2020年5月8日時点**
 
@@ -70,9 +70,9 @@ HeadlessCMSは数多くのサービスが存在しています．
 | ドキュメント                                      | 英語                      | 英語                | 日本語                  |
 
 どのサービスも基本的な機能は満たされています．microCMSは日本製HeadlessCMSですのでドキュメントからサポートまですべて日本語対応です．サービス開始が2019年8月からということもあり，現在も活発に機能の改善や追加が行われています．
-公式で様々な[入門記事やチュートリアル](https://microcms.io/blog/)を書いてくれているので初めてHeadlessCMSを触ってみる場合に取り掛かりやすいと思います．
+公式で様々な[入門記事やチュートリアル](https://microcms.io/blog/)を書いてくれているので初めてHeadlessCMSを触ってみる場合に取り掛かりやすいと思います。
 
-したがって今回は[microCMS](https://microcms.io/)を使ってみます！ 無料プランの機能も充実しています．
+したがって今回は[microCMS](https://microcms.io/)を使ってみます！ 無料プランの機能も充実しています。
 
 ## microCMSを使ってみる
 
@@ -89,7 +89,7 @@ HeadlessCMSは数多くのサービスが存在しています．
 ### 会員登録
 
 まずは[ここ](https://microcms.io/)から会員登録を完了させてください．
-画面の手順通りに進めば簡単に会員登録できると思いますので，詳細は省略させていただきます．
+画面の手順通りに進めば簡単に会員登録できると思いますので，詳細は省略させていただきます。
 
 料金体系は以下のようになっていますので，ご自身で利用したいプランを選択してください．
 本記事ではFreeプランを選択しています．
@@ -103,7 +103,7 @@ HeadlessCMSは数多くのサービスが存在しています．
 
 また，サービスには識別しやすいように画像を設定できますので，複数サービスを運用する場合には設定するといいと思います．
 <img src="/images/2020/20200512/photo_20200512_03.png" style="border:solid 1px #000000" loading="lazy">
-私は既に1つサービスを作成していましたので，画面左上にうっすら既存サービスのアイコンが見えるかと思います．
+私は既に1つサービスを作成していましたので，画面左上にうっすら既存サービスのアイコンが見えるかと思います。
 
 ### APIの作成
 
@@ -160,13 +160,13 @@ curl "https://[サービスID].io/api/v1/blog/l5cn1orii" -H "X-API-KEY: YOUR_API
 
 ### 参照先コンテンツの作成
 
-まずは参照先のコンテンツを作成します．今回の例では以下の画像のようなリスト形式の「ブログ作成者」というAPIを作成しました．
+まずは参照先のコンテンツを作成します．今回の例では以下の画像のようなリスト形式の「ブログ作成者」というAPIを作成しました。
 
 <img src="/images/2020/20200512/photo_20200512_12.png" style="border:solid 1px #000000" loading="lazy">
 
 「ブログ作成者」に以下のようなコンテンツを作成します．この未来太郎さんの各種情報をブログ記事のコンテンツ側から取得したいと思います．
 <img src="/images/2020/20200512/photo_20200512_13.png" style="border:solid 1px #000000" loading="lazy">
-参照される側のコンテンツ作成はこれで完了です．
+参照される側のコンテンツ作成はこれで完了です。
 
 ### コンテンツ参照の設定
 
@@ -194,7 +194,7 @@ writerの種類を**テキストフィールド**から**コンテンツ参照**
 - golang
 - etc...
 
-のように複数のタグを付与させたいことがあると思います．
+のように複数のタグを付与させたいことがあると思います。
 
 ```json
 "tags":["AWS","lambda","golang"]
@@ -220,12 +220,12 @@ writerの種類を**テキストフィールド**から**コンテンツ参照**
 これで準備はできました！
 実際にAPIプレビューを試してみると，リスト形式で複数タグを持っていることが分かります．
 <img src="/images/2020/20200512/photo_20200512_21.png" style="border:solid 1px #000000" loading="lazy">
-これでリスト形式で複数の要素を与えることができました．
+これでリスト形式で複数の要素を与えることができました。
 
 ## Vue.jsで画面にデータを表示してみる
 
 最後は簡単にVue.jsでmicroCMSのコンテンツを画面に表示してみます．
-今回はaxiosを利用してAPIリクエストを行います．以下のようなVue.jsコードを作成しました．
+今回はaxiosを利用してAPIリクエストを行います．以下のようなVue.jsコードを作成しました。
 
 ```html
 <template>
@@ -265,7 +265,7 @@ export default {
 ```
 
 ブラウザで確認してみると無事表示されました！ リッチエディタで作成したhtml形式の本文もちゃんと機能しています．
-これでフロントエンドとmicroCMSの疎通ができたのでAPIで取得したコンテンツを利用して様々なページを作成することが出来るようになりました．
+これでフロントエンドとmicroCMSの疎通ができたのでAPIで取得したコンテンツを利用して様々なページを作成することが出来るようになりました。
 
 <img src="/images/2020/20200512/photo_20200512_22.png" style="border:solid 1px #000000" loading="lazy">
 
@@ -273,12 +273,12 @@ export default {
 
 今回は初めてのCMS利用でmicroCMSを触ってみた！ ということで本記事を書かせていただきました．
 microCMSはすべて日本語で書かれており，チュートリアルやブログ記事も豊富にあるのですごく始めやすかったです．特にUIがシンプルで分かりやすくて素晴らしいと思いました．APIプレビューで即座に作成したコンテンツの確認ができることなど特徴的だったかと思います．
-実際にプロジェクトでmicroCMSを利用している社員の方曰く，サポートはかなり手厚く，チャットのレスポンスもすぐ帰ってくるようです．日本語でやり取りでき，ドキュメントやUIも日本語なので，それだけでもプラスポイントではないでしょうか．
+実際にプロジェクトでmicroCMSを利用している社員の方曰く，サポートはかなり手厚く，チャットのレスポンスもすぐ帰ってくるようです．日本語でやり取りでき，ドキュメントやUIも日本語なので，それだけでもプラスポイントではないでしょうか。
 
 しかし，比較的新しく出てきたサービスのため，細かな機能不足があるように感じました．例えばバリデーション機能，編集履歴の表示などは現在開発中とのことです．
 <img src="/images/2020/20200512/photo_20200512_23.png" loading="lazy">
 
-ですが，開発スピードがすごく早いため今後どんどん使いやすくなっていくと思います．機能更新の様子は[公式のブログ](https://microcms.io/blog/)で見ることができます．ですので今後も注目していきたいサービスの１つだと思います．
+ですが，開発スピードがすごく早いため今後どんどん使いやすくなっていくと思います．機能更新の様子は[公式のブログ](https://microcms.io/blog/)で見ることができます．ですので今後も注目していきたいサービスの１つだと思います。
 
 ありがとうございました！
 

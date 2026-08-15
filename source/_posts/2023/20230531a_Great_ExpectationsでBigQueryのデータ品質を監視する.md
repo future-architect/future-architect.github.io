@@ -307,7 +307,7 @@ expectationは計13個自動生成されたようです。
 Checkpointとは「監視対象データ（データソース）、Expectation Suite、バリデーションを実施した後の行動」の3点をまとめたものであり、Checkpointを実行することで、Expectation Suiteをまとめてバリデーションできます。
 
 バリデーションを実施した後の行動として、結果をメールやSlackでの通知する等が挙げられますが、Pythonでプログラミングできるものなら何でも可能となっており、自由度が高いです（[公式Docs参考](https://docs.greatexpectations.io/docs/terms/action)）\
-※今回はバリデーションを実施した後の行動の設定までは扱いません
+※今回はバリデーションを実施した後の行動の設定までは扱いません。
 
 `great_expectations checkpoint new <設定したいcheckpoint名>`コマンドを実行すると、`great_expectations/uncommitted/edit_checkpoint_~~.ipynb`にNotebookファイルが自動生成されます。
 

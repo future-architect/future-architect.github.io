@@ -40,7 +40,7 @@ IaCがアプリケーション開発やっと同じ土俵に立った今、同�
 
 <img src="/images/2020/20200213/photo_20200213_02.png" loading="lazy">
 
-仕組みはごく単純です
+仕組みはごく単純です。
 
 * Policy をソースコード(yaml)として定義
 * Terraformのplanの結果(json)を生成

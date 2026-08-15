@@ -78,7 +78,7 @@ https://docs.konghq.com/gateway/latest/install/
 まずはKongをインストールします。Dockerなど便利なオプションもあるので好きな方法でインストールしましょう。
 Kongは設定の保存先としてDBを使うのでPostgreSQLもインストールが必要です。
 
-Kongはデフォルトで
+Kongはデフォルトで…
 
 - Port 8001：あらゆるエンティティ設定をするのAdminAPI
 - Port 8000：実際トラフィックをさばくProxy
