@@ -41,7 +41,7 @@ Terraform の挙動を細かく調査したいときに環境変数の設定を�
 export TF_LOG=DEBUG
 ```
 
-Terraform apply をした時などにDEBUG レベルの詳細なログを確認することができます。
+Terraform apply をした時などにDEBUG レベルの詳細なログを確認できます。
 また、ログをファイルとして保存したい場合は、以下で可能です。
 
 ```bash

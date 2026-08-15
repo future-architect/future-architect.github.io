@@ -73,7 +73,7 @@ MacOs, Linuxの場合は、[dbt VS Code拡張機能](https://marketplace.visuals
 
 **Windowsにおけるインストール**
 
-Windowsの場合は、VS Code拡張機能を経由してFusionのインストールできなかったため、PowerShellで以下のコマンドをたたき、dbt.exeのパスを通すと、上記と同じようにdbt fusionを利用することができました。
+Windowsの場合は、VS Code拡張機能を経由してFusionのインストールできなかったため、PowerShellで以下のコマンドをたたき、dbt.exeのパスを通すと、上記と同じようにdbt fusionを利用できました。
 
 ```ps
 irm https://public.cdn.getdbt.com/fs/install/install.ps1 | iex
@@ -83,7 +83,7 @@ irm https://public.cdn.getdbt.com/fs/install/install.ps1 | iex
 
 ### ２．インストール後の対応
 
-`dbt-core`からの移行手順もとても簡単です。以下のコマンドをただくと、画像のとおり、いくつかの質問に答えると、自動的に`dbt-autofix`まで適用して移行のためのファイルの書き換えを行ってくれます。
+`dbt-core`からの移行手順もとても簡単です。以下のコマンドをただくと、画像のとおり、いくつかの質問に答えると、自動的に`dbt-autofix`まで適用して移行のためのファイルを書き換えてくれます。
 
 ```sh
 dbt init --fusion-upgrade

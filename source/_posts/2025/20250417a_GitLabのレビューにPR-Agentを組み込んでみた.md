@@ -71,7 +71,7 @@ PR-Agentとのやり取りは、Pythonで実装されたCLIツール(後述)、�
   - slash_command: `/ask`
   - cli: `python -m pr_agent.cli --pr_url=<pr_url> ask "your question"`
     - PRの内容について、質問を投げることができます
-    - コード差分へのコメント経由で、該当行についてコンテキストを絞って質問することも可能です
+    - コード差分へのコメント経由で、該当行についてコンテキストを絞って質問もできます
 - UpdateChangelog
   - slash_command: `/update_changelog`
   - cli: `python -m pr_agent.cli --pr_url=<pr_url> update_changelog`
