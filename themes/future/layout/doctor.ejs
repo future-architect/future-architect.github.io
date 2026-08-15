@@ -1,4 +1,4 @@
-<div class="container">
+<div class="container doctor-page">
   <%- partial('_partial/breadcrumb', {items: [
         {label: 'ホーム', url: '/'},
         {label: '記事ドクター'}
@@ -16,11 +16,64 @@
         <li><span class="summary-count"><%= checks.categoryDupTags.length %></span><br><span class="summary-label">カテゴリと同名のタグ</span></li>
         <li><span class="summary-count"><%= checks.singleUse.length %></span><br><span class="summary-label">1記事タグ</span></li>
         <% const dormant = doctor_dormant_authors(); %>
+        <% const thisYear = new Date().getFullYear(); %>
         <li><span class="summary-count"><%= dormant.length %></span><br><span class="summary-label">投稿が途切れた著者</span></li>
       </ul>
 
-      <%# タグ無しと付けすぎは、どちらも件数の少ない「記事単位の粗さ」の検査。
-          縦に積むと1件ずつのために画面を1つ使うので、2つの節を横に並べる %>
+      <%# 並びは #2442 の指定。サイト全体のレイアウト → カテゴリ → タグ の順に、
+          関係の近い検査どうしを2列に組んで縦の長さを詰める。
+          外部リンクの明示はサイトの導線そのもの（1記事ではなく全ページに効く）
+          なので先頭に置く %>
+      <h2 class="bottom-content-header">外部リンクの明示漏れ（サイトの導線）</h2>
+      ※リンクテキストから外部と読めないリンクには「（外部サイト）」を付ける（#2346）。ブランド名・メディア名を名乗るリンクは対象外（許容リストは <code>scripts/doctor.js</code>）。記事本文は対象外
+      <% const extLinks = doctor_external_links(); %>
+      <% if (extLinks.length) { %>
+      <ul class="doctor-list">
+        <% extLinks.forEach(function(f){ %>
+        <li><%= f.text %><span class="doctor-note"><%= f.file %></span></li>
+        <% }) %>
+      </ul>
+      <% } else { %>
+      <p>該当なし</p>
+      <% } %>
+
+      <%# カテゴリ系。説明の抜けと、カテゴリと語彙がぶつかるタグを並べる %>
+      <div class="doctor-cols">
+        <section>
+          <h2 class="bottom-content-header">カテゴリの説明の抜け・食い違い</h2>
+          ※カテゴリの一言説明は <code>source/_data/categories.yml</code>（#2405）。新設カテゴリの説明漏れと、実在しないカテゴリの説明（改名・統合後の消し忘れ）を両方向で照合します
+          <% const catDescs = doctor_category_descriptions(); %>
+          <% if (catDescs.missing.length || catDescs.orphaned.length) { %>
+          <ul class="doctor-list">
+            <% catDescs.missing.forEach(function(name){ %>
+            <li><%= name %><span class="doctor-note">説明が無い</span></li>
+            <% }) %>
+            <% catDescs.orphaned.forEach(function(name){ %>
+            <li><%= name %><span class="doctor-note">カテゴリとして実在しない</span></li>
+            <% }) %>
+          </ul>
+          <% } else { %>
+          <p>該当なし</p>
+          <% } %>
+        </section>
+        <section>
+          <h2 class="bottom-content-header">カテゴリと同名のタグ</h2>
+          ※カテゴリとタグで語彙が重複しています。タグ側を記事から外し、_config.yml の alias でタグURLをカテゴリへ転送してください（大文字小文字違いも同一視して照合）
+          <% if (checks.categoryDupTags.length) { %>
+          <ul class="doctor-list">
+            <% checks.categoryDupTags.forEach(function(d){ %>
+            <li>
+              <a href="<%- url_for(d.path) %>"><%= d.name %></a>（タグ <%= d.n %>本）＝ <a href="<%- url_for(d.catPath) %>"><%= d.cat %></a>（カテゴリ <%= d.catN %>本）
+            </li>
+            <% }) %>
+          </ul>
+          <% } else { %>
+          <p>該当なし</p>
+          <% } %>
+        </section>
+      </div>
+
+      <%# ここからタグメンテ系。まず記事単位の粗さ（タグ無し・付けすぎ） %>
       <div class="doctor-cols">
         <section>
           <h2 class="bottom-content-header">タグが1つも無い記事</h2>
@@ -49,35 +102,30 @@
         </section>
       </div>
 
-      <h2 class="bottom-content-header">ほぼ重なるタグ（統合候補）</h2>
-      ※片方の記事すべてがもう片方にも付いていて、差が2本以内のペア。実質同じ集合に2つの名前が付いています。Go1.27 ⊆ Go のような差の大きい健全な階層は出しません
-      <% if (checks.nearDuplicates.length) { %>
-      <ul class="doctor-list">
-        <% checks.nearDuplicates.forEach(function(d){ %>
-        <li>
-          <a href="<%- url_for(d.aPath) %>"><%= d.a %></a>（<%= d.aN %>本）<%= d.identical ? ' ＝ ' : ' ⊆ ' %><a href="<%- url_for(d.bPath) %>"><%= d.b %></a>（<%= d.bN %>本）
-          <% if (d.identical) { %><span class="doctor-note">記事集合が完全に一致</span><% } %>
-        </li>
-        <% }) %>
-      </ul>
-      <% } else { %>
-      <p>該当なし</p>
-      <% } %>
+      <%# 統合候補はペア（A ⊆ B）を1行に書くので幅が要る。単独で出す %>
+      <div class="doctor-single">
+        <section>
+          <h2 class="bottom-content-header">ほぼ重なるタグ（統合候補）</h2>
+          ※片方の記事すべてがもう片方にも付いていて、差が2本以内のペア。実質同じ集合に2つの名前が付いています。Go1.27 ⊆ Go のような差の大きい健全な階層は出しません
+          <% if (checks.nearDuplicates.length) { %>
+          <ul class="doctor-list">
+            <% checks.nearDuplicates.forEach(function(d){ %>
+            <li>
+              <a href="<%- url_for(d.aPath) %>"><%= d.a %></a>（<%= d.aN %>本）<%= d.identical ? ' ＝ ' : ' ⊆ ' %><a href="<%- url_for(d.bPath) %>"><%= d.b %></a>（<%= d.bN %>本）
+              <% if (d.identical) { %><span class="doctor-note">記事集合が完全に一致</span><% } %>
+            </li>
+            <% }) %>
+          </ul>
+          <% } else { %>
+          <p>該当なし</p>
+          <% } %>
+        </section>
+      </div>
 
-      <h2 class="bottom-content-header">カテゴリと同名のタグ</h2>
-      ※カテゴリとタグで語彙が重複しています。タグ側を記事から外し、_config.yml の alias でタグURLをカテゴリへ転送してください（大文字小文字違いも同一視して照合）
-      <% if (checks.categoryDupTags.length) { %>
-      <ul class="doctor-list">
-        <% checks.categoryDupTags.forEach(function(d){ %>
-        <li>
-          <a href="<%- url_for(d.path) %>"><%= d.name %></a>（タグ <%= d.n %>本）＝ <a href="<%- url_for(d.catPath) %>"><%= d.cat %></a>（カテゴリ <%= d.catN %>本）
-        </li>
-        <% }) %>
-      </ul>
-      <% } else { %>
-      <p>該当なし</p>
-      <% } %>
-
+      <%# #2442 では「タイトル照合」と横に並べる指定だったが、この節は中を
+          2列（英数字／和文）に割って情報密度を上げたので全幅で使う %>
+      <div class="doctor-single">
+        <section>
       <h2 class="bottom-content-header">1記事にしか使われていないタグ</h2>
       ※「同居」は、同じ記事に1記事タグ同士が付いているもの。その記事のタグ付けがまとめて薄い可能性が高い
       <%# 1タグ1行で並べると縦に長すぎる。辞書の索引のように、英数字は先頭の
@@ -119,12 +167,24 @@
           byInitial.get(k).push(t);
         });
         [...byInitial.entries()].sort((a, b) => orderOf(a[0]) - orderOf(b[0])).forEach(g => singleGroups.push(g));
+        // 1列だと1行あたりの情報量が少なく縦に伸びるので、節の中を2列に割る。
+        // 左が英数字（A〜Z）、右が和文（五十音・漢字）。「同居あり」は
+        // 意味の違う印なので左の先頭に置く
+        const isLatinGroup = g => /^[\x20-\x7e]$/.test(g[0]);
+        const latinGroups = singleGroups.filter(g => g[0] === '同居あり' || isLatinGroup(g));
+        const jaGroups = singleGroups.filter(g => !(g[0] === '同居あり' || isLatinGroup(g)));
       %>
-      <ul class="doctor-list">
-        <% singleGroups.forEach(function(g){ %>
-        <li><span class="doctor-note"><%= g[0] %></span><% g[1].forEach(function(t, i){ %><a href="<%- url_for(t.path) %>"><%= t.name %></a><%= i < g[1].length - 1 ? '、' : '' %><% }) %></li>
+      <div class="doctor-cols">
+        <% [latinGroups, jaGroups].forEach(function(groups){ %>
+        <ul class="doctor-list">
+          <% groups.forEach(function(g){ %>
+          <li><span class="doctor-note"><%= g[0] %></span><% g[1].forEach(function(t, i){ %><a href="<%- url_for(t.path) %>"><%= t.name %></a><%= i < g[1].length - 1 ? '、' : '' %><% }) %></li>
+          <% }) %>
+        </ul>
         <% }) %>
-      </ul>
+      </div>
+        </section>
+      </div>
 
       <h2 class="bottom-content-header">タグの親子関係（オントロジー）</h2>
       ※<code>source/_data/tag_ontology.yml</code> の broader の可視化。関連記事の計算が辿る辺で、「子タグの記事に親タグを打つのは冗長」という自明な包含だけを登録しています（#2292）。灰色はタグとして実在しない概念ノード。「系統」は自分＋子孫のユニーク記事数。「版」はバージョン同義（Go1.27 は Go を書いたのと同じ扱い。<code>scripts/version_tags.js</code>）で語幹に吸収されるタグ
@@ -163,57 +223,6 @@
         </li>
       </ul>
 
-      <h2 class="bottom-content-header">投稿が途切れている著者</h2>
-      ※今年まだ投稿が無く、最後の投稿が昨年か一昨年の著者。声をかけると再開してくれるかもしれない候補です（/authors/ に <code>*</code> / <code>**</code> で出していたものの移設。読者向けのページには凡例の無い記号を置かない #2418）
-      <%# 累計本数でまとめて横に並べる。本数が同じ人は声かけの重みも同じなので、
-          1人1行にするより「何本書いた人が何人いるか」が一目で分かる。
-          並びは本数の多い順。区切りの「、」は使わず間隔で分ける %>
-      <% if (dormant.length) { %>
-      <% const dormantCounts = [...new Set(dormant.map(d => d.count))].sort((a, b) => b - a); %>
-      <ul class="doctor-list">
-        <% dormantCounts.forEach(function(c){ %>
-        <% const members = dormant.filter(d => d.count === c); %>
-        <li class="doctor-inline-row">
-          <span class="doctor-note"><%= c %>本（<%= members.length %>名）</span>
-          <%# 最終投稿年は名前の直後に添える。行を折らないインラインの注記にする
-              （.doctor-note は display:block で1件ごとに改行されてしまう）%>
-          <% members.forEach(function(d){ %><a href="<%- url_for('authors/' + d.name + '/') %>"><%= d.name %></a><span class="doctor-note-inline"><%= d.last %>年</span><% }) %>
-        </li>
-        <% }) %>
-      </ul>
-      <% } else { %>
-      <p>該当なし</p>
-      <% } %>
-
-      <h2 class="bottom-content-header">カテゴリの説明の抜け・食い違い</h2>
-      ※カテゴリの一言説明は <code>source/_data/categories.yml</code>（#2405）。新設カテゴリの説明漏れと、実在しないカテゴリの説明（改名・統合後の消し忘れ）を両方向で照合します
-      <% const catDescs = doctor_category_descriptions(); %>
-      <% if (catDescs.missing.length || catDescs.orphaned.length) { %>
-      <ul class="doctor-list">
-        <% catDescs.missing.forEach(function(name){ %>
-        <li><%= name %><span class="doctor-note">説明が無い</span></li>
-        <% }) %>
-        <% catDescs.orphaned.forEach(function(name){ %>
-        <li><%= name %><span class="doctor-note">カテゴリとして実在しない</span></li>
-        <% }) %>
-      </ul>
-      <% } else { %>
-      <p>該当なし</p>
-      <% } %>
-
-      <h2 class="bottom-content-header">外部リンクの明示漏れ（サイトの導線）</h2>
-      ※リンクテキストから外部と読めないリンクには「（外部サイト）」を付ける（#2346）。ブランド名・メディア名を名乗るリンクは対象外（許容リストは <code>scripts/doctor.js</code>）。記事本文は対象外
-      <% const extLinks = doctor_external_links(); %>
-      <% if (extLinks.length) { %>
-      <ul class="doctor-list">
-        <% extLinks.forEach(function(f){ %>
-        <li><%= f.text %><span class="doctor-note"><%= f.file %></span></li>
-        <% }) %>
-      </ul>
-      <% } else { %>
-      <p>該当なし</p>
-      <% } %>
-
       <h2 class="bottom-content-header">タイトルにタグ名を含むのに、そのタグが付いていない記事</h2>
       ※英数3文字・和文4文字未満のタグ名は一般語に当たりやすいので照合していません
       <ul class="doctor-list">
@@ -230,6 +239,39 @@
         </li>
         <% }) %>
       </ul>
+
+      <%# タグ系の検査とは対象が違うので最後に置く。
+          声かけは「まず昨年まで書いていた人、駄目なら一昨年の人」の順に進めるので、
+          左に昨年・右に一昨年を並べて、そのまま上から当たれるようにする %>
+      <h2 class="bottom-content-header">投稿が途切れている著者</h2>
+      ※今年まだ投稿が無い著者。声をかけると再開してくれるかもしれない候補です（/authors/ に <code>*</code> / <code>**</code> で出していたものの移設。読者向けのページには凡例の無い記号を置かない #2418）
+      <% if (dormant.length) { %>
+      <div class="doctor-cols">
+        <% [thisYear - 1, thisYear - 2].forEach(function(y){ %>
+        <section>
+          <% const members = dormant.filter(d => d.last === y); %>
+          <h3 class="doctor-subhead"><%= y %>年まで（<%= members.length %>名）</h3>
+          <% if (members.length) { %>
+          <ul class="doctor-list">
+            <%# 累計本数でまとめる。本数が同じ人は声かけの重みも同じなので、
+                1人1行にするより「何本書いた人が何人いるか」が掴める %>
+            <% const counts = [...new Set(members.map(d => d.count))].sort((a, b) => b - a); %>
+            <% counts.forEach(function(c){ %>
+            <li class="doctor-inline-row">
+              <span class="doctor-note"><%= c %>本</span>
+              <% members.filter(d => d.count === c).forEach(function(d){ %><a href="<%- url_for('authors/' + d.name + '/') %>"><%= d.name %></a><span class="doctor-note-inline"></span><% }) %>
+            </li>
+            <% }) %>
+          </ul>
+          <% } else { %>
+          <p>該当なし</p>
+          <% } %>
+        </section>
+        <% }) %>
+      </div>
+      <% } else { %>
+      <p>該当なし</p>
+      <% } %>
     </div>
   </section>
 </div>
