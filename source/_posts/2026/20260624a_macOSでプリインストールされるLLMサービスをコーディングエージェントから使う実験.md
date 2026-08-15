@@ -42,7 +42,7 @@ lede: "みなさん、WWDC26の情報はみられましたか？昨年発表さ�
 
 次にコーディングエージェントをインストールします。今回は[OpenCode](https://opencode.ai)を入れました。インストールの方法はいろいろあるので、公式サイトを参照してください。brewで入れるとXCodeも27 Betaを入れる必要があります。
 
-ローカルを参照させるために、`~/.config/opencode/opencode.json`を作成し、モデル設定を行います。これで`/models`にAppleのモデルが出てくるようになります。
+ローカルを参照させるために、`~/.config/opencode/opencode.json`を作成し、モデルを設定します。これで`/models`にAppleのモデルが出てくるようになります。
 
 ```json ~/.config/opencode/opencode.json
 {

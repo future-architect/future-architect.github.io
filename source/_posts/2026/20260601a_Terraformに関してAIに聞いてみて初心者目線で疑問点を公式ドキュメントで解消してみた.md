@@ -73,7 +73,7 @@ Providerに関する公式ドキュメントのURLを教えてもらって自分
 
 具体的にTerraform本体（Core）は下図のフローで動いています。
 
-つまり、Terraform本体はクラウドに直接触れることはなく、「状態管理と差分計算を行う非常に賢いエンジン」として機能しています。この明確な役割分担があるからこそ、TerraformはAWSでもGCPでもローカルPCでも、同じ「Plan（計画）してApply（適用）する」という統一された体験を提供できるのです。
+つまり、Terraform本体はクラウドに直接触れることはなく、「状態管理と差分計算をする非常に賢いエンジン」として機能しています。この明確な役割分担があるからこそ、TerraformはAWSでもGCPでもローカルPCでも、同じ「Plan（計画）してApply（適用）する」という統一された体験を提供できるのです。
 
 :::
 
@@ -179,7 +179,7 @@ Terraform Coreの重要な役割である「状態管理」と「計画の実行
 
 * Stateファイルによって「コード上の名前」と「クラウド上のID」を紐づけているからこそ、未作成や更新の判断が正確にできる。
 * Terraformはリソースの依存関係（参照・被参照）などのメタデータを管理している。
-* キャッシュを保持することで効率的にリソースの管理を行うことができる。
+* キャッシュを保持することで効率的にリソースを管理できる。
 * Stateファイルはリスク管理の観点からバックアップを取得して[HCP Terraform](https://developer.hashicorp.com/terraform/cloud-docs/migrate)に保存しておくのがおすすめ。
 * Stateファイルはユーザが自分で手編集できない。
 * [暗黙の依存関係](https://developer.hashicorp.com/terraform/tutorials/configuration-language/dependencies#manage-implicit-dependencies)と[ユーザが規定する明示的な依存関係](https://developer.hashicorp.com/terraform/tutorials/configuration-language/dependencies#manage-explicit-dependencies)という仕組みを用いて、「どちらを先に作るべきか」を決定している。
