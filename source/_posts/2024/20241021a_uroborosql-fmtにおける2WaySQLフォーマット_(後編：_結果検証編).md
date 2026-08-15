@@ -33,7 +33,7 @@ mathjax: true
 
 uroboroSQL-fmtではPostgreSQL向けのパーサ ([tree-sitter-sql](https://github.com/future-architect/tree-sitter-sql)) で構文解析し、その結果を利用してフォーマットをしています。そのため、SQL文として不正な2WaySQLのソースをフォーマットできないという問題がありました。
 
-当フォーマッタでは2WaySQLの条件分岐をサポートするために、元のSQLを条件分岐に対応したSQLに分解します。そして、各SQLをフォーマットしてからマージして、一つのSQLファイルに復元します。
+当フォーマッタでは2WaySQLの条件分岐をサポートするために、元のSQLを条件分岐に対応したSQLに分解します。そして、各SQLをフォーマットしてからマージして、1つのSQLファイルに復元します。
 
 例えば、以下のSQLを考えます。
 
