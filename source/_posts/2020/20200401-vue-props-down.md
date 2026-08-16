@@ -235,10 +235,10 @@ export default {
 
 答えは、`ChildLayer.vue`の`props`の`value`プロパティです。`ParentLayer.vue`では`testData`という変数で扱われていた値は、`ChildLayer.vue`では`value`プロパティの値として扱われます。こうして、親コンポーネントから子コンポーネントへと値が流れ込んできます。`ChildLayer.vue`内では、その`value`を4箇所で使っています。
 
-- 1つ目は、マスタッシュ構文
-- 2つ目は、`input`の`:value`
-- 3つ目は、`button`タグのクリックイベントの引数
-- 4つ目は、さらに子コンポーネントの`grand-parent-layer`
+- 1つ目: マスタッシュ構文
+- 2つ目: `input`の`:value`
+- 3つ目: `button`タグのクリックイベントの引数
+- 4つ目: さらに子コンポーネントの`grand-parent-layer`
 
 `ParentLayer.vue`との違いに気づきましたか？`button`タグがあることが1番目立ちますがそれ以外です。
 
