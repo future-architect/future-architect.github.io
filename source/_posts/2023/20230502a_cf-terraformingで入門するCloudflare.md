@@ -26,7 +26,7 @@ Terraformは言わずもがな、Infrastructure as Code(IaC)を実現するた�
 
 https://github.com/cloudflare/terraform-provider-cloudflare
 
-さて、このようにTerraform管理できることで、Cloudflareのリソースがどれだけあるか、どのように設定されているか見通しを良くできますが、一方で元々手動で作ってしまったリソースをTerraformの管理下とする場合、そもそも全量把握できているか、と不透明な状況になります。そこで、今回取り上げるcf-terraformingです。
+さて、このようにTerraform管理できることで、Cloudflareのリソースがどれだけあるか、どのように設定されているか見通しを良くできます。一方で元々手動で作ってしまったリソースをTerraformの管理下とする場合、そもそも全量把握できているか、と不透明な状況になります。そこで、今回取り上げるcf-terraformingです。
 
 ## cf-terraformingによるIaC化
 

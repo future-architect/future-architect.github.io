@@ -493,7 +493,7 @@ var a [10]int
 s = a[:] // s = a[0:len(a)]の短縮形
 ```
 
-もし、`[100]byte`型の値（`byte`100個分の配列、例えばバッファ）を作り、関数に参照渡しをしたいのであれば、`[]byte`型の引数を持つ関数を宣言し、配列をスライスに変えて、その引数に渡してあげるのが良いでしょう [^9]。スライスは、[下記](https://yourbasic.org/golang/go-java-tutorial/#making-values)に書いてあるような`make`関数でも作り出すことができます。
+もし、`[100]byte`型の値（`byte`100個分の配列、例えばバッファ）を作り、関数に参照渡しをしたいとします。その場合は、`[]byte`型の引数を持つ関数を宣言し、配列をスライスに変えて、その引数に渡してあげるのが良いでしょう [^9]。スライスは、[下記](https://yourbasic.org/golang/go-java-tutorial/#making-values)に書いてあるような`make`関数でも作り出すことができます。
 
  [^9]: サンプルコード ( <https://play.golang.org/p/jTKvVIBqwMa> )
 

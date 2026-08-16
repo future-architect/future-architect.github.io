@@ -87,7 +87,7 @@ npm run serve
 
 その際、Vue.jsのバージョンの他、Linter/Formatterの有無等の詳細な設定を選択できます。
 
-今回は、TypeScriptを利用した状態で、Linter/Formatterを利用しない設定と、利用した状態の差分を比較する事で、Linterを有効にするにあたって必要な、また推奨される設定、準備を確認します。
+今回は、TypeScriptを利用した状態で、Linter/Formatterを利用しない設定と利用した状態の差分を比較する事で、Linterを有効にするにあたって必要な、また推奨される設定・準備を確認します。
 
 <img src="/images/2021/20210616a/image_3.png" alt="Linter設定" width="642" height="529" loading="lazy">
 
