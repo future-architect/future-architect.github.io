@@ -156,7 +156,7 @@ sudo apt update
 #### 仮説③ WSLのHyper-Vファイアウォールが遮断している？
 
 「デフォルトでオンになっているHyper-V FirewallをOFFにすると`apt`が通ることがある」という情報を教えてもらい、「WSL Settings」のGUIから無効化してみました。
-→ 変化なし
+*→ 変化なし*
 
 <img src="/images/2026/20260421b/WSL_Settings_で_Hyper-V_Firewall_を無効化した画面.png" alt="WSL_Settings_で_Hyper-V_Firewall_を無効化した画面" width="1200" height="645" loading="lazy">
 

@@ -210,7 +210,7 @@ No violations found
 
 <img src="/images/2020/20200213/photo_20200213_04.png" loading="lazy">
 
-Cloud BuildのSteps イメージ
+*Cloud BuildのSteps イメージ*
 
 ```yaml
 ---

@@ -158,7 +158,7 @@ Advent Calendarの前月11月は凪の月と呼ばれ（要出典）、気持ち
 
 もし、連絡が無くてスルーしているときですが、チャットのDMでチラってコメントを送っています。大体悪気は無いので、リスケするかどうか確認して、これは1.5ヶ月くらい後ろにしています。あまり1人に頼る公開スケジュールを立てると、崩壊した時にリスクが大きく精神的にもよろしくないです。そのため、大体**3人くらいの冗長性を持ってスケジュールを計画すると良い**かなと思います。
 
-🚩繰り返されるリスケの図
+*🚩繰り返されるリスケの図*
 
 <img src="/images/2020/20200530/photo_20200530_05.png" loading="lazy">
 
@@ -190,7 +190,7 @@ Advent Calendarの前月11月は凪の月と呼ばれ（要出典）、気持ち
 🚩200人超えの社内チャットに宣伝する図
 <img src="/images/2020/20200530/photo_20200530_06.png" style="border:solid 1px #000000" loading="lazy">
 
-🚩Twitterに宣伝している図
+*🚩Twitterに宣伝している図*
 <blockquote class="twitter-tweet"><p lang="ja" dir="ltr">Goのパッケージ構成で悩んでいる人にオススメの記事を公開しました✨ / あなたのGoアプリ/ライブラリのパッケージ構成もっとシンプルでよくない？ <a href="https://t.co/Mi8nvhQpfz">https://t.co/Mi8nvhQpfz</a></p>&mdash; フューチャー技術ブログ🥢 (@future_techblog) <a href="https://twitter.com/future_techblog/status/1265813149883613184?ref_src=twsrc%5Etfw">May 28, 2020</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
 ## 公開後に反応があった場合

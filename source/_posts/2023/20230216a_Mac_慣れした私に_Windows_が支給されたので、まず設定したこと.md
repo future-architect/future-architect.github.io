@@ -229,7 +229,7 @@ Change Key のダウンロードが完了したら「管理者として実行(A)
 
 <img src="/images/2023/20230216a/ck_2.png" alt="ck_2.png" width="879" height="297" loading="lazy">
 
-F13 から F24 と スキャンコードの対応表
+*F13 から F24 と スキャンコードの対応表*
 
 | Key | Scan code |
 | --- | --------- |
