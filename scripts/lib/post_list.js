@@ -13,10 +13,14 @@ const { getSNSCnt } = require('./sns');
  * 判断の順序に合わせている。
  */
 
-// 反響が0のときは何も出さない。0と表示されると寂しく見えるため
+// 反響が0のときは何も出さない。0と表示されると寂しく見えるため。
+// ♡ だけ span で包むのは、記号は少し大きくしないと線が潰れる一方、
+// 数字は日付と同じ大きさに揃えたいため（#2453）
 const snsLabel = (permalink) => {
   const n = getSNSCnt(permalink);
-  return n > 0 ? `<span class="snscount">&#9825;${n}</span>` : '';
+  return n > 0
+    ? `<span class="snscount"><span class="snscount-icon">&#9825;</span>${n}</span>`
+    : '';
 };
 
 // 公開から30日以内なら NEW を付ける
