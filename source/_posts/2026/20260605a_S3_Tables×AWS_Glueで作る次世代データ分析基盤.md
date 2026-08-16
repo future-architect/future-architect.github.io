@@ -110,7 +110,8 @@ if validation_errors:
 
 ただエラーで弾いて落とすだけでなく、運用フェーズで原因調査がしやすいように「どのレコードの、どの主キー（PK群）でエラーが起きたか」を最大20件サンプリングしてログに書き出す工夫を入れています。
 <img src="/images/2026/20260605a/image_2.png" alt="image.png" width="1200" height="564" loading="lazy">
-↑エラー時のGlueの画面
+
+*↑エラー時のGlueの画面*
 
 ```sh
 ===== Validation Error Summary =====

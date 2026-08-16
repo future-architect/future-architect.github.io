@@ -36,13 +36,13 @@ mathjax: true
 
 <img src="/images/2025/20250226a/new_ModalNet-21.jpg" alt="" width="759" height="1105" loading="lazy">
 
-図 1．元論文から引用したTransformerの構成図
+*図 1．元論文から引用したTransformerの構成図*
 
 とても簡潔ですが、図からは理解できない内容が多々あるかと思います。そのため、少しだけ具体化した構成図を図2に示します。できるだけ見やすく作りたかったのですが、どうしても複雑になる箇所があるため、拡大して見ていただければと思います。図2の補足ですが、EmbeddingやLinear、Layer Normalization、Softmaxは行方向（＝各Tokenのベクトル方向）に対して行われる処理であることに注意してください。
 
 <img src="/images/2025/20250226a/Screenshot_2025-02-26_101047.png" alt="" width="1105" height="459" loading="lazy">
 
-図 2．私が作った、元論文の構成図を具体化させたTransformerの構成図
+*図 2．私が作った、元論文の構成図を具体化させたTransformerの構成図*
 
 ## 次に「処理フロー」で理解する
 
@@ -52,7 +52,7 @@ mathjax: true
 
 <img src="/images/2025/20250226a/76fa3ac9-6b02-48c1-a1a2-8dd97951d03e.png" alt="" width="558" height="592" loading="lazy">
 
-図 3．図2のQ,K,Vの対応
+*図 3．図2のQ,K,Vの対応*
 
 ```txt
 1.質問を入力
@@ -166,7 +166,7 @@ Embeddingで各TokenをD次元に拡張しますが、分割がない場合、1�
 
 <img src="/images/2025/20250226a/multi-head-attention_l1A3G7a.png" alt="" width="576" height="746" loading="lazy">
 
-図 4．元論文から引用したMulti-Head Attentionの構成図
+*図 4．元論文から引用したMulti-Head Attentionの構成図*
 
 ### [スケール化内積注意機構(Scaled Dot-Product Attention)](https://paperswithcode.com/method/scaled)
 
