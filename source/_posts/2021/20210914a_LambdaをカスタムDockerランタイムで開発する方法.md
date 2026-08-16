@@ -61,7 +61,7 @@ GoでOracle DBを利用する方法を検討した結果[mattn/go-oci8](https://
 
 このベースイメージに必要なライブラリ、今回はOracleクライアント一式と設定ファイルを用意します。
 
-`go get github.com/mattn/go-oci8`コマンドの実行、および[mattn/go-oci8](https://github.com/mattn/go-oci8)を利用したコードをビルドし、ビルドされたコードを実行するためには、Oracleクライアントと設定ファイル一式がいずれのタイミングでも必要になるため、マルチステージビルドは行わず、Oracleクライアントの準備を整えた後にGoをインストールし、実行バイナリのビルドが終わったらGoを削除するという仕組みを整えました。
+`go get github.com/mattn/go-oci8`コマンドの実行、および[mattn/go-oci8](https://github.com/mattn/go-oci8)を利用したコードをビルドし、ビルドされたコードを実行するためには、Oracleクライアントと設定ファイル一式がいずれのタイミングでも必要になります。そのため、マルチステージビルドは行わず、Oracleクライアントの準備を整えた後にGoをインストールし、実行バイナリのビルドが終わったらGoを削除するという仕組みを整えました。
 
 ```Dockerfile Dockerfile
 FROM amazon/aws-lambda-provided:al2

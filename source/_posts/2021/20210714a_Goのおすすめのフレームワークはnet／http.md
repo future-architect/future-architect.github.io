@@ -43,7 +43,7 @@ func (r Receiver) ServeHTTP(http.ResponseWriter, *http.Request) {
 }
 ```
 
-実は前者の関数も、``http.HandlerFunc(Hello)``とラップしてあげれば、上記のメソッドが生えて``http.Handler``になる、というのはあるんですが、Goになじみがある人でも、この感覚は持ちにくいところかな、とは思います。今回はこの話は忘れてしまってもいいです。
+実は前者の関数も、``http.HandlerFunc(Hello)``とラップしてあげれば、上記のメソッドが生えて``http.Handler``になる、というのはあるんです。ただ、Goになじみがある人でも、この感覚は持ちにくいところかな、とは思います。今回はこの話は忘れてしまってもいいです。
 
 この``ServeHTTP()``メソッドが誰が持つかと言うと、標準ライブラリでは``http.ServeMux``、いわゆる「Router」というやつです。Goの標準ライブラリのサーバー``http.Server``は、この``ServeHTTP()``を持つもの（ようするに``http.Handler``）を1つ受け取って、受け取ったリクエストの実際の処理をこいつに委譲します。
 
