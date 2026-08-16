@@ -37,6 +37,22 @@ hljs.registerLanguage('rego', function () {
       },
       hljs.C_NUMBER_MODE,
       {
+        // ルールの名前。deny / warn / violation は Conftest が拾う名前で
+        // ポリシーの主役だが、言語のキーワードではなく利用者が付けた名前なので
+        // keyword には入れない。代わりに「ルールを定義している位置」で拾う。
+        // 関数定義の名前と同じ扱い（title）になり、独自の名前でも同じように効く。
+        //
+        // 行頭（列0）に限るのが要点。ルールの本体は必ずインデントされるので、
+        // 本体の中の代入（msg := ...）を巻き込まずに済む
+        className: 'title',
+        begin: /^[a-z_]\w*(?=\s+(?:contains|if)\b|\s*(?::=|=[^=]|\[))/,
+      },
+      {
+        // default allow := false の allow。上の規則は行頭しか見ないため別に拾う
+        className: 'title',
+        begin: /(?<=^default\s+)[a-z_]\w*/,
+      },
+      {
         // input と data はポリシーが参照する2つの入口。
         // どのポリシーにも出てきて意味が大きいので、変数色で立たせる
         className: 'variable',
