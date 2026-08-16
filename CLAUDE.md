@@ -68,6 +68,10 @@ lede: "Go 1.27 で標準ライブラリに追加されたuuidパッケージを�
   完全に同じ日時だと一覧の並びが同着になり、ビルドごとに順序が入れ替わる（#2055）
 - `lede` は一覧・OGP に出る概要文
 - 画像は `<img src="/images/2026/20260804a/xxx.jpg" alt="" width="1024" height="559" loading="lazy">` のように実寸の width/height を明記する
+  - **キャプションは画像の直下の行を `*` で挟む**（Zenn と同じ記法、#2517）。
+    `scripts/figure_caption.js` が `<figure><figcaption>` に組み替える。
+    Markdown 自体にキャプションの概念はなく、`![alt](url "title")` の title はツールチップで別物。
+    alt は画像が見えない人への代替テキスト、キャプションは全員向けの補足なので alt は流用しない
 - 連載記事は冒頭で `[連載名](/articles/20260728a/) の N 本目です。` と相対リンクで親記事を参照する
 - `series` は連載への所属。値がそのまま連載名として表示され、記事末に前 / 次 と索引へのリンクが出る（`scripts/series.js`）
   - **3本そろってから連載にする。** 2本では前後リンクが片方しか出ず、連載として扱う意味が薄い
@@ -158,6 +162,10 @@ make mermaid # mermaid 図のSVGキャッシュ更新（Docker必須、記事の
 - `sns_count_cache.json` / `ga_cache.json` / `ga4_pv.json` — SNSシェア数・GA の PV キャッシュ
 - `temp.json` — `snssharecount` の出力用一時ファイル
 - `db.json`（112MB、gitignore 済み）— Hexo のビルドキャッシュ
+
+**`scripts/` のフィルタを足したり直したら `make clean` してからビルドする。**
+Hexo は記事の描画結果を `db.json` に持っていて、記事の内容が変わらなければ再描画しない。
+フィルタだけ変えても既存記事には効かず、最近更新した記事にだけ効いた状態になって原因を見誤る（#2517）。
 
 `normalize.mjs` は日本語ファイル名・本文の Unicode NFC 正規化を行うスクリプトで、
 週次ワークフロー（`normalize.yml`）から実行され PR を作る。手動実行は `node normalize.mjs`。
