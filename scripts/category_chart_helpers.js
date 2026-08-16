@@ -1,77 +1,5 @@
 'use strict';
 
-/**
- * サイトの全投稿を集計し、時間軸ごとのカテゴリ別投稿データを生成する
- * - 2018年以前は年ごと、2019年以降は四半期ごと
- * @returns {object} { quarters: string[], series: object[], categories: string[] }
- */
-function getQuarterlyCategoryData() {
-  const posts = this.site.posts.sort('date', 1); // 日付順にソート
-  if (!posts.length) {
-    return { quarters: [], series: [], categories: [] };
-  }
-
-  const dataByTimeBucket = new Map();
-
-  // 1. 全投稿をループして、時間軸ごとにカテゴリ別投稿数を集計
-  posts.forEach((post) => {
-    const year = post.date.year();
-    let timeKey;
-
-    if (year >= 2019) {
-      // 2019年以降は四半期ごと
-      const quarter = Math.floor(post.date.month() / 3) + 1;
-      timeKey = `${year}-Q${quarter}`;
-    } else {
-      // 2018年以前は年ごと
-      timeKey = year.toString();
-    }
-
-    if (!dataByTimeBucket.has(timeKey)) {
-      dataByTimeBucket.set(timeKey, new Map());
-    }
-
-    const bucketData = dataByTimeBucket.get(timeKey);
-    const postCategories = post.categories.map((cat) => cat.name);
-    if (!postCategories.length) return;
-
-    postCategories.forEach((catName) => {
-      const currentCount = bucketData.get(catName) || 0;
-      bucketData.set(catName, currentCount + 1);
-    });
-  });
-
-  // 2. サイトの全カテゴリを取得し、「合計記事数」で降順にソートする。
-  //    同点の決着が無いとビルドごとに並びが変わる
-  const sortedCategoryObjects = this.site.categories
-    .toArray()
-    .sort((a, b) => b.length - a.length || (a.name < b.name ? -1 : 1));
-  const sortedCategoryNames = sortedCategoryObjects.map((cat) => cat.name);
-
-  // 3. X軸のラベル（時間軸）を生成し、ソートする
-  const sortedTimeKeys = Array.from(dataByTimeBucket.keys()).sort();
-
-  // 4. カテゴリごとの時系列に整形する。チャートの種類（棒・折れ線）や色は
-  //    表示側の関心なので、ここでは名前とデータだけを返す
-  const series = sortedCategoryObjects.map((category) => {
-    const catName = category.name;
-    const data = sortedTimeKeys.map((timeKey) => {
-      const bucketData = dataByTimeBucket.get(timeKey);
-      return bucketData.get(catName) || 0; // その期間に投稿がなければ0
-    });
-    return { name: catName, data: data };
-  });
-
-  return {
-    quarters: sortedTimeKeys, // キー名はEJS側と合わせるため'quarters'のまま
-    series: series,
-    categories: sortedCategoryNames,
-  };
-}
-
-// ヘルパーとして登録
-hexo.extend.helper.register('get_quarterly_category_data', getQuarterlyCategoryData);
-
 // カテゴリの色は名前で固定する (#2170)。系列順に既定パレットを当てると、
 // 著者やページごとにカテゴリの並びが違うため、同じ Programming が青だったり
 // 緑だったりして色が手がかりにならない。記事数の多いカテゴリから
@@ -123,25 +51,57 @@ hexo.extend.helper.register('category_colors', function () {
   return JSON.stringify(colors);
 });
 
-// 指定年の月別 × カテゴリ別の投稿数 (#2171)
+// 月別 × カテゴリ別の投稿数 (#2171)。year を渡すとその年、省略すると全期間。
+//
+// 全期間も月で刻む (#2432)。以前は四半期（しかも2018年以前だけ年）だったが、
+// 同じ全期間を個別ページ（カテゴリ・タグ・著者）は月で描いており、粒度が
+// ページによって違っていた。読み手が知りたいのは「どれくらいのペースで
+// 書かれているか」で、それは月の単位で見るもの。粒度はページの種類ではなく
+// 読み取る問いで決める
 hexo.extend.helper.register('get_monthly_category_data', function (year) {
-  // 今年はまだ来ていない月を出さない。月の探索リンク（archive.ejs）と同じ規則。
-  // 12ヶ月固定にすると、今年のグラフに未来の空欄が並ぶうえ、
-  // 同じページの「週別」タブ（posts_stack_series）と軸の長さが食い違い、
-  // タブを切り替えるたびに棒の幅と位置が変わっていた (#2430)
   const now = new Date();
-  const monthCount = Number(year) === now.getFullYear() ? now.getMonth() + 1 : 12;
+  const nowY = now.getFullYear();
+  const nowM = now.getMonth() + 1;
+
+  // 軸の作り方。年を指定したときは 1月〜（今年なら現在月まで）。
+  // 今年で12ヶ月固定にすると未来の空欄が並ぶうえ、同じページの「週別」タブ
+  // （posts_stack_series）と軸の長さが食い違い、タブを切り替えるたびに
+  // 棒の幅と位置が変わっていた (#2430)
+  //
+  // 全期間は最初の投稿の月から現在月まで。ラベルは YYYY/MM で、
+  // 個別ページ（category.ejs / author.ejs）と同じ書式にそろえる
+  let months;
+  let indexOf;
+  if (year) {
+    const monthCount = Number(year) === nowY ? nowM : 12;
+    months = Array.from({ length: monthCount }, (_, i) => `${i + 1}月`);
+    indexOf = (post) =>
+      String(post.date.year()) === String(year) && post.date.month() < monthCount
+        ? post.date.month()
+        : -1;
+  } else {
+    const first = this.site.posts.sort('date', 1).first();
+    if (!first) return JSON.stringify({ months: [], series: [] });
+    const startY = first.date.year();
+    const startM = first.date.month() + 1; // moment の month() は 0 始まり
+    months = [];
+    for (let y = startY; y <= nowY; y++) {
+      for (let m = y === startY ? startM : 1; m <= (y === nowY ? nowM : 12); m++) {
+        months.push(`${y}/${String(m).padStart(2, '0')}`);
+      }
+    }
+    indexOf = (post) => (post.date.year() - startY) * 12 + (post.date.month() + 1) - startM;
+  }
 
   const byCat = new Map(); // カテゴリ -> 月ごとの配列
   this.site.posts.forEach((post) => {
-    if (String(post.date.year()) !== String(year)) return;
+    const i = indexOf(post);
+    if (i < 0 || i >= months.length) return;
     const cat = post.categories.first();
     if (!cat) return;
-    if (!byCat.has(cat.name)) byCat.set(cat.name, new Array(monthCount).fill(0));
-    if (post.date.month() < monthCount) byCat.get(cat.name)[post.date.month()]++;
+    if (!byCat.has(cat.name)) byCat.set(cat.name, new Array(months.length).fill(0));
+    byCat.get(cat.name)[i]++;
   });
-  const months = [];
-  for (let m = 1; m <= monthCount; m++) months.push(`${m}月`);
   // 並びはその年の多い順ではなく、全期間ページと同じサイト累計の多い順で
   // 固定する。年ごとに入れ替わると、年を移動したとき凡例と積み上げの
   // 色の位置が動いて比較しにくい (#2201)
