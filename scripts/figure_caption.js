@@ -22,10 +22,7 @@
  */
 const IMG = '(?:<a\\b[^>]*>\\s*)?<img\\b[^>]*>(?:\\s*</a>)?';
 const CAPTION = '<p><em>((?:(?!</em>)[\\s\\S])+)</em></p>';
-const PATTERN = new RegExp(
-  `(?:<p>\\s*(${IMG})\\s*</p>|(${IMG}))\\s*${CAPTION}`,
-  'g'
-);
+const PATTERN = new RegExp(`(?:<p>\\s*(${IMG})\\s*</p>|(${IMG}))\\s*${CAPTION}`, 'g');
 
 function toFigure(content) {
   return content.replace(PATTERN, (match, wrapped, bare, caption) => {
@@ -46,7 +43,7 @@ hexo.extend.filter.register(
     data.content = toFigure(data.content);
     return data;
   },
-  20
+  20,
 );
 
 module.exports = { toFigure };
