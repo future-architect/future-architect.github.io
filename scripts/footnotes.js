@@ -83,7 +83,10 @@ function renderFootnotes(text) {
 
   // 6. 脚注リストを記事の末尾に追加
   if (html) {
-    text += '<div id="footnotes">';
+    // 空行を挟まないと、記事が箇条書きで終わっている場合に最後の <li> の続きと
+    // 見なされ、脚注一覧ごとリスト項目の中に入ってしまう。そうなると本文側の
+    // リストのインデントや padding が脚注にも効く (#2500)
+    text += '\n\n<div id="footnotes">';
     text += '<hr>';
     text += '<div id="footnotelist">';
     text += '<ol style="list-style:none; padding-left: 0;">' + html + '</ol>';
