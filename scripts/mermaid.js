@@ -24,6 +24,7 @@
 const fs = require('fs');
 const path = require('path');
 const { fenceRegExp, hashOf, CACHE_DIR } = require('./lib/mermaid');
+const { replaceOutsideFences } = require('./lib/fence');
 
 // hexo-mermaid-lastest 1.1.1 が付けていたものと同一（フォールバックの挙動を変えない）
 const MERMAID_SCRIPT = `<script type="module"> import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';	mermaid.initialize({startOnLoad: true, flowchart: {curve: 'linear'}}); </script>`;
@@ -45,7 +46,9 @@ hexo.extend.filter.register(
     if (ignore(data)) return;
     let matched = false;
     let missing = 0;
-    data.content = data.content.replace(
+    // 外側のフェンスに入れ子で書かれた ```mermaid は記法の見本なので触らない (#2549)
+    data.content = replaceOutsideFences(
+      data.content,
       fenceRegExp(),
       (raw, start, quote, lang, source, endQuote, end) => {
         matched = true;

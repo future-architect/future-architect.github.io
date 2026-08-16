@@ -16,6 +16,8 @@
  * 色は highlight.styl の既存トークン色を6色循環させる（配色は CSS 側）。
  */
 
+const { replaceOutsideFences } = require('./lib/fence');
+
 const FENCE = /^([ \t]*)```csv[ \t]*(.*)\n([\s\S]*?)\n[ \t]*```/gm;
 
 // 色数。8列でも2周目が隣の列と重ならない
@@ -94,7 +96,8 @@ hexo.extend.filter.register(
     if (data.layout !== 'post' && data.layout !== 'page') return;
     if (data.content.indexOf('```csv') === -1) return;
 
-    data.content = data.content.replace(FENCE, (match, indent, caption, code) => {
+    // 外側のフェンスに入れ子で書かれた ```csv は記法の見本なので触らない (#2549)
+    data.content = replaceOutsideFences(data.content, FENCE, (match, indent, caption, code) => {
       const lines = tokenize(code);
       // 1列しかないブロックは色分けの対象にならない。全体が1色で塗られると
       // 意味のある色に見えてしまうので、hexo の素の描画に任せる
