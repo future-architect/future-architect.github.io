@@ -113,58 +113,6 @@ hexo.extend.helper.register('get_monthly_category_data', function (year) {
   return JSON.stringify({ months, series });
 });
 
-/**
- * /categories/ の構成比グラフ (#2432)。年ごとに、その年の投稿を100%として
- * カテゴリの割合を返す。
- *
- * 実数の積み上げにすると /articles/ の全期間グラフと同じ図になる。あちらは
- * 「どれくらい書かれているか」を見る図で、こちらは「どの分野が伸びて、
- * どの分野が縮んだか」を見る図。実数のままだと投稿の多い月は全部の帯が
- * 太くなるので、構成が変わったのか総量が増えただけなのかを区別できない。
- *
- * 粒度は年。構成比は分母が小さいと激しく揺れる（3本の月は33%刻みになる）ので、
- * 月では構成の変化を読み取れない。読み取る問いが違うので、
- * 全期間を月で刻む他のグラフとは粒度が違ってよい。
- *
- * 割合だけだと「4本中2本で50%」のような薄い根拠が読めないため、
- * 実数も添えて返す（ツールチップで併記する）。
- */
-hexo.extend.helper.register('get_yearly_category_ratio', function () {
-  const first = this.site.posts.sort('date', 1).first();
-  if (!first) return JSON.stringify({ years: [], series: [], totals: [] });
-  const startY = first.date.year();
-  const endY = new Date().getFullYear();
-  const years = [];
-  for (let y = startY; y <= endY; y++) years.push(String(y));
-
-  const byCat = new Map(); // カテゴリ -> 年ごとの本数
-  const totals = new Array(years.length).fill(0);
-  this.site.posts.forEach((post) => {
-    const i = post.date.year() - startY;
-    if (i < 0 || i >= years.length) return;
-    const cat = post.categories.first();
-    if (!cat) return;
-    if (!byCat.has(cat.name)) byCat.set(cat.name, new Array(years.length).fill(0));
-    byCat.get(cat.name)[i]++;
-    totals[i]++;
-  });
-
-  // 並びと色の規則は他のグラフと同じ（サイト累計の多い順で固定 #2201）
-  const series = this.site.categories
-    .toArray()
-    .sort((a, b) => b.length - a.length || (a.name < b.name ? -1 : 1))
-    .filter((c) => byCat.has(c.name))
-    .map((c) => {
-      const counts = byCat.get(c.name);
-      return {
-        name: c.name,
-        counts,
-        data: counts.map((n, i) => (totals[i] ? Math.round((n / totals[i]) * 1000) / 10 : 0)),
-      };
-    });
-  return JSON.stringify({ years, series, totals });
-});
-
 // 月ページの週別 × カテゴリ別の投稿数 (#2227)。週は「その月の何日目か」で
 // 決める（1〜7日 = 第1週）。posts_stack_series と同じ規則で、ISO週だと
 // 月をまたぐ週が出て合計が月の投稿数と合わなくなる
