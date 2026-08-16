@@ -85,6 +85,7 @@ lede: "Go 1.27 で標準ライブラリに追加されたuuidパッケージを�
 ```sh
 make s      # ローカルサーバ（http://localhost:4000、ライブリロード付き。hexo-server-live）
 make g      # 静的ファイル生成（public/）
+make css    # public/css/site.css だけ再生成（0.3秒。CSSの確認用）
 make clean  # キャッシュ・生成物の削除
 make fix    # textlint --fix（source/_posts 配下）
 make fmt    # markdownlint-cli2 --fix ＋ prettier（scripts/*.js と *.mjs のみ。記事MDは対象外 #2307）
@@ -94,6 +95,18 @@ make mermaid # mermaid 図のSVGキャッシュ更新（Docker必須、記事の
 
 記事を書き換えたら `make fix` か、対象ファイルだけの
 `node_modules/.bin/textlint --fix <path>` を通してから push する。
+
+**`hexo generate` は必要なときだけ回す。** 何も変えていなくても1分半以上かかる
+（記事1,449本ぶんの処理が毎回走り、書き出し0ファイルでも同じ）。
+
+| 変えたもの | 確認に必要なもの |
+| --- | --- |
+| CSS（`themes/future/css-src/*.styl`） | `make css`（0.3秒）だけ。ページの再生成は不要 |
+| テンプレート（`.ejs`）・`scripts/` のヘルパー・記事 | `hexo generate` |
+
+`_config.fast.yml` を渡す差分ビルドは効いていない。`ignore` のパターンが実パスに
+1つもマッチせず、記事数も画像コピー（1.2GB）も素のビルドと変わらない。
+時間の内訳は書き出しではなく Hexo 側の処理なので、除外しても縮まない。
 
 ## Lint ルール
 
