@@ -93,7 +93,7 @@ AIエージェントが「売上データを集計して」といった指示に
 
 Gartnerのハイプサイクルによると、AIエージェントは現在「過熱期」の真っ只中にあり、最も期待に満ちた面白い時期だと言えるでしょう。時間が経つにつれて、一度は前述のような課題から「幻滅期」に入ると考えられますが、それを乗り越えて最終的には様々な場面で利用されるようになるはずです。
 
-<img src="/images/2025/20250908b/Gartner_Hype_Cycle.png" alt="Gartner_Hype_Cycle" width="1200" height="984" loading="lazy">
+<img src="/images/2025/20250908b/Gartner_Hype_Cycle.png" alt="Gartner_Hype_Cycle" width="600" height="492" loading="lazy">
 
 *Gartner Hype Cycle Identifies Top AI Innovations in 2025*
 
