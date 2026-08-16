@@ -1,0 +1,32 @@
+<%# 月を並べた軸のラベル。echarts の option 内で
+    axisLabel: <この部品>, として使い、月の配列の式とチャートの要素idを渡す
+    （例: partial('_partial/chart-xaxis-year-labels', {months: 'chartData.months', el: 'chart'})）。
+
+    軸が12ヶ月以下（投稿の少ないタグ・年ページ）なら月ラベルが全部読めるので
+    そのまま出す。10年分の軸では年の変わり目だけにする（#2135）。
+
+    ただし年の変わり目だけにしても足りない。2016〜2026年は11本あり、
+    「2016年」1本に読める間隔まで含めて約64px 要る。11本で704px なので、
+    本文カラム（約700px）でも既に重なり、狭い画面では倍以上あふれる（#2530）。
+    そこで幅に収まる本数まで年を間引く。700px なら2年ごと、375px なら3年ごと。
+
+    幅は描画時の1回だけ見る。このサイトのチャートはどれも resize を
+    購読しておらず、ここだけ追従させても他の寸法が揃わない。
+    タブで隠れているチャートは clientWidth が 0 になるため、
+    本文カラムの実測値 700 を既定にする。
+
+    軸の規則を1箇所でしか決めないための共有部品。タグ・カテゴリ・著者・
+    全期間の5ページに同じ式が散ると、片方だけ直して基準がズレる %>
+(function (months, el) {
+  if (months.length <= 12) return { interval: 0 };
+  const starts = months
+    .map((v, i) => (i === 0 || v.endsWith('/01')) ? i : -1)
+    .filter((i) => i >= 0);
+  const width = (document.getElementById(el) || {}).clientWidth || 700;
+  const step = Math.max(1, Math.ceil(starts.length / Math.max(2, Math.floor(width / 64))));
+  const shown = new Set(starts.filter((_, k) => k % step === 0));
+  return {
+    interval: 0,
+    formatter: (value, index) => shown.has(index) ? value.slice(0, 4) + '年' : ''
+  };
+})(<%- months %>, '<%= el %>')
