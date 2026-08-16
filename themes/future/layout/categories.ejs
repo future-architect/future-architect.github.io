@@ -15,36 +15,43 @@
     </ul>
 
     <%# 統計の直下にグラフ、その後にコンテンツの一覧。全ページ同じ並びにする (#2211) %>
-    <%- partial('_partial/section-heading', {id: 'trend', text: 'カテゴリ別 投稿数の推移'}) %>
-    ※月ごとの投稿数を表示
+    <%- partial('_partial/section-heading', {id: 'trend', text: 'カテゴリ構成の推移'}) %>
+    <%# 実数の積み上げにすると /articles/ の全期間グラフと同じ図になる。
+        あちらは「どれくらい書かれているか」、ここは「どの分野が伸びて、
+        どの分野が縮んだか」を見る図なので、構成比で描く (#2432) %>
+    ※各年の投稿を100%としたカテゴリの割合
     <div id="category-chart" style="width: 100%; height: 400px;"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.1.2/dist/echarts.min.js" integrity="sha384-QqZssazD9IzPiEJz2lyFewTMgYObqDWxBfCX5k5E4n4fH7ygMIqp6A6Ek8HIrRyQ" crossorigin="anonymous"></script>
 
     <script type="text/javascript">
-      const chartData = <%- get_monthly_category_data() %>;
+      const chartData = <%- get_yearly_category_ratio() %>;
       const catColors = <%- category_colors() %>;
       const myChart = echarts.init(document.getElementById('category-chart'));
       const option = {
-        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: { type: 'shadow' },
+          <%# 割合だけだと「4本中2本で50%」のような薄い根拠が読めないので実数も出す。
+              0%の分野は行が並ぶだけなので省く %>
+          formatter: (params) => {
+            const i = params[0].dataIndex;
+            const rows = params
+              .filter(p => p.value > 0)
+              .map(p => p.marker + p.seriesName + ': '
+                + chartData.series.find(s => s.name === p.seriesName).counts[i] + '本（' + p.value + '%）');
+            return [chartData.years[i] + '年\u3000全' + chartData.totals[i] + '本'].concat(rows).join('<br>');
+          }
+        },
         legend: { bottom: 0, type: 'scroll' },
         <%# 余白と凡例位置は他のチャート（posts-chart）に合わせる (#2212) %>
         grid: { left: 0, right: '2%', bottom: 32, containLabel: true },
-        <%# 全期間は127ヶ月になるため、年の変わり目だけを「YYYY年」で出す
-            （個別ページ・posts-chart と同じ #2135 / #2432）%>
-        xAxis: [ {
-          type: 'category',
-          boundaryGap: true,
-          data: chartData.months,
-          axisLabel: {
-            interval: 0,
-            formatter: (value, index) => (index === 0 || value.endsWith('/01')) ? value.slice(0, 4) + '年' : ''
-          }
-        } ],
-        <%# 軸名は付けない。何の数かは直上の h2 が名乗っている %>
-        yAxis: [ { type: 'value' } ],
+        xAxis: [ { type: 'category', boundaryGap: true, data: chartData.years } ],
+        <%# 構成比なので上限は100%で固定する。年ごとに上限が動くと
+            帯の高さを年をまたいで比べられない %>
+        yAxis: [ { type: 'value', min: 0, max: 100, axisLabel: { formatter: '{value}%' } } ],
         <%# 16本の折れ線の重なりは読めないので積み上げ棒にする (#2169)。
-            棒の高さが月の合計、内訳がカテゴリ。色は名前で固定 (#2170) %>
+            棒の高さは常に100%で、内訳がカテゴリ。色は名前で固定 (#2170) %>
         series: chartData.series.map(s => ({
           name: s.name,
           type: 'bar',
