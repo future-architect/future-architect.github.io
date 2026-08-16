@@ -21,6 +21,7 @@
  */
 
 const hljs = require('highlight.js');
+const { replaceOutsideFences } = require('./lib/fence');
 
 // ```diff_go / ```diff-go のどちらでも受ける。後ろにファイル名を書ける点は
 // hexo 標準のコードブロックと同じ
@@ -111,19 +112,24 @@ hexo.extend.filter.register(
     if (data.layout !== 'post' && data.layout !== 'page') return;
     if (data.content.indexOf('```diff') === -1) return;
 
-    data.content = data.content.replace(FENCE, (match, indent, lang, caption, code) => {
-      // hljs が知らない言語はそのまま素の diff として hexo に任せる
-      if (!hljs.getLanguage(lang)) return match;
+    // 外側のフェンスに入れ子で書かれた ```diff_xxx は記法の見本なので触らない (#2549)
+    data.content = replaceOutsideFences(
+      data.content,
+      FENCE,
+      (match, indent, lang, caption, code) => {
+        // hljs が知らない言語はそのまま素の diff として hexo に任せる
+        if (!hljs.getLanguage(lang)) return match;
 
-      const caption_ = caption.trim();
-      return (
-        indent +
-        `<figure class="highlight diff_${escapeHtml(lang)}">` +
-        (caption_ ? `<figcaption><span>${escapeHtml(caption_)}</span></figcaption>` : '') +
-        `<table><tbody><tr><td class="code"><pre>${render(code, lang)}</pre></td></tr></tbody></table>` +
-        `</figure>`
-      );
-    });
+        const caption_ = caption.trim();
+        return (
+          indent +
+          `<figure class="highlight diff_${escapeHtml(lang)}">` +
+          (caption_ ? `<figcaption><span>${escapeHtml(caption_)}</span></figcaption>` : '') +
+          `<table><tbody><tr><td class="code"><pre>${render(code, lang)}</pre></td></tr></tbody></table>` +
+          `</figure>`
+        );
+      },
+    );
   },
   9,
 );
