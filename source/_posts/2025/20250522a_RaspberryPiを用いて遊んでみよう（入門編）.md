@@ -106,7 +106,7 @@ Thonny を起動し、接続ができたことを確認します。
 
 <img src="/images/2025/20250522a/117947.jpg" alt="117947.jpg" width="640" height="480" loading="lazy">
 
-図１　Raspberry Pi Pico WH 本体
+*図１　Raspberry Pi Pico WH 本体*
 
 GPIO（General Purpose Input/Output）は、「汎用入力/出力ピン」を指します。このピンを使用することで、さまざまな外部デバイス（センサー、LED、モータなど）と通信したり制御したりできます。Raspberry Pi Pico W には**40ピンのヘッダ**があり、それぞれ異なる役割を持っています。以下は、全体のピン配置と役割の概要です。
 
@@ -146,7 +146,7 @@ GPIO（General Purpose Input/Output）は、「汎用入力/出力ピン」を�
 
 <img src="/images/2025/20250522a/117947_(1).jpg" alt="117947_(1).jpg" width="640" height="480" loading="lazy">
 
-図２　Raspberry Pi Pico WH 本体の裏側
+*図２　Raspberry Pi Pico WH 本体の裏側*
 
 以下は、Raspberry Pi Pico W の40ピンの役割を簡単にまとめたものです。
 
@@ -181,7 +181,7 @@ GPIO（General Purpose Input/Output）は、「汎用入力/出力ピン」を�
 
 <img src="/images/2025/20250522a/image_2.png" alt="image.png" width="1200" height="775" loading="lazy">
 
-図３　ブレッドボードの電気的関係
+*図３　ブレッドボードの電気的関係*
 
 ブレッドボードは、電子部品をハンダ付けせずに接続・テストできる基板です。電源レールと端子列を使って部品を配置し、ジャンパーワイヤで接続します。
 
@@ -236,7 +236,7 @@ GPIO（General Purpose Input/Output）は、「汎用入力/出力ピン」を�
 
 <img src="/images/2025/20250522a/img_7902_720.jpg" alt="img_7902_720.jpg" width="719" height="424" loading="lazy">
 
-図４　Lチカ時の配線概要図
+*図４　Lチカ時の配線概要図*
 
 以下はMicroPythonで記述したコードです。
 
@@ -261,7 +261,7 @@ LED が1秒間隔で点滅すれば成功です！これは GPIO ピンの基本
 
 <img src="/images/2025/20250522a/img_7903_720.jpg" alt="img_7903_720.jpg" width="720" height="471" loading="lazy">
 
-図５　赤外線反射センサーの動作確認時の配線概要図
+*図５　赤外線反射センサーの動作確認時の配線概要図*
 
 以下は本動作確認におけるコードです。
 
@@ -302,7 +302,7 @@ while True:
 
 <img src="/images/2025/20250522a/img_7904_720.png" alt="img_7904_720.png" width="720" height="656" loading="lazy">
 
-図６　障害物検知センサーの配線概要図
+*図６　障害物検知センサーの配線概要図*
 
 1. **障害物検知センサーの接続**
    - センサーの**出力ピン**を Raspberry Pi Pico W の GPIO に接続
@@ -356,15 +356,15 @@ while True:
 
 <img src="/images/2025/20250522a/kai_4763_720.jpg" alt="kai_4763_720.jpg" width="720" height="479" loading="lazy">
 
-図７　障害物がない状態
+*図７　障害物がない状態*
 
 <img src="/images/2025/20250522a/kai_4765_720.jpg" alt="kai_4765_720.jpg" width="479" height="720" loading="lazy">
 
-図８　片側のセンサーのみ障害物を検知している状態
+*図８　片側のセンサーのみ障害物を検知している状態*
 
 <img src="/images/2025/20250522a/kai_4758_720.jpg" alt="kai_4758_720.jpg" width="720" height="479" loading="lazy">
 
-図９　両センサーが障害物を検知した状態
+*図９　両センサーが障害物を検知した状態*
 
 #### 3.4.5 のびしろ
 
