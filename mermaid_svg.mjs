@@ -22,7 +22,10 @@ const require = createRequire(import.meta.url);
 const { fenceRegExp, hashOf, toKrokiSource, CACHE_DIR } = require('./scripts/lib/mermaid.js');
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
-const POSTS_DIR = path.join(ROOT, 'source', '_posts');
+// 記事だけでなく固定ページも見る。記法ガイド（/specials/markdown/）が図の見本を
+// 持つため。対象から漏れると SVG が作られず、CDN の mermaid.js へ黙って
+// フォールバックする（描画はされるので気づけない）(#2533)
+const SOURCE_DIRS = [path.join(ROOT, 'source', '_posts'), path.join(ROOT, 'source', 'specials')];
 const COMPOSE_FILE = path.join(ROOT, 'mermaid_svg.compose.yml');
 const KROKI_URL = process.env.KROKI_URL || 'http://127.0.0.1:8006';
 const CONCURRENCY = 4;
@@ -34,10 +37,11 @@ async function listFiles(dir, ext) {
     .map((e) => path.join(e.parentPath, e.name));
 }
 
-/** 全記事から ```mermaid フェンスを集める。戻り値: Map<hash, {source, files}> */
+/** 全記事・固定ページから ```mermaid フェンスを集める。戻り値: Map<hash, {source, files}> */
 async function collectDiagrams() {
   const diagrams = new Map();
-  for (const file of await listFiles(POSTS_DIR, '.md')) {
+  const files = (await Promise.all(SOURCE_DIRS.map((dir) => listFiles(dir, '.md')))).flat();
+  for (const file of files) {
     const content = await readFile(file, 'utf8');
     for (const m of content.matchAll(fenceRegExp())) {
       const source = m[4];
