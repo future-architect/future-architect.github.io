@@ -30,7 +30,16 @@ hexo.extend.helper.register('article_award', function (post) {
     .filter((r) => r.author === row.author)
     .map((r) => r.year)
     .sort((a, b) => a - b);
-  return { year: row.year, author: row.author, nth: years.indexOf(row.year) + 1 };
+  // その年の発表記事（選出理由が書かれている）。バッジのリンク先にする (#2562)。
+  // 記録が無い年は null で、バッジはリンクにならない
+  const announcements = (this.site.data && this.site.data.award_announcements) || {};
+  const announcement = announcements[String(row.year)];
+  return {
+    year: row.year,
+    author: row.author,
+    nth: years.indexOf(row.year) + 1,
+    announcement: announcement ? `articles/${announcement}/` : null,
+  };
 });
 
 hexo.extend.helper.register('author_awards', function (author) {
