@@ -20,6 +20,25 @@
  * `出典：URL` をリンク化する autolink_image_source.js と同じ after_post_render で
  * 動くため、優先度を下げて後に回す。
  */
+const { replaceOutsideFences } = require('./lib/fence');
+
+/**
+ * 画像の行と、その直下のキャプション行の間に空行を入れる（#2553）。
+ *
+ * 行頭の <img> から始まる塊を marked は HTML ブロックとして扱い、空行までを
+ * raw のまま出す。そのため直下に書いた `*…*` は <em> にならず、下の
+ * after_post_render が探している形（<p><em>…</em></p>）にならない。
+ * 記法は「直下の行」と決まっている（#2517）ので、実装側で空行を補う。
+ *
+ * キャプションの中身は空行を空けたあとに marked が描くため、`code` や
+ * リンクといったインライン記法もそのまま効く。
+ */
+const IMAGE_LINE = '(?:<a\\b[^>]*>\\s*)?<img\\b[^>]*>(?:\\s*</a>)?|!\\[[^\\]]*\\]\\([^)\\n]*\\)';
+const BLANK_BEFORE_CAPTION = new RegExp(
+  `^([ \\t]*(?:${IMAGE_LINE})[ \\t]*)\\n(?=[ \\t]*\\*[^*\\n]+\\*[ \\t]*$)`,
+  'gm',
+);
+
 const IMG = '(?:<a\\b[^>]*>\\s*)?<img\\b[^>]*>(?:\\s*</a>)?';
 const CAPTION = '<p><em>((?:(?!</em>)[\\s\\S])+)</em></p>';
 const PATTERN = new RegExp(`(?:<p>\\s*(${IMG})\\s*</p>|(${IMG}))\\s*${CAPTION}`, 'g');
@@ -33,6 +52,17 @@ function toFigure(content) {
     return `<figure>${image}<figcaption>${caption}</figcaption></figure>`;
   });
 }
+
+hexo.extend.filter.register('before_post_render', function (data) {
+  if (!data || !data.content) return;
+  // コードフェンスの中の見本は記法の説明なので触らない (#2549)
+  data.content = replaceOutsideFences(
+    data.content,
+    BLANK_BEFORE_CAPTION,
+    (m, line) => `${line}\n\n`,
+  );
+  return data;
+});
 
 hexo.extend.filter.register(
   'after_post_render',
