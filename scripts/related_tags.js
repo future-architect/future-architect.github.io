@@ -19,6 +19,23 @@
  * lift が飽和するためで、1本の共起から関係の強さは測れない。
  * 共起数 × log(1 + lift) の折衷にしている。
  *
+ * 出すのは3種類の関係で、この順に並べる。
+ *
+ *   1. 共起（発見）      … 一緒に付いている。移動すると新しい記事に出会える
+ *   2. 絞り込み (#2569)  … 移動先の記事が全部このタグにもある（完全な部分集合）
+ *   3. 系列（名前）      … Go1.26 と Go1.27 のような版違い
+ *
+ * 2 を別の群にしているのは、共起と枠を奪い合わせないため。スコアは
+ * 共起数 × log(1 + lift) で、lift は移動先が小さいほど跳ねる（2本のタグで50倍
+ * 前後）。同じ列に混ぜると 2本のタグが CI/CD や Vite のような中堅を8枠から
+ * 追い出す。実データで測ると 199件が入る代わりに 79件が消えた。
+ * 別の群にすれば消えるものは0件になる。
+ *
+ * 絞り込みを出すのは6本以上のタグ（NARROWING_MIN_POSTS）。移動先に新しい記事が
+ * 無くても、22本のDynamoDBから2本のDynamoDBStreamsへ絞れること自体に価値がある。
+ * 6本からにしたのは、PCの画面に一覧が5件ほど収まるため。それを超えると
+ * スクロールして探すことになり、絞り込む先があるかどうかが効いてくる。
+ *
  * ただし共起では「同じ仲間だが同じ記事には付かない」関係が見えない。
  * Go1.26 と Go1.27 の共起は0本で、バージョン違いは排他的に付くため原理的に
  * 検出できない。そこで名前の形（末尾の数字を外した接頭辞が一致する）から
@@ -54,10 +71,18 @@ const MAX_CO_TAGS = 8;
 // 共起がこれ未満なら関係を測れない
 const MIN_CO_OCCURRENCE = 2;
 // 移動先の記事がこれ未満だと、クリックしても得るものが少ない。
-// 3件あれば選択肢として成立する
+// 3件あれば選択肢として成立する（絞り込みの群には掛けない。あちらは
+// 移動先の少なさが目的なので、共起2本＝移動先2本でも出す #2569）
 const MIN_DESTINATION_POSTS = 3;
 // 「新しい記事」がこれ未満なら、移動しても既に見た記事しか出てこない
 const MIN_NEW_POSTS = 2;
+// 絞り込みの群を出すタグの大きさ。これ以下なら一覧を眺めるだけで済む (#2569)
+const NARROWING_MIN_POSTS = 5;
+// 絞り込みの群の上限。実データでは102ページ中100ページが12件以内（中央値2件）で、
+// 超えるのは Go の39件と GoogleCloud の22件だけ。件数の多い順に並べるので、
+// 切れるのは2〜3本の細いタグになる。12 は兄弟群の最大（Go1.16〜1.27 の12件）と
+// 同じ大きさで、この長さまでは表示側が受け止められると分かっている
+const MAX_NARROWING_TAGS = 12;
 
 // 末尾の数字（1.27 や 2024）を切り出す。接頭辞が一致すれば同じ系列とみなす
 const VERSIONED = /^(.*?)(\d+(?:\.\d+)*)$/;
@@ -156,12 +181,13 @@ hexo.extend.helper.register('related_tags', function (tagName) {
     .sort((a, b) => b.version - a.version); // 新しいバージョンを先に
   const siblingNames = new Set(siblings.map((s) => s.name));
 
-  // 1ページに収まるタグでは、絞り込む必要がない。スクロールすれば全部見えるので、
-  // 読者が求めるのは新しい記事に出会えるタグの方。
-  // 1ページを超えるタグでは、逆に絞り込めること自体に価値がある
-  const allowNarrowing = own > PER_PAGE;
+  // 移動先に新しい記事が1本しか無い相手を出すかどうか。1ページに収まるタグでは
+  // スクロールすれば全部見えるので、読者が求めるのは新しい記事に出会えるタグの方。
+  // 1ページを超えるタグなら、わずかでも絞れることに意味がある。
+  // 新しい記事が0本（完全な部分集合）の相手は下の絞り込みの群が受け持つ
+  const allowThinNew = own > PER_PAGE;
 
-  const rows = (partners.get(tagName) || [])
+  const candidates = (partners.get(tagName) || [])
     .map(([name, n]) => {
       const dest = total.get(name) || 0;
       return {
@@ -173,16 +199,28 @@ hexo.extend.helper.register('related_tags', function (tagName) {
         lift: (n * postCount) / (own * dest),
       };
     })
-    .filter(
-      (r) =>
-        !siblingNames.has(r.name) && // 兄弟は上で拾っているので重複させない
-        r.co >= MIN_CO_OCCURRENCE &&
-        r.posts >= MIN_DESTINATION_POSTS &&
-        (allowNarrowing || r.fresh >= MIN_NEW_POSTS),
-    );
+    // 兄弟は上で拾っているので重複させない
+    .filter((r) => !siblingNames.has(r.name) && r.co >= MIN_CO_OCCURRENCE);
+
+  // 絞り込み (#2569)。移動先の記事が全部このタグにもある（fresh が0）関係。
+  // 新しい記事に出会えないが、大きなタグの中から目的の話題へ降りる道になる。
+  // 共起の8枠とは別に数える（枠を奪い合わせない）。件数の多い順に上限まで
+  const narrowing =
+    own > NARROWING_MIN_POSTS
+      ? candidates
+          .filter((r) => r.fresh === 0)
+          .map((r) => ({ ...r, narrowing: true }))
+          .sort((a, b) => b.posts - a.posts || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
+          .slice(0, MAX_NARROWING_TAGS)
+      : [];
+
+  const rows = candidates.filter(
+    (r) =>
+      r.fresh > 0 && r.posts >= MIN_DESTINATION_POSTS && (allowThinNew || r.fresh >= MIN_NEW_POSTS),
+  );
 
   // 同点は名前で決める（決着が無いとビルドごとに並びが変わる）
   const score = (r) => r.co * Math.log(1 + r.lift);
   rows.sort((a, b) => score(b) - score(a) || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
-  return rows.slice(0, MAX_CO_TAGS).concat(siblings);
+  return rows.slice(0, MAX_CO_TAGS).concat(narrowing).concat(siblings);
 });
