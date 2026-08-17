@@ -186,6 +186,9 @@ function build(site) {
     });
   }
 
+  const all = [...groups.values()].flat();
+  const oneYearAgo = Date.now() - 365 * 24 * 60 * 60 * 1000;
+
   return {
     byPath: series,
     list: [...groups].map(([name, posts]) => {
@@ -193,11 +196,38 @@ function build(site) {
       return {
         name,
         total: posts.length,
+        // 年ごとの著者数は連載をまたいで重複するため、数ではなく名前で持つ
+        authors: [...authorsOf(posts)],
         index: index || posts[0],
         first: posts[0].date,
         latest: posts[posts.length - 1].date,
       };
     }),
+    stats: {
+      total: countOf(all),
+      recent: countOf(all.filter((p) => p.date.valueOf() >= oneYearAgo)),
+    },
+  };
+}
+
+// 共著の旧記事は author が配列（category_chart_helpers.js と同じ扱い）
+function authorsOf(posts) {
+  const authors = new Set();
+  posts.forEach((p) => [].concat(p.author || []).forEach((a) => authors.add(a)));
+  return authors;
+}
+
+/**
+ * /series/ のページ統計 (#2572)。累計と直近1年を同じ形で返す。
+ *
+ * 著者はユニークで数える。連載の記事645本を延べで数えると600名を超えるが、
+ * 同じ人が何本もの連載に出るため、実際に連載を書いた人は175名まで減る。
+ */
+function countOf(posts) {
+  return {
+    series: new Set(posts.map((p) => p.series)).size,
+    posts: posts.length,
+    authors: authorsOf(posts).size,
   };
 }
 
@@ -211,6 +241,12 @@ function seriesOf(site, post) {
 function allSeries(site) {
   if (!cache) cache = build(site);
   return cache.list.slice().sort((a, b) => b.latest - a.latest || (a.name < b.name ? -1 : 1));
+}
+
+/** /series/ の統計。{total, recent} それぞれ {series, posts, authors} */
+function seriesStats(site) {
+  if (!cache) cache = build(site);
+  return cache.stats;
 }
 
 const NONE = new Set();
@@ -227,4 +263,4 @@ function navLinkedPaths(site, post) {
   return s ? s.linked : NONE;
 }
 
-module.exports = { seriesOf, navLinkedPaths, allSeries };
+module.exports = { seriesOf, navLinkedPaths, allSeries, seriesStats };

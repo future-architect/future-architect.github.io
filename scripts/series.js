@@ -3,7 +3,7 @@
 // 連載ナビ本体。グループ化と題名の整形は lib/series.js にある
 // （related_posts / reference_posts も同じ結果を使うため）
 
-const { seriesOf, allSeries } = require('./lib/series');
+const { seriesOf, allSeries, seriesStats } = require('./lib/series');
 
 hexo.extend.helper.register('series_nav', function (post) {
   return seriesOf(this.site, post);
@@ -19,6 +19,11 @@ hexo.extend.helper.register('recent_series', function (limit = 4, minPosts = 3) 
 // /series/ 一覧ページ（#2304）。更新が新しい順の全連載
 hexo.extend.helper.register('all_series', function () {
   return allSeries(this.site);
+});
+
+// /series/ の統計。累計と直近1年 (#2572)
+hexo.extend.helper.register('series_stats', function () {
+  return seriesStats(this.site);
 });
 
 hexo.extend.generator.register('series-list', function (locals) {
