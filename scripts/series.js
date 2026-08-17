@@ -10,7 +10,7 @@ hexo.extend.helper.register('series_nav', function (post) {
 });
 
 // ホームの「連載から探す」。更新が新しい順に、索引へのリンクとサムネイルを返す
-hexo.extend.helper.register('recent_series', function (limit = 4, minPosts = 3) {
+hexo.extend.helper.register('recent_series', function (limit = 2, minPosts = 3) {
   return allSeries(this.site)
     .filter((s) => s.total >= minPosts && s.index.thumbnail)
     .slice(0, limit);
