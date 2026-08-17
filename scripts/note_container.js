@@ -15,6 +15,8 @@
  * タイトルを付けると、タイトル行と本文が分かれて本文が全幅になる (#2490)。
  * :::
  */
+const { replaceOutsideFences } = require('./lib/fence');
+
 hexo.extend.filter.register('before_post_render', function (data) {
   // ^([ \t]*): 行頭のインデントをキャプチャし、同じインデントの終了タグ（\1:::）と対にする。
   // 水平空白に限るのが要点で、\s にすると改行まで飲み、直前の空行から
@@ -26,67 +28,75 @@ hexo.extend.filter.register('before_post_render', function (data) {
   // ::: が本文に出ていた（書いた側は気づけない）
   const regex = /^([ \t]*):::[ \t]+note(?:[ \t]+(\S+))?(?:[ \t]+([^\n]*))?\n([\s\S]+?)\n\1:::$/gm;
 
-  data.content = data.content.replace(regex, (match, indent, firstWord, rest, content) => {
-    let className = 'info'; // デフォルトのクラス名
-    const allowedClasses = ['tip', 'info', 'warn', 'alert'];
-    // 1語目が種別ならそれを採り、残りをタイトルとする。種別でなければ
-    // 行の残り全部がタイトル（種別は既定の info）。
-    // 「tip」という語をタイトルにしたいときだけ取り違えるが、
-    // その場合は種別を明示して `::: note info tip` と書けばよい
-    let title = '';
-    if (firstWord && allowedClasses.includes(firstWord)) {
-      className = firstWord;
-      title = (rest || '').trim();
-    } else if (firstWord) {
-      title = [firstWord, rest || ''].join(' ').trim();
-    }
+  // コードフェンスの中の ::: は記法の見本なので置換しない (#2549)
+  data.content = replaceOutsideFences(
+    data.content,
+    regex,
+    (match, indent, firstWord, rest, content) => {
+      let className = 'info'; // デフォルトのクラス名
+      const allowedClasses = ['tip', 'info', 'warn', 'alert'];
+      // 1語目が種別ならそれを採り、残りをタイトルとする。種別でなければ
+      // 行の残り全部がタイトル（種別は既定の info）。
+      // 「tip」という語をタイトルにしたいときだけ取り違えるが、
+      // その場合は種別を明示して `::: note info tip` と書けばよい
+      let title = '';
+      if (firstWord && allowedClasses.includes(firstWord)) {
+        className = firstWord;
+        title = (rest || '').trim();
+      } else if (firstWord) {
+        title = [firstWord, rest || ''].join(' ').trim();
+      }
 
-    // キャプチャしたコンテナ内のコンテンツから、共通のインデントを削除
-    // これにより、Markdownレンダラが意図せずコードブロックとして解釈するのを防ぐ
-    const unindentedContent = content
-      .split('\n')
-      .map((line) => {
-        if (line.startsWith(indent)) {
-          return line.substring(indent.length);
-        }
-        return line;
-      })
-      .join('\n');
+      // キャプチャしたコンテナ内のコンテンツから、共通のインデントを削除
+      // これにより、Markdownレンダラが意図せずコードブロックとして解釈するのを防ぐ
+      const unindentedContent = content
+        .split('\n')
+        .map((line) => {
+          if (line.startsWith(indent)) {
+            return line.substring(indent.length);
+          }
+          return line;
+        })
+        .join('\n');
 
-    // インデントを削除したコンテンツをMarkdownとして正しくレンダリング
-    const renderedContent = hexo.render.renderSync({ text: unindentedContent, engine: 'markdown' });
+      // インデントを削除したコンテンツをMarkdownとして正しくレンダリング
+      const renderedContent = hexo.render.renderSync({
+        text: unindentedContent,
+        engine: 'markdown',
+      });
 
-    // クラス名に note- を付ける。tip/info/warn/alert のような一般語をそのまま使うと
-    // 他のCSSと衝突する。実際 alert は bootstrap の .alert に当たっていた (#2486)。
-    // アイコンの fa-check-circle も Font Awesome 由来の名前で、実体（警告なら
-    // 感嘆符、tip なら電球）と合っていなかったため役割名にする
-    //
-    // タイトルがあるときだけ構造を変える。無ければ従来どおりの2列。
-    // 既存の note は225件あり、そのすべての見た目を動かさないため (#2490)
-    //
-    // コードブロックとして認識されてしまわないよう、インデントされないよう愚直に文字列結合
-    if (title) {
-      // タイトルも Markdown として描く。`code` やリンクを本文と同じ書き方で
-      // 使えるようにするため。1行なので描画結果の <p> を外して中身だけ使う
-      const renderedTitle = hexo.render
-        .renderSync({ text: title, engine: 'markdown' })
-        .trim()
-        .replace(/^<p>/, '')
-        .replace(/<\/p>$/, '');
+      // クラス名に note- を付ける。tip/info/warn/alert のような一般語をそのまま使うと
+      // 他のCSSと衝突する。実際 alert は bootstrap の .alert に当たっていた (#2486)。
+      // アイコンの fa-check-circle も Font Awesome 由来の名前で、実体（警告なら
+      // 感嘆符、tip なら電球）と合っていなかったため役割名にする
+      //
+      // タイトルがあるときだけ構造を変える。無ければ従来どおりの2列。
+      // 既存の note は225件あり、そのすべての見た目を動かさないため (#2490)
+      //
+      // コードブロックとして認識されてしまわないよう、インデントされないよう愚直に文字列結合
+      if (title) {
+        // タイトルも Markdown として描く。`code` やリンクを本文と同じ書き方で
+        // 使えるようにするため。1行なので描画結果の <p> を外して中身だけ使う
+        const renderedTitle = hexo.render
+          .renderSync({ text: title, engine: 'markdown' })
+          .trim()
+          .replace(/^<p>/, '')
+          .replace(/<\/p>$/, '');
+        return (
+          `<div class="note-container note-${className} note-has-title">` +
+          `<div class="note-title"><span class="note-icon"></span>${renderedTitle}</div>` +
+          `<div class="note-body">${renderedContent.trim()}</div>` +
+          `</div>`
+        );
+      }
       return (
-        `<div class="note-container note-${className} note-has-title">` +
-        `<div class="note-title"><span class="note-icon"></span>${renderedTitle}</div>` +
-        `<div class="note-body">${renderedContent.trim()}</div>` +
+        `<div class="note-container note-${className}">` +
+        `<span class="note-icon"></span>` +
+        `<div>${renderedContent.trim()}</div>` +
         `</div>`
       );
-    }
-    return (
-      `<div class="note-container note-${className}">` +
-      `<span class="note-icon"></span>` +
-      `<div>${renderedContent.trim()}</div>` +
-      `</div>`
-    );
-  });
+    },
+  );
 
   return data;
 });
