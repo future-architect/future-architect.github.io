@@ -109,8 +109,10 @@ function render(code, language) {
 hexo.extend.filter.register(
   'before_post_render',
   function (data) {
-    if (data.layout !== 'post' && data.layout !== 'page') return;
-    if (data.content.indexOf('```diff') === -1) return;
+    // レイアウト名で絞らない。before_post_render は記事と固定ページにしか
+    // 掛からないので絞る必要が無く、page 以外のレイアウト名を付けた固定ページ
+    // （記法ガイドの page_nosidebar）で黙って効かなくなる (#2533)
+    if (!data.content || data.content.indexOf('```diff') === -1) return;
 
     // 外側のフェンスに入れ子で書かれた ```diff_xxx は記法の見本なので触らない (#2549)
     data.content = replaceOutsideFences(
