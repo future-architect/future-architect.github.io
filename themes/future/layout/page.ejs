@@ -6,10 +6,25 @@
     他レイアウト（post.ejs 等）と同じく container で包む %>
 <div class="container">
   <%- partial('_partial/breadcrumb-page') %>
+  <%# 見出しから目次を組む (#2559)。EJS の特設ページは項目を specialsToc に
+      手で書くが、Markdown のページは本文があるので toc() で作れる。
+      min_depth: 2 で h1 を外す。Markdown のページの h1 はそのページの
+      タイトルそのもの（#2577）で、目次に自分を載せる意味が無い。
+      見出しが1つしか無いページ（/specials/）では目次を出さない %>
+  <% const tocHtml = toc(page.content, {list_number: false, min_depth: 2, max_depth: 3}); %>
+  <% const hasToc = (tocHtml.match(/<li/g) || []).length >= 2; %>
   <div class="row">
     <main class="col-md-9 blog-posts">
       <article class="article blog-item">
         <div class="article-inner">
+          <%# 1024px 以下ではサイドバーの目次が本文の下に落ちて役に立たないので、
+              記事と同じく本文の直前に畳んだ目次を出す (#2452) %>
+          <% if (hasToc) { %>
+          <details class="toc-mobile" data-nosnippet>
+            <summary>目次</summary>
+            <div class="toc-section"><%- tocHtml %></div>
+          </details>
+          <% } %>
           <div class="article-entry">
             <%- page.content %>
           </div>
@@ -17,7 +32,7 @@
       </article>
     </main>
     <aside class="col-md-3 blog-sidebar">
-      <%- partial('_partial/sidebar') %>
+      <%- partial('_partial/sidebar', hasToc ? {tocHtml: tocHtml} : {}) %>
     </aside>
   </div>
 </div>
