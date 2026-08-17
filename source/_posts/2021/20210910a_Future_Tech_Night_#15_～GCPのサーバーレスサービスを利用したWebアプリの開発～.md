@@ -1,5 +1,5 @@
 ---
-title: "Future Tech Night #15 ~GCPのサーバーレスサービスを利用したWebアプリの開発~"
+title: "Future Tech Night #15 ～GCPのサーバーレスサービスを利用したWebアプリの開発～"
 date: 2021/09/10 00:00:00
 postid: a
 tags:
