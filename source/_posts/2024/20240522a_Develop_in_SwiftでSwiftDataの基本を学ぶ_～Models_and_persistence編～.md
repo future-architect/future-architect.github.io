@@ -1,5 +1,5 @@
 ---
-title: "Develop in SwiftでSwiftDataの基本を学ぶ ~Models and persistence編~"
+title: "Develop in SwiftでSwiftDataの基本を学ぶ ～Models and persistence編～"
 date: 2024/05/22 00:00:00
 postid: a
 tags:
