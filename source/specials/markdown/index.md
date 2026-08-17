@@ -1,6 +1,6 @@
 ---
 title: 記法ガイド
-layout: page_nosidebar
+layout: page
 mathjax: true
 ---
 
@@ -308,29 +308,33 @@ fmt.Println("コードブロックも書けます")
 
 ### 画像
 
-画像は HTML で書き、**実寸の `width` と `height`** を必ず書いてください。読み込み中に本文が動くのを防ぎます。
+画像は Markdown の記法で書いてください。
 
-```html
-<img src="/images/2026/20260114a/thumbnail.jpg" alt="" width="300" height="93" loading="lazy">
+```markdown
+![代替テキスト](/images/2026/20260114a/thumbnail.jpg)
 ```
 
-<img src="/images/2026/20260114a/thumbnail.jpg" alt="" width="300" height="93" loading="lazy">
+![](/images/2026/20260114a/thumbnail.jpg)
 
-`alt` は画像が見えない人に向けた代替テキストです。装飾目的の画像なら空のままで構いません。
+公開時にこちらで `<img>` へ変換し、**実寸の `width` と `height`** を付けます。読み込み中に本文が動くのを防ぐためで、書き手が意識する必要はありません。
+
+**`<img>` を手で書いて `width` / `height` で表示サイズを変えるのは避けてください。** 実寸と違う値を指定すると、大きい画像を送ってブラウザ側で縮めるだけになります。小さく見せたい場合は**画像ファイル自体を加工**してください（そのほうが表示も速くなります）。
+
+角括弧の中に書く `代替テキスト` は、画像が見えない人に向けた説明（alt）です。装飾目的の画像なら空のままで構いません。
 
 ### 画像のキャプション
 
 画像の直下の行を `*` で挟むと、キャプションになります。
 
 ```markdown
-<img src="/images/2026/20260114a/thumbnail.jpg" alt="" width="300" height="93" loading="lazy">
+![](/images/2026/20260114a/thumbnail.jpg)
 *図1: キャプションの文*
 ```
 
-<img src="/images/2026/20260114a/thumbnail.jpg" alt="" width="300" height="93" loading="lazy">
+![](/images/2026/20260114a/thumbnail.jpg)
 *図1: キャプションの文*
 
-`alt` とキャプションは役割が違います。`alt` は画像が見えない人への説明、キャプションは全員に向けた補足なので、同じ文を両方に書く必要はありません。
+代替テキストとキャプションは役割が違います。代替テキストは画像が見えない人への説明、キャプションは全員に向けた補足なので、同じ文を両方に書く必要はありません。
 
 ### 図（mermaid）
 
