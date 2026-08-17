@@ -69,9 +69,7 @@ MacOs, Linuxの場合は、[dbt VS Code拡張機能](https://marketplace.visuals
 
 詳しい手順は、公式サイト（[dbt VS Code拡張をインストールする](https://docs.getdbt.com/docs/fusion/install-dbt-extension)）をご参考ください。
 
-::: note info
-
-**Windowsにおけるインストール**
+::: note info Windowsにおけるインストール
 
 Windowsの場合は、VS Code拡張機能を経由してFusionのインストールできなかったため、PowerShellで以下のコマンドをたたき、dbt.exeのパスを通すと、上記と同じようにdbt fusionを利用できました。
 
