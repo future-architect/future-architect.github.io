@@ -69,9 +69,7 @@ MacOs, Linuxの場合は、[dbt VS Code拡張機能](https://marketplace.visuals
 
 詳しい手順は、公式サイト（[dbt VS Code拡張をインストールする](https://docs.getdbt.com/docs/fusion/install-dbt-extension)）をご参考ください。
 
-::: note info
-
-**Windowsにおけるインストール**
+::: note info Windowsにおけるインストール
 
 Windowsの場合は、VS Code拡張機能を経由してFusionのインストールできなかったため、PowerShellで以下のコマンドをたたき、dbt.exeのパスを通すと、上記と同じようにdbt fusionを利用できました。
 
@@ -107,9 +105,7 @@ dbt init --fusion-upgrade
 
 例えば、過去に3分実行時間が必要なパイプラインがおおよそ1分で終わりました。
 
-::: note warn
-
-よくよく考えてみると、dbt fusionはあくまでSQL実行計画をしてくれるツールであり、30倍早くならなかった理由は以下の様に考えられます。
+::: note warn よくよく考えてみると、dbt fusionはあくまでSQL実行計画をしてくれるツールであり、30倍早くならなかった理由は以下の様に考えられます。
 
 - そもそもSQL自体の最適化が徹底されていない
 - そもそもSQLの依存関係が複雑すぎる

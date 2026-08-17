@@ -59,12 +59,6 @@ hexo.extend.filter.register('before_post_render', function (data) {
         })
         .join('\n');
 
-      // インデントを削除したコンテンツをMarkdownとして正しくレンダリング
-      const renderedContent = hexo.render.renderSync({
-        text: unindentedContent,
-        engine: 'markdown',
-      });
-
       // クラス名に note- を付ける。tip/info/warn/alert のような一般語をそのまま使うと
       // 他のCSSと衝突する。実際 alert は bootstrap の .alert に当たっていた (#2486)。
       // アイコンの fa-check-circle も Font Awesome 由来の名前で、実体（警告なら
@@ -74,6 +68,7 @@ hexo.extend.filter.register('before_post_render', function (data) {
       // 既存の note は225件あり、そのすべての見た目を動かさないため (#2490)
       //
       // コードブロックとして認識されてしまわないよう、インデントされないよう愚直に文字列結合
+      let open;
       if (title) {
         // タイトルも Markdown として描く。`code` やリンクを本文と同じ書き方で
         // 使えるようにするため。1行なので描画結果の <p> を外して中身だけ使う
@@ -82,19 +77,27 @@ hexo.extend.filter.register('before_post_render', function (data) {
           .trim()
           .replace(/^<p>/, '')
           .replace(/<\/p>$/, '');
-        return (
+        open =
           `<div class="note-container note-${className} note-has-title">` +
           `<div class="note-title"><span class="note-icon"></span>${renderedTitle}</div>` +
-          `<div class="note-body">${renderedContent.trim()}</div>` +
-          `</div>`
-        );
+          `<div class="note-body">`;
+      } else {
+        open =
+          `<div class="note-container note-${className}">` + `<span class="note-icon"></span><div>`;
       }
-      return (
-        `<div class="note-container note-${className}">` +
-        `<span class="note-icon"></span>` +
-        `<div>${renderedContent.trim()}</div>` +
-        `</div>`
-      );
+
+      // 本文はここで描かず、Markdown のまま囲みの中に置く。開きタグと本文の間、
+      // 本文と閉じタグの間に空行を入れるのが要点で、CommonMark の HTML ブロックは
+      // 空行で終わる。本文は本体と同じ経路で描かれる。
+      //
+      // 以前はここで renderSync していた。この時点の本文はコードフェンスが
+      // すでに backtick_code に HTML へ置き換えられた後で、その HTML を
+      // もう一度 Markdown として解釈していた。コードの中の `Identity[T any](T) T` が
+      // リンク記法として `Identity<a href="T">T any</a> T` になる、Go の raw string を
+      // 含むコードでハイライト用の HTML 自体が再エスケープされる、素の URL が
+      // 勝手にリンクになる、コードブロックが note の中でだけ <p> に包まれる、
+      // といった壊れ方をしていた (#2547)
+      return `${open}\n\n${unindentedContent.trim()}\n\n</div></div>`;
     },
   );
 

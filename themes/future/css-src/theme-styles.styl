@@ -2917,6 +2917,51 @@ note-alert-bg = #ffdbdb
   margin-bottom: 0;
 }
 
+/* モバイルでは note の本文だけが狭かった (#2521)。幅375pxで本文カラムは
+   351px あるのに、note の中は枠の padding 40px とアイコン列 28.4px を引いて
+   282.6px しかない。19.5% が一律に削られ、本文15.6pxで1行4文字強の差になる。
+
+   地の色を画面端まで伸ばし、文字の位置は段落と揃える。左右の padding を
+   .container と同じ12pxにすると note の中の文字の左端が段落の左端と一致し、
+   幅も完全に戻る。読者から見ると文字の位置は何も変わらず、色の帯だけが
+   端まで伸びた形になる。padding を20pxのまま全幅にすると、note の文字だけが
+   本文より8px内側へ入って段差がかえって目立つ。
+
+   50% は .container の内側幅を指すので、margin は左右とも -12px になる。
+   100vw と違いスクロールバーの幅を含まない。
+
+   絵柄は本文と連動させず、左上に置いた装飾として扱う。1行目の横に回り込ませる
+   float も試したが、float が避けるのは行ボックスだけで、箇条書きやコードブロックが
+   自前で持つ左の溝とは重なる。実際に箇条書きで始まる3件でマーカーが潰れていた。
+   絶対配置なら中身が何で始まっても関係が無く、要素ごとの特例を持たずに済む */
+@media (max-width: 767px) {
+  .article-entry .note-container {
+    display: block;
+    margin-inline: calc(50% - 50vw);
+    padding-left: 12px;
+    padding-right: 12px;
+    /* 画面端まで伸びた帯に角丸は掛からない */
+    border-radius: 0;
+    position: relative;
+  }
+  /* 絵柄のぶんの空きは、絵柄を単独で持つタイトル無しの note だけに掛ける。
+     タイトル付き（24件）は絵柄がタイトル行の中に収まっていて上に帯が要らない。
+     全体に掛けるとタイトルの上に何も無い空きが42px空く */
+  .article-entry .note-container:not(.note-has-title) {
+    padding-top: 42px;
+    /* 上が絵柄のぶん厚くなるので、下も広げて釣り合わせる。
+       16px のままだと本文の最終行が枠の下辺に近づいて詰まって見える */
+    padding-bottom: 24px;
+  }
+  .article-entry .note-container > .note-icon {
+    position: absolute;
+    top: 14px;
+    left: 12px;
+    height: 18px;
+    margin-right: 0;
+  }
+}
+
 /* タイトル付きの note (#2490)。タイトルがアイコンを引き受けるので2列をやめ、
    本文は枠いっぱいを使う。タイトル無しの note は従来の2列のままなので、
    既存の225件の見た目は動かない */
@@ -2980,8 +3025,13 @@ note-alert-bg = #ffdbdb
 
    罫線 #ccc は共通のまま変えない。線が示すのは表の構造で、地の色に
    染めると表ごとに濃さが変わり構造の読み取りが不安定になる。
-   各 note の地とのコントラストは 1.25〜1.52 で、白地の 1.61 と大きく違わない */
-.article-entry .note-container table {
+   各 note の地とのコントラストは 1.25〜1.52 で、白地の 1.61 と大きく違わない。
+
+   コードブロックは figure.highlight > table という構造なので、素の table を
+   指すとこちらにも当たる。同じ詳細度で後から書いた分だけ勝ってしまい、
+   note の中のコードブロックから地（#2b2b2b）が消えていた。
+   親が .highlight でないものだけに絞る（#2546） */
+.article-entry .note-container :not(.highlight) > table {
   background-color: transparent;
 }
 .article-entry .note-container.note-tip th {
