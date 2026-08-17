@@ -6,20 +6,43 @@
 
   <section id="main" class="margin-top-30">
 
-    <h1 class="list-page margin-bottom-20">連載一覧</h1>
+    <h1 class="list-page margin-bottom-20"><%- partial('_partial/svg-icon', {icon: 'run-baton'}) %>連載一覧</h1>
 
-    <%# 統計は h1 直下。/tags/・/categories/ と同じ流儀 (#2211) %>
+    <%# 統計は h1 直下。/tags/・/categories/ と同じ流儀 (#2211)。
+        累計と直近1年は時間軸が違うので、カテゴリ個別ページと同じくパネルで束ねて区別する (#2276)。
+        著者数はユニーク。延べだと記事数とほぼ同じ数字になり、
+        連載を何本も書いている人がいることが見えない (#2572) %>
     <% const series = all_series(); %>
-    <ul class="summary">
-      <li><span class="summary-count"><%= series.length %></span><br><span class="summary-label">連載数</span></li>
-      <li><span class="summary-count"><%= series.reduce((sum, s) => sum + s.total, 0) %></span><br><span class="summary-label">投稿</span></li>
-    </ul>
+    <% const stats = series_stats(); %>
+    <div class="summary-panels">
+      <section class="summary-panel">
+        <span class="summary-panel-label">累計</span>
+        <ul class="summary">
+          <li><span class="summary-count"><%= stats.total.series %></span><br><span class="summary-label">連載数</span></li>
+          <li><span class="summary-count"><%= stats.total.posts %></span><br><span class="summary-label">投稿</span></li>
+          <li><span class="summary-count"><%= stats.total.authors %></span><br><span class="summary-label">著者数</span></li>
+        </ul>
+      </section>
+      <section class="summary-panel">
+        <span class="summary-panel-label">直近1年</span>
+        <% if (stats.recent.posts > 0) { %>
+        <ul class="summary">
+          <li><span class="summary-count"><%= stats.recent.series %></span><br><span class="summary-label">連載数</span></li>
+          <li><span class="summary-count"><%= stats.recent.posts %></span><br><span class="summary-label">投稿</span></li>
+          <li><span class="summary-count"><%= stats.recent.authors %></span><br><span class="summary-label">著者数</span></li>
+        </ul>
+        <% } else { %>
+        <p class="summary-note">投稿はありません</p>
+        <% } %>
+      </section>
+    </div>
 
     <%# h1「連載一覧」と重ならない語にする（categories.ejs の流儀） %>
     <%- partial('_partial/section-heading', {id: 'series', text: 'すべての連載'}) %>
-    <p class="section-note">※最終更新の年ごとに、更新が新しい順。リンク先は各連載の索引記事です</p>
     <%# 最終更新の年ごとに枠で束ねる。枠と小ラベルは詳細ページの
-        「累計/直近1年」パネル（summary-panel）と同じ見た目に揃える %>
+        「累計/直近1年」パネル（summary-panel）と同じ見た目に揃える。
+        並べ方の注記は置かない。年は枠のラベルが、順序と期間は各カードの
+        「全9本・2026.02 〜 2026.08」が名乗っている（categories.ejs と同じ流儀） %>
     <% const byYear = new Map(); %>
     <% series.forEach(function(s){
          const y = date(s.latest, 'YYYY');
@@ -29,10 +52,15 @@
     <% const years = [...byYear.keys()]; %>
     <% years.forEach(function(year, yi){ %>
     <section class="summary-panel series-year <%= yi === years.length - 1 ? 'footer-gap' : '' %>">
-      <span class="summary-panel-label"><%= year %>年</span>
+      <%# 年ラベルの横にその年の内訳。本数は連載の全本数なので「全」を付ける
+          （枠の並びは最終更新の年で、年をまたぐ連載も本数はまとめて数える）。
+          著者は連載をまたいで重なるため、名前で寄せてから数える (#2572) %>
+      <% const list = byYear.get(year); %>
+      <% const yearAuthors = new Set(list.flatMap((s) => s.authors)); %>
+      <span class="summary-panel-label"><%= year %>年<span class="series-year-meta"><%= list.length %>連載・全<%= list.reduce((sum, s) => sum + s.total, 0) %>本・著者<%= yearAuthors.size %>名</span></span>
       <%# .series-panels がパネルの横並びレイアウトを持つ（トップの「連載から探す」と同じ部品） %>
       <div class="series-panels row g-4">
-        <% byYear.get(year).forEach(function(s){ %>
+        <% list.forEach(function(s){ %>
         <div class="col-12 col-md-6 col-lg-4">
           <div class="article-card series-panel h-100">
             <% if (s.index.thumbnail) { %>
