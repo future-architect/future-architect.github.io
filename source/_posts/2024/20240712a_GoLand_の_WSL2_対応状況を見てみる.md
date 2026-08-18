@@ -91,7 +91,7 @@ GOPATH設定については何も違和感なく利用できます。
 
 デフォルトインストール先は `\\wsl.localhost\Ubuntu-22.04\home\YOURNAME\sdk` でした。`go1.23.rc1` を選択してインストールしました。IDEのターミナルにも反映されてるので便利。
 
-```sh
+```console
 $ go version
 go version go1.23rc1 linux/amd64
 ```

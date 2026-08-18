@@ -64,7 +64,7 @@ GXでは「監視対象データ、Expectation Suite、バリデーションを�
 
 執筆当時のバージョンは`0.16.8`です。
 
-```sh
+```console
 $ pip install great-expectations
 $ pip freeze | grep great  # バージョン確認
 great-expectations==0.16.8

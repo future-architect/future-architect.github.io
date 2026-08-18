@@ -201,7 +201,7 @@ ssh linaro@<IPaddress>
 ディレクトリ構成ですが私はhome直下にgreengrassというディレクトリを作成し、そこに先程の2つのファイルを格納しました。
 下記のような構成です。
 
-```bash
+```console
 linaro@linaro-alip:~/greengrass$ tree
 .
 ├── xxxxxxx-setup.tar.gz
@@ -225,7 +225,7 @@ certsとconfigは証明書の圧縮ファイルを解凍して生成されたも
 本記事で解説している方法は解凍ファイル中のREADME.mdに全て記載されています。
 RaspberryPiを使用される方はarmv7l についての環境構築方法も記載されているため、ぜひご覧になってください。
 
-```bash
+```console
 linaro@linaro-alip:~/greengrass/aws-greengrass-docker-1.11.0$ ls
 Dockerfile                          config
 Dockerfile.alpine-aarch64           deployment
@@ -269,7 +269,7 @@ sudo wget -O root.ca.pem https://www.amazontrust.com/repository/AmazonRootCA1.pe
 
 certs配下にroot.ca.pemがダウンロードされていることを確認してください。
 
-```bash
+```console
 linaro@linaro-alip:~/greengrass/aws-greengrass-docker-1.11.0/certs$ tree
 .
 ├── xxxxxxxxxx.cert.pem

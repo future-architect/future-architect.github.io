@@ -104,7 +104,7 @@ DuckDB本体をWASMに変換することで、この強力なデータベース�
 
 Windowsでの Duckdb-WASM開発はすでに [先駆者](https://qiita.com/ttdc_msuzuki/items/5602a13c14259de8e3b8) がいらっしゃったため、今回は Rocky Linux を利用することとしました。
 
-```sh
+```console
 $ curl -o- [https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh](https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh) | bash
 ~~~ (中略) ~~~
 
@@ -124,7 +124,7 @@ $ npm -v
 
 今回使用したライブラリ群は以下の通りです。
 
-```sh
+```console
 $ npm list
 security-invest@0.0.0 /home/user01/security-invest
 ├── @duckdb/duckdb-wasm@1.29.0

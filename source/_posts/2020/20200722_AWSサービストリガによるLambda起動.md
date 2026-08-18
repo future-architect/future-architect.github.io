@@ -203,7 +203,7 @@ aws apigateway create-deployment \
 
 curlコマンドで想定のレスポンスが返ってくるか確認しましょう。
 
-```sh
+```console
 $ curl -i http://localhost:4567/restapis/${rest_api_id}/prod/_user_request_/hello?name=lambda
 hello lambda
 ```

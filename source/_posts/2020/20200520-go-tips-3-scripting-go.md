@@ -146,7 +146,7 @@ SOFTWARE.`)}, true, false},
 }
 ```
 
-```bash
+```console
 $ go test
 === RUN   Test_hasCopyright
 === RUN   Test_hasCopyright/正常
@@ -210,7 +210,7 @@ func Test_writeHello(t *testing.T) {
 }
 ```
 
-```bash
+```console
 $ go test
 === RUN   Test_writeHello
 === RUN   Test_writeHello/正常

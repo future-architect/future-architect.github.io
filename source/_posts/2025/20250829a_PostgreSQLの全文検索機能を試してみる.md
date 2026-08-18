@@ -74,7 +74,7 @@ Goでは分かち書きのライブラリとして定評のある[github.com/ika
 
 kagomeではこんな感じではこんな感じに…
 
-```sh
+```console
 $ kagome
 シグナルを送信した
 シグナル        名詞,一般,*,*,*,*,シグナル,シグナル,シグナル
@@ -90,7 +90,7 @@ $ kagome
 
 ソースコードは[github.com/shibukawa/pgtfs](https://github.com/shibukawa/pgtfs)です。生成AIでサッと作りました。ライセンスはUnlicenseです。full text searchだとftsのはずですが、スペルを間違ったのでtfsになってます。CLIツールとなっています。実証実験のコードなので、インデックスのメンテナンスとか考えずに、一発投入のみ。
 
-```sh
+```console
 # PostgreSQLの起動
 $ docker compose up
 
@@ -136,7 +136,7 @@ Goは以下の分野で広く使用されています：
 
 「Web開発」で検索します。この単語は文中にはありません。「Webサービス開発」ならあります。うまく分かち書きされると単語がヒットしてくれるはず!!!
 
-```shell
+```console
 $ ./pgtfs search "Web開発"
 Searching for: "Web開発"
 Found 1 articles:

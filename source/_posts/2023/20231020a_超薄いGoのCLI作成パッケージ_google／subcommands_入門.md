@@ -167,7 +167,7 @@ func main() {
 
 これをビルドして、ヘルプコマンドを表示します。
 
-```sh
+```console
 $ go build -o subclip .
 $ subclip help
 Usage: subclip <flags> <subcommand> <subcommand args>
@@ -184,7 +184,7 @@ write            Write to clipboard
 
 さて、printにはオプションを2つ追加しています。どうやって確認するのでしょうか。答えはflagsかhelp の引数に、オプションを確認したいコマンド名を渡す必要があります。
 
-```sh オプションを確認
+```console オプションを確認
 $ subclip flags print 
   -n int
         display within particular line number
@@ -204,7 +204,7 @@ print [-n number] [-trim]:
 
 続いて予め用意された`commands` ですが、これはコマンドの一覧を表示します。`help` で詳細を確認するとその通りの内容です（どのようなケースで嬉しいのかいまいち掴みきれませんが）。
 
-```sh
+```console
 $ subclip commands
 help
 flags
@@ -245,7 +245,7 @@ func main() {
 
 そうすると `help` メッセージを出すときにグルーピングが行われます。類似性の高いサブコマンドごとに設定すると便利かもしれません。
 
-```sh
+```console
 $ subclip help     
 Usage: subclip <flags> <subcommand> <subcommand args>
 
@@ -274,7 +274,7 @@ func main() {
 
 ヘルプメッセージにも表現されています。
 
-```sh
+```console
 $ subclip help
 Usage: subclip <flags> <subcommand> <subcommand args>
 

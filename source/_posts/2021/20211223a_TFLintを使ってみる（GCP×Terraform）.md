@@ -43,7 +43,7 @@ lede: "terraform validateやterraform planでは検知できないエラーを�
 3. `tflint.exe`をパスが通ってるところに配置
 3. 以下を実行し、バージョン情報が出たら成功
 
-```bash PowerShell
+```console PowerShell
 $ tflint --version
 
 TFLint version 0.34.0
@@ -100,7 +100,7 @@ resource "google_compute_instance" "gce_test" {
 
 2. tflintを実行してみる。そうするとエラーがでます
 
-```bash PowerShell
+```console PowerShell
 $ tflint
 
 1 issue(s) found:
@@ -168,7 +168,7 @@ locals {
 
 これに対して、TFLint実行します。ルール違反を検知したことがわかります。どのファイルの何行目に違反があったか表示してくれていますね。
 
-```bash PowerShell
+```console PowerShell
 $ tflint
 
 1 issue(s) found:
@@ -203,7 +203,7 @@ resource "google_compute_instance" "gce_test" {
 }
 ```
 
-```bash tflintの実行
+```console tflintの実行
 $ tflint
 # ルール違反を検知できない
 ```

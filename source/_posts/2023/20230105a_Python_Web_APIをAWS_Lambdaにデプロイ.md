@@ -114,7 +114,7 @@ poetryはその性質上docker内に仮想環境を構築する必要があり�
 上記のDockerfileをビルドします。
 proxy環境の場合はそのままではdocker内で各パッケージのインストールが行えないため、`--build-arg`にプロキシを設定する必要があります。
 
-```bash
+```console
 $ docker build \
     -f ./Dockerfile \
 	-t "<AWSアカウントID>.dkr.ecr.ap-northeast-1.amazonaws.com/<ECRリポジトリ名>:latest" \
@@ -130,7 +130,7 @@ docker push <AWSアカウントID>.dkr.ecr.ap-northeast-1.amazonaws.com/<ECRリ�
 
 プッシュが完了したらECRからLambdaにアップロードします。
 
-```bash
+```console
 $ aws lambda update-function-code --function-name <Lambda名> \
 	--image-uri <AWSアカウントID>.dkr.ecr.ap-northeast-1.amazonaws.com/<ECRリポジトリ名>:latest
 ```

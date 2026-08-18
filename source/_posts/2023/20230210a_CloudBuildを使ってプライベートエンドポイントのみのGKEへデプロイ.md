@@ -301,7 +301,7 @@ Install Google Cloud Buildの画面から…
 
 terraform実行環境にて、terraform importを実行し、手動で作成したCloud Buildトリガーをコード管理できるように設定します。
 
-```bash
+```console
 xxxxxxxx@xxxxxxxx:~/cloud-provider/gcp/gke$ terraform import google_cloudbuild_trigger.trigger projects/xxxxxxxxx/locations/asia-northeast1/triggers/f51e2b94-2be8-4ec6-a983-72ded1f69bb7
 google_cloudbuild_trigger.trigger: Importing from ID "projects/xxxxxxxxx/locations/asia-northeast1/triggers/f51e2b94-2be8-4ec6-a983-72ded1f69bb7"...
 google_cloudbuild_trigger.trigger: Import prepared!
@@ -517,7 +517,7 @@ options:
 
 Version: 1.0.0　→　Version: 2.0.0へ修正してmainブランチにPushします。
 
-```bash
+```console
 xxxxxx@xxxxxx:~/cloud-provider/gcp/gke$ git diff src/cmd/main.go
 diff --git a/gcp/gke/src/cmd/main.go b/gcp/gke/src/cmd/main.go
 index db8369b..8d603f5 100644
@@ -575,7 +575,7 @@ CloudBuildのビルドが正常終了したので、再度ドメインに対し�
 
 ビルドしたイメージをPullしてデプロイされることで、もともと存在していたPodが次々と終了し、新しいPodが作成されていることがわかります。
 
-```sh
+```console
 xxxxxx@xxxxxx@tky-bastion:~$ kubectl get pod -w
 NAME                                   READY   STATUS    RESTARTS   AGE
 hello-go-deployment-78b555bdf6-rv8sh   1/1     Running   0          2m40s

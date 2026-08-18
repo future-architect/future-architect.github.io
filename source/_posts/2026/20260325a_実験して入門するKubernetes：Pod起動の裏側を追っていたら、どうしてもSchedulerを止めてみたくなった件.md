@@ -287,7 +287,7 @@ kube-scheduler-minikube            1/1     Running   0          5s
 
 すると、あれだけ何度削除しても復活していた`kube-scheduler-minikube`が、`kubectl get pods`から消えました。
 
-```sh
+```console
 % minikube ssh
 $ sudo mv /etc/kubernetes/manifests/kube-scheduler.yaml /tmp/
 $ exit

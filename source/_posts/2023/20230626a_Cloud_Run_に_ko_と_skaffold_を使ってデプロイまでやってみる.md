@@ -103,7 +103,7 @@ Hello World を返すような API を v1・v2 として作成していきます
 
 ### Prerequisite
 
-```bash
+```console
 # Go
 $ go version
 go version go1.20.5 darwin/arm64
@@ -139,7 +139,7 @@ func HelloServer(w http.ResponseWriter, r *http.Request) {
 
 ### Prerequisite
 
-```bash
+```console
 # （ko）
 ※ Skaffold の機能を用いるため、特別 ko をインストールする必要はありません。
 
@@ -154,7 +154,7 @@ Google Cloud SDK 430.0.0
 
 またあらかじめ Artifact Registry を作成する必要があります。今回は、gcloud コマンドでさくっと作ってしまいましょう。
 
-```bash
+```console
 $ gcloud artifacts repositories create hello-world \
     --location=asia-northeast1 \
     --repository-format=docker
@@ -192,7 +192,7 @@ build:
 
 こちらのファイルが用意できたら、以下のコマンドを実行すると Artifact Registry にイメージのプッシュが行えるはずです。
 
-```bash
+```console
 $ skaffold build \
     --filename "skaffold_v1.yaml" \
     --default-repo "Artifact Registry の場所 ex）asia-northeast1-docker.pkg.dev/PROJECT_NAME/hello-world"
@@ -255,7 +255,7 @@ spec:
 ここまで作成できたらまた改めてビルドを行いましょう。
 今度は、成果物をローカルにアウトプットもしておきます（後ほど Cloud Deploy にてこの成果物を用いてデプロイを行います）。
 
-```bash
+```console
 $ skaffold build \
     --filename "skaffold_v1.yaml" \
     --default-repo "Artifact Registry の場所 ex）asia-northeast1-docker.pkg.dev/PROJECT_ID/hello-world"
@@ -305,7 +305,7 @@ run:
 
 ファイルを作成できたら、以下のコマンドを実行して Cloud Deploy に反映します。
 
-```bash
+```console
 $ gcloud deploy apply \
   --file=deploy.yaml \
   --project=PROJECT_ID \
@@ -326,7 +326,7 @@ $ gcloud deploy apply \
 
 **※ ここでは、v1 用のリリースだけ作成します。後ほど v2 用のリリースを作成します。**
 
-```bash
+```console
 $ gcloud deploy releases create v1 \
   --delivery-pipeline "hello-world" \
   --region "asia-northeast1" \
@@ -382,7 +382,7 @@ run:
 
 それでは再度修正したものを Cloud Deploy に反映しましょう。
 
-```bash
+```console
 $ gcloud deploy apply \
   --file=deploy.yaml \
   --project=PROJECT_ID \
@@ -396,7 +396,7 @@ $ gcloud deploy apply \
 次に v2 アプリケーションをデプロイしてみましょう。
 先ほどと同じ（v1 が v2 になっているだけ）コマンドで以下のとおりです。
 
-```bash
+```console
 $ gcloud deploy releases create v2 \
   --delivery-pipeline "hello-world" \
   --region "asia-northeast1" \

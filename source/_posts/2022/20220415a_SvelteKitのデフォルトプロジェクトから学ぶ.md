@@ -19,7 +19,7 @@ ReactにNext.jsがあれば、VueにはNuxt.js、SvelteにはSvelteKitがあり�
 
 プロジェクトは次のコマンドで作っていきます。最初のコマンドでいろいろ聞かれるので、好きな条件を入れていきます。デモプロジェクトはYESにするといろいろなコードが生成されます。今回はこれを見ていきます。それ以外は全部YESにしてみました。
 
-```sh
+```console
 $ npm init svelte@next my-app
 
 Welcome to SvelteKit!

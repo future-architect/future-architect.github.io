@@ -149,7 +149,7 @@ func main() {
 
 Receiverを起動してSenderからメッセージを投げてみると...
 
-```sh
+```console
 $ go run main.go
 Event received.
 ====
@@ -348,7 +348,7 @@ export PUBSUB_SUBSCRIPTION=<YOUR PUBSUB SUBSCRIPTION> # default is "demo_cloudev
 
 準備が整ったので動かします！
 
-```sh 実行
+```console 実行
 $ go run main.go
 # ---中略---
 Event Context: Context Attributes,

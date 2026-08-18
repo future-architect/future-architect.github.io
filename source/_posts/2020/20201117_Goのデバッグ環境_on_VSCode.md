@@ -100,7 +100,7 @@ go get -u github.com/derekparker/delve/cmd/dlv
 
 インストールが完了したら、ターミナル上で `dlv` コマンドが実行できることを確認してください。
 
-```bash
+```console
 $ dlv version
 Delve Debugger
 Version: 1.5.0

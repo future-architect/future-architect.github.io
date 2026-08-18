@@ -120,7 +120,7 @@ envs
 
 先ほどとは異なり、各環境でbackendを1つとしてWorkspaceによってリージョンを区別していきます。
 
-```sh
+```console
 $ terraform workspace list
   default
 * sydney

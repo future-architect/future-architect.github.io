@@ -79,7 +79,7 @@ act を利用する上でDockerのインストールは前提条件です。も�
 
 私はGo環境が構築済みだったため、 `go install` で対応します。
 
-```sh
+```console
 $ go install github.com/nektos/act@v0.2.78
 $ act --version
 act version 0.2.78
@@ -87,7 +87,7 @@ act version 0.2.78
 
 helpを見ると、オプションが豊富なことも分かります。
 
-```sh
+```console
 $ act --help
 Run GitHub actions locally by specifying the event name (e.g. `push`) or an action name directly.
 
@@ -193,7 +193,7 @@ jobs:
 
 初回はMicro/Medium/Largeのうち、どのランナーで動かすか？ と聞かれますが、`Medium` で良いでしょう。
 
-```sh 実行結果
+```console 実行結果
 $ time act -j greet
 INFO[0000] Using docker host 'unix:///var/run/docker.sock', and daemon socket 'unix:///var/run/docker.sock'
 [Local Development Tasks/greet] ⭐ Run Set up job
@@ -234,7 +234,7 @@ sys     0m0.046s
 
 `act -j list-files` で実行します。
 
-```sh
+```console
 $ time act -j list-files
 INFO[0000] Using docker host 'unix:///var/run/docker.sock', and daemon socket 'unix:///var/run/docker.sock'
 [Local Development Tasks/list-files] ⭐ Run Set up job
@@ -276,7 +276,7 @@ sys     0m0.055s
 
 おそらく、最軽量のmicroで動かします。
 
-```sh microでの実行結果
+```console microでの実行結果
 $ time act -P ubuntu-latest=node:16-buster-slim -j greet
 INFO[0000] Using docker host 'unix:///var/run/docker.sock', and daemon socket 'unix:///var/run/docker.sock'
 [Local Development Tasks/greet] ⭐ Run Set up job
@@ -309,7 +309,7 @@ sys     0m0.053s
 
 act には[オフラインモード](https://nektosact.com/usage/index.html#action-offline-mode)が存在します。ローカルにジョブコンテナやアクションのイメージがキャッシュされていれば、オフラインでも動作可能。原理的に高速化もされます。
 
-```sh オフライン化greetの実行結果
+```console オフライン化greetの実行結果
 $ time act --action-offline-mode -j greet
 INFO[0000] Using docker host 'unix:///var/run/docker.sock', and daemon socket 'unix:///var/run/docker.sock'
 [Local Development Tasks/greet] ⭐ Run Set up job
@@ -372,7 +372,7 @@ sys     0m0.044s
 
 試したリポジトリサイズは以下です。`size-pack` がリモートサーバーにpushされた時のサイズとのことで、1.3GiB程度です。
 
-```sh リポジトリサイズ計測
+```console リポジトリサイズ計測
 $ git gc
 $ git count-objects -vH
 count: 0
@@ -387,7 +387,7 @@ size-garbage: 0 bytes
 
 これで試してみます。 先程の `act --action-offline-mode -j list-files` を試してみます。
 
-```sh
+```console
 $ time act --action-offline-mode -j list-files
 INFO[0000] Using docker host 'unix:///var/run/docker.sock', and daemon socket 'unix:///var/run/docker.sock'
 [Local Development Tasks/list-files] ⭐ Run Set up job
@@ -475,7 +475,7 @@ sys     0m2.852s
 
 actでリンター（`go vet`） を実行して成功した結果です。
 
-```sh 実行結果
+```console 実行結果
 $ time act -j lint
 INFO[0000] Using docker host 'unix:///var/run/docker.sock', and daemon socket 'unix:///var/run/docker.sock'
 [Local Development Tasks/Lint Go Files] ⭐ Run Set up job
@@ -555,7 +555,7 @@ Error: Job 'Lint Go Files' failed
 
 act コマンドを実行します。 `--container-options "-v $(pwd):/workdir"` の `/workdir` の値は、さきほどの `local-tasks.yaml` で指定した値と一致させます。
 
-```sh 実行結果
+```console 実行結果
 $ time act -j fmt --container-options "-v $(pwd):/workdir"
 INFO[0000] Using docker host 'unix:///var/run/docker.sock', and daemon socket 'unix:///var/run/docker.sock'
 [Local Development Tasks/Format Go Files] ⭐ Run Set up job

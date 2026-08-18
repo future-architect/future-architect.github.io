@@ -35,7 +35,7 @@ npm init playwright@latest
 
 実行すると初期化に伴うオプションの変更をあれこれ聞かれます。 特にこだわりがなければそのままEnterを押していってください。空白で送信した場合はデフォルト値で設定されます。
 
-```sh
+```console
 $ npm init playwright@latest
 
 Need to install the following packages:
@@ -189,7 +189,7 @@ test('githubアイコンの遷移先URLにplaywrightが含まれる', async ({ p
 
 全てのテストを実行するには以下のコマンドを実行します。
 
-```sh
+```console
 $ npx playwright test
 
 Running 9 tests using 4 workers
@@ -206,7 +206,7 @@ To open last HTML report run:
 
 ファイル名(今回はtest1.spec.ts)を指定して実行するには以下のコマンドを実行します。
 
-```sh
+```console
 $ npx playwright test tests/test1.spec.ts
 
 Running 3 tests using 3 workers

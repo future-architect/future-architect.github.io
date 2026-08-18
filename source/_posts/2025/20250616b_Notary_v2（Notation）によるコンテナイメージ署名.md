@@ -54,7 +54,7 @@ Notary（実際に用いるのはCLI実装のNotation）の使い所ですが、
 
 x86かつ、WSL2上の環境にて構築します。 notationはGo言語で開発されていますが、`go install` ではお手軽には無理そうだったため、バイナリを直接取得する流れにします。
 
-```sh インストール
+```console インストール
 export NOTATION_VERSION=2.0.0-alpha.1
 
 # ダウンロード
@@ -115,7 +115,7 @@ docker start zot
 
 署名するためのテスト RSA キーと、検証するための自己署名 X.509 証明書を、以下で生成します。あくまで動作確認用のコマンドとのこと。プロダクションで利用時は[こちらの手順](https://aws.amazon.com/jp/blogs/containers/announcing-container-image-signing-with-aws-signer-and-amazon-eks/)を参考にして、 AWS Signer などと連携させるか、少なくても、AWS KMSなどシークレットの管理サービスを利用すべきでしょう。
 
-```sh
+```console
 $ notation cert generate-test --default "suji-toshi-mashoya"
 generating RSA Key with 2048 bits
 generated certificate expiring on 2025-06-14T10:57:29Z
@@ -132,7 +132,7 @@ suji-toshi-mashoya: mark as default signing ke
 
 適当なイメージをpullし、ローカル上のZotレジストリにpushします。
 
-```sh
+```console
 $ docker pull busybox:1.37.0
 $ docker tag busybox:1.37.0 localhost:5000/suji-tootteruyo:1.0
 $ docker push localhost:5000/suji-tootteruyo:1.0
@@ -146,7 +146,7 @@ i Info → Not all multiplatform-content is present and only the available singl
 
 続いて、お待ちかねのnotationコマンドです。タグだと上手く見つけることができなかったため、ダイジェスト指定することが必要でした（最近だと、タグは書き換え可能であり、ダイジェストを使う方が良いという話もあるので、深入りはしていません）
 
-```sh
+```console
     $ notation sign --insecure-registry "localhost:5000/suji-tootteruyo@sha256:7c0ffe5751238c8479f952f3fbc3b719d47bccac0e9bf0a21c77a27cba9ef12d"
 Successfully signed localhost:5000/suji-tootteruyo@sha256:7c0ffe5751238c8479f952f3fbc3b719d47bccac0e9bf0a21c77a27cba9ef12d
 Pushed the signature to localhost:5000/suji-tootteruyo@sha256:ef3915777084e9f5fb59fa2b2184d60f452bd374352e2afdb1c20aac637c3304```
@@ -154,7 +154,7 @@ Pushed the signature to localhost:5000/suji-tootteruyo@sha256:ef3915777084e9f5fb
 
 以下で紐づきを確認できます。
 
-```sh
+```console
 $ notation ls localhost:5000/suji-tootteruyo@sha256:7c0ffe5751238c8479f952f3fbc3b719d47bccac0e9bf0a21c77a27cba9ef12d
 localhost:5000/suji-tootteruyo@sha256:7c0ffe5751238c8479f952f3fbc3b719d47bccac0e9bf0a21c77a27cba9ef12d
 └── application/vnd.cncf.notary.signature
@@ -165,7 +165,7 @@ localhost:5000/suji-tootteruyo@sha256:7c0ffe5751238c8479f952f3fbc3b719d47bccac0e
 
 信頼ポリシーという、どの署名を信頼するか定義したJSONを作成します。
 
-```sh
+```console
 $ cat <<EOF > ./trustpolicy.json
 {
     "version": "1.0",
@@ -184,14 +184,14 @@ EOF
 
 JSONファイルをインポートします。
 
-```sh
+```console
 $ notation policy import ./trustpolicy.json
 Successfully imported OCI trust policy configuration to /home/mano/.config/notation/trustpolicy.oci.json.
 ```
 
 署名を検証します。
 
-```sh
+```console
 $ notation verify --insecure-registry "localhost:5000/suji-tootteruyo@sha256:7c0ffe5751238c8479f952f3fbc3b719d47bccac0e9bf0a21c77a27cba9ef12d"
 Successfully verified signature for localhost:5000/suji-tootteruyo@sha256:7c0ffe5751238c8479f952f3fbc3b719d47bccac0e9bf0a21c77a27cba9ef12d```
 ```
@@ -204,7 +204,7 @@ Successfully verified signature for localhost:5000/suji-tootteruyo@sha256:7c0ffe
 
 まず不正なキーを生成します。
 
-```sh
+```console
 $ notation cert generate-test --default "fade-out"
 $ notation key ls
 NAME                 KEY PATH                                                       CERTIFICATE PATH                                               ID   PLUGIN NAME
@@ -216,7 +216,7 @@ suji-toshi-mashoya   /home/mano/.config/notation/localkeys/suji-toshi-mashoya.ke
 
 新しく別のイメージを準備します。前回利用した1.37.0 ではなく、1.36.0を利用します。
 
-```sh
+```console
 $ docker pull busybox:1.36.0
 $ docker tag busybox:1.36.0 localhost:5000/suji-tooranaiyo:1.0
 $ docker push localhost:5000/suji-tooranaiyo:1.0
@@ -230,7 +230,7 @@ i Info → Not all multiplatform-content is present and only the available singl
 
 このイメージに対して、攻撃用のキーで署名します。
 
-```sh
+```console
 $ notation sign \
   --insecure-registry \
   --key fade-out \
@@ -241,7 +241,7 @@ Pushed the signature to localhost:5000/suji-tooranaiyo@sha256:49fc8cc2e956660bb8
 
 これで、信頼できない署名付きのイメージが作成されましたので、このイメージを検証します。
 
-```sh
+```console
 $ notation verify --insecure-registry localhost:5000/suji-tooranaiyo@sha256:49fc8cc2e956660bb8c6ab9cd18618609eb106ae5503855e7b2b3de5138c7ec6
 Error: signature verification failed: artifact "localhost:5000/suji-tooranaiyo@sha256:49fc8cc2e956660bb8c6ab9cd18618609eb106ae5503855e7b2b3de5138c7ec6" has no applicable oci trust policy statement. Trust policy applicability for a given artifact is determined by registryScopes. To create a trust policy, see: https://notaryproject.dev/docs/quickstart/#create-a-trust-policy
 ```

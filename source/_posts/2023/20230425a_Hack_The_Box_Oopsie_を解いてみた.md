@@ -136,7 +136,7 @@ robert ユーザーと共有されているパスワードを含むファイル�
 lsコマンドで色々探してると、`/var/www/html/cdn-cgi/login`配下にdb.phpファイルが存在します。
 db.phpファイルをcatしてみます。
 
-```sh
+```console
 $ cat db.php
 <?php
 $conn = mysqli_connect('localhost','robert','M3g4C0rpUs3r!','garage');
@@ -155,7 +155,7 @@ bugtrackerグループが所有するすべてのファイルを特定するた�
 
 whoamiコマンドを実行すると `www-data`と表示されます。
 
-```sh
+```console
 $ whoami
 www-data
 ```
@@ -179,7 +179,7 @@ su robert
 パスワードはMySQLの接続情報に記載されていた`M3g4C0rpUs3r!`を入力するとユーザを切り替えできました。
 bugtrackerに属するファイルを探します。
 
-```shell
+```console
 $ find / -group bugtracker 2>/dev/null
 > /usr/bin/bugtracker
 ```
@@ -216,7 +216,7 @@ What is the name of the executable being called in an insecure manner?
 
 TASK7でbugtracker　グループに属しているファイルを実行してみます。
 
-```sh
+```console
 $ /usr/bin/bugtracker
 
 ------------------
