@@ -3,6 +3,7 @@ title: "Spring Boot マルチDataSource構成で secondary DB だけに Flyway �
 date: 2026/04/10 00:00:00
 postid: a
 tags:
+  - Java
   - SpringBoot
 categories:
   - DB
