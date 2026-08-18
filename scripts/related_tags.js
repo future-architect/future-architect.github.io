@@ -19,28 +19,47 @@
  * lift が飽和するためで、1本の共起から関係の強さは測れない。
  * 共起数 × log(1 + lift) の折衷にしている。
  *
- * ただし共起では「同じ仲間だが同じ記事には付かない」関係が見えない。
+ * また共起では「同じ仲間だが同じ記事には付かない」関係が見えない。
  * Go1.26 と Go1.27 の共起は0本で、バージョン違いは排他的に付くため原理的に
  * 検出できない。そこで名前の形（末尾の数字を外した接頭辞が一致する）から
- * 兄弟を拾い、共起の結果の後ろに置く。
+ * 同じ系列のタグを拾う。
  *
- * 並びを共起→兄弟にしているのは、先頭の一等地を非自明な発見に使うため
- * (#2357)。Terraform → IaC のような共起の関係は見て初めて気づくが、
- * Go1.26 の隣の Go1.27 は名前だけで関係が自明なので、末尾でも見落とされない。
- * 逆に先頭へ置くと、兄弟が多いタグ（Go1.xx は11個）で一等地を占拠して
- * 発見を後ろへ押し出してしまう。
+ * 出すのは4つの群で、読者の目的ごとに分ける (#2569)。
  *
- * 名前の一致は共起と違って決定的な関係なので、件数による裏付けは要らない。
- * 兄弟が1つでも、移動先が1本でも出す。読者にとって Go1.26 の隣に Go1.27 が
- * あるのは自明で、薄い結果でも期待が裏切られない。
- * 接頭辞そのもののタグ（無印: Go / GoogleCloudNext）も同じ系列に含める
- * (#2355)。親ページに子の一覧が出て、子ページには親が系列の先頭に出る。
- * 実データでは Go / インターン / GoogleCloudNext / Terraform / PostgreSQL /
- * NLP の6系列（無印含む）が拾え、束ね間違いは無かった。
+ *   1. 詳しく見る … 移動先が今のタグの中に収まる（共起の部分集合＋系列の子）
+ *   2. 隣を見る   … 一緒に付いている。移動すると新しい記事に出会える
+ *   3. 広げる     … 系列の親（Go1.27 から見た無印の Go）
+ *   4. 別の版へ   … 系列の同じ階層（Go1.27 から見た Go1.26）
  *
- * 兄弟は表示数の上限にも数えない。共起と枠を奪い合う理屈が無いためで、
- * 最も多い無印 Go のページでも兄弟12（Go1.16〜1.27）なので、
- * 際限なく増えることもない。
+ * 1 と 2 を分けるのは目的が違うためで、同時に枠の奪い合いも避けられる。
+ * lift は移動先が小さいほど跳ねる（2本のタグで50倍前後）ので、同じ列に混ぜると
+ * 2本のタグが CI/CD や Vite のような中堅を8枠から追い出す。実データで測ると
+ * 199件が入る代わりに 79件が消えた。群を分ければ消えるものは0件になる。
+ *
+ * 1 に系列の子（Go の下の Go1.27）を入れるのは、実データの子26件すべてが親の
+ * 完全な部分集合、つまり共起由来の絞り込みと同じ関係だったため。
+ * それでも親子の判定を集合ではなく名前で行うのは、包含がタグ付け次第で崩れる
+ * から。子に親タグを付け忘れた記事が1本あるだけで、Go1.24 だけが群から落ちて
+ * 並びが不揃いになる。名前なら揺れない。代わりにパネルは移動先の本数だけを
+ * 出し、包含は名乗らない。
+ * 3 と 4 が出るのは版のページ（Go1.26 など26件）だけ。親は自分の記事を全部
+ * 含む上位集合、別の版は記事が1本も重ならない排他的な集合で、読者の動きも
+ * 「広げる」と「別の版を見る」で違う。同じ群に入れると、どちらの関係なのかが
+ * ラベルから読めない。4 を 2（共起の隣接）に混ぜないのは、隣接群のパネルが
+ * 共有本数を名乗る群であるため。別の版との共有は0本で、「共有0本の隣接」が
+ * 混ざると群の意味が壊れる。
+ *
+ * 並びは 1 → 2 → 3 → 4。1ページ目の関連タグは一覧の前にあり、読者はまだ
+ * このタグで合っているかを見ている (#2088)。群にラベルがあるので後ろの群も
+ * 目的から探せる（ラベルが無いと末尾の群は見落とされる #2357）。
+ *
+ * 1 の上限は共起由来にだけ掛け、系列の子は全部出す。名前の一致は共起と違って
+ * 決定的な関係なので、件数による裏付けは要らない。系列が1つでも、移動先が
+ * 1本でも出す。読者にとって Go1.26 の隣に Go1.27 があるのは自明で、薄い結果でも
+ * 期待が裏切られない。接頭辞そのもののタグ（無印: Go / GoogleCloudNext）も
+ * 同じ系列に含める (#2355)。親ページに子の一覧が出て、子ページには親が
+ * 広げる相手として出る。実データでは Go / インターン / GoogleCloudNext / Terraform /
+ * PostgreSQL / NLP の6系列（無印含む）が拾え、束ね間違いは無かった。
  *
  * リンク先は単にそのタグのページで、2タグの AND 検索はしない。
  * 組み合わせの数だけページが増えるうえ、読者の行動としても
@@ -49,23 +68,49 @@
 
 // 1ページに表示する記事数（_config.yml の per_page と揃える）
 const PER_PAGE = 25;
-// 共起から出すタグの数。兄弟はこの枠に数えず、全部出す
+// 共起から出すタグの数。系列はこの枠に数えず、全部出す
 const MAX_CO_TAGS = 8;
 // 共起がこれ未満なら関係を測れない
 const MIN_CO_OCCURRENCE = 2;
 // 移動先の記事がこれ未満だと、クリックしても得るものが少ない。
-// 3件あれば選択肢として成立する
+// 3件あれば選択肢として成立する（詳しく見る群には掛けない。あちらは
+// 移動先の少なさが目的なので、共起2本＝移動先2本でも出す #2569）
 const MIN_DESTINATION_POSTS = 3;
 // 「新しい記事」がこれ未満なら、移動しても既に見た記事しか出てこない
 const MIN_NEW_POSTS = 2;
+// 詳しく見る群を共起から作るタグの大きさ。これ以下なら一覧を眺めるだけで済む (#2569)
+const NARROWING_MIN_POSTS = 5;
+// 共起由来の絞り込みの上限。実データでは102ページ中100ページが12件以内
+// （中央値2件）で、超えるのは Go の39件と GoogleCloud の22件だけ。件数の多い順に
+// 並べるので、切れるのは2〜3本の細いタグになる。12 は系列の最大（Go1.16〜1.27 の
+// 12件）と同じ大きさで、この長さまでは表示側が受け止められると分かっている
+const MAX_NARROWING_TAGS = 12;
 
 // 末尾の数字（1.27 や 2024）を切り出す。接頭辞が一致すれば同じ系列とみなす
 const VERSIONED = /^(.*?)(\d+(?:\.\d+)*)$/;
 
-function family(name) {
+// 語幹は version_tags.js と同じ3層で決める（名前規則 → versionOf → notVersion）。
+// 名前が語幹と一致しない版タグ（Vue3 → Vue.js、JDK23 → Java）は名前規則では
+// 拾えず、共起の相手として「N本を共有」の隣接群に落ちていた。版タグの語幹は
+// version_tags.js が記事へ注入している（＝語幹は必ず版タグを含む上位集合）ので、
+// 判定を揃えないとこちらだけ関係を見落とす (#2569)
+function family(name, ontology) {
+  const node = ontology[name];
+  if (node && node.notVersion) return null;
+  if (node && node.versionOf) return node.versionOf;
   const m = VERSIONED.exec(name);
   // 接頭辞が空（"2024" のような数字だけのタグ）は系列として扱わない
   return m && m[1] ? m[1] : null;
+}
+
+// 末尾が4桁の年なら、系列の軸はバージョンではなく年。実データでは
+// インターン / GoogleCloudNext / NLP が年、Go / PostgreSQL / Terraform が
+// バージョンで、この境目で綺麗に分かれる（PostgreSQL18 は2桁なので年ではない）
+const YEAR = /^(?:19|20)\d{2}$/;
+
+function isYear(name) {
+  const m = VERSIONED.exec(name);
+  return !!m && YEAR.test(m[2]);
 }
 
 // 1.27 -> 1027、2024 -> 2024。桁上げを 1000 にしているのは
@@ -76,6 +121,11 @@ function versionKey(name) {
     .reduce((acc, n) => acc * 1000 + Number(n), 0);
 }
 
+// 同点は名前で決める（決着が無いとビルドごとに並びが変わる）
+function byName(a, b) {
+  return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
+}
+
 // site.tags は毎回同じなので、共起の集計は一度だけ行って使い回す
 let cache = null;
 
@@ -83,14 +133,17 @@ function build(site) {
   const postTags = new Map(); // 記事ID -> タグ名の配列
   const total = new Map(); // タグ名 -> 記事数
   const path = new Map(); // タグ名 -> URL のパス
-  const families = new Map(); // 接頭辞 -> 同じ系列のタグ名
+  const families = new Map(); // 語幹 -> 同じ系列のタグ名
+  const stems = new Map(); // タグ名 -> 語幹
+  const ontology = (site.data && site.data.tag_ontology) || {};
 
   site.tags.forEach((tag) => {
     total.set(tag.name, tag.length);
     // URL は自前で組まない。tag_map や記号の置換（Go1.18 -> tags/Go1-18）が
     // 効いており、encodeURIComponent(name) では存在しないパスになる
     path.set(tag.name, tag.path);
-    const stem = family(tag.name);
+    const stem = family(tag.name, ontology);
+    if (stem) stems.set(tag.name, stem);
     if (stem) {
       if (!families.has(stem)) families.set(stem, []);
       families.get(stem).push(tag.name);
@@ -130,59 +183,90 @@ function build(site) {
     partners.get(b).push([a, n]);
   }
 
-  return { total, path, families, partners, postCount: site.posts.length };
+  return { total, path, families, stems, co, partners, postCount: site.posts.length };
 }
 
 hexo.extend.helper.register('related_tags', function (tagName) {
   if (!cache) cache = build(this.site);
-  const { total, path, families, partners, postCount } = cache;
+  const { total, path, families, stems, co, partners, postCount } = cache;
 
   const own = total.get(tagName);
   if (!own) return [];
 
-  // 同じ系列のタグ。共起では見えない関係なので、件数で足切りせず全部出す。
-  // 無印タグ（Go / GoogleCloudNext）のページでは自分が接頭辞そのもの (#2355)
-  const stem = family(tagName) || (families.has(tagName) ? tagName : null);
-  const siblings = (stem ? families.get(stem) || [] : [])
-    .filter((name) => name !== tagName)
-    .map((name) => ({
-      name,
-      path: path.get(name),
-      posts: total.get(name),
-      // 無印（親）はバージョンを持たないので先頭に置く。系列全体への入口のため
-      version: VERSIONED.test(name) ? versionKey(name) : Infinity,
-      sibling: true,
-    }))
+  const coWith = (name) => co.get([tagName, name].sort().join('\u0000')) || 0;
+  const member = (name) => {
+    const posts = total.get(name);
+    const shared = coWith(name);
+    return { name, path: path.get(name), posts, co: shared, fresh: posts - shared };
+  };
+
+  // 同じ系列のタグ。無印タグ（Go / GoogleCloudNext）のページでは
+  // 自分が語幹そのものになる (#2355)
+  const stem = stems.get(tagName) || (families.has(tagName) ? tagName : null);
+  const relatives = (stem ? families.get(stem) || [] : []).filter((name) => name !== tagName);
+  const relativeNames = new Set(relatives);
+  // 接頭辞のページから見た系列は全部「より詳しいタグ」。版のページから見ると
+  // 親（無印）は広げる相手、別の版は同じ軸の別の値で、向きが違う
+  const children = stem === tagName ? relatives.map(member) : [];
+  const broader =
+    stem === tagName
+      ? []
+      : relatives
+          .filter((name) => name === stem)
+          .map(member)
+          // 親が自分の記事を全部含むかは、共起が自分の本数と一致するかで分かる
+          .map((r) => ({ ...r, covers: r.co === own }));
+  const versions = (stem === tagName ? [] : relatives)
+    .filter((name) => name !== stem)
+    .map(member)
+    // versionOf で束ねたタグは名前に数字が無いこともある。順序を決められないので先頭
+    .map((r) => ({ ...r, version: VERSIONED.test(r.name) ? versionKey(r.name) : Infinity }))
     .sort((a, b) => b.version - a.version); // 新しいバージョンを先に
-  const siblingNames = new Set(siblings.map((s) => s.name));
 
-  // 1ページに収まるタグでは、絞り込む必要がない。スクロールすれば全部見えるので、
-  // 読者が求めるのは新しい記事に出会えるタグの方。
-  // 1ページを超えるタグでは、逆に絞り込めること自体に価値がある
-  const allowNarrowing = own > PER_PAGE;
+  // 移動先に新しい記事が1本しか無い相手を出すかどうか。1ページに収まるタグでは
+  // スクロールすれば全部見えるので、読者が求めるのは新しい記事に出会えるタグの方。
+  // 1ページを超えるタグなら、わずかでも絞れることに意味がある。
+  // 新しい記事が0本（完全な部分集合）の相手は詳しく見る群が受け持つ
+  const allowThinNew = own > PER_PAGE;
 
-  const rows = (partners.get(tagName) || [])
-    .map(([name, n]) => {
-      const dest = total.get(name) || 0;
-      return {
-        name,
-        path: path.get(name),
-        co: n,
-        posts: dest,
-        fresh: dest - n, // 移動先にあって、いま見ているタグには無い記事数
-        lift: (n * postCount) / (own * dest),
-      };
-    })
+  const candidates = (partners.get(tagName) || [])
+    .map(([name, n]) => ({
+      ...member(name),
+      co: n,
+      fresh: (total.get(name) || 0) - n,
+      lift: (n * postCount) / (own * (total.get(name) || 0)),
+    }))
+    // 系列は上で拾っているので重複させない
+    .filter((r) => !relativeNames.has(r.name) && r.co >= MIN_CO_OCCURRENCE);
+
+  // 詳しく見る群 (#2569)。移動先の記事が全部このタグにもある（fresh が0）関係と、
+  // 系列の子。新しい記事には出会えないが、大きなタグの中から目的の話題へ降りる道
+  // になる。共起の8枠とは別に数える（枠を奪い合わせない）
+  const narrowing =
+    own > NARROWING_MIN_POSTS
+      ? candidates
+          .filter((r) => r.fresh === 0)
+          .sort((a, b) => b.posts - a.posts || byName(a, b))
+          .slice(0, MAX_NARROWING_TAGS)
+      : [];
+  const detail = narrowing.concat(children).sort((a, b) => b.posts - a.posts || byName(a, b));
+
+  const score = (r) => r.co * Math.log(1 + r.lift);
+  const adjacent = candidates
     .filter(
       (r) =>
-        !siblingNames.has(r.name) && // 兄弟は上で拾っているので重複させない
-        r.co >= MIN_CO_OCCURRENCE &&
+        r.fresh > 0 &&
         r.posts >= MIN_DESTINATION_POSTS &&
-        (allowNarrowing || r.fresh >= MIN_NEW_POSTS),
-    );
+        (allowThinNew || r.fresh >= MIN_NEW_POSTS),
+    )
+    .sort((a, b) => score(b) - score(a) || byName(a, b))
+    .slice(0, MAX_CO_TAGS);
 
-  // 同点は名前で決める（決着が無いとビルドごとに並びが変わる）
-  const score = (r) => r.co * Math.log(1 + r.lift);
-  rows.sort((a, b) => score(b) - score(a) || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
-  return rows.slice(0, MAX_CO_TAGS).concat(siblings);
+  // 空の群は返さない。表示側でラベルだけが残らないようにする
+  return [
+    { kind: 'detail', tags: detail },
+    { kind: 'adjacent', tags: adjacent },
+    { kind: 'broader', tags: broader },
+    { kind: versions.every((r) => isYear(r.name)) ? 'years' : 'versions', tags: versions },
+  ].filter((g) => g.tags.length);
 });
