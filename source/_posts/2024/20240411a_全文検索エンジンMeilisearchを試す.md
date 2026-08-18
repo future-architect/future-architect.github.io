@@ -188,7 +188,7 @@ cf. [Zero downtime index deployment](https://blog.meilisearch.com/zero-downtime-
 
 docs-scraperによって作成される [ドキュメント](https://www.meilisearch.com/docs/learn/core_concepts/documents) の詳細を確認するため、APIでドキュメントを参照してみます (cf. [単一ドキュメントを取得するAPIのリファレンス](https://www.meilisearch.com/docs/reference/api/documents#get-one-document))。docs-scraperによって作成されるインデックスではprimary keyとして `objectID` が設定されています (cf. [単一インデックスの情報を取得するAPIのリファレンス](https://www.meilisearch.com/docs/reference/api/indexes#get-one-index))。
 
-```sh
+```console
 $ curl -s \
   -X GET "http://127.0.0.1:7700/indexes/future-tech-blog" \
   -H "Authorization: Bearer aSampleMasterKey" | jq

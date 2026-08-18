@@ -87,7 +87,7 @@ Pulumiは以下の構成をとります。詳しくは[公式ドキュメント]
 
 Pulumiを利用するため、ローカルのWSL2にPulumiをインストールします。
 
-```bash
+```console
 $ curl -fsSL https://get.pulumi.com | sh
 $ pulumi version
 v3.64.0
@@ -98,7 +98,7 @@ v3.64.0
 Pulumiでは、Goを利用しようと思うのでGoをインストールします。
 こちらは[公式ドキュメント](https://go.dev/dl/)を参照ください。
 
-```sh
+```console
 $ go version
 go version go1.20.2 linux/amd64
 ```
@@ -108,7 +108,7 @@ go version go1.20.2 linux/amd64
 ローカルにGoogle Cloud SDKはインストールされている前提で進めます。
 PulumiはGoogle Cloud リソースとやり取りするためにデフォルトのアプリケーション資格情報を必要とするため、`gcloud auth application-default login`コマンドを実行して資格情報を取得します。
 
-```bash
+```console
 $ gcloud auth application-default login
 Go to the following link in your browser:
 
@@ -147,7 +147,7 @@ export GOOGLE_PROJECT=xxxxxxxx
 
 Pulumiを利用するためPulumiプロジェクトを作成します。
 
-```bash
+```console
 $ mkdir pulumi && cd pulumi
 
 $ pulumi new gcp-go
@@ -186,7 +186,7 @@ Enter your access token from https://app.pulumi.com/account/tokens
 先ほどのCLI画面に戻り、生成したアクセストークンを入力します。
 するとWelcome to Pulumi!と表示されます。
 
-```bash
+```console
 $ pulumi new gcp-go
 Manage your Pulumi stacks by logging in.
 Run `pulumi login --help` for alternative login options.
@@ -238,7 +238,7 @@ Saved config
 
 上記の設定が完了すると、作業ディレクトリに以下のファイルが生成されます。
 
-```bash
+```console
 $ tree
 .
 ├── Pulumi.dev.yaml # 初期化したスタックの構成値が記載されています。
@@ -358,7 +358,7 @@ Google Cloudのコンソール画面からCloud Storageを確認すると、バ�
 
 スタックのアウトプットを確認したい場合は、以下のコマンドを実行すると確認できます。
 
-```bash
+```console
 $ pulumi stack output bucketName
 gs://my-bucket-0cae339
 ```
@@ -420,7 +420,7 @@ func main() {
 main.goの修正が完了したので、変更分をデプロイしていきましょう。
 再度`pulumi up`を実行します。
 
-```bash
+```console
 $ pulumi up
 Previewing update (dev)
 
@@ -470,7 +470,7 @@ Duration: 3s
 
 更新作業が完了したので、`gsutilコマンド`でオブジェクトのアップロードを確認します。
 
-```bash
+```console
 $ gsutil ls $(pulumi stack output bucketName)
 gs://my-bucket-0cae339/index.html-5c30f0c
 ```
@@ -549,7 +549,7 @@ func main() {
 
 main.goの設定が完了しましたので、`pulumi up`を実行し`yes`を選択しデプロイします。
 
-```bash
+```console
 $ pulumi up
 Previewing update (dev)
 
@@ -580,7 +580,7 @@ Do you want to perform this update?  [Use arrows to move, type to filter]
 
 デプロイが完了しましたので、`curlコマンド`を実行し、バケットエンドポイントへアクセスします。
 
-```bash
+```console
 $ curl $(pulumi stack output bucketEndpoint)
 <html>
     <body>
@@ -602,7 +602,7 @@ Chromeでアクセスするとブラウザ上でindex.htmlの内容が表示さ�
 `pulumi destroy`を実行します。
 リソースを本当に削除するかどうかを確認するプロンプトが表示されます。問題なければ`yes`を選択し、リソースが削除されるまで待機します。
 
-```bash
+```console
 $ pulumi destroy
 Previewing destroy (dev)
 
@@ -662,7 +662,7 @@ Duration: 8s
 
 Google Cloudのコンソール画面から手動でオブジェクトを削除し、再度`pulumi destroy`を実行します。
 
-```bash
+```console
 $ pulumi destroy
 Previewing destroy (dev)
 
@@ -711,7 +711,7 @@ If you want to remove the stack completely, run `pulumi stack rm dev`.
 
 スタック自体を削除するには、`pulumi stack rm`を実行します。このコマンドによりすべての更新履歴とともに、Pulumi Cloud からスタックが完全に削除されます。
 
-```bash
+```console
 $ pulumi stack rm
 This will permanently remove the 'dev' stack!
 Please confirm that this is what you'd like to do by typing `dev`: dev
@@ -824,7 +824,7 @@ func main() {
 
 とりあえず、脳死コピーをして`pulumi up`を実行すると下記のようにエラーになりました。
 
-```bash
+```console
 $ pulumi up
 Previewing update (dev)
 
@@ -926,7 +926,7 @@ func main() {
 
 修正後、再度`pulumi up`コマンドを実行し、yesをクリックします。
 
-```bash
+```console
 $ pulumi up
 Previewing update (dev)
 

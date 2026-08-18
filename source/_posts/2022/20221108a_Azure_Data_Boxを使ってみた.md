@@ -327,7 +327,7 @@ Data Box初期設定用PCのブラウザーからhttps:/{Data＃1〜3ポート�
 
 まずデータコピー用サーバにログインし、`/etc/fstab` にData BoxをNFSマウントするための定義を記入していきます。
 
-```sh
+```console
 $ vim /etc/fstab
 
 =====以下定義を追加=====
@@ -340,7 +340,7 @@ $ vim /etc/fstab
 `/etc/fstab` ファイルへの書き込みが完了したら、ついにData Boxをマウントしていきます。
 対象ファイルシステムが正しくマウントされたかも同時に確認していきます。
 
-```sh
+```console
 $ mount /mnt/databox1
 $ mount /mnt/databox2
 
@@ -368,7 +368,7 @@ $ df -h
 ※Data Boxを2台同時に使用するため、管理上の都合でコンテナ用ディレクトリ配下に更に1階層ディレクトリを作成していますが、特に必要ではありません。
 ユーザー/オーナーは…
 
-```sh
+```console
 $ mkdir -m 755 /mnt/databox1/<containername>
 $ mkdir -m 755 /mnt/databox2/<containername>
 
@@ -527,7 +527,7 @@ Azureにデータをインポートしてしまえばファイルの権限はな
 当初はNFSでData Boxのファイルシステムをマウントを予定していました。
 先述のようにデータコピーでは```cp -prf```コマンドを実行したのですが、NFSマウントの環境下ではコピーコマンド実行時に権限の保持ができませんでした。
 
-```sh
+```console
 $ cp -prf /tmp/databox_dev/test.txt /mnt/databox1/<containername>/databox1
 cp: '/mnt/databox1/<containername>/databox1/test.txt' の所有者の保護に失敗しました: 許可がありません
 ```

@@ -78,7 +78,7 @@ Goのバージョンを確認したところ、トップディレクトリ配下
 
 `$ go version` 実行時に、`1.22.1` が表示されていれば、実行環境の準備は完了です。
 
-```sh
+```console
 $ go version
 go version go1.22.1 linux/amd64
 ```
@@ -93,7 +93,7 @@ go version go1.22.1 linux/amd64
 <details>
 <summary>テスト実行ログ</summary><div>
 
-```sh
+```console
 $ cd terraform/
 
 $ go test ./...
@@ -256,7 +256,7 @@ ok      github.com/hashicorp/terraform/version  0.003s
 テストを実行してみたところ、`[no test files]` が多数見つかりました。
 少し気になりますので、テストのカバレッジを見てみます。
 
-```sh
+```console
 $ go test -cover
 Terraform has no command named "bar".
 
@@ -282,7 +282,7 @@ ok      github.com/hashicorp/terraform  0.049s
 Go言語では王道の [Makefile](https://github.com/hashicorp/terraform/blob/main/Makefile) を見たところ、`go build` に相当しそうなコマンドは見つかりません。
 ただし、いくつかのコマンドが `$(CURDIR)/scripts/` 配下のシェルスクリプトを参照していますので、当該ディレクトリにお目当てのファイルがないかを確認します。
 
-```sh
+```console
 $ ls -l scripts/
 total 40
 -rwxr-xr-x 1 blog-user blog-user 2853 Mar 25 05:19 build.sh
@@ -311,7 +311,7 @@ DIR="$( cd -P "$( dirname "$SOURCE" )/.." && pwd )"
 
 上記を踏まえて、さっそくビルドしてみます。
 
-```sh
+```console
 $ /usr/bin/bash build.sh
 ==> Removing old directory...
 ==> Installing gox...
@@ -339,7 +339,7 @@ Number of parallel builds: 11
 
 リポジトリからクローンしたソースコード全体と、ビルドで生成した実行バイナリのダブルパンチにより、ローカル PC が悲鳴を上げていました。
 
-```sh
+```console
 $ du -h terraform/bin/terraform
 119M    terraform
 
@@ -377,7 +377,7 @@ fi
 
 今回はローカル環境でのみビルド、動作検証ができれば十分ですので、環境変数 `TF_DEV` を設定し再ビルドします。
 
-```sh
+```console
 $ export TF_DEV=yes
 $ echo $TF_DEV
 yes
@@ -407,7 +407,7 @@ total 119M
 * terraform/bin
 * GOPATH/bin
 
-```sh
+```console
 $ ./terraform/bin/terraform version
 Terraform v1.9.0-dev
 on linux_amd64
@@ -443,7 +443,7 @@ if c.VersionPrerelease != "" {
 
 この1行が追記された状態で実行バイナリをビルドすると、コマンドのログ出力が増えていることを確認できます。
 
-```sh
+```console
 $ /usr/bin/bash ./terraform/scripts/build.sh
 ...
 
@@ -519,7 +519,7 @@ export GOFLAGS="-mod=readonly -trimpath"
 
 サブコマンドを与えずに `terraform` を実行した場合、本来ならば `help` が表示されますが、無事に「壊す」ことができました。
 
-```sh
+```console
 $ ./terraform
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!! TERRAFORM CRASH !!!!!!!!!!!!!!!!!!!!!!!!!!!!

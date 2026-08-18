@@ -55,7 +55,7 @@ moved blockは [v1.1.0](https://github.com/hashicorp/terraform/releases/tag/v1.1
 
 私は [tfenv](https://github.com/tfutils/tfenv) を利用し、v1.1.7 を入れました。
 
-```bash
+```console
 $ tfenv install 1.1.7
 Installing Terraform v1.1.7
 Downloading release tarball from https://releases.hashicorp.com/terraform/1.1.7/terraform_1.1.7_darwin_amd64.zip
@@ -77,7 +77,7 @@ on darwin_amd64
 
 作業用ディレクトリを用意し、以下のようにファイルを配置します。
 
-```bash
+```console
 $ tree
 .
 ├── docker-compose.yml
@@ -97,7 +97,7 @@ resource "null_resource" "resource_C" {}
 作業ディレクトリで terraform init / plan / apply を実行して、null_resource を作成します。
 これにより、stateファイル（`terraform.tfstate`） が作成されます。
 
-```bash
+```console
 $ tree
 .
 ├── docker-compose.yml
@@ -176,7 +176,7 @@ $ cat terraform.tfstate
 
 terraform state list でも、リソース名を確認できます。
 
-```bash
+```console
 $ terraform state list
 null_resource.resource_A
 null_resource.resource_B
@@ -200,7 +200,7 @@ moved {
 
 このタイミングで、すぐに terraform plan してみると...
 
-```bash
+```console
 $ terraform plan
 null_resource.resource_X: Refreshing state... [id=592263413744525319]
 null_resource.resource_B: Refreshing state... [id=5369048601034101090]
@@ -230,7 +230,7 @@ resource "null_resource" "resource_B" {}
 resource "null_resource" "resource_C" {}
 ```
 
-```bash
+```console
 $ terraform plan
 null_resource.resource_B: Refreshing state... [id=5369048601034101090]
 null_resource.resource_C: Refreshing state... [id=3453046184153615927]
@@ -255,7 +255,7 @@ Note: You didn't use the -out option to save this plan, so Terraform can't guara
 というメッセージで、「どこが変わるのか」が分かりますね。
 applyして、変化後の状況を確認してみます。
 
-```bash
+```console
 $ terraform apply
 null_resource.resource_X: Refreshing state... [id=592263413744525319]
 null_resource.resource_B: Refreshing state... [id=5369048601034101090]
@@ -288,7 +288,7 @@ null_resource.resource_X
 リソース名が、resource_A から resource_X に変化しています。
 これにより `moved.tf` ファイルは役目を果たしたので、削除しても以降の plan / apply には影響しません。
 
-```bash
+```console
 $ rm moved.tf # delete moved.tf file
 $ terraform plan
 null_resource.resource_X: Refreshing state... [id=592263413744525319]

@@ -33,7 +33,7 @@ Terraformを用いてインフラ構築する際には、強めの権限（本�
 
 [README](https://github.com/JamesWoolfenden/pike?tab=readme-ov-file#install) に環境別の手順があります。私はGo言語環境があったので、以下でインストールします。
 
-```bash
+```console
 $ go install github.com/jameswoolfenden/pike@v0.3.47
 
 $ pike -h
@@ -342,7 +342,7 @@ output "dynamodb_table_name" {
 
 同一ディレクトリ上で、pikeコマンドを実行します。応答速度は一瞬でした。早い。
 
-```bash
+```console
 $ pike scan -output json
 {
     "Version": "2012-10-17",
@@ -462,7 +462,7 @@ $ pike scan -output json
 
 早速、このJSONを用いてIAMポリシーを作成 ⇛ それをアタッチしたIAMロール作成 ⇛ スイッチロールして利用 ⇛ `terraform apply` します。
 
-```bash
+```console
 $ terraform apply
 （...中略...）
 
@@ -689,7 +689,7 @@ lambda_function_name = "pile-test-function"
 
 一度、`terraform destory` してから再実行すると、やはり成功します。
 
-```bash
+```console
 $ terraform apply
 （...中略...）
 
@@ -750,7 +750,7 @@ pikeコマンドを実行しますが、先ほどと差分は無しです（`loc
 
 そのため、当たり前ですが `terraform apply` はS3実行権限が不足しているため失敗します。
 
-```bash
+```console
 $ terraform apply
 (...中略...)
 

@@ -54,7 +54,7 @@ Linuxはプロセスやファイルシステムを隔離してそのプロセス
 
 UDPベースのHTTPなので、curlコマンドでコンテナを操作できます。次のサンプルはhello-worldイメージを実行してそのログをコンソールに出力するコマンドです（CIDは最初のコマンド実行後に出力されるコンテナのIDが代入されているものとします）。
 
-```sh
+```console
 $ curl --unix-socket /var/run/docker.sock -H "Content-Type: application/json" \
   -d '{"Image": "hello-world"}' \
   -X POST http://localhost/containers/create

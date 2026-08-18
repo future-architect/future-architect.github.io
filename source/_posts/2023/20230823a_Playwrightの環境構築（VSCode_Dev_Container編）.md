@@ -45,7 +45,7 @@ Windowsの方は[Xming](http://www.straightrunning.com/XmingNotes/)などを利�
 Xquartzをインストールし、コンテナからのアクセスを許可するため「ネットワーク・クライアントからの接続を許可」します。
 下記はコマンドラインから実行していますがGUI上から実施していただいても構いません。
 
-```bash
+```console
 # Install Xquartz
 $ brew install --cask xquartz
 # Go to Preferences -> Security, and check “Allow connections from network clients”

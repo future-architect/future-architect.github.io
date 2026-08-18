@@ -63,7 +63,7 @@ SQLLineageはデータリネージの中でも、SQLに特化したツールで�
 
 READMEにも記載されている通り、pipでインストールできます。
 
-```sh
+```console
 # インストール
 $ pip install sqllineage
 ```
@@ -72,7 +72,7 @@ $ pip install sqllineage
 
 実行は簡単です。`-g`オプションでグラフ表示されます。
 
-```sh
+```console
 # サンプルの実行
 $ sqllineage -g -e "insert into db1.table1 select * from db2.table2"
  * SQLLineage Running on http://localhost:5000/?e=insert+into+db1.table1+select+%2A+from+db2.table2
@@ -98,7 +98,7 @@ INSERT INTO table1 (name, text)
 
 `-f`オプションでファイルを指定できます。
 
-```sh
+```console
 $ sqllineage -g -f join.sql
 * SQLLineage Running on http://localhost:5000/?f=join.sql
 ```
@@ -122,7 +122,7 @@ where
 ;
 ```
 
-```sh
+```console
 $ sqllineage -g -f oracle.sql
  * SQLLineage Running on http://localhost:5000/?f=oracle.sql
 ```

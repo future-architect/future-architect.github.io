@@ -58,7 +58,7 @@ Dockerコンテナもあるようなので、好みに応じて使い分けく�
 
 サクッと設定しましょう。
 
-```bash
+```console
 # 環境変数の設定
 $ export PROJECT_ID=my-secret-project
 $ export BUCKET_ID=my-secrets-bucket-123
@@ -105,7 +105,7 @@ For more help and examples, please run "berglas -h".
 
 [httpbin](http://httpbin.org/)のBasic認証は次のようなレスポンスを返すモックサーバです。
 
-```bash
+```console
 # 認証情報なしだと401を返す
 $ curl -i -G "https://httpbin.org/basic-auth/basic-user-name/basic-user-pass"
 HTTP/2 401
@@ -135,7 +135,7 @@ access-control-allow-credentials: true
 
 ということで、ユーザ名・パスワードを認証情報としてシークレットにしていきましょう！
 
-```shell
+```console
 $ berglas create ${BUCKET_ID}/api-user basic-user-name \
   --key projects/${PROJECT_ID}/locations/global/keyRings/berglas/cryptoKeys/berglas-key
 
@@ -147,7 +147,7 @@ $ berglas create ${BUCKET_ID}/api-pass basic-user-pass \
 
 * Cloud Functionへ渡すサービスアカウントを作成
 
-```shell
+```console
 $ gcloud iam service-accounts create berglas-service-account \
   --project ${PROJECT_ID} \
   --display-name "berglas Cloud Functions Example"
@@ -211,7 +211,7 @@ func F(w http.ResponseWriter, r *http.Request) {
 
 #### デプロイ
 
-```shell
+```console
 $ gcloud functions deploy berglas-example-go \
   --project ${PROJECT_ID} \
   --region us-central1 \
@@ -264,7 +264,7 @@ GUI画面へは`セキュリティ -> シークレット マネージャー`で�
 
 * BerglasからSecret Managerのキーにアクセス
 
-```shell
+```console
 $ berglas access sm://${PROJECT_ID}/the-first-secret
 sugoi-secret
 ```
@@ -273,7 +273,7 @@ sugoi-secret
 
 [Google Cloud Blog](https://cloud.google.com/blog/ja/products/identity-security/introducing-google-clouds-secret-manager)に「1回限りの」って書いてあるのが不穏ｗ
 
-```shell
+```console
 $ berglas migrate ${BUCKET_ID} --project ${PROJECT_ID}
 Migrating api-user to projects/my-secret-project/secrets/api-user... done!
 Migrating api-pass to projects/my-secret-project/secrets/api-pass... done!
@@ -281,7 +281,7 @@ Migrating api-pass to projects/my-secret-project/secrets/api-pass... done!
 
 2回目の実行
 
-```shell
+```console
 $ berglas migrate ${BUCKET_ID} --project ${PROJECT_ID}
 Migrating api-user to projects/my-secret-project/secrets/api-user... done!
 Migrating api-pass to projects/my-secret-project/secrets/api-pass... done!
@@ -336,7 +336,7 @@ google-cloud-secret-manager==0.1.1
 
 #### デプロイ
 
-```shell
+```console
 $ gcloud functions deploy print_secret \
   --runtime python37 \
   --trigger-http \

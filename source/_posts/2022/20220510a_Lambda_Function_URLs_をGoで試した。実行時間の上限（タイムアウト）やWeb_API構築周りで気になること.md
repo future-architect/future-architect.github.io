@@ -143,7 +143,7 @@ func main() {
 
 動かしてみます。
 
-```sh
+```console
 $ curl https://ma5pnqdphjf6tvd5xxxxxxxxxxxxxxxx.lambda-url.ap-northeast-1.on.aws/
 aws labs http adapter response!!
 ```

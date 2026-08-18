@@ -99,7 +99,7 @@ https://www.swift.org/install/macos/#development-snapshots
 
 Toolchainがインストールされたことを確認します。`swift-DEVELOPMENT-SNAPSHOT-2025-04-03-a.xctoolchain`が追加した Toolchainです。タイミングによっては、より新しいものになっていると思います。
 
-```sh
+```console
 $ ls /Library/Developer/Toolchains/
 
 swift-DEVELOPMENT-SNAPSHOT-2025-04-03-a.xctoolchain	swift-latest.xctoolchain
@@ -107,7 +107,7 @@ swift-DEVELOPMENT-SNAPSHOT-2025-04-03-a.xctoolchain	swift-latest.xctoolchain
 
 追加したToolchainが使用できるように、パスを通します。
 
-```sh
+```console
 $ vi ~/.zshrc
 export PATH="/Library/Developer/Toolchains/swift-DEVELOPMENT-SNAPSHOT-2025-04-03-a.xctoolchain/usr/bin:$PATH"
 export TOOLCHAINS="/Library/Developer/Toolchains/swift-DEVELOPMENT-SNAPSHOT-2025-04-03-a.xctoolchain/usr/bin"
@@ -115,7 +115,7 @@ export TOOLCHAINS="/Library/Developer/Toolchains/swift-DEVELOPMENT-SNAPSHOT-2025
 
 `Swift`のバージョンが次のように変わっていることを確認します。
 
-```sh
+```console
 $ swift -version
 
 Apple Swift version 6.2-dev (LLVM 3f3fde0d5f85709, Swift 0c5fd6a3017961d)

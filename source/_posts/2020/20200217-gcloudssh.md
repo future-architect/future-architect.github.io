@@ -83,7 +83,7 @@ config                     google_compute_engine      google_compute_engine.pub 
 
 **ここで本題の `gcloud compute config-ssh` の出番です。** 実行してみましょう。
 
-```bash
+```console
 
 ❯ gcloud compute config-ssh --project test-project
 You should now be able to use ssh/scp with your instances.

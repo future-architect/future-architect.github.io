@@ -72,7 +72,7 @@ UBUNTU_CODENAME=jammy
 
 まずは事象を整理するため、発生していたエラーログを確認します。
 
-```bash
+```console
 $ sudo apt update
 ...
 エラー:5 http://archive.ubuntu.com/ubuntu jammy-updates InRelease
@@ -90,7 +90,7 @@ W: いくつかのインデックスファイルのダウンロードに失敗�
 
 試しに同じ社内プロキシを経由している `wget` / `curl` コマンドを試しましたが、成功することを確認できました。
 
-```bash
+```console
 $ wget google.com
 # → 200 OK で正常に取得できる
 

@@ -40,7 +40,7 @@ https://github.com/cloudflare/cf-terraforming
 
 はじめに環境構築をしましょう。今回はMac環境で進めていきます。前提としてHomebrewを利用できるようにしておきましょう。
 
-```bash
+```console
 # Terraformのインストール
 $ brew tap hashicorp/tap
 $ brew install hashicorp/tap/terraform
@@ -89,7 +89,7 @@ export CLOUDFLARE_ACCOUNT_ID=00000000000000000000000000
 
 まずは、`generate`コマンドを使ってみます。Workers KVはAccount単位で利用するリソースであることと、事前に環境変数を利用できるようにしてあるので、 以下のワンラインを入力すると、それに対応したTerraformのコードが出力されます。
 
-```bash
+```console
 $ cf-terraforming generate --resource-type "cloudflare_workers_kv_namespace"
 
 resource "cloudflare_workers_kv_namespace" "terraform_managed_resource_xxxxxxxxxxxxxx" {
@@ -111,7 +111,7 @@ cf-terraforming generate --resource-type "cloudflare_workers_kv_namespace" >> wo
 `cf-terraforming generate`コマンドで出力したHCLを利用してState管理下にしていきましょう。
 コマンドは、先ほど実行した`generate`を`import`に変えた形で、実行します。
 
-```bash
+```console
 $ cf-terraforming import --resource-type "cloudflare_workers_kv_namespace"
 
 terraform import cloudflare_workers_kv_namespace.terraform_managed_resource_xxxxxxxxxxxxxx xxxxxxxxxxxxxx
@@ -119,7 +119,7 @@ terraform import cloudflare_workers_kv_namespace.terraform_managed_resource_xxxx
 
 このように`cf-terraforming import`コマンドでは「`terraform import`コマンドのワンライン」を出力してくれるようです。それでは、この出力されたコマンドを入力してみましょう。
 
-```bash
+```console
 $ terraform import cloudflare_workers_kv_namespace.terraform_managed_resource_xxxxxxxxxxxxxx xxxxxxxxxxxxxx
 
 cloudflare_workers_kv_namespace.terraform_managed_resource_xxxxxxxxxxxxxx: Importing from ID "xxxxxxxxxxxxxx"...
@@ -132,7 +132,7 @@ cloudflare_workers_kv_namespace.terraform_managed_resource_xxxxxxxxxxxxxx: Impor
 
 エラーになってしまいました。エラーの内容を読んでみると「`accountID/namespaceID`の形式でコマンドを実行してね」なので、上で入力したnamespaceIDの手前にaccountIDを差し込んで再度トライしたところ、成功しました。
 
-```bash
+```console
 $ terraform import cloudflare_workers_kv_namespace.terraform_managed_resource_xxxxxxxxxxxxxx 00000000000000000000000000/xxxxxxxxxxxxxx
 
 cloudflare_workers_kv_namespace.terraform_managed_resource_xxxxxxxxxxxxxx: Importing from ID "00000000000000000000000000/xxxxxxxxxxxxxx"...

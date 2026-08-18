@@ -121,7 +121,7 @@ func ExampleReverseProxy() {
 
 どちらのコードも実行してみると、プロキシ経由でのレスポンスが出力されます。
 
-```bash
+```console
 $ go run main.go
 this call was relayed by the reverse proxy
 ```
@@ -235,7 +235,7 @@ func main() {
 
 この状態で動かしてみると、Go1.20 と Go1.19 では、それぞれ以下の出力が得られます。
 
-```bash
+```console
 $ go run main.go
 
 # Go1.20
@@ -275,7 +275,7 @@ func main() {
 
 上記のように、ProxyRequest.SetXForwarded を追加して再度実行すると、バックエンドに到達するリクエスト内のヘッダーが 3 つ増えていることがわかります。
 
-```bash
+```console
 $ go run main.go
 
 # Go1.20
@@ -358,7 +358,7 @@ func main() {
 
 こちらも、Go1.20 と Go1.19 のそれぞれで動かしてみると、どちらのバージョンにおいても、リクエスト生成直後に付与したヘッダー「Connection: Keep-Alive」が、プロキシサーバーを経由したのちに RFC の定義通りに削除されていることがわかります。
 
-```bash
+```console
 $ go run main.go
 
 # Go1.20
@@ -463,7 +463,7 @@ func main() {
 インバウンドリクエストのヘッダーに「Connection: X-Forwarded-Proto」を付与して、Director にて「X-Forwarded-Proto: http」を追加しています。
 この状態で実行すると、以下の出力が得られます。
 
-```sh
+```console
 $ go run main.go
 # Go1.19
 

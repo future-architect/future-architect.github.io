@@ -218,7 +218,7 @@ resource "google_access_context_manager_service_perimeter" "service_perimeter_qi
 
 認証されていないアカウントで`bq`コマンドでも同様に確認してみます。
 
-```bash
+```console
 $ bq query --use_legacy_sql=false --project_id <YOUR_PROJECT_ID>  'select worker_id from `****-service-three.svc3_dataset.test_table`'
 
 BigQuery error in query operation: VPC Service Controls: Request is prohibited by organization's policy.

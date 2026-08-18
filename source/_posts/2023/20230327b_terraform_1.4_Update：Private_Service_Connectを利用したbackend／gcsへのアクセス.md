@@ -98,7 +98,7 @@ Private Service Connectエンドポイントが正しく機能しているかを
 
 エンドポイントが機能している場合は、HTTP 204 レスポンス コードが表示されます。
 
-```bash
+```console
 xxxxxxxxxx@tky-bastion:~/terraform$ curl -v 10.0.3.0/generate_204
 *   Trying 10.0.3.0:80...
 * TCP_NODELAY set
@@ -160,7 +160,7 @@ tcpdumpを利用してPrivate Service Connectのエンドポイント(10.0.3.0)�
 
 tcpdumpコマンドを実行後に、terraform initを実行するコンソールからterraform initを実行するとPrivate Service Connectのエンドポイント(10.0.3.0)を経由するパケットがキャプチャされていることが確認できました。Private Service Connectのエンドポイント(10.0.3.0)を経由して無事GCSにアクセスできたようです。
 
-```bash terraform init実行
+```console terraform init実行
 xxxxxxxxxx@tky-bastion:~/terraform$ date && terraform init
 Sat Mar 25 02:13:50 UTC 2023
 
@@ -181,7 +181,7 @@ rerun this command to reinitialize your working directory. If you forget, other
 commands will detect it and remind you to do so if necessary.
 ```
 
-```bash tcpdumpの実行
+```console tcpdumpの実行
 xxxxxxxxxx@tky-bastion:~$ date && sudo tcpdump dst 10.0.3.0
 Sat Mar 25 02:13:49 UTC 2023
 tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
@@ -219,7 +219,7 @@ listening on ens4, link-type EN10MB (Ethernet), capture size 262144 bytes
 
 また、nslookupコマンドでbackend.tfのstorage_custom_endpointに設定している`storage-sampleendpoint.p.googleapis.com`を指定して実行すると10.0.3.0で名前解決されることも確認できました。
 
-```sh
+```console
 xxxxxxxxxx@tky-bastion:~/terraform$ nslookup storage-sampleendpoint.p.googleapis.com
 Server:         127.0.0.53
 Address:        127.0.0.53#53
@@ -233,7 +233,7 @@ Address: 10.0.3.0
 
 余談ですが、`tcpdump -n -vv dst port 443`コマンドを実行してterraform initを実施し、GCEから443ポートへアクセスしたパケットをキャプチャしてみました。
 
-```bash tcpdump -n -vv dst port 443コマンド実行結果
+```console tcpdump -n -vv dst port 443コマンド実行結果
 xxxxxxxxxx@tky-bastion:~/terraform$ sudo tcpdump -n -vv dst port 443
 tcpdump: listening on ens4, link-type EN10MB (Ethernet), capture size 262144 bytes
 05:14:59.618319 IP (tos 0x0, ttl 64, id 11848, offset 0, flags [DF], proto TCP (6), length 60)
@@ -359,7 +359,7 @@ tcpdump: listening on ens4, link-type EN10MB (Ethernet), capture size 262144 byt
 こちらについてもう少し調べてみます。
 tcpdump -n -vv dst port 53コマンドを実行してterraform initを実施し、GCEから53ポートへアクセスしたパケットをキャプチャしてみました。
 
-```bash tcpdump -n -vv dst port 53コマンド実行結果
+```console tcpdump -n -vv dst port 53コマンド実行結果
 xxxxxxxxxx@tky-bastion:~/terraform$ sudo tcpdump -n -vv dst port 53
 tcpdump: listening on ens4, link-type EN10MB (Ethernet), capture size 262144 bytes
 05:28:31.201384 IP (tos 0x0, ttl 64, id 52411, offset 0, flags [DF], proto UDP (17), length 96)
@@ -382,7 +382,7 @@ tcpdump: listening on ens4, link-type EN10MB (Ethernet), capture size 262144 byt
 すると先ほどの`tcpdump -n -vv dst port 443`コマンドを実行して出力されたIPアドレス`18.65.202.87`が存在することがわかりました。
 registry.terraform.io(18.65.202.87)への通信はCloud Nat/インターネット経由でアクセスしています。
 
-```bash dig registry.terraform.ioコマンド実行結果
+```console dig registry.terraform.ioコマンド実行結果
 xxxxxxxxxx@tky-bastion:~/terraform$ dig registry.terraform.io
 
 ; <<>> DiG 9.16.1-Ubuntu <<>> registry.terraform.io

@@ -102,7 +102,7 @@ gcloud deployment-manager deployments COMMAND DEPLOYMENT_NAME --config [FILE_PAT
 
 それでは実際に[create](https://cloud.google.com/sdk/gcloud/reference/deployment-manager/deployments/create)コマンドを実行したいと思います。
 
-```bash
+```console
 $ gcloud deployment-manager deployments create test --config vm.yaml --preview
 The fingerprint of the deployment is xxx
 Waiting for create [xxx]...done.
@@ -119,7 +119,7 @@ test-vm  compute.v1.instance  IN_PREVIEW  []      CREATE_OR_ACQUIRE
 ブラウザ上からデプロイも可能ですが、`gcloud`コマンドから実行したいと思います。
 [update](https://cloud.google.com/sdk/gcloud/reference/deployment-manager/deployments/update)を指定し、`DEPLOYMENT_NAME`を指定します（ここではtest）
 
-```bash
+```console
 $ gcloud deployment-manager deployments update test
 The fingerprint of the deployment is xxx==
 Waiting for update [xxx]...done.
@@ -139,7 +139,7 @@ test-vm  compute.v1.instance  COMPLETED  []
 その他のコマンドを紹介したいと思います。
 [list](https://cloud.google.com/sdk/gcloud/reference/deployment-manager/deployments/list)コマンドでデプロイの一覧を表示できます。
 
-```bash
+```console
 $ gcloud deployment-manager deployments list
 NAME  LAST_OPERATION_TYPE  STATUS  DESCRIPTION  MANIFEST  ERRORS
 test  preview              DONE                           []
@@ -147,7 +147,7 @@ test  preview              DONE                           []
 
 [describe](https://cloud.google.com/sdk/gcloud/reference/deployment-manager/deployments/describe)コマンドでデプロイの詳細情報を確認できます。
 
-```bash
+```console
 $ gcloud deployment-manager deployments describe test
 ---
 fingerprint: xxx==
@@ -170,7 +170,7 @@ test-vm  compute.v1.instance  COMPLETED
 もし、デプロイを削除したい場合は、[delete](https://cloud.google.com/sdk/gcloud/reference/deployment-manager/deployments/delete)コマンドを使用します。
 `Do you want to continue (y/N)?`は、`y`と入力します。
 
-```bash
+```console
 $ gcloud deployment-manager deployments delete test
 The following deployments will be deleted:
 - test
@@ -228,7 +228,7 @@ resources:
 
 `name`を01と02に分けるかたちでVM を2台分の定義を記述し、デプロイします。
 
-```bash
+```console
 $ gcloud deployment-manager deployments create test-vms --config vms.yaml
 The fingerprint of the deployment is xxx==
 Waiting for create [xxx]...done.
@@ -409,7 +409,7 @@ resources:
 
 実行方法は、今まで変わらず`gcloud` コマンドから実行します。
 
-```bash
+```console
 $ gcloud deployment-manager deployments create test-templates --config vms.yaml
 The fingerprint of the deployment is xxx==
 Waiting for update [xxxx]...done.
@@ -431,7 +431,7 @@ gcloud コマンドからデプロイした際に何かしらのエラーが発�
 
 原因は、失敗したとしても中途半端にデプロイは作られてしまうため、既にあるといったエラーが発生します。
 
-```bash
+```console
 $ gcloud deployment-manager deployments create test-templates --config vms.yaml
 ERROR: (gcloud.deployment-manager.deployments.create) ResponseError: code=409, message='projects/xxx/global/deployments/test-templates' already exists and cannot be created.
 ```

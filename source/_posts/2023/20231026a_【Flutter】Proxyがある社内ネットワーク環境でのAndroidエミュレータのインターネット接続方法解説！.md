@@ -79,7 +79,7 @@ Installed as C:\Program Files\platform-tools\adb.exe
 
 これをホストPCから、Androidエミュレータ側の、 `/sdcard/Download` にパスに転送します。
 
-```sh
+```console
 $ cd %USERPROFILE%\Desktop
 $ adb root
 $ adb disable-verity

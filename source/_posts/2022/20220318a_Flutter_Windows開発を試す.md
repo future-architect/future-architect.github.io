@@ -42,7 +42,7 @@ Flutterのいつものインストール手順でインストールします。
 
 CLI上でflutterコマンドを使って有効化します。
 
-```sh
+```console
 $ flutter config --enable-windows-desktop
 Setting "enable-windows-desktop" value to "true".
 
@@ -51,7 +51,7 @@ You may need to restart any open editors for them to read new settings.
 
 既存のプロジェクトでは次のコマンドでWindowsデスクトップのターゲットを追加できます。
 
-```sh
+```console
 > flutter create --platforms=windows .
 Recreating project ....
 :

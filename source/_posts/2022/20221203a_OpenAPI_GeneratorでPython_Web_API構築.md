@@ -145,7 +145,7 @@ components:
 サーバ側、クライアント側どちらを生成するかはgeneratorのコマンドライン引数によって決まります。
 例えばサーバ側をPython、クライアント側をGolangで生成する場合、以下のようになります。
 
-```bash
+```console
 サーバ側
 $ docker run --rm -v ${PWD}:/local openapitools/openapi-generator-cli generate -i /local/openapi.yaml -g python-flask -o /local
 
@@ -315,7 +315,7 @@ docker run -p 8080:8080 openapi_server
 
 疎通確認をするとAPIのルーティングがしっかりと行われており、返り値が返却されることが分かると思います。
 
-```bash
+```console
 $ curl http://localhost:8080/v1/sc/4722/stockPrice
 "do some magic!"
 ```

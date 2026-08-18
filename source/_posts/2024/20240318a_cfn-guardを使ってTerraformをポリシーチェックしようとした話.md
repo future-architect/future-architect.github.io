@@ -177,7 +177,7 @@ rule aws_s3_bucket_rule when %aws_s3_bucket_resources !empty {
 
 このルールに従っているか実際に `cfn-guard` を動かし、チェックしてみましょう。
 
-```shell
+```console
 $ cfn-guard validate -r s3_template_example.guard -d infrastructure/tfplan1.json -o yaml
 tfplan1.json Status = FAIL
 FAILED rules
@@ -214,7 +214,7 @@ not_compliant:
 
 そこでバケット名を修正し、再度 `cfn-guard` にかけてみます。
 
-```shell
+```console
 # 修正したs3.tf及びyamlファイルは割愛
 $ cfn-guard validate -r s3_template_example.guard -d infrastructure/tfplan2.json -o yaml
 name: tfplan2.json

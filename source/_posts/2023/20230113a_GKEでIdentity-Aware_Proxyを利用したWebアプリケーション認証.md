@@ -273,7 +273,7 @@ kubectl create secret generic oauth-secret --from-literal=client_id=xxxxxxxxxxxx
 
 Kubernetes Secretが作成されていることを確認します。
 
-```bash
+```console
 xxxxxxxxxxxxx@tky-bastion:~$ kubectl describe secret oauth-secret
 Name:         oauth-secret
 Namespace:    default
@@ -314,7 +314,7 @@ kubectl apply -f backendconfig.yaml
 
 BackendConfigが作成されていることを確認します。
 
-```bash
+```console
 xxxxxxxxxxxxx@tky-bastion:~/manifest$ kubectl get backendconfig
 NAME         AGE
 iap-conifg   3m42s

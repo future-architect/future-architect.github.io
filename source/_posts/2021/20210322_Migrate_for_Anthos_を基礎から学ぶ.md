@@ -223,7 +223,7 @@ migctl setup install --<Your Target Platform>
 
 インストール後には `doctor` コマンドでインストールの進捗状況を確認できます。
 
-```sh
+```console
 $ migctl doctor
   [✓] Deployment
   [!] Docker registry
@@ -235,7 +235,7 @@ $ migctl doctor
 
 データリポジトリ設定後に期待される `doctor` コマンドの応答は以下です。
 
-```sh
+```console
 $ migctl doctor
   [✓] Deployment
   [✓] Docker registry
@@ -270,7 +270,7 @@ $ migctl doctor
 
 最終的に以下のようにアーティファクト生成の完了が確認できれば成功です。
 
-```sh
+```console
 $ migctl migration status my-migration
 
 NAME            CURRENT-OPERATION       PROGRESS        STEP            STATUS    AGE

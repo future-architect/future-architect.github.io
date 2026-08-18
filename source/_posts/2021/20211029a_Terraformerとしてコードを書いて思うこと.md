@@ -148,7 +148,7 @@ resource "aws_instance" "web" {
 }
 ```
 
-```sh
+```console
 # 作成後のリソース一覧
 $ terraform state list
 aws_instance.web[0]
@@ -175,7 +175,7 @@ resource "aws_route53_zone" "this" {
 }
 ```
 
-```shell
+```console
 $ terraform state list
 aws_route53_zone.this[0]
 ```
@@ -203,7 +203,7 @@ resource "aws_instance" "web" {
 }
 ```
 
-```sh
+```console
 $ terraform state list
 aws_instance.web[0]
 aws_instance.web[1]
@@ -235,7 +235,7 @@ resource "aws_instance" "web" {
 }
 ```
 
-```shell
+```console
 $ terraform state list
 aws_instance.web["ap-northeast-1a"]
 aws_instance.web["ap-northeast-1b"]

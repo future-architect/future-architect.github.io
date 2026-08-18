@@ -183,7 +183,7 @@ func HandleInvalid(ctx context.Context) int {
 
 `awslambdahandler` を実行すると、以下のように有効でない関数シグネチャとして検知できます。AWS Lambdaにデプロイして実行せずとも、実行時にエラーになる関数シグネチャを静的解析で検知できました。
 
-```bash
+```console
 $ go vet -vettool=`which awslambdahandler` main.go
 # command-line-arguments
 ./main.go:10:14: lambda handler of "HandleInvalid" is invalid lambda signature, see https://pkg.go.dev/github.com/aws/aws-lambda-go/lambda#Start

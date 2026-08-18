@@ -119,7 +119,7 @@ output "qiita_article_response" {
 
 実行すると最後に output の内容が表示されます。
 
-```sh
+```console
 $ terraform apply
 2023-03-27T10:59:30.450+0900 [INFO]  Terraform version: 1.3.3
 2023-03-27T10:59:30.522+0900 [INFO]  Go runtime version: go1.19.1

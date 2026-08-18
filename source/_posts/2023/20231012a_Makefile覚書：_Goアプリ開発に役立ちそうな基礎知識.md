@@ -26,7 +26,7 @@ makeは細かい記法をいつも忘れる＋調べるとC言語向けの情報
 
 なお、今記事におけるmakeは、GNU Makeを指します。バージョンは以下で動かしています。
 
-```sh
+```console
 $ make -v | head -n 1
 GNU Make 4.2.1
 ```
@@ -184,7 +184,7 @@ func main() {
 
 環境変数は適用されません。
 
-```sh
+```console
 $ make run
 Load env: {Host: Port:0 Name: User: Pass:}
 ```
@@ -462,7 +462,7 @@ help: ## display this help screen
     @grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 ```
 
-```sh
+```console
 $ make help
 run                  run launches go server
 test                 test calls go test
@@ -501,7 +501,7 @@ help:
 
 実行すると、 "h" というターゲット名が存在しない場合は、helpの内容を出すことができます。
 
-```sh
+```console
 $ make h
 command "h" is not found.
 run                  run launches go server
@@ -581,7 +581,7 @@ clean: ## Remove output files and clean cache
 
 Goのテストですが、`$(option)` というオプションを追加しています。Goでテスト実行の場合、特定のテストだけ実行したい場合は `-run TestSum` などと指定したいときや、 `-v`、`-short`、`-vet=all` など様々なオプションを渡したいときがあります。その場合にmake経由で対応できるようにするため拡張用に用意しています。
 
-```sh
+```console
 # 通常
 $ make test
 
