@@ -218,7 +218,7 @@ run-image = "distroless:python"
 build-image = "distroless:python-builder"
 ```
 
-```bash
+```console
 $ pack create-builder python:distroless --config ./builder.toml
 Downloading from https://github.com/buildpacks/lifecycle/releases/download/v0.9.1/lifecycle-v0.9.1+linux.x86-64.tgz
 5.2 MB/5.2 MB
@@ -228,7 +228,7 @@ Tip: Run pack build <image-name> --builder python:distroless to use this builder
 
 設定した名前のイメージができていることを確認します。日付はなぜか40年前。
 
-```bash
+```console
 $ docker images
 REPOSITORY             TAG                 IMAGE ID            CREATED             SIZE
 python                 distroless          b0ed12f6c423        40 years ago        125MB
@@ -264,7 +264,7 @@ Successfully built image empty-sample
 
 dockerコマンドでビルド結果をみてみましょう。日付はいつも40年前です。中は空なのでほぼgcr.io/distroless/python3-debian10と同じはずですが、2.4MBほど大きくなっています。
 
-```bash
+```console
 $ docker images
 REPOSITORY             TAG                 IMAGE ID            CREATED             SIZE
 empty-sample           latest              dfe5b21636ef        40 years ago        54.6MB
@@ -447,7 +447,7 @@ build-image = "distroless:python-builder"
 
 ビルダーの再作成が完了したらイメージを作成してみましょう。
 
-```bash
+```console
 $ pack build webapp --builder python:distroless
 0.9.1: Pulling from buildpacksio/lifecycle
 Digest: sha256:53bf0e18a734e0c4071aa39b950ed8841f82936e53fb2a0df56c6aa07f9c5023
@@ -492,7 +492,7 @@ Successfully built image webapp
 
 きちんと実行もできました。めでたしめでたし。
 
-```bash
+```console
 $ docker run --rm -it -p "8000:8000" webapp
 INFO:     Started server process [1]
 INFO:     Waiting for application startup.

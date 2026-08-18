@@ -231,14 +231,14 @@ application/json:
 
 `score`が存在する場合は、`score`値が返却されます。
 
-```sh
+```console
 $ curl -X GET /users/00001
 { "id": "00001", "name": "Bob", score: 70 }
 ```
 
 `score`が存在しない場合は、レスポンスに`score`プロパティは含めません。
 
-```sh
+```console
 $ curl -X GET /users/00001
 { "id": "00001", "name": "Bob" }
 ```

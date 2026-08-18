@@ -60,7 +60,7 @@ npx prism mock ./swagger.yaml -p 8080
 
 これを実行すると、**OpenAPIファイルに記載されている全てのエンドポイントのURLが一覧で表示**されます（ここでは、 [Swagger Petstore](https://petstore.swagger.io/) を実行した結果を掲載しています）
 
-```bash
+```console
 $ npx prism mock ./swagger.yaml -p 8080
 [14:30:40] › [CLI] …  awaiting  Starting Prism…
 [14:30:40] › [CLI] ℹ  info      POST       http://127.0.0.1:8080/pet

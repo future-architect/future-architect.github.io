@@ -266,7 +266,7 @@ terraform workspace new test
 
 以下の様に表示されます(現在いるworkspaceに*が付きます。)
 
-```sh
+```console
 $ terraform workspace list
   default
   dev

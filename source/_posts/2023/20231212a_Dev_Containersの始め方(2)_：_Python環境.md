@@ -34,7 +34,7 @@ git init
 
 Pythonのイメージをインストールすると、有名どころのツールはすでにインストール済みとなっていますこの辺りは特にインストールする必要はありません。
 
-```bash
+```console
 $ ls -1 /usr/local/py-utils/bin
 autopep8
 bandit

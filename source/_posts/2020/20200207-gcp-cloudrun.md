@@ -68,7 +68,7 @@ chiは高速だけども、イベントハンドラ周りは標準のnet/httpと
 
 Vueのプロジェクトと、Goのプロジェクトを同じフォルダに入れてしまいましょう。Vueの設定はお好みで色々設定しますが、Babel、TS、CSS Preprocessor(dart-sass)、Formatter(Prettier)、Unittest(Jest)を有効にしました(E2EのCypressを有効にするとDockerのビルド時間がめちゃ伸びるので注意)。
 
-```bash
+```console
 $ cd ~/go/src/github.com/shibukawa
 $ npx @vue/cli create serverless-sample
 :
@@ -289,7 +289,7 @@ JSON-RPCサーバーのスタブ生成でgo generateが必要です。go generat
 
 ポートを8080じゃなくしているのは、手元の開発環境のcode-serverが使っていたので回避しただけです。Vueのプロキシー設定と合わせれば問題ないです。
 
-```sh
+```console
 $ go generate
 $ go build
 $ HOST=127.0.0.1 PORT=8888 ./serverless-sample

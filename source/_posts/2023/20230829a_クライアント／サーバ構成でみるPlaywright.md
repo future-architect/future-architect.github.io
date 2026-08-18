@@ -64,7 +64,7 @@ Playwright CLIの[ソースコード](https://github.com/microsoft/playwright/bl
 
 内部実装は[このあたり](https://github.com/microsoft/playwright/blob/v1.37.1/packages/playwright-core/src/cli/driver.ts#L33)を見るとJSON形式のメッセージを標準入出力でやりとりしていることがわかります。
 
-```sh
+```console
 $ npx playwright run-driver -h
 Usage: npx playwright run-driver [options]
 
@@ -76,7 +76,7 @@ Options:
 
 このコマンドはWebSocketを通信経路とするPlaywright Serverを起動します。
 
-```sh
+```console
 $ npx playwright run-server -h
 Usage: npx playwright run-server [options]
 
@@ -97,7 +97,7 @@ Options:
 
 コマンドのオプションを見てもわかる通りブラウザの指定が必須となっています。
 
-```sh
+```console
 $ npx playwright launch-server -h
 Usage: npx playwright launch-server [options]
 
@@ -116,7 +116,7 @@ Options:
 `run-server`コマンドを利用してPlaywright Serverを8008ポートで起動します。
 なお、サーバ側のログを出力するため環境変数`DEBUG=pw:server`を指定します。
 
-```sh
+```console
 $ DEBUG=pw:server npx playwright run-server --port 8008
 Listening on ws://127.0.0.1:8008/
 ```
@@ -138,7 +138,7 @@ export default defineConfig({
 
 テストを実行すると6ケースのテストがパスします。
 
-```sh
+```console
 $ npx playwright test
 Running 6 tests using 4 workers
   6 passed (8.2s)

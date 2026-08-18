@@ -97,7 +97,7 @@ docker run -v $(pwd):/root/ wgrib2:latest sample.grib2 -csv-
 
 緯度経度を指定したファイルを抽出後、csvとして出力、先頭の10行を標準出力してみます。
 
-```sh
+```console
 $ docker run -v $(pwd):/root/ wgrib2:latest -small_grib 130:135 30:35 small.grib Z__C_RJTD_20160620150000_MET_GPV_Ggis1km_Plfdc_Aper10min_FH0000-0300_grib2.bin
 
 1:0:d=2016062015:var discipline=0 center=34 local_table=1 parmcat=1 parm=218:surface:anl:

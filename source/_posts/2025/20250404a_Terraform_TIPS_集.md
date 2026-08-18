@@ -60,7 +60,7 @@ export TF_LOG_PATH=./terraform.log
 
 現在、利用しているプロバイダのバージョンや参照元を確認できます。
 
-```bash
+```console
 $ terraform providers
 
 Providers required by configuration:
@@ -126,7 +126,7 @@ Terraform をCI/CD 環境で利用しているときに`リソースの差分が
 
 実際にターミナルで確認する場合のコマンドは以下です。
 
-```bash
+```console
 $ terraform plan -detailed-exitcode
 echo $? # 終了コード確認
 ### 出力例
@@ -190,7 +190,7 @@ Terraform を使ってリソースを作成、更新などする際、リソー�
 
 Terraform は、デフォルトで最大10リソースを並列（同時）に作成、更新します。
 
-```bash
+```console
 ### 並列数を30に指定した場合
 $ terraform plan --parallelism=30
 

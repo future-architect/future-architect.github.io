@@ -137,7 +137,7 @@ cmd/watertower-server以下に実装があります。次のように起動し�
 
 あとはcurlでいつものElasticsearchのように使えます。
 
-```sh
+```console
 # ドキュメントの登録
 $ curl -X POST "http://127.0.0.1:8888/index/_doc/"
 　　-H "content-type: application/json"

@@ -89,7 +89,7 @@ docker run -d --rm --name db -e POSTGRES_USER=pg -e POSTGRES_PASSWORD=pw -e POST
 
 このコンテナのpsqlコマンドを起動してテーブルを作っておきます。
 
-```bash
+```console
 $ docker exec -it db psql -U pg -d toriki
 psql (13.3 (Debian 13.3-1.pgdg100+1))
 Type "help" for help.

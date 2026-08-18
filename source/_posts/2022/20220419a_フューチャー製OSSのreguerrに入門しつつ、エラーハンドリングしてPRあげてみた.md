@@ -38,7 +38,7 @@ go install github.com/future-architect/reguerr/cmd/reguerr
 
 以下のようにヘルプコマンドが実行できればインストール成功です。
 
-```sh
+```console
 $ reguerr -h
 Usage:
   reguerr [command]
@@ -58,7 +58,7 @@ Use "reguerr [command] --help" for more information about a command.
 
 `generate` コマンドのヘルプを見てみると、-fでインプットファイルを指定すれば良いことが分かります。
 
-```sh
+```console
 $ reguerr generate --help
 generate reguerr code
 
@@ -183,7 +183,7 @@ mdファイルは以下のような内容になっています。エラーが自
 
 `generate` コマンドの引数には `--defaultStatusCode` などの可変パラメータが存在していました。次はこちらをいじってみます。
 
-```sh
+```console
 $ reguerr generate -f example.go --defaultStatusCode 300
 $ cat example_gen.md
 # Error Code List
@@ -202,7 +202,7 @@ $ cat example_gen.md
 
 `--defaultErrorLevel` をいじってデフォルトのエラーレベルを変更しようとしたのですが、エラーが出てしまいました。
 
-```sh
+```console
 $ reguerr generate -f example.go --defaultErrorLevel Info
 Usage:
   reguerr generate [flags]
@@ -312,7 +312,7 @@ reguerr generate -f example.go --defaultErrorLevel Info
 
 生成されたマークダウンファイルを覗いてみると、LOGLEVEL部が想定通り `Info` に変わっていることを確認できました。
 
-```sh
+```console
 $ cat example_gen.md
 # Error Code List
 

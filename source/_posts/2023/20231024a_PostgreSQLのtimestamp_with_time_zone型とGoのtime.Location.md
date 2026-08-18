@@ -83,7 +83,7 @@ docker-compose up -d
 
 `psql` でセッションで有効なタイムゾーンを表示すると、 `Asia/Tokyo` であることがわかります。
 
-```sh
+```console
 $ PGPASSWORD=pass psql -h localhost -p 5432 -U postgres -c "select current_setting('timezone');"
  current_setting
 -----------------
@@ -105,7 +105,7 @@ CREATE TABLE event
 
 `psql` を用いてDDLを流します。
 
-```sh
+```console
 $ PGPASSWORD=pass psql -h localhost -p 5432 -U postgres -f schema.sql
 CREATE TABLE
 ```
@@ -244,7 +244,7 @@ func main() {
 
 動かすと、 `0001`はUTC、 `0002` はJSTにしたtime.Timeの値をDBに登録したのですが、結果は **どちらもUTC**になっていることがわかります。
 
-```sh
+```console
 $ TZ=UTC go run .
 0001 2023-10-21T12:04:20Z
 0002 2023-10-21T12:04:20Z
@@ -252,7 +252,7 @@ $ TZ=UTC go run .
 
 OSがWindowsの場合は `TZ` 環境変数を読み込んでくれなかったので、tzutilコマンドで切り替えます。こちらも当然結果は同じく、2レコードとも、AtフィールドがUTCのタイムゾーンとなっていることが確認できます。
 
-```sh
+```console
 # UTCにタイムゾーン切り替え
 $ tzutil /s "UTC"
 
@@ -266,7 +266,7 @@ $ tzutil /s "Tokyo Standard Time"
 
 今度はタイムゾーンをJSTに登録すると2レコードともJSTのタイムゾーンになることが確認できます（Windows側の実行例は割愛します）。
 
-```sh
+```console
 $ $ TZ=Asia/Tokyo go run .
 0001 2023-10-21T21:04:20+09:00
 0002 2023-10-21T21:04:20+09:00
@@ -416,7 +416,7 @@ postgres=# select * from event;
 
 環境変数`PGTZ`でのタイムゾーンを`UTC`にした、`psql` コマンドを利用する例です。
 
-```sh
+```console
 $ PGTZ=UTC PGPASSWORD=pass psql -h localhost -p 5432 -U postgres -c 'select * from event;'
  event_id |           event_at
 ----------+-------------------------------
@@ -444,7 +444,7 @@ $ PGTZ=UTC PGPASSWORD=pass psql -h localhost -p 5432 -U postgres -c 'select * fr
 
 具体例をあげると、SQL側で以下のような `timestampz` の項目を `to_char` で文字列に変換する場合には、セッションで有効なタイムゾーンが利用されます（この例だと `Asia/Tokyo` を利用していますね）。
 
-```sh
+```console
 $ PGPASSWORD=pass psql -h localhost -p 5432 -U postgres \
   -c "select event_id, to_char(event_at, 'YYYY-MM-DD HH24:MI:SS') from event;"
  event_id |       to_char

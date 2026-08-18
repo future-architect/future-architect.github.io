@@ -368,7 +368,7 @@ func main() {
 
 API GatewayとLambda関数のリソースを作成する準備が整いました。`terraform plan` `terraform apply` をしてリソースを作成します。
 
-```bash
+```console
 $ terraform apply
 ...
 (省略)
@@ -492,7 +492,7 @@ definitions:
 
 `go-swagger` は[Installing](https://goswagger.io/install.html)を参考にインストールします。今回は2020/09/23現在の最新バージョンである `0.25.0` をインストールします。以下のように出力されていればOKです。
 
-```bash
+```console
 $ swagger version
 version: v0.25.0
 commit: f032690aab0634d97e2861a708d8fd9365ba77d2
@@ -632,7 +632,7 @@ deploy: zip
 
 先程作成した `swagger.yml` のAPI定義を元に `make generate-server` で `go-swagger` でコードを生成します。
 
-```bash
+```console
 $ make generate-server
 swagger generate server --exclude-main -f ./swagger.yaml -t gen
 2020/09/15 22:17:26 validating spec C:\Users\dramt\go\src\github.com\d-tsuji\example\swagger.yaml
@@ -911,7 +911,7 @@ func TestGetUsers(t *testing.T) {
 
 Goのテストを実行するとPASSすることがわかります。ハンドラの実装ができました。
 
-```bash
+```console
 $ make test
 export DYNAMO_TABLE_USERS=local_users;\
         go test -race -v -count=1 ./
@@ -1043,7 +1043,7 @@ deploy: zip
 
 それではビルドしてデプロイします。
 
-```bash
+```console
 $ make deploy
 go mod download
 go mod tidy
@@ -1086,7 +1086,7 @@ aws dynamodb put-item --table-name example-users --item '{"user_id": {"S": "001"
 
 今回はお手軽にcurlでAPIにリクエストしてレスポンスを確認します。
 
-```bash
+```console
 $ curl -i https://${rest-api-id}.execute-api.ap-northeast-1.amazonaws.com/test/v1/users
 HTTP/1.1 200 OK
 Content-Type: application/json

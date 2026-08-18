@@ -47,7 +47,7 @@ ReactやVue.js等のフロントエンドライブラリと組み合わせて使
 
 `git clone` から起動までを体験できる一連のコマンドは[公式ページ](https://www.electronjs.org/)にも記載があります。
 
-```sh
+```console
 # Clone the Quick Start repository
 $ git clone https://github.com/electron/electron-quick-start
 

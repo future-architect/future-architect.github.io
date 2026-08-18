@@ -42,7 +42,7 @@ docker run -d --name dynamodb -p 8000:8000 amazon/dynamodb-local
 
 DynamoDB Localへのアクセスはaws cliを利用するのでそちらも準備します。アクセス時はEndpointのURLを引数で指定してあげる必要があります。
 
-```bash AWSCLIのテスト_失敗
+```console AWSCLIのテスト_失敗
 $ aws dynamodb list-tables --endpoint-url http://localhost:8000 --region ap-northeast-1
 Unable to locate credentials. You can configure credentials by running "aws configure".
 ```
@@ -50,7 +50,7 @@ Unable to locate credentials. You can configure credentials by running "aws conf
 怒られちゃいました...
 FakeでもいいのでCredentialを指定しなければならないので `aws configure` を使って指定します。
 
-```bash デフォルトのProfile作成
+```console デフォルトのProfile作成
 $ aws configure
 AWS Access Key ID [None]: fake
 AWS Secret Access Key [None]: fake
@@ -60,7 +60,7 @@ Default output format [None]: json
 
 ...ということで気を取り直して、
 
-```bash AWSCLIのテスト_成功
+```console AWSCLIのテスト_成功
 $ aws dynamodb list-tables --endpoint-url http://localhost:8000
 {
     "TableNames": []
@@ -77,7 +77,7 @@ OKそうですね。あとはテーブルを作成したら準備OKです。
 * RangeKey
   * `MyRangeKey` - `N`
 
-```bash DynamoDBテーブル作成
+```console DynamoDBテーブル作成
 $ aws dynamodb create-table --endpoint-url http://localhost:8000 --table-name MyFirstTable --attribute-definitions AttributeName=MyHashKey,AttributeType=S AttributeName=MyRangeKey,AttributeType=N --key-schema AttributeName=MyHashKey,KeyType=HASH AttributeName=MyRangeKey,KeyType=RANGE --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1
 {
     "TableDescription": {

@@ -287,7 +287,7 @@ ECサイトで注文情報の変更・キャンセルを行う自動応答シス
 
 - JustinさんがNorth Faceのジャケットを買った的なデータです。
 
-```sh デモデータ投入
+```console デモデータ投入
 $ aws dynamodb put-item --table-name CustomerTable --item '{
     "orderId": {"S": "100"},
     "orderedItem": {"S": "The North Face Summit L3 Ventrix 2.0 Hoodie"},

@@ -99,7 +99,7 @@ Terraform 定義パラメータ
 
 暗号化作業で `AliasArn` の値を使うため、環境変数 **$KEYID** に登録します。
 
-```bash
+```console
 # KEYID に登録
 $ export KEYID=$(aws kms list-aliases \
 --query 'Aliases[?AliasName==`alias/demo-alias`]' | jq -r '.[].AliasArn')
@@ -113,7 +113,7 @@ arn:aws:kms:ap-northeast-1:{aws-account}:alias/demo-alias
 
 ローカルに `PlaintextFile` の名前でファイルを生成して、認証情報の平文を保存します。
 
-```bash
+```console
 $ vim PlaintextFile
 
 $ cat PlaintextFile
@@ -124,7 +124,7 @@ Hello, World!
 
 コマンド実行後、KMS により暗号化された認証情報が `CiphertextBlob` として取得できます。CiphertextBlob の実態は、認証情報を暗号化して Base64 エンコードした値です。
 
-```bash
+```console
 $ aws kms encrypt \
   --key-id $KEYID \
   --plaintext fileb://PlaintextFile
@@ -142,7 +142,7 @@ $ aws kms encrypt \
 
 先ほどの操作で生成した暗号文 `CiphertextBlob` を、`CiphertextFile` に保存します。
 
-```bash
+```console
 $ aws kms encrypt \
   --key-id $KEYID \
   --plaintext fileb://PlaintextFile \
@@ -153,7 +153,7 @@ $ aws kms encrypt \
 復号化コマンドを実行すると、最初に暗号化した平文が取得できます。
 暗号文自体に KEYID の情報が格納されているので、復号化のコマンドには `--key-id $KEYID` の指定が不要です。
 
-```bash
+```console
 $ aws kms decrypt \
   --ciphertext-blob fileb://CiphertextFile \
   --query Plaintext \
@@ -265,7 +265,7 @@ func decryptKey(key string) (string, error) {
 コマンドで動作確認
 invoke を実行して、関数のレスポンスを取得
 
-```bash
+```console
 $ aws lambda invoke \
   --function-name kms-demo-lambda outfile.txt
 {

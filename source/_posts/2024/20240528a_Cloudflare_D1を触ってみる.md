@@ -151,7 +151,7 @@ cat db.json |  jq '.models.Tag[] | {tag_id: ._id, tag_name: .name}'
 
 [D1チュートリアル](https://developers.cloudflare.com/d1/get-started/)に従いデータを投入します。
 
-```sh
+```console
 $ npx wrangler d1 execute dev-d1-futuretechblog --local --file=./schema.sql
 Proxy environment variables detected. We'll use your proxy for fetch requests.
 
@@ -163,7 +163,7 @@ Proxy environment variables detected. We'll use your proxy for fetch requests.
 
 postテーブルの件数を確認すると 1089件と、今の記事件数と一致します。
 
-```sh
+```console
 $ npx wrangler d1 execute dev-d1-futuretechblog --local --command="SELECT count(*) FROM post"
 Proxy environment variables detected. We'll use your proxy for fetch requests.
  ⛅️ wrangler 3.57.2
@@ -256,7 +256,7 @@ npx wrangler dev
 
 ローカルで動作検証が済んだとして、デプロイします。出力内容はローカル版と特に違いは無いです。
 
-```sh
+```console
 $ npx wrangler d1 execute dev-d1-futuretechblog --remote --file=./schema.sql
 Proxy environment variables detected. We'll use your proxy for fetch requests.
  ⛅️ wrangler 3.57.2

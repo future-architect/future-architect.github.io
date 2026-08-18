@@ -317,7 +317,7 @@ claude mcp add --scope user --transport http oreilly \
 
 登録できたら、以下のコマンドで接続状態を確認します。
 
-```bash
+```console
 $ claude mcp list
 oreilly: https://api.oreilly.com/api/content-discovery/v1/mcp/ (HTTP) - ✓ Connected
 ```

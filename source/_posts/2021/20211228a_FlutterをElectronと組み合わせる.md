@@ -167,7 +167,7 @@ flutter build web --base-href "/myapp/"
 
 デフォルト値は`/`になっています。Electronで利用する場合、`base`タグの値は空文字が都合が良いのですが、オプションで空文字を指定するとエラーが起きてしまいます。
 
-```sh
+```console
 $ flutter build web --base-href ""
 base-href should start and end with /
 ```

@@ -423,7 +423,7 @@ BETWEEN述語は次のような構文になっています。[PostgreSQLのド�
 
 これでBETWEEN述語の規則を追加できました。拡張した文法をもとにパーサを生成してみましょう。以下のコマンドを実行します。
 
-```sh
+```console
 $ tree-sitter generate
 Unresolved conflict for symbol sequence:
 
@@ -558,7 +558,7 @@ AND ID      BETWEEN 0   AND 100
 
 `tree-sitter test`でテストを行います。`-f`フラグを加えることで、特定のテストのみを実行できます。
 
-```sh
+```console
 $ tree-sitter test -f 'BETWEEN predicates'
   between:
     ✓ BETWEEN predicates

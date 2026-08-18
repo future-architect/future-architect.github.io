@@ -113,7 +113,7 @@ generate:
 この状態で`make generate` でコードを生成すると、もともと配置していた`Makefile`と`openapi.yaml`の他にたくさんのファイルが生成されます。
 親切に、Markdownのドキュメントまで生成してくれていますね。
 
-```bash
+```console
 $ tree
 .
 ├── Cargo.toml
@@ -569,7 +569,7 @@ cargo run
 
 GETメソッドで最新のレコードが取得できていることがわかります。
 
-```bash
+```console
 $ curl -X GET localhost:8080/ip -i
 HTTP/1.1 200 OK
 x-span-id: 8a278ac0-a84f-4643-b29b-22ae83be9d6c
@@ -583,7 +583,7 @@ date: Sun, 28 Aug 2022 18:12:27 GMT
 POSTメソッドのパラメータとして登録内容を渡すと、新規レコードが登録されます。
 その後GETメソッドを呼び出すと登録されたことが確認できます。
 
-```bash
+```console
 $ curl -X POST localhost:8080/ip -H "Content-Type: application/json" -d '{"IPv4_address":"1.1.1.1"}' -i
 HTTP/1.1 200 OK
 x-span-id: 72fb2d42-c968-4e6a-bf54-73cf0b592e07

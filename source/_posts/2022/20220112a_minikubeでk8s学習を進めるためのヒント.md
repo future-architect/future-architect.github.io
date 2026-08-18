@@ -38,7 +38,7 @@ k8s完全ガイドでは[minikube](https://github.com/kubernetes/minikube)だっ
 
 下の様にオプションなしで起動した場合、筆者環境ではDockerコンテナとして起動します。デフォルトでは1 nodeで構築されます。
 
-```bash
+```console
 $ minikube start
 ...
 🏄  Done! kubectlisnow configuredtouse "minikube" clusterand "default" namespacebydefault
@@ -58,7 +58,7 @@ NAMES
 
 **NodePort**は<ノードのIP>:< Port >への通信をPodに転送する形で、アプリケーションの外部疎通性を確保するリソースです。
 
-```sh
+```console
 $ kubectl create deployment test-deployment --image=nginx
 
 # NodePortを作成
@@ -70,7 +70,7 @@ test-deployment   NodePort   10.107.114.198   <none>        80:31307/TCP   4m21s
 
 上記Deploymentにアクセスするには、ノードのIPアドレスを調べる必要があります。minikubeではコマンドが用意されており、`minikube ip` で調べられます。  実態はminikubeノードとして起動しているDockerコンテナのアドレスです。
 
-```sh
+```console
 $ minikube ip
 192.168.49.2
 
@@ -94,7 +94,7 @@ curl 192.168.49.2:31307
 
 **LoadBalancer**を使う場合は`minikube tunnel` で EXTERNAL-IPを払い出し、ホストサーバからEXTERNAL-IPへルートを確保します。
 
-```bash
+```console
 $ kubectl expose deployment test-deployment --type=LoadBalancer --port=80
 
 $ kubectl get service test-deployment
@@ -116,7 +116,7 @@ test-deployment   LoadBalancer   10.108.139.68   10.108.139.68   80:31284/TCP   
 Ingressを使う場合は、Ingressコントローラをデプロイする必要があります。
 minikubeではそのためのaddonが用意されています。
 
-```sh
+```console
 $ minikube addons enable ingress
 # nginx ingress controllerがデプロイされている
 $ kubectl get pods -n ingress-nginx
@@ -154,7 +154,7 @@ kubectl apply -f ing.yaml
 
 下のようにIngressが作成されたことがわかります。 `ADDRESS` に対してリクエストを送ればアプリケーションにアクセスできます。
 
-```sh
+```console
 $ kubectl get ingress
 NAME            CLASS    HOSTS   ADDRESS        PORTS   AGE
 test-ingress    <none>   *       192.168.49.2   80      13m
@@ -166,14 +166,14 @@ test-ingress    <none>   *       192.168.49.2   80      13m
 
 Horizontal Pod Autoscaler(HPA)はCPUやメモリ消費に基づいてPodをスケールさせる機能です。HPAを使うためには、Podの消費するリソースをmetricsとして取得できる必要があります。minikubeではaddonとしてmetrics-serverを有効化します。
 
-```bash
+```console
 $ minikube addons enable metrics-server
     ▪ Using image k8s.gcr.io/metrics-server/metrics-server:v0.4.2
 ```
 
 metrics-serverを有効化したので、`kubectl top` でpodのリソース消費を確認できます。
 
-```sh
+```console
 $ kubectl top pod test-nginx
 NAME         CPU(cores)   MEMORY(bytes)
 test-nginx   0m           1Mi
@@ -187,7 +187,7 @@ minikubeはデフォルトで1 nodeで起動します。なのでそのままで
 
 ですが、minikubeでは`--nodes` オプションで複数ノードでクラスタを作成可能です。
 
-```sh
+```console
 $ minikube start --nodes 2
 $ kubectl get node
 NAME           STATUS   ROLES                  AGE     VERSION
@@ -234,7 +234,7 @@ spec:
 
 Podが異なるノードに配置されていることがわかります。
 
-```bash
+```console
 $ kubectl get pods -o wide
 NAME                     READY   STATUS    RESTARTS   AGE     IP           NODE           NOMINATED NODE   READINESS GATES
 hello-7db79cdc77-68mvs   1/1     Running   0          4m23s   10.244.0.3   minikube       <none>           <none>

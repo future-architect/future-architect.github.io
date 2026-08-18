@@ -29,7 +29,7 @@ E2Eテストとはソフトウェアやシステムの全体的な動作や機�
 
 はじめに以下のコマンドでテスト環境を作成します。
 
-```sh
+```console
 $ mkdir playwright-ci-test && cd playwright-ci-test
 $ git init
 $ npm init playwright@latest

@@ -54,7 +54,7 @@ UTMのウインドウで＋ボタンを押して「仮想化」を選びます�
 
 起動してIDとパスワードを入れて起動できたら、``sudo``と``curl``コマンドだけインストールしておきます。
 
-```sh
+```console
 $ su -
 (rootのパスワードを入れる)
 $ apt-get install sudo curl
@@ -63,7 +63,7 @@ $ adduser debian sudo
 
 内部で起動したサービスにつながるかテスト。ネットワークはデフォルトのホストネットワークを使っています。まずはゲストの中でIPアドレスを確認します。192.168.64.7というIPv4アドレスを持っているようです。
 
-```sh
+```console
 $ ip a
 1: lo: ...
     :
@@ -75,7 +75,7 @@ $ ip a
 
 引き続き、ゲストの中からPythonのウェブサーバーを起動してみます。
 
-```sh
+```console
 $ python3 -m http.server
 Serving HTTP on :: port 8000 (http://[::]:8000/) ...
 ```
@@ -95,7 +95,7 @@ Serving HTTP on :: port 8000 (http://[::]:8000/) ...
 
 Dokployはシェルでインストールします。さまざまなビルドツールとかをダウンロードするので、そこそこの量のダウンロードが走ります。間違ってもテザリングでやらないように・・・勇気と無謀は違います。この手のシェルでインストールはちょっと怖い気持ちはあるのですが、まあ何もないLinux仮想環境なのでえいやで実行します。最後のシェル実行だけroot権限が必要なので``sudo``をつけます。
 
-```bash
+```console
 $ curl -sSL https://dokploy.com/install.sh | sudo sh
 ```
 
@@ -190,7 +190,7 @@ PaaSなので複数のアプリケーションを稼働させられます。た�
 
 そのためにはサービスごとにドメインを発行する必要があります。hostsファイルでも良かったのですがワイルドカード対応のためにdnsmasqをローカルに入れて使います。macOSの手順を書いています。他のOSの方は生成AIにでも投げて自分の環境に合わせて変更してください。
 
-```bash
+```console
 # dnsmasqをインストール
 $ brew install dnsmasq
 ```
@@ -209,7 +209,7 @@ nameserver 127.0.0.1
 
 最後にDNSサーバーとOSキャッシュをクリアします。
 
-```bash
+```console
 $ sudo brew services restart dnsmasq
 $ sudo killall -HUP mDNSResponder
 ```

@@ -109,7 +109,7 @@ func main() {
 
 実行するとJWTトークンが標準出力されます。これをAuthorizationヘッダーに利用します。
 
-```sh
+```console
 $ go run .
 eyJhbGciOiJFUzUxMiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJteS1hdXRoLXNlcnZlciIsInNjcCI6InJlYWQ6aGVsbG9zIHdyaXRlOmhlbGxvcyIsInN1YiI6IjEyMyJ9.AM5-XwIJM0HBxHeaUt2SXU7fU8UXQhet6DfzP7i0JoTVLwbme36NZ-rG_8URqtUkQ2knvi7D3iydvCGgoDGdHm41Ae3aMDNG-yjwUiH7O9xJVLPly2EkwQC0GdsZU6ax-99t0ePDaeJaNf7k799hgxDQ3op9KCNTr8pDfvR2a6PkLvfQ
 ```
@@ -232,7 +232,7 @@ ogen --target api --clean openapi.yaml
 
 そのまま実行すると以下のエラーが表示されます。`ogen` はサーバサイドコード生成だけど `OIDC` が未対応でした。
 
-```sh openIdConnect未対応のメッセージ
+```console openIdConnect未対応のメッセージ
 $ ogen --target api --clean openapi.yaml
 Feature "openIdConnect security" is not implemented yet.
 ```
@@ -351,7 +351,7 @@ func main() {
 
 `curl` で実行して動作確認します。
 
-```sh
+```console
 $ curl localhost:8080/hello
 {"message":"hello"}
 
@@ -368,7 +368,7 @@ $ curl -H "Authorization: Bearer <トークン>" localhost:8080/hello-oidc
 
 あえて失敗させるケースでの挙動を見てみます。
 
-```sh
+```console
 # Authorizationヘッダなしで動かすケース
 $ curl localhost:8080/hello-bearer
 {"error_message":"operation HelloBearer: security \"\": security requirement is not satisfied"}
@@ -513,7 +513,7 @@ func validateSecurityScheme(input *openapi3filter.AuthenticationInput) error {
 
 サーバを `go run .` で起動して、動作確認します。
 
-```sh 成功ケース
+```console 成功ケース
 $ curl localhost:8080/hello
 {"message":"hello"}
 
@@ -530,7 +530,7 @@ $ curl -H "Authorization: Bearer <トークン>" localhost:8080/hello-oidc
 
 エラーメッセージはハンドリングがデフォルトのままなので、JSONではなく文字列が返ってきていますが、チェック自体はできていることがわかります。
 
-```sh 失敗ケース
+```console 失敗ケース
 # Authorizationヘッダなしで動かすケース
 $ curl localhost:8080/hello-bearer
 security requirements failed: getting jws: authorization header is missing

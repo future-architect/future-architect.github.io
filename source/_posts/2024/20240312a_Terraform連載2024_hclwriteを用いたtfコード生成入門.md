@@ -195,7 +195,7 @@ resource "aws_dynamodb_table" "myproduct_content" {
 
 さきほどのコードを実行すると、Terraformリソース名が取れています。
 
-```sh
+```console
 $ go run . ../example/dynamodb_table.tf
 [myproduct_read myproduct_content]
 ```
@@ -241,7 +241,7 @@ for 文の中にある、 `AppendNewBlock()` が今回出力したい本丸の�
 
 実行すると次のような空リソースが生成されます。
 
-```sh
+```console
 $ go run . ../example/dynamodb_table_one.tf
 // DO NOT EDIT, MADE BY hclwrite-dynamodb-generator
 
@@ -306,7 +306,7 @@ func main() {
 
 これを実行すると次のようにTerraformコードが生成されます。
 
-```sh
+```console
 $ go run . example/dynamodb_table_one.tf
 // DO NOT EDIT, MADE BY hclwrite-dynamodb-generator
 
