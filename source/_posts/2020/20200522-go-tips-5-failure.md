@@ -14,7 +14,7 @@ author: 多賀聡一朗
 lede: "今回は、errors package を一部利用して、エラーコードベースのエラーハンドリング処理を実装しました。また、morikuni/failure を利用した実装への書き換えも試してみています。"
 ---
 
-<img src="/images/2020/20200522/top.png" loading="lazy">
+<img src="/images/2020/20200522/top.png" width="1354" height="688" loading="lazy">
 
 ## 概要
 
@@ -153,7 +153,7 @@ morikuni/failure は morikuni さんが作成されたエラーハンドリン�
 
 以前の [Go Conference 2019 Spring にて発表されている資料](https://speakerdeck.com/morikuni/designing-errors) にて、failure と errors (当時は xerrors) の使い分けについて明確に説明されています。とてもわかりやすくて、しっくりきたことを覚えています。
 
-<img src="/images/2020/20200522/photo_20200522_01.png" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2020/20200522/photo_20200522_01.png" style="border:solid 1px #000000" width="1000" height="557" loading="lazy">
 
 参考: [https://speakerdeck.com/morikuni/designing-errors?slide=33](https://speakerdeck.com/morikuni/designing-errors?slide=33)
 

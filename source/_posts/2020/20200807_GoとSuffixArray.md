@@ -15,7 +15,7 @@ lede: "Go は標準ライブラリが充実しているとよく言われます�
 mathjax: true
 ---
 
-<img src="/images/2020/20200807/suffixarray.png" class="img-small-size" loading="lazy">
+<img src="/images/2020/20200807/suffixarray.png" class="img-small-size" width="270" height="336" loading="lazy">
 
 [フューチャー夏休みの自由研究連載](/articles/20200726/)の5回目です。
 

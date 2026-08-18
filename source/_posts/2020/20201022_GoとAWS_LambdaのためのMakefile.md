@@ -14,7 +14,7 @@ author: 筒井悠平
 lede: "GoとAWS LambdaのためのMakefileを整理しました。Lambda Functionの増加と同時に増えていくターゲットにはオサラバです。"
 ---
 
-<img src="/images/2020/20201022/GNU-make.webp" class="img-middle-size" loading="lazy">
+<img src="/images/2020/20201022/GNU-make.webp" class="img-middle-size" width="600" height="315" loading="lazy">
 
 筒井です。
 

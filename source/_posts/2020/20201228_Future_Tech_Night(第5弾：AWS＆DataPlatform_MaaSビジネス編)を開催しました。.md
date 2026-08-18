@@ -25,7 +25,7 @@ lede: "先日2020/11/25にオンラインにてFuture Tech Nightという社外�
 * [Future Tech Night #4 〜Go x AWS スマート工場編〜](https://future.connpass.com/event/188742/)
 * [Future Tech Night #5 〜AWS＆DataPlatform MaaSビジネス編〜](https://future.connpass.com/event/195568/) ← 今回はここ
 
-<img src="/images/2020/20201228/74fb7c65c1ef518a159eb99b5105ef10.png" loading="lazy">
+<img src="/images/2020/20201228/74fb7c65c1ef518a159eb99b5105ef10.png" width="659" height="345" loading="lazy">
 
 ## 概要
 
@@ -36,11 +36,11 @@ lede: "先日2020/11/25にオンラインにてFuture Tech Nightという社外�
 * DataPlatform 蓄積データの外部提供の仕組みの紹介
 
 多賀からは、DataPlatform の構築方法と設計事例の共有と、 構築にあたって利用したシステム・サービスの Tips の紹介をしました。DataPlatform で必要な要素を分解し、責務を分けた設計事例をお話いたしました。Tips では、バッチ処理・AWS Glue・Airflow についてお話いたしました。
-<img src="/images/2020/20201228/image.png" loading="lazy">
+<img src="/images/2020/20201228/image.png" width="1200" height="688" loading="lazy">
 
 町田からは、DataPlatformに蓄積されたデータを外部に提供する仕組みを構築するにあたっての検討内容を紹介しました。また、データ提供基盤であるGatewayアプリの全体像をお話しました。
 
-<img src="/images/2020/20201228/2020-12-25_153425.jpg" loading="lazy">
+<img src="/images/2020/20201228/2020-12-25_153425.jpg" width="1200" height="677" loading="lazy">
 
 ## 登壇者からコメント
 

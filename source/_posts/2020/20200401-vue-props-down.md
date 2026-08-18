@@ -43,7 +43,7 @@ props down, event upの理解のためにMVVMについて簡単に触れてお�
 
 下の図はVue.jsの公式サイトから拝借しました。
 図で見ると何となく分かった感じがしますが、何となくの理解ではなく確実に理解しましょう。
-<img src="/images/2020/20200401/photo_20200401_01.png" loading="lazy">
+<img src="/images/2020/20200401/photo_20200401_01.png" width="1600" height="850" loading="lazy">
 
 [Vue.js 公式サイト(https://012-jp.vuejs.org/guide/)](https://012-jp.vuejs.org/guide/)より…
 
@@ -107,7 +107,7 @@ App.vue ────────────────────────
 親コンポーネントがもつデータを浅い階層でやり取りするため、再利用性の高いコンポーネントの利用/作成のためと思ってご覧ください。場合によってはVuexを使ったデータ管理も有効かもしれません。
 
 実際の画面はこんな感じです。
-<img src="/images/2020/20200401/photo_20200401_02.png" class="img-small-size" loading="lazy">
+<img src="/images/2020/20200401/photo_20200401_02.png" class="img-small-size" width="320" height="318" loading="lazy">
 
 `components`配下のvueファイルのソースを下記に示します。
 `App.vue`は中身を空っぽにして`ParentLayer.vue`を表示しているだけですので割愛します。

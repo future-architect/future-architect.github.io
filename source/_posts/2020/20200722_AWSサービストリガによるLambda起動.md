@@ -83,7 +83,7 @@ LocalStackの詳細については[こちらのブログ](/articles/20191115/)�
 
 ではまず同期型の呼び出しから設定/実装方法を見ていきましょう。今回はよくあるAPI Gateway --> Lambdaという構成を参考に進めていきます。
 
-<img src="/images/2020/20200722/2020-07-17T17.05.46.png" loading="lazy">
+<img src="/images/2020/20200722/2020-07-17T17.05.46.png" width="560" height="219" loading="lazy">
 
 それでは早速構築してきましょう。まずは、APIのレスポンスを返すLambdaを作成します。
 
@@ -212,7 +212,7 @@ hello lambda
 
 続いてS3とLambdaの連携です。API Gatewayに比べるとだいぶ設定が簡単です。S3にローカルPCからオブジェクトをコピーし、Lambdaが起動できることを確認していきます。
 
-<img src="/images/2020/20200722/2020-07-17T17.05.34.png" loading="lazy">
+<img src="/images/2020/20200722/2020-07-17T17.05.34.png" width="588" height="221" loading="lazy">
 
 先程と同じようにまずはLambda関数のデプロイから実施していきます。
 トリガの起動が確認できればよいので、Lambdaが起動したらメッセージが出力されるようなソースを用意します。
@@ -374,7 +374,7 @@ aws logs get-log-events \
 
 最後はストリームベーズのLambda起動の設定です。ローカルPCからKinesisへメッセージをPUTしてLambdaを起動させましょう。
 
-<img src="/images/2020/20200722/2020-07-17T17.05.23.png" loading="lazy">
+<img src="/images/2020/20200722/2020-07-17T17.05.23.png" width="592" height="222" loading="lazy">
 
 例によってテスト用のLambdaを作成します。
 今回はPUTしたメッセージの内容がログに出力されるようなソースを用意します。

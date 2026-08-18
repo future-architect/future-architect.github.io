@@ -14,7 +14,7 @@ author: 斎藤賢太
 lede: "皆さん、こんにちは。Future Engineer Camp 2020に参加しました齋藤です。インターンシップやその前のできごとを書いていきます。"
 ---
 
-<img src="/images/2020/20200920/factory-3550550_1280.png" alt="" title="Oberholster VenitaによるPixabayからの画像">
+<img src="/images/2020/20200920/factory-3550550_1280.png" alt="" title="Oberholster VenitaによるPixabayからの画像" width="1280" height="666">
 
 ## はじめに
 
@@ -151,6 +151,6 @@ lede: "皆さん、こんにちは。Future Engineer Camp 2020に参加しまし
 
 受け入れてくれたプロジェクトのみなさま、HRのみなさま本当にありがとうござました。
 
-<img src="/images/2020/20200920/発表.png" loading="lazy">
+<img src="/images/2020/20200920/発表.png" width="1920" height="1080" loading="lazy">
 
-<img src="/images/2020/20200920/集合.png" loading="lazy">
+<img src="/images/2020/20200920/集合.png" width="1712" height="572" loading="lazy">

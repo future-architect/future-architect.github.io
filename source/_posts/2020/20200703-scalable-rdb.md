@@ -138,7 +138,7 @@ lede:
 
 次の表の中で非正規化とあるのは、あえて正規化を崩していることを意味していますので、データの整合性を保つための施策を実装時におこなう必要があることを意味しています。なおこの表はパフォーマンスという点の評価はしていません。
 
-<img src="/images/2020/20200703/photo_20200703_01.png" loading="lazy">
+<img src="/images/2020/20200703/photo_20200703_01.png" width="1561" height="874" loading="lazy">
 
 ここで言えるのは、**key-value型は扱うデータモデルを選び、実装面の工夫が必要であるのに対して、Relational型はデータモデルとしての制約はない**ということです。このことから以下のことが言えます。
 
@@ -156,9 +156,9 @@ lede:
 
 もちろんシステムにはこのほかにも多様な業務処理が存在し、エンティティも無数に存在しますが、主要なエンティティという視点で見渡すと意外にシンプルな形になります。データを中心に業務が動いているということを改めて感じるはずです。
 
-<img src="/images/2020/20200703/photo_20200703_02.png" loading="lazy">
+<img src="/images/2020/20200703/photo_20200703_02.png" width="1106" height="455" loading="lazy">
 
-<img src="/images/2020/20200703/photo_20200703_03.png" loading="lazy">
+<img src="/images/2020/20200703/photo_20200703_03.png" width="1132" height="472" loading="lazy">
 
 この例では次のことが言えます。
 
@@ -175,11 +175,11 @@ lede:
 
 1. MySQLによReadonly用レプリケーション構成例
 [Using Replication for Scale-Out](https://dev.mysql.com/doc/refman/5.7/en/replication-solutions-scaleout.html)
-<img src="/images/2020/20200703/photo_20200703_04.png" loading="lazy">
+<img src="/images/2020/20200703/photo_20200703_04.png" width="450" height="223" loading="lazy">
 
 2.Amazon AuroraでのReadonly用レプリケーション構成例
 [Amazon Aurora DB クラスター](https://docs.aws.amazon.com/ja_jp/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.html)
-<img src="/images/2020/20200703/photo_20200703_05.png" loading="lazy">
+<img src="/images/2020/20200703/photo_20200703_05.png" width="399" height="223" loading="lazy">
 
 ここで紹介したように、**データ参照(ReadOnly)についてのスケーラビリティという点については解決策があり、アーキテクチャとしての課題はないと考えてもよいでしょう。**もちろん実装にあたっては十分な検討が必要です。
 
@@ -196,7 +196,7 @@ lede:
 
 これを先ほどの在庫管理システムに当てはめて考えてると以下のようになります。
 
-<img src="/images/2020/20200703/photo_20200703_06.png" loading="lazy">
+<img src="/images/2020/20200703/photo_20200703_06.png" width="796" height="356" loading="lazy">
 
 約100TPS発生して、データ更新(insert/update)が約1500レコード発生しています。
 
@@ -206,9 +206,9 @@ lede:
 
 得られたテスト結果が以下です。「records」はトランザクションあたりの更新レコード数を示します（このテスト結果はテストシナリオにおけるあくまでもサンプルです）
 
-<img src="/images/2020/20200703/photo_20200703_07.png" loading="lazy">
+<img src="/images/2020/20200703/photo_20200703_07.png" width="769" height="603" loading="lazy">
 
-<img src="/images/2020/20200703/photo_20200703_08.png" loading="lazy">
+<img src="/images/2020/20200703/photo_20200703_08.png" width="748" height="205" loading="lazy">
 
 この結果から、AWS Aurora (PostgreSQL)で今回の要件を実現する場合には、r4.8xlargeを利用した場合において実現性はありそうということが推測できます。
 
@@ -225,7 +225,7 @@ lede:
 (2)論理分割パターン
 (3)データ分割パターン
 
-<img src="/images/2020/20200703/photo_20200703_09.png" loading="lazy">
+<img src="/images/2020/20200703/photo_20200703_09.png" width="1481" height="918" loading="lazy">
 
 どのパターンを選択すべきかは、要件によって変わるため答えは1つではありません。
 
@@ -246,7 +246,7 @@ lede:
 
 この部分の検討は、データベースソフトウェアに深く依存することになりますので、事前の調査はしておく必要があります。以下の図はPostgreSQLをベースとした検討例です。
 
-<img src="/images/2020/20200703/photo_20200703_10.png" loading="lazy">
+<img src="/images/2020/20200703/photo_20200703_10.png" width="1492" height="882" loading="lazy">
 
 PostgreSQLのパーティションの特性についてここで詳細は記載しませんが制約事項について理解する必要があります。理屈上は正しいが、実装してみると正しくスケールしないということもあるため確認したほうが良いでしょう。以下に参考リンクを載せておきます。
 

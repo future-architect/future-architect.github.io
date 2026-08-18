@@ -16,7 +16,7 @@ thumbnail: /images/2020/20201002/thumbnail.png
 author: 澁川喜規
 lede: "CNCF連載の第4回は、CNCFのSandboxプロジェクトのBuildpacksについて紹介します。* https://buildpacks.io"
 ---
-<img src="/images/2020/20201002/buildpacks-horizontal-color.png" loading="lazy">
+<img src="/images/2020/20201002/buildpacks-horizontal-color.png" width="1200" height="341" loading="lazy">
 
 TIGの渋川です。
 
@@ -52,7 +52,7 @@ Buildpackは、現在のワークフォルダが自分のタスクと関係あ�
 
 その作業の土台になるのが「Stack」です。「Stack」は実行用のDockerイメージと、ビルド用のDockerイメージのペアです。普通に公開されているものではなく、少し手を加える必要があります。Dockerfileで作ってもいいです。GoogleはBazelを使っているようです。
 
-<img src="/images/2020/20201002/Screen_Shot_2020-10-02_at_9.11.57.png" loading="lazy">
+<img src="/images/2020/20201002/Screen_Shot_2020-10-02_at_9.11.57.png" width="1200" height="524" loading="lazy">
 
 ビルダーを作るにはこれらの構成要素を1つずつ作っていくことになります。
 
