@@ -168,7 +168,7 @@ AWSやAzure、GCPなどのクラウドサービスでは、「大量なデータ
 
 ### \[2\] Argilla
 
-[Argilla](https://docs.argilla.io/en/latest/)は、RLHF用に「人力で集めるデータの入力・出力の評価」を円滑にするための管理をしてくれるプラットフォームです。\
+[Argilla](https://docs.argilla.io/en/latest/)は、RLHF用に「人力で集めるデータの入力・出力の評価」を円滑にするための管理をしてくれるプラットフォームです。
 
 例えば、人力で集めるデータとは、[こちら](https://huggingface.co/datasets/kunishou/databricks-dolly-15k-ja)にあるような指示文(instruction)、参考情報(input)、理想の回答(output)がセットになったものや、複数のLLMからの出力にランク付けをした結果等です。
 
