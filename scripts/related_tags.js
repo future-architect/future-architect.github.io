@@ -126,6 +126,16 @@ function byName(a, b) {
   return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
 }
 
+// versionOf で束ねたタグは名前に数字が無いこともある。順序を決められないので先頭
+function withVersion(r) {
+  return { ...r, version: VERSIONED.test(r.name) ? versionKey(r.name) : Infinity };
+}
+
+// 新しいバージョンを先に
+function byVersionDesc(a, b) {
+  return b.version - a.version || byName(a, b);
+}
+
 // site.tags は毎回同じなので、共起の集計は一度だけ行って使い回す
 let cache = null;
 
@@ -219,9 +229,8 @@ hexo.extend.helper.register('related_tags', function (tagName) {
   const versions = (stem === tagName ? [] : relatives)
     .filter((name) => name !== stem)
     .map(member)
-    // versionOf で束ねたタグは名前に数字が無いこともある。順序を決められないので先頭
-    .map((r) => ({ ...r, version: VERSIONED.test(r.name) ? versionKey(r.name) : Infinity }))
-    .sort((a, b) => b.version - a.version); // 新しいバージョンを先に
+    .map(withVersion)
+    .sort(byVersionDesc);
 
   // 移動先に新しい記事が1本しか無い相手を出すかどうか。1ページに収まるタグでは
   // スクロールすれば全部見えるので、読者が求めるのは新しい記事に出会えるタグの方。
@@ -249,7 +258,13 @@ hexo.extend.helper.register('related_tags', function (tagName) {
           .sort((a, b) => b.posts - a.posts || byName(a, b))
           .slice(0, MAX_NARROWING_TAGS)
       : [];
-  const detail = narrowing.concat(children).sort((a, b) => b.posts - a.posts || byName(a, b));
+  // 版の子はバージョン降順で先、共起由来の絞り込みは記事数降順で後に置く (#2601)。
+  // 版どうしの記事数の差は「その年の連載が何本だったか」でしかなく、読者が探す
+  // 順序とは関係が無い。記事数で1本に並べると最新版が末尾に沈み（インターン2026 が
+  // 1本で最後）、共起の相手と交互に混ざって版の列として流し読みできない。
+  // 版をひとかたまりにすると「別の版へ」群と同じ規則になり、同じ関係がページに
+  // よって並び順を変えることも無くなる
+  const detail = children.map(withVersion).sort(byVersionDesc).concat(narrowing);
 
   const score = (r) => r.co * Math.log(1 + r.lift);
   const adjacent = candidates
