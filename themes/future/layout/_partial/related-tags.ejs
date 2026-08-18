@@ -1,34 +1,46 @@
 <%# タグページの関連タグ。archive.ejs が読者の状態に合わせて位置を変えて使う。
     1ページ目 = 一覧の前（このタグで合っているかの絞り込み直し）、
     最終ページ = ページャーの下（読み尽くした読者への次の導線）(#2088 / #2213) %>
-<% const related = related_tags(page.tag); %>
-<% if (related.length) { %>
+<% const groups = related_tags(page.tag); %>
+<% if (groups.length) { %>
 <aside data-nosnippet>
-  <section class="popular-articles margin-bottom-20">
+  <section class="popular-articles related-tag-groups margin-bottom-20">
     <%# 見出しは記事ページの「関連記事」に合わせる。あちらも内部ではスコアで
         並べているが強度は名乗っていない。「関連が強いタグ」とすると根拠を
         問われるうえ、実際には絞り込み系と発見系が混在していて言い切れない %>
     <%- partial('section-heading', {id: 'relatedtags', text: '関連タグ'}) %>
     <%# チップだと関連の中身（何本の記事を共有しているか・同じ系列か）が
         title 属性に隠れてホバーしないと分からない。著者ページの
-        「よく使うタグ」と同じ tendency-panel の作りで常時見せる (#2172)。
-        兄弟タグは排他的に付くため共起0本。共通本数ではなく「同じ系列」と名乗る %>
-    <%# 注記は著者ページの「61本投稿」と同じ「数字＋動詞」の型に揃える。
-        移動先の総数はホバーの title に残す。
-
-        絞り込み（移動先の記事が全部このタグにもある関係 #2569）は
-        「共有」だと関係が伝わらない。移動しても新しい記事は出てこないので、
-        押したときに何が起きるか（何本に絞り込めるか）を名乗る。
-        単位は「件」ではなく「本」。読者に見える記事の数え方はサイト全体で
-        「本」に揃えてある（「件」を使うのは内部向けの /doctor/ でタグを数えるときだけ） %>
+        「よく使うタグ」と同じ tendency-panel の作りで常時見せる (#2172) %>
+    <%# 群ごとに読者の目的が違う（中を絞り込む / 隣の話題へ移る / 版を選ぶ）ので、
+        目的はラベルが名乗り、パネルは本数だけを出す (#2569)。
+        「N本に絞り込む」のように動詞をパネルへ持たせるとラベルと二重になるうえ、
+        系列の子はタグ付け漏れで完全な部分集合とは限らないため、
+        絞り込みだと言い切れない。移動先の総数と共通本数はホバーの title に残す %>
+    <% const labels = {
+         detail: 'もっと詳しいタグで探す',
+         adjacent: '隣接するタグを探す',
+         series: '同じ系列',
+       }; %>
+    <% const note = (kind, t) =>
+         kind === 'series'
+           ? `${t.name} の記事 ${t.posts}本（${page.tag} と同じ系列）`
+           : t.fresh === 0
+             ? `${t.name} の記事 ${t.posts}本（すべて ${page.tag} の記事）`
+             : `${t.name} の記事 ${t.posts}本（うち ${page.tag} と共通 ${t.co}本）`; %>
+    <% groups.forEach(function(g){ %>
+    <h3 class="panels-label"><%= labels[g.kind] %></h3>
     <ul class="tendency-panels">
-      <% related.forEach(function(t){ %>
+      <% g.tags.forEach(function(t){ %>
       <li class="tendency-panel">
-        <a class="tag-list-link" href="<%- url_for(t.path) %>" rel="tag" title="<%= t.sibling ? `${t.name} の記事 ${t.posts}本（${page.tag} と同じ系列）` : t.narrowing ? `${t.name} の記事 ${t.posts}本（すべて ${page.tag} の記事）` : `${t.name} の記事 ${t.posts}本（うち ${page.tag} と共通 ${t.co}本）` %>"><%= t.name %></a>
-        <span class="tendency-panel-count"><%= t.sibling ? '同じ系列' : t.narrowing ? `${t.posts}本に絞り込む` : `${t.co}本を共有` %></span>
+        <a class="tag-list-link" href="<%- url_for(t.path) %>" rel="tag" title="<%= note(g.kind, t) %>"><%= t.name %></a>
+        <%# 隣接だけは共通本数が関係の強さそのもの。他の2群は移動先の本数
+            （＝押した先の一覧の長さ）を出す %>
+        <span class="tendency-panel-count"><%= g.kind === 'adjacent' ? `${t.co}本を共有` : `${t.posts}本` %></span>
       </li>
       <% }) %>
     </ul>
+    <% }) %>
   </section>
 </aside>
 <% } %>
