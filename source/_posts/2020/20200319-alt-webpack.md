@@ -169,7 +169,7 @@ $ du -h
 
 コマンド体系はGoを目指していて、ncc build [script]でビルドができます。ncc run [script]で実行ができます。
 
-```console
+```text
 % npx ncc run -q test.ts
 ncc: Using typescript@3.7.5 (ncc built-in)
 hello world

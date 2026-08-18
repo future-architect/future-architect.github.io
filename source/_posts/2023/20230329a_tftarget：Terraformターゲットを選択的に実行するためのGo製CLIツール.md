@@ -79,7 +79,7 @@ https://github.com/future-architect/tftarget/releases
 
 Go製のCLIツールであるtftargetは、`go install`コマンドを使ってインストールできます。次のコマンドを実行してください。
 
-```shell
+```bash
 go install github.com/future-architect/tftarget@latest
 ```
 
@@ -87,7 +87,7 @@ go install github.com/future-architect/tftarget@latest
 
 Homebrewを利用している場合も、tftargetをインストールできます。以下のコマンドでインストールできます。
 
-```shell
+```bash
 brew install future-architect/tap/tftarget
 ```
 
@@ -107,7 +107,7 @@ tftargetには、`plan`、`apply`、`destroy`の3つのコマンドが用意さ�
 
 通常の`plan`と同様に、以下のコマンドを実行します。
 
-```shell
+```bash
 tftarget plan
 ```
 
@@ -150,7 +150,7 @@ Spaceキーを押すことでチェックを付けることができます。右
 
 それぞれのコマンドには、以下のオプションが用意されています。
 
-```shell
+```text
 Flags:
   -f, --filter string   filter by action. You can select create, destroy, update, or replace
   -i, --items int       check box item size (default 25)
@@ -162,13 +162,13 @@ Flags:
 
 `--filter`オプションでは、最初の選択肢表示画面でアクション別にフィルタリングを追加できます。例えば、新規作成のリソースの場合、`create`と指定することで選択肢に`create`のリソースのみを表示できます。利用可能なアクションは、`create`、`destroy`、`update`、`replace`の4つです。
 
-```shell
+```bash
 tftarget apply -f create
 ```
 
 このオプションは、複数のアクションを指定できません。そのため、以下のようなコマンドはエラーとなります。
 
-```shell
+```bash
 tftarget apply -f create destroy
 ```
 
@@ -176,7 +176,7 @@ tftarget apply -f create destroy
 
 `--items`オプションでは、チェックボックスの表示数を指定できます。デフォルトでは25個のリソースが表示されますが、このオプションを使用して表示数を増減させることができます。
 
-```shell
+```bash
 tftarget apply -i 50
 ```
 
@@ -186,7 +186,7 @@ tftarget apply -i 50
 
 `--parallel`オプションはTerraform CLIで実装されている`-parallelism`に並列数を渡すためのオプションです。デフォルトでは10が設定されています。
 
-```shell
+```bash
 tftarget apply -p 30
 ```
 
@@ -196,7 +196,7 @@ tftarget apply -p 30
 
 <img src="/images/2023/20230329a/simple-usage-5_2.png" alt="simple-usage-5.png" width="1074" height="147" loading="lazy">
 
-```shell
+```bash
 tftarget apply -s false
 ```
 

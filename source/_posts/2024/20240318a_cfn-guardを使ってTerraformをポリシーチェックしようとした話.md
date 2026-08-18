@@ -84,7 +84,7 @@ resource "aws_s3_bucket_public_access_block" "my_bucket" {
 このファイルがまだ未作成の場合、次のようにコマンドを実行することで
 作成後に想定されるリソース構成をJSONファイルで出力できます。
 
-```shell
+```bash
 terraform plan -out tfplan.bin
 terraform show --json tfplan.bin > tfplan.json
 ```

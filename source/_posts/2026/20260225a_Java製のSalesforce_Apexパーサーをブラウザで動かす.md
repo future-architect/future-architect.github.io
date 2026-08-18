@@ -110,7 +110,7 @@ TeaVMを選んだ理由は以下の通りです：
 
 - JsMain/WasmMainはそれぞれJavaScript版とWebAssembly版のエントリーポイントとなる(ソースコード文字列を引数とする)mainクラスです。
 
-```console
+```text
 mvn clean package
   ↓
 [Maven Compiler Plugin]

@@ -77,7 +77,7 @@ GitHubリポジトリから自分の環境に併せて実行ファイルをダ�
 
 次にWindowsで検知するためのデータベースをローカルに作成します。
 
-```Shell
+```bash
 gost.exe fetch microsoft
 ```
 
@@ -98,7 +98,7 @@ port = "local"
 
 以上でWindowsスキャンの準備が完了したので、スキャンを実行します。
 
-```Shell
+```bash
 vuls.exe scan
 ```
 
@@ -106,7 +106,7 @@ vuls.exe scan
 
 検出した脆弱性の一覧を表示してみましょう。
 
-```Shell
+```bash
 vuls.exe report
 ```
 

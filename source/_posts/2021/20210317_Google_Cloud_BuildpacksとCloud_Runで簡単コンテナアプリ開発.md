@@ -69,21 +69,21 @@ Buildpacksにはアプリケーションの言語を検知する機能を有し�
 
 ここからは[Google Cloud公式のチュートリアル](https://github.com/GoogleCloudPlatform/buildpack-samples)を使いながら実際にCloud Runを利用するところまで実行してみます。今回はnodeのアプリケーションを利用します。
 
-```shell
+```bash
 git clone https://github.com/GoogleCloudPlatform/buildpack-samples.git
 cd buildpack-samples/sample-node
 ```
 
 Cloneまでできたらまずはローカルで動かしましょう。
 
-```shell
+```bash
 npm install
 npm start
 ```
 
 http://localhost:3000 にアクセスして`hello, world`が表示されることを確認しましょう。まずはコンテナになる前に動くことがわかったので次はBuildpacksを使ってコンテナ化して動かしましょう。
 
-```shell
+```bash
 pack build --builder=gcr.io/buildpacks/builder node
 docker run -it -ePORT=8080 -p8080:8080 node
 ```
@@ -98,7 +98,7 @@ Cloud Runにデプロイする時はContainer Registryからデプロイを行�
 
 １の方がローカルを汚さずに済んだり、ローカルPCの能力に依存せずにビルドできるので、今回は前者で進めます。
 
-```shell
+```bash
 gcloud alpha builds submit --pack image=gcr.io/[project-id]/node
 ```
 
@@ -108,7 +108,7 @@ gcloud alpha builds submit --pack image=gcr.io/[project-id]/node
 
 ここでCloud Runにデプロイを行います。とはいえ、コマンド1行で実行完了するので、あっという間です。
 
-```shell
+```bash
 gcloud run deploy --image=gcr.io/[project-id]/node --platform managed
 ```
 

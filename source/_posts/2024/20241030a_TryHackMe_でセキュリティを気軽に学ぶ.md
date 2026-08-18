@@ -352,7 +352,7 @@ Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2024-10-27 21:04:
 
 パスワードについてもブルートフォース攻撃で調べられそうです。今回はこのサイトが WordPress のものとわかっているので、これに特化した `wpscan` というツールを使います。
 
-```console
+```text
 ┌──(kali㉿kali)-[~/tryhackme/MrRobotCTF]
 └─$ wpscan --url http://10.10.203.195 -U Elliot -P fsocity_uniq.dic -t 32
 _______________________________________________________________

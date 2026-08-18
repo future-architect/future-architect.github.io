@@ -85,7 +85,7 @@ MegaLinterにはインタラクティブに設定ファイルを生成するコ�
 [node.js](https://nodejs.org/en/)はインストールされているものとします。
 :::
 
-```shell
+```bash
 npx mega-linter-runner --install
 ```
 
@@ -100,7 +100,7 @@ npx mega-linter-runner --install
 以下、この断面のコミットIとディレクトリ構成です。
 コミットID：[98c3d85](https://github.com/orangekame3/megalinter-sample/commit/98c3d85d333584f067f3ed47da3f97e51eaf0eeb)
 
-```shell
+```text
 .
 ├── .github
 │   └── workflows
@@ -162,14 +162,14 @@ Go Flavorに採用されているLinterは[こちら](https://megalinter.io/late
 
 ではローカルでLinterを実行してみます。MegaLinterはdockerを利用するため、ローカル環境のDockerエンジンを起動して以下コマンドを実行してください。
 
-```shell
+```bash
 npx mega-linter-runner --flavor go
 ```
 
 コマンドを実行するとLinterが走ります。
 以下実行結果です。
 
-```shell
+```text
 npx mega-linter-runner --flavor go
 Pulling docker image oxsecurity/megalinter-go:v7 ...
 INFO: this operation can be long during the first use of mega-linter-runner
@@ -273,7 +273,7 @@ Goでエラーが出ていますね。出力結果の最後にレポートが出
 
 では該当の部分を修正して再度Linterを走らせます。
 
-```shell
+```text
 ❌ Linted [GO] files with [revive]: Found 1 error(s) - (9.25s)
 - Using [revive v1.3.4] https://megalinter.io/7.4.0/descriptors/go_revive
 - MegaLinter key: [GO_REVIVE]
@@ -300,7 +300,7 @@ func main() {
 
 以下再実行した結果です。エラーが解消したことを確認できます。
 
-```shell
+```text
 +----MATCHING LINTERS-------+----------+----------------+------------+
 | Descriptor | Linter       | Criteria | Matching files | Format/Fix |
 +------------+--------------+----------+----------------+------------+

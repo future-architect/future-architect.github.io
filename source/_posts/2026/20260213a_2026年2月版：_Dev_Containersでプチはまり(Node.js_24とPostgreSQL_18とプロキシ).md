@@ -126,7 +126,7 @@ Environment="NO_PROXY=localhost,127.0.0.1,docker-registry.somecorporation.com"
 
 修正したらデーモンを再起動します。
 
-```shell
+```bash
 sudo system docker restart
 ```
 
@@ -172,7 +172,7 @@ Dockerfile内で直接書いてしまう方法もありますが、ポータビ�
 
 WSL2ではないLinuxの場合は、いつも通り、ユーザーの.profileとか.bashrcといったところに環境変数でプロキシ設定を書きます。
 
-```shell .bashrc
+```bash .bashrc
 export http_proxy="http://proxy.example.com:8080"
 export https_proxy="http://proxy.example.com:8080"
 export no_proxy="localhost,127.0.0.1,host.docker.internal"

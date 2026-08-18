@@ -32,7 +32,7 @@ Healthcare Innovation Group(HIG)所属の山本です。
 CREATE DATABASE healthcare_data;
 ```
 
-```shell
+```text
 -- 作成したデータベースに接続
 \c healthcare_data;
 ```
@@ -63,7 +63,7 @@ VALUES
 
 作成後としては、以下のようになります。配列型、自作型などがあることがポイントです。
 
-```console
+```text
 healthcare_data=# select * from patient_records ;
  patient_id | blood_sugar |  test_results   |             address
 ------------+-------------+-----------------+---------------------------------
@@ -106,7 +106,7 @@ to_regtypemod(text) → integer
 
 #### VARCHARの例
 
-```console
+```text
 healthcare_data=# SELECT to_regtypemod('varchar(50)');
  to_regtypemod
 ---------------
@@ -117,7 +117,7 @@ healthcare_data=# SELECT to_regtypemod('varchar(50)');
 このように内部表現の値で返されます。
 この値は、`to_regtype`関数と`format_type`関数と併用することで、見てわかる直感的な表現となります。
 
-```console
+```text
 healthcare_data=# WITH datatype AS (
   SELECT
     'varchar(50)' AS type
@@ -141,7 +141,7 @@ FROM
 
 numeric型で、scale(小数点の右側の小数部分の桁数)が指定されている場合には以下のようになります。
 
-```console
+```text
 healthcare_data=# SELECT to_regtypemod('numeric(5,2)');
  to_regtypemod
 ---------------
@@ -150,7 +150,7 @@ healthcare_data=# SELECT to_regtypemod('numeric(5,2)');
 
 ```
 
-```console
+```text
 healthcare_data=# WITH datatype AS (
   SELECT 'numeric(5, 2)' AS type
 )
@@ -170,7 +170,7 @@ SELECT format_type(
 
 配列の場合にも、以下のように取得できています。
 
-```console
+```text
 healthcare_data=# WITH datatype AS (
   SELECT 'numeric(5, 2)[]' AS type
 )
@@ -192,7 +192,7 @@ SELECT format_type(
 
 修飾子が存在しない場合、以下のように`-1`が返されていますね。
 
-```console
+```text
 healthcare_data=# SELECT to_regtypemod('numeric');
  to_regtypemod
 ---------------
@@ -214,7 +214,7 @@ CREATE TYPE address_type AS (
 );
 ```
 
-```console
+```text
 healthcare_data=# SELECT to_regtypemod('address_type');
  to_regtypemod
 ---------------
@@ -231,7 +231,7 @@ PostgreSQL 17時点の型宣言では、カスタム型の中でも複合型(上
 
 存在しない型だが文法的に有効な場合には、以下のようにNULLが戻ります。
 
-```console
+```text
 healthcare_data=# SELECT to_regtypemod('tekitounakata(200)');
  to_regtypemod
 ---------------
@@ -242,7 +242,7 @@ healthcare_data=# SELECT to_regtypemod('tekitounakata(200)');
 
 文法エラーでは、以下のようにエラーが発生します。
 
-```console
+```text
 healthcare_data=# SELECT to_regtypemod('!');
 ERROR:  syntax error at or near "!"
 LINE 1: SELECT to_regtypemod('!');
@@ -282,7 +282,7 @@ CREATE TABLE sample_patient_info (
 
 ageには型修飾子を指定していないので、以下のように大きな数字を入れることができます。46億年なので、だいたい地球の誕生と同じくらいの年齢ですね。
 
-```console
+```text
 healthcare_data=# INSERT INTO sample_patient_info (age, heart_rate, blood_pressure)
 VALUES
 (4600000000, 120, 120.75);
@@ -291,7 +291,7 @@ INSERT 0 1
 
 heart_rateに、桁数以上の数字を指定してみると、以下のようにエラーとなります。
 
-```console
+```text
 healthcare_data=# INSERT INTO sample_patient_info (age, heart_rate, blood_pressure)
 VALUES
 (120, 1200, 120.75);
@@ -302,7 +302,7 @@ DETAIL:  A field with precision 3, scale 0 must round to an absolute value less 
 
 一方で、位取りの桁数以上を指定した場合には、エラーとならずに数字が丸められます。
 
-```console
+```text
 healthcare_data=# INSERT INTO sample_patient_info (age, heart_rate, blood_pressure)
 VALUES
 (120, 120, 120.759);
@@ -334,7 +334,7 @@ PostgreSQLの`pg_attribute`テーブルの`atttypmod`カラム(int4, 32bit)な�
 
 サンプルデータのテーブルに確認すると、以下のようになっています。
 
-```console
+```text
 healthcare_data=# SELECT attname, atttypid, atttypmod FROM pg_attribute WHERE attrelid = 'patient_records'::regclass;
    attname    | atttypid | atttypmod
 --------------+----------+-----------
@@ -354,7 +354,7 @@ healthcare_data=# SELECT attname, atttypid, atttypmod FROM pg_attribute WHERE at
 
 以下のようにしてto_regtypemodで取得した型修飾子と、同一の内部表現値ですね。
 
-```console
+```text
 healthcare_data=# SELECT to_regtypemod('numeric(5,2)');
  to_regtypemod
 ---------------
@@ -366,7 +366,7 @@ healthcare_data=# SELECT to_regtypemod('numeric(5,2)');
 
 この内部表現は、以下のようにformat_type関数を適応することで、値を内部表現から戻すことができます。
 
-```console
+```text
 healthcare_data=# SELECT format_type(
          1700,
          327686
@@ -423,7 +423,7 @@ printTypmod(const char *typname, int32 typmod, Oid typmodout)
 
 今回は例として、atttypmod=327686のものを確認します。
 
-```console
+```text
 healthcare_data=# WITH attribute_info AS (
   SELECT
     a.attname,

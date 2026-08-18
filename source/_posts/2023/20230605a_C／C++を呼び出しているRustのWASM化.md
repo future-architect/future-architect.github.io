@@ -183,13 +183,13 @@ C/C++を呼んでいる場合はこちらの方法をオススメします。
 2. emscriptenのインストール
       まずemsdkをインストールします
 
-      ```shell
+      ```bash
       git clone https://github.com/emscripten-core/emsdk.git
       ```
 
       emsdkを利用してemscriptenをインストールします。ここでバージョンを**2.0.24**にしている点に注意してください。(私の環境では最新のemscriptenでは成功しませんでした。)
 
-      ```shell
+      ```bash
       cd emsdk
       ./emsdk install 2.0.24
       ```

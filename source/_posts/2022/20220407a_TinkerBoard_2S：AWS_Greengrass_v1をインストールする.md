@@ -299,7 +299,7 @@ Helloフォルダにgreengrasssdkをコピーしてzipファイルに圧縮し�
 [ここから](https://github.com/aws/aws-greengrass-core-sdk-python/)ダウンロードしたファイルのexamplesにHelloフォルダがあるので以下の構成で
 圧縮ファイルを作成します。
 
-```console
+```text
 ~/Downloads/aws-greengrass-core-sdk-python-master/examples/HelloWorld
 ❯❯❯ tree
 .

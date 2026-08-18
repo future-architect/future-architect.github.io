@@ -76,25 +76,25 @@ tree-sitterでパーサを生成するために、tree-sitter-cliをインスト
 
 [tree-sitter-sql](https://github.com/m-novikov/tree-sitter-sql)をcloneします。tree-sitter用のSQL構文はいくつかありますが、今回は最もスター数が多いものを選択しました。
 
-```console
+```bash
 git clone https://github.com/m-novikov/tree-sitter-sql.git
 ```
 
 `git clone`を行うと、以下のようなエラーが発生する場合があります。
 
-```console
+```text
 error: unable to create file [filepath]: Filename too long
 ```
 
 これはファイル名が長すぎることが問題であるようなので、以下のように設定することで解決します。
 
-```console gitの設定
+```bash gitの設定
 git config --global core.longpaths true
 ```
 
 `git clone` したtree-sitter-sqlのルートディレクトリで、`tree-sitter test` コマンドでテストが動作したら環境構築終了です。
 
-```console
+```bash
 cd ./tree-sitter-sql
 tree-sitter test
 ```
@@ -133,7 +133,7 @@ $ tree-sitter parse ./exapmles/simple.sql
 
 `tree-sitter-sql`の結果を利用してCSTを出力するためのプロジェクトを作成します。
 
-```console
+```bash
 cargo new print-cst
 ```
 
@@ -147,7 +147,7 @@ tree-sitter-sql = {path = "{tree-sitter-sqlのパス}"}
 
 また、Github上のtree-sitter-sqlが使用しているtree-sitterのバージョンが古い(2022年11月22日現在)ため、tree-sitter-cliとtree-sitterのバージョン不整合が生じる可能性があります。バージョン不整合が生じるとき、後述するプログラムを実行すると以下のような実行時エラーが発生します。
 
-```console
+```text
 thread 'main' panicked at 'called `Result::unwrap()` on an `Err` value: LanguageError { version: 14 }', src\lib.rs:16:35
 note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
 ```
@@ -474,7 +474,7 @@ AND ID      BETWEEN 0   AND 100
 
 以下のコマンドでパーサを生成します。
 
-```console
+```bash
 tree-sitter generate
 ```
 

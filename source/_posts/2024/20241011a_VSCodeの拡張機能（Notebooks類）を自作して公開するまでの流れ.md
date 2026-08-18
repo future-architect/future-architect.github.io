@@ -89,7 +89,7 @@ v22.9.0
 
 _※ 自分は `oh-my-zsh` を使って、 `vscode-ext` というパスの配下で作業していますので、以降、のプロンプトは `➜  vscode-ext` になります。_
 
-```console
+```text
 ➜  vscode-ext npx --package yo --package generator-code -- yo code
 (node:42073) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
 (Use `node --trace-deprecation ...` to show where the warning was created)
@@ -111,7 +111,7 @@ _※ 自分は `oh-my-zsh` を使って、 `vscode-ext` というパスの配下
 
 その続きで、いくつかの質問を回答すると、Hello World 拡張の大枠(scaffold 形式)が作られます。
 
-```console
+```text
 ? What type of extension do you want to create? (Use arrow keys)
 ❯ New Extension (TypeScript)
   New Extension (JavaScript)
@@ -127,7 +127,7 @@ _※ 自分は `oh-my-zsh` を使って、 `vscode-ext` というパスの配下
 
 最初の質問は作る拡張機能のタイプを決めます。おすすめの TypeScript の新拡張機能を選びます。
 
-```console
+```text
 ? What type of extension do you want to create? New Extension (TypeScript)
 ? What's the name of your extension? vscode-pipe-run-notebook
 ? What's the identifier of your extension? vscode-pipe-run-notebook
@@ -191,7 +191,7 @@ For more information, also visit http://code.visualstudio.com and follow us @cod
 
 生成されたディレクトリ構造は以下。（他の bundler を選んだ場合は生成したファイルに差異があるはず。）
 
-```console
+```text
 ➜  vscode-ext tree -I 'node_modules' vscode-pipe-run-notebooks
 vscode-pipe-run-notebook
 ├── CHANGELOG.md
@@ -425,7 +425,7 @@ npm install -g @vscode/vsce
 
 ちなみに、今回の公開する対象ファイルのリストアップは以下になります。
 
-```console
+```text
 ➜  vscode-pipe-run-notebook git:(main) vsce ls
 package.json
 README.md
@@ -458,7 +458,7 @@ README はもちろん、LICENSE ファイルも追加したほうが良いで�
 
 拡張機能のプロジェクトディレクトリ配下で、`vsce login`, `vsce package`, `vsce publish` を実行します。
 
-```console
+```text
 vsce login wsysuper
 https://marketplace.visualstudio.com/manage/publishers/
 Personal Access Token for publisher 'wsysuper': ****************************************************
@@ -468,7 +468,7 @@ The Personal Access Token verification succeeded for the publisher 'wsysuper'.
 
 まだバグと改善点があったりすると思いますので、今回は pre-release 版を公開します。command に `--pre-release` のオプションをつけます。
 
-```console
+```text
 ➜  vscode-pipe-run-notebook git:(main) vsce package --pre-release
 Executing prepublish script 'npm run vscode:prepublish'...
 
@@ -525,7 +525,7 @@ The file extension/dist/extension.js is large (1.51 MB)
 
 パッケージ化後のディレクトリ構成の結果は以下になります。`vscode-pipe-run-notebook-0.0.1.vsix` が作られています。
 
-```console
+```text
 ➜ vscode-ext tree -I 'node_modules' vscode-pipe-run-notebook
 vscode-pipe-run-notebook
 ├── CHANGELOG.md
@@ -566,7 +566,7 @@ vscode-pipe-run-notebook
 
 さて、いよいよ公開のコマンドを打ちます！
 
-```console
+```text
 vsce publish --pre-release
 Executing prepublish script 'npm run vscode:prepublish'...
 

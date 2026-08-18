@@ -57,7 +57,7 @@ LSPがない場合は各IDEに対応した言語、仕様で言語サーバを�
 
 まず適当なディレクトリで以下のコマンドを実行してVSCode拡張機能サンプルリポジトリをダウンロードします。
 
-```shell
+```bash
 git clone https://github.com/microsoft/vscode-extension-samples.git
 ```
 
@@ -68,7 +68,7 @@ git clone https://github.com/microsoft/vscode-extension-samples.git
 1. まず先程ダウンロードしたリポジトリ内のlsp-sampleディレクトリをvscodeで開く
 1. Ctrl+@(macOSの場合は^+@)でターミナルを開き、以下を実行する
 
-```shell
+```bash
 npm install
 ```
 

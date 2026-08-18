@@ -109,7 +109,7 @@ gunicorn
 
 `pip install -r requirements.txt`で依存ライブラリと一緒にインストールした後に、requirements.lockを作ります。前回と同じですね。
 
-```shell
+```bash
 pip freeze > requirements.lock
 ```
 

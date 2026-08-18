@@ -105,7 +105,7 @@ release.ymlを作成したらリリース時にGenerate release noteを押下す
 
 GitHub CLIをインストールして、以下コマンドを実行することでPullRequestを操作できます。
 
-```shell
+```text
 gh pr edit [<number> | <url> | <branch>] [flags]
 ```
 
@@ -330,7 +330,7 @@ add_label.shでは、author.nameがスペースで区切られていないこと
 [circleci/github-cli](https://circleci.com/developer/orbs/orb/circleci/github-cli)の`- gh/setup`は何も指定しないとGitHub CLIのデフォルトバージョンは2.3.0です。
 記事執筆時の2023年2月18日にローカルにインストールされていたGitHub CLIは2.23.0でした。
 
-```shell
+```text
 ❯❯❯ gh --version
 gh version 2.23.0 (2023-02-08)
 https://github.com/cli/cli/releases/tag/v2.23.0
