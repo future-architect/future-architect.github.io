@@ -40,14 +40,14 @@ FigmaをFlutterに変換できると謳っているプラグインは複数存�
 <img src="/images/2021/20211021a/Figma_to_Code.png" alt="Figmaからコード生成イメージ" width="1200" height="600" loading="lazy">
 
 インストール数：28.5k
-最終更新日：2021年3月9日
+*最終更新日：2021年3月9日*
 
 [Figma to Code (HTML, Tailwind, Flutter, SwiftUI](https://www.figma.com/community/plugin/842128343887142055/Figma-to-Code-(HTML%2C-Tailwind%2C-Flutter%2C-SwiftUI))は、Bernardo Ferrariという人が主に開発をしているプラグインで、ソースが[githubに公開](https://github.com/bernaferrari/FigmaToCode)されています。Figma→Flutter以外にもSwiftUI、tailwindcss、HTML5にも対応しているようですが、今回はFlutterの出力のみを試してみます。
 
 **（2） Flutter Export**
 <img src="/images/2021/20211021a/thumbnail-1.png" alt="Flutter Exportアイコン" width="1200" height="600" loading="lazy">
 インストール数：11.3k
-最終更新日：2019年11月22日
+*最終更新日：2019年11月22日*
 
 [Flutter Export](https://www.figma.com/community/plugin/778755750523021654/Flutter-Export)は、とてもFlutterに変換できそうな名前が付いていますが、Figmaで作ったものをPNG画像で出力するだけのプラグインのようです。インストールして少し試してみましたが、上手く動かすことができませんでした。最終更新日も約2年前と古く、メンテもされていなそうなので、今回の**比較対象外**とします。
 （インストール数が少し多い理由が謎です）。
@@ -55,14 +55,14 @@ FigmaをFlutterに変換できると謳っているプラグインは複数存�
 **（3） FigmaToFlutter**
 <img src="/images/2021/20211021a/thumbnail-2.png" alt="thumbnail-2.png" width="1200" height="600" loading="lazy">
 インストール数：10.8k
-最終更新日：2021年1月2日
+*最終更新日：2021年1月2日*
 
 [FigmaToFlutter](https://www.figma.com/community/plugin/844008530039534144/FigmaToFlutter)は、1つ目のFigma to Codeと同様に個人が開発しているプラグインで、使い方も非常に似ています。今回の**比較対象**とします。
 
 **（4） Assistant by Grida**
 <img src="/images/2021/20211021a/thumbnail-3.png" alt="Assistant by Gridaイメージ" width="1200" height="600" loading="lazy">
 インストール数：4.7k
-最終更新日：2021年8月25日
+*最終更新日：2021年8月25日*
 
 [Assistant by Grida](https://www.figma.com/community/plugin/896445082033423994/Assistant-by-Grida)は、以前はBridgedという名前だったプラグインです。
 

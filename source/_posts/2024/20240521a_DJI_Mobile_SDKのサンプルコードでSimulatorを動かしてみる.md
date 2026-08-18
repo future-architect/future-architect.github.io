@@ -56,7 +56,7 @@ https://github.com/dji-sdk/Mobile-SDK-Android/tree/master
 - [DJI Developer](https://developer.dji.com/user/apps/#all)でログイン
 - 「CREATE APP」でアプリケーションを登録する
 
-※Package Nameはサンプルコード内のパッケージ名（各パッケージが存在するパス：Sample Code/app/src/main/java）。その他の項目は適当に記載
+※Package Nameはサンプルコード内のパッケージ名（各パッケージが存在するパス：Sample Code/app/src/main/java）。その他の項目は適当に記載。
 
 <img src="/images/2024/20240521a/image_3.png" alt="image.png" width="1192" height="1130" loading="lazy">
 
@@ -69,7 +69,7 @@ AndroidManifest.xml（パス：Sample Code/app/src/main/main）
 ### ４（開発PC）Sample Codeフォルダーを開いてビルドする
 
 - gradle-wrapper.properties(パス：Sample Code/gradle/wrapper)で一度「Sync」OR「build」
-※まず最初からSyncするといいと思うが、大抵の場合ビルドエラーが起こる。こんな感じ
+※まず最初からSyncするといいと思うが、大抵の場合ビルドエラーが起こる。こんな感じ…
 
 <img src="/images/2024/20240521a/image_5.png" alt="image.png" width="1200" height="569" loading="lazy">
 

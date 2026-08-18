@@ -304,7 +304,7 @@ if err := resp.EventStream.Err(); err != nil {
 
 <img src="/images/2020/20200515/photo_20200515_03.png" loading="lazy">
 
-※HelloWorldのStep Functionsの開発イメージ
+*※HelloWorldのStep Functionsの開発イメージ*
 
 ### Step Functions × Lambda
 

@@ -27,7 +27,7 @@ lede: "エンプラ&オンプレでもAnsible導入成功したのでユーザ�
 
 <iframe src="//www.slideshare.net/slideshow/embed_code/key/BuEj51P21HL3yF" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/taroshun/3ojisanansible" title="新卒3年目のぼくが、でぶおぷす???なエンプラ金融PJにAnsibleを導入してみた" target="_blank">新卒3年目のぼくが、でぶおぷす???なエンプラ金融PJにAnsibleを導入してみた</a> </strong> from <strong><a href="https://www.slideshare.net/taroshun" target="_blank">Shuntaro Saiba</a></strong> </div>
 
-どちらの内容も多くの皆様に共感いただくことができた気がします。。!!特にエンプラPJでのサーバ管理のツラミについて
+どちらの内容も多くの皆様に共感いただくことができた気がします。。!!特にエンプラPJでのサーバ管理のツラミについて。
 
 ## そもそもAnsibleとは
 

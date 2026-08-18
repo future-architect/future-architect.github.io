@@ -83,7 +83,7 @@ Database Tools and SQLプラグインがDataGripと同等と伝えてしまっ�
 
 <img src="/images/2022/20221014a/スキーマ探索.gif" alt="スキーマ探索" width="1200" height="569" loading="lazy">
 
-DDLを見たほうが嬉しいという人にも、サクッと生成する機能があります。テーブルを右クリック＞SQLスクリプト＞SQLジェネレータ
+DDLを見たほうが嬉しいという人にも、サクッと生成する機能があります。テーブルを右クリック＞SQLスクリプト＞SQLジェネレータ。
 
 <img src="/images/2022/20221014a/DDL生成.gif" alt="DDL生成" width="1200" height="926" loading="lazy">
 

@@ -30,7 +30,7 @@ RedmineとGitLabリポジトリを連携する[Redmine GitLab Adapter Plugin](ht
 
 Gitリポジトリ登録機能ですが、Redmineサーバ上で直接Gitリポジトリを読み取ることができないといけません。大きく以下の2つの方式が採られることが多いようです。
 
-（1）bareリポジトリをRedmineサーバ上にコピーし、定期的にリポジトリの更新を反映させる
+（1）bareリポジトリをRedmineサーバ上にコピーし、定期的にリポジトリの更新を反映させる。
 
 <img src="/images/2021/20210908a/1.png" alt="1.png" width="507" height="320" loading="lazy">
 

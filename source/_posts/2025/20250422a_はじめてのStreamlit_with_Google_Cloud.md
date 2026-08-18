@@ -42,7 +42,7 @@ Streamlitは、Pythonを使って簡単にインタラクティブなWebアプ�
 まずはStreamlitアプリを開発するためのGoogle Cloud Notebooksインスタンスを作成します。
 
 1. Vertex AI Workbench に移動
-Google Cloud Consoleのナビゲーションメニューから「Vertex AI」>「Workbench」に移動します。見つからない場合は検索ウィンドウでVertex AIを検索して直接移動してくださいね
+Google Cloud Consoleのナビゲーションメニューから「Vertex AI」>「Workbench」に移動します。見つからない場合は検索ウィンドウでVertex AIを検索して直接移動してくださいね。
 
 2. 新しいノートブックの作成
 Viewで「インスタンス」を指定し、「新規作成」をクリックし、適切な環境を選択します。

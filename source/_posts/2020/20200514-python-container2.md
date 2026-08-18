@@ -48,7 +48,7 @@ https://github.com/GoogleContainerTools/distroless/tree/master/examples/python3
 | (参考)Alpine  | Alpine  | ○  | ※1 | ※2 |
 
 ※1 manylinux1が動作せず、ソースビルドになる。apkでgcc等のインストールが必要
-※2 apkでgcc等のインストールが必要
+※2 apkでgcc等のインストールが必要。
 
 Pythonの場合、多くのパッケージがバイナリwheelを提供してくれています。そのため、Cコンパイラのインストールや設定が大変なWindowsであっても、昔からPythonユーザーはネイティブコードを使ったライブラリの恩恵に授かりやすく、環境構築も短時間で完了していました。「ライブラリのビルドが難しい」みたいな話は僕はPythonではほとんど聞いたことがありません。そのため、distrolessを使うチャンスはもしかしたら結構多いかもしれません。しかし、前回紹介したuwsgiはコンパイルが必要なので難しいです。
 

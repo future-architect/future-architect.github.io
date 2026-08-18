@@ -747,7 +747,7 @@ python predict_iris_dataflow_pubsub2bq.py \
 
 これでパイプラインが実行されます。
 
-パイプラインのジョブが動き始めたら、以下のコマンドで、Irisデータセットの各サンプルをPublishしていきます。なお、PythonファイルからPub/SubにPublishする際にはサービスアカウントキー作成する必要があります。`IAMと管理→サービスアカウント`からサービスアカウントキーを含むjsonファイルを作成し
+パイプラインのジョブが動き始めたら、以下のコマンドで、Irisデータセットの各サンプルをPublishしていきます。なお、PythonファイルからPub/SubにPublishする際にはサービスアカウントキー作成する必要があります。`IAMと管理→サービスアカウント`からサービスアカウントキーを含むjsonファイルを作成し…
 
 ```bash
 export GOOGLE_APPLICATION_CREDENTIALS="{jsonファイルまでのpath}"

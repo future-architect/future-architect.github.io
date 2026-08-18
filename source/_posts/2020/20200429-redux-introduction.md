@@ -35,7 +35,7 @@ Reduxとは、React.jsで使用するstateつまりアプリケーションの�
 **State**：アプリケーションの状態
 **Action**：ユーザーが何押したいかという情報を持つオブジェクト
 **Reducer**：Actionを元にStateを更新するメソッド
-**Store**：Stateの情報を保持している場所
+**Store**：Stateの情報を保持している場所。
 
 ## Reduxのデータフロー
 

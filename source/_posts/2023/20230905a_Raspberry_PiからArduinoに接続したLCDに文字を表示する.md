@@ -91,7 +91,7 @@ void loop() {
 
 ## Raspberry Pi の準備
 
-Raspberry Piについては、昔購入したModel Bを使用。OSの状態とか覚えていないので、まずは付属のSDカードよりRaspian（wheezy）を再インストール＆以下の作業を実施
+Raspberry Piについては、昔購入したModel Bを使用。OSの状態とか覚えていないので、まずは付属のSDカードよりRaspian（wheezy）を再インストール＆以下の作業を実施…
 
 - packageの更新
 - python3とpipの更新

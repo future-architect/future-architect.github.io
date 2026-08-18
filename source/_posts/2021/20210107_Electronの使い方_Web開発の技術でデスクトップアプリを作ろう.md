@@ -559,7 +559,7 @@ Webアプリケーションとして一通りの機能を持ったアプリケ�
 
 > VueRouterを用いた画面遷移は可能か
 
-→[少々設定が必要](https://nklayman.github.io/vue-cli-plugin-electron-builder/guide/commonIssues.html#blank-screen-on-builds-but-works-fine-on-serve)だが動いた
+→[少々設定が必要](https://nklayman.github.io/vue-cli-plugin-electron-builder/guide/commonIssues.html#blank-screen-on-builds-but-works-fine-on-serve)だが動いた。
 
 > ファイルのダウンロード、生成は可能か
 

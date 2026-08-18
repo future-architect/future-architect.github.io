@@ -40,7 +40,7 @@ Infrastructure as Code は、AWS CloudFormation と AWS サーバーレスアプ
 
 <img src="/images/2023/20230509a/スクリーンショット_2023-05-07_23.07.19.png" alt="" width="1200" height="453" loading="lazy">
 
-※ドラッグ&ドロップでサービスを配置して、サービス同士を線で繋いでいくイメージ
+*※ドラッグ&ドロップでサービスを配置して、サービス同士を線で繋いでいくイメージ*
 
 ## サービスの特徴
 

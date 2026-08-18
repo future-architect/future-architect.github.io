@@ -13,7 +13,7 @@ lede: "WWDC2024: visionOS向けエンタープライズAPIのご紹介 よりvis
 ---
 <img src="/images/2024/20240906a/スクリーンショット_2024-09-05_16.04.34.png" alt="" width="604" height="345" loading="lazy">
 
-▼WWDC2024: visionOS向けエンタープライズAPIのご紹介 より
+*▼WWDC2024: visionOS向けエンタープライズAPIのご紹介 より*
 
 ---
 

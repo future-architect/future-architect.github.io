@@ -53,11 +53,11 @@ $平文=平文^{ED} \quad mod \quad N$
 
 平文を5,とある数E,D,Nを3,7,33として確認してみます。
 
-暗号化
+**暗号化**
 
 $5^3 \quad mod \quad 33 = 125 \quad mod \quad 33 = 2$
 
-復号
+**復号**
 
 $26^7 \quad mod \quad 33 = 8031810176 \quad mod \quad 33\quad = 5$
 

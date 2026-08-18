@@ -56,7 +56,7 @@ https://cloud.google.com/vision/pricing?hl=ja
 
 <img src="/images/2020/20200218/photo_20200218_01.png" class="img-middle-size" loading="lazy">
 
-プロジェクト名を入力し作成ボタンをクリック
+プロジェクト名を入力し作成ボタンをクリック。
 
 ### Cloud Vision APIの有効化
 

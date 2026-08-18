@@ -37,7 +37,7 @@ Version2と3はメジャーバージョンが変わったということで、�
 
 <img src="/images/2022/20220622b/v2とv3の違い.png" alt="v2とv3の違い" width="1131" height="792" loading="lazy">
 
-※ 図は https://blog.stoplight.io/difference-between-open-v2-v3-v31 より
+*※ 図は https://blog.stoplight.io/difference-between-open-v2-v3-v31 より*
 
 上図を見ると、v2からSecurityDefinicions、definitions、parameters、responses などがなくなりスッキリしていると思います。これはcomponentsに移動になったからで、これにより再利用性が高まるように設計されました。書いている内容自体はほぼ変わらないので、v2がわかればv3のお作法にもすぐ慣れると思います。
 

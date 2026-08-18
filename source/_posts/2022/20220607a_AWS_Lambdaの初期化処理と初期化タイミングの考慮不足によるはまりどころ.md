@@ -34,7 +34,7 @@ Lambda実行環境のライフサイクルは3つに分かれています。INIT
 
 <img src="/images/2022/20220607a/Overview-Successful-Invokes.png" alt="Overview-Successful-Invokes.png" width="1200" height="225" loading="lazy">
 
-https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/lambda-runtime-environment.html より
+*https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/lambda-runtime-environment.html より*
 
 INITフェーズでは、関数インスタンス（Lambda関数が実行される環境のこと）作成やハンドラ関数外に実装されている初期化処理が行われます。たとえばGoの場合、AWSのサンプルにある [^2] 以下のような `init()` の処理はINITフェーズで行われます。
 

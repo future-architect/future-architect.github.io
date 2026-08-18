@@ -29,7 +29,7 @@ ML監視についての概要や意義については、[こちらの記事](/ar
 
 <img src="/images/2023/20230531a/2023-05-10-16-41-00.png" alt="" width="500" height="133" loading="lazy">
 
-※[公式サイト](https://docs.greatexpectations.io/docs/)ロゴ
+*※[公式サイト](https://docs.greatexpectations.io/docs/)ロゴ*
 
 Great Expectations（GX）はデータ品質監視ツールの1つで、表形式データの品質監視ができます。GXはOSSであり、Pythonライブラリとして提供されています。
 
