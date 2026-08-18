@@ -16,7 +16,7 @@ author: 真野隼記
 lede: "Real World HTTPミニ版を記念にフューチャーのオフィスで勉強会を実施しましたら、リアル渋川さんに出会えました話です"
 ---
 
-<img src="/images/2019/20190410/top.png" class="img-small-size" loading="lazy">
+<img src="/images/2019/20190410/top.png" class="img-small-size" width="515" height="660" loading="lazy">
 
 こんにちは、フーチャーのTIG所属、真野です。
 パネルディスカッションとして参加したらとても良い経験になったため、その流れで開催報告記事を担当させていただくことになりました。
@@ -49,7 +49,7 @@ Real World HTTPミニ版は、若手エンジニアの勉強会や、企業の�
 ミニ版をなぜ公開したかといった背景の説明や、さらにReal World HTTPに追加するネタもいくつか紹介。
 アカデミックなプロトコルの話ではなく、あくまで現実世界で使われているようなWebFrameworkの仕様のようなネタが紹介され、個人的には非常に勉強になりました。
 
-<img src="/images/2019/20190410/shibukawa.jpg" loading="lazy">
+<img src="/images/2019/20190410/shibukawa.jpg" width="512" height="384" loading="lazy">
 
 ### 内容について
 
@@ -79,7 +79,7 @@ Real World HTTPミニ版は、若手エンジニアの勉強会や、企業の�
 * DeNA karupaneruraさん
 * フューチャー真野、司会:渋川さん
 
-<img src="/images/2019/20190410/panel.jpg" loading="lazy">
+<img src="/images/2019/20190410/panel.jpg" width="2451" height="1838" loading="lazy">
 
 新人研修はそれぞれ各社の特色が出ていて、話していて面白かったです。
 
