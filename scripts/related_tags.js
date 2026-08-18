@@ -24,11 +24,12 @@
  * 検出できない。そこで名前の形（末尾の数字を外した接頭辞が一致する）から
  * 同じ系列のタグを拾う。
  *
- * 出すのは3つの群で、読者の目的ごとに分ける (#2569)。
+ * 出すのは4つの群で、読者の目的ごとに分ける (#2569)。
  *
  *   1. 詳しく見る … 移動先が今のタグの中に収まる（共起の部分集合＋系列の子）
  *   2. 隣を見る   … 一緒に付いている。移動すると新しい記事に出会える
- *   3. 同じ系列   … 版違い（Go1.26 の隣の Go1.27）と親（無印の Go）
+ *   3. 広げる     … 系列の親（Go1.27 から見た無印の Go）
+ *   4. 別の版へ   … 系列の同じ階層（Go1.27 から見た Go1.26）
  *
  * 1 と 2 を分けるのは目的が違うためで、同時に枠の奪い合いも避けられる。
  * lift は移動先が小さいほど跳ねる（2本のタグで50倍前後）ので、同じ列に混ぜると
@@ -41,10 +42,14 @@
  * から。子に親タグを付け忘れた記事が1本あるだけで、Go1.24 だけが群から落ちて
  * 並びが不揃いになる。名前なら揺れない。代わりにパネルは移動先の本数だけを
  * 出し、包含は名乗らない。
- * 3 に残るのは版のページ（Go1.26 など26件）から見た親と別の版で、こちらは
- * 絞り込みではなく「広げる」「横に移る」関係になる。
+ * 3 と 4 が出るのは版のページ（Go1.26 など26件）だけ。親は自分の記事を全部
+ * 含む上位集合、別の版は記事が1本も重ならない排他的な集合で、読者の動きも
+ * 「広げる」と「別の版を見る」で違う。同じ群に入れると、どちらの関係なのかが
+ * ラベルから読めない。4 を 2（共起の隣接）に混ぜないのは、隣接群のパネルが
+ * 共有本数を名乗る群であるため。別の版との共有は0本で、「共有0本の隣接」が
+ * 混ざると群の意味が壊れる。
  *
- * 並びは 1 → 2 → 3。1ページ目の関連タグは一覧の前にあり、読者はまだ
+ * 並びは 1 → 2 → 3 → 4。1ページ目の関連タグは一覧の前にあり、読者はまだ
  * このタグで合っているかを見ている (#2088)。群にラベルがあるので後ろの群も
  * 目的から探せる（ラベルが無いと末尾の群は見落とされる #2357）。
  *
@@ -52,8 +57,8 @@
  * 決定的な関係なので、件数による裏付けは要らない。系列が1つでも、移動先が
  * 1本でも出す。読者にとって Go1.26 の隣に Go1.27 があるのは自明で、薄い結果でも
  * 期待が裏切られない。接頭辞そのもののタグ（無印: Go / GoogleCloudNext）も
- * 同じ系列に含める (#2355)。親ページに子の一覧が出て、子ページには親が系列の
- * 先頭に出る。実データでは Go / インターン / GoogleCloudNext / Terraform /
+ * 同じ系列に含める (#2355)。親ページに子の一覧が出て、子ページには親が
+ * 広げる相手として出る。実データでは Go / インターン / GoogleCloudNext / Terraform /
  * PostgreSQL / NLP の6系列（無印含む）が拾え、束ね間違いは無かった。
  *
  * リンク先は単にそのタグのページで、2タグの AND 検索はしない。
@@ -88,6 +93,16 @@ function family(name) {
   const m = VERSIONED.exec(name);
   // 接頭辞が空（"2024" のような数字だけのタグ）は系列として扱わない
   return m && m[1] ? m[1] : null;
+}
+
+// 末尾が4桁の年なら、系列の軸はバージョンではなく年。実データでは
+// インターン / GoogleCloudNext / NLP が年、Go / PostgreSQL / Terraform が
+// バージョンで、この境目で綺麗に分かれる（PostgreSQL18 は2桁なので年ではない）
+const YEAR = /^(?:19|20)\d{2}$/;
+
+function isYear(name) {
+  const m = VERSIONED.exec(name);
+  return !!m && YEAR.test(m[2]);
 }
 
 // 1.27 -> 1027、2024 -> 2024。桁上げを 1000 にしているのは
@@ -179,13 +194,21 @@ hexo.extend.helper.register('related_tags', function (tagName) {
   const stem = family(tagName) || (families.has(tagName) ? tagName : null);
   const relatives = (stem ? families.get(stem) || [] : []).filter((name) => name !== tagName);
   const relativeNames = new Set(relatives);
-  // 接頭辞のページから見た系列は全部「より詳しいタグ」。版のページから見た系列は
-  // 親（無印）と別の版で、絞り込みではないので独立した群にする
+  // 接頭辞のページから見た系列は全部「より詳しいタグ」。版のページから見ると
+  // 親（無印）は広げる相手、別の版は同じ軸の別の値で、向きが違う
   const children = stem === tagName ? relatives.map(member) : [];
-  const series = (stem === tagName ? [] : relatives)
+  const broader =
+    stem === tagName
+      ? []
+      : relatives
+          .filter((name) => name === stem)
+          .map(member)
+          // 親が自分の記事を全部含むかは、共起が自分の本数と一致するかで分かる
+          .map((r) => ({ ...r, covers: r.co === own }));
+  const versions = (stem === tagName ? [] : relatives)
+    .filter((name) => name !== stem)
     .map(member)
-    // 無印（親）はバージョンを持たないので先頭に置く。系列全体への入口のため
-    .map((r) => ({ ...r, version: VERSIONED.test(r.name) ? versionKey(r.name) : Infinity }))
+    .map((r) => ({ ...r, version: versionKey(r.name) }))
     .sort((a, b) => b.version - a.version); // 新しいバージョンを先に
 
   // 移動先に新しい記事が1本しか無い相手を出すかどうか。1ページに収まるタグでは
@@ -231,6 +254,7 @@ hexo.extend.helper.register('related_tags', function (tagName) {
   return [
     { kind: 'detail', tags: detail },
     { kind: 'adjacent', tags: adjacent },
-    { kind: 'series', tags: series },
+    { kind: 'broader', tags: broader },
+    { kind: versions.every((r) => isYear(r.name)) ? 'years' : 'versions', tags: versions },
   ].filter((g) => g.tags.length);
 });
