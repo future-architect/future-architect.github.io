@@ -1,5 +1,5 @@
 ---
-title: "GoLand Tips 7選"
+title: "GoLand Tips 6選"
 date: 2021/09/02 00:00:01
 postid: b
 tags:
@@ -87,12 +87,12 @@ Go言語ではエラー処理など何度も書く処理がありますが、こ
 
 <img src="/images/2021/20210902b/gif7.gif" alt="gif7.gif" width="600" height="305" loading="lazy">
 
-## 6. ドキュメントを見る (Quick documentation)
+## 5. ドキュメントを見る (Quick documentation)
 
 関数名の上にカーソルを持ってきてホバーすると関数のドキュメントやドキュメントのURLが表示されます。マウスとか使いたくない時は`Shift+ F1`でドキュメントのページを開きます。
 <img src="/images/2021/20210902b/gif9.gif" alt="gif9.gif" width="600" height="272" loading="lazy">
 
-## 7. タブの移動
+## 6. タブの移動
 
 `⌘ + Shift + [` , `⌘ + Shift + ]`でタブ間を移動できます。
 
