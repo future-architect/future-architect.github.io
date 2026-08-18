@@ -17,13 +17,13 @@ Futureとしてstackshareを活用するのは初めての試みとなります�
 先日「Future IoT」のstackshareを公開しました。
 https://stackshare.io/future-corporation/futureiot
 
-<img src="/images/2019/20190723/photo_20190723_01.png" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2019/20190723/photo_20190723_01.png" style="border:solid 1px #000000" width="2880" height="1480" loading="lazy">
 
 Futureとしてstackshareを活用するのは初めての試みとなりますが、本記事では公開に至った経緯や技術スタックの採用戦略について簡単にお伝えできればと思います。
 
 ## stackshareとは
 
-<img src="/images/2019/20190723/photo_20190723_02.png" loading="lazy">
+<img src="/images/2019/20190723/photo_20190723_02.png" width="812" height="124" loading="lazy">
 
 https://stackshare.io
 世界中のツールやサービスがどのような技術スタックを使っているかチェックできるサービスになります。FacebookやTwitterといった有名企業もstackshareで自社の技術スタックを公開しています。

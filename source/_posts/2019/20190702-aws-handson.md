@@ -104,11 +104,11 @@ Future入社後は業務でクラウドを触ったことがなかった状態�
 の両面から監視・分析できる環境を構築していきます。
 
 イメージ図はこちら
-<img src="/images/2019/20190702/photo_20190702_01.png" loading="lazy">
+<img src="/images/2019/20190702/photo_20190702_01.png" width="1000" height="323" loading="lazy">
 
 ### 3-1. はじめの準備
 
-<img src="/images/2019/20190702/photo_20190702_02.png" loading="lazy">
+<img src="/images/2019/20190702/photo_20190702_02.png" width="1768" height="686" loading="lazy">
 
 後続のログ分析に使うためのログを生成し続けるEC2インスタンスを作成します。
 
@@ -118,7 +118,7 @@ Future入社後は業務でクラウドを触ったことがなかった状態�
 
 ### 3-2. リアルタイムのアプリケーションログ可視化
 
-<img src="/images/2019/20190702/photo_20190702_03.png" loading="lazy">
+<img src="/images/2019/20190702/photo_20190702_03.png" width="1000" height="419" loading="lazy">
 
 続いて、スピードレイヤの構築を開始します。
 
@@ -133,7 +133,7 @@ Future入社後は業務でクラウドを触ったことがなかった状態�
 
 ### 3-3. アラームの設定
 
-<img src="/images/2019/20190702/photo_20190702_04.png" loading="lazy">
+<img src="/images/2019/20190702/photo_20190702_04.png" width="1896" height="718" loading="lazy">
 
 fluentd→ESの間に、CloudWatchLogs(Alarm)とLambdaを差し込むことで、リアルタイムのログ監視とアラームを設定します。
 
@@ -141,7 +141,7 @@ fluentd→ESの間に、CloudWatchLogs(Alarm)とLambdaを差し込むことで�
 
 ### 3-4. アプリケーションログの永続化・長期間データの分析と可視化
 
-<img src="/images/2019/20190702/photo_20190702_05.png" loading="lazy">
+<img src="/images/2019/20190702/photo_20190702_05.png" width="1908" height="736" loading="lazy">
 
 ここからバッチレイヤの構築に入ります。
 
@@ -151,13 +151,13 @@ S3への保存によって長期間のデータ保管を可能にしたうえで
 
 ### 3-5. アプリケーションログの永続化・長期間データの分析と可視化
 
-<img src="/images/2019/20190702/photo_20190702_06.png" loading="lazy">
+<img src="/images/2019/20190702/photo_20190702_06.png" width="1902" height="770" loading="lazy">
 
 3-4とは異なり、ストリーミングされたログをS3で永続化したうえで、DWHに読み込み分析し、BIツールで可視化しました。
 
 ### 3-6. サーバレスでデータのETL処理
 
-<img src="/images/2019/20190702/photo_20190702_07.png" loading="lazy">
+<img src="/images/2019/20190702/photo_20190702_07.png" width="1884" height="792" loading="lazy">
 
 Glueを使い、サーバーレスでデータの加工処理をしました。
 
