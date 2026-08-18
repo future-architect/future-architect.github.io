@@ -82,7 +82,7 @@ Terraformで管理している設定と、実際のクラウドリソースの�
 * https://developer.hashicorp.com/terraform/cloud-docs
 * https://qiita.com/hsmto25519/items/a9ff129657d0d0e531c7
 
-### 4. アーキテクチャ選定とコストの落とし穴
+## 4. アーキテクチャ選定とコストの落とし穴
 
 HCP Terraformは非常に便利なツールですが、Cloud Run Functions（旧Cloud Functions）などを多用する「サーバーレス開発」において、**「なんでもかんでもTerraformで管理しようとする」と、思わぬコストの罠にハマる**ことがあります。まずは具体的な料金体系とコスト感を見てみましょう。
 
