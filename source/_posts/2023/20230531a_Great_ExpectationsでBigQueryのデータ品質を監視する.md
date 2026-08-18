@@ -41,12 +41,12 @@ GXでは「監視対象データ、Expectation Suite、バリデーションを�
 
 ### 3.1. 事前準備
 
-### 必要な環境
+#### 必要な環境
 
 * Python環境
 * JupyterNotebook環境（必須ではないですが初期設定ではあった方が楽です）
 
-### 使用するデータ
+#### 使用するデータ
 
 [Bike Sharing Dataset](https://archive.ics.uci.edu/ml/datasets/bike+sharing+dataset)を利用し、1時間毎のシェアバイク利用者数が記録されているテーブルを使います。
 
