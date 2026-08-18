@@ -25,7 +25,7 @@ lede: "DebuggerとProfilerを試してみます。本当は仕事で使ってい
 
 プロジェクトIDは自分で入力する名前に何か数値が後ろについたようなやつです。プロジェクト一覧に出てくるserverless-12345のようなものがIDです。
 
-```sh
+```console
 # 初期化とプロジェクトの選択
 $ gcloud auth login
 $ gcloud config set project [プロジェクトID]
@@ -35,7 +35,7 @@ $ gcloud config set project [プロジェクトID]
 
 Cloud Runで試しで動かすプロジェクトを作ってみます。Poetryを使ってFastAPIなプロジェクトを作ってみましょう。作ったアプリケーションはCloud Runで実行します。
 
-```sh
+```console
 # 一度だけやるPoetryのインストール
 $ python -m pip install --user poetry
 # .venvはIDEが探しやすいようにプロジェクトローカルに作って欲しい
@@ -122,7 +122,7 @@ CMD [ "/bin/sh", "-c", "exec /usr/local/bin/uvicorn --host 0.0.0.0 --port $PORT 
 
 ローカルでビルドしてうまく動くことを確認したらpushします。リポジトリに入れてクラウドビルドをする方法も最近は使えます。とりあえず手元で動かしてプッシュしてみます。M1 macの場合は--platform linux/amd64が必要です。
 
-```sh
+```console
 # ビルド
 $ docker build --platform linux/amd64 -t gcr.io/[プロジェクトID]/[プロジェクト名]:latest .
 # ローカルで実行

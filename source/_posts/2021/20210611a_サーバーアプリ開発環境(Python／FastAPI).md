@@ -184,7 +184,7 @@ start = { cmd = "uvicorn example_server.main:app --reload", help = "launch test 
 
 これで次のコマンドで8000ポートで開発サーバーが起動するようになります。ファイルを変更すると自動リロードします。
 
-```bash
+```console
 $ poetry run task start
 INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
 INFO:     Started reloader process [49000] using statreload

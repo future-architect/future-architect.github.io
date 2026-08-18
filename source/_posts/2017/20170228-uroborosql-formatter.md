@@ -22,7 +22,7 @@ lede: "弊社謹製のSQLフォーマッターuroboroSQL formatterを公開し�
 また、[弊社、星が昨年投稿した記事](/articles/20160902/)の中で[Javaのコーディング規約](/coding-standards/documents/forJava/Javaコーディング規約.html)を公開しましたが、今回その第2弾として、[SQLのコーディング規約（Oracle限定）](/coding-standards/documents/forSQL/SQLコーディング規約（Oracle）.html)も公開いたしましたので、こちらについても触れたいと思います。
 
 <a href="https://github.com/future-architect/uroboroSQL-formatter">
-<img src="/images/2017/20170227/photo_20170227_01.png" class="img-middle-size"  loading="lazy">
+<img src="/images/2017/20170227/photo_20170227_01.png" class="img-middle-size"  width="500" height="120" loading="lazy">
 </a>
 
 ## 作成経緯
@@ -47,7 +47,7 @@ lede: "弊社謹製のSQLフォーマッターuroboroSQL formatterを公開し�
 
 SublimeText3のプラグインとして利用できます。
 
-<img src="/images/2017/20170227/photo_20170227_02.png" loading="lazy">
+<img src="/images/2017/20170227/photo_20170227_02.png" width="1125" height="678" loading="lazy">
 
 導入は、
 `Package Control`の`Install Package`から

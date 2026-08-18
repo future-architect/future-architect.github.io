@@ -78,7 +78,7 @@ docker run --name pg18-handson -e POSTGRES_PASSWORD=mysecretpassword -p 5432:543
 
 コンテナの起動を確認。
 
-```sh
+```console
 $ docker ps
 CONTAINER ID   IMAGE                        COMMAND                  CREATED         STATUS                     PORTS                                       NAMES
 0806a36cb87c   postgres:18                  "docker-entrypoint.s…"   8 seconds ago   Up 7 seconds               0.0.0.0:5432->5432/tcp, :::5432->5432/tcp   pg18-handson
@@ -86,7 +86,7 @@ CONTAINER ID   IMAGE                        COMMAND                  CREATED    
 
 `psql`コマンドで入ってみると、、しっかりと動いてることが確認できたので次に進みます。
 
-```sh
+```console
 $ docker exec -it pg18-handson psql -U postgres
 psql (18.0 (Debian 18.0-1.pgdg13+3))
 Type "help" for help.

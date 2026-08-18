@@ -154,7 +154,7 @@ sudo apt install mariadb-server
 - Remove test database and access to it? → Yes
 - Reload privilege tables now? → Yes
 
-```sh
+```console
 $ sudo mysql_secure_installation
 
 NOTE: RUNNING ALL PARTS OF THIS SCRIPT IS RECOMMENDED FOR ALL MariaDB
@@ -226,7 +226,7 @@ Thanks for using MariaDB!
 
 `mysql -u root -p` でログインできるか確かめておきましょう。
 
-```sh
+```console
 $ mysql -u root -p
 Enter password:
 Welcome to the MariaDB monitor.  Commands end with ; or \g.

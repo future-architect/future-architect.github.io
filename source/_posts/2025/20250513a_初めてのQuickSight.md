@@ -174,7 +174,7 @@ parseDate(concat(toString({年}), "/", toString({月}), "/", toString({日})), "
 
 APIを利用することで、より高度なユースケースを実現できるようになります。ここでは、APIのみで利用可能なQuickSightの仕組み（テンプレート）を題材に、CLIの利用例をご紹介します。使用したAWS CLIのバージョンは以下の通りです。
 
-```sh
+```console
 $ aws --version
 aws-cli/2.17.33 Python/3.11.9 Linux/5.15.153.1-microsoft-standard-WSL2 exe/x86_64.ubuntu.22
 ```
@@ -191,7 +191,7 @@ AWS CLIを利用して[先ほど](#さっそく触ってみる)を作成した�
 
 テンプレートを作成するために、先ほど作成したデータセットと分析のARNをCLIを使って取得しておきます。
 
-```bash
+```console
 # データセットのARNを取得する例
 $ aws quicksight list-data-sets \
   --aws-account-id ${AWS_ACCOUNT_ID} \
@@ -233,7 +233,7 @@ arn:aws:quicksight:ap-northeast-1:${AWS_ACCOUNT_ID}:analysis/${ANALYSIS_ID}
 
 作成されたテンプレートは、`describe-template`のAPIなどから確認できます。
 
-```bash
+```console
 $ aws quicksight create-template \
   --aws-account-id ${AWS_ACCOUNT_ID} \
   --template-id kion-template \
@@ -264,7 +264,7 @@ $ aws quicksight create-template \
 
 以下で指定している`ダッシュボードのID`は、`describe-dashboard`のAPIなどから確認できます。
 
-```bash
+```console
 $ aws quicksight describe-dashboard-permissions \
   --aws-account-id ${AWS_ACCOUNT_ID} \
   --dashboard-id ${ダッシュボードのID} \
@@ -274,7 +274,7 @@ $ aws quicksight describe-dashboard-permissions \
 
 作成したテンプレートと用意した情報を元に、別地点のダッシュボードは以下のように作成します。
 
-```bash
+```console
 $ aws quicksight create-dashboard \
   --aws-account-id ${AWS_ACCOUNT_ID} \
   --dashboard-id soyamisaki-kion-dashboard \

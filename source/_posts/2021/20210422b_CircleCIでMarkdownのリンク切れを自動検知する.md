@@ -66,7 +66,7 @@ CircleCI のチェックで、リンク切れファイルが**1つでも**存在
 
 - 引用: [今さらながらfindパイセンについてまとめてみた（‐execオプション）](/articles/20210331/)
 
-```bash -execとxargsの違い
+```console -execとxargsの違い
 # -exex
 $ find . -type f -name "*.txt" -exec echo "ファイル名: {}" \;
 ファイル名: ./test01.txt
@@ -112,7 +112,7 @@ workflows:
 長期間メンテナンスされていないリポジトリの場合、markdown-link-check が大量のリンク切れを検知します。
 `.circleci/config.yml` に定義ファイルが追加された時点で、CircleCI が落ち続けてしまうので、まずはローカル実行でリンク切れ状況をチェックしましょう。
 
-```bash
+```console
 $ circleci local execute --job markdown_link_check
 （略）
 

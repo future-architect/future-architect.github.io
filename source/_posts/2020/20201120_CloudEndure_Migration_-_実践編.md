@@ -376,7 +376,7 @@ CloudEndureコンソールの「JobProgress」を確認すると、終了して�
 テストモードで起動したターゲットマシンに、SSHログインしてみます。
 <img src="/images/2020/20201120/TargetMachine(TestMode)成功GIP.png" loading="lazy">
 
-```bash 実行結果
+```console 実行結果
 $ ssh -i key-pair.pem yamaki@18.179.11.231
 〜〜〜〜〜中略〜〜〜〜〜
 Last login: Wed Nov  4 11:30:13 2020 from xx-xx-xx-xx.xx.xx.xx.xx.jp
@@ -504,7 +504,7 @@ WordPressの設定を変更したあと、アクセスしてみます。
 以下のコマンドをrootで実行して、エージェントを停止します。
 `/var/lib/cloudendure/stopAgent.sh`
 
-```bash 実行結果
+```console 実行結果
 $ /var/lib/cloudendure/stopAgent.sh
 Killing agent: 1569
 17818
@@ -534,7 +534,7 @@ Killed tail
 以下のコマンドをrootで実行することで、起動設定などを削除できます。
 `/var/lib/cloudendure/install_agent --remove`
 
-```bash 実行結果
+```console 実行結果
 $ /var/lib/cloudendure/install_agent --remove
 --- installing new driver
 running: 'which update-rc.d'

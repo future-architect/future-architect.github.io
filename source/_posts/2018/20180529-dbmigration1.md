@@ -57,7 +57,7 @@ OSSデータベースで広く採用されているのはPostgreSQLとMySQLが�
 
 データベースのマイグレーションが決定した後は、一例として以下のように進めていきます。
 
-<img src="/images/2018/20180529/migration_phase.png" loading="lazy">
+<img src="/images/2018/20180529/migration_phase.png" width="528" height="369" loading="lazy">
 
 赤字となっている作業については、実装されているアプリケーションにより作業量が大きく変動するものとなります。
 データベースのマイグレーションの成功は、現状アプリケーションの正確な把握に直結すると考えておりますので、現状把握については専門技術者を交えてしっかりと実施することをお奨め致します。
@@ -173,7 +173,7 @@ PostgreSQLにおいて外部結合は当然SQL標準であるOUTER JOINの記載
 
 言葉だけでは分かりづらいと思いますので、Oracleで用意されているサンプルスキーマ（SCOTTユーザ）で見ていきます。テーブルはEMP表とDEPT表を使います。デフォルトの状態から少しだけ値を変えているところはあります。
 
-<img src="/images/2018/20180529/demo.png" loading="lazy">
+<img src="/images/2018/20180529/demo.png" width="740" height="482" loading="lazy">
 
 2種類の外部結合表記のSQL文を用意しました。
 
@@ -197,7 +197,7 @@ AND e.comm = 300;
 
 検索結果は以下の通りです。
 
-<img src="/images/2018/20180529/outerjoin_result_SQL.png" loading="lazy">
+<img src="/images/2018/20180529/outerjoin_result_SQL.png" width="757" height="423" loading="lazy">
 
 （1）の場合は結合前にリテラル条件で絞っている、（2）の場合は結合後にリテラル条件で絞っている、ということです。
 
@@ -224,11 +224,11 @@ WHERE e.comm = 300;
 
 念のため結果も。
 
-<img src="/images/2018/20180529/outerjoin_result_SQL.png" loading="lazy">
+<img src="/images/2018/20180529/outerjoin_result_SQL.png" width="757" height="423" loading="lazy">
 
 PostgreSQLでも。
 
-<img src="/images/2018/20180529/outerjoin_result_postgres.png" loading="lazy">
+<img src="/images/2018/20180529/outerjoin_result_postgres.png" width="624" height="397" loading="lazy">
 
 同じですね。
 
@@ -243,11 +243,11 @@ PostgreSQLでも。
 OracleとPostgreSQLの両方で用意されていますが、機能仕様が全く異なる関数としては`DECODE`があります。
 OracleではDECODE関数は条件分岐として使われています。構文としては以下です。
 
-<img src="/images/2018/20180529/decode_oracle.png"  class="img-middle-size" loading="lazy">
+<img src="/images/2018/20180529/decode_oracle.png"  class="img-middle-size" width="610" height="64" loading="lazy">
 
 PostgreSQLでは、DECODE関数はテキスト表現からバイナリデータを復号する関数となっております。構文としては以下です（formatオプションはbase64/hex/escapeから選択）。
 
-<img src="/images/2018/20180529/decode_postgres.png"  class="img-small-size" loading="lazy">
+<img src="/images/2018/20180529/decode_postgres.png"  class="img-small-size" width="264" height="49" loading="lazy">
 
 OracleでのDECODE関数はPostgreSQLではcase文に変換します。
 
@@ -309,7 +309,7 @@ PosrgreSQL 9.5からUPSERT文（INSERT ON CONFLICT）が使用可能となりま
 こちらもサンプルスキーマ環境で見てみましょう。
 empと同じ定義のemp_up表を作成してます。
 
-<img src="/images/2018/20180529/merge_empup.png" loading="lazy">
+<img src="/images/2018/20180529/merge_empup.png" width="854" height="125" loading="lazy">
 
 emp_up表のレコードを見てemp表にレコードが存在した場合はUPDATEをして、emp表にレコードが無ければINSERTをするというMERGE文を作ってみました（今回はSAL列とCOMM列だけをUPDATEしてます）。
 
@@ -324,7 +324,7 @@ USING emp_up u ON (e.empno = u.empno)
 
 実行結果です。
 
-<img src="/images/2018/20180529/merge_result.png" loading="lazy">
+<img src="/images/2018/20180529/merge_result.png" width="912" height="564" loading="lazy">
 
 empno:7369のsal列が変更され、empno:8000のレコードが作成されていますね。
 
@@ -339,7 +339,7 @@ DO UPDATE SET sal = excluded.sal, comm = excluded.comm ;
 
 実行結果です。
 
-<img src="/images/2018/20180529/upsert_result.png" loading="lazy">
+<img src="/images/2018/20180529/upsert_result.png" width="741" height="396" loading="lazy">
 
 同じ結果となりました。
 
@@ -359,7 +359,7 @@ INSERT INTO scott.emp
 
 実行結果です。
 
-<img src="/images/2018/20180529/insert_CTE_result.png" loading="lazy">
+<img src="/images/2018/20180529/insert_CTE_result.png" width="818" height="442" loading="lazy">
 
 通常テーブルであれば、もちろんUPSERTでもCTEでも結果は一緒ですね。
 

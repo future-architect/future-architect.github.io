@@ -77,7 +77,7 @@ docker composeではv2から `compose.yaml` が[推奨](https://docs.docker.com/
 
 Warnログが出力され、適用されたファイルを確認できます(composeはyamlが優先、docker-composeはymlが優先になってます)。
 
-```shell
+```console
 $ docker compose up
 WARN[0000] Found multiple config files with supported names: /tmp/compose-sample/compose.yaml, /tmp/compose-sample/compose.yml, /tmp/compose-sample/docker-compose.yml, /tmp/compose-sample/docker-compose.yaml
 WARN[0000] Using /tmp/compose-sample/compose.yaml
@@ -201,7 +201,7 @@ docker compose --profile dev up
 `compose.yaml` のトップレベルの[versionの記載が不要](https://docs.docker.com/compose/compose-file/04-version-and-name/)になりました。
 記載するとエラーが出るようになっています。
 
-```shell
+```console
 $ docker compose up
 WARN[0000] /tmp/compose-sample/compose.yaml: `version` is obsolete
 [+] Running 1/0

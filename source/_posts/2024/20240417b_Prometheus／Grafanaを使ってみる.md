@@ -81,7 +81,7 @@ https://github.com/trallnag/prometheus-fastapi-instrumentator
 
 これでコンテナを起動させ、`/metrics`にcURLを実行すると以下のようにたくさん情報が出てきます。
 
-```bash
+```console
 $ curl http://localhost:8080/metrics
 
 # HELP python_gc_objects_collected_total Objects collected during gc

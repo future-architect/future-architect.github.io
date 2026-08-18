@@ -37,7 +37,7 @@ Docker Desktopの有償化と契約すべきライセンスについては以前
 
 そのままだと実行すると、プロキシのホスト名が解決できないというエラーが発生してしまいます。ネームサーバーの設定を入れてあげる必要があります。まずWSL2を起動します。まずはresolv.confが上書きされないようにwsl.confを編集します。
 
-```bash
+```console
 $ wsl -d podman-machine-default
 
 (wsl2起動)
@@ -61,7 +61,7 @@ wsl --shutdown
 
 次は/etc/resolv.confを編集します。
 
-```bash
+```console
 $ wsl -d podman-machine-default
 
 (wsl2起動)

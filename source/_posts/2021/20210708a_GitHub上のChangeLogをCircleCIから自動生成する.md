@@ -164,7 +164,7 @@ Tipsを載せておきます。
 
 ローカルにGoが入っている方は以下コマンドでインストール、入っていない方はバイナリをインストールしてください。
 
-```bash
+```console
 # Goが1.16以下の方は go get でインストールしてください。
 $ go install github.com/Songmu/ghch/cmd/ghch@v0.10.2
 $ go install github.com/github-release/github-release@v0.10.0
@@ -178,7 +178,7 @@ export GITHUB_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxxxxxxx
 
 上記が完了したら、下記コマンドで生成できます。
 
-```bash
+```console
 $ github-release release \
   --user {YOUR_GITHUB_USER} \
   --repo {YOUR_REPOSITORY} \
@@ -194,7 +194,7 @@ $ github-release release \
 `--from` オプションから `--to` オプションまでの差分を公開できます。
 ※ ↑で記した、インストールや環境変数の定義は完了していることを前提とします。
 
-```bash 例
+```console 例
 $ github-release release \
   --user {YOUR_GITHUB_USER} \
   --repo {YOUR_REPOSITORY} \

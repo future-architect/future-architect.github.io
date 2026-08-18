@@ -50,7 +50,7 @@ TerraformはLocalstackに対してもapplyできます。便利な方法なの�
 
 参考までに、私が本ブログの執筆時に利用したバージョンはこちらです。
 
-```bash
+```console
 $ docker-compose --version
 docker-compose version 1.27.4, build 40524192
 
@@ -133,7 +133,7 @@ services:
 yamlファイルに追記完了したら、localstackを立ち上げます。
 `$ docker-compose ps` で起動が確認できたら、localstack側の準備は完了です。
 
-```bash
+```console
 $ docker-compose -f docker-compose.yml up -d localstack
 Creating localstack_main ... done
 
@@ -311,7 +311,7 @@ resource "aws_s3_bucket" "local_archive" {
 
 新しいディレクトリでterraformを使う場合は、まずは `$ terraform init` して、backend と provider を設定します。
 
-```bash
+```console
 $ terraform init
 
 Initializing the backend...
@@ -332,7 +332,7 @@ terraform init が完了しました。
 
 Terraformの実行準備が完了したので、`$ terraform plan` を実行します。
 
-```bash
+```console
 $ terraform plan
 Refreshing Terraform state in-memory prior to plan...
 The refreshed state will be used to calculate this plan, but will not be
@@ -368,7 +368,7 @@ planも正しく実行できました。
 `$ terraform apply`
 （なるべく短いログでapply状況を載せたかったので、--auto-approve を利用しています）
 
-```bash
+```console
 $ terraform apply --auto-approve
 data.aws_iam_policy_document.local_policy_document: Refreshing state...
 aws_iam_policy.local_policy: Creating...
@@ -405,7 +405,7 @@ apply成功です！
 
 awscliを用いて、各リソースの追加を確認できます。
 
-```bash
+```console
 # S3
 $ aws --endpoint-url http://localhost:4566 s3 ls
 2020-10-29 14:51:17 local-archive

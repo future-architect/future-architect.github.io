@@ -32,7 +32,7 @@ Terraformのv1.0が出て約2年弱、ついにv1.4までやってきました�
 
 ビルトインということもあって、本来の機能からは逸れますが、`terraform init`コマンドをそれぞれ利用する前提で実行した時にinitにかかる時間や、実際の`terraform init`の中で行われている内容に違いが現れています。
 
-```bash
+```console
 # null_resourceを扱う時
 $ terraform init
 
@@ -101,7 +101,7 @@ resource "terraform_data" "pip_install" {
 
 `terraform workspace select`に新しいオプションとして`-or-create`というオプションが使えるようになりました。実際にhelpを実行しても見えるようになりました。
 
-```bash
+```console
 $ terraform workspace select --help
 Usage: terraform [global options] workspace select NAME
 
@@ -115,7 +115,7 @@ Options:
 helpを読んでみると、`terraform workspace select`コマンドで指定したworkspaceがない時にこのオプションを渡すことで作成してくれるようです。
 例えば、以下のように、`dev`、`stg`というworkspaceがあったとします。
 
-```bash
+```console
 $ terraform workspace list
   default
   dev
@@ -124,7 +124,7 @@ $ terraform workspace list
 
 ここに、さらに`prd`というworkspaceを選択して、本番環境を作成するとしましょう。現在であれば、`terraform workspace select`コマンドはないworkspaceを指定するので、エラーになってしまいます。しかし、`-or-create`オプションがあることで、ない場合でもエラーにならずに、新しいworkspaceが作成されるようになります。
 
-```bash
+```console
 # オプションがない時
 $ terraform workspace select prd
 
@@ -166,7 +166,7 @@ terraform workspace list
 `teraform show`コマンドは、そのStateで管理されているリソースを全て展開して表示してくれるコマンドですが、そのStateで管理しているリソースがない場合もあり得ます。この時に、「なぜ何も表示されないのか」をメッセージとして表示してくれるようになりました。
 従来では、Stateがそもそもないときはコメントが返ってくるものの、Stateはある状態で中身がないときは何もでませんでした。
 
-```bash
+```console
 # Stateがない時
 $ terraform show
 No state.
@@ -179,7 +179,7 @@ $ terraform show
 
 後者のStateはあって、リソースがないケースについて、メッセージが出るようになりました。
 
-```bash
+```console
 $ terraform show
 The state file is empty. No resources are represented.
 ```

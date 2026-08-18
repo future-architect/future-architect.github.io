@@ -60,7 +60,7 @@ Helidonには2つのフレーバーがあります。[迷ったらMPの方を使
 
 インストールはバイナリを落としてきてパスを通すだけです。init/dev/buildのサブコマンドだけで色々できるようになります。
 
-```bash
+```console
 # プロジェクト作成
 $ helidon init
 
@@ -119,7 +119,7 @@ public class GreetResource {
 
 すでにjarへのビルドは触れました。コンテナのビルドもDockerfileが生成されているので簡単です。Dockerfileは3つあり、今時のJavaのアップデートの恩恵が受けられます。
 
-```bash
+```console
 # JDKでjarを起動するイメージ
 $ docker build .
 

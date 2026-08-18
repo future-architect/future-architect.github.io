@@ -54,14 +54,14 @@ Terraform バージョン 1.5.7
 
 1\. 統合元のStateで `remove` コマンド
 
-```sh  s3の場合
+```console s3の場合
 # 統合元のStateにて
 $ terraform state rm aws_s3_bucket.s3
 ```
 
 2\. 統合先のStateで `import` コマンド
 
-```sh  s3の場合
+```console s3の場合
 # 統合先のStateにて
 $ terraform state import aws_s3_bucket.s3 バケット名
 ```
@@ -75,7 +75,7 @@ https://developer.hashicorp.com/terraform/language/import
 
 4\. `plan` にて差分が発生しないことを確認
 
-```sh
+```console
 $ terraform plan
 
 ==(略)==
@@ -109,12 +109,12 @@ Stateを直接操作することはあまり推奨されないですが、今回
 
 1\. ローカルにtfstateをローカルに取得
 
-```sh  作業例
+```console 作業例
 # 統合元のStateにて
 $ terraform state pull > a.tfstate
 ```
 
-```sh  作業例
+```console 作業例
 # 統合先のStateにて
 $ terraform state pull > b.tfstate
 ```
@@ -156,7 +156,7 @@ git の 差分の増減などを確認するもよいでしょう。
 
 5\. `plan` にて差分が発生しないことを確認
 
-```sh
+```console
 $ terraform plan
 
 ==(略)==

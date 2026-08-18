@@ -53,7 +53,7 @@ AWS MCP Server は、AWS 公式が提供する Agent Toolkit for AWS スイー�
 
 セットアップ前に以下が揃っているか確認します。
 
-```bash
+```console
 # uv（必須：mcp-proxy-for-aws を uvx で実行するため）
 $ uv --version
 uv 0.11.11
@@ -118,7 +118,7 @@ A・B どちらの方法でも裏側で起動するプロセスは同じ（`uvx 
 
 ### 接続確認
 
-```bash
+```console
 $ claude mcp list
 Checking MCP server health…
 
@@ -163,7 +163,7 @@ LLM のナレッジカットオフ以降にリリースされた AWS サービ�
 
 題材は [AWS News Blog の GA アナウンス](https://aws.amazon.com/blogs/aws/the-aws-mcp-server-is-now-generally-available/)で取り上げられている **Amazon S3 Vectors** を採用し、公式デモと同じ題材が Claude Code 環境でも同様に再現できるかを確認します。Claude Code の対話セッション中に普通に質問するだけで、必要に応じてツールが呼ばれます。ここでは再現性のために `claude -p`（非対話モード）で明示的にツールを指定して呼び出します。
 
-```bash
+```console
 $ claude --allowedTools "mcp__aws-mcp__aws___search_documentation,mcp__aws-mcp__aws___read_documentation" \
     -p "search_documentation で 'Amazon S3 Vectors' を検索し、最初の3件のタイトルとURLを箇条書きで報告してください。"
 ```
@@ -213,7 +213,7 @@ $ claude --allowedTools "mcp__aws-mcp__aws___search_documentation,mcp__aws-mcp__
 
 本記事ではこの後の手順で読者の手元で同じ結果が再現できるよう、`-p`（非対話）モードで同じ質問を投げる形でデモします。対話モードと同じ自然言語のプロンプトで構いません。
 
-```bash
+```console
 $ claude --allowedTools "mcp__aws-mcp__aws___call_aws,mcp__aws-mcp__aws___run_script,ToolSearch" \
     -p "AWS MCP Server を使って、ap-northeast-1 にある EC2 インスタンスを稼働中・停止中で分けて、それぞれの起動時刻と、作成した IAM プリンシパルも一緒に一覧してください。"
 ```

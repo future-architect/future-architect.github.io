@@ -48,7 +48,7 @@ IaCがアプリケーション開発やっと同じ土俵に立った今、同�
 
 ポリシーに反したリソースがterraformで定義された場合、以下のように `Found Violations` と出力されます。 (以下のサンプルは、GCSのロケーションが許可されていないリージョンを利用している)
 
-```bash
+```console
 # Sample
 $ terraform-validator validate --policy-path=${POLICY_PATH} ./terraform.tfplan.json
 Found Violations:
@@ -138,7 +138,7 @@ terraform show -json ./terraform.tfplan > ./terraform.tfplan.json
 
 これで準備は整いました。Terraform Validatorを実行します。
 
-```bash
+```console
 $ terraform-validator validate --policy-path=${POLICY_PATH} ./terraform.tfplan.json
 Found Violations:
 Constraint allow_some_storage_location on resource //storage.googleapis.com/validator-trial: //storage.googleapis.com/validator-trial is in a disallowed location.
@@ -161,7 +161,7 @@ resource "google_storage_bucket" "validator_trial" {
 
 再度実行してみると.。
 
-```bash
+```console
 $ terraform-validator validate --policy-path=${POLICY_PATH} ./terraform.tfplan.json
 No violations found
 ```

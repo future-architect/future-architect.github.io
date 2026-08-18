@@ -39,14 +39,14 @@ GXでは「監視対象データ、Expectation Suite、バリデーションを�
 
 ## 3. 利用の流れ
 
-## 3.1. 事前準備
+### 3.1. 事前準備
 
-### 必要な環境
+#### 必要な環境
 
 * Python環境
 * JupyterNotebook環境（必須ではないですが初期設定ではあった方が楽です）
 
-### 使用するデータ
+#### 使用するデータ
 
 [Bike Sharing Dataset](https://archive.ics.uci.edu/ml/datasets/bike+sharing+dataset)を利用し、1時間毎のシェアバイク利用者数が記録されているテーブルを使います。
 
@@ -64,7 +64,7 @@ GXでは「監視対象データ、Expectation Suite、バリデーションを�
 
 執筆当時のバージョンは`0.16.8`です。
 
-```sh
+```console
 $ pip install great-expectations
 $ pip freeze | grep great  # バージョン確認
 great-expectations==0.16.8

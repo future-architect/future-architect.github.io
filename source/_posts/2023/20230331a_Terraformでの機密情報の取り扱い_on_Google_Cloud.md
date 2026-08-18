@@ -54,7 +54,7 @@ variable "db_password" {
 
 今回のリリースにて`sensitive=true`にされたvariableは、入力する際にターミナル上で表示されなくなりました。
 
-```bash terminal
+```console terminal
 # これまで
 $ terraform apply
 var.db_password

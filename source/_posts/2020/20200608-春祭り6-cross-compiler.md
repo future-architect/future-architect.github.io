@@ -44,7 +44,7 @@ Cで使えるコンパイラとしてはgccやclangがあります。Windowsだ�
 
 コンパイラも特定の実行環境上で動くプログラムなので、当然実行環境やバージョンによって挙動が違います。そして気をつけなければいけないのが、同じ名前のコマンドを叩いているように見えても実際は違うコマンドを叩いているようなことがあります。代表的なところでいうと、MacのXcodeにてデフォルトで使えるgccの実体は、エイリアスがついたclangです。
 
-```bash
+```console
 $ which gcc
 /usr/bin/gcc
 $ gcc -v
@@ -114,7 +114,7 @@ gcc4.3以降で依存しているMPC, GMP, MPFRをインストールします。
 
 コマンド1つで終わり、あとは確認です。
 
-```bash
+```console
 $ sudo port -v install libmpc
 $ port deps libmpc
 Full Name: libmpc @1.1.0_1
@@ -131,7 +131,7 @@ $ port installed | grep -e mpc -e gmp -e mpfr
 
 これから、コンパイラを切り替えます。
 
-```bash
+```console
 $ sudo port -v install gcc10
 $ port select --list gcc
 Available versions for gcc:
@@ -208,7 +208,7 @@ export PATH=$PATH:/Users/kurita/work/arm-none-eabi-gcc/bin
 
 簡単ではありますが、試しに `--version` で情報表示してみましょう。
 
-```bash
+```console
 $ arm-none-eabi-gcc --version
 arm-none-eabi-gcc (GCC) 9.1.0
 Copyright (C) 2019 Free Software Foundation, Inc.

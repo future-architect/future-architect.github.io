@@ -41,7 +41,7 @@ Dockerfile の書き方自体のアップデートとしては以下に書いた
 
 環境構築からパッケージのインストールまで一気に終わります。
 
-```shell
+```console
 $ mkdir pyapp
 $ cd pyapp
 $ uv init
