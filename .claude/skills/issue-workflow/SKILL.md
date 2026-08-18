@@ -89,7 +89,7 @@ npx hexo server -p <port>   # run_in_background で投げる
   - **確認ポイント**（何がどう変わったか。数字は本文にも書く）
   - **比較用の URL**（同じ部品を使っている既存ページ。揃っているかを見てもらう）
 
-## 7. CI を確認してから報告する
+## 7. CI は1回だけ見る。完走は待たない
 
 ```sh
 gh pr view <n> --json headRefOid -q .headRefOid
@@ -97,6 +97,15 @@ gh api repos/future-architect/future-architect.github.io/commits/<sha>/check-run
   -q '.check_runs[] | "\(.name) \(.status) \(.conclusion)"'
 ```
 
-`gh pr checks <n>` は直前のコミットの結果を出していることがある。
-**追いコミットの後は head の sha で確かめる。**
-`mergeable` は CI の合否を含まないので、それだけで「マージできます」と言わない。
+- `gh pr checks <n>` は直前のコミットの結果を出していることがある。
+  **追いコミットの後は head の sha で確かめる**
+- **`in_progress` / `queued` なら、そこで見るのをやめる。** 完走を待つと1往復が終わらない。
+  この環境では background に投げた待機（`sleep` やポーリングのループ）が
+  短く打ち切られて空振りするため、何度投げても結果は取れない
+- 待たない代わりに、**CI と同じことをローカルで回した結果を報告に書く**。PR の CI は2本とも
+  手元で再現できるので、CI はゲートではなく確認でよい
+  - reviewdog（textlint）: 変更した記事に `node_modules/.bin/textlint`
+  - prettier: `npx prettier --check "scripts/**/*.js" "*.mjs"`（ワークフローと同じ対象）
+- `mergeable` は CI の合否を含まない。**それだけで「マージできます」と言わない。**
+  実行中なら「まだ実行中、ローカルでは同じチェックが通っている」と正直に書き、
+  最終結果は PR 画面で見てもらう
