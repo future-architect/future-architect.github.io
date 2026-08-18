@@ -18,7 +18,7 @@ lede: "先日、弊社デザインワークスチームにて、2度目のハッ
 先日、弊社デザインワークスチームにて、 2度目のハッカソンとなる[SPAJAM2016](http://spajam.jp/)に参加しました。
 今回はその様子をお伝えしたいと思います。
 （前回挑戦したサバフェスの様子は[こちら](http://future-architect.github.io/articles/20160406/)）。
-<img src="/images/2016/20160420/photo_20160420_01.jpg" class="img-small-size" loading="lazy">
+<img src="/images/2016/20160420/photo_20160420_01.jpg" class="img-small-size" width="512" height="512" loading="lazy">
 
 SPAJAMは「温泉でスマホアプリを作る」ことをテーマにしたハッカソンです。
 予選は6地域9会場で開催され、**国内でも有数の規模** を誇ります。
@@ -41,7 +41,7 @@ SPAJAMは「温泉でスマホアプリを作る」ことをテーマにした�
 我々は入門書片手にキャッチアップ、社内のAndroid技術者からレクチャーを受け、
 戦う準備を早急に整えました。
 
-<img src="/images/2016/20160420/photo_20160420_02.jpg" class="img-small-size" loading="lazy">
+<img src="/images/2016/20160420/photo_20160420_02.jpg" class="img-small-size" width="350" height="439" loading="lazy">
 
 ## 第2章　活躍とは何か？
 
@@ -51,14 +51,14 @@ SPAJAMは「温泉でスマホアプリを作る」ことをテーマにした�
 
 会議室嫌いの我々は、会場を飛び出し恵比須ガーデンプレイスの広間で話し合いを始めます。
 
-<img src="/images/2016/20160420/photo_20160420_03.jpg" loading="lazy">
+<img src="/images/2016/20160420/photo_20160420_03.jpg" width="1920" height="1080" loading="lazy">
 
 ---
 
 アイデアを練るに当たって、まず現状分析をしました。
 1つ目は、SPAJAMそれ自体の調査です。
 過去の予選・本戦結果を調査して、勝利の方程式を考えます。
-<img src="/images/2016/20160420/photo_20160420_04.jpg" loading="lazy">
+<img src="/images/2016/20160420/photo_20160420_04.jpg" width="1916" height="1029" loading="lazy">
 
 ---
 
@@ -71,7 +71,7 @@ SPAJAMは「温泉でスマホアプリを作る」ことをテーマにした�
 
 そのため、アイデアをゼロベースに戻し、**「一億総活躍社会」** の本流に挑むことを決意しました。
 アイデアを考える事は我々デザインワークチームの十八番です。
-<img src="/images/2016/20160420/photo_20160420_05.jpg" loading="lazy">
+<img src="/images/2016/20160420/photo_20160420_05.jpg" width="1920" height="1080" loading="lazy">
 
 ---
 
@@ -82,8 +82,8 @@ BLE通信を用いて身近にいるのに気付いていない、「優秀な�
 
 このニアエルは **見落としがちな身近な縁を発掘し、眠っているチャンスを呼び起こし、ビジネスを活性化し、日本経済を向上するためのシステムです。**
 ちなみにシステム名の「ニアエル」は「near」と「～に会える」をかけています（笑）。
-<img src="/images/2016/20160420/photo_20160420_06.jpg" class="img-small-size" loading="lazy">
-<img src="/images/2016/20160420/photo_20160420_07.jpg" class="img-small-size" loading="lazy">
+<img src="/images/2016/20160420/photo_20160420_06.jpg" class="img-small-size" width="540" height="960" loading="lazy">
+<img src="/images/2016/20160420/photo_20160420_07.jpg" class="img-small-size" width="540" height="960" loading="lazy">
 
 ## 第3章 one more thing を追い求めて
 
@@ -99,7 +99,7 @@ BLE通信を用いて身近にいるのに気付いていない、「優秀な�
 イベントの企業ブースなどで、あなたに代わって情報を届ける事が出来ます。**
 
 欲しいときに欲しい場所で情報を発信・収集できる。そんな新しいデジタルサイネージを考えました。
-<img src="/images/2016/20160420/photo_20160420_08.jpg" loading="lazy">
+<img src="/images/2016/20160420/photo_20160420_08.jpg" width="2560" height="1440" loading="lazy">
 
 ---
 
@@ -119,8 +119,8 @@ BLE通信を用いて身近にいるのに気付いていない、「優秀な�
 **ふらっと訪れた酒場で、人生の転機となるような出会いが待っている。そんな素敵な未来を実現させます**
 <Font color="red">**そう、世界はチャンスに満ち溢れているのです。**</Font>
 
-<img src="/images/2016/20160420/photo_20160420_09.jpg" class="img-small-size" loading="lazy">
-<img src="/images/2016/20160420/photo_20160420_10.jpg" class="img-small-size" loading="lazy">
+<img src="/images/2016/20160420/photo_20160420_09.jpg" class="img-small-size" width="196" height="340" loading="lazy">
+<img src="/images/2016/20160420/photo_20160420_10.jpg" class="img-small-size" width="281" height="519" loading="lazy">
 
 ## 終章　戦いは終わらない
 
@@ -165,4 +165,4 @@ BLE通信を用いて身近にいるのに気付いていない、「優秀な�
 
 最後に、我々のアイデアや、活動に興味を持った方は、ご連絡お待ちしております。
 <Font color="red">**何度でも言います！ 世界はチャンスで満ち溢れているのです！！**<Font>
-<img src="/images/2016/20160420/photo_20160420_11.jpg" loading="lazy">
+<img src="/images/2016/20160420/photo_20160420_11.jpg" width="2560" height="1440" loading="lazy">
