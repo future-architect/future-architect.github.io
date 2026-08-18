@@ -8,6 +8,8 @@
  *    説明を書く形が多い）。箇条書きの一部として読むので句点は要らない
  * 3. 箇条書きの**中**（ネストを含む）… 項目は文ではなく、句点を打たないのが
  *    このブログの書き方。項目に句点を足すと兄弟の項目と体裁が割れる
+ * 4. 行頭が丸数字（①②…）の段落 … Markdown の箇条書きではないが連番の項目。
+ *    段落なので最終行だけがルールに当たり、そこにだけ句点が付く形になる
  *
  * 長さでは切っていない。何文字までがラベルかを決められないので位置で決める。
  *
@@ -49,6 +51,10 @@ module.exports = function (context, options = {}) {
   const isBlock = (node) =>
     !!node && (BLOCKS.includes(node.type) || isImageOnlyParagraph(node));
 
+  // ①②… で始まる行を含む段落は、記法こそ段落だが連番の項目
+  const NUMBERED = /^[①-⑳㉑-㉟⑴-⒇]/m;
+  const isNumberedItems = (node) => NUMBERED.test(node.raw || "");
+
   const ignore = (node) =>
     ruleIds.forEach((ruleId) => shouldIgnore(node.range, { ruleId }));
 
@@ -63,7 +69,11 @@ module.exports = function (context, options = {}) {
         if (child.type !== Syntax.Paragraph) {
           return;
         }
-        if (isBlock(children[index + 1]) || children[index - 1]?.type === Syntax.List) {
+        if (
+          isBlock(children[index + 1]) ||
+          children[index - 1]?.type === Syntax.List ||
+          isNumberedItems(child)
+        ) {
           ignore(child);
         }
       });
