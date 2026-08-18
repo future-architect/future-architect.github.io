@@ -20,7 +20,7 @@ TIGのDXチームに所属している加部です。入社してからは主に
 
 ## DataTransferServiceとは
 
-<img src="/images/2020/20200214/photo_20200214_01.png" class="img-very-small-size" loading="lazy">
+<img src="/images/2020/20200214/photo_20200214_01.png" class="img-very-small-size" width="309" height="378" loading="lazy">
 
 > BigQuery Data Transfer Service は、あらかじめ設定されたスケジュールに基づき、BigQuery BigQuery Data Transfer Service は、あらかじめ設定されたスケジュールに基づき、BigQuery へのデータの移動を自動化するマネージド サービスです。そのため、アナリティクス チームが BigQuery データ ウェアハウス基盤を構築する際にコードの作成はまったく必要ありません。
 > https://cloud.google.com/bigquery/transfer
@@ -43,7 +43,7 @@ TIGのDXチームに所属している加部です。入社してからは主に
 
 ## 今回の構成と手順
 
-<img src="/images/2020/20200214/photo_20200214_02.png"  class="img-middle-size" loading="lazy">
+<img src="/images/2020/20200214/photo_20200214_02.png"  class="img-middle-size" width="523" height="234" loading="lazy">
 
 今回はS3のバケットに格納したCSVファイルのデータを、DataTransferServiceの機能を使ってBiqQueryに転送します。
 複雑なコマンドや手順があるわけでは無いため、とてもかんたんに設定できます。本記事では主にコマンドラインによる作成となりますが、もちろんコンソールからポチポチして作成もできます。
@@ -73,7 +73,7 @@ AWS環境の準備が完了したら次はGCP環境の準備です。まずは[D
 コンソールタブの「APIとサービス」からライブラリを選択し、「BigQuery Data Transfer API」と入力して検索してください。
 
 検索したAPIを選択して、有効にするをクリックするとAPIが有効化されます。
-<img src="/images/2020/20200214/photo_20200214_04.png" loading="lazy">
+<img src="/images/2020/20200214/photo_20200214_04.png" width="888" height="474" loading="lazy">
 
 ## 手順4 BigQueryのデータセット、テーブル作成
 
@@ -132,19 +132,19 @@ bq mk \
 * **skip_leading_rows** : スキップするヘッダの行数。今回はヘッダ行を含まないデータにしているため「０」
 
 コマンドを実行するとGoogleアカウントのログイン許可のURLが表示され、URLのリンクに飛び認証コードを入力すると正常に作成されましたと表示されます。コンソールからも転送ジョブが作成されていることが確認できました。
-<img src="/images/2020/20200214/1.png" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2020/20200214/1.png" style="border:solid 1px #000000" width="1972" height="270" loading="lazy">
 
 ジョブが作成されるとその後すぐに実行され、コンソールから実行ログを確認できます。
-<img src="/images/2020/20200214/2.png" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2020/20200214/2.png" style="border:solid 1px #000000" width="1720" height="1024" loading="lazy">
 
 今回は小さなデータでしたが3分ほどかかってジョブは終了しました。
 実際にSQLでデータを見てみると下記の様に取得できます。
-<img src="/images/2020/20200214/photo_20200214_05.png" class="img-small-size" loading="lazy">
+<img src="/images/2020/20200214/photo_20200214_05.png" class="img-small-size" width="303" height="156" loading="lazy">
 
 ### 注意点
 
 注意点としてはコマンドラインからの作成の場合、スケジュールの選択オプションがありませんでした。どうやらデフォルト値である24時間ごと(日時)が自動で選択されているようです。作成後にコンソールからジョブのスケジュールを編集できます。下記のように毎日、毎週、毎月、カスタム、オンデマンドと選ぶことができます。
-<img src="/images/2020/20200214/3.png" class="img-middle-size" loading="lazy">
+<img src="/images/2020/20200214/3.png" class="img-middle-size" width="974" height="516" loading="lazy">
 
 ## まとめ
 

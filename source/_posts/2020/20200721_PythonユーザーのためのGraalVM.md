@@ -148,7 +148,7 @@ Please note: This Python implementation is in the very early stages, and can run
 >>> win.show()
 ```
 
-<img src="/images/2020/20200721/thumbnail.png" class="img-small-size" loading="lazy">
+<img src="/images/2020/20200721/thumbnail.png" class="img-small-size" width="482" height="458" loading="lazy">
 
 デフォルトはnativeモードでAoTコンパイルをします。CPythonと変わらない感覚で使えます。JVMモードにするとJITコンパイルになりますが、ちょっとしたコードはこちらの方が時間がかかるようになります。ただ、Jythonのコードを実行するにはJVMモードでないとダメです。
 

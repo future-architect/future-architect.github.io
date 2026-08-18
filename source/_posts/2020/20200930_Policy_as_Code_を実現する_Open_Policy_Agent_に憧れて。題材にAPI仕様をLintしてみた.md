@@ -16,7 +16,7 @@ thumbnail: /images/2020/20200930/thumbnail.png
 author: 真野隼記
 lede: "Open Policy Agent（OPA）は汎用的なポリシーエンジンで、Rego と呼ばれるポリシー言語で定義されたルールに従って、入力がポリシーに沿っているか否かの判定を移譲させることができます。Regoで宣言的にポリシーを実装し、Policy as Code を実現できます。コーディング規約も一種のポリシーとみなして、Open API Spec（Swagger）をLinter的にチェックするツールを題材に、OPAを用いて開発してみたいと思います。"
 ---
-<img src="/images/2020/20200930/opa-horizontal-color.png" loading="lazy">
+<img src="/images/2020/20200930/opa-horizontal-color.png" width="1200" height="398" loading="lazy">
 
 ## はじめに
 
@@ -30,7 +30,7 @@ lede: "Open Policy Agent（OPA）は汎用的なポリシーエンジンで、Re
 
 Open Policy Agent（OPA）は汎用的なポリシーエンジンで、[Rego](https://www.openpolicyagent.org/docs/latest/policy-language/) と呼ばれるポリシー言語で定義されたルールに従って、入力がポリシーに沿っているか否かの判定を移譲させることができます。Regoで宣言的にポリシーを実装し、Policy as Code を実現できます。
 
-<img src="/images/2020/20200930/opa.png" loading="lazy">
+<img src="/images/2020/20200930/opa.png" width="471" height="302" loading="lazy">
 
 OPAは汎用的というだけあって、Kubernetes上でしか動かせないと言った制約は無いです。Go言語で書かれていることもあって、普通の外部パッケージと同様に関数呼び出しができます。また、公式ドキュメントにも適用ドメインを選ばないと書かかれており、いくつかの活用例も挙げられています。
 
@@ -66,7 +66,7 @@ RegoはDatalogというクエリ言語にインスパイアされて開発され
 見たまんまですが、画像の左側がRegoエディタ、右枠のINPUTが入力、DATAがRegoで参照する外部データ、OUTPUTがEvaluateボタンを押した後の実行結果です。
 ご覧のように入力も出力も構造化データ（JSON）なのがよく分かります。
 
-<img src="/images/2020/20200930/image.png" loading="lazy">
+<img src="/images/2020/20200930/image.png" width="1200" height="500" loading="lazy">
 
 公式ドキュメントでは以下3つの例が載っていました。
 
@@ -76,7 +76,7 @@ RegoはDatalogというクエリ言語にインスパイアされて開発され
 
 PlaygroudのExamplesをクリックすると、他にも色々な例が載っています。
 
-<img src="/images/2020/20200930/image_2.png" loading="lazy">
+<img src="/images/2020/20200930/image_2.png" width="912" height="449" loading="lazy">
 
 ## Regoの文法さわり
 

@@ -90,13 +90,24 @@ function usedDimension(raw) {
   return { px: Number(m[1]) };
 }
 
+// src は日本語ファイル名で percent-encoding されていることがあるので戻す。ただし
+// `Replication-8%.png` のように % がファイル名の一部で encoding として不正な場合も
+// あり、decodeURI は例外を投げる。その場合は素のパスがそのままファイル名
+function decodePath(src) {
+  try {
+    return decodeURI(src);
+  } catch {
+    return src;
+  }
+}
+
 function measure(src) {
   if (EXTERNAL_SIZES[src]) {
     const [width, height] = EXTERNAL_SIZES[src];
     return { width, height, from: '外部（実測値を表に保持）' };
   }
   if (!src.startsWith('/')) return null;
-  const file = path.join(SOURCE, decodeURI(src.split('?')[0]).replace(/^\//, ''));
+  const file = path.join(SOURCE, decodePath(src.split('?')[0]).replace(/^\//, ''));
   if (!fs.existsSync(file)) return null;
   const { width, height } = imageSize(fs.readFileSync(file));
   if (!Number.isInteger(width) || !Number.isInteger(height)) return null;

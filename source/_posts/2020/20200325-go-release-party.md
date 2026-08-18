@@ -23,9 +23,9 @@ Go 1.14 のリリースノートは以下です。
 
 ## 発表1: hash/maphash コードリーディング
 
-<img src="/images/2020/20200325/3.png" class="img-middle-size" loading="lazy">
+<img src="/images/2020/20200325/3.png" class="img-middle-size" width="512" height="270" loading="lazy">
 
-<img src="/images/2020/20200325/4.png" class="img-middle-size" loading="lazy">
+<img src="/images/2020/20200325/4.png" class="img-middle-size" width="512" height="269" loading="lazy">
 
 辻さんのコメントにもある、社内のコードリーディングで紹介したGo 1.14で追加されたhash/maphashパッケージについて紹介しました。今回追加された唯一の新パッケージではあるものの、Hashインターフェースを使った使い方もすでにあるものですし、機能もGo内部で文字列やバイト列をハッシュのキーに使うときに使われていたアルゴリズムを公開したものなので、特に真新しさはありません。なので、よくある新パッケージの機能紹介というよりも、コードを読んでいて面白いと思ったところを紹介する、という発表にしました。
 
@@ -41,9 +41,9 @@ https://qiita.com/shibukawa/items/d483889731c34d3e5faa
 
 ## 発表2: context の話
 
-<img src="/images/2020/20200325/1.png" class="img-middle-size" loading="lazy">
+<img src="/images/2020/20200325/1.png" class="img-middle-size" width="512" height="293" loading="lazy">
 
-<img src="/images/2020/20200325/2.png" class="img-middle-size" loading="lazy">
+<img src="/images/2020/20200325/2.png" class="img-middle-size" width="512" height="290" loading="lazy">
 
 辻からは Go1.14 の context についてお話しました。リリースノートには記載されていないのですが、Go1.14 の context パッケージは内部的な挙動が改善されています。
 

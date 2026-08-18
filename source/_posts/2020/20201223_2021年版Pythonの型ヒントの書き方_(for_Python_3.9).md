@@ -60,7 +60,7 @@ python setup.py install
 
 PyCharmはPythonインタプリタ(IntelliJ IDEA Ultimateを使っている場合はSDK設定で追加)の設定をすればmypyのインストールは不要です。
 
-<img src="/images/2020/20201223/スクリーンショット_2020-12-20_10.30.58.png" alt="IntelliJ IDEA Ultimateを使っている場合はSDK設定で追加の様子" loading="lazy">
+<img src="/images/2020/20201223/スクリーンショット_2020-12-20_10.30.58.png" alt="IntelliJ IDEA Ultimateを使っている場合はSDK設定で追加の様子" width="1200" height="940" loading="lazy">
 
 ## 変数の型の型付け
 
@@ -217,7 +217,7 @@ def wait_callback(cb: Callable[[str], None]) -> None:
 
 ``collections.abc``には多数の型があります。今までのコーディングで、これらを細かく区別して利用することは基本的になかったと思いますが、型付けを行うにあたっては、なるべく制約（メソッド）の少ないコレクションを選択する方がポータビリティが上がります。次の図は``collections.abc``および組み込み型のシーケンスの継承関係（実装上の継承ではなく、メソッドの包含で定義した）の図です。左に行くほど、少ないメソッドを持っており、右側に行くほど、メソッドが多くなります。関数の中で使用しているメソッドを見て、なるべくこの図の左側にある型を選んで使うと良いでしょう。
 
-<img src="/images/2020/20201223/collections.png" alt="collections.abcおよび組み込み型のシーケンスの継承関係" loading="lazy">
+<img src="/images/2020/20201223/collections.png" alt="collections.abcおよび組み込み型のシーケンスの継承関係" width="861" height="531" loading="lazy">
 
 例えば、関数の中で引数のシーケンスに対して、``for``でループを回すだけの使い方をするならば``collections.abc.Iterable``を、さらに``in``で存在確認をする必要があれば、``Collection``を使うと、さまざまなシーケンスのインスタンスを受けて利用できるようになります。ランダムアクセスが必要であれば``Sequence``を使います。値の変更が必要であれば``Mutable``がついた型を利用します。
 

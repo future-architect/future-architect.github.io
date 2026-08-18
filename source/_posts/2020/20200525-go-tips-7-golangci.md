@@ -13,7 +13,7 @@ author: 佐藤尚至
 lede: "今回はgolangci-lintを取り上げます。Goのコード品質のベースラインを上げる目的でgolngci-lintというlintアグリゲーターを利用されているかたも多いかと思います。コードベースがlint issueのないクリーンな状態に保たれていることが望ましいのですが、必ずしもそういった状態を維持できるとはかぎりません。"
 ---
 
-<img src="/images/2020/20200525/photo_20200525_01.png" loading="lazy">
+<img src="/images/2020/20200525/photo_20200525_01.png" width="1760" height="1012" loading="lazy">
 
 [Go Tips連載](/tags/GoTips%E9%80%A3%E8%BC%89/)の第6弾です。
 

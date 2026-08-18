@@ -12,7 +12,7 @@ author: 多賀聡一朗
 lede: "Airflowの SLA 設定方法を紹介します。sla_miss_callback 関数は以下の引数が必要"
 ---
 
-<img src="/images/2020/20200827/feature-image.png" class="img-middle-size" loading="lazy">
+<img src="/images/2020/20200827/feature-image.png" class="img-middle-size" width="700" height="296" loading="lazy">
 
 ## 概要
 
