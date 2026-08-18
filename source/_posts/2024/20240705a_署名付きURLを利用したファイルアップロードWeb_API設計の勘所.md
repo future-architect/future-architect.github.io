@@ -40,7 +40,7 @@ lede: "現代のWebアプリケーションにおいて、ユーザが写真や�
 サーバ側で特別な処理を行う必要がなく、通常のJSONベースのAPIと変わらずに取り扱いができるというメリットがある一方で、Base64エンコードによりファイルサイズが大きくなるというデメリットもあります。
 そのため、巨大なファイルを取り扱う場合には不向きであり。プロフィール画像やサムネイル画像など限定されたユースケースでの利用が向いていると考えられます。
 
-GitHubの[Contents API](https://docs.github.com/ja/rest/repos/contents?apiVersion=2022-11-28)でも採用されており、この方式もまた「`multipart/form-data`」と同様に一般的な方式と言って差し支えないでしょう。
+GitHubの[Contents API](https://docs.github.com/ja/rest/repos/contents?apiVersion=2022-11-28)でも採用されており、この方式もまた`multipart/form-data`と同様に一般的な方式と言って差し支えないでしょう。
 
 ### Pattern 3. 署名付きURL
 
