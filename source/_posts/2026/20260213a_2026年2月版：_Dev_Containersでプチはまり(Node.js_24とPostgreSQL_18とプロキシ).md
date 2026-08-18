@@ -75,7 +75,7 @@ Node.js + PostgreSQLのベース設定をもとに環境を作ると、いきな
 
 * [ProxyとDockerと新人社員と時々わたし](https://future-architect.github.io/articles/20201020/)
 
-しかし、特にDockerをDev Containersで使う場合は、通常のイメージ作成で使う…
+しかし、特にDockerをDev Containersで使う場合は、通常のイメージ作成で使う
 
 * イメージ取得
 * ビルド時

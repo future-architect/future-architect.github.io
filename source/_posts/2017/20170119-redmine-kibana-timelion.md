@@ -281,7 +281,7 @@ PVの累計が期日別に表示されました。
 - .es(timefield)：X軸の項目名を指定する。今回は期日(due_date)を指定。
 - .cusum()：累積表示するという意味。
 
-次は、`.es(metric='sum:pv', timefield='due_date').cusum().label('[累積]pv')`という記載を…
+次は、`.es(metric='sum:pv', timefield='due_date').cusum().label('[累積]pv')`という記載を
 
 `.es(metric='sum:pv', timefield='due_date').cusum().label('[累積]pv'),.es(metric='sum:ev', timefield='updated_on').cusum().label('[累積]ev')`
 に変更します。
@@ -296,7 +296,7 @@ PVの累計が期日別に表示されました。
 - .es(timefield)：X軸の項目名を指定する。今回は更新日(updated_on)を指定。
 - .cusum()：累積表示するという意味。
 
-次は、`.es(metric='sum:pv', timefield='due_date').cusum().label('[累積]pv'),.es(metric='sum:ev', timefield='updated_on').cusum().label('[累積]ev')`という記載を…
+次は、`.es(metric='sum:pv', timefield='due_date').cusum().label('[累積]pv'),.es(metric='sum:ev', timefield='updated_on').cusum().label('[累積]ev')`という記載を
 
 `.es(metric='sum:pv', timefield='due_date').cusum().label('[累積]pv'),.es(metric='sum:ev', timefield='updated_on').cusum().label('[累積]ev'),.es(metric='sum:ac', timefield='updated_on').cusum().label('[累積]ac')`
 に変更します。

@@ -153,7 +153,7 @@ wasm-packはビルド時に以下の処理をしてくれています。
 1. Rustコードをwasmにコンパイル
     * `cargo build --target wasm32-unknown-unknown`を実行
 (ビルドターゲットにwasm32-unknown-unknownがインストールされていない場合は`rustup target add wasm32-unknown-unknown`を実行してビルドターゲットに追加)
-    * ここでコンパイルしたwasmは`target/wasm32-unknown-unknown/release/`に生成される。
+    * ここでコンパイルしたwasmは`target/wasm32-unknown-unknown/release/`に生成される
 1. グルーコードの生成
     * `wasm-bindgen-cli`を用いてwasmとjsがデータをやり取りするためのjsファイルを作成し、`pkg`ディレクトリに格納
 1. `Cargo.toml`を読んで等価な`pakcage.json`を作成
