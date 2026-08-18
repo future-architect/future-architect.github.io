@@ -44,7 +44,7 @@ TIG DXユニット [^1]真野です。
 
 自分の環境では以下です。
 
-```bash 環境情報
+```console 環境情報
 >flutter doctor
 Doctor summary (to see all details, run flutter doctor -v):
 [√] Flutter (Channel stable, 2.0.6, on Microsoft Windows [Version 10.0.19043.964], locale ja-JP)

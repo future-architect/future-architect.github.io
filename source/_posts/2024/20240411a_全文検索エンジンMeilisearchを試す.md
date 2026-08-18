@@ -52,7 +52,7 @@ lede: "ある静的サイトジェネレーターで生成された膨大なド�
 
 日本語向けのビルドバイナリを含むDockerイメージはDocker Hubの [こちら](https://hub.docker.com/r/getmeili/meilisearch/tags?page=1&name=japanese) で配布されています。Meilisearchのバージョンとイメージタグの対応関係は [こちらのPull request](https://github.com/meilisearch/meilisearch/pull/3882) に記載されています。
 
-今回は、現時点の最新版であるv1.7.1に対応したDockerイメージを使ってみます。公式の手順通り、pullして
+今回は、現時点の最新版であるv1.7.1に対応したDockerイメージを使ってみます。公式の手順通り、pullして…
 
 ```sh
 docker pull getmeili/meilisearch:prototype-japanese-10

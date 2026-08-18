@@ -101,7 +101,7 @@ Flutterのプロジェクトを作成します。このとき、Android Studio�
 Exception in thread "main" java.io.IOException: Unable to tunnel through proxy. Proxy returns "HTTP/1.1 407 Proxy Authentication Required"
 ```
 
-これは途中`gradlew assembleDebug`を実行するときのエラーなので、gradleでProxyを設定します。`~/.gradle/gradle.properties`において
+これは途中`gradlew assembleDebug`を実行するときのエラーなので、gradleでProxyを設定します。`~/.gradle/gradle.properties`において…
 
 ```gradle
 systemProp.http.proxyHost=http://proxy.example.com
@@ -118,7 +118,7 @@ systemProp.https.proxyPassword=password
 
 加えて、証明書エラーが出ることもあります。
 
-```sh
+```console
 A problem occurred configuring root project 'android'.
 > Could not resolve all artifacts for configuration ':classpath'.
    > Could not resolve com.android.tools.build:gradle:4.1.0.

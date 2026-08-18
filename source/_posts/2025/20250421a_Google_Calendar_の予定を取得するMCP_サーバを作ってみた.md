@@ -246,7 +246,7 @@ https://github.com/modelcontextprotocol/inspector
 
 プロジェクトのルートディレクトリ下で以下コマンドを打つことで、テスト用のサーバが起動されます。
 
-```bash
+```console
 % npx @modelcontextprotocol/inspector npx ts-node src/index.ts
 Starting MCP inspector...
 ⚙️ Proxy server listening on port 6277

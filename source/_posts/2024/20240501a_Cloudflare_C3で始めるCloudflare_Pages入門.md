@@ -268,7 +268,7 @@ import TheWelcome from '../components/TheWelcome.vue'
 
 変更を保存した状態で、 `npm run deploy` を走らせてみましょう。
 
-```sh
+```console
 % npm run deploy
 
 > frontend@0.0.0 deploy

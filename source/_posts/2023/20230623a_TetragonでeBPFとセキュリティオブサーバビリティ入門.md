@@ -199,7 +199,7 @@ kubectl run test --image=busybox -- sleep 3600
 
 Tetragonではデフォルトでプロセスの実行に対して検知ログを出すようになっています。例えばコンテナでデバッグ用途以外でシェルが起動しているのはいかにも怪しいですが、そのようなイベントを観測できるということです。
 
-Tetragonのログをtailしながら、別のターミナルから先ほど作ったPodで `/bin/sh` を動かしてみましょう
+Tetragonのログをtailしながら、別のターミナルから先ほど作ったPodで `/bin/sh` を動かしてみましょう。
 
 ```bash
 kubectl logs -f -n kube-system -l app.kubernetes.io/name=tetragon -c export-stdout

@@ -66,7 +66,7 @@ GLDirectMem = on
 
 以下のように出力されればOKです。
 
-```sh
+```console
 > adb --version
 Android Debug Bridge version 1.0.41
 Version 33.0.3-8952118

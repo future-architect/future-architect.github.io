@@ -133,7 +133,7 @@ task("dist", async ctx => {
 
 ビルドは高速で快適です。tsconfig.jsonがなくても実行できます。なお、Node.js 10.xや11.xのバージョンではまだexperimentalなworker_threadパッケージを使っているので、12以降を使うか、``--experimental-worker``オプションが必要です。開発サーバーもあり、HMRもできて、ウェブフロントエンド開発でTypeScriptでやりたい人には良いですね。
 
-```sh
+```console
 % npm start
 
 > fuse-box-test@1.0.0 start /Users/shibukawa/fuse-box-test
@@ -169,7 +169,7 @@ $ du -h
 
 コマンド体系はGoを目指していて、ncc build [script]でビルドができます。ncc run [script]で実行ができます。
 
-```text
+```console
 % npx ncc run -q test.ts
 ncc: Using typescript@3.7.5 (ncc built-in)
 hello world

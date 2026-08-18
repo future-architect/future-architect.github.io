@@ -107,7 +107,7 @@ SQL文の条件分岐を集計してカバレッジレポートを行うこと�
 | 依存（必須）         | slf4j-api                     |
 | 依存（任意）         | ognl,spring-expression,jline,jansi,logback-classic |
 
-※2024/06/25時点最新バージョンとなるv0.26.8時点
+*※2024/06/25時点最新バージョンとなるv0.26.8時点*
 
 ## uroboroSQLのコードサンプル
 

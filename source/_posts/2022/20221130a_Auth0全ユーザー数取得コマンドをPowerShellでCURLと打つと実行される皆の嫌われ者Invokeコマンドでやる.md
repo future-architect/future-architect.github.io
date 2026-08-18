@@ -247,7 +247,7 @@ Return results inside an object that contains the total result count (true) or a
 
 <img src="/images/2022/20221130a/image_2.png" alt="image.png" width="612" height="200" loading="lazy">
 
-また、概要にある通りユーザーのリストが取得できてしまうが、合計人数だけ知りたいので**ユーザー情報をなくすオプションを探します**。※全パラメータは任意
+また、概要にある通りユーザーのリストが取得できてしまうが、合計人数だけ知りたいので**ユーザー情報をなくすオプションを探します**。※全パラメータは任意。
 
 |  パラメータ  |  説明  |
 | ---- | ---- |

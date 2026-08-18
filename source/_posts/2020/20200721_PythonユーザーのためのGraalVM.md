@@ -34,7 +34,7 @@ macOSはJavaに対するちょっとしたサポートがあるので、ちょ�
 
 インストールが終わるとguコマンドが利用できるようになります。``gu available``で追加インストール可能なコンポーネント一覧が表示されます。
 
-```sh
+```console
 % gu available
 Downloading: Component catalog from www.graalvm.org
 ComponentId              Version             Component name      Origin
@@ -49,7 +49,7 @@ wasm                     20.1.0              GraalWasm           github.com
 
 Pythonをインストールするので、次のようにタイプします。
 
-```sh
+```console
 % gu install python
 ```
 
@@ -57,7 +57,7 @@ Pythonをインストールするので、次のようにタイプします。
 
 先ほどグローバルにパスを通すのはやめておいた方がよい、とお伝えしました。Python以外にnative-imageもインストールした状態ですが、/binフォルダの中は次のようになっています。
 
-```sh
+```console
  % ls /Library/Java/JavaVirtualMachines/graalvm-ce-java11-20.1.0/Contents/Home/bin
 graalpython	javac		jdb		jimage		jmod		jstack		lli		pack200		rmiregistry
 gu		javadoc		jdeprscan	jinfo		jps		jstat		native-image	polyglot	serialver
@@ -76,7 +76,7 @@ Graal.Pythonの一次情報は[ここ](https://www.graalvm.org/docs/reference-ma
 
 graalpythonを起動すると、次のようなメッセージが出ます。Python 3.8.2互換と言うことがわかります。なかなか新しいですね。公式ドキュメントとか昨年の情報をみると、19系は3.7だったようなので、順当に更新されています。なお、この起動メッセージにも入っていますが、まだearly stageで安定版ではないです。
 
-```sh
+```console
 % graalpython
 Python 3.8.2 (Fri May 15 05:42:24 PDT 2020)
 [GraalVM CE, Java 11.0.7] on darwin
@@ -89,7 +89,7 @@ Please note: This Python implementation is in the very early stages, and can run
 
 venvを使った環境の分離も可能です。
 
-```sh
+```console
 % graalpython -m venv .venv
 % source .venv/bin/activate
 ```
@@ -127,13 +127,13 @@ print("Here is what we found: '%s'" % md[1])
 
 Pythonの互換実装で有名なものはいくつかありますが、Javaで実装されたものがJythonです。RPAツールのSikuliXとかでもスクリプト言語として組み込まれていたりします。Jythonは2.7互換で実装されており、3系の実装は安定版が出ていません。Graal.PythonはJavaで実装された3.x系実装で、Jythonと出自は似ています。コマンドラインオプションでJythonをエミュレーションするモードも有効にできます。
 
-```sh
+```console
 % graalpython --jvm --experimental-options --python.EmulateJython
 ```
 
 [ここのサンプルの通り](https://github.com/graalvm/graalpython/blob/master/docs/user/JYTHON.md)ですが、こんな感じで、AWTを使ってウィンドウを表示できます。
 
-```sh
+```console
  % graalpython --jvm --experimental-options --python.EmulateJython
 Python 3.8.2 (Sat Jun 13 16:19:51 JST 2020)
 [GraalVM CE, Java 11.0.7] on darwin
@@ -164,7 +164,7 @@ Please note: This Python implementation is in the very early stages, and can run
 
 GraalVMといえばネイティブな実行バイナリ（ネイティブイメージ）作成なのでPythonでもチャレンジしてみました。まずはnative-imageの処理系をインストールします。
 
-```sh
+```console
 % gu install native-image
 ```
 
@@ -230,7 +230,7 @@ public class ExtListDir {
 
 これからネイティブバイナリを作成してみます。
 
-```sh
+```console
 # .classファイル作成
 % javac ExtListDir.java
 # 動作確認で実行してみる

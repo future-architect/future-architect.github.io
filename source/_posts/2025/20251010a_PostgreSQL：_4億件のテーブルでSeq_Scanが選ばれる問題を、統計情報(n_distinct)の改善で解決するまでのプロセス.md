@@ -117,7 +117,7 @@ ows=76774 loops=1)
 調査の結果、Seq Scan が過度に選ばれてしまった原因は、 `n_distinct` と呼ばれる統計情報が実際の値と乖離していることであると分かりました。
 
 ::: note info
-`n_distinct` とは
+**`n_distinct` とは**
 
 テーブル内でのユニークな値の個数を表す統計情報です。
 詳細は、 [pg_stats のドキュメント](https://www.postgresql.jp/docs/9.4/view-pg-stats.html) をご覧ください。
@@ -184,7 +184,7 @@ PostgreSQL のコスト計算には、ディスクアクセスのコストを以
 #### B 案: `stats target` の引き上げ
 
 ::: note info
-`stats target` とは
+**`stats target` とは**
 
 stats target とは、「統計情報」を取得する際にサンプルする行数を示す値です。
 0~10000 まで設定でき、デフォルトは 100 です。 `ANALYZE` の際にサンプリングされる行数は `stats target * 300` で決定されます。

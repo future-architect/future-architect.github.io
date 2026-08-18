@@ -176,7 +176,7 @@ Embeddingで各TokenをD次元に拡張しますが、分割がない場合、1�
 
 <img src="/images/2025/20250226a/35184258-10f5-4cd0-8de3-bd9bc8f88dc3.png" alt="" width="684" height="732" loading="lazy">
 
-図 5．元論文から引用したScaled-Dot Product Attentionの構成図
+*図 5．元論文から引用したScaled-Dot Product Attentionの構成図*
 
 $$
 \begin{align}

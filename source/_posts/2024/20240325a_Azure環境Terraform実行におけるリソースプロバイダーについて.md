@@ -30,7 +30,7 @@ Azure環境でTerraformを利用する際、裏で動いているリソースプ
 
 見やすいように改行等追加しています。
 
-```text
+```console
 Original Error: Cannot register providers:
 Microsoft.ServiceBus,
 Microsoft.DBforPostgreSQL,

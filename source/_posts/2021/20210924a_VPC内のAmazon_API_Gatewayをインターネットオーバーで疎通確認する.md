@@ -110,7 +110,7 @@ func main() {
 
 これを実行すると、awscliコマンドで実行した結果と同等の応答を得られます。
 
-```sh
+```console
 >go run sample.go
 200
 map[Content-Type:application/json Vary:Accept-Encoding X-Amzn-Trace-Id:Root=1-67891233-abcdef012345678912345678;Sampled=0]

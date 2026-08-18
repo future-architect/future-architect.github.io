@@ -236,7 +236,7 @@ func FuncInternal() error {
 
 これを実行するとStacktraceが出力されました。
 
-```text Stacktrace出力例
+```console Stacktrace出力例
 stacktrace: anyFunc any error - internal failed:
     main.Func
         /tmp/sandbox921242282/prog.go:16

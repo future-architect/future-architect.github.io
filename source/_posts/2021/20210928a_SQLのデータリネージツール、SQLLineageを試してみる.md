@@ -160,7 +160,7 @@ INSERT INTO tbl5 (name, text)
 
 これをsqllineageの入力とします。
 
-```sh
+```console
 >sqllineage -g -f multiple.sql
  * SQLLineage Running on http://localhost:5000/?f=multiple.sql
 ```

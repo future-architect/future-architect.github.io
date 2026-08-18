@@ -48,7 +48,7 @@ UTMはApp Storeでも入れられますし、公式サイトからダウンロ�
 
 ### Linuxインストール
 
-DokployがサポートしているOSはDebian, Ubuntu, Centosです。今回はUbuntuを選びました。手元のmacはM3なので[下記のページ](https://www.debian.org/distrib/netinst)の「小さなCDまたはUSBメモリ」のARM64のイメージをダウンロードします。Debian Downloadで出てくるサイトだとAMD64版しかないので要注意
+DokployがサポートしているOSはDebian, Ubuntu, Centosです。今回はUbuntuを選びました。手元のmacはM3なので[下記のページ](https://www.debian.org/distrib/netinst)の「小さなCDまたはUSBメモリ」のARM64のイメージをダウンロードします。Debian Downloadで出てくるサイトだとAMD64版しかないので要注意。
 
 UTMのウインドウで＋ボタンを押して「仮想化」を選びます。OS選択ではLinuxを選び、Apple仮想化と、ISOイメージで先ほどダウンロードした.isoファイルを選択して、あとはすべてデフォルトでインストールしていきました。特にパッケージなども追加はしていません。SSHサーバのみが入った感じですかね。
 
@@ -82,7 +82,7 @@ Serving HTTP on :: port 8000 (http://[::]:8000/) ...
 
 ホストのマシンからこのゲスト上で動いているサービスにアクセスしてみてHTMLが帰ってきたら無事にサーバーがでっきていることの確認ができます。
 
-```sh
+```console
 % curl http://192.168.64.7:8000
 <!DOCTYPE HTML>
 <html lang="en">

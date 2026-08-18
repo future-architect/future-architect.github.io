@@ -50,7 +50,7 @@ podが起動
 
 最初の実験として、実際に`kubectl run`を実行し、出力されるイベントログを確認してみます。
 
-```sh
+```console
 % kubectl run log-test --image=nginx
 pod/log-test created
 % kubectl get events -w
@@ -271,7 +271,7 @@ spec:
 
 `kubectl delete pod`で`kube-scheduler-minikube`を削除してみます。しかし、何度削除しても、即座に復活し、`kubectl get pods`の結果に出てきます。
 
-```sh
+```console
 % kubectl delete pod kube-scheduler-minikube -n kube-system
 pod "kube-scheduler-minikube" deleted from kube-system namespace
 % kubectl get pods -n kube-system
@@ -305,7 +305,7 @@ storage-provisioner                1/1     Running   0          11h
 
 このSchedulerがいない状態で、新しいPodを作成してみます。Podデータ自体は作成できましたが、STATUSが`Pending`のまま動かず、NODEも`<none>`のままです（必要な情報を出力するため`custom-columns`オプションをつけています）。
 
-```sh
+```console
 % kubectl run new-pod --image=nginx
 pod/new-pod created
 % kubectl get pods -o custom-columns=NAME:.metadata.name,STATUS:.status.phase,NODE:.spec.nodeName

@@ -91,7 +91,7 @@ services:
 
 この段階で `s3 ls` コマンドを叩くと、空文字列が返ってくることが確認できます。
 
-```bash
+```console
 % docker compose up -d moto
 % aws --endpoint-url http://localhost:5050 s3 ls
 
@@ -264,7 +264,7 @@ resource "aws_sqs_queue_policy" "allow_s3" {
 
 ここまで揃ったら、あとは Terraform コマンドを叩くだけです。
 
-```bash
+```console
 % cd terraform
 % terraform init
 % terraform apply -auto-approve
@@ -278,7 +278,7 @@ apply が通ることを確認できました。
 `--endpoint-url` で moto を向ければ、AWS CLI からリソースが見えます。
 Terraform で定義した通りに S3 バケットと SQS キューが作られていることが確認できました。
 
-```bash
+```console
 % aws --endpoint-url http://localhost:5050 s3 ls
 2026-04-07 22:30:11 moto-test-json-bucket
 
@@ -371,7 +371,7 @@ moto の ECS は API のレスポンスを返すだけで、実際にコンテ�
 
 初期状態のキュー内のメッセージは当然 0 個です。
 
-```bash
+```console
 % aws --endpoint-url http://localhost:5050 sqs get-queue-attributes \
   --queue-url http://localhost:5050/123456789012/moto-test-queue \
   --attribute-names ApproximateNumberOfMessages \
@@ -382,7 +382,7 @@ Attributes:
 
 この状態でS3 に JSON を put してみます。
 
-```bash
+```console
 % S3_KEY="data/$(date +%Y%m%d-%H%M%S).json"
 % echo '{"hello": "world!"}' | aws --endpoint-url http://localhost:5050 s3 cp - \
   "s3://moto-test-json-bucket/${S3_KEY}" \
@@ -391,7 +391,7 @@ Attributes:
 
 その後ふたたびキュー内のメッセージ数を見てみると、1 個になっていることが分かります。
 
-```bash
+```console
 % aws --endpoint-url http://localhost:5050 sqs get-queue-attributes \
   --queue-url http://localhost:5050/123456789012/moto-test-queue \
   --attribute-names ApproximateNumberOfMessages \

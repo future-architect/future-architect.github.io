@@ -271,7 +271,7 @@ func main() {
 
 ビルドしたら試しにcurlでこのサーバーAPIを叩いてみます。バッチリですね(長いのでレスポンスは短くしてます)。
 
-```bash
+```console
 % curl http://localhost:8000/api/postal/1410032
 {
   "version": "2021-04-30",

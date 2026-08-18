@@ -47,7 +47,7 @@ OKをもらったら、イベントのスポンサーページにフューチャ
 
 このプログラムはconnpassのイベント情報からユーザー情報を取得して、PDFファイルを作成するところまで行います。Go ConferenceのconnpassのURLは https://gocon.connpass.com/event/148602/ です。この数値をコマンドライン引数に設定します。
 
-```bash
+```console
 go get github.com/shibukawa/tofuonfire
 ./tofuonfire 148602
 ```

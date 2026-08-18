@@ -180,7 +180,7 @@ napi new
 
 すると、以下の質問が表示されるので、順に回答してください。
 
-```text
+```console
 # 任意のパッケージ名
 ? Package name: (The name filed in your package.json)
 

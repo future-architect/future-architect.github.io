@@ -150,7 +150,7 @@ Spaceキーを押すことでチェックを付けることができます。右
 
 それぞれのコマンドには、以下のオプションが用意されています。
 
-```text
+```console
 Flags:
   -f, --filter string   filter by action. You can select create, destroy, update, or replace
   -i, --items int       check box item size (default 25)

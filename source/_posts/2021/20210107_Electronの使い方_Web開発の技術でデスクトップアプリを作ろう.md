@@ -559,7 +559,7 @@ Webアプリケーションとして一通りの機能を持ったアプリケ�
 
 > VueRouterを用いた画面遷移は可能か
 
-→[少々設定が必要](https://nklayman.github.io/vue-cli-plugin-electron-builder/guide/commonIssues.html#blank-screen-on-builds-but-works-fine-on-serve)だが動いた
+→[少々設定が必要](https://nklayman.github.io/vue-cli-plugin-electron-builder/guide/commonIssues.html#blank-screen-on-builds-but-works-fine-on-serve)だが動いた。
 
 > ファイルのダウンロード、生成は可能か
 
@@ -571,7 +571,7 @@ Webアプリケーションとして一通りの機能を持ったアプリケ�
 
 > クライアント証明書を利用することは可能か
 
-→可能、クライアント証明書が端末に複数インストールされているような場合は自前で選択処理を実装する必要があった
+→可能、クライアント証明書が端末に複数インストールされているような場合は自前で選択処理を実装する必要があった。
 
 初めて触る場合は色々不安になると思いますが、想像以上に大丈夫でした。
 これらハマりどころやtipsは今あるもの、今後気が付いたもの含め適宜記事にしたいと考えています。

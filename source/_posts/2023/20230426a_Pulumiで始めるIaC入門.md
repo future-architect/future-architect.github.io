@@ -291,7 +291,7 @@ pulumi up
 
 上記のコマンドを実行すると、Goのプログラムを評価し、実行するリソースの更新を決定します。変更の概要を示すプレビューが表示されます。
 
-```bash
+```console
 Previewing update (dev)
 
 View in Browser (Ctrl+O): https://app.pulumi.com/xxxxxxxx/gcp-test/dev/previews/xxxxxxxxxxxxxx

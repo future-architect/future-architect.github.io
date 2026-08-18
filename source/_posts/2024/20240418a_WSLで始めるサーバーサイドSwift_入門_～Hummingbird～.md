@@ -61,7 +61,7 @@ https://docs.hummingbird.codes/2.0/documentation/hummingbird/
 
 - Windows Subsystem for Linux （以下、WSL）に関するバージョン情報
 
-    ```sh cmd.exe
+    ```console cmd.exe
     >wsl -v
     WSL バージョン: 2.1.5.0
     カーネル バージョン: 5.15.146.1-2
@@ -82,7 +82,7 @@ https://docs.hummingbird.codes/2.0/documentation/hummingbird/
 Swiftly は、Swift Server Workgroup[^9] が提供するCLIツールで異なるバージョンのSwiftを使い分けることができます。
 記載の手順通り、実行していきます。
 
-```bash
+```console
 # swiftly のインストール
 > curl -L https://swift-server.github.io/swiftly/swiftly-install.sh | bash
 ~~~
@@ -115,7 +115,7 @@ https://docs.hummingbird.codes/2.0/tutorials/todos/
 
 #### Hummingbird のセットアップ
 
-```bash
+```console
 # プロジェクトDirectoryの作成
 > mkdir Todos
 > cd Todos
@@ -135,7 +135,7 @@ https://docs.hummingbird.codes/2.0/tutorials/todos/
 `--type tool` は、コマンドライン引数をデフォルトで利用できるテンプレートみたいです。
 `Package.swift` に、 https://github.com/apple/swift-argument-parser.git が含まれるか否かと置き換えても問題ないと思います。
 
-```bash  --type executable の場合
+```console  --type executable の場合
 > swift package init --type executable
 Creating executable package: Sample
 Creating Package.swift
@@ -214,7 +214,7 @@ struct Todos: AsyncParsableCommand {
 
 一連の修正が完了すると、アプリケーションが正常に動くことを確認できます。
 
-```bash
+```console
 > swift run
 Building for debugging...
 [8/8] Linking Todos
@@ -270,7 +270,7 @@ Linux 上でも Homebrew インストールできるみたいなので、Homebre
 https://docs.brew.sh/Homebrew-on-Linux
 :::
 
-```bash
+```console
 > sudo apt update
 > sudo apt install postgresql postgresql-contrib
 > psql --version
@@ -279,7 +279,7 @@ psql (PostgreSQL) 14.11 (Ubuntu 14.11-0ubuntu0.22.04.1)
 
 インストールが完了したので、チュートリアルの続きを実施します。
 
-```bash
+```console
 > psql postgres
 psql: error: connection to server on socket "/var/run/postgresql/.s.PGSQL.5432" failed: No such file or directory
         Is the server running locally and accepting connections on that socket?
@@ -288,7 +288,7 @@ psql: error: connection to server on socket "/var/run/postgresql/.s.PGSQL.5432" 
 エラーで進めません。
 エラーについて調べると `.conf` ファイルを確認しよう[^5]、などとありますが、そもそも`.conf`ファイルを含んだディレクトリ（`/etc/postgresql/14/main/`）がないことに気が付きました。
 
-```bash
+```console
 > ls -la /etc/postgresql/
 total 8
 drwxr-xr-x  2 postgres postgres 4096 Feb 10  2022 .
@@ -297,7 +297,7 @@ drwxr-xr-x 84 root     root     4096 Apr 17 06:54 ..
 
 別の記事[^6]を参考に、PostgreSQL のクラスタを追加します。
 
-```bash
+```console
 > sudo pg_createcluster --start 14 main
 > ls -la /etc/postgresql/14/main/
 conf.d/          pg_ctl.conf      pg_ident.conf    start.conf
@@ -307,7 +307,7 @@ environment      pg_hba.conf      postgresql.conf
 動くようになったので、チュートリアルの続きに戻ります。
 まずは、データベースを準備します。
 
-```bash
+```console
 > postgres psql
 psql (14.11 (Ubuntu 14.11-0ubuntu0.22.04.1))
 Type "help" for help.
@@ -330,7 +330,7 @@ https://github.com/hummingbird-project/hummingbird-examples/tree/main/todos-post
 
 これまで構築したものの動作確認を行います。
 
-```bash
+```console
 > swift run
 
 # 別タブで動作確認

@@ -66,7 +66,7 @@ Constraint allow_some_storage_location on resource //storage.googleapis.com/vali
 
 ### Terraform Validator インストール
 
-バイナリファイルがGCSで公開されているので、最新版をダウンロードし適当なパスに配置
+バイナリファイルがGCSで公開されているので、最新版をダウンロードし適当なパスに配置。
 
 ```bash
 gsutil ls -r gs://terraform-validator/releases

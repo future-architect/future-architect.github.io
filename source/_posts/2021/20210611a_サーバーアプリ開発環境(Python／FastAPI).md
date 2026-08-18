@@ -41,7 +41,7 @@ curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poet
 
 ## プロジェクト作成
 
-プロジェクトフォルダはコマンドで一緒に作られるので、フォルダをおきたい親フォルダでコマンドを実行
+プロジェクトフォルダはコマンドで一緒に作られるので、フォルダをおきたい親フォルダでコマンドを実行。
 
 ```bash
 poetry new sample-server

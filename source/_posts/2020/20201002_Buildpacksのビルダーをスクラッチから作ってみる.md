@@ -236,7 +236,7 @@ python                 distroless          b0ed12f6c423        40 years ago     
 
 ### 試しに実行してみる
 
-```bash
+```console
 % pack build empty-sample --builder python:distroless
 0.9.1: Pulling from buildpacksio/lifecycle
 Digest: sha256:53bf0e18a734e0c4071aa39b950ed8841f82936e53fb2a0df56c6aa07f9c5023
@@ -294,7 +294,7 @@ Dockerは行志向のプログラムになっていて、その行のコンテ�
 
 最初に空のビルダーを作りましたが、これは実は大切なことです。emptyというbuildpackでなくても、最初から作りたいbuildpackを作ってやっても良いのですが、ベースとなるビルダーが構築済みだと、アプリケーションのビルド時にbuildpackを独自にうわがいて使うことができます。いちいちビルダーをビルドし直さなくてもすばやくアプリケーションコードとビルダーの両方の調整が行えます。やたらとレイヤー化だので、ステップをわけているせいで、何度もビルドを回すのが面倒なツールが世の中増えていますが、この開発を高速に回せる使い勝手はとても良いです。ビルドツールはたいてい面倒なことが多いので・・・
 
-```bash
+```console
 % pack build webapp --builder python:distroless --buildpack ../buildpack/python
 ```
 

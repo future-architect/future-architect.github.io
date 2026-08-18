@@ -106,7 +106,7 @@ Azure Data Factoryは、Microsoftが提供するクラウド型のデータ統�
 <img src="/images/2025/20250512b/image_2.png" alt="" width="1200" height="753" loading="lazy">
 
 ::: note info
-Azure Logic Appsとの違い
+**Azure Logic Appsとの違い**
 
 データの統合や自動化を目的としたツールとして、Azure Data Factoryに類似したツールであるLogic Appsがあります。ユースケースに合わせて使い分ける必要があります（[参考](https://learn.microsoft.com/ja-jp/azure/logic-apps/azure-integration-services-choose-capabilities)）
 

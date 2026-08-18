@@ -158,7 +158,7 @@ errored: false
 
 をチェックしたいと思います。
 
-```sh
+```console
 let aws_s3_bucket_resources = planned_values.root_module.resources[type == "aws_s3_bucket"]
 
 rule aws_s3_bucket_rule when %aws_s3_bucket_resources !empty {
@@ -254,7 +254,7 @@ Resources:
 
 というファイルに対してS3のバケット名の命名規則をチェックします。
 
-```sh
+```console
 let buckets = Resources.*[ Type == 'AWS::S3::Bucket' ]
 
 rule BucketEncryption when %buckets !empty {

@@ -24,7 +24,7 @@ lede: "Salesforce ApexというJava5に似た構文を持つ言語のパーサ�
 
 <img src="/images/2026/20260225a/TeaVMによるclassファイルのコンパイル.png" alt="TeaVMによるclassファイルのコンパイル" width="1200" height="655" loading="lazy">
 
-**目標**: 自作Java製Apexパーサーをブラウザで動かし、ApexソースコードのAST[^ast]をインタラクティブに可視化すること
+**目標**: 自作Java製Apexパーサーをブラウザで動かし、ApexソースコードのAST[^ast]をインタラクティブに可視化すること。
 
 **技術スタック**:
 
@@ -110,7 +110,7 @@ TeaVMを選んだ理由は以下の通りです：
 
 - JsMain/WasmMainはそれぞれJavaScript版とWebAssembly版のエントリーポイントとなる(ソースコード文字列を引数とする)mainクラスです。
 
-```text
+```console
 mvn clean package
   ↓
 [Maven Compiler Plugin]

@@ -78,7 +78,7 @@ def test_add(x, y, expected):
 期待通り、3つのテストケースが実行されていることが確認できますね。
 (表示の都合上失敗させています)
 
-```bash
+```console
 test_main.py::test_add[normal1] PASSED                                           [ 33%]
 test_main.py::test_add[normal2] PASSED                                           [ 66%]
 test_main.py::test_add[abnormal] FAILED                                          [100%]
@@ -144,7 +144,7 @@ def test_hoge_function(db_setup):  # 引数にfixtureを渡す
 期待通り、セットアップとクリーンアップが実行されていることが確認できますね。
 (表示の都合上失敗させています)
 
-```bash
+```console
 test_main.py::test_hoge_function FAILED                                          [100%]
 
 ======================================= FAILURES =======================================

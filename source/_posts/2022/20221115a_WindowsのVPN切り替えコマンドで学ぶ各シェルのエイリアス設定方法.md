@@ -58,7 +58,7 @@ Windowsだと色んなシェルを使いますが、`GitBash`、`PowerShell`、`
 
 #### CiscoのCLIツールのパスを通す
 
-CiscoのCLIツールはWindowsの場合
+CiscoのCLIツールはWindowsの場合…
 
 `/c/Program Files (x86)/Cisco/Cisco AnyConnect Secure Mobility Client`
 
