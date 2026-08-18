@@ -89,7 +89,15 @@ const MAX_NARROWING_TAGS = 12;
 // 末尾の数字（1.27 や 2024）を切り出す。接頭辞が一致すれば同じ系列とみなす
 const VERSIONED = /^(.*?)(\d+(?:\.\d+)*)$/;
 
-function family(name) {
+// 語幹は version_tags.js と同じ3層で決める（名前規則 → versionOf → notVersion）。
+// 名前が語幹と一致しない版タグ（Vue3 → Vue.js、JDK23 → Java）は名前規則では
+// 拾えず、共起の相手として「N本を共有」の隣接群に落ちていた。版タグの語幹は
+// version_tags.js が記事へ注入している（＝語幹は必ず版タグを含む上位集合）ので、
+// 判定を揃えないとこちらだけ関係を見落とす (#2569)
+function family(name, ontology) {
+  const node = ontology[name];
+  if (node && node.notVersion) return null;
+  if (node && node.versionOf) return node.versionOf;
   const m = VERSIONED.exec(name);
   // 接頭辞が空（"2024" のような数字だけのタグ）は系列として扱わない
   return m && m[1] ? m[1] : null;
@@ -125,14 +133,17 @@ function build(site) {
   const postTags = new Map(); // 記事ID -> タグ名の配列
   const total = new Map(); // タグ名 -> 記事数
   const path = new Map(); // タグ名 -> URL のパス
-  const families = new Map(); // 接頭辞 -> 同じ系列のタグ名
+  const families = new Map(); // 語幹 -> 同じ系列のタグ名
+  const stems = new Map(); // タグ名 -> 語幹
+  const ontology = (site.data && site.data.tag_ontology) || {};
 
   site.tags.forEach((tag) => {
     total.set(tag.name, tag.length);
     // URL は自前で組まない。tag_map や記号の置換（Go1.18 -> tags/Go1-18）が
     // 効いており、encodeURIComponent(name) では存在しないパスになる
     path.set(tag.name, tag.path);
-    const stem = family(tag.name);
+    const stem = family(tag.name, ontology);
+    if (stem) stems.set(tag.name, stem);
     if (stem) {
       if (!families.has(stem)) families.set(stem, []);
       families.get(stem).push(tag.name);
@@ -172,12 +183,12 @@ function build(site) {
     partners.get(b).push([a, n]);
   }
 
-  return { total, path, families, co, partners, postCount: site.posts.length };
+  return { total, path, families, stems, co, partners, postCount: site.posts.length };
 }
 
 hexo.extend.helper.register('related_tags', function (tagName) {
   if (!cache) cache = build(this.site);
-  const { total, path, families, co, partners, postCount } = cache;
+  const { total, path, families, stems, co, partners, postCount } = cache;
 
   const own = total.get(tagName);
   if (!own) return [];
@@ -190,8 +201,8 @@ hexo.extend.helper.register('related_tags', function (tagName) {
   };
 
   // 同じ系列のタグ。無印タグ（Go / GoogleCloudNext）のページでは
-  // 自分が接頭辞そのものになる (#2355)
-  const stem = family(tagName) || (families.has(tagName) ? tagName : null);
+  // 自分が語幹そのものになる (#2355)
+  const stem = stems.get(tagName) || (families.has(tagName) ? tagName : null);
   const relatives = (stem ? families.get(stem) || [] : []).filter((name) => name !== tagName);
   const relativeNames = new Set(relatives);
   // 接頭辞のページから見た系列は全部「より詳しいタグ」。版のページから見ると
@@ -208,7 +219,8 @@ hexo.extend.helper.register('related_tags', function (tagName) {
   const versions = (stem === tagName ? [] : relatives)
     .filter((name) => name !== stem)
     .map(member)
-    .map((r) => ({ ...r, version: versionKey(r.name) }))
+    // versionOf で束ねたタグは名前に数字が無いこともある。順序を決められないので先頭
+    .map((r) => ({ ...r, version: VERSIONED.test(r.name) ? versionKey(r.name) : Infinity }))
     .sort((a, b) => b.version - a.version); // 新しいバージョンを先に
 
   // 移動先に新しい記事が1本しか無い相手を出すかどうか。1ページに収まるタグでは
