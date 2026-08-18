@@ -37,7 +37,7 @@ lede:
 
 1万 GitHub Star目前！
 
-<img src="/images/2023/20230508a/vuls.png" alt="" loading="lazy">
+<img src="/images/2023/20230508a/vuls.png" alt="" width="300" height="100" loading="lazy">
 
 そんな便利ツールのVulsですが、これまではWindowsはサポートしていませんでした。
 
@@ -110,7 +110,7 @@ vuls.exe scan
 vuls.exe report
 ```
 
-<img src="/images/2023/20230508a/vuls_report.png" alt="" loading="lazy">
+<img src="/images/2023/20230508a/vuls_report.png" alt="" width="943" height="809" loading="lazy">
 
 自分のサーバで見つかった脆弱性と、それらのCVSSスコアなどが表形式で表示されました。
 
