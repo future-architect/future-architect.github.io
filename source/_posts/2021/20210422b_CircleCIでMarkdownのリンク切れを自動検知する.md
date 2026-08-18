@@ -29,7 +29,7 @@ lede: "私のチームでは、「システムの設計情報」や「実装に�
 
 ### 完成版コード
 
-<img src="https://github-link-card.s3.ap-northeast-1.amazonaws.com/r-ryu/markdown-link-checker.png" width="460px"loading="lazy">
+<img src="https://github-link-card.s3.ap-northeast-1.amazonaws.com/r-ryu/markdown-link-checker.png" width="460" height="153" loading="lazy">
 
 https://github.com/r-ryu/markdown-link-checker
 

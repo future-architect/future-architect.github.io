@@ -152,7 +152,7 @@ JSONのマッピングの実装ミスを静的解析で検知した要領で、A
 自作したAWS Lambdaの関数シグネチャを静的解析ツールは以下です。
 
 <a href="https://github.com/d-tsuji/awslambdahandler">
-<img src="https://github-link-card.s3.ap-northeast-1.amazonaws.com/d-tsuji/awslambdahandler.png" width="460px">
+<img src="https://github-link-card.s3.ap-northeast-1.amazonaws.com/d-tsuji/awslambdahandler.png" width="460" height="153" loading="lazy">
 </a>
 
 `d-tsuji/awslambdahandler` を使うと `Start` や `StartWithContext` の引数に渡す関数のシグネチャが正しくないコードを発見してくれます。

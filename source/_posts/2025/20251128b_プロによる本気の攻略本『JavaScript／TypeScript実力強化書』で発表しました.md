@@ -21,7 +21,7 @@ lede: "プロによる本気の攻略本『JavaScript/TypeScript実力強化書�
 
 [プロによる本気の攻略本『JavaScript/TypeScript実力強化書』 - FL#115](https://forkwell.connpass.com/event/375550/)というForkwellを運営するGroovesさんのイベントで登壇してきました。こちらが発表資料になります。
 
-<iframe src="https://www.slideshare.net/slideshow/embed_code/key/mqdKZqMe9HA0UF" width="95%" height="420"frameborder="0" marginwidth="0" marginheight="0" scrolling="no"style="border: var(--border-1) solid #CCC; border-width:1px; margin-bottom:5px; max-width:100%;"allowfullscreen></iframe><div style="margin-bottom:5px"><strong><a href="https://www.slideshare.net/slideshow/javascript-typescript-2-forkwell-library/284342600" title="javascript-typescript-2-forkwell-library" target="_blank">javascript-typescript-2-forkwell-library</a></strong>from <strong><a href="https://www.slideshare.net/shibukawa" target="_blank">Yoshiki Shibukawa</a></strong></div>
+<iframe src="https://www.slideshare.net/slideshow/embed_code/key/mqdKZqMe9HA0UF" width="95%" height="420" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border: var(--border-1) solid #CCC; border-width:1px; margin-bottom:5px; max-width:100%;" allowfullscreen></iframe><div style="margin-bottom:5px"><strong><a href="https://www.slideshare.net/slideshow/javascript-typescript-2-forkwell-library/284342600" title="javascript-typescript-2-forkwell-library" target="_blank">javascript-typescript-2-forkwell-library</a></strong>from <strong><a href="https://www.slideshare.net/shibukawa" target="_blank">Yoshiki Shibukawa</a></strong></div>
 
 <br>
 
