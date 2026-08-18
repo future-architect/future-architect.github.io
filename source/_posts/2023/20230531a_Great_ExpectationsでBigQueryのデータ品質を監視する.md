@@ -404,7 +404,7 @@ JSONファイルの直接編集もできますが、複雑なため、Notebook�
 
 ### GCPにおける構成例は？
 
-[公式Docs](https://docs.greatexpectations.io/docs/deployment_patterns/how_to_use_great_expectations_with_google_cloud_platform_and_bigquery)によると、GCPを利用する場合、以下のような構成で動かす一例が挙げられています。\
+[公式Docs](https://docs.greatexpectations.io/docs/deployment_patterns/how_to_use_great_expectations_with_google_cloud_platform_and_bigquery)によると、GCPを利用する場合、以下のような構成で動かす一例が挙げられています。
 
 設定のための初回実行はローカル環境で行い、定期実行する際はCloud Composerを利用します。
 
