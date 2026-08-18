@@ -290,7 +290,7 @@ developer tool で確認してみると、`log: test, pwd: password` という�
 
 ブルートフォース攻撃をしたくなったので、先ほど見つけた辞書ファイル `fsocity.dic` を取得してきます。しかしこのファイル、やけに重い。ダウンロードに2分もかかってます。確認すると 7.0 MB もあります。
 
-```sh
+```console
 ┌──(kali㉿kali)-[~/tryhackme/MrRobotCTF]
 └─$ curl -O http://10.10.203.195/fsocity.dic 
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current

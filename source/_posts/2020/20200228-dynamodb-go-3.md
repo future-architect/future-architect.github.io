@@ -289,7 +289,7 @@ DynamoDBのConditional Expressionsほど万能では無いですが、多くの�
 
 もし、更新回数などをアプリケーションとして持ちたい場合は、自分で属性を持つ必要があるのでご注意ください。
 
-```bash
+```console
 >aws dynamodb scan --endpoint-url http://localhost:8000 --table-name MyFirstTable
 {
     "Items": [

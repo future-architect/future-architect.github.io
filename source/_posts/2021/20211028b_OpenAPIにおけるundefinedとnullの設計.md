@@ -247,14 +247,14 @@ $ curl -X GET /users/00001
 
 作成時に`score`値が存在する場合は、リクエストに`score`値を含めます。
 
-```sh
+```console
 $curl -X POST /users --data '{ "name": "Bob", "score": 70 }'
 { "id": "00001", "name": "Bob", score: 70 }
 ```
 
 作成時に`score`値が存在しない場合は、リクエストに`score`プロパティは含めません。もちろんこの時のレスポンスとして作成したリソースを返却する場合、レスポンスの中にも`score`プロパティは含まれません。
 
-```sh
+```console
 $curl -X POST /users --data '{ "name": "Bob" }'
 { "id": "00001", "name": "Bob" }
 ```
@@ -269,14 +269,14 @@ $curl -X POST /users --data '{ "name": "Bob" }'
 
 というのもリクエストのプロパティからscore自体を除外してしまうと、更新対象外となってしまい意図した挙動となりません。
 
-```sh
+```console
 $curl -X PATCH /users/00001 --data '{ }'
 { "id": "00001", "name": "Bob", score: 70 } // score　is not cleared.
 ```
 
 このような場合、明確に`null`値を指定してアップデートをする必要があります。
 
-```sh
+```console
 $curl -X PATCH /users/00001 --data '{ "score": null }'
 { "id": "00001", "name": "Bob" }  // score　is cleared.
 ```

@@ -82,7 +82,7 @@ Serving HTTP on :: port 8000 (http://[::]:8000/) ...
 
 ホストのマシンからこのゲスト上で動いているサービスにアクセスしてみてHTMLが帰ってきたら無事にサーバーがでっきていることの確認ができます。
 
-```sh
+```console
 % curl http://192.168.64.7:8000
 <!DOCTYPE HTML>
 <html lang="en">

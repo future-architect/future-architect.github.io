@@ -239,7 +239,7 @@ FATA[0000] --account and --zone are mutually exclusive, support for both is depr
 
 どうやら先程セットした環境変数 `CLOUDFLARE_ACCOUNT_ID` がセットされていると正常に動いてくれなさそうなので、一旦 `unset CLOUDFLARE_ACCOUNT_ID` コマンドで環境変数を外しておきます。
 
-```sh
+```console
 % cf-terraforming generate --resource-type "cloudflare_record" --zone "ゾーンID"
 resource "cloudflare_record" "terraform_managed_resource_xxxxxxxxxxx" {
   name    = "920oj.net"
@@ -298,7 +298,7 @@ importするためのコマンドはcf-terraformingを利用して出力でき�
 
 まずはcf-terraformingを利用してコマンドを出力してみましょう。
 
-```sh
+```console
  % cf-terraforming import --resource-type "cloudflare_record" --zone "ゾーンID"
 terraform import cloudflare_record.terraform_managed_resource_xxxxxxxxxx ゾーンID/xxxxxxxxxx
 terraform import cloudflare_record.terraform_managed_resource_yyyyyyyyyy ゾーンID/yyyyyyyyyy
@@ -313,7 +313,7 @@ terraform import cloudflare_record.terraform_managed_resource_mx_root ゾーンI
 
 これを実行してみましょう。 Import successful! と表示されれば、インポート完了です。
 
-```sh
+```console
  % ./import.sh
 cloudflare_record.cname_root: Importing from ID "ゾーンID/xxxxxxxxxx"...
 cloudflare_record.cname_root: Import prepared!
@@ -330,7 +330,7 @@ your Terraform state and will henceforth be managed by Terraform.
 
 ここで `terraform plan` を実行してみましょう。先ほどimportしたものが表示され、最後にNo chanegsと表示されれば、無事反映に成功しています。
 
-```sh
+```console
  % terraform plan
 cloudflare_record.cname_root: Refreshing state... [id=xxxxxxxxxxxxxxxxxxxxxx]
 cloudflare_record.mx_root: Refreshing state... [id=xxxxxxxxxxxxxxxxxxxxxx]
@@ -381,7 +381,7 @@ import {
 
 この状態で `terraform plan -generate-config-out=generate.tf` コマンドを実行します。
 
-```sh
+```console
 % terraform plan -generate-config-out=generate.tf
 cloudflare_pages_domain.domain-920oj-net: Preparing import... [id=xxxxxxxxxxxxxxx/920oj-net/920oj.net]
 cloudflare_pages_project.project-920oj-net: Preparing import... [id=xxxxxxxxxxxxxxx/920oj-net]
@@ -524,7 +524,7 @@ Do you want to perform these actions?
 
 先ほどインポートに利用したimport.tfは削除しても構いません。
 
-```sh
+```console
  % terraform plan
 cloudflare_pages_domain.domain-920oj-net: Refreshing state... [id=xxxxxxxxxx]
 cloudflare_pages_project.project-920oj-net: Refreshing state... [id=xxxxxxxxxx]

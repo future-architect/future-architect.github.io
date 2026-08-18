@@ -72,7 +72,7 @@ Elasticsearchのメリットとして、以下が挙げられます。
 
 動作確認として、別のコマンドプロンプトを立ち上げ `curl http://localhost:9200/` と叩いてみましょう。
 
-```sh
+```console
 > curl http://localhost:9200/
 
 # 実行結果
@@ -107,7 +107,7 @@ Elasticsearchのメリットとして、以下が挙げられます。
 標準ではElasticsearchは日本語の形態素解析（後述します）に対応しておりませんが、オープンソースの**kuromoji**というソフトウェアを対応させることで、日本語の解析が可能となります。
 `bin/elasticsearch-pulgin.bat` から追加インストールできます。コマンドプロンプトで以下のコマンドを実行しましょう。
 
-```sh
+```console
 # [zip解凍したフォルダ\bin] にて実行
 > elasticsearch-plugin.bat install analysis-kuromoji
 
@@ -170,7 +170,7 @@ curlコマンドを使ってバシバシ叩いてみましょう。
 
 それでは、実際にコマンドを叩いてみます。
 
-```sh インデックスとドキュメントを作成
+```console インデックスとドキュメントを作成
 > curl -X POST "http://localhost:9200/my_index/my_type/?pretty" -H "Content-Type":"application/json" -d @my_document_1.json
 
 # 実行結果
@@ -196,7 +196,7 @@ curlコマンドを使ってバシバシ叩いてみましょう。
 ドキュメントを指定して参照するには、`～/{インデックス名}/{ドキュメントタイプ名}/{ドキュメントid}`と指定してリクエストします。
 ドキュメントidとは、先ほどのレスポンスの **"_id"** です。
 
-```sh
+```console
 > curl -X GET "http://localhost:9200/my_index/my_type/D4DCxnIB33lDYAWdACgJ?pretty" -H "Content-Type":"application/json"
 
 # 実行結果
@@ -238,7 +238,7 @@ curlコマンドを使ってバシバシ叩いてみましょう。
 検索は`～/{インデックス名}/{ドキュメントタイプ名}/_search`という形式でリクエストします。
 検索条件として、先ほどの`my_query_1.json` を指定します。
 
-```sh 「春祭り」で検索
+```console 「春祭り」で検索
 > curl -X GET "http://localhost:9200/my_index/my_type/_search?pretty" -H "Content-Type":"application/json" -d @my_query_1.json
 ```
 
@@ -294,7 +294,7 @@ curlコマンドを使ってバシバシ叩いてみましょう。
 
 そして以下の通りリクエストしてみます。
 
-```sh 「春の入門祭り　Elasticsearch入門」の解析結果を調べる
+```console 「春の入門祭り　Elasticsearch入門」の解析結果を調べる
 > curl -X POST "http://localhost:9200/my_index/_analyze?pretty" -H "Content-Type":"application/json" -d @my_analyze_1.json
 ```
 
@@ -371,7 +371,7 @@ Elasticsearchではこの索引型検索方式を採用することで、大量�
 }
 ```
 
-```sh 「おいしい食べ物」で検索
+```console 「おいしい食べ物」で検索
 > curl -X GET "http://localhost:9200/my_index/my_type/_search?pretty" -H "Content-Type":"application/json" -d @my_query_2.json
 ```
 

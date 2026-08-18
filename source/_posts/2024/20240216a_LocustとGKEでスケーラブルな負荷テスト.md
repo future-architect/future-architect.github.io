@@ -89,7 +89,7 @@ resource "google_artifact_registry_repository" "my-repo" {
 
 ここからはターミナルでの作業がメインとなるため、頻繁に利用する定数などを定義しておきます。適宜、自身で定義した内容に変更してください。
 
-```shell terminal
+```bash terminal
 export PROJECT=test-project
 export REGION=asia-northeast1
 export AR_REPO=my-repository

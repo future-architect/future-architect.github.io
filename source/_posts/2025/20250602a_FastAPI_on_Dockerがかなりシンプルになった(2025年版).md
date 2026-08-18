@@ -113,7 +113,7 @@ CMD ["fastapi", "run", "main.py", "--port", "80"]
 
 これの実行前には requirements.txt の生成が必要です。uv は良いのですがライブラリ更新のたびに自動で出力してくれるオプションとかあったらなぁ、と画竜点睛感はありますが。
 
-```shell
+```bash
 uv pip compile pyproject.toml > requirements.txt
 ```
 

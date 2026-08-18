@@ -157,13 +157,13 @@ napi-rsの使い方を説明します。
 yarnでnapi-rsのCLIツールをインストールします。
 まずyarnをインストールします。以降もyarnが必要になるため、必ずインストールしてください。
 
-```shell
+```bash
 npm install -g yarn
 ```
 
 napi-rsのCLIツールをインストールします。
 
-```shell
+```bash
 yarn global add @napi-rs/cli
 ```
 
@@ -174,13 +174,13 @@ yarn global add @napi-rs/cli
 インストールしたCLIツールを使用して新規プロジェクトを作成します。
 新規プロジェクトを作成したいディレクトリで以下のコマンドを実行します。
 
-```shell
+```bash
 napi new
 ```
 
 すると、以下の質問が表示されるので、順に回答してください。
 
-```shell
+```console
 # 任意のパッケージ名
 ? Package name: (The name filed in your package.json)
 
@@ -227,7 +227,7 @@ pub fn sum(a: i32, b: i32) -> i32 {
 これをNode.jsアドオンへビルドして実行してみます。
 まず先ほど作成したプロジェクトのルートディレクトリでビルドコマンドを実行します。
 
-```shell
+```bash
 yarn build
 ```
 
@@ -244,7 +244,7 @@ console.log(sum(3, 4));
 
 実行して"7"という出力が返ってきたら成功です。
 
-```shell
+```bash
 node test.js
 # 7
 ```
@@ -278,7 +278,7 @@ pub fn runfmt(input: String) ->  String {
 
 プロジェクトのルートディレクトリでビルドします。
 
-```shell
+```bash
 yarn build
 ```
 
@@ -317,7 +317,7 @@ console.log(runfmt(target));
 
 作成した`run.js`を実行します。
 
-```shell
+```bash
 node run.js
 ```
 
@@ -435,7 +435,7 @@ GitHubのリポジトリ > Actions > 最新のワークフローに移動し、�
 
 1. 以下のコマンドを実行して圧縮
 
-    ```shell
+    ```bash
     npm pack
     ```
 
@@ -638,7 +638,7 @@ Python3が必要なためインストールします。既にPython3が入って
 
 まずnode-gypをインストールします。
 
-```shell
+```bash
 npm install -g node-gyp
 ```
 
@@ -653,7 +653,7 @@ npm install -g node-gyp
 
 以下を実行します。(2022の部分はダウンロードしたバージョンに合わせて適宜変更して下さい)
 
-```shell
+```bash
 npm config set msvs_version 2022
 ```
 
@@ -661,7 +661,7 @@ npm config set msvs_version 2022
 
 以下を実行します。
 
-```shell
+```bash
 npm install -g vsce
 ```
 

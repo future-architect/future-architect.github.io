@@ -214,7 +214,7 @@ pvc-constraint（Constraint名）より、リクエストが拒否されたエ�
 
 ちなみにですが、kubectlコマンドでも削除リクエストが拒否されることが確認できます。
 
-```sh
+```console
 kubectl delete pvc -n monitoring storage-kube-prometheus-stack-grafana-0
 > Error from server (Forbidden): admission webhook "validation.gatekeeper.sh" denied the request: [pvc-operation-constraint] : DELETE request detected in monitoring namespace. Cancel the request for PVC to prevent deletion
 ```

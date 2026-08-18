@@ -135,7 +135,7 @@ dbt_trial:
 
 作成した dbt プロジェクトフォルダの直下で`dbt debug`コマンドを実行し、BigQuery への接続が正常に確立できるかを確認します。
 
-```bash
+```console
 dbt debug
 # 接続に成功すると、以下のような出力が表示されます。
 > Connection test: OK connection ok

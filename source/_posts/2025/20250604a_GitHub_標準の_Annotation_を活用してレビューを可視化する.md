@@ -186,7 +186,7 @@ Problem Matcher は、GitHub Actions のワークフロー内で `::add-matcher:
 Python 用の Linter である [Ruff](https://github.com/astral-sh/ruff) など GitHub Annotation に対応した出力をサポートしているツールもあります。
 Ruff では `--output-format` に `github` を指定することで、次のような出力を得ることができます。
 
-```shell
+```console
 ruff check test.py --output-format github
 ::error title=Ruff (F401),file=test.py,line=1,col=8,endLine=1,endColumn=10::test.py:1:8: F401 `os` imported but unused
 ```

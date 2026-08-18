@@ -33,7 +33,7 @@ skip_career: true
 
 VSCodeでコードを修正する場合、ES2023とか2024のメソッドを使おうとすると ``lib`` を上げろと言ってきますが、実際に使えるECMAScriptバージョンにあわせて、tsconfig.jsonのtargetを上げてしまう方が良いかと思います。
 
-```shell
+```bash
 npx -p typescript tsc --init
 ```
 

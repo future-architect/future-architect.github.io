@@ -84,7 +84,7 @@ resource "aws_s3_bucket_public_access_block" "my_bucket" {
 このファイルがまだ未作成の場合、次のようにコマンドを実行することで
 作成後に想定されるリソース構成をJSONファイルで出力できます。
 
-```shell
+```bash
 terraform plan -out tfplan.bin
 terraform show --json tfplan.bin > tfplan.json
 ```
@@ -158,7 +158,7 @@ errored: false
 
 をチェックしたいと思います。
 
-```sh
+```console
 let aws_s3_bucket_resources = planned_values.root_module.resources[type == "aws_s3_bucket"]
 
 rule aws_s3_bucket_rule when %aws_s3_bucket_resources !empty {
@@ -254,7 +254,7 @@ Resources:
 
 というファイルに対してS3のバケット名の命名規則をチェックします。
 
-```sh
+```console
 let buckets = Resources.*[ Type == 'AWS::S3::Bucket' ]
 
 rule BucketEncryption when %buckets !empty {

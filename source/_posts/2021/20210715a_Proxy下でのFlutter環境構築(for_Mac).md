@@ -118,7 +118,7 @@ systemProp.https.proxyPassword=password
 
 加えて、証明書エラーが出ることもあります。
 
-```sh
+```console
 A problem occurred configuring root project 'android'.
 > Could not resolve all artifacts for configuration ':classpath'.
    > Could not resolve com.android.tools.build:gradle:4.1.0.

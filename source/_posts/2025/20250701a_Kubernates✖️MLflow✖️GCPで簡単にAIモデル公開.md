@@ -122,7 +122,7 @@ spec:
 
 以下のコマンドでデプロイできます。
 
-```sh deploy_docker.sh
+```console deploy_docker.sh
 # イメージをビルド、Dockerにプッシュする
 mlflow models build-docker -m models:/{my_model_id} -n my-model --enable-mlserver
 docker push my-model
@@ -160,7 +160,7 @@ spec:
 
 定義ファイルを用意できましたら、必要なモデルArtifactをGcloud Storageにアップロードし、デプロイします。GKEがGCSからモデルをダウンロードして推論サーバーを構築してくれます。
 
-```sh deploy_gke.sh
+```console deploy_gke.sh
 # MLflowで生成されたモデルartifactsをGCSにアップロード
 gsutil cp -r models/{model_id} gs://{gcp_project_id}_mlflow_models/
 

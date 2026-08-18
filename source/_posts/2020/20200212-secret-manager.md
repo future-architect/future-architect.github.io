@@ -47,7 +47,7 @@ lede: "突然ですが、普段生活するうえでカギ🔑をなくした、
 
 ### Berglasのインストール（正確にはバイナリをダウンロード）
 
-```shell
+```bash
 wget https://storage.googleapis.com/berglas/master/linux_amd64/berglas
 chmod +x berglas
 ```
@@ -74,7 +74,7 @@ $ gcloud services enable --project ${PROJECT_ID} \
 
 次コマンドを実行すると、シークレットを保存するための新しいCloud Storageバケットと、データを暗号化するためのCloud KMSキーが自動的に作成されます。
 
-```shell
+```bash
 berglas bootstrap --project $PROJECT_ID --bucket $BUCKET_ID
 ```
 
@@ -157,7 +157,7 @@ $ export SA_EMAIL=berglas-service-account@${PROJECT_ID}.iam.gserviceaccount.com
 
 #### Berglasから先ほど作ったサービスアカウントへシークレットへのアクセス権限を渡す
 
-```shell
+```bash
 berglas grant ${BUCKET_ID}/api-user --member serviceAccount:${SA_EMAIL}
 berglas grant ${BUCKET_ID}/api-pass --member serviceAccount:${SA_EMAIL}
 ```

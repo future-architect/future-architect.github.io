@@ -133,7 +133,7 @@ await test.step("名前", async () => {
 
 テストの名前に `@タグ`というテキストを入れることで[タグ付けしてテストのフィルタリングが可能](https://playwright.dev/docs/test-annotations#tag-tests)になります。例えば、本番環境で軽い確認用に幾つかのテストをピックアップして使いたい場合はテストの名前の文字列の中に `@validation`という文字列を含めておくことで、そのテストのみを選択して実行ができます。
 
-```shell
+```bash
 npx playwright test --grep @validation
 ```
 

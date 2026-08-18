@@ -64,7 +64,7 @@ Write-Host "World"
 
 VBAにそのまま張れる関数コードになりました。
 
-```bash
+```console
 > python3.exe convert.py hello.ps1
 Function SourceCode() As String
     Dim src As String

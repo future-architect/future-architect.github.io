@@ -32,7 +32,7 @@ Healthcare Innovation Group(HIG)所属の山本です。
 CREATE DATABASE healthcare_data;
 ```
 
-```shell
+```console
 -- 作成したデータベースに接続
 \c healthcare_data;
 ```

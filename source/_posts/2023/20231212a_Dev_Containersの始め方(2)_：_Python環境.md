@@ -20,7 +20,7 @@ lede: "Dev ContainersのPython環境を作っていきます。"
 
 まずリポジトリのフォルダを作ります。`python-dev`とします。
 
-```shell
+```bash
 mkdir python-dev
 cd python-dev
 git init
