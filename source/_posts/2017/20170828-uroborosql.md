@@ -51,16 +51,16 @@ uroboroSQLは、特定のWebアプリケーションフレームワークには�
 
 ## uroboroSQL PetClinic
 
-<img src="/images/2017/20170828/photo_20170828_01.jpg" class="img-middle-size" loading="lazy">
+<img src="/images/2017/20170828/photo_20170828_01.jpg" class="img-middle-size" width="1194" height="763" loading="lazy">
 
 トップページはSpring PetClinicをご存じの方だったら、ピンと来るかなと思います。
 基本的に仕様はほぼ踏襲しています。
 
 簡単にこのアプリケーションの説明をすると、動物病院のペット・飼い主の管理システムですね。「Find Owner」から飼い主を検索して、その飼い主のペットの登録やペットの来院履歴の登録ができるといったものです。
 
-<img src="/images/2017/20170828/photo_20170828_02.png" class="img-middle-size" loading="lazy">
+<img src="/images/2017/20170828/photo_20170828_02.png" class="img-middle-size" width="1190" height="671" loading="lazy">
 
-<img src="/images/2017/20170828/photo_20170828_03.png" class="img-middle-size" loading="lazy">
+<img src="/images/2017/20170828/photo_20170828_03.png" class="img-middle-size" width="1990" height="1186" loading="lazy">
 
 ログイン不要で利用できたり、DBの排他制御がなかったりと、あくまでサンプルという位置づけですね。
 
@@ -177,7 +177,7 @@ uroboroSQLはSQLを実装する方式のライブラリなので、ご覧の通�
 
 ## 登録処理の実装
 
-<img src="/images/2017/20170828/photo_20170828_04.png" class="img-middle-size" loading="lazy">
+<img src="/images/2017/20170828/photo_20170828_04.png" class="img-middle-size" width="1184" height="796" loading="lazy">
 
 次に飼い主の登録画面の実装を見てみます。
 
@@ -276,7 +276,7 @@ uroboroSQL PetClinicも認証機能など、エンタープライズ用途の参
 
 ## 番外編：SQLログ表示機能
 
-<img src="/images/2017/20170828/photo_20170828_05.png" class="img-middle-size" loading="lazy">
+<img src="/images/2017/20170828/photo_20170828_05.png" class="img-middle-size" width="1190" height="820" loading="lazy">
 
 本家Spring Clinicには存在しない機能ですが、サーバサイドで実行されたuroboroSQLの出力するログを画面上で表示する機能を追加してみました。画面左下の目のアイコンをクリックするとログウィンドウが表示されます。
 
