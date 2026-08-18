@@ -89,7 +89,7 @@ MegaLinterにはインタラクティブに設定ファイルを生成するコ�
 npx mega-linter-runner --install
 ```
 
-コマンドを実行すると
+コマンドを実行すると…
 
 下図のようなプロンプトが立ち上がるので選択をしていきます。
 <img src="/images/2023/20231129a/image.png" alt="image.png" width="1153" height="356" loading="lazy">

@@ -45,8 +45,8 @@ https://cloud.google.com/learn/certification/cloud-digital-leader?hl=ja
 ### 試験の形式
 
 >試験時間: 90 分
-登録料: $99
-言語: 英語、日本語
+>登録料: $99
+>言語: 英語、日本語
 
 ### 出題範囲
 

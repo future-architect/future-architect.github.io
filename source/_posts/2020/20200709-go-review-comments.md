@@ -614,7 +614,7 @@ func bar(argstring) (*Example, error) {
 
 <blockquote class="twitter-tweet"><p lang="ja" dir="ltr">コードには How<br>テストコードには What<br>コミットログには Why<br>コードコメントには Why not<br><br>を書こうという話をした</p>&mdash; Takuto Wada (@t_wada) <a href="https://twitter.com/t_wada/status/904916106153828352?ref_src=twsrc%5Etfw">September 5, 2017</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
-これ以上は蛇足になりそうですが、、、あとはことAWS, GCPなどのサービスを利用する場合は、処理件数などの制約があるかと思いますので、そのリファレンスURLなどをコードに貼ることは有効だと思います。また、ライブラリの利用方法も特殊なものがあれば、GoDocのExampleコードのリンクを貼るのは有効です。[ソースコードのコメントに登場する URL の役割](https://ishiotks.hatenablog.com/entry/2019/02/02/143259)にもある通り、**無効になりにくい URL を使う** といったテクニックがあるので、リンク先の記事も確認してみて下さい
+これ以上は蛇足になりそうですが、、、あとはことAWS, GCPなどのサービスを利用する場合は、処理件数などの制約があるかと思いますので、そのリファレンスURLなどをコードに貼ることは有効だと思います。また、ライブラリの利用方法も特殊なものがあれば、GoDocのExampleコードのリンクを貼るのは有効です。[ソースコードのコメントに登場する URL の役割](https://ishiotks.hatenablog.com/entry/2019/02/02/143259)にもある通り、**無効になりにくい URL を使う** といったテクニックがあるので、リンク先の記事も確認してみて下さい。
 
 コードレビュー時には、正直自分が使ったことがないプロダクトにアクセスするコードの場合は、レビューがつらすぎるので、レビュイーに参考にしたURLを教えてもらったり、制約から来ているぽい数値の諸元を確認したりしています。この時、すでにコード上に参考URLが貼ってあれば、GitHub上のPullRequestのコメントで余計なやり取りが減らせるので、スピード感が増してお互い幸せかなと思っています。
 

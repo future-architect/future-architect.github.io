@@ -121,7 +121,7 @@ $env:GOOGLE_APPLICATION_CREDENTIALS="C:\xxx\Text-to-Speech-123456789012.json"
 }
 ```
 
-設定可能な言語、音声は[こちら](https://cloud.google.com/text-to-speech/docs/voices?hl=ja)を参照
+設定可能な言語、音声は[こちら](https://cloud.google.com/text-to-speech/docs/voices?hl=ja)を参照。
 
 ### APIの実行
 
@@ -186,7 +186,7 @@ certutil -decode base64.txt future.mp3
 
 高音域まで聞こえるスピーカーで聞くと若干ノイズが気になりますが、電話を通じた音声に利用したりするには十分かと思います。
 
-公式によるユースケースは[こちら](https://cloud.google.com/text-to-speech?hl=ja#section-6)を参照
+公式によるユースケースは[こちら](https://cloud.google.com/text-to-speech?hl=ja#section-6)を参照。
 
 今回作成したプロジェクトを削除して終わりです。
 

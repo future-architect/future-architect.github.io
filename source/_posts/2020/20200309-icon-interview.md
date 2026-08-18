@@ -68,7 +68,7 @@ https://future-architect.github.io/articles/20160721/
 
 <img src="/images/2020/20200308/図①.png" class="img-middle-size" loading="lazy">
 
-2016年に公開した作ったアイコン
+*2016年に公開した作ったアイコン*
 
 前半はここまで。社外で使ってもらえているのは嬉しいですね。私もぜひ「これ自分の作ったあれでは？」の現場に遭遇したいです。
 

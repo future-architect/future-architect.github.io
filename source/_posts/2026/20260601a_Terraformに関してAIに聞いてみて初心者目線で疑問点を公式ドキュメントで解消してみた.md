@@ -132,7 +132,7 @@ Terraform Planしたときに確認できる内容ですが、これもTerraform
 Terraform Coreの重要な役割である「状態管理」と「計画の実行」についてもAIに聞き、公式ドキュメントで裏付けを取りました。
 
 ::: note tip 状態管理（Resource state management）とは？（AIの回答）
-「現実のインフラが今どうなっているか」をTerraform本体が記憶しておく仕組み
+「現実のインフラが今どうなっているか」をTerraform本体が記憶しておく仕組み。
 
 結論から言うと、状態管理（Resource state management）は、Terraform本体（Core）が `terraform.tfstate` というファイルを使って、自分が過去に作成したリソースの現在の状態を追跡・記憶しておく重要な役割です。
 
@@ -147,7 +147,7 @@ Terraform Coreの重要な役割である「状態管理」と「計画の実行
 :::
 
 ::: note tip 計画の実行（Plan execution）とは？（AIの回答）
-理想と現実の「差分」を計算し、Providerに正しい順番で指示を出す仕組み
+理想と現実の「差分」を計算し、Providerに正しい順番で指示を出す仕組み。
 
 計画の実行（Plan execution）とは、Terraform本体（Core）がコード（理想）とState（現実）の差分から「どのリソースを、どういう順番で作成・変更・削除するか」という手順書を作成し、それを実行する役割のことです。
 

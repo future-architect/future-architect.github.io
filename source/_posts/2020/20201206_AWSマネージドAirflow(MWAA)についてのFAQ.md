@@ -58,7 +58,7 @@ AWS マネージド Airflow (MWAA) が 2020/11/24 にリリースされました
 
 Celery Executor の構成は以下の図の通りです。
 <img src="/images/2020/20201206/graphviz-91fd3ca4f3dc01a69b3f84fbcd6b5c7975945ba4.png" loading="lazy">
-[Architecture-Celery Executor](https://airflow.apache.org/docs/stable/_images/graphviz-91fd3ca4f3dc01a69b3f84fbcd6b5c7975945ba4.png) からの画像
+*[Architecture-Celery Executor](https://airflow.apache.org/docs/stable/_images/graphviz-91fd3ca4f3dc01a69b3f84fbcd6b5c7975945ba4.png) からの画像*
 
 プロセスの種類は全部で3つで、webserver, scheduler と worker になります。
 履歴やメタデータ管理のため、DB (metadata DB) があります。scheduler と worker の間に キューが存在しているはずですが、公式には記載されていません。(Elatsic Cache (Redis) の可能性が高いかなと推測してます。)

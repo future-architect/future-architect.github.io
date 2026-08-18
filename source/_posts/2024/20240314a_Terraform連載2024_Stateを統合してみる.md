@@ -119,7 +119,7 @@ $ terraform state pull > a.tfstate
 $ terraform state pull > b.tfstate
 ```
 
-2\. 2つのStateファイルをマージ
+**2\. 2つのStateファイルをマージ**
 
 ここが今回の作業のキモです。頑張って手作業でStateファイルをマージしていきましょう。
 
@@ -149,7 +149,7 @@ terraform state push b'.tfstate
 tfstateファイルは必ずバックアップを取っておくようにしましょう
 :::
 
-4\. Terraform のコードを統合
+**4\. Terraform のコードを統合**
 
 ここはパターン（1）と同様、根気よく作業していきましょう。
 git の 差分の増減などを確認するもよいでしょう。

@@ -121,7 +121,7 @@ EVMを使うことで多角的にプロジェクトを把握できますね。
 - [Logstash Download URL](https://www.elastic.co/downloads/logstash)
   - →私の場合は、 `logstash-5.1.2.zip` をダウンロードしました。
 
-(d) 「c:\elastic」というフォルダを作成
+(d) 「c:\elastic」というフォルダを作成します。
 
 (e) 先ほどダウンロードしたそれぞれの圧縮ファイルを解凍し、「c:\elastic」へ配置します。
 

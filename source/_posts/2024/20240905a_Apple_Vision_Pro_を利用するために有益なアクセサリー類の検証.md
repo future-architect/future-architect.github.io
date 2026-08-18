@@ -13,7 +13,7 @@ lede: "2024年初めから米国で発売開始されたApple Vision Proです�
 ---
 <img src="/images/2024/20240905a/Image_20240905_101403.png" alt="" width="1061" height="885" loading="lazy">
 
-▼SoloニットバンドM/S、Soloニット用バッテリーホルダー、SoloTop、Lens Protectorを組み合わせた例
+*▼SoloニットバンドM/S、Soloニット用バッテリーホルダー、SoloTop、Lens Protectorを組み合わせた例*
 
 ---
 
