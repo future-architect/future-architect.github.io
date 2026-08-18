@@ -93,15 +93,15 @@ Apache Beamでは以下の図のような構成となっています。
 
 いくつのBundleに分割するかはRunnerが決定します。以下の図では9つのelementからなるPCollectionを2つのBundleに分割しています。
 
-<img src="/images/2022/20220920a/Bundleに分割する例.svg" alt="Bundleに分割する例" loading="lazy">
+<img src="/images/2022/20220920a/Bundleに分割する例.svg" alt="Bundleに分割する例" width="422" height="217" loading="lazy">
 
 ParDo1を実行する際に、各BundleはWorkerに渡され、並列に実行されます。
 
-<img src="/images/2022/20220920a/Bundleの並列処理.svg" alt="Bundleの並列処理" loading="lazy">
+<img src="/images/2022/20220920a/Bundleの並列処理.svg" alt="Bundleの並列処理" width="585" height="221" loading="lazy">
 
 PCollectionに含まれるelementよりも小さく分割できないため、Bundle数の最大はPCollectionのelement数です。
 
-<img src="/images/2022/20220920a/最も細かくBundleに分割した例.svg" alt="最も細かくBundleに分割した例" loading="lazy">
+<img src="/images/2022/20220920a/最も細かくBundleに分割した例.svg" alt="最も細かくBundleに分割した例" width="557" height="277" loading="lazy">
 
 _※Splittable ParDoを使えば、1つのelementを複数のBundleで処理できるらしい。この機能は開発中とのこと。_
 
@@ -111,11 +111,11 @@ _※Splittable ParDoを使えば、1つのelementを複数のBundleで処理で�
 
 図ではBundle AにParDo1を適用した出力がBundle C、Bundle BにParDo1を適用した出力がBundle Dとなっています。
 
-<img src="/images/2022/20220920a/Transform間に従属関係がある場合.svg" alt="Transform間に従属関係がある場合" loading="lazy">
+<img src="/images/2022/20220920a/Transform間に従属関係がある場合.svg" alt="Transform間に従属関係がある場合" width="406" height="397" loading="lazy">
 
 RunnerがParDo1を適用前と後でBundleを再構成しない場合、各Bundleは同じWorkerでParDo1とParDo2を適用されます。
 
-<img src="/images/2022/20220920a/各Bundleは同じWorkerで処理される.svg" alt="各Bundleは同じWorkerで処理される" loading="lazy">
+<img src="/images/2022/20220920a/各Bundleは同じWorkerで処理される.svg" alt="各Bundleは同じWorkerで処理される" width="641" height="222" loading="lazy">
 
 こうすることで、Worker間の通信を省くことができ、他のWorkerの処理を待つ必要がなくなります。
 
@@ -125,13 +125,13 @@ Bundle内のあるelementの処理に失敗した場合、そのelementが属す
 
 ただし、処理を実行するWorkerは変わってもよく、以下の例ではWorker2が処理に失敗したBundleをWorker1が引き受けています。
 
-<img src="/images/2022/20220920a/1つのTransformに失敗した時.svg" alt="1つのTransformに失敗した時" loading="lazy">
+<img src="/images/2022/20220920a/1つのTransformに失敗した時.svg" alt="1つのTransformに失敗した時" width="602" height="248" loading="lazy">
 
 #### 従属関係にあるTransformに失敗した場合の挙動
 
 2つのTransform間に従属関係があり、後続のTransformの処理に失敗した場合、Bundleは再度最初からTransformを適用される必要があります。
 
-<img src="/images/2022/20220920a/従属関係にあるTransformに失敗した場合.svg" alt="従属関係にあるTransformに失敗した場合" loading="lazy">
+<img src="/images/2022/20220920a/従属関係にあるTransformに失敗した場合.svg" alt="従属関係にあるTransformに失敗した場合" width="679" height="256" loading="lazy">
 
 _このような挙動となっている理由は、Transform間のelementを保持しておくとメモリを圧迫してしまうため？公式DocにはPersistence costを節約するためとあった。ラージスケールなデータを処理することを念頭においた設計となっている？_
 

@@ -147,7 +147,7 @@ https://www.g-mark.org/gallery/winners/26906
 <img src="/images/2025/20250916a/image_3.png" alt="image.png" width="985" height="519" loading="lazy">
 出典：https://tarupo.jp/mimimi
 
-<img src="/images/2025/20250916a/mimimi.avif" alt="1400" width="1867" height="" loading="lazy">
+<img src="/images/2025/20250916a/mimimi.avif" alt="" width="1400" height="1867" loading="lazy">
 
 ちなみに、「みみみ」のユーザ基盤を支えている「たるポ」はFutureとも関わりがあります🎉
 

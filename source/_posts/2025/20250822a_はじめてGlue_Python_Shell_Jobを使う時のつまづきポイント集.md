@@ -16,7 +16,7 @@ author: 八木雅斗
 lede: "業務でGlue Python Shell Job（以降、Python Shell）を利用する機会があったのですが、「Lambdaとかだと簡単にできるのに、Python Shellだとできないんか～」とか、ドキュメント上でPySparkジョブ or Python Shellのどちらについて記載しているのか分かりにくかったりと..."
 ---
 
-<img src="/images/2025/20250822a/top.jpg" alt="" width="700  " height="700">
+<img src="/images/2025/20250822a/top.jpg" alt="" width="700" height="700" loading="lazy">
 
 ## はじめに
 
