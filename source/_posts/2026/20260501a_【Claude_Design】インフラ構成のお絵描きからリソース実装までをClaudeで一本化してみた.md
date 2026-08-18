@@ -15,7 +15,7 @@ lede: "Claude Design、最近話題になっていますね。"
 ---
 <img src="/images/2026/20260501a/imagetets.jpg" alt="imagetets.jpg" width="1200" height="648" loading="lazy">
 
-## 1. はじめに
+## はじめに
 
 こんにちは。Healthcare Innovation Group（HIG）の福島です。
 本記事は、[春の入門祭り2026](https://future-architect.github.io/articles/20260421a/)の7日目の記事です。
@@ -39,7 +39,7 @@ Claude Design、最近話題になっていますね。
 5. 実際にAWSリソースを構築できるか確認する
 6. AI活用時に人間がレビューすべきポイントを整理する
 
-## 2. 今回構築するインフラ構成
+## 今回構築するインフラ構成
 
 今回の主目的は、Claude DesignでAWS構成図を作成し、それをもとにTerraformコードを生成することなので、インフラ構成自体は最小構成とします。
 
@@ -67,7 +67,7 @@ ECSのセキュリティグループではALBからの通信のみ許可し、�
 - IAM Role
 - CloudWatch Logs
 
-## 3. ステップ1： 要件から設計資料・AWS構成図を作成する
+## ステップ1： 要件から設計資料・AWS構成図を作成する
 
 まずはプロジェクトを作成します。
 
@@ -184,7 +184,7 @@ Claude Designには使用量の週次リミットがあり、到達してしま�
 細かい不備は少々あれど、必要最低限の内容は表現できており、資料の叩き台としては十分なレベルです。
 構成図については、AWSが公式に提供するアイコンアセットを事前に読み込ませると、より視認性の高い図になるかもしれません。興味のある方は試してみてください。
 
-## 4. ステップ2： Terraformコードの生成
+## ステップ2： Terraformコードの生成
 
 ここからは、Claude DesignがまとめてくれたAWS構成および各リソースの設定値をベースに、Terraformコードを作成していきます。
 前提として、ローカル環境にはTerraform CLIとAWS CLIの事前インストールが必要です。
@@ -816,7 +816,7 @@ CloudWatch Logsの保持期間やECSタスク数など、コストに関わる�
 Apply complete! Resources: 18 added, 0 changed, 0 destroyed.
 ```
 
-## 5. ステップ3： 疎通確認
+## ステップ3： 疎通確認
 
 AWSマネジメントコンソールから、構築されたリソースを確認します。
 
@@ -835,7 +835,7 @@ ALBからECSへの接続設定が完了していることがわかります。�
 terraform destroy
 ```
 
-## 6. おわりに
+## おわりに
 
 今回は、Claude DesignでAWS構成図を含む設計資料を作成し、その内容をClaude Codeへ引き継いでTerraformコードを生成し、実際にAWSリソースを構築するところまで検証しました。
 
