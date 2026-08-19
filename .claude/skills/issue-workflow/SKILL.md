@@ -44,12 +44,35 @@ gh issue view <n>
 
 ## 4. 検証
 
-| 変えたもの | 回すもの |
-| --- | --- |
-| CSS（`css-src/*.styl`） | `make css`（0.3秒）だけ |
-| `.ejs` / `scripts/` / 記事 | `npx hexo generate`（1分半。`run_in_background` で投げて他の作業を進める） |
-| `scripts/` のフィルタ | `make clean` してから `hexo generate`（`db.json` のキャッシュが効いて既存記事に反映されない） |
+回すものは**変えたもの**ではなく**確かめたいものの範囲**で決める。
+サイトを作り直すのではなく、変わった出力を見る。
 
+| 確かめたいもの | 回すもの |
+| --- | --- |
+| CSS の見え方 | `make css`（0.3秒）だけ |
+| フィルタ・ヘルパーを通した**1ページの描画結果** | `hexo.post.render` を叩くスクリプト（10秒） |
+| 一覧・集計・複数ページにまたがる出力 | `npx hexo generate`（`run_in_background` で投げる） |
+
+- **`hexo generate` は生成物そのものが要るときだけ。** 何も変えていなくても記事1,449本の
+  処理と画像1.2GB のコピーが走る。1ページの描画結果を見たいだけなら 10 秒で済む
+
+  ```js
+  const hexo = new Hexo(process.cwd(), { silent: true });
+  await hexo.init(); // scripts/ と Hexo 本体のフィルタが両方載る
+  const data = { content: src, source: 'specials/markdown/index.md', layout: 'page' };
+  await hexo.post.render(null, data);
+  ```
+
+- **フィルタチェーンを自分で組んで再現しない**（#2654）。`scripts/` の登録だけ集めて
+  優先度順に呼ぶと、Hexo 本体が登録するフィルタ（`backtick_code_block` など）が抜ける。
+  **通ったように見えて実際は直っていない**という最悪の外し方をする。
+  実パイプラインを回すのと手間は変わらないので、必ず `hexo.post.render` を使う
+- **`hexo generate` と `hexo server` を同じ worktree で同時に走らせない**（#2654）。
+  server は終了時に `db.json` を書き戻すので、古いコードで描いた結果が `hexo clean` の
+  後から復活する。**自分の検証を自分で汚す**。並行して走っている server を先に落とす
+- **1ページだけ描き直すなら `db.json` から該当行を落とす。** `hexo clean` は全記事の
+  再描画（数分）を招く。`models.Cache` の `_id`（`source/…`）と `models.Page` /
+  `models.Post` の該当行を消せば、次の起動でそのページだけ再処理される
 - **生成 HTML を機械で確かめる。** `grep` の一致だけで「反映されました」と報告して
   誤報を出したことがある。python で該当セクションを切り出して中身を出す
 
