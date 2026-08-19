@@ -102,7 +102,7 @@ AWSの広告っぽくなってしまうので、サラッと記載します。
 
 ### Connectインスタンスの作成
 
-<img src="/images/2018/20181202/photo_20181202_02.png" style="border:solid 1px #000000" width="1440" height="759" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_02.png" class="bordered" width="1440" height="759" loading="lazy">
 
 - 通常2つのインスタンスを作ることが多い（本番・検証）
 - 既存のAWS Directory Serviceにリンクしたり、SAML 2.0認証も可能
@@ -114,7 +114,7 @@ AWSの広告っぽくなってしまうので、サラッと記載します。
 
 ### インスタンスの設定
 
-<img src="/images/2018/20181202/photo_20181202_03.png" style="border:solid 1px #000000" width="1437" height="756" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_03.png" class="bordered" width="1437" height="756" loading="lazy">
 
 - テレフォニー：発信・着信をAmazonConnectで処理するか否かを設定
 - データストレージ：S3/KMSの設定が可能。クレジット情報などを扱う場合は暗号化必須です
@@ -164,7 +164,7 @@ AWSの広告っぽくなってしまうので、サラッと記載します。
 
 ### 5. 問い合わせフローの作成
 
-<img src="/images/2018/20181202/photo_20181202_08.png" style="border:solid 1px #000000" width="1436" height="793" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_08.png" class="bordered" width="1436" height="793" loading="lazy">
 
 - サンプルのフローが20近くあり、それらを修正しても良いかも
 - 基本はブロックをつないでいけばIVRが簡単に構築できます
@@ -277,7 +277,7 @@ ECサイトで注文情報の変更・キャンセルを行う自動応答シス
 
 #### 全体図
 
-<img src="/images/2018/20181202/photo_20181202_11.png" style="border:solid 1px #000000" width="2678" height="924" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_11.png" class="bordered" width="2678" height="924" loading="lazy">
 
 ### 手順
 
@@ -504,7 +504,7 @@ aws lambda add-permission --function-name function:<Lambda Function名> \
 ```
 
 > ※ ARNはAWSコンソール > AmazonConnect > インスタンスエイリアス名　から確認できます。
-<img src="/images/2018/20181202/photo_20181202_12.png" style="border:solid 1px #000000" width="1179" height="390" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_12.png" class="bordered" width="1179" height="390" loading="lazy">
 
 #### Lexとの連携を作成します。
 
@@ -516,17 +516,17 @@ aws lambda add-permission --function-name function:<Lambda Function名> \
 - Sample utterances：ここでの言葉に反応してLexがSlotを呼びます。
 - Slots："Sure, when?"とLexが聞いて来るので、その後の言葉をAMAZON.DATE型として認識します。
 
-<img src="/images/2018/20181202/photo_20181202_13.png" style="border:solid 1px #000000" width="1437" height="724" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_13.png" class="bordered" width="1437" height="724" loading="lazy">
 
 ##### Amazon LexとConnectを接続します。
 
 下図の通り、Lexボットを作成したリージョンとボット名を選択して追加します。
 
-<img src="/images/2018/20181202/photo_20181202_14.png" style="border:solid 1px #000000" width="1241" height="711" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_14.png" class="bordered" width="1241" height="711" loading="lazy">
 
 #### 最後にフローを作成します。
 
-<img src="/images/2018/20181202/photo_20181202_15.png" style="border:solid 1px #000000" width="1500" height="518" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_15.png" class="bordered" width="1500" height="518" loading="lazy">
 
 かいつまんで説明すると、吹き出し部分が重要なところで、データの受け渡しで若干躓くところです。
 個別に見ていきましょう。
@@ -535,43 +535,43 @@ aws lambda add-permission --function-name function:<Lambda Function名> \
 
 電話をかけてきた相手の電話番号はシステムの値で取得可能です。
 宛先キーは使いやすい名称を設定すれば良いと思います（今回はCallerIDでいきます）。
-<img src="/images/2018/20181202/photo_20181202_16.png"  class="img-middle-size" style="border:solid 1px #000000" width="459" height="745" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_16.png"  class="img-middle-size bordered" width="459" height="745" loading="lazy">
 
 ##### Lambdaの呼び出し
 
 先程取得したCallerID（発信者電話番号）を引数としてセットします。
 呼び出すLambdaのARNは関数画面から取得してきましょう。
-<img src="/images/2018/20181202/photo_20181202_17.png"  class="img-middle-size"  style="border:solid 1px #000000" width="456" height="745" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_17.png"  class="img-middle-size bordered" width="456" height="745" loading="lazy">
 
 ##### 値のチェック
 
 Lambda関数の戻り値をチェックできます。
 ここでは発信者電話番号をキーとした注文情報レコードの有無を確認することを想定しています。
-<img src="/images/2018/20181202/photo_20181202_18.png" class="img-middle-size"  style="border:solid 1px #000000" width="457" height="747" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_18.png" class="img-middle-size bordered" width="457" height="747" loading="lazy">
 
 ##### ダイヤルプッシュを取得（IVR）
 
 IVRの機能を枠ひとつでできてしまいます！
 ここは特につまずくことなく設定可能かなと思います。
-<img src="/images/2018/20181202/photo_20181202_19.png"  style="border:solid 1px #000000" width="1384" height="1125" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_19.png" class="bordered" width="1384" height="1125" loading="lazy">
 
 ##### キャンセル関数
 
 複数の引数を持つLambda関数にもちゃんとデータを渡すことができます。
-<img src="/images/2018/20181202/photo_20181202_20.png" style="border:solid 1px #000000" width="1383" height="924" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_20.png" class="bordered" width="1383" height="924" loading="lazy">
 
 ##### Lexで顧客の入力を取得
 
 前項の「ダイヤルプッシュを取得（IVR）」と同様のことをLexを用いて実装可能です。
 ボットを選択するだけなので、とても簡単に追加できます。
-<img src="/images/2018/20181202/photo_20181202_21.png" style="border:solid 1px #000000" width="1403" height="1125" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_21.png" class="bordered" width="1403" height="1125" loading="lazy">
 
 ##### 配送日変更関数の呼び出し
 
 以前までと違うのが、Lexで取得してきた値を引数としたい点です。
 素晴らしいことにこれもGUIで簡単に取れてしまいます。
 （Lexの部分だけ抜き取っています）。。
-<img src="/images/2018/20181202/photo_20181202_22.png" class="img-middle-size" style="border:solid 1px #000000" width="455" height="586" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_22.png" class="img-middle-size bordered" width="455" height="586" loading="lazy">
 
 ##### 完成！
 

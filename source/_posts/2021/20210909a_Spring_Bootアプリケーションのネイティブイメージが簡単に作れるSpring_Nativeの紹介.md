@@ -73,7 +73,7 @@ Spring Nativeは動的機能を使うためのヒント文をアノテーショ�
 
 Spring InitializrでSpring WebとSpring Nativeを依存関係に追加してプロジェクトのひな型を生成します。
 
-<img src="/images/2021/20210909a/spring_initializr.png" alt="spring_initializr.png" width="1200" height="675" loading="lazy" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;">
+<img src="/images/2021/20210909a/spring_initializr.png" alt="spring_initializr.png" width="1200" height="675" loading="lazy" class="bordered">
 
 非常にシンプルなアプリケーションを記述します。
 
@@ -108,7 +108,7 @@ Spring Initializrを使ってSpring Nativeを依存関係に追加してプロ�
 
 0.076秒で起動しました。
 
-<img src="/images/2021/20210909a/image_3.png" alt="image.png" width="1200" height="245" loading="lazy" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;">
+<img src="/images/2021/20210909a/image_3.png" alt="image.png" width="1200" height="245" loading="lazy" class="bordered">
 
 動いているようです。
 

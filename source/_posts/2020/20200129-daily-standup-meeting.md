@@ -47,7 +47,7 @@ lede: "皆さんは普段どのようにプロジェクトのタスク優先順�
 
 ### 状況共有シートの書きっぷり
 
-<img src="/images/2020/20200129/photo_20200129_02.png" style="border:solid 1px #000000" width="1000" height="262" loading="lazy">
+<img src="/images/2020/20200129/photo_20200129_02.png" class="bordered" width="1000" height="262" loading="lazy">
 
 *↑こんな感じで記載しています↑*
 
@@ -72,17 +72,17 @@ lede: "皆さんは普段どのようにプロジェクトのタスク優先順�
 #### シートを書く際は絵文字をフル活用すると良い
 
 状況共有の際にタスクを種別ごとやプロジェクトごとにカテゴライズすると思いますが、付帯情報を書き始めると縦に長くなってしまいがちです。
-<img src="/images/2020/20200129/photo_20200129_04.png" class="img-small-size" style="border:solid 1px #000000" width="294" height="322" loading="lazy">
+<img src="/images/2020/20200129/photo_20200129_04.png" class="img-small-size bordered" width="294" height="322" loading="lazy">
 
 この縦に長い共有内容を5人分記載するといよいよ一覧性に欠けてしまうので、絵文字をフル活用する方針を立てています。
-<img src="/images/2020/20200129/photo_20200129_05.png" class="img-small-size" style="border:solid 1px #000000" width="149" height="250" loading="lazy">
+<img src="/images/2020/20200129/photo_20200129_05.png" class="img-small-size bordered" width="149" height="250" loading="lazy">
 
 上記は一例ですが、このように絵文字ごとに意味を持たせて記載するようにしています。
 絵文字を利用して先程の共有内容を書き換えると...
-<img src="/images/2020/20200129/photo_20200129_06.png" class="img-small-size" style="border:solid 1px #000000" width="182" height="166" loading="lazy">
+<img src="/images/2020/20200129/photo_20200129_06.png" class="img-small-size bordered" width="182" height="166" loading="lazy">
 
 このようにスッキリします。もちろん行数を圧縮するだけであれば絵文字を使わず書き方を変えるだけで実現はできます。
-<img src="/images/2020/20200129/photo_20200129_07.png" class="img-small-size" style="border:solid 1px #000000" width="317" height="185" loading="lazy">
+<img src="/images/2020/20200129/photo_20200129_07.png" class="img-small-size bordered" width="317" height="185" loading="lazy">
 
 これでも必要な情報は含まれていますが...なんか味気ないと思いませんか？ 私は思います笑
 絵文字に意味づけを行うことでハイコンテキスト化してしまうという点はありますが、見てて視覚的にも楽しいので絵文字をガンガン利用しています。
@@ -95,7 +95,7 @@ lede: "皆さんは普段どのようにプロジェクトのタスク優先順�
 ### Slack ReminderでSUMをリマインド
 
 私のチームではSlack Reminderを使って毎日9時にリマインダを飛ばしています。
-<img src="/images/2020/20200129/photo_20200129_09.png" style="border:solid 1px #000000" width="853" height="264" loading="lazy">
+<img src="/images/2020/20200129/photo_20200129_09.png" class="bordered" width="853" height="264" loading="lazy">
 
 SpreadsheetのURLを都度探すのは面倒なので、Slack reminderでURLを投稿する形にしています。ブックマーク登録しとけばいいという意見もありますが、Slack駆動にしておくと何かと便利なのでこうしています。
 

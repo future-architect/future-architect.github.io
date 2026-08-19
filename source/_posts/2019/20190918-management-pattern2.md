@@ -214,7 +214,7 @@ eyecatch: "/images/2019/20190918/photo_20190918_05.png"
 
 何かの参考になれば。
 
-<img src="/images/2019/20190918/photo_20190918_06.jpg" class="img-small-size" style="border:solid 1px #000000" width="336" height="500" loading="lazy">
+<img src="/images/2019/20190918/photo_20190918_06.jpg" class="img-small-size bordered" width="336" height="500" loading="lazy">
 
 『[予想どおりに不合理](https://www.amazon.co.jp/dp/B00K1A75N4/)』　ダン・アリエリード(著)
 

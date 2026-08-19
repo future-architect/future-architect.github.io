@@ -64,19 +64,19 @@ Google Hangoutsとの関連は以下のようになっています（[Wikipedia�
 手順は以下のとおりです。
 
 Google Chatを開いて、チャットルームを作成します。スレッド返信を使用する場合はチェックを入れます。
-<img src="/images/2021/20210913a/screenshot_setup1.png" alt="チャットルーム作成" width="1200" height="672" loading="lazy" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px;">
+<img src="/images/2021/20210913a/screenshot_setup1.png" alt="チャットルーム作成" width="1200" height="672" loading="lazy" class="bordered">
 
 左上をクリックして「Webhookを管理」を選びます。
 
-<img src="/images/2021/20210913a/screenshot_setup2.png" alt="Webhook管理画面" width="400" height="648" loading="lazy" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px;">
+<img src="/images/2021/20210913a/screenshot_setup2.png" alt="Webhook管理画面" width="400" height="648" loading="lazy" class="bordered">
 
 Webhookの名前とアバターURLを入力し、保存を押します。
 
-<img src="/images/2021/20210913a/screenshot_setup3.png" alt="Webhookの名前とアバターURL入力画面" width="1200" height="659" loading="lazy" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px;">
+<img src="/images/2021/20210913a/screenshot_setup3.png" alt="Webhookの名前とアバターURL入力画面" width="1200" height="659" loading="lazy" class="bordered">
 
 以上でWebhookの設定は終わりです。この時払い出されるURLは後で使用します。
 
-<img src="/images/2021/20210913a/screenshot_setup4.png" alt="設定完了画面" width="1200" height="469" loading="lazy" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px;">
+<img src="/images/2021/20210913a/screenshot_setup4.png" alt="設定完了画面" width="1200" height="469" loading="lazy" class="bordered">
 
 ## 2. Goでメッセージを送る
 
@@ -318,7 +318,7 @@ Cardの中には1つ以上のSectionが、Sectionの中には1つ以上のウィ
 <img src="/images/2021/20210913a/screenshot_card_message.png" alt="screenshot_card_message" width="1200" height="654" loading="lazy">
 
 出力結果がこちらです。
-<img src="/images/2021/20210913a/screenshot_card_message_2.png" alt="screenshot_card_message" width="425" height="455" loading="lazy" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px;">
+<img src="/images/2021/20210913a/screenshot_card_message_2.png" alt="screenshot_card_message" width="425" height="455" loading="lazy" class="bordered">
 
 ## 実際に使ってみた感想
 

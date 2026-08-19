@@ -96,7 +96,7 @@ hexo.extend.helper.register('popular_posts_in', function (posts, limit, decay) {
   const cards = ranked
     .map(({ post }) => {
       const thumb = post.thumbnail
-        ? `<a href="/${post.path}" title="${post.title}" class="img_wrap panel-thumb"><img src="${post.thumbnail}" alt="" width="200" height="135" loading="lazy"></a>`
+        ? `<a href="/${post.path}" title="${post.title}" class="thumb-link panel-thumb"><img src="${post.thumbnail}" alt="" width="200" height="135" loading="lazy"></a>`
         : '';
       return (
         `<div class="col-12 col-md-6"><div class="article-card post-panel h-100">${thumb}` +

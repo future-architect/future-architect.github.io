@@ -58,7 +58,7 @@ $ cd electron-quick-start
 $ npm install && npm start
 ```
 
-<img src="/images/2021/20210107/image.png"  style="border:solid 1px #000000" width="1171" height="344" loading="lazy">
+<img src="/images/2021/20210107/image.png" class="bordered" width="1171" height="344" loading="lazy">
 
 `npm start`コマンドでアプリケーションが実行されます、公式にしては少々素朴ですがHello Worldが表示されます。
 
@@ -126,7 +126,7 @@ Vue CLIの案内に従い、バージョンや構成をいくつか選択しま�
 
 <img src="/images/2021/20210107/image_4.png" width="656" height="246" loading="lazy">
 
-<img src="/images/2021/20210107/image_5.png"  style="border:solid 1px #000000" width="1200" height="658" loading="lazy">
+<img src="/images/2021/20210107/image_5.png" class="bordered" width="1200" height="658" loading="lazy">
 
 サーバーが立ち上がり、ブラウザで`localhost:8080`にアクセスするとHello Worldが表示されます。
 
@@ -256,11 +256,11 @@ npm run electron:build
 
 ビルドに成功すると、dist_electronフォルダ配下に成果物が配置されます。通常のVue.jsアプリケーションのdistフォルダに相当します。
 
-<img src="/images/2021/20210107/image_11.png"  style="border:solid 1px #000000" width="885" height="383" loading="lazy">
+<img src="/images/2021/20210107/image_11.png" class="bordered" width="885" height="383" loading="lazy">
 
 dist_electronフォルダ配下は画像のような状態です。
 
-<img src="/images/2021/20210107/image_12.png"  style="border:solid 1px #000000" width="866" height="234" loading="lazy">
+<img src="/images/2021/20210107/image_12.png" class="bordered" width="866" height="234" loading="lazy">
 
 vue-cli-electron-sample Setup 0.1.0をダブルクリックするとアプリケーションのインストールが開始されます。ちなみに、アプリケーションのバージョン情報は`package.json`記載のバージョンに依存します。
 <img src="/images/2021/20210107/image_13.png" class="img-small-size" width="577" height="234" loading="lazy">

@@ -126,7 +126,7 @@ limiter.Wait(context.Background())
 
 これも、goqueryを駆使してなんとか取得しています。moreのリンクがあったらそれをたどり、下のページングのリンクの2ページ目から最終ページの手前までのページにアクセスして追加で取得するようにしています（1ページ目は取得済みなので飛ばし）。ページングのリストが最大10ページまで表示だとすると、1000人までは対応できます。それ以上になるともうちょっとコードが必要かと。
 
-<img src="/images/2019/20191202/photo_20191202_05.png"  style="border:solid 1px #000000" width="923" height="110" loading="lazy">
+<img src="/images/2019/20191202/photo_20191202_05.png" class="bordered" width="923" height="110" loading="lazy">
 
 ### PDFにする
 

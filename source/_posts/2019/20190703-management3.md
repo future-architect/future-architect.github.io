@@ -22,7 +22,7 @@ lede: "OSSのBIツールであるMetabaseを利用して、Redmineのデータ�
 
 一方で、Redmineにはデータの可視化機能が標準で搭載されていないという課題があります。
 例えばこれが、標準のサマリ画面。グラフがないから傾向とか分かりづらいんですよね。
-<img src="/images/2019/20190703/photo_20190703_02.png" style="border:solid 1px #000000" width="1600" height="806" loading="lazy">
+<img src="/images/2019/20190703/photo_20190703_02.png" class="bordered" width="1600" height="806" loading="lazy">
 参考：http://www.redmine.org/projects/redmine/issues/report
 
 これを何とかしようと、[以前の投稿](/articles/20160920/)では、Kibana+Timelionを使ってRedmineデータをグラフ表示する方法を紹介しました。
@@ -32,10 +32,10 @@ lede: "OSSのBIツールであるMetabaseを利用して、Redmineのデータ�
 そこで、本日はOSSのBIツールである[Metabase](https://metabase.com/)を利用して、Redmineのデータをグラフ表示する方法を紹介します。
 
 例えば、Metabaseを利用すると、チケットの発生件数とクローズ件数の推移を簡単に表示できます。
-<img src="/images/2019/20190703/photo_20190703_03.png" style="border:solid 1px #000000" width="1920" height="1040" loading="lazy">
+<img src="/images/2019/20190703/photo_20190703_03.png" class="bordered" width="1920" height="1040" loading="lazy">
 
 構築する環境は下記の通り。Kibana+Timelionで構築した環境よりもシンプルですね。
-<img src="/images/2019/20190703/photo_20190703_04.png" style="border:solid 1px #000000" class="img-middle-size" width="423" height="148" loading="lazy">
+<img src="/images/2019/20190703/photo_20190703_04.png" class="img-middle-size bordered" width="423" height="148" loading="lazy">
 
 では実際にやってみましょう。
 
@@ -88,52 +88,52 @@ c:\metabase
 <img src="/images/2019/20190703/photo_20190703_05.png" width="979" height="512" loading="lazy">
 
 しばらくすると、下記のように`Metabase Initialization COMPLETE`と表示されます。
-<img src="/images/2019/20190703/photo_20190703_06.png" style="border:solid 1px #000000" width="979" height="512" loading="lazy">
+<img src="/images/2019/20190703/photo_20190703_06.png" class="bordered" width="979" height="512" loading="lazy">
 
 これでMetabaseが起動しました。
 ブラウザで `http://localhost:3000` を開きます。
 
 すると下記のような画面が表示されます。
-<img src="/images/2019/20190703/photo_20190703_07.png" style="border:solid 1px #000000" width="1920" height="1040" loading="lazy">
+<img src="/images/2019/20190703/photo_20190703_07.png" class="bordered" width="1920" height="1040" loading="lazy">
 
 「開始しましょう」をクリックします。
 すると下記のような画面が表示されます。
-<img src="/images/2019/20190703/photo_20190703_08.png" style="border:solid 1px #000000" width="1920" height="1040" loading="lazy">
+<img src="/images/2019/20190703/photo_20190703_08.png" class="bordered" width="1920" height="1040" loading="lazy">
 
 姓名、メールアドレス、パスワード、組織名を入力します。
-<img src="/images/2019/20190703/photo_20190703_09.png" style="border:solid 1px #000000" width="1920" height="1040" loading="lazy">
+<img src="/images/2019/20190703/photo_20190703_09.png" class="bordered" width="1920" height="1040" loading="lazy">
 
 そして、「次へ」をクリック。
 すると、下記のような画面が表示されます。
-<img src="/images/2019/20190703/photo_20190703_10.png" style="border:solid 1px #000000" width="1920" height="1040" loading="lazy">
+<img src="/images/2019/20190703/photo_20190703_10.png" class="bordered" width="1920" height="1040" loading="lazy">
 
 「使用するデータベースのタイプを選択する」から、データベースタイプを選択。
 私の場合は、「MySQL」を選択しました。
 すると、下記のように表示されるので、
-<img src="/images/2019/20190703/photo_20190703_11.png" style="border:solid 1px #000000" width="1920" height="1040" loading="lazy">
+<img src="/images/2019/20190703/photo_20190703_11.png" class="bordered" width="1920" height="1040" loading="lazy">
 
 データベースの種類、名前、ホスト、ポート、データベース名、ユーザ名、パスワードを入力。
 私の場合は、名前を「redmine」にしました。
-<img src="/images/2019/20190703/photo_20190703_12.png" style="border:solid 1px #000000" width="1920" height="1040" loading="lazy">
+<img src="/images/2019/20190703/photo_20190703_12.png" class="bordered" width="1920" height="1040" loading="lazy">
 
 そして、「次へ」をクリックします。
 すると、下記のような画面が表示されます。
-<img src="/images/2019/20190703/photo_20190703_13.png" style="border:solid 1px #000000" width="1920" height="1040" loading="lazy">
+<img src="/images/2019/20190703/photo_20190703_13.png" class="bordered" width="1920" height="1040" loading="lazy">
 
 「次へ」をクリックしましょう。
 すると、下記のような画面が表示されます。
 
-<img src="/images/2019/20190703/photo_20190703_14.png" style="border:solid 1px #000000" width="1920" height="1040" loading="lazy">
+<img src="/images/2019/20190703/photo_20190703_14.png" class="bordered" width="1920" height="1040" loading="lazy">
 
 右上の「照会する」をクリックします。
-<img src="/images/2019/20190703/photo_20190703_15.png" style="border:solid 1px #000000" width="1920" height="1040" loading="lazy">
+<img src="/images/2019/20190703/photo_20190703_15.png" class="bordered" width="1920" height="1040" loading="lazy">
 
 「ネイティブクエリ」をクリック。
-<img src="/images/2019/20190703/photo_20190703_16.png" style="border:solid 1px #000000" width="1920" height="1040" loading="lazy">
+<img src="/images/2019/20190703/photo_20190703_16.png" class="bordered" width="1920" height="1040" loading="lazy">
 
 「データベースを選択する」から、先ほど入力したデータベースを選択しましょう。
 （私の場合は、「redmine」）。
-<img src="/images/2019/20190703/photo_20190703_17.png" style="border:solid 1px #000000" width="1920" height="1040" loading="lazy">
+<img src="/images/2019/20190703/photo_20190703_17.png" class="bordered" width="1920" height="1040" loading="lazy">
 
 次に、チケットの発生件数とクローズ件数を取得する下記のSQLを水色のエリアに貼り付けます。
 
@@ -196,30 +196,30 @@ group by
 ```
 
 貼り付けました。
-<img src="/images/2019/20190703/photo_20190703_18.png" style="border:solid 1px #000000" width="1920" height="1040" loading="lazy">
+<img src="/images/2019/20190703/photo_20190703_18.png" class="bordered" width="1920" height="1040" loading="lazy">
 
 そして、「回答を得る」をクリックすると、
-<img src="/images/2019/20190703/photo_20190703_19.png" style="border:solid 1px #000000" width="1920" height="1040" loading="lazy">
+<img src="/images/2019/20190703/photo_20190703_19.png" class="bordered" width="1920" height="1040" loading="lazy">
 
 結果が表示されます。
 更に、左下の「テーブル」をクリックして、
-<img src="/images/2019/20190703/photo_20190703_20.png" style="border:solid 1px #000000" width="1920" height="1040" loading="lazy">
+<img src="/images/2019/20190703/photo_20190703_20.png" class="bordered" width="1920" height="1040" loading="lazy">
 
 「線」をクリックすると、
-<img src="/images/2019/20190703/photo_20190703_21.png" style="border:solid 1px #000000" width="1920" height="1040" loading="lazy">
+<img src="/images/2019/20190703/photo_20190703_21.png" class="bordered" width="1920" height="1040" loading="lazy">
 
 出ましたね。
 チケットの発生件数とクローズ件数の推移が表示されています。
 
 右上の「エディターを非表示にする」をクリックすると
-<img src="/images/2019/20190703/photo_20190703_22.png" style="border:solid 1px #000000" width="1920" height="1040" loading="lazy">
+<img src="/images/2019/20190703/photo_20190703_22.png" class="bordered" width="1920" height="1040" loading="lazy">
 
 グラフが大きくなりましたね。
 グラフの線にカーソルを当てると、
-<img src="/images/2019/20190703/photo_20190703_23.png" style="border:solid 1px #000000" width="1920" height="1040" loading="lazy">
+<img src="/images/2019/20190703/photo_20190703_23.png" class="bordered" width="1920" height="1040" loading="lazy">
 
 値が表示されますし、右側の「↓」をクリックすると、
-<img src="/images/2019/20190703/photo_20190703_24.png" style="border:solid 1px #000000" width="1920" height="1040" loading="lazy">
+<img src="/images/2019/20190703/photo_20190703_24.png" class="bordered" width="1920" height="1040" loading="lazy">
 データのダウンロードも可能です。
 便利ですね。
 
