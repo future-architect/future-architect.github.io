@@ -19,7 +19,7 @@ lede: "フューチャーの有志メンバーでSwagger（OpenAPI Specification
 
 ## はじめに
 
-フューチャーの有志メンバーでSwagger（OpenAPI Specification Version 2.0）のコーディング規約を作りました。多少の仕掛り部分はあるものの、ある程度見れるものになってきたので紹介させてください。
+フューチャーの有志メンバーでSwagger（OpenAPI Specification Version 2.0）のコーディング規約を作りました。多少の仕掛り部分はあるものの、ある程度見られるものになってきたので紹介させてください。
 
 <img src="/images/2023/20230725a/example.png" alt="" width="800" height="632" loading="lazy">
 

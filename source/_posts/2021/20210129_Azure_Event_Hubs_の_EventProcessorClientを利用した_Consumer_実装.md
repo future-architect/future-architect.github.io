@@ -185,7 +185,7 @@ Endpoint=sb://<namespace>/;SharedAccessKeyName=<KeyName>;SharedAccessKey=<KeyVal
 ## 所感
 
 Azure Event Hubs の EventProcessorClient について紹介いたしました。
-Azure 系は、他クラウドサービスと比べ情報があまり調べても出てこないので、実装と公式ドキュメントをどれだけ見れるかで理解度が変わってくるなぁという印象でした。また他のサービスも触ってみたいです。
+Azure 系は、他クラウドサービスと比べ情報があまり調べても出てこないので、実装と公式ドキュメントをどれだけ見られるかで理解度が変わってくるなぁという印象でした。また他のサービスも触ってみたいです。
 
 ## 参考
 

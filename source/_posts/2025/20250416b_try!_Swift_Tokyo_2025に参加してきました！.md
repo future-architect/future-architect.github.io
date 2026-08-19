@@ -56,7 +56,7 @@ try! Swift Tokyo 2025を楽しむための公式アプリがありました。
 
 <img src="/images/2025/20250416b/06e5ab60-6582-4ab4-957d-cfe1e5f62750.png" alt="" width="600" height="1299" loading="lazy">
 
-visionOS対応もしており、Apple Vision Proユーザーの方は、会場に表示されている壇上のスライドの上に、AI翻訳のウィンドウを表示させて見れてとても便利でしたという声もありました。（自分も体験してみたい。。。）
+visionOS対応もしており、Apple Vision Proユーザーの方は、会場に表示されている壇上のスライドの上に、AI翻訳のウィンドウを表示させて見られてとても便利でしたという声もありました。（自分も体験してみたい。。。）
 
 - [日本語でのSwiftプログラミングのスピーカーFlipByBlink DevさんのXへ投稿より](https://x.com/FlipByBlink/status/1909836805278683436)
 
