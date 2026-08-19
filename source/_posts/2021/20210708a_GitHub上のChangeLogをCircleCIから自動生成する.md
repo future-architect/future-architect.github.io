@@ -40,13 +40,13 @@ ChangeLogとは、機能拡張や不具合修正の内容などをユーザー�
 
 https://github.com/future-architect/vuls/releases
 
-<img src="/images/2021/20210708a/スクリーンショット_2021-06-27_13.55.17.png" alt="Vuls ChangeLog" width="1200" height="695">
+<img src="/images/2021/20210708a/スクリーンショット_2021-06-27_13.55.17.png" alt="Vuls ChangeLog" width="1200" height="695" loading="lazy">
 
 ## 今回作成するChangelog
 
 今回は、以下のようなChangeLogを作成していきます。
 
-<img src="/images/2021/20210708a/Screen_Shot_2021-06-27_at_12.42.40.png" alt="ChangeLog出力例" width="1200" height="549">
+<img src="/images/2021/20210708a/Screen_Shot_2021-06-27_at_12.42.40.png" alt="ChangeLog出力例" width="1200" height="549" loading="lazy">
 
 今回作成するChangeLogに含ませる情報は以下の2つとします。
 
@@ -88,7 +88,7 @@ CircleCIの環境変数の設定方法は、[コンテキストの使用](https:
 
 以下のように、 `GITHUB_TOKEN` を定義し、個人アクセストークンを設定しましょう。
 
-<img src="/images/2021/20210708a/スクリーンショット_2021-06-27_8.19.12.png" alt="アクセストークンの設定" width="853" height="471">
+<img src="/images/2021/20210708a/スクリーンショット_2021-06-27_8.19.12.png" alt="アクセストークンの設定" width="853" height="471" loading="lazy">
 
 #### 3. `.circleci/config.yml` を編集する
 

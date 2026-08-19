@@ -124,9 +124,9 @@ MPUとしては、Wi-Fi、BLEも内蔵した比較的安価なESP32を採用し�
   * C++
   * C
 
-<img width="400" height="274" alt="Blocklyの編集画面" src="/images/2017/20171207/asset_20171207_04.jpeg">
+<img width="400" height="274" alt="Blocklyの編集画面" src="/images/2017/20171207/asset_20171207_04.jpeg" loading="lazy">
 
-<img width="400" height="300" alt="JavaScriptの編集画面" src="/images/2017/20171207/asset_20171207_05.png">
+<img width="400" height="300" alt="JavaScriptの編集画面" src="/images/2017/20171207/asset_20171207_05.png" loading="lazy">
 
 ### クラウド
 

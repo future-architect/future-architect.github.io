@@ -24,7 +24,7 @@ Terraformは、インフラ構築をコードで管理できる強力なツー�
 ちなみに、以下の構成の前提で解説するため、事前にご了承ください。
 
 <a href="https://mermaid.live/edit#pako:eNptkltvozAQhf-KNU-tRCsI4RI_VCq0kXa1uxIkTyteXDxJLIHNGrtqNsp_X5NA2m3Kky_fOXPGzAFqxREo9PjHoqzxSbCtZm0lifs6po2oRcekIeslYT1Zo9Zso_QXQFYMQCa2hUW9v77PTwZ5oywnSytrI5S8pviL-UJavktLK8l39VKN2vXy7uEhKygxUzLCuq4Z6-fT7TfZo3buzLCNaw_JzfOb0aw2t2fwlzJI1CtqMtBPDiOPnCOfyjhSvDLH5OXoXDpnF5YOiYm2n7lLH24xZhiSr4of5GatmeyHqLefRFlxPsiKu8l9ZZix_WiFV-Tg7tC8pGQppOh3_8f5oLgEem91ULmnJLVquwYNXpfJS_CgRd0ywd2QHAagArPDFiugbslxw2xjKqjk0aHMGrXayxqo0RY90Mpud0A3rOndznbu_acJmxD3g38rddkiF0bpn-ehPM2mB1s9VB8dUXLUubLSAA2Ckx7oAd6AptF9nITz2dxfLGaLJA492AOdRe44CoLF3I98P0jS-dGDv6eK_n0Up0kSxmmcplEahsnxHxOl-Us">
-<img src="/images/2025/20250407a/mermaid-diagram-2025-04-07-100048.png" alt="" width="1000" height="642">
+<img src="/images/2025/20250407a/mermaid-diagram-2025-04-07-100048.png" alt="" width="1000" height="642" loading="lazy">
 </a>
 
 ## 1. テーブルのライフサイクル管理
