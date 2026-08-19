@@ -149,7 +149,7 @@ graph TB
 
 一方、揮発性の高い証拠の保全を優先するなら、スナップショットが先です。[AWS Security Incident Response User Guide - Collect relevant artifacts](https://docs.aws.amazon.com/security-ir/latest/userguide/collect-relevant-artifacts.html)が示すフォレンジック観点の順序は「メタデータ取得 → インスタンス保護(削除保護)有効化とタグ付与 → EBSスナップショット → メモリ取得 → (オプション)ライブレスポンス → デコミッション → 隔離」で、隔離は最後に置かれます。なお、[AWS Prescriptive Guidance - Forensics account](https://docs.aws.amazon.com/prescriptive-guidance/latest/security-reference-architecture-cyber-forensics/forensics-account.html)のように、調査対象のスナップショットをフォレンジック専用アカウントへコピーする設計パターンもあります。
 
-正解は状況次第ですが、「インスタンスを保護する」「攻撃を断つ」「証拠を保全する」の3つが論点だと頭に入っていれば、本番のシナリオ問題でも選択肢の優先順位を付けられました。
+正解は状況次第です。ただし「インスタンスを保護する」「攻撃を断つ」「証拠を保全する」の3つが論点だと頭に入っていれば、本番のシナリオ問題でも選択肢の優先順位を付けられました。
 
 ### データ集約先としてのAmazon Security Lake
 
