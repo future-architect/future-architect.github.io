@@ -43,7 +43,7 @@ Difyは、LLMアプリを直感的に開発できるオープンソースのLLM�
 
 ### MCP
 
-Anthropicが公開したMCPは(参考：[Model Context Protocol（MCP）とは](https://zenn.dev/cloud_ace/articles/model-context-protocol))、LLMと外部データ（DB、API、ローカルファイル等）を接続するためのオープンプロトコルです。これまではツールごとに専用の繋ぎ込みが必要でしたが、MCPという「共通規格」を通すことで、一つのMCPサーバーを作るだけで様々なAIクライアントからデータを利用可能になります。似ているものでRAGがありますがRAGは「知識の検索・参照」に特化しているのに対し、MCPは「機能（ツール）の呼び出し・実行」に特化しています。
+Anthropicが公開したMCPは(参考：[Model Context Protocol（MCP）とは](https://zenn.dev/cloud_ace/articles/model-context-protocol))、LLMと外部データ（DB、API、ローカルファイル等）を接続するためのオープンプロトコルです。これまではツールごとに専用の繋ぎ込みが必要でしたが、MCPという「共通規格」を通すことで、1つのMCPサーバーを作るだけで様々なAIクライアントからデータを利用可能になります。似ているものでRAGがありますがRAGは「知識の検索・参照」に特化しているのに対し、MCPは「機能（ツール）の呼び出し・実行」に特化しています。
 
 <img src="/images/2026/20260324a/image_2.png" alt="image.png" width="709" height="330" loading="lazy">
 

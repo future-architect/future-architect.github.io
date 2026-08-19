@@ -113,7 +113,7 @@ Agent 定義の設計では、Anthropic の **Progressive Disclosure（段階的
 
 > [Lost in the Middle: How Language Models Use Long Contexts](https://aclanthology.org/2024.tacl-1.9/) (2024)
 
-結局、一つの会話で全部をこなすのは、そもそも筋が悪かったということでした。現場で感じていた「なんだか話が通じなくなる」という感触の正体が見えました。
+結局、1つの会話で全部をこなすのは、そもそも筋が悪かったということでした。現場で感じていた「なんだか話が通じなくなる」という感触の正体が見えました。
 
 ### 3.2 いつでもセッションを捨てられるよう、成果物をファイルに「逃がす」
 

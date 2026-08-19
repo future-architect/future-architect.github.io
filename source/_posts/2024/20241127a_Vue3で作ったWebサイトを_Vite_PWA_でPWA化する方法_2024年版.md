@@ -332,7 +332,7 @@ workbox: {
 
 ## もう一つのモード: injectManifest について
 
-さて、ここまで `generateSW` を指定しServiceWorkerファイルを自動生成する方法で説明してきましたが、もう一つ `injectManifest` というモードがあります。これは、自前で用意したServiceWorkerのコードにプリキャッシュや外部リソースのキャッシュに対応させるコードをWorkboxが挿入(inject)してくれるモードです。
+さて、ここまで `generateSW` を指定しServiceWorkerファイルを自動生成する方法で説明してきましたが、もう1つ `injectManifest` というモードがあります。これは、自前で用意したServiceWorkerのコードにプリキャッシュや外部リソースのキャッシュに対応させるコードをWorkboxが挿入(inject)してくれるモードです。
 
 https://vite-pwa-org.netlify.app/workbox/inject-manifest.html
 

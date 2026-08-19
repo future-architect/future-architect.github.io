@@ -15,7 +15,7 @@ lede: "Kiro Meetup Japan #1でKiroを使った開発体験について発表し�
 
 <img src="/images/2025/20250919a/kiro.png" alt="" width="500" height="231">
 
-先日[Kiro Meetup Japan #1](https://findy.connpass.com/event/365956/)でKiroを使った開発体験について発表してきました。第一回ということで、ネタ被りとかないかドキドキしながら「普通のKiroの感想」を話ししてきたのですが、意外と被らなかったですね。オンライン・オフライン合計で応募人数が1200人を超えるような(実数はそこよりも下ですが)大人気ぶりでした。
+先日[Kiro Meetup Japan #1](https://findy.connpass.com/event/365956/)でKiroを使った開発体験について発表してきました。第1回ということで、ネタ被りとかないかドキドキしながら「普通のKiroの感想」を話ししてきたのですが、意外と被らなかったですね。オンライン・オフライン合計で応募人数が1200人を超えるような(実数はそこよりも下ですが)大人気ぶりでした。
 
 <iframe class="slideshare-responsive" src="https://www.slideshare.net/slideshow/embed_code/key/1L2DrqwOGZwCpg?hostedIn=slideshare&page=upload" width="714" height="600" frameborder="0" marginwidth="0" marginheight="0" scrolling="no"></iframe>
 
