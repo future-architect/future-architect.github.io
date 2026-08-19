@@ -252,11 +252,6 @@ SaaSを作る側にいる自分にとって、この指摘は他人事ではあ�
 
 次に何を受けるかは迷っていますが、AIエージェントの運用が本格化するほど、それを支えるインフラやセキュリティの知識がまた要るはずです。受かったら、また書きます。
 
-## 関連記事
-
-- [AWS Certified Security - Specialty 合格体験記 - Claude壁打ちとUdemy演習で一発合格](https://future-architect.github.io/articles/20260604a/)
-- [AWS Certified Advanced Networking - Specialty 合格体験記 - 廃止直前の駆け込み受験](https://future-architect.github.io/articles/20260708a/)
-
 ## 参考
 
 - [AWS Certified Generative AI Developer - Professional（公式ページ）](https://aws.amazon.com/certification/certified-generative-ai-developer-professional/)
