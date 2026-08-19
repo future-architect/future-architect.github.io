@@ -17,7 +17,7 @@ lede:
 
 ---
 
-<img src="/images/2021/20211005b/archive-g39b73f1f8.jpg" alt="PexelsによるPixabayからの画像" title="800" width="533" height="">
+<img src="/images/2021/20211005b/archive-g39b73f1f8.jpg" alt="PexelsによるPixabayからの画像" title="800" width="533" height="355">
 
 ## はじめに
 

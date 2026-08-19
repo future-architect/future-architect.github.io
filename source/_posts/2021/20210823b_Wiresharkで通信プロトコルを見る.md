@@ -43,7 +43,7 @@ Twitterで投稿するとき、YouTubeを見るときも、その裏側ではコ
 
 あるコンピュータ(PC)から別のコンピュータ(Server)に通信するとき、以下のようなやりとりが発生しています。
 
-<img src="/images/2021/20210823b/Screen_Shot_2021-08-23_at_3.37.34.png" alt="" width="" height="" loading="lazy">
+<img src="/images/2021/20210823b/Screen_Shot_2021-08-23_at_3.37.34.png" alt="" width="1200" height="515" loading="lazy">
 
 人間が会話するのと同様に…
 
@@ -56,11 +56,11 @@ Twitterで投稿するとき、YouTubeを見るときも、その裏側ではコ
 
 PC→Server
 
-<img src="/images/2021/20210823b/Screen_Shot_2021-08-23_at_4.00.52.png" alt="" width="" height="" loading="lazy">
+<img src="/images/2021/20210823b/Screen_Shot_2021-08-23_at_4.00.52.png" alt="" width="1200" height="670" loading="lazy">
 
 PC←Server
 
-<img src="/images/2021/20210823b/Screen_Shot_2021-08-23_at_4.09.34.png" alt="" width="" height="" loading="lazy">
+<img src="/images/2021/20210823b/Screen_Shot_2021-08-23_at_4.09.34.png" alt="" width="1200" height="674" loading="lazy">
 
 通信したいデータに対して、カプセル化を繰り返しながら情報を追加していき、符号化してデータを送る。受け手側ではその逆の順序で情報を外していき、最終的に送信元のデータを取得する。各層には独自の役割があり、それぞれがうまく機能することでコンピュータ同士は通信しています。よくある「ネットにつながない」現象は、これらの層のどこかで問題が生じている、ということになります。
 
@@ -74,7 +74,7 @@ PC←Server
 
 Wiresharkを起動するとキャプチャするNICの選択画面が表示されるので、インターフェース表示を無線にして「Wi-Fi」を選択すれば、無線で送受信されるパケットが見れます。
 
-<img src="/images/2021/20210823b/1_wifi_en0.png" alt="" width="" height="" loading="lazy">
+<img src="/images/2021/20210823b/1_wifi_en0.png" alt="" width="1200" height="169" loading="lazy">
 
 パケットを見る機会などほとんどないので、しばらく見続けてみましょう。
 
@@ -97,11 +97,11 @@ IPアドレスとMacアドレスの対応表を作成する`ARP`の通信を見�
 
 Wiresharkは表示レコードを制限できるので、表示条件を`arp`にしてしばらく待つとルータからのARP通信をキャッチできます。
 
-<img src="/images/2021/20210823b/2_arp_1.png" alt="" width="" height="" loading="lazy">
+<img src="/images/2021/20210823b/2_arp_1.png" alt="" width="1200" height="135" loading="lazy">
 
 今回キャッチした内容は以下です。
 
-<img src="/images/2021/20210823b/2_arp_2.png" alt="" width="" height="" loading="lazy">
+<img src="/images/2021/20210823b/2_arp_2.png" alt="" width="1200" height="343" loading="lazy">
 
 - Source
   - MAC: Buffalo_(UAA)
@@ -113,7 +113,7 @@ Wiresharkは表示レコードを制限できるので、表示条件を`arp`に
 - Info
   - Who has 192.168.11.7? Tell 192.168.11.1
 
-<img src="/images/2021/20210823b/2_apr_3.png" alt="" width="" height="" loading="lazy">
+<img src="/images/2021/20210823b/2_apr_3.png" alt="" width="1200" height="336" loading="lazy">
 
 - Source
   - MAC: Apple_(UAA)
@@ -162,17 +162,17 @@ round-trip min/avg/max/stddev = 7.234/8.086/8.456/0.438 ms
 このとき、Wiresharkでは5つの通信全てをキャッチしています。
 `icmp`で表示を絞り込むと...
 
-<img src="/images/2021/20210823b/3_icmp_1.png" alt="" width="" height="" loading="lazy">
+<img src="/images/2021/20210823b/3_icmp_1.png" alt="" width="1200" height="264" loading="lazy">
 
 各通信ごとに「Echo (ping) Request」と「Echo (ping) Reply」を送り合っていることが分かります。
 
 Echo (ping) Request
 
-<img src="/images/2021/20210823b/3_icmp_2.png" alt="" width="" height="" loading="lazy">
+<img src="/images/2021/20210823b/3_icmp_2.png" alt="" width="1200" height="453" loading="lazy">
 
 Echo (ping) Reply
 
-<img src="/images/2021/20210823b/3_icmp_3.png" alt="" width="" height="" loading="lazy">
+<img src="/images/2021/20210823b/3_icmp_3.png" alt="" width="1200" height="482" loading="lazy">
 
 ネットワーク疎通確認のとき、ping単体だと通信がイメージできないならば、裏でWiresharkを起動すると理解が進むかもしれません。その場合、デフォルトのWiresharkはNICを通過する全パケットを取得&表示してしまうため、メモリ負荷を下げるために「キャプチャフィルタ」や「表示フィルタ」の利用がオススメです。
 
@@ -202,7 +202,7 @@ Wiresharkには、TCP通信の開始からコネクションの終了までを�
 
 開始・終了
 
-<img src="/images/2021/20210823b/4_tpc_3.png" alt="" width="" height="" loading="lazy">
+<img src="/images/2021/20210823b/4_tpc_3.png" alt="" width="1200" height="279" loading="lazy">
 
 開始のSYN+ACKと、終了のFIN+ACKがキャッチできました。
 
@@ -220,18 +220,18 @@ Wiresharkには、TCP通信の開始からコネクションの終了までを�
 
 SYN
 
-<img src="/images/2021/20210823b/5_syn.png" alt="" width="" height="" loading="lazy">
+<img src="/images/2021/20210823b/5_syn.png" alt="" width="1200" height="769" loading="lazy">
 
 SYN・ACK
 
-<img src="/images/2021/20210823b/5_syn_ack.png" alt="" width="" height="" loading="lazy">
+<img src="/images/2021/20210823b/5_syn_ack.png" alt="" width="1200" height="719" loading="lazy">
 
 FIN・ACK
 
-<img src="/images/2021/20210823b/5_fin_ack.png" alt="" width="" height="" loading="lazy">
+<img src="/images/2021/20210823b/5_fin_ack.png" alt="" width="1200" height="676" loading="lazy">
 
 ACK
-<img src="/images/2021/20210823b/5_ack.png" alt="" width="" height="" loading="lazy">
+<img src="/images/2021/20210823b/5_ack.png" alt="" width="1200" height="674" loading="lazy">
 
 Wiresharkでパケットをしばらく監視していると、通信失敗やリトライ時の挙動が見れるので、「Wiresharkを眺める→新しい情報を見つける→ネットで調べる」を繰り返せば、色々な生きた知識が身についていきます。
 

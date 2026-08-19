@@ -137,7 +137,7 @@ module.exports = {
 
 ### ESLint + Prettier
 
-<img src="/images/2021/20210616a/image_6.png" alt="" width="" height="" loading="lazy">
+<img src="/images/2021/20210616a/image_6.png" alt="" width="1200" height="482" loading="lazy">
 
 ESLintに加え、[Prettier](https://prettier.io/)も有効にした状態を確認してみます。
 
@@ -147,7 +147,7 @@ ESLintは、Prettierと比較するとJavaScriptの言語としてのコーデ�
 
 このオプションを有効にすると、package.jsonにPrettierも追加されている事が確認できます。
 
-<img src="/images/2021/20210616a/image_7.png" alt="" width="" height="" loading="lazy">
+<img src="/images/2021/20210616a/image_7.png" alt="" width="754" height="918" loading="lazy">
 
 `.eslintrc.js`にもPrettier向けの設定が追記されています。
 
@@ -194,7 +194,7 @@ Airbnbのテック企業としての立ち位置について私は詳しくな�
 
 そんなAirbnbスタイルがVue CLIの公式オプションとして選択できるようになっているわけですが、ひとまず`package.json`の差分を見てみましょう。
 
-<img src="/images/2021/20210616a/image_10.png" alt="" width="" height="" loading="lazy">
+<img src="/images/2021/20210616a/image_10.png" alt="" width="723" height="893" loading="lazy">
 
 `eslint-config-airbnb`がインポートされています。
 

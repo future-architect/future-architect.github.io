@@ -236,7 +236,7 @@ module.exports = {
 };
 ```
 
-<img src="/images/2021/20210410/image.png" alt="通常の構成" loading="lazy">
+<img src="/images/2021/20210410/image.png" alt="通常の構成" width="1200" height="724" loading="lazy">
 
 このAPIサーバ `api1` と `api2` をモックサーバに置き換えたいとします。しかし、前述の通りPrismでは `/api1/v1` の部分を無視してしまうため、そのままではアクセスできません。そこで使うのが、 `pathRewrite` オプションです。
 
@@ -262,7 +262,7 @@ module.exports = {
 };
 ```
 
-<img src="/images/2021/20210410/image_2.png" alt="MOCサーバを交えた構成" loading="lazy">
+<img src="/images/2021/20210410/image_2.png" alt="MOCサーバを交えた構成" width="1200" height="745" loading="lazy">
 
 これで、実際に先ほどの手順でモックサーバを起動してみて、 `http://localhost:3000/api/v1/` にアクセスしレスポンスが返ってきたらOKです。
 

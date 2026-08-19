@@ -18,7 +18,7 @@ Goでアプリケーションを作成する場合のイメージは次の通り
 
 PythonとかRubyとかもそうですが、言語組み込みのウェブサーバー機能はテスト用で本番運用には機能が足りない、性能が足りない、ということから「プロダクションに耐えうるフレームワークを別に入れないと」と思う人も多いんじゃないかな、と思いますが、Goの場合は組み込みのサーバーで問題なかったりします。Node.jsに近いかも？ 世間にはテスト用のはずだったのにやたら性能が高いPHPの内蔵サーバー（ケンオールで有名な会社の社長の作らしい）なんてものもあったりもしますが・・・
 
-<img src="/images/2021/20210714a/library-rate.png" alt="アプリケーションにおけるコードの比率" loading="lazy">
+<img src="/images/2021/20210714a/library-rate.png" alt="アプリケーションにおけるコードの比率" width="371" height="291" loading="lazy">
 
 ## Goのウェブを語る上で重要な2つの型
 
@@ -49,17 +49,17 @@ func (r Receiver) ServeHTTP(http.ResponseWriter, *http.Request) {
 
 通常は``http.ServeMux``などのRouterを渡します。これに``http.HandlerFunc``の実際のロジックを登録して、パスごとのロジックを書く、というのがシンプルな状態ですね。
 
-<img src="/images/2021/20210714a/interface.png" alt="HandlerFuncの動作イメージ" loading="lazy">
+<img src="/images/2021/20210714a/interface.png" alt="HandlerFuncの動作イメージ" width="561" height="221" loading="lazy">
 
 リクエストを受け取ってヘッダーを解析したり、HTTP/2対応だったり、TLSだったりの下回り部分は標準ライブラリで用がすみます。
 
 この``ServeMux``は他の``http.Handler``も子供にできるのでネストできます。一部のパスを別のRouterに渡せます。このインターフェースを提供している静的ファイル配信の[http.FileServer](https://golang.org/pkg/net/http/#FileServer)とか[http.RedirectHandler](https://golang.org/pkg/net/http/#RedirectHandler)とか柔軟に組み合わせられます。
 
-<img src="/images/2021/20210714a/nested-servemux-ページ3.png" alt="ネストしたルーター" loading="lazy">
+<img src="/images/2021/20210714a/nested-servemux-ページ3.png" alt="ネストしたルーター" width="791" height="241" loading="lazy">
 
 最近のウェブのフレームワークは、ミドルウェアという機構を用意していたりします。リクエストを事前に解釈し、エラー処理をまとめて行ったり、認証チェックをしたり・・・図には書きにくいのですが、これも、``http.Handler``として振る舞い、受け取ったリクエストの処理結果を次の``http.Handler``に渡すラッパーという実装になります。標準ライブラリの[http.TimeoutHandler](https://golang.org/pkg/net/http/#TimeoutHandler)もこれですね。
 
-<img src="/images/2021/20210714a/middleware.png" alt="ミドルウェア" loading="lazy">
+<img src="/images/2021/20210714a/middleware.png" alt="ミドルウェア" width="342" height="81" loading="lazy">
 
 ``net/http/httptest``といったテスト用パッケージも、``http.Handler``を受け取るローカルテスト用サーバーがいたりします。　猫も杓子も``http.Handler``です。
 

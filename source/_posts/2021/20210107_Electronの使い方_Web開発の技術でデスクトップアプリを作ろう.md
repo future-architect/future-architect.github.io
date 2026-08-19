@@ -58,7 +58,7 @@ $ cd electron-quick-start
 $ npm install && npm start
 ```
 
-<img src="/images/2021/20210107/image.png"  style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2021/20210107/image.png"  style="border:solid 1px #000000" width="1171" height="344" loading="lazy">
 
 `npm start`コマンドでアプリケーションが実行されます、公式にしては少々素朴ですがHello Worldが表示されます。
 
@@ -109,13 +109,13 @@ vue create vue-cli-electron-sample
 
 Vue CLIの案内に従い、バージョンや構成をいくつか選択します。
 
-<img src="/images/2021/20210107/image_2.png" loading="lazy">
+<img src="/images/2021/20210107/image_2.png" width="648" height="153" loading="lazy">
 
 全てDefault設定で問題ありません。
 
 アプリケーションの構築が正常に完了すると画像のような案内が表示されます。
 
-<img src="/images/2021/20210107/image_3.png" loading="lazy">
+<img src="/images/2021/20210107/image_3.png" width="731" height="159" loading="lazy">
 
 指示に従いひとまず起動してみましょう。
 
@@ -124,9 +124,9 @@ Vue CLIの案内に従い、バージョンや構成をいくつか選択しま�
  npm run serve
 ```
 
-<img src="/images/2021/20210107/image_4.png" loading="lazy">
+<img src="/images/2021/20210107/image_4.png" width="656" height="246" loading="lazy">
 
-<img src="/images/2021/20210107/image_5.png"  style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2021/20210107/image_5.png"  style="border:solid 1px #000000" width="1200" height="658" loading="lazy">
 
 サーバーが立ち上がり、ブラウザで`localhost:8080`にアクセスするとHello Worldが表示されます。
 
@@ -138,7 +138,7 @@ Vue CLIの案内に従い、バージョンや構成をいくつか選択しま�
 vue add electron-builder
 ```
 
-<img src="/images/2021/20210107/image_6.png" loading="lazy">
+<img src="/images/2021/20210107/image_6.png" width="902" height="363" loading="lazy">
 
 Electronのバージョンを選択できます。
 
@@ -230,17 +230,17 @@ if (isDevelopment) {
 
 ここがVue CLIプラグインの最大の利点です。
 
-<img src="/images/2021/20210107/image_7.png" loading="lazy">
+<img src="/images/2021/20210107/image_7.png" width="922" height="339" loading="lazy">
 
 package.jsonにelectronに関連するコマンドが追記されます。
 
 `npm run serve`の代わりに`npm run electron:serve`コマンドを実行してみます。
 
-<img src="/images/2021/20210107/image_8.png" loading="lazy">
+<img src="/images/2021/20210107/image_8.png" width="952" height="408" loading="lazy">
 
 npm run serveコマンドと似ていますが、Electronアプリケーションが起動されます。
 
-<img src="/images/2021/20210107/image_9.png" loading="lazy">
+<img src="/images/2021/20210107/image_9.png" width="1200" height="868" loading="lazy">
 
 表示内容はVue.jsのHello Worldです、これをElectronアプリとして起動することに成功しました。
 
@@ -250,23 +250,23 @@ npm run serveコマンドと似ていますが、Electronアプリケーショ�
 npm run electron:build
 ```
 
-<img src="/images/2021/20210107/image_10.png" loading="lazy">
+<img src="/images/2021/20210107/image_10.png" width="963" height="909" loading="lazy">
 
 ビルドコマンドを実行するとアプリケーションのビルドが走ります。基本的にはアプリケーションをビルドしている端末のOS向けのアプリケーションがビルドされますが、WindowsでMac向けのアプリケーションをビルドするようなことも可能です。詳しくは[公式ガイド](https://nklayman.github.io/vue-cli-plugin-electron-builder/guide/recipes.html#multi-platform-build)をご確認ください。
 
 ビルドに成功すると、dist_electronフォルダ配下に成果物が配置されます。通常のVue.jsアプリケーションのdistフォルダに相当します。
 
-<img src="/images/2021/20210107/image_11.png"  style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2021/20210107/image_11.png"  style="border:solid 1px #000000" width="885" height="383" loading="lazy">
 
 dist_electronフォルダ配下は画像のような状態です。
 
-<img src="/images/2021/20210107/image_12.png"  style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2021/20210107/image_12.png"  style="border:solid 1px #000000" width="866" height="234" loading="lazy">
 
 vue-cli-electron-sample Setup 0.1.0をダブルクリックするとアプリケーションのインストールが開始されます。ちなみに、アプリケーションのバージョン情報は`package.json`記載のバージョンに依存します。
-<img src="/images/2021/20210107/image_13.png" class="img-small-size" loading="lazy">
+<img src="/images/2021/20210107/image_13.png" class="img-small-size" width="577" height="234" loading="lazy">
 
 インストールが完了したアプリケーションは一般的なアプリケーション同様に起動できます。
-<img src="/images/2021/20210107/image_14.png" loading="lazy">
+<img src="/images/2021/20210107/image_14.png" width="1159" height="751" loading="lazy">
 
 vue.config.jsに、下記のように、ビルド設定を`portable`に設定することで、インストール不要な、ダウンロードしたファイルを直接実行、起動できるようなものとしてアプリケーションもビルドできます。
 
@@ -291,7 +291,7 @@ module.exports = {
 }
 ```
 
-<img src="/images/2021/20210107/image_15.png" class="img-small-size" loading="lazy">
+<img src="/images/2021/20210107/image_15.png" class="img-small-size" width="285" height="302" loading="lazy">
 
 デフォルトの状態ではアイコンが無いため少々寂しいですが、デスクトップアイコンもvue.config.jsで指定できます。
 
@@ -317,7 +317,7 @@ module.exports = {
 
 なお最小画像サイズ(256 x 256, macの場合512 x 512px)を下回るサイズの画像を指定した場合エラーが発生してビルドできません、ご注意ください。
 
-<img src="/images/2021/20210107/image_16.png" class="img-small-size" loading="lazy">
+<img src="/images/2021/20210107/image_16.png" class="img-small-size" width="302" height="304" loading="lazy">
 
 アイコンを設定することでそれらしくなってきました。
 
@@ -348,7 +348,7 @@ cd react-electron-sample
 create-react-app react-electron-sample
 ```
 
-<img src="/images/2021/20210107/image_17.png" loading="lazy">
+<img src="/images/2021/20210107/image_17.png" width="964" height="589" loading="lazy">
 
 アプリケーションの構築に成功すると画像のような案内が表示されます。
 指示に従ってアプリケーションを起動してみましょう。
@@ -358,11 +358,11 @@ cd react-electron-sample
 npm start
 ```
 
-<img src="/images/2021/20210107/image_18.png" loading="lazy">
+<img src="/images/2021/20210107/image_18.png" width="1200" height="665" loading="lazy">
 
 無事にHello Worldが起動しました。
 
-<img src="/images/2021/20210107/image_19.png" loading="lazy">
+<img src="/images/2021/20210107/image_19.png" width="1200" height="654" loading="lazy">
 `Edit src/App.js`の文言を無視するのは忍びないので、Hello Worldらしいメッセージに修正しました。
 pタグの文言を修正するだけです。
 
@@ -528,7 +528,7 @@ npm run electron:serve
 
 無事に成功しました。
 
-<img src="/images/2021/20210107/image_20.png" loading="lazy">
+<img src="/images/2021/20210107/image_20.png" width="1174" height="894" loading="lazy">
 
 アプリケーションのビルドは下記コマンドです。
 
@@ -539,7 +539,7 @@ npm run electron:build
 dis_electron配下にアプリケーションがビルドされました。
 package.jsonに何も設定が無いとdistディレクトリに生成されます。
 
-<img src="/images/2021/20210107/image_21.png" class="img-small-size" loading="lazy">
+<img src="/images/2021/20210107/image_21.png" class="img-small-size" width="269" height="295" loading="lazy">
 
 作業の抜け漏れ、typoの確認や、理想のディレクトリ構成を検討して迷うコストを鑑みると体感でVue.jsの3倍くらいの時間がかかる感触でした。
 

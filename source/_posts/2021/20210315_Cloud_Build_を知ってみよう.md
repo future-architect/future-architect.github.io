@@ -57,7 +57,7 @@ Cloud Build は、GCP が提供するビルドを行うサービスです。
 以下の図のようにCloud Build は、ソース、ビルド、デプロイから構成されています。
 ソースやデプロイは、例として記載しています。
 
-<img src="/images/2021/20210315/image.png" loading="lazy">
+<img src="/images/2021/20210315/image.png" width="777" height="404" loading="lazy">
 
 ### ソース
 
@@ -181,7 +181,7 @@ Cloud Build のトリガは、GitHub トリガによる自動実行で行われ�
 
 Cloud Build は、GitHub からソースを取得し、ビルドを実行し、コンテナイメージをContainer Registry にPush します。GKE をデプロイする際は、Cloud Build からkubectl でデプロイします。
 
-<img src="/images/2021/20210315/image_2.png" loading="lazy">
+<img src="/images/2021/20210315/image_2.png" width="543" height="255" loading="lazy">
 
 #### GitOps パターン
 
@@ -189,7 +189,7 @@ CIOps と同様にビルドを実行し、Container Registry にコンテナイ�
 
 Argo CD は、ポーリングもしくはWebhook により、反映します。
 
-<img src="/images/2021/20210315/image_3.png" loading="lazy">
+<img src="/images/2021/20210315/image_3.png" width="760" height="256" loading="lazy">
 
 ## さいごに
 

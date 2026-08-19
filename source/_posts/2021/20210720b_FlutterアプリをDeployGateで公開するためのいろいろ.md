@@ -49,7 +49,7 @@ iOSは``ios/Runner/Info.plist``に次のタグのペアを書きます。
 
 適当に絵を描きました。
 
-<img src="/images/2021/20210721b/スクリーンショット_2021-07-19_19.28.14.png" alt="適当な絵" loading="lazy">
+<img src="/images/2021/20210721b/スクリーンショット_2021-07-19_19.28.14.png" alt="適当な絵" width="1185" height="984" loading="lazy">
 
 pngファイルをエクスポートして、assetsフォルダ以下におき、アイコンとスプラッシュのそれぞれで同じ画像を参照するようにします。
 
@@ -92,9 +92,9 @@ flutte pub run flutter_native_splash:create
 
 Android Studio上で実行すると、Androidエミュレータ上にインストールされるアイコンが変わりますし、起動画面も変わりました。
 
-<img src="/images/2021/20210721b/スクリーンショット_2021-07-19_19.22.27.png" alt="Androidエミュレータ上のアイコン" loading="lazy">
+<img src="/images/2021/20210721b/スクリーンショット_2021-07-19_19.22.27.png" alt="Androidエミュレータ上のアイコン" width="1102" height="1920" loading="lazy">
 
-<img src="/images/2021/20210721b/スクリーンショット_2021-07-19_19.24.19.png" alt="起動画面" loading="lazy">
+<img src="/images/2021/20210721b/スクリーンショット_2021-07-19_19.24.19.png" alt="起動画面" width="1102" height="1920" loading="lazy">
 
 ## DeployGate用のSDKの追加
 

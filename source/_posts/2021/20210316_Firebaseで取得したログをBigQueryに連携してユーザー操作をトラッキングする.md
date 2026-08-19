@@ -45,7 +45,7 @@ lede: "[CP連載2021も折り返しの6本目です！陽光麗らかなある�
 
 ## Google Analytics for Firebaseとは
 
-<img src="/images/2021/20210316/image.png" loading="lazy">
+<img src="/images/2021/20210316/image.png" width="1200" height="675" loading="lazy">
 
 実態はGoogleのサービス`Google Analytics` (GA)をFirebaseで利用できるようにしたものです。
 [公式ドキュメント](https://firebase.google.com/docs/analytics/get-started?hl=ja&platform=android)では以下のように紹介されています。
@@ -150,8 +150,8 @@ paramやevent_nameは任意に指定できますし、Firebaseが用意してい
 今回のようにFirebaseログの生データにアクセスしたい場合はさらにBigQueryとの連携を進めます。
 
 以下は、Firebase Consoleの一例です。使用状況をグラフ化して確認できたり(上)、event_nameごとの発生回数がサマリ表示されていたりします(下)。
-<img src="/images/2021/20210316/image_2.png" loading="lazy">
-<img src="/images/2021/20210316/image_3.png" loading="lazy">
+<img src="/images/2021/20210316/image_2.png" width="1200" height="670" loading="lazy">
+<img src="/images/2021/20210316/image_3.png" width="1200" height="670" loading="lazy">
 
 ### 2. BigQueryへログを連携する
 
@@ -161,17 +161,17 @@ paramやevent_nameは任意に指定できますし、Firebaseが用意してい
 Firebase Consoleの設定画面から、`Integrations`タブを選択します。
 そこで表示される、各種連携可能なカードから、`BigQuery`を選択します。
 ※参考画像ではすでに連携済みのため「Manage」となっていますが、初回設定の場合は「Link」と表示されます。
-<img src="/images/2021/20210316/image_4.png" loading="lazy">
+<img src="/images/2021/20210316/image_4.png" width="1200" height="670" loading="lazy">
 
 Linkが開始されると、「どのサービスのデータをBigQueryに連携するか」を選択できるようになります。
 今回は`Google Analytics`にチェックを入れます。
 他にも、CrashlyticsやCloud Messagingなどのデータも連携できるようです。
-<img src="/images/2021/20210316/image_5.png" loading="lazy">
+<img src="/images/2021/20210316/image_5.png" width="1200" height="670" loading="lazy">
 
 ここまでの設定で、BigQueryへFirebaseのデータが連携されます。
 GCP Consoleから確認してみると、プロジェクトフォルダの配下に、`analytics_XXXX`というフォルダ名でFirebaseからのデータが連携されています。(XXXXはGAのProperty ID です)
 当日のデータは`events_intraday_YYYYMMDD`というテーブル名称で格納されています。翌日になると `events_YYYYMMDD`の名称に変化します。
-<img src="/images/2021/20210316/image_6.png" loading="lazy">
+<img src="/images/2021/20210316/image_6.png" width="1200" height="669" loading="lazy">
 
 「プレビュー」タブを参照すると、1つの`event_name`に紐付く`params`のkey/valueペアの形でデータが格納されていることが確認できます。
 ただしこのままではFirebaseデフォルトのログと入り混じって見にくい、かつ複数のユーザーのログが混じっている、のでクエリを作成して可読性を上げます。
@@ -250,7 +250,7 @@ ORDER BY
 この`screen_view`は自動で遷移前後の画面名を取得してくれるので、非常に便利です。
 
 端末の戻るボタンが押されて遷移した場合も検知してくれます。
-<img src="/images/2021/20210316/image_7.png" loading="lazy">
+<img src="/images/2021/20210316/image_7.png" width="1200" height="484" loading="lazy">
 
 ## おわりに
 

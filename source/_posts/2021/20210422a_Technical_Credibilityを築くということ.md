@@ -28,7 +28,7 @@ lede: "私は新卒でフューチャーへ入社しITの世界でのキャリ�
 ## Technical Credibilityとはなにか
 
 <img src="/images/2021/20210422a/climbing-4514507_640.jpg"　alt="" title="Rappellingusaによるixabayからの画像
-" class="img-middle-size" loading="lazy">
+" class="img-middle-size" width="640" height="640" loading="lazy">
 
 Technical Credibilityとは無理やり日本語に訳すと技術的信頼？ 信頼度？ となります。Technical Credibilityの厳密な説明や定義が少ししにくいのですが、技術力やそのナレッジを通して信頼を得ていくこと、そのプロセス、と自分は解釈しています。
 

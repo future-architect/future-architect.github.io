@@ -20,7 +20,7 @@ lede: "昨年に続きGCP連載企画の参加です。私個人としてはGCP�
 
 ## Text-to-Speechとは
 
-<img src="/images/2021/20210312/Cloud_Text-to-Speech.png" loading="lazy">
+<img src="/images/2021/20210312/Cloud_Text-to-Speech.png" width="800" height="333" loading="lazy">
 
 > https://cloud.google.com/blog/ja/products/ai-machine-learning/cloud-text-to-speech-expands-its-number-of-voices-now-covering-33-languages-and-variants より
 
@@ -39,7 +39,7 @@ lede: "昨年に続きGCP連載企画の参加です。私個人としてはGCP�
 
 ### 1.新しいプロジェクトの作成
 
-<img src="/images/2021/20210312/00create_prj.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2021/20210312/00create_prj.png" class="img-middle-size" style="border:solid 1px #000000" width="628" height="456" loading="lazy">
 
 適当にプロジェクト名を入力して作成します。
 
@@ -47,19 +47,19 @@ lede: "昨年に続きGCP連載企画の参加です。私個人としてはGCP�
 
 [クイックスタート ページ内](https://cloud.google.com/text-to-speech/docs/quickstart-protocol?hl=ja)のAPIを有効にするボタン]をクリックして有効にします。
 
-<img src="/images/2021/20210312/01pre.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2021/20210312/01pre.png" class="img-middle-size" style="border:solid 1px #000000" width="456" height="198" loading="lazy">
 
 ### 3.認証の設定
 
 必要なロールはありませんということなのでロールを選択せず作成します。
 
-<img src="/images/2021/20210312/02pre.png" class="img-large-size" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2021/20210312/02pre.png" class="img-large-size" style="border:solid 1px #000000" width="908" height="652" loading="lazy">
 
-<img src="/images/2021/20210312/03pre.png" class="img-large-size" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2021/20210312/03pre.png" class="img-large-size" style="border:solid 1px #000000" width="824" height="650" loading="lazy">
 
-<img src="/images/2021/20210312/04pre.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2021/20210312/04pre.png" class="img-middle-size" style="border:solid 1px #000000" width="633" height="320" loading="lazy">
 
-<img src="/images/2021/20210312/05pre.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2021/20210312/05pre.png" class="img-middle-size" style="border:solid 1px #000000" width="587" height="311" loading="lazy">
 
 JSONファイルがダウンロードされるので適切な場所に保存します。のちにこのJSONファイルのパスを環境変数に設定することになります。
 
@@ -67,27 +67,27 @@ JSONファイルがダウンロードされるので適切な場所に保存し�
 
 [このページ](https://cloud.google.com/sdk/docs/install?hl=ja)に則りインストールします。
 
-<img src="/images/2021/20210312/05sdk.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2021/20210312/05sdk.png" class="img-middle-size" style="border:solid 1px #000000" width="497" height="386" loading="lazy">
 
-<img src="/images/2021/20210312/06sdk.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2021/20210312/06sdk.png" class="img-middle-size" style="border:solid 1px #000000" width="496" height="386" loading="lazy">
 
-<img src="/images/2021/20210312/07sdk.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2021/20210312/07sdk.png" class="img-middle-size" style="border:solid 1px #000000" width="497" height="386" loading="lazy">
 
-<img src="/images/2021/20210312/08sdk.png" class="img-middle-size" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2021/20210312/08sdk.png" class="img-middle-size" style="border:solid 1px #000000" width="497" height="386" loading="lazy">
 
 環境にもよると思いますが割と時間かかります。コーヒーでも飲んで待ちましょう。
 
-<img src="/images/2021/20210312/09sdk.png" loading="lazy">
+<img src="/images/2021/20210312/09sdk.png" width="977" height="510" loading="lazy">
 
 コマンドプロンプトが起動するのでYを入力します。
 
-<img src="/images/2021/20210312/13sdk.png" loading="lazy">
+<img src="/images/2021/20210312/13sdk.png" width="977" height="510" loading="lazy">
 
-<img src="/images/2021/20210312/14sdk.png" loading="lazy">
+<img src="/images/2021/20210312/14sdk.png" width="478" height="948" loading="lazy">
 
 ブラウザが起動するのでアクセスを許可します。
 
-<img src="/images/2021/20210312/15sdk.png" style="border:solid 1px #000000" loading="lazy">
+<img src="/images/2021/20210312/15sdk.png" style="border:solid 1px #000000" width="1200" height="629" loading="lazy">
 
 無事に完了しました。
 
@@ -141,7 +141,7 @@ Invoke-WebRequest `
 
 実行すると以下のエラーが発生しました。
 
-<img src="/images/2021/20210312/16err.png" loading="lazy">
+<img src="/images/2021/20210312/16err.png" width="838" height="125" loading="lazy">
 
 [このページ](https://qiita.com/ponsuke0531/items/4629626a3e84bcd9398f)を参考にしてエラーを解消します。
 

@@ -52,7 +52,7 @@ Cypressを用いて自動化することで、コスト削減＆品質向上を�
 
 [Cypress](https://www.cypress.io/)とはWebテスト用に構築されたJava Scriptライブラリです。
 
-<img src="/images/2021/20210428a/image.png" alt="Cypressロゴ" loading="lazy">
+<img src="/images/2021/20210428a/image.png" alt="Cypressロゴ" width="135" height="56" loading="lazy">
 
 特徴として、以下のができます。
 
@@ -83,13 +83,13 @@ npx cypress open
 
 を実行すると、Cypressの管理画面が開きます。また、インストールしてから1回目の実行時には、いくつかのサンプルテストを生成してくれます。
 
-<img src="/images/2021/20210428a/image_2.png" alt="サンプルテスト" loading="lazy">
+<img src="/images/2021/20210428a/image_2.png" alt="サンプルテスト" width="541" height="334" loading="lazy">
 
 管理画面ではspecファイルごとにテストが並んでおり、実行したいファイルをクリックすると、記述されたテストが自動で実行されていきます。
 
 試しに、サンプルテストの1つ、`actions.spec.js`を実行してみましょう。
 
-<img src="/images/2021/20210428a/image_3.png" alt="actions.spec.jsの実行例" loading="lazy">
+<img src="/images/2021/20210428a/image_3.png" alt="actions.spec.jsの実行例" width="1200" height="602" loading="lazy">
 
 画面右側で、Cypressが実際にどのようなWeb上操作をしているかが確認できます。また、画面左側では、記述したテストの進行状況やチェック項目の可否が表示されています。失敗したテストがあれば、該当箇所をアラートで教えてくれます。
 
@@ -168,7 +168,7 @@ cy.contains('Gogle').should('exist');
 ```
 
 テストが失敗していた場合はCypressが教えてくれます。
-<img src="/images/2021/20210428a/image_4.png" alt="エラーログ" loading="lazy">
+<img src="/images/2021/20210428a/image_4.png" alt="エラーログ" width="485" height="91" loading="lazy">
 
 ### テストの動画を保存する
 
@@ -178,7 +178,7 @@ CYpressでは、テスト実行中の画面の様子を動画として保存で�
 
 1. Cypressを実行し、開いた管理画面の`Runs`タブからユーザ登録する。
 2. Record Keyが発行される。表示されたコマンドでCypressを実行する。
-<img src="/images/2021/20210428a/image_5.png" alt="動画保存コマンド" loading="lazy">
+<img src="/images/2021/20210428a/image_5.png" alt="動画保存コマンド" width="1072" height="223" loading="lazy">
 3. 管理画面の`Runs`タブに、テストシナリオごとの実行ビデオが表示される。各ビデオファイルごとに保存や共有が可能である。
 
 ## おわりに

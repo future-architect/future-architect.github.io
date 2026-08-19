@@ -30,7 +30,24 @@ const SOURCE = 'source';
 // 実測値をここに持つ（curl で取得して計測。2026-08-18）
 const EXTERNAL_SIZES = {
   'http://i.creativecommons.org/p/zero/1.0/88x31.png': [88, 31],
+  'https://gh-card.dev/repos/upx/upx.svg': [442, 109],
 };
+
+// Amazon のアフィリエイト widget 画像（ws-fe.amazon-adsystem.com）は名前解決できず
+// 直接測れないため、同じ元画像から生成される m.media-amazon.com の
+// `images/P/<ASIN>.09._SL160_.jpg` を測った値を ASIN で持つ（2026-08-18 計測）。
+// `_SL160_` は長辺160pxの意味で、どの値も長辺が160なのが両者が同じ変換である裏付け。
+// 商品が取り下げられた ASIN は 1x1 のプレースホルダが返るため載せていない（#2617）
+const AMAZON_SL160 = {
+  B07WKM5ZCS: [160, 160],
+  B06XZY8JTZ: [101, 160],
+  B00MIBN16O: [154, 160],
+  B004QJYBAG: [160, 160],
+  4320121740: [113, 160],
+  4774149934: [116, 160],
+  4000069748: [113, 160],
+};
+const AMAZON_WIDGET_RE = /\/\/[^/]*amazon-adsystem\.com\/widgets\/q\?.*?ASIN=([A-Z0-9]+)/;
 
 // タグの終わりを素朴に [^<>]* で探すと、引用符の中の > （alt="a -> b" 等）で
 // タグを途中で切ってしまう。引用符で囲まれた値は丸ごと飛ばして > を探す
@@ -105,6 +122,11 @@ function measure(src) {
   if (EXTERNAL_SIZES[src]) {
     const [width, height] = EXTERNAL_SIZES[src];
     return { width, height, from: '外部（実測値を表に保持）' };
+  }
+  const asin = AMAZON_WIDGET_RE.exec(src);
+  if (asin && AMAZON_SL160[asin[1]]) {
+    const [width, height] = AMAZON_SL160[asin[1]];
+    return { width, height, from: `Amazon SL160（ASIN ${asin[1]}）` };
   }
   if (!src.startsWith('/')) return null;
   const file = path.join(SOURCE, decodePath(src.split('?')[0]).replace(/^\//, ''));
