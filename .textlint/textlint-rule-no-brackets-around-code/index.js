@@ -11,6 +11,11 @@
 // --fix を効かせるには linter とは別に fixer を持つ形（{ linter, fixer }）でエクスポートする必要がある
 // （textlint v15 の TextlintFixableRuleDescriptor が module.fixer の有無で fix 対象かどうかを判定するため）。
 // 同じ reporter を両方に渡せば、report() に fix を渡すだけで linter 側でも --fix 側でも動く
+// no-japanese-only-inline-code と同じ判定。「`続行`」は括弧ではなくコードの印を外すのが正解なので、
+// こちらで括弧を外させると逆方向に直してしまう（#2609）
+const JAPANESE_ONLY =
+  /^[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}々〆ー\s]+$/u;
+
 const reporter = function (context) {
   const { Syntax, RuleError, report, getSource, fixer } = context;
   const source = getSource();
@@ -19,6 +24,9 @@ const reporter = function (context) {
     [Syntax.Code](node) {
       const [start, end] = node.range;
       if (source[start - 1] !== "「" || source[end] !== "」") {
+        return;
+      }
+      if (JAPANESE_ONLY.test(node.value)) {
         return;
       }
       // fixer.replaceTextRange の range はノード相対（絶対指定は replaceText(node, text) 側）
