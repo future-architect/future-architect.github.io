@@ -17,7 +17,7 @@ Futureとしてstackshareを活用するのは初めての試みとなります�
 先日「Future IoT」のstackshareを公開しました。
 https://stackshare.io/future-corporation/futureiot
 
-<img src="/images/2019/20190723/photo_20190723_01.png" style="border:solid 1px #000000" width="2880" height="1480" loading="lazy">
+<img src="/images/2019/20190723/photo_20190723_01.png" class="bordered" width="2880" height="1480" loading="lazy">
 
 Futureとしてstackshareを活用するのは初めての試みとなりますが、本記事では公開に至った経緯や技術スタックの採用戦略について簡単にお伝えできればと思います。
 

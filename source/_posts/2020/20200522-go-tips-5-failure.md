@@ -153,7 +153,7 @@ morikuni/failure は morikuni さんが作成されたエラーハンドリン�
 
 以前の [Go Conference 2019 Spring にて発表されている資料](https://speakerdeck.com/morikuni/designing-errors) にて、failure と errors (当時は xerrors) の使い分けについて明確に説明されています。とてもわかりやすくて、しっくりきたことを覚えています。
 
-<img src="/images/2020/20200522/photo_20200522_01.png" style="border:solid 1px #000000" width="1000" height="557" loading="lazy">
+<img src="/images/2020/20200522/photo_20200522_01.png" class="bordered" width="1000" height="557" loading="lazy">
 
 参考: [https://speakerdeck.com/morikuni/designing-errors?slide=33](https://speakerdeck.com/morikuni/designing-errors?slide=33)
 

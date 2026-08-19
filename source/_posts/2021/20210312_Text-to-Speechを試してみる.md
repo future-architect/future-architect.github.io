@@ -39,7 +39,7 @@ lede: "昨年に続きGCP連載企画の参加です。私個人としてはGCP�
 
 ### 1.新しいプロジェクトの作成
 
-<img src="/images/2021/20210312/00create_prj.png" class="img-middle-size" style="border:solid 1px #000000" width="628" height="456" loading="lazy">
+<img src="/images/2021/20210312/00create_prj.png" class="img-middle-size bordered" width="628" height="456" loading="lazy">
 
 適当にプロジェクト名を入力して作成します。
 
@@ -47,19 +47,19 @@ lede: "昨年に続きGCP連載企画の参加です。私個人としてはGCP�
 
 [クイックスタート ページ内](https://cloud.google.com/text-to-speech/docs/quickstart-protocol?hl=ja)のAPIを有効にするボタン]をクリックして有効にします。
 
-<img src="/images/2021/20210312/01pre.png" class="img-middle-size" style="border:solid 1px #000000" width="456" height="198" loading="lazy">
+<img src="/images/2021/20210312/01pre.png" class="img-middle-size bordered" width="456" height="198" loading="lazy">
 
 ### 3.認証の設定
 
 必要なロールはありませんということなのでロールを選択せず作成します。
 
-<img src="/images/2021/20210312/02pre.png" class="img-large-size" style="border:solid 1px #000000" width="908" height="652" loading="lazy">
+<img src="/images/2021/20210312/02pre.png" class="img-large-size bordered" width="908" height="652" loading="lazy">
 
-<img src="/images/2021/20210312/03pre.png" class="img-large-size" style="border:solid 1px #000000" width="824" height="650" loading="lazy">
+<img src="/images/2021/20210312/03pre.png" class="img-large-size bordered" width="824" height="650" loading="lazy">
 
-<img src="/images/2021/20210312/04pre.png" class="img-middle-size" style="border:solid 1px #000000" width="633" height="320" loading="lazy">
+<img src="/images/2021/20210312/04pre.png" class="img-middle-size bordered" width="633" height="320" loading="lazy">
 
-<img src="/images/2021/20210312/05pre.png" class="img-middle-size" style="border:solid 1px #000000" width="587" height="311" loading="lazy">
+<img src="/images/2021/20210312/05pre.png" class="img-middle-size bordered" width="587" height="311" loading="lazy">
 
 JSONファイルがダウンロードされるので適切な場所に保存します。のちにこのJSONファイルのパスを環境変数に設定することになります。
 
@@ -67,13 +67,13 @@ JSONファイルがダウンロードされるので適切な場所に保存し�
 
 [このページ](https://cloud.google.com/sdk/docs/install?hl=ja)に則りインストールします。
 
-<img src="/images/2021/20210312/05sdk.png" class="img-middle-size" style="border:solid 1px #000000" width="497" height="386" loading="lazy">
+<img src="/images/2021/20210312/05sdk.png" class="img-middle-size bordered" width="497" height="386" loading="lazy">
 
-<img src="/images/2021/20210312/06sdk.png" class="img-middle-size" style="border:solid 1px #000000" width="496" height="386" loading="lazy">
+<img src="/images/2021/20210312/06sdk.png" class="img-middle-size bordered" width="496" height="386" loading="lazy">
 
-<img src="/images/2021/20210312/07sdk.png" class="img-middle-size" style="border:solid 1px #000000" width="497" height="386" loading="lazy">
+<img src="/images/2021/20210312/07sdk.png" class="img-middle-size bordered" width="497" height="386" loading="lazy">
 
-<img src="/images/2021/20210312/08sdk.png" class="img-middle-size" style="border:solid 1px #000000" width="497" height="386" loading="lazy">
+<img src="/images/2021/20210312/08sdk.png" class="img-middle-size bordered" width="497" height="386" loading="lazy">
 
 環境にもよると思いますが割と時間かかります。コーヒーでも飲んで待ちましょう。
 
@@ -87,7 +87,7 @@ JSONファイルがダウンロードされるので適切な場所に保存し�
 
 ブラウザが起動するのでアクセスを許可します。
 
-<img src="/images/2021/20210312/15sdk.png" style="border:solid 1px #000000" width="1200" height="629" loading="lazy">
+<img src="/images/2021/20210312/15sdk.png" class="bordered" width="1200" height="629" loading="lazy">
 
 無事に完了しました。
 

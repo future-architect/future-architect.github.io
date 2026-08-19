@@ -82,7 +82,7 @@ PC自体は順当にMacやWindowsなら受験が可能で、Webカメラやマ�
 
 無事合格しました。スコアを見ると他の合格体験記と見比べて割とギリギリだったようです。今までAWSやらGCPやら受けてきましたが、また違った緊張感でした。試験終了直後は受かったというメールのみ来て、10日くらいあけるとデジタルバッジが来ます。やはり、何かしら形になるのは嬉しいですね。
 合格してから数日でデジタルバッジが取得できるので、より実感が湧きます。素直に嬉しかったです。
-<img src="/images/2020/20200629/photo_20200629_01.png" class="img-middle-size" style="border:solid 1px #000000" width="835" height="725" loading="lazy">
+<img src="/images/2020/20200629/photo_20200629_01.png" class="img-middle-size bordered" width="835" height="725" loading="lazy">
 
 ## まとめ
 

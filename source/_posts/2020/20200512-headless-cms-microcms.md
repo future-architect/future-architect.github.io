@@ -99,36 +99,36 @@ HeadlessCMSは数多くのサービスが存在しています．
 
 会員登録を済ませたら最初にサービスを作成します．サービスIDはコンテンツのサブドメインです．すなわち，**https://[サービスID].microcms.io/**となりますので半角英数字で作成します．
 ここではサービス名を**microCMS入門**，サービスIDを**future-blog-sample**としています．
-<img src="/images/2020/20200512/photo_20200512_02.png" style="border:solid 1px #000000" width="1901" height="927" loading="lazy">
+<img src="/images/2020/20200512/photo_20200512_02.png" class="bordered" width="1901" height="927" loading="lazy">
 
 また，サービスには識別しやすいように画像を設定できますので，複数サービスを運用する場合には設定するといいと思います．
-<img src="/images/2020/20200512/photo_20200512_03.png" style="border:solid 1px #000000" width="1903" height="924" loading="lazy">
+<img src="/images/2020/20200512/photo_20200512_03.png" class="bordered" width="1903" height="924" loading="lazy">
 私は既に1つサービスを作成していましたので，画面左上にうっすら既存サービスのアイコンが見えるかと思います。
 
 ### APIの作成
 
 サービスの作成が完了したら先ほど作成した**https://[サービスID].microcms.io/**に進みAPIの作成をします．
 今回は「ブログ記事」の配信と管理を想定しているので以下のようにAPI名とエンドポイントを作成します．
-<img src="/images/2020/20200512/photo_20200512_04.png" style="border:solid 1px #000000" width="1438" height="626" loading="lazy">
+<img src="/images/2020/20200512/photo_20200512_04.png" class="bordered" width="1438" height="626" loading="lazy">
 
 APIで得られるデータ形式にはリスト形式かオブジェクト形式を選択できます．
 今回配信するコンテンツの「ブログ記事」はリスト形式で管理したいと思います．
-<img src="/images/2020/20200512/photo_20200512_05.png" style="border:solid 1px #000000" width="1899" height="925" loading="lazy">
+<img src="/images/2020/20200512/photo_20200512_05.png" class="bordered" width="1899" height="925" loading="lazy">
 
 次にAPIスキーマを定義していきます．
 スキーマの種類には以下の画像のように選択できます．一通り想定されるスキーマは備えられており，簡単な説明もあるため，どれを使うべきか非常にわかりやすくなっています．
 <img src="/images/2020/20200512/photo_20200512_06.png" width="1074" height="742" loading="lazy">
 
 今回は「ブログ記事」のコンテンツ配信を想定しているので以下のようにスキーマを作成します．スキーマは後から修正を加えることができます．
-<img src="/images/2020/20200512/photo_20200512_07.png" style="border:solid 1px #000000" width="1895" height="923" loading="lazy">
+<img src="/images/2020/20200512/photo_20200512_07.png" class="bordered" width="1895" height="923" loading="lazy">
 
 ### コンテンツの作成
 
 最後に先ほど作成したAPIにコンテンツの作成をします．画面右上の「追加」からコンテンツを作成します．
-<img src="/images/2020/20200512/photo_20200512_08.png" style="border:solid 1px #000000" width="1654" height="925" loading="lazy">
+<img src="/images/2020/20200512/photo_20200512_08.png" class="bordered" width="1654" height="925" loading="lazy">
 
 コンテンツの作成ができたら早速コンテンツの公開をしましょう！ 右上の公開ボタンを押してコンテンツが公開されます．なおプルダウンメニューから下書きとして保存しておくこともできます．
-<img src="/images/2020/20200512/photo_20200512_09.png" style="border:solid 1px #000000" width="1629" height="921" loading="lazy">
+<img src="/images/2020/20200512/photo_20200512_09.png" class="bordered" width="1629" height="921" loading="lazy">
 
 これでコンテンツが配信されている状態となりました．次で実際にコンテンツを取得してみたいと思います！
 
@@ -138,10 +138,10 @@ APIで得られるデータ形式にはリスト形式かオブジェクト形�
 
 microCMSには簡単にAPIを試すことができる「APIプレビュー」が備わっています．まずはここからAPIを利用してみたいと思います．
 先ほど作成したコンテンツの画面から右上の「APIプレビュー」を選択します．
-<img src="/images/2020/20200512/photo_20200512_10.png" style="border:solid 1px #000000" width="1638" height="928" loading="lazy">
+<img src="/images/2020/20200512/photo_20200512_10.png" class="bordered" width="1638" height="928" loading="lazy">
 
 「APIプレビュー」で開かれたメニューから「取得」をクリックすると，APIリクエストが実行されてレスポンスが表示されます！ また，curlコマンドも提示してくれているためご自身の環境でもすぐに試せるようになっている親切設計です．
-<img src="/images/2020/20200512/photo_20200512_11.png" style="border:solid 1px #000000" width="786" height="928" loading="lazy">
+<img src="/images/2020/20200512/photo_20200512_11.png" class="bordered" width="786" height="928" loading="lazy">
 
 ```bash
 curl "https://[サービスID].io/api/v1/blog/l5cn1orii" -H "X-API-KEY: YOUR_API_KEY"
@@ -162,27 +162,27 @@ curl "https://[サービスID].io/api/v1/blog/l5cn1orii" -H "X-API-KEY: YOUR_API
 
 まずは参照先のコンテンツを作成します．今回の例では以下の画像のようなリスト形式の「ブログ作成者」というAPIを作成しました。
 
-<img src="/images/2020/20200512/photo_20200512_12.png" style="border:solid 1px #000000" width="1644" height="763" loading="lazy">
+<img src="/images/2020/20200512/photo_20200512_12.png" class="bordered" width="1644" height="763" loading="lazy">
 
 「ブログ作成者」に以下のようなコンテンツを作成します．この未来太郎さんの各種情報をブログ記事のコンテンツ側から取得したいと思います．
-<img src="/images/2020/20200512/photo_20200512_13.png" style="border:solid 1px #000000" width="1659" height="576" loading="lazy">
+<img src="/images/2020/20200512/photo_20200512_13.png" class="bordered" width="1659" height="576" loading="lazy">
 参照される側のコンテンツ作成はこれで完了です。
 
 ### コンテンツ参照の設定
 
 次にブログ記事のコンテンツ側から先ほどの「ブログ作成者」を参照できるように設定します．
 writerの種類を**テキストフィールド**から**コンテンツ参照**に変更します．
-<img src="/images/2020/20200512/photo_20200512_14.png" style="border:solid 1px #000000" width="1647" height="923" loading="lazy">
+<img src="/images/2020/20200512/photo_20200512_14.png" class="bordered" width="1647" height="923" loading="lazy">
 
 参照したいコンテンツには先ほどのブログ作成者を選択します．
 <img src="/images/2020/20200512/photo_20200512_15.png" width="454" height="206" loading="lazy">
 
 「writer」の種類をコンテンツ参照に変更したら，コンテンツ管理から「作成者」を選択しましょう．
 先ほど作成した未来太郎さんが選択できるはずです！
-<img src="/images/2020/20200512/photo_20200512_16.png" style="border:solid 1px #000000" width="1643" height="911" loading="lazy">
+<img src="/images/2020/20200512/photo_20200512_16.png" class="bordered" width="1643" height="911" loading="lazy">
 
 「作成者」の選択が済んだらコンテンツを公開し，先ほどのように「APIプレビュー」からAPIリクエストをしてレスポンスの確認をしましょう！「writer」には指定した「ブログ作成者」が対応しています！
-<img src="/images/2020/20200512/photo_20200512_17.png" style="border:solid 1px #000000" width="780" height="911" loading="lazy">
+<img src="/images/2020/20200512/photo_20200512_17.png" class="bordered" width="780" height="911" loading="lazy">
 
 ## リスト形式の要素を持たせる
 
@@ -207,19 +207,19 @@ writerの種類を**テキストフィールド**から**コンテンツ参照**
 ### 参照先コンテンツの作成
 
 まずはタグ一覧を管理するリスト形式の「タグ」コンテンツを作成します．作成方法は今までのコンテンツと同様です．
-<img src="/images/2020/20200512/photo_20200512_18.png" style="border:solid 1px #000000" width="1647" height="580" loading="lazy">
+<img src="/images/2020/20200512/photo_20200512_18.png" class="bordered" width="1647" height="580" loading="lazy">
 
 ### コンテンツ参照の設定
 
 「ブログ記事」のAPIスキーマに「tag」フィールドを追加します．種類には**複数コンテンツ参照** -> **タグ**を選択します．
-<img src="/images/2020/20200512/photo_20200512_19.png" style="border:solid 1px #000000" width="1623" height="914" loading="lazy">
+<img src="/images/2020/20200512/photo_20200512_19.png" class="bordered" width="1623" height="914" loading="lazy">
 
 次にコンテンツ管理で「タグ」を付与させましょう．今までと異なり複数選択できるようになっていると思います．
-<img src="/images/2020/20200512/photo_20200512_20.png" style="border:solid 1px #000000" width="1257" height="384" loading="lazy">
+<img src="/images/2020/20200512/photo_20200512_20.png" class="bordered" width="1257" height="384" loading="lazy">
 
 これで準備はできました！
 実際にAPIプレビューを試してみると，リスト形式で複数タグを持っていることが分かります．
-<img src="/images/2020/20200512/photo_20200512_21.png" style="border:solid 1px #000000" width="775" height="915" loading="lazy">
+<img src="/images/2020/20200512/photo_20200512_21.png" class="bordered" width="775" height="915" loading="lazy">
 これでリスト形式で複数の要素を与えることができました。
 
 ## Vue.jsで画面にデータを表示してみる
@@ -267,7 +267,7 @@ export default {
 ブラウザで確認してみると無事表示されました！ リッチエディタで作成したhtml形式の本文もちゃんと機能しています．
 これでフロントエンドとmicroCMSの疎通ができたのでAPIで取得したコンテンツを利用して様々なページを作成することが出来るようになりました。
 
-<img src="/images/2020/20200512/photo_20200512_22.png" style="border:solid 1px #000000" width="1898" height="746" loading="lazy">
+<img src="/images/2020/20200512/photo_20200512_22.png" class="bordered" width="1898" height="746" loading="lazy">
 
 ## おわりに
 

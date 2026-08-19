@@ -64,13 +64,13 @@ IT企業の技術ブログ運営は、**ある一定の質をキープ**しな�
 
 Go相談室の例です。50人くらい参加していて割とアクティブに相談が行われています。
 
-<img src="/images/2020/20200530/photo_20200530_02.png" style="border:solid 1px #000000" width="782" height="548" loading="lazy">
+<img src="/images/2020/20200530/photo_20200530_02.png" class="bordered" width="782" height="548" loading="lazy">
 
 だれかの疑問はブログネタの種ですし、初心者の基本的な質問も歓迎する雰囲気を出すのが重要ですよね。
 
 こっちは「電子工作部」という公認社内サークルの様子です。
 
-<img src="/images/2020/20200530/photo_20200530_03.png" style="border:solid 1px #000000" width="1000" height="689" loading="lazy">
+<img src="/images/2020/20200530/photo_20200530_03.png" class="bordered" width="1000" height="689" loading="lazy">
 
 ミニ四駆も最高ですが、AWS DeepRacerを買いたいですが技適が..というわけで、無いものは作る精神でHWから設計。[第1回社内ロボコン開催記-ライントレーサー編-](/articles/20191018/) という記事に繋げていました。執筆者の勝村さんはチャット画像の筒井さんとともに電子工作部を支えるエース達ですが、実はAIの方が専門という人生2週目かな？ って感じです。筒井さんは他にも[ソフトとハードの垣根を越えろ - IoTハードウェアの開発をソフト屋視点で解説します](/articles/20190826/) という記事で、IoTで獣害問題に取り組んだ記事も書いており、強いです。
 
@@ -80,7 +80,7 @@ Go相談室の例です。50人くらい参加していて割とアクティブ�
 
 Slackであれば、リアクションのスタンプ（Add reaction）を持つコメントも検索できます。例えば「知見」という絵文字が `:chiken` で使えるのであれば、 `has::chiken:` で検索できます。
 
-<img src="/images/2020/20200530/photo_20200530_04.png" style="border:solid 1px #000000" width="1000" height="895" loading="lazy">
+<img src="/images/2020/20200530/photo_20200530_04.png" class="bordered" width="1000" height="895" loading="lazy">
 
 中々記事が集まらない場合は、こういったスタンプトリガーに記事候補を見繕うことも有効だなと思います。
 
@@ -188,7 +188,7 @@ Advent Calendarの前月11月は凪の月と呼ばれ（要出典）、気持ち
 面倒ですがなるべく多くのチャネル（社内の複数のチャットグループ、複数のSNSなど）に投稿しましょう。
 
 🚩200人超えの社内チャットに宣伝する図
-<img src="/images/2020/20200530/photo_20200530_06.png" style="border:solid 1px #000000" width="2128" height="944" loading="lazy">
+<img src="/images/2020/20200530/photo_20200530_06.png" class="bordered" width="2128" height="944" loading="lazy">
 
 🚩Twitterに宣伝している図
 <blockquote class="twitter-tweet"><p lang="ja" dir="ltr">Goのパッケージ構成で悩んでいる人にオススメの記事を公開しました✨ / あなたのGoアプリ/ライブラリのパッケージ構成もっとシンプルでよくない？ <a href="https://t.co/Mi8nvhQpfz">https://t.co/Mi8nvhQpfz</a></p>&mdash; フューチャー技術ブログ🥢 (@future_techblog) <a href="https://twitter.com/future_techblog/status/1265813149883613184?ref_src=twsrc%5Etfw">May 28, 2020</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>

@@ -132,10 +132,10 @@ bq mk \
 * **skip_leading_rows** : スキップするヘッダの行数。今回はヘッダ行を含まないデータにしているため「０」
 
 コマンドを実行するとGoogleアカウントのログイン許可のURLが表示され、URLのリンクに飛び認証コードを入力すると正常に作成されましたと表示されます。コンソールからも転送ジョブが作成されていることが確認できました。
-<img src="/images/2020/20200214/1.png" style="border:solid 1px #000000" width="1972" height="270" loading="lazy">
+<img src="/images/2020/20200214/1.png" class="bordered" width="1972" height="270" loading="lazy">
 
 ジョブが作成されるとその後すぐに実行され、コンソールから実行ログを確認できます。
-<img src="/images/2020/20200214/2.png" style="border:solid 1px #000000" width="1720" height="1024" loading="lazy">
+<img src="/images/2020/20200214/2.png" class="bordered" width="1720" height="1024" loading="lazy">
 
 今回は小さなデータでしたが3分ほどかかってジョブは終了しました。
 実際にSQLでデータを見てみると下記の様に取得できます。

@@ -79,35 +79,35 @@ lede: "さて、皆さん、ServiceNow(以降：SNOW)というSaaSはご存知�
 #### Category の作成
 
 `Maintain Categories`をクリックし、Newを押下する。
-<img src="/images/2020/20200416/1.png"  class="img-middle-size" style="border:solid 1px #000000" width="816" height="817" loading="lazy">
+<img src="/images/2020/20200416/1.png"  class="img-middle-size bordered" width="816" height="817" loading="lazy">
 
 #### item の作成
 
 `Maintain Items` をクリックし、Newを押下する。
 前述の通り、プロジェクトとインスタンス名をvariablesに設定します。この例では、Projectはカスタムテーブルを作って参照形式にしました。
-<img src="/images/2020/20200416/2.png" class="img-middle-size" style="border:solid 1px #000000" width="1389" height="1293" loading="lazy">
-<img src="/images/2020/20200416/3.png" class="img-middle-size" style="border:solid 1px #000000" width="548" height="268" loading="lazy">
-<img src="/images/2020/20200416/4.png" class="img-middle-size" style="border:solid 1px #000000" width="1026" height="284" loading="lazy">
+<img src="/images/2020/20200416/2.png" class="img-middle-size bordered" width="1389" height="1293" loading="lazy">
+<img src="/images/2020/20200416/3.png" class="img-middle-size bordered" width="548" height="268" loading="lazy">
+<img src="/images/2020/20200416/4.png" class="img-middle-size bordered" width="1026" height="284" loading="lazy">
 
 ちなみに、色んなパトロールの方から『Application scopeは別で切るべきだ』と絶対に言われますが、本来なら私もそうします。今はそこは本質じゃないからGlobalのまま行きます。
 
 ## 2. Terraform Server にリクエストを送り、各種承認を回すFlowDesigner @ SNOW
 
 Flow Designer の前に、Terraform の実行結果を格納するテーブルを作っておきましょう。作ったのはこんな感じです。
-<img src="/images/2020/20200416/4.png" class="img-middle-size" style="border:solid 1px #000000" width="1026" height="284" loading="lazy">
-<img src="/images/2020/20200416/5.png" class="img-middle-size" style="border:solid 1px #000000" width="1241" height="252" loading="lazy">
+<img src="/images/2020/20200416/4.png" class="img-middle-size bordered" width="1026" height="284" loading="lazy">
+<img src="/images/2020/20200416/5.png" class="img-middle-size bordered" width="1241" height="252" loading="lazy">
 
 それではいよいよ Flow Designer です。`Flow Designer` → `Designer` をクリック。右上のNew で新しい Flow を作ります。
 以下の様にフローを組みます。スペースの関係で、細かいパラメータまでは取っていませんが、大枠の処理をコメントで書き込みました。
-<img src="/images/2020/20200416/photo_20200416_02.png" class="img-middle-size" style="border:solid 1px #000000" width="1144" height="2244" loading="lazy">
+<img src="/images/2020/20200416/photo_20200416_02.png" class="img-middle-size bordered" width="1144" height="2244" loading="lazy">
 
 Terraform Server に送るためのアクションの定義は以下です。大した事やっていません。
-<img src="/images/2020/20200416/7.png" class="img-middle-size" style="border:solid 1px #000000" width="1296" height="817" loading="lazy">
-<img src="/images/2020/20200416/8.png" class="img-middle-size" style="border:solid 1px #000000" width="1299" height="836" loading="lazy">
-<img src="/images/2020/20200416/9.png" class="img-middle-size" style="border:solid 1px #000000" width="1350" height="822" loading="lazy">
+<img src="/images/2020/20200416/7.png" class="img-middle-size bordered" width="1296" height="817" loading="lazy">
+<img src="/images/2020/20200416/8.png" class="img-middle-size bordered" width="1299" height="836" loading="lazy">
+<img src="/images/2020/20200416/9.png" class="img-middle-size bordered" width="1350" height="822" loading="lazy">
 
 最後に作った Flow Designer を GCE インスタンスのメニューに紐づけます。
-<img src="/images/2020/20200416/10.png" class="img-middle-size" style="border:solid 1px #000000" width="1114" height="526" loading="lazy">
+<img src="/images/2020/20200416/10.png" class="img-middle-size bordered" width="1114" height="526" loading="lazy">
 
 これで SNOW の準備は終わりです。大した事はなかったです。
 
@@ -389,12 +389,12 @@ terraform apply -auto-approve -no-color
 ### ユーザの操作
 
 Service Catalog のダッシュボードに、GCP infra の ウィジェット を追加すると、以下の様になります。
-<img src="/images/2020/20200416/u1.png" class="img-middle-size" style="border:solid 1px #000000" width="1022" height="750" loading="lazy">
-<img src="/images/2020/20200416/u2.png" class="img-middle-size" style="border:solid 1px #000000" width="899" height="482" loading="lazy">
+<img src="/images/2020/20200416/u1.png" class="img-middle-size bordered" width="1022" height="750" loading="lazy">
+<img src="/images/2020/20200416/u2.png" class="img-middle-size bordered" width="899" height="482" loading="lazy">
 
 画面ではGCSも追加しています。手順はGCEの時と全く同じです。
-<img src="/images/2020/20200416/u3.png" class="img-middle-size" style="border:solid 1px #000000" width="1144" height="616" loading="lazy">
-<img src="/images/2020/20200416/u4.png" class="img-middle-size" style="border:solid 1px #000000" width="1086" height="476" loading="lazy">
+<img src="/images/2020/20200416/u3.png" class="img-middle-size bordered" width="1144" height="616" loading="lazy">
+<img src="/images/2020/20200416/u4.png" class="img-middle-size bordered" width="1086" height="476" loading="lazy">
 
 Shoppingっぽくなっているのは、あんまり気にしないでください。SaaSで細部を気にし始めると工数が跳ね上がります（※初期構築だけ考えるとそうでもないですが、保守や機能拡張を考えると雪だるま式に増えます）。
 
@@ -403,35 +403,35 @@ Shoppingっぽくなっているのは、あんまり気にしないでくださ
 ### リクエストの状態を確認
 
 リクエストされたアイテムを見ると、自分の上司で止まっているのが確認できます。
-<img src="/images/2020/20200416/u5.png" class="img-middle-size" style="border:solid 1px #000000" width="1282" height="822" loading="lazy">
-<img src="/images/2020/20200416/u6.png" class="img-middle-size" style="border:solid 1px #000000" width="1136" height="214" loading="lazy">
+<img src="/images/2020/20200416/u5.png" class="img-middle-size bordered" width="1282" height="822" loading="lazy">
+<img src="/images/2020/20200416/u6.png" class="img-middle-size bordered" width="1136" height="214" loading="lazy">
 
 FlowDesingnerは非常に強力な機能で、すべての実行ログを記録していますので、それで状態を確認してみます。すると、確かに1つ目のapprovalで止まっていますね。
-<img src="/images/2020/20200416/u7.png" class="img-middle-size" style="border:solid 1px #000000" width="1137" height="664" loading="lazy">
+<img src="/images/2020/20200416/u7.png" class="img-middle-size bordered" width="1137" height="664" loading="lazy">
 
 Terraform の実行ログを見てみましょう。この結果からすると、良さそうですね。
-<img src="/images/2020/20200416/u8.png" class="img-middle-size" style="border:solid 1px #000000" width="1151" height="295" loading="lazy">
-<img src="/images/2020/20200416/u9.png" class="img-middle-size" style="border:solid 1px #000000" width="1167" height="685" loading="lazy">
+<img src="/images/2020/20200416/u8.png" class="img-middle-size bordered" width="1151" height="295" loading="lazy">
+<img src="/images/2020/20200416/u9.png" class="img-middle-size bordered" width="1167" height="685" loading="lazy">
 
 ### 承認を回す
 
 それじゃあ、上司のアカウントでログインして、承認しましょう。
-<img src="/images/2020/20200416/u10.png" class="img-middle-size" style="border:solid 1px #000000" width="1286" height="719" loading="lazy">
-<img src="/images/2020/20200416/u11.png" class="img-middle-size" style="border:solid 1px #000000" width="1920" height="654" loading="lazy">
+<img src="/images/2020/20200416/u10.png" class="img-middle-size bordered" width="1286" height="719" loading="lazy">
+<img src="/images/2020/20200416/u11.png" class="img-middle-size bordered" width="1920" height="654" loading="lazy">
 
 1つ進みましたね。画像はつけてないですが、この画面からTerraformの実行plan結果のレコードには遷移出来るので、上司も確認できます。
 そんな感じで、みんなに承認してもらいましょう。
 
-<img src="/images/2020/20200416/u12.png" class="img-middle-size" style="border:solid 1px #000000" width="1146" height="350" loading="lazy">
+<img src="/images/2020/20200416/u12.png" class="img-middle-size bordered" width="1146" height="350" loading="lazy">
 
 なぜか名前に既視感がありますねぇ…不思議…
 
 ### apply の結果を見てみる
 
 これで承認が回ったので GCE がデプロイ（アプリ-Tにデリバリー）されているはずです。早速関連リストからTerraformの実行ログを見てみましょう。
-<img src="/images/2020/20200416/u13.png" class="img-middle-size" style="border:solid 1px #000000" width="1264" height="283" loading="lazy">
-<img src="/images/2020/20200416/u14.png" class="img-middle-size" style="border:solid 1px #000000" width="1288" height="786" loading="lazy">
-<img src="/images/2020/20200416/u15.png" class="img-middle-size" style="border:solid 1px #000000" width="1167" height="217" loading="lazy">
+<img src="/images/2020/20200416/u13.png" class="img-middle-size bordered" width="1264" height="283" loading="lazy">
+<img src="/images/2020/20200416/u14.png" class="img-middle-size bordered" width="1288" height="786" loading="lazy">
+<img src="/images/2020/20200416/u15.png" class="img-middle-size bordered" width="1167" height="217" loading="lazy">
 
 来ましたね！ 同時実行とか、変更・削除はどうするのかとか色々ありますが、とりあえずPoCとしては完成！
 

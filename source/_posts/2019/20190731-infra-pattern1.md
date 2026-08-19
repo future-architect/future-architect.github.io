@@ -92,7 +92,7 @@ Tomcatディレクトリ配下に、環境・システム種別のディレク�
 フューチャーでは、オープンな技術を要素別に整理した技術マップがあり、Winners‘ Circleと呼んでいます。
 
 **図3:Winners‘ Circle**
-<img src="/images/2019/20190731/photo_20190731_03.png" style="border:solid 1px #000000" width="1320" height="784" loading="lazy">
+<img src="/images/2019/20190731/photo_20190731_03.png" class="bordered" width="1320" height="784" loading="lazy">
 ※全く見せられなくてすいません...
 
 ボカシが強めですが、Winners‘ Circleは以下のような構成になっています。
