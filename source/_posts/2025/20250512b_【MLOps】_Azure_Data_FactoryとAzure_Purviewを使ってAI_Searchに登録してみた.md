@@ -59,7 +59,7 @@ RAGには、検索フェーズと生成フェーズの2段階が存在します�
   5. 入力されたデータをもとに、生成AIが回答を作成
   6. 作成された回答をユーザーに出力
 
-<img src="/images/2025/20250512b/rag.png" alt="" width="567" height="332">
+<img src="/images/2025/20250512b/rag.png" alt="" width="567" height="332" loading="lazy">
 
 ▲ [RAGとは？仕組みと導入メリット、使用の注意点をわかりやすく解説](https://business.ntt-east.co.jp/content/cloudsolution/municipality/column-28.html)
 

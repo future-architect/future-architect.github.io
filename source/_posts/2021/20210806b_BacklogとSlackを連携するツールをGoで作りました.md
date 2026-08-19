@@ -102,7 +102,7 @@ APIリファレンスは[こちら](https://developer.nulab.com/ja/docs/backlog/
 
 Slackに投稿されると何が嬉しいかというと、画像のようなノリで楽に終わってないチケットにツッコミを入れることができます。
 
-<img src="/images/2021/20210806b/image_3.png" alt="" width="759" height="585" loading="">
+<img src="/images/2021/20210806b/image_3.png" alt="" width="759" height="585" loading="lazy">
 
 未完了のチケットを調べて、誰の担当になっているかを確認して、適宜終わっているか確認するのは単純に手間がかかるだけでなく、急かしているような印象を与えないための配慮など、人対人のコミュニケーションには時間とスタミナを奪われがちです。
 
