@@ -39,7 +39,7 @@ PDFの内部構造について、zawakinさんの[僕「PDFとは何か知りた
 
 このような課題を解決し、PDFから効率的かつ正確に構造化されたデータを抽出するために、以下のフローを考案しました。このフローでは、特にプロンプト設計とBigQuery MLを活用しています。
 
-![](/images/2025/20250724a/sequence.png)
+<img src="/images/2025/20250724a/sequence.png" alt="" width="800" height="1105" loading="lazy">
 
 <details>
 <summary>シーケンス図 (クリックでコードを表示)</summary>

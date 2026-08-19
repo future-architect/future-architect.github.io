@@ -69,7 +69,8 @@ lede: "Go 1.27 で標準ライブラリに追加されたuuidパッケージを�
 - `lede` は一覧・OGP に出る概要文
 - 画像は `<img src="/images/2026/20260804a/xxx.jpg" alt="" width="1024" height="559" loading="lazy">` のように実寸の width/height を明記する
   - これはリポジトリに入る形。**寄稿者には `![alt](url)` で書いてもらい、公開時にこちらで変換する**（#2559）。
-    記法ガイド（`/specials/markdown/`）もそう案内している。`width` / `height` で表示サイズを変えるのは避け、
+    記法ガイド（`/specials/markdown/`）もそう案内している。変換漏れは textlint の
+    `no-markdown-image` が止める（#2644）。`width` / `height` で表示サイズを変えるのは避け、
     小さく見せたいときは画像ファイル自体を加工する（実寸と違う値だと大きい画像を送って縮めるだけになる）
   - **`loading="lazy"` は2枚目以降に付ける**（#2645）。**先頭画像には付けない。**
     `scripts/lcp_image_priority.js` が先頭画像から lazy を外して `fetchpriority="high"` を付ける
