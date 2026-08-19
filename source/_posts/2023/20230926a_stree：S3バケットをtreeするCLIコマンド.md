@@ -26,7 +26,7 @@ lede: "S3バケットをtreeするCLIコマンドを紹介します。"
 
 作成したツールは以下リンク先で公開しています。
 
-[![orangekame3/stree - GitHub](https://gh-card.dev/repos/orangekame3/stree.svg)](https://github.com/orangekame3/stree)
+<a href="https://github.com/orangekame3/stree"><img src="https://gh-card.dev/repos/orangekame3/stree.svg" alt="orangekame3/stree - GitHub" width="442" height="109" loading="lazy"></a>
 
 >streeは「エスツリー」と読みます。先に語感の良い名称を思いついたため、衝動に身を任せて開発しました。
 
@@ -188,7 +188,7 @@ stree my-bucket/test/dir2 -r us-east-1 -e http://localhost:4537
 
 実装に取り掛かるうえでtreeは骨が折れそうだなと思ったのですが、既にgteeというパッケージがGitHubで公開されていました。
 
-[![ddddddO/gtree - GitHub](https://gh-card.dev/repos/ddddddO/gtree.svg)](https://github.com/ddddddO/gtree)
+<a href="https://github.com/ddddddO/gtree"><img src="https://gh-card.dev/repos/ddddddO/gtree.svg" alt="ddddddO/gtree - GitHub" width="442" height="109" loading="lazy"></a>
 
 パッケージの利用方法なども記事で公開されていて実装に困ることはありませんでした。
 

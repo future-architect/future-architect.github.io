@@ -22,7 +22,7 @@ lede: "PrometheusはSoundCloud社によって開発されたオープンソー�
 
 https://grafana-meetup-japan.connpass.com/event/314500/
 
-[![From connpass: Grafana Meetup Japan #1 - connpass | ## Grafana Meetup Japanへようこそ！  このイベントは、オープンソースの監視・可視化ツールであるGrafanaについて、互いに学び、発信し、交流することを目的としています。  Grafanaは、ITインフラやアプリケーションの監視から、IoTデバイス、ビジネス指標、工場、物流、自然災害、宇宙に至るまで、あらゆる分野でのデータ可視化と監視を支援するツールです。  日本でも広く利用されつつありますが、Grafanaの最新情報や導入事例、プラクティスを学んだり発信したりする場は多くありませんでした。そこで、Grafana Labsと共にGrafana Meetup Jap...](/images/2024/20240417b/2024-04-17_Grafana_Meetup_Japan_1___connpass.jpg)](https://grafana-meetup-japan.connpass.com/event/314500/)
+<a href="https://grafana-meetup-japan.connpass.com/event/314500/"><img src="/images/2024/20240417b/2024-04-17_Grafana_Meetup_Japan_1___connpass.jpg" alt="Grafana Meetup Japan #1 - connpass" width="1119" height="256"></a>
 
 知り合いが告知していたことや、登壇される方々に興味を持って参加しました。しかし、「Grafanaほぼ触ったことない」の丸腰で行っても得るものが少なくなりそうなので、せっかくならと記事を書いています。
 
