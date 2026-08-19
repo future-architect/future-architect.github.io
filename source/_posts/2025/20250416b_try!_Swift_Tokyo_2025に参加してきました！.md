@@ -195,7 +195,7 @@ SwiftUIViewがどのようにレンダリングされているかという質問
 
 [drawinggroup(opaque:colormode:)](https://developer.apple.com/documentation/swiftui/view/drawinggroup(opaque:colormode:))
 
-このメソッドを使うことで、画面上には見えないオフスクリーン上でMetal APIを使用して、一つのイメージにまとめて描画することでパフォーマンスを改善させています。
+このメソッドを使うことで、画面上には見えないオフスクリーン上でMetal APIを使用して、1つのイメージにまとめて描画することでパフォーマンスを改善させています。
 実際に、CPUの使用率も、適用前の112%から33%ほどまで下がっていました。
 
 **Cherry Blossoms! App:**

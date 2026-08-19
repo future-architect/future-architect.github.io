@@ -277,7 +277,7 @@ brew install armmbed/formulae/arm-none-eabi-gcc
 
 ### 2. C言語の標準ヘッダが見つからない
 
-次のエラーは、`sysroot`を認識しないことが一つの要因だと考えました。
+次のエラーは、`sysroot`を認識しないことが1つの要因だと考えました。
 
 ```sh
 error: failed to emit precompiled header '.../BridgingHeader.pch' for bridging header '.../BridgingHeader.h'

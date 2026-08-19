@@ -267,7 +267,7 @@ Dify Cloudでは、外部LLMとの接続に「プラグイン」を使用しま�
 | `xai_api_key` | **Secret** | GrokのAPIトークン |
 | `CHUDOU_DESCRIPTION` | String | プロンプト内で参照する政党情報(後述) |
 
-`xai_api_key`をSecret型にすることで、Dify上のUIでマスク表示されます。もう一つの`CHUDOU_DESCRIPTION`は政党の説明文を格納する変数で、プロンプト内から`{{#env.CHUDOU_DESCRIPTION#}}`で参照します。
+`xai_api_key`をSecret型にすることで、Dify上のUIでマスク表示されます。もう1つの`CHUDOU_DESCRIPTION`は政党の説明文を格納する変数で、プロンプト内から`{{#env.CHUDOU_DESCRIPTION#}}`で参照します。
 
 1. 右上の `ENV` をクリックします
 2. 「環境変数を追加」のポップアップに適切な「タイプ・変数名・値」を入力します
