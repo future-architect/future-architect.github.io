@@ -391,7 +391,6 @@ const LINK_TEXT_EXEMPT = [
   'YouTube',
   'Qiita',
   'Feedly',
-  'X(旧Twitter)',
   '公式note',
   'LEAD TO THE FUTURE',
   // X のフォローボタン。ブランドはアイコンが名乗る (#2036)
