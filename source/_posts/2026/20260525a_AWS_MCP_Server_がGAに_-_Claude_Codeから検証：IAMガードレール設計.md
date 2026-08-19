@@ -127,7 +127,7 @@ aws-mcp: uvx mcp-proxy-for-aws@latest https://aws-mcp.us-east-1.api.aws/mcp --pr
 
 ## 提供される11のツール
 
-ローンチブログでは `call_aws` / `search_documentation` / `read_documentation` / `run_script` の4つが強調されますが、実際に AWS MCP Server が公開するツールは **11個** あります。
+ローンチブログでは `call_aws` / `search_documentation` / `read_documentation` / `run_script` の4つが強調されます。実際に AWS MCP Server が公開するツールは **11個** あります。
 
 確認方法は以下の2系統があります。
 
