@@ -6,6 +6,8 @@ var md = require('markdown-it')({
   linkify: true, // URLのようなテキストを自動でリンクに変換
 });
 
+const { replaceOutsideFences } = require('./lib/fence');
+
 /**
  * 記事内の脚注をレンダリングする関数
  * @param {String} text 記事のコンテンツ
@@ -25,20 +27,20 @@ function renderFootnotes(text) {
   const reFootnoteIndex = /\[\^([\w-]+)\]/g;
 
   // 1. インライン形式の脚注 [^name](content) を処理
-  text = text.replace(reInlineFootnote, function (match, name, content) {
+  text = replaceOutsideFences(text, reInlineFootnote, function (match, name, content) {
     footnotesByName[name] = { content: content.trim() };
     return '[^' + name + ']'; // 本文からは内容を削除し、参照のみ残す
   });
 
   // 2. 脚注の定義部分 [^name]: content を処理
-  text = text.replace(reFootnoteContent, function (match, name, content) {
+  text = replaceOutsideFences(text, reFootnoteContent, function (match, name, content) {
     footnotesByName[name] = { content: content.trim() };
     return ''; // 本文から脚注定義を削除
   });
 
   // 3. 本文中の脚注参照をスキャンし、出現順のリストを作成
   const seen = {};
-  text.replace(reFootnoteIndex, function (match, name) {
+  replaceOutsideFences(text, reFootnoteIndex, function (match, name) {
     // 未処理かつ定義が存在する脚注のみをリストに追加
     if (!seen[name] && footnotesByName[name]) {
       orderedFootnotes.push({
@@ -56,7 +58,7 @@ function renderFootnotes(text) {
   }
 
   // 4. 本文中の脚注参照 [^name] をHTMLタグに置換
-  text = text.replace(reFootnoteIndex, function (match, name) {
+  text = replaceOutsideFences(text, reFootnoteIndex, function (match, name) {
     let index = -1;
     for (let i = 0; i < orderedFootnotes.length; i++) {
       if (orderedFootnotes[i].name === name) {
@@ -96,10 +98,15 @@ function renderFootnotes(text) {
   return text;
 }
 
-// Hexoフィルターに登録
-hexo.extend.filter.register('before_post_render', function (data) {
-  if (data.layout === 'post' || data.layout === 'page') {
-    data.content = renderFootnotes(data.content);
-  }
-  return data;
-});
+// Hexo 本体の backtick_code_block（優先度10）より先に走らせる。後だとフェンスが
+// <figure class="highlight"> に変わっていて、フェンスの中の見本まで脚注にしてしまう
+hexo.extend.filter.register(
+  'before_post_render',
+  function (data) {
+    if (data.layout === 'post' || data.layout === 'page') {
+      data.content = renderFootnotes(data.content);
+    }
+    return data;
+  },
+  9,
+);
