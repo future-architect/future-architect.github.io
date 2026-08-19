@@ -78,7 +78,7 @@ Nyle 工藤さん
 レガシーメディアシステムのJamstackリプレイス計画素案
 
 <a href="https://www.ta9to.com/talks/nextjs-mysql/" title="スライドへ">
-  <img src="/images/2021/20211004a/jamstack.jpg" alt="スライドトップページ" width="" height="" loading="lazy">
+  <img src="/images/2021/20211004a/jamstack.jpg" alt="スライドトップページ" width="1000" height="661" loading="lazy">
 </a>
 
 ## 登壇した感想

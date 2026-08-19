@@ -13,7 +13,7 @@ author: 棚井龍之介
 lede: "私のチームでは、「システムの設計情報」や「実装に関わる業務知識」などを、README.md に整理して GitHub 管理しています。設計資料や業務系のドキュメントが蓄積され、何度も更新され続けることに伴い、「あれ、この資料のリンクが切れてる。オリジナルのファイルはどこだっけ？」と探す機会が増えてきました。本来ならば PullRequest のレビュー時に気付くべきですが、ファイル名のちょっとしたスペルミスや資料パスの変更などだと、目視でのチェックには限界があります。"
 ---
 
-<img src="/images/2021/20210422b/chain-312403_640.png" class="img-small-size" alt="" title="Clker-Free-Vector-ImagesによるPixabayからの画像">
+<img src="/images/2021/20210422b/chain-312403_640.png" class="img-small-size" alt="" title="Clker-Free-Vector-ImagesによるPixabayからの画像" width="640" height="560">
 
 ## はじめに
 

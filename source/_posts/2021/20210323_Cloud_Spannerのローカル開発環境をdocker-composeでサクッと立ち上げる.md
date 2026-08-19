@@ -138,7 +138,7 @@ spanner> select * from Singers;
 
 ### ファイル構成
 
-<img src="/images/2021/20210323/image.png" loading="lazy">
+<img src="/images/2021/20210323/image.png" width="1200" height="674" loading="lazy">
 
 * **docker-compose.yaml** : docker-composeファイルです。これを立ち上げます
 * **migrations** : DB初期化時に適用するDDL&DMLを配置します
@@ -157,7 +157,7 @@ spanner> select * from Singers;
 
 ### コンテナ構成のイメージとdocker-compose.yamlの内容
 
-<img src="/images/2021/20210323/image_2.png" loading="lazy">
+<img src="/images/2021/20210323/image_2.png" width="1200" height="676" loading="lazy">
 
 Spannerエミュレータ本体`spanner`とCLIアクセス用の`spanner-cli`は常駐プロセスとして起動し続け、それ以外のコンテナはコマンド実行後に正常終了します。
 

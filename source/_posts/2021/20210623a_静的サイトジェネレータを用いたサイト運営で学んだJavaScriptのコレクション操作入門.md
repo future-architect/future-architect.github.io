@@ -143,7 +143,7 @@ console.log(awsArticles);
 
 利用されているタグの利用回数を表示させたい場合があります。2021.06.23時点のフューチャー技術ブログだと以下みたいに表示されていますね。
 
-<img src="/images/2021/20210623a/image.png" alt="タグの件数表示" loading="lazy">
+<img src="/images/2021/20210623a/image.png" alt="タグの件数表示" width="1200" height="341" loading="lazy">
 
 これも `articles` に対して算出します。先程の指定したタグを持つ記事を抽出する処理を用いたヘルパー関数 `flatMap` を用いると楽です。
 

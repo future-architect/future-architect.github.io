@@ -11,14 +11,10 @@
  *       "from": 2026,
  *       "rules": [
  *         "ja-technical-writing/no-doubled-joshi",
- *         { "rule": "no-img-without-dimensions", "from": 2022, "cleaned": [2016] }
+ *         { "rule": "no-brackets-around-code", "from": 2022 }
  *       ]
  *     }
  *   }
- *
- * `cleaned` は `from` より前でも直し終わって対象に戻した年（#2605）。過去記事を
- * 年単位で潰していく間、直した年だけ先に守るために要る。`from` を下げる形では
- * 「2016年だけ直した」を表せない。全年そろったら `from` を下げて `cleaned` は消す。
  *
  * filter は関数を直接エクスポートする（config-loader の判定は typeof === "function"。
  * エラーメッセージは filter プロパティを求めるように読めるが実装と食い違っている）。
@@ -30,8 +26,8 @@ module.exports = function (context, options = {}) {
   const entries = (options.rules || [])
     .map((entry) =>
       typeof entry === "string"
-        ? { ruleId: entry, from: options.from, cleaned: [] }
-        : { ruleId: entry.rule, from: entry.from || options.from, cleaned: entry.cleaned || [] }
+        ? { ruleId: entry, from: options.from }
+        : { ruleId: entry.rule, from: entry.from || options.from }
     )
     .filter((entry) => entry.ruleId && entry.from);
   if (entries.length === 0) {
@@ -43,7 +39,7 @@ module.exports = function (context, options = {}) {
     return {};
   }
   const year = Number(matched[1]);
-  const ignored = entries.filter((entry) => year < entry.from && !entry.cleaned.includes(year));
+  const ignored = entries.filter((entry) => year < entry.from);
   if (ignored.length === 0) {
     return {};
   }
