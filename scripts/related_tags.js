@@ -193,12 +193,28 @@ function build(site) {
     partners.get(b).push([a, n]);
   }
 
-  return { total, path, families, stems, co, partners, postCount: site.posts.length };
+  // broader を多段に辿った祖先。上位集合（相手が自分の記事を全部含む）を
+  // 「広い」と名乗るかの裏付けに使う (#2597)
+  const ancestors = new Map(); // タグ名 -> 祖先の集合
+  const walk = (name, acc, trail) => {
+    for (const p of (ontology[name] || {}).broader || []) {
+      if (trail.has(p)) continue; // 循環は整合性チェック側の担当（check.mjs）
+      trail.add(p);
+      acc.add(p);
+      walk(p, acc, trail);
+    }
+    return acc;
+  };
+  for (const name of total.keys()) {
+    ancestors.set(name, walk(name, new Set(), new Set([name])));
+  }
+
+  return { total, path, families, stems, co, partners, ancestors, postCount: site.posts.length };
 }
 
 hexo.extend.helper.register('related_tags', function (tagName) {
   if (!cache) cache = build(this.site);
-  const { total, path, families, stems, co, partners, postCount } = cache;
+  const { total, path, families, stems, co, partners, ancestors, postCount } = cache;
 
   const own = total.get(tagName);
   if (!own) return [];
@@ -266,22 +282,47 @@ hexo.extend.helper.register('related_tags', function (tagName) {
   // よって並び順を変えることも無くなる
   const detail = children.map(withVersion).sort(byVersionDesc).concat(narrowing);
 
+  // 上位集合（相手が自分の記事を全部含む）を「広い」として扱う (#2597)。
+  //
+  // 共起だけで見ると 273件あるが、そのうち「話題として広い」と言えるのは
+  // tag_ontology.yml に broader が書かれている13件だけ。残りには
+  // 春の入門祭り → インデックス、YANS → 参加レポート のように
+  // 「記事の種類」を表すタグが混ざる。集合として広いのは事実でも、
+  // 広い話題へ移る導線としては噛み合わない。
+  //
+  // そこで表示はオントロジーの裏付けがあるものに限る。裏付けの無い260件は
+  // /doctor/ の「オントロジーへの追加提案」に出し（scripts/doctor.js）、
+  // 人が親子を認めて追記したぶんだけ表示に反映される。
+  // 機械が候補を出し、意味づけは人が決める、という分担にしている
+  const own_ancestors = ancestors.get(tagName) || new Set();
+  const isSuperset = (r) => r.co === own && r.posts > own && own_ancestors.has(r.name);
+
   const score = (r) => r.co * Math.log(1 + r.lift);
   const adjacent = candidates
     .filter(
       (r) =>
         r.fresh > 0 &&
         r.posts >= MIN_DESTINATION_POSTS &&
-        (allowThinNew || r.fresh >= MIN_NEW_POSTS),
+        (allowThinNew || r.fresh >= MIN_NEW_POSTS) &&
+        !isSuperset(r),
     )
     .sort((a, b) => score(b) - score(a) || byName(a, b))
     .slice(0, MAX_CO_TAGS);
+
+  // 広い群は「近い一般化から」＝記事数の昇順に並べる (#2597)。
+  // jackc/pgx なら PostgreSQL（28本）→ Go（262本）。大きい順にすると
+  // いちばん漠然とした相手が先に来て、次の一歩として選びにくい。
+  // 版の親（Go1.27 → Go）は系列の関係なので、共起由来より前に置く
+  const supersets = candidates
+    .filter((r) => isSuperset(r) && r.posts >= MIN_DESTINATION_POSTS)
+    .map((r) => ({ ...r, covers: true }))
+    .sort((a, b) => a.posts - b.posts || byName(a, b));
 
   // 空の群は返さない。表示側でラベルだけが残らないようにする
   return [
     { kind: 'detail', tags: detail },
     { kind: 'adjacent', tags: adjacent },
-    { kind: 'broader', tags: broader },
+    { kind: 'broader', tags: broader.concat(supersets) },
     { kind: versions.every((r) => isYear(r.name)) ? 'years' : 'versions', tags: versions },
   ].filter((g) => g.tags.length);
 });

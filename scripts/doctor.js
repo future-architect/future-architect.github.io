@@ -183,6 +183,105 @@ hexo.extend.helper.register('doctor_checks', function () {
 });
 
 /**
+ * オントロジーへの追加提案 (#2597)。
+ *
+ * 「A の記事が全部 B にも付いている」関係は共起から機械的に出せる。これは
+ * A ⊆ B という包含で、多くは A が B の一種（GKE ⊆ GoogleCloud、
+ * SpringBoot ⊆ Java）＝ broader の候補になる。
+ *
+ * ただし機械には「話題として広い」と「記事の種類が同じ」の区別が付かない。
+ * 春の入門祭り ⊆ インデックス、YANS ⊆ 参加レポート のように、集合としては
+ * 包含でも親子ではないものが混ざる。そのため related_tags.js は
+ * tag_ontology.yml に書かれた関係だけを「もっと広いタグ」として表示し、
+ * こちらは候補を並べるだけに留める。人が見て認めたものを yml に書き、
+ * 書いた分だけ表示に反映される。
+ *
+ * 差が2本以内のペアは「ほぼ重なるタグ（統合候補）」が受け持つので出さない。
+ * あちらは名前を1つに寄せる提案で、こちらは親子として繋ぐ提案。
+ */
+const ONTOLOGY_SUGGEST_MIN_DIFF = 3; // 差がこれ未満なら統合候補（別の節）の担当
+const ONTOLOGY_SUGGEST_MIN_POSTS = 2; // 1記事タグは包含が偶然になりやすい
+
+hexo.extend.helper.register('doctor_ontology_suggestions', function () {
+  const ontology = (this.site.data && this.site.data.tag_ontology) || {};
+
+  const sets = new Map(); // タグ名 -> 記事IDの集合
+  const paths = new Map();
+  this.site.tags.forEach((tag) => {
+    sets.set(tag.name, new Set(tag.posts.map((p) => p._id)));
+    paths.set(tag.name, tag.path);
+  });
+
+  // broader を多段に辿った祖先。直接の親でなくても、祖先に含まれていれば
+  // 「もう繋がっている」ので提案しない
+  const ancestorMemo = new Map();
+  const ancestorsOf = (name) => {
+    if (ancestorMemo.has(name)) return ancestorMemo.get(name);
+    const acc = new Set();
+    const walk = (n, trail) => {
+      for (const p of (ontology[n] || {}).broader || []) {
+        if (trail.has(p)) continue;
+        trail.add(p);
+        acc.add(p);
+        walk(p, trail);
+      }
+    };
+    walk(name, new Set([name]));
+    ancestorMemo.set(name, acc);
+    return acc;
+  };
+
+  // 版タグ（Go1.27）は名前の規則で語幹と同義になり、オントロジーに書く対象では
+  // ないので提案しない（scripts/version_tags.js が担う）
+  const VERSIONED = /^(.+?)(\d+(?:\.\d+)+|\d{2,})$/;
+  const stemOf = (name) => {
+    const node = ontology[name];
+    if (node && node.notVersion) return null;
+    if (node && node.versionOf) return node.versionOf;
+    const m = VERSIONED.exec(name);
+    return m && sets.has(m[1]) ? m[1] : null;
+  };
+
+  const entries = [...sets.entries()].filter(([, s]) => s.size >= ONTOLOGY_SUGGEST_MIN_POSTS);
+  const suggestions = [];
+  for (const [child, C] of entries) {
+    const stem = stemOf(child);
+    const known = ancestorsOf(child);
+    for (const [parent, P] of entries) {
+      if (parent === child || P.size - C.size < ONTOLOGY_SUGGEST_MIN_DIFF) continue;
+      if (parent === stem) continue; // 版タグと語幹は名前の規則が担う
+      if (known.has(parent)) continue; // すでに親子として書かれている
+      let subset = true;
+      for (const id of C) {
+        if (!P.has(id)) {
+          subset = false;
+          break;
+        }
+      }
+      if (!subset) continue;
+      suggestions.push({
+        child,
+        childPath: paths.get(child),
+        childN: C.size,
+        parent,
+        parentPath: paths.get(parent),
+        parentN: P.size,
+        // 子がオントロジーに未登録なら、親子を書く前にノードを足す必要がある
+        childUnregistered: !ontology[child],
+        parentUnregistered: !ontology[parent],
+      });
+    }
+  }
+  // 記事数の多い子から。影響するページが大きい順に見てもらう
+  suggestions.sort(
+    (a, b) => b.childN - a.childN || a.parentN - b.parentN || (a.child < b.child ? -1 : 1),
+  );
+
+  const childCount = new Set(suggestions.map((s) => s.child)).size;
+  return { suggestions, childCount };
+});
+
+/**
  * タグオントロジー（source/_data/tag_ontology.yml）の親子構造を /doctor/ で
  * 見るためのツリー。複数親のノードはそれぞれの親の下に重複して出す
  * （DAG を1本の木に潰すと片方の系統から見えなくなる）。
