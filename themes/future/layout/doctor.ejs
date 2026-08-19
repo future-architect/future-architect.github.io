@@ -186,6 +186,29 @@
         </section>
       </div>
 
+      <%# 提案リストはツリーの直前に置く。ツリーを見て「この親子が無い」と
+          気づく流れではなく、候補を見て yml に足し、ツリーで結果を確かめる流れ %>
+      <div class="doctor-single">
+        <section>
+          <h2 class="bottom-content-header">オントロジーへの追加提案（親子の候補）</h2>
+          ※左のタグの記事が<strong>すべて</strong>右のタグにも付いている関係を共起から拾ったものです。多くは「A は B の一種」で <code>broader</code> の候補になりますが、機械には「話題として広い」と「記事の種類が同じ」の区別が付きません（春の入門祭り ⊆ インデックス のような包含も混ざります）。認めたものを <code>source/_data/tag_ontology.yml</code> に書くと、そのタグページの関連タグで「もっと広いタグで探す」に出ます（#2597）。差が2本以内のペアは上の「ほぼ重なるタグ（統合候補）」の担当
+          <% const ontoSuggest = doctor_ontology_suggestions(); %>
+          <% if (ontoSuggest.suggestions.length) { %>
+          <p class="doctor-note">候補 <%= ontoSuggest.suggestions.length %>件 / タグ <%= ontoSuggest.childCount %>件</p>
+          <ul class="doctor-list">
+            <% ontoSuggest.suggestions.forEach(function(s){ %>
+            <li>
+              <a href="<%- url_for(s.childPath) %>"><%= s.child %></a>（<%= s.childN %>本） ⊆ <a href="<%- url_for(s.parentPath) %>"><%= s.parent %></a>（<%= s.parentN %>本）
+              <% if (s.childUnregistered || s.parentUnregistered) { %><span class="doctor-note-inline">yml に未登録: <%= [s.childUnregistered ? s.child : null, s.parentUnregistered ? s.parent : null].filter(Boolean).join('、') %></span><% } %>
+            </li>
+            <% }) %>
+          </ul>
+          <% } else { %>
+          <p>該当なし</p>
+          <% } %>
+        </section>
+      </div>
+
       <h2 class="bottom-content-header">タグの親子関係（オントロジー）</h2>
       ※<code>source/_data/tag_ontology.yml</code> の broader の可視化。関連記事の計算が辿る辺で、「子タグの記事に親タグを打つのは冗長」という自明な包含だけを登録しています（#2292）。灰色はタグとして実在しない概念ノード。「系統」は自分＋子孫のユニーク記事数。「版」はバージョン同義（Go1.27 は Go を書いたのと同じ扱い。<code>scripts/version_tags.js</code>）で語幹に吸収されるタグ
       <% const onto = doctor_ontology(); %>
