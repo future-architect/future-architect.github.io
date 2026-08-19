@@ -98,10 +98,15 @@ function renderFootnotes(text) {
   return text;
 }
 
-// Hexoフィルターに登録
-hexo.extend.filter.register('before_post_render', function (data) {
-  if (data.layout === 'post' || data.layout === 'page') {
-    data.content = renderFootnotes(data.content);
-  }
-  return data;
-});
+// Hexo 本体の backtick_code_block（優先度10）より先に走らせる。後だとフェンスが
+// <figure class="highlight"> に変わっていて、フェンスの中の見本まで脚注にしてしまう
+hexo.extend.filter.register(
+  'before_post_render',
+  function (data) {
+    if (data.layout === 'post' || data.layout === 'page') {
+      data.content = renderFootnotes(data.content);
+    }
+    return data;
+  },
+  9,
+);
