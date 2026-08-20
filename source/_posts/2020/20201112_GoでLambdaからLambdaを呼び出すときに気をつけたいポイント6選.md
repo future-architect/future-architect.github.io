@@ -407,7 +407,9 @@ func init() {
 
 ~~SDKでLambda関数を呼び出すためにはプライベートサブネットからインターネットに抜ける経路が必要であるため、プライベートサブネットにNAT Gatewayを構築します。また、パブリックサブネットやInternet Gatewayを構築、各種セキュリティグループやルートテーブルの設定を実施する必要があります。~~
 
-~~その他の解決策としては、VPC Endpointを備えたPrivateなAPI Gatewayを経由してVPC Lambdaを呼び出す方法や、PrivateなALBを経由してVPC Lambdaを呼び出す方法などが考えられます。このような方法の場合はVPCにInternet Gatewayを備えていなくても、間接的にVPC Lambdaを呼び出せる、というメリットがあります。インフラ構成によっては十分有用な方法です。~~
+~~その他の解決策としては、VPC Endpointを備えたPrivateなAPI Gatewayを経由してVPC Lambdaを呼び出す方法や、PrivateなALBを経由してVPC Lambdaを呼び出す方法などが考えられます。~~
+
+~~このような方法の場合はVPCにInternet Gatewayを備えていなくても、間接的にVPC Lambdaを呼び出せる、というメリットがあります。インフラ構成によっては十分有用な方法です。~~
 
 2020/10/20現在、VPCエンドポイントがLambdaに対応したため、VPCエンドポイントを使う場合、上記の解決先は不要になりました。
 

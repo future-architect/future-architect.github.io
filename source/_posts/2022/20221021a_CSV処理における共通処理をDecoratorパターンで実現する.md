@@ -180,7 +180,7 @@ type CSVReader interface {
 
 またヌル文字を除外する前の実装で `gocsv.UnmarshalCSV` の引数として渡している `*csv.Reader` 構造体は当然ながら `Read()` と `ReadAll()` メソッドがあります。
 
-このとき **`gocsv.CSVReader` インターフェースを満たす `Read()` と `ReadAll()` メソッドを持つ構造体を用意し、それぞれメソッドで `*csv.Reader` の `Read()` と `ReadAll()` を呼び出したあとに、ヌル文字を除外するような実装ができます。この構造体を `gocsv.UnmarshalCSV()` の引数に渡すことで `gocsv` によるデコード時にヌル文字を除去できます**。
+このとき **`gocsv.CSVReader` インターフェースを満たす `Read()` と `ReadAll()` メソッドを持つ構造体を用意し、それぞれメソッドで `*csv.Reader` の `Read()` と `ReadAll()` を呼び出したあとに、ヌル文字を除外するような実装ができます**。**この構造体を `gocsv.UnmarshalCSV()` の引数に渡すことで `gocsv` によるデコード時にヌル文字を除去できます**。
 
 具体的な Decorator の実装例は以下のとおりです。
 
