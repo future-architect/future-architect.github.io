@@ -232,7 +232,7 @@ GPIO（General Purpose Input/Output）は、「汎用入力/出力ピン」を�
 
 #### 3.3.3 「Lチカ」をやってみよう
 
-ここでは Raspberry Pi Pico W の基本機能を試します。「Lチカ」とはプログラミング言語学習における「Hello World !」です。「LEDを点滅（チカチカ）させる」作業を行い、GPIO ピンが正しく動作していることを確認します。電子回路は以下のように設計し、構築していきます。
+ここでは Raspberry Pi Pico W の基本機能を試します。「Lチカ」とはプログラミング言語学習における「Hello World !」です。「LEDを点滅（チカチカ）させる」作業し、GPIO ピンが正しく動作していることを確認します。電子回路は以下のように設計し、構築していきます。
 
 <img src="/images/2025/20250522a/img_7902_720.jpg" alt="img_7902_720.jpg" width="719" height="424" loading="lazy">
 
