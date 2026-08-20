@@ -54,7 +54,7 @@ DynamoDB Streamsについては1.5年前に似たような小ネタを投稿し�
 
 <img src="/images/2022/20221020a/dynamodbstreams_構成-ページ2.drawio.png" alt="dynamodbstreams_構成-ページ2.drawio.png" width="1200" height="486" loading="lazy">
 
-最初は、センシングするデバイス側から送られる順番が狂ったとか、図では省略していますが途中で経由するKinesis Data StreamsのシャードIDにデバイスIDが入っていないなど、DynamoDBに書き込まれるまでで順序が狂ったのかと思っていましたが、書き込みデータにデバイスから送信日時とサーバ受付時間、DBへの永続日時を比較すると原因がDynamoDB Streamsでの出力で狂っていることが分かりました。
+最初は、センシングするデバイス側から送られる順番が狂ったとか、図では省略していますが途中で経由するKinesis Data StreamsのシャードIDにデバイスIDが入っていないなど、DynamoDBに書き込まれるまでで順序が狂ったのかと思っていました。しかし、書き込みデータにデバイスから送信日時とサーバ受付時間、DBへの永続日時を比較すると原因がDynamoDB Streamsでの出力で狂っていることが分かりました。
 
 ## 発生メカニズム
 

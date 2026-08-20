@@ -35,7 +35,7 @@ GNU Make 4.2.1
 
 Makefileのインデントはハードタブである必要があります。誤りを防ぐためにも[EditorConfig](https://editorconfig.org/)を設定しておくと良いでしょう。
 
-makeは通常、Makefileという名称をデフォルトで認識しますが、同一フォルダに複数のファイルを用意したいときや、includeように共通の変数などを定義したファイルを作る場合は、`.mk` という拡張子を付けますので、`[{Makefile,**.mk}]` というセクションが良いでしょう（[小文字の`makefile` より `Makefile` の方を推奨する](https://www.gnu.org/software/make/manual/html_node/Makefile-Names.html)とのことなので小文字の方はあえて入れてません）。
+makeは通常、Makefileという名称をデフォルトで認識します。しかし、同一フォルダに複数のファイルを用意したいときや、includeように共通の変数などを定義したファイルを作る場合は、`.mk` という拡張子を付けますので、`[{Makefile,**.mk}]` というセクションが良いでしょう（[小文字の`makefile` より `Makefile` の方を推奨する](https://www.gnu.org/software/make/manual/html_node/Makefile-Names.html)とのことなので小文字の方はあえて入れてません）。
 
 ```ini .editorconfig
 root = true

@@ -325,7 +325,7 @@ terraform import後
 ## CloudBuildからGKE Control Planeへの接続
 
 今回、Control Planeへのアクセスにプライベートエンドポイントのみの「パブリックエンドポイントアクセスが無効」でGKEを構成しているため、CloudBuildからGKE Control Planeへの接続も内部ネットワーク経由でプライベートエンドポイントに対して行わなければいけません。
-（GKEをパブリック エンドポイント アクセスが有効、承認済みネットワークが有効で構成している場合は、CloudBuildからGKE Control Planeへのアクセスもパブリックエンドポイントに対して行う必要がありますが、CloudBuildの外部IPはユーザで指定できずビルド環境ごとに変わってしまい、承認済みネットワークが定義できないので、少しトリッキーなやり方をしないとアクセスができないです）。。
+（GKEをパブリック エンドポイント アクセスが有効、承認済みネットワークが有効で構成している場合は、CloudBuildからGKE Control Planeへのアクセスもパブリックエンドポイントに対して行う必要があります）。（ただし、CloudBuildの外部IPはユーザで指定できずビルド環境ごとに変わってしまい、承認済みネットワークが定義できないので、少しトリッキーなやり方をしないとアクセスができないです）。
 CloudBuildからGKE Control Planeのプライベートエンドポイント接続を内部ネットワークを経由するようにしたいので、CloudBuildをPrivate Poolを利用するように作成します。
 Cloud Build プライベート プールを使用した限定公開 Google Kubernetes Engine クラスタへのアクセスはGoogle Cloudの[アーキテクチャセンター](https://cloud.google.com/architecture/accessing-private-gke-clusters-with-cloud-build-private-pools)にも記載されているので、詳しくはこちらの記事をご覧ください。
 
@@ -619,6 +619,6 @@ hello-go-deployment-78b555bdf6-z5rk8   0/1     Terminating         0          7m
 
 ## さいごに
 
-今回はCloudBuildを利用したGKEへの継続デプロイ基盤について記載しました。GKEは限定公開クラスタでControl Planeへのアクセスがプライベートエンドポイントのみの「パブリックエンドポイントアクセスが無効」構築しているため、Cloud BuildからGKEのControl Planeへのアクセスを成功させるためのネットワーク構成が複雑になってしまいましたが、限定公開クラスタで「パブリック エンドポイント アクセスが有効、承認済みネットワークが無効」で構築すればCloudBuildでPrivate PoolやHA VPNで作成することもなくパブリックエンドポイント経由でControl Planeへアクセスができます。セキュリティ要件次第でデプロイフローやアーキテクチャなどは変更してください。
+今回はCloudBuildを利用したGKEへの継続デプロイ基盤について記載しました。GKEは限定公開クラスタでControl Planeへのアクセスがプライベートエンドポイントのみの「パブリックエンドポイントアクセスが無効」構築しているため、Cloud BuildからGKEのControl Planeへのアクセスを成功させるためのネットワーク構成が複雑になってしまいました。一方、限定公開クラスタで「パブリック エンドポイント アクセスが有効、承認済みネットワークが無効」で構築すれば、CloudBuildでPrivate PoolやHA VPNで作成することもなくパブリックエンドポイント経由でControl Planeへアクセスができます。セキュリティ要件次第でデプロイフローやアーキテクチャなどは変更してください。
 
 まだまだGKEの知らない機能がたくさんあるので、引き続きインプットとアウトプットをしていきたいと思います。

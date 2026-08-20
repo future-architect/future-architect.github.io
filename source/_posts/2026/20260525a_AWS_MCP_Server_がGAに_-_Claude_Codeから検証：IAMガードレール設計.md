@@ -324,9 +324,9 @@ Organizations を使っているなら、本番アカウント・OU に SCP と�
 
 ### 補足：AssumeRole で包括的な ReadOnly キャップ
 
-`aws:ViaAWSMCPService` を使った前項の例は「特定サービスごとのガードレール」（経路別 Deny）に向く一方、「経路に関わらずエージェントが使うクレデンシャル自体を ReadOnly に縛りたい」というように、複数サービスにまたがる包括的な制限を入れたい場合は、IAM の context key ではなく **MCP 専用ロール + AssumeRole** という別レイヤーで構成できます。
+`aws:ViaAWSMCPService` を使った前項の例は「特定サービスごとのガードレール」（経路別 Deny）に向きます。一方、「経路に関わらずエージェントが使うクレデンシャル自体を ReadOnly に縛りたい」というように複数サービスにまたがる包括的な制限を入れたい場合は、IAM の context key ではなく **MCP 専用ロール + AssumeRole** という別レイヤーで構成できます。
 
-AWS 公式の設計指針は [AWS Security Blog: Secure AI agent access patterns to AWS resources using MCP](https://aws.amazon.com/blogs/security/secure-ai-agent-access-patterns-to-aws-resources-using-model-context-protocol/) を参照してください（サンプル実装は `boto3.assume_role()` の `PolicyArns` で渡す session policy 方式が中心です）。本セクションでは、AssumeRole ベースの人間アクセスで広く使われてきた **「Group identity policy で AssumeRole 権限を付与・剥奪 + Trust policy の `sts:RoleSessionName = ${aws:username}` で監査詐称防止 + 専用ロールに `ReadOnlyAccess` を静的アタッチ + 機密 read 系は Inline Deny で除外」** という多層防御パターンを MCP 用ロールに当てはめます。
+AWS 公式の設計指針は [AWS Security Blog: Secure AI agent access patterns to AWS resources using MCP](https://aws.amazon.com/blogs/security/secure-ai-agent-access-patterns-to-aws-resources-using-model-context-protocol/) を参照してください（サンプル実装は `boto3.assume_role()` の `PolicyArns` で渡す session policy 方式が中心です）。本セクションでは、AssumeRole ベースの人間アクセスで広く使われてきた多層防御パターンを MCP 用ロールに当てはめます。そのパターンとは、**「Group identity policy で AssumeRole 権限を付与・剥奪 + Trust policy の `sts:RoleSessionName = ${aws:username}` で監査詐称防止 + 専用ロールに `ReadOnlyAccess` を静的アタッチ + 機密 read 系は Inline Deny で除外」** です。
 
 仕組みの概略:
 

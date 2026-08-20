@@ -119,7 +119,7 @@ Plan: 0 to add, 1 to change, 0 to destroy.
 
 DeepLに日本語訳してもらいます。
 
-「このリソースの `managed_policy_arns` 引数または `inline_policy` 設定ブロックを使用すると、このリソースはロールのそれぞれのポリシータイプ（例えば、両方の引数を使用した場合は両方のポリシータイプ）の排他的管理を引き受けます。これらの引数は、`aws_iam_policy_attachment` 、`aws_iam_role_policy_attachment` 、`aws_iam_role_policy` といったロールのポリシーを管理する他の方法と互換性がありません。複数の手段でロールのポリシーを管理しようとすると、リソースの循環やエラーが発生します」
+「このリソースの `managed_policy_arns` 引数または `inline_policy` 設定ブロックを使用すると、このリソースはロールのそれぞれのポリシータイプ（例えば、両方の引数を使用した場合は両方のポリシータイプ）の排他的管理を引き受けます」。「これらの引数は、`aws_iam_policy_attachment` 、`aws_iam_role_policy_attachment` 、`aws_iam_role_policy` といったロールのポリシーを管理する他の方法と互換性がありません。複数の手段でロールのポリシーを管理しようとすると、リソースの循環やエラーが発生します」
 
 確かに今回の例では、 `aws_iam_role` リソースの引数として `managed_policy_arns` を設定し `AWSLambdaVPCAccessExecutionRole` ポリシーをアタッチすると同時に、 `aws_iam_role_policy_attachment` リソースも記述し、カスタマー管理ポリシーをアタッチしようとしています。まさに、「**複数の手段でロールのポリシーを管理しようとすると、リソースの循環やエラーが発生します。**」という部分に該当します。
 

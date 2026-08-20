@@ -61,7 +61,7 @@ IaCのコードによって管理されているインフラリソースに対�
 
 ## Pulumiとは
 
-[Pulumi](https://www.pulumi.com/)とは、OSSのIaCツールの1つであり、Terraformは独自のHCL言語でコードを記述しなければなりませんが、Pulumiの場合、アプリケーション開発者がよく使用する言語(Go/Java/Python/Typescript/C#/Yaml)などでコードを記述できるため、普段アプリケーションコード書いているエンジニアでも学習コストが低く、使い慣れた言語でインフラリソースをループ処理で作成したりできます。AWS/GCP/Azureなど各クラウドプロバイダーやKubernetesやServerlessにも幅広く対応しています。また、[TerraformやCloudFormationからPulumiに変換する](https://www.pulumi.com/tf2pulumi/)ことも可能なため、Pulumiへの移行も可能です。
+[Pulumi](https://www.pulumi.com/)とは、OSSのIaCツールの1つであり、Terraformは独自のHCL言語でコードを記述しなければなりません。一方、Pulumiの場合、アプリケーション開発者がよく使用する言語(Go/Java/Python/Typescript/C#/Yaml)などでコードを記述できるため、普段アプリケーションコード書いているエンジニアでも学習コストが低く、使い慣れた言語でインフラリソースをループ処理で作成したりできます。AWS/GCP/Azureなど各クラウドプロバイダーやKubernetesやServerlessにも幅広く対応しています。また、[TerraformやCloudFormationからPulumiに変換する](https://www.pulumi.com/tf2pulumi/)ことも可能なため、Pulumiへの移行も可能です。
 
 Pulumiは無料で利用できますが、複数人での利用や、企業単位、ミッションクリティカルなシステムを扱う方向けに有償プランもあり、追加機能や充実したサポートを利用できます。
 

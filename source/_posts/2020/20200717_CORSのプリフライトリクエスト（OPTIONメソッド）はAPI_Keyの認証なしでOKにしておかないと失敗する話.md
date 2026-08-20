@@ -47,7 +47,7 @@ CORSとは **オリジン間リソース共有**（Cross-Origin Resource Sharing
 
 [オリジン間リソース共有 (CORS)](https://developer.mozilla.org/ja/docs/Web/HTTP/CORS#Preflighted_requests) から引用
 
-上図ですが、OPTIONSメソッドには、`Origin`、`Access-Control-Request-Method`、`Access-Control-Request-Headers` のリクエストヘッダが含まれ（1番上の矢印）、それに対してサーバ側が`Access-Control-Allow-Origin`にリクエストされたオリジンの値、`Access-Control-Allow-Methods`に先ほどのメソッドを含めた値、`Access-Control-Allow-Headers`に先ほど要求が合ったヘッダの名称を含めてレスポンスする必要があります（2番目の矢印）。上記の条件を満たせば、ブラウザは通常のメインのリクエストをサーバに要求します（3,4番目の矢印）
+上図ですが、OPTIONSメソッドには、`Origin`、`Access-Control-Request-Method`、`Access-Control-Request-Headers` のリクエストヘッダが含まれます（1番上の矢印）。それに対してサーバ側が`Access-Control-Allow-Origin`にリクエストされたオリジンの値、`Access-Control-Allow-Methods`に先ほどのメソッドを含めた値、`Access-Control-Allow-Headers`に先ほど要求が合ったヘッダの名称を含めてレスポンスする必要があります（2番目の矢印）。上記の条件を満たせば、ブラウザは通常のメインのリクエストをサーバに要求します（3,4番目の矢印）
 
 CORSに対しては、上記のmozillaの記事や、tomoyukilabsさんのQiitaにある[CORSまとめ](https://qiita.com/tomoyukilabs/items/81698edd5812ff6acb34)も網羅的でオススメです。CORSは必ずプリフライトリクエストが飛ぶのではなく、条件によっては「単純リクエスト」と呼ばれる簡易的な認証をする場合もあるなど細かい仕様は学びがあります。そもそもなんでCORSという決まり事があるかというと、[同一オリジンポリシー](https://developer.mozilla.org/ja/docs/Web/Security/Same-origin_policy)があって、なぜ同一オリジンポリシーが存在するかというと、ユーザーの情報を他サイトに漏れてしまわないようにといったセキュリティ上の理由が上げられます。
 
