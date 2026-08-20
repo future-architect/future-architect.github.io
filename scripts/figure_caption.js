@@ -34,13 +34,31 @@ const { replaceOutsideFences } = require('./lib/fence');
  * リンクといったインライン記法もそのまま効く。
  */
 const IMAGE_LINE = '(?:<a\\b[^>]*>\\s*)?<img\\b[^>]*>(?:\\s*</a>)?|!\\[[^\\]]*\\]\\([^)\\n]*\\)';
+const CAPTION_LINE = '[ \\t]*\\*[^*\\n]+\\*[ \\t]*';
 const BLANK_BEFORE_CAPTION = new RegExp(
-  `^([ \\t]*(?:${IMAGE_LINE})[ \\t]*)\\n(?=[ \\t]*\\*[^*\\n]+\\*[ \\t]*$)`,
+  `^([ \\t]*(?:${IMAGE_LINE})[ \\t]*)\\n(?=${CAPTION_LINE}$)`,
+  'gm',
+);
+
+/**
+ * 画像・キャプションの塊が前後の段落とくっついているときに空行で切り離す（#2517）。
+ *
+ * 画像の行を直前の文に続けて書くと marked は画像を段落の中に入れ、キャプションを
+ * 続けて書くと `<p><em>…</em><br>本文</p>` になる。どちらも下の toFigure が探す形に
+ * ならず、記法どおりに書いたのにキャプションが素の斜体で出る。
+ */
+const BLANK_BEFORE_IMAGE = new RegExp(
+  `^(?![ \\t]*(?:#|>|[-*+][ \\t]|[0-9]+\\.[ \\t]|\\||<|!\\[))[ \\t]*(\\S.*?)[ \\t]*\\n` +
+    `(?=[ \\t]*(?:${IMAGE_LINE})[ \\t]*\\n(?:[ \\t]*\\n)?${CAPTION_LINE}$)`,
+  'gm',
+);
+const BLANK_AFTER_CAPTION = new RegExp(
+  `^([ \\t]*(?:${IMAGE_LINE})[ \\t]*\\n(?:[ \\t]*\\n)?${CAPTION_LINE})\\n(?=[ \\t]*\\S)`,
   'gm',
 );
 
 const IMG = '(?:<a\\b[^>]*>\\s*)?<img\\b[^>]*>(?:\\s*</a>)?';
-const CAPTION = '<p><em>((?:(?!</em>)[\\s\\S])+)</em></p>';
+const CAPTION = '<p>\\s*<em>((?:(?!</em>)[\\s\\S])+)</em>\\s*</p>';
 const PATTERN = new RegExp(`(?:<p>\\s*(${IMG})\\s*</p>|(${IMG}))\\s*${CAPTION}`, 'g');
 
 function toFigure(content) {
@@ -56,10 +74,16 @@ function toFigure(content) {
 hexo.extend.filter.register('before_post_render', function (data) {
   if (!data || !data.content) return;
   // コードフェンスの中の見本は記法の説明なので触らない (#2549)
+  data.content = replaceOutsideFences(data.content, BLANK_BEFORE_IMAGE, (m, line) => `${line}\n\n`);
   data.content = replaceOutsideFences(
     data.content,
     BLANK_BEFORE_CAPTION,
     (m, line) => `${line}\n\n`,
+  );
+  data.content = replaceOutsideFences(
+    data.content,
+    BLANK_AFTER_CAPTION,
+    (m, block) => `${block}\n\n`,
   );
   return data;
 });
