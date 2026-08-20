@@ -7,6 +7,7 @@ tags:
   - GoConference
   - スクレイピング
   - カンファレンス
+  - アドベントカレンダー
 categories:
   - Programming
 author: 澁川喜規

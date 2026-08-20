@@ -7,6 +7,7 @@ tags:
   - AWS
   - Python
   - ジョブ設計
+  - アドベントカレンダー
 categories:
   - Cloud
 thumbnail: /images/2020/20201206/thumbnail.png

@@ -6,6 +6,7 @@ tags:
   - AWS
   - Glue
   - 性能検証
+  - アドベントカレンダー
 categories:
   - DataEngineering
 author: 千葉駿
