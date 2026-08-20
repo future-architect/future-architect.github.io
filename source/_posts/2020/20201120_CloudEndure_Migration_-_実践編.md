@@ -364,7 +364,7 @@ CloudEndureの裏の動きについては、AWSコンソールを観察してみ
 よく見ると、1GBのストレージがアタッチされています。
 <img src="/images/2020/20201120/TargetMachine(TestMode)停止1GB.png" width="1200" height="632" loading="lazy">
 
-停止されると、1GBのストレージがデタッチされ、インスタンスの情報からは見れなくなります。
+停止されると、1GBのストレージがデタッチされ、インスタンスの情報からは見られなくなります。
 <img src="/images/2020/20201120/TargetMachine(TestMode)停止デタッチ.png" width="1200" height="643" loading="lazy">
 
 最後にレプリケーション済みのボリュームがアタッチされた状態でインスタンスが起動されて完了です。

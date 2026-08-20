@@ -330,7 +330,7 @@ var swaggerSpec = []string{
 - クエリパラメータが struct へ Bindされる
 - パラメータのバリデーションに対応
   - デフォルトだとリクエストボディはバリデーションされない (読まれないため)
-  - Echo だと middleware をいれれば Body のバリデーションエラーも見れる
+  - Echo だと middleware をいれれば Body のバリデーションエラーも見られる
     - `middleware.OapiRequestValidator(swagger)`
     - OpenAPI の spec が必要
 

@@ -25,13 +25,13 @@ lede: "Markdownで設計書を充実させようとすればするほど、設�
 
 * シーケンス図、業務フロー図
   * Markdown中にPlantUMLで記載
-  * 参照はGitHub上からも見れるように、[pegmatite](https://chrome.google.com/webstore/detail/pegmatite/jegkfbnfbfnohncpcfcimepibmhlkldo) を利用
+  * 参照はGitHub上からも見られるように、[pegmatite](https://chrome.google.com/webstore/detail/pegmatite/jegkfbnfbfnohncpcfcimepibmhlkldo) を利用
 * システム構成図など画像系
   * Diagrams.net（draw.io）で作成し、`.drawio.png` の拡張子でMarkdownから参照
   * これだけは目視で差分チェックとなる
 * Web API定義
   * OpenAPI SpecのYAMLファイル
-  * 参照はGitHub上からも見れるように、[swagger-viewer](https://chrome.google.com/webstore/detail/swagger-viewer/nfmkaonpdmaglhjjlggfhlndofdldfag) を利用
+  * 参照はGitHub上からも見られるように、[swagger-viewer](https://chrome.google.com/webstore/detail/swagger-viewer/nfmkaonpdmaglhjjlggfhlndofdldfag) を利用
 * ERD
   * [A5:SQL Mk-2](https://a5m2.mmatsubara.com/index.html) の `.a5er` 拡張子のファイルをコミット
   * ini形式のテキストファイルであるため、差分がわかりやすい

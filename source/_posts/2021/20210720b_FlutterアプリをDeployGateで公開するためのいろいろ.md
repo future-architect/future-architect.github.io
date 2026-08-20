@@ -98,7 +98,7 @@ Android Studio上で実行すると、Androidエミュレータ上にインス�
 
 ## DeployGate用のSDKの追加
 
-DeployGate用のSDKを入れると、ログやら何やらが見れるようになるとのことですので入れてみます。
+DeployGate用のSDKを入れると、ログやら何やらが見られるようになるとのことですので入れてみます。
 
 ドキュメントは[こちら](https://docs.deploygate.com/docs/android-sdk)ですが、Flutterようになっていないので少し追加で解説します。依存を追加するbuild.gradleはandroid/app以下にあります。
 

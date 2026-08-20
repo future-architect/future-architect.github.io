@@ -364,7 +364,7 @@ healthcare_data=# SELECT to_regtypemod('numeric(5,2)');
 
 ご覧の通り、typemodの表現には内部表現が用いられているので、よほどの職人でなければ目で見てどの型修飾子が付与されているのかの判定は難しいです。
 
-この内部表現は、以下のようにformat_type関数を適応することで、値を内部表現から戻すことができます。
+この内部表現は、以下のようにformat_type関数を適用することで、値を内部表現から戻すことができます。
 
 ```console
 healthcare_data=# SELECT format_type(

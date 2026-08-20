@@ -102,7 +102,7 @@ Export S3の実行には Point-in-Time Recovery の設定が必要なため、�
 出力先のS3を選択したら、「エクスポート」を実行します。
 <img src="/images/2021/20210403/6-2.png" alt="エクスポートの実行" width="1200" height="1371" loading="lazy">
 
-コンソール画面上でExportの進行状況が見れます。
+コンソール画面上でExportの進行状況が見られます。
 データ数にもよりますが、出力は5分程度で完了します。
 <img src="/images/2021/20210403/7.png" alt="出力先" width="1200" height="303" loading="lazy">
 

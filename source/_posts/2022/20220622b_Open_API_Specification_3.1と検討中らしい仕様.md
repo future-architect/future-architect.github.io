@@ -97,7 +97,7 @@ Swaggerから Open API Specificationへの切り替えですが、 2015年にSwa
 ### （1）[Investigate possibility of removing the constraint that paths must start with "/" #2327](https://github.com/OAI/OpenAPI-Specification/issues/2327)
 
 * パスが`/` 始まりである必要があるかですが、 [#2316](https://github.com/OAI/OpenAPI-Specification/issues/2316) を見ると、OPTIONSメソッドの場合は、`*` の指定も許容するようです。[RFC7231 4.7.3](https://datatracker.ietf.org/doc/html/rfc7231#section-4.3.7)
-* https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/OPTIONS#identifying_allowed_request_methods にもSyntaxでかかれれていました。
+* https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/OPTIONS#identifying_allowed_request_methods にもSyntaxで書かれていました。
   * サーバー全体に対して指定するときに用いるようです
 
 ```text
