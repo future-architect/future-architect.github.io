@@ -3,7 +3,7 @@ title: スケーラブルデータベース ～クラウドにおける後悔し
 date: 2020/07/03 10:34:11
 postid: ''
 tags:
-  - KVS
+  - NoSQL
   - 技術選定
   - 要件定義
   - Redshift
