@@ -1,0 +1,124 @@
+<%
+/**
+ * 構造化データ (#2462)。ページ種ごとに1つの JSON-LD を出す。
+ *
+ * microdata ではなく JSON-LD で書く。microdata は DOM の入れ子に縛られ、
+ * 全ページ共通の layout.ejs に itemscope を置いた結果、タグ・カテゴリ・
+ * 著者一覧まで TechArticle を名乗り（トップは datePublished を25個持っていた）、
+ * 記事をその中に入れるために schema.org に存在しない blogPost を使っていた。
+ * JSON-LD なら「このページは記事1本」「このページは一覧」を独立して宣言できる。
+ * パンくずの BreadcrumbList だけは microdata のまま残す（_partial/breadcrumb.ejs）。
+ *
+ * dateModified は出さない。フロントマターに updated を持つ記事は0件で、
+ * Hexo の既定値はファイルの mtime になり CI のチェックアウトで動く（scripts/feed.js と同じ判断）。
+ */
+const SITE = String(config.url).replace(/\/$/, '');
+
+// タグ名・著者名・連載名は日本語をそのまま URL に含む。encodeURI は / と : を保つ
+const abs = (p) => {
+  const clean = String(p || '')
+    .replace(/^\//, '')
+    .replace(/index\.html$/, '');
+  return encodeURI(`${SITE}/${clean}`);
+};
+
+const BLOG = { '@type': 'Blog', '@id': `${SITE}/#blog` };
+
+// ロゴはラスタ画像を渡す。Google の Article ガイドラインが寸法を求めるため、
+// サイトのシンボルである logo.svg ではなく apple-touch-icon.png を使う
+const PUBLISHER = {
+  '@type': 'Organization',
+  name: 'フューチャー株式会社',
+  url: 'https://www.future.co.jp/',
+  logo: {
+    '@type': 'ImageObject',
+    url: abs('apple-touch-icon.png'),
+    width: 152,
+    height: 152,
+  },
+};
+
+const personOf = (name) => {
+  const person = { '@type': 'Person', name: name, url: abs(`authors/${name}/`) };
+  const p = get_profile_data(name);
+  if (p) {
+    if (p.about) {
+      person.description = String(p.about)
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+    const sameAs = [];
+    if (p.twitter_id) sameAs.push(`https://x.com/${p.twitter_id}`);
+    if (p.github_id) sameAs.push(`https://github.com/${p.github_id}`);
+    if (sameAs.length) person.sameAs = sameAs;
+  }
+  return person;
+};
+
+const namesOf = (collection) =>
+  collection && collection.toArray ? collection.toArray().map((e) => e.name) : [];
+
+const COLLECTION_PATHS = [
+  'tags/index.html',
+  'categories/index.html',
+  'authors/index.html',
+  'series/index.html',
+];
+
+let jsonld;
+if (is_post()) {
+  // 画像は OGP と同じものを出す。同じページの「代表画像」が2箇所で割れないようにする
+  const image = Array.isArray(ogpImage) ? ogpImage[0] : ogpImage;
+  const keywords = namesOf(page.tags);
+  const section = namesOf(page.categories)[0];
+  jsonld = {
+    '@type': 'TechArticle',
+    headline: page.title,
+    url: abs(page.path),
+    mainEntityOfPage: { '@type': 'WebPage', '@id': abs(page.path) },
+    // date_xml は UTC に寄せるため、JST 0:00 公開の記事が前日になる。
+    // 表示している日付と一致させたいので、オフセット付きで出す
+    datePublished: page.date.format(),
+    author: personOf(page.author),
+    publisher: PUBLISHER,
+    isPartOf: BLOG,
+    inLanguage: 'ja',
+  };
+  if (page.lede) jsonld.description = page.lede;
+  if (image) jsonld.image = abs(image);
+  if (keywords.length) jsonld.keywords = keywords;
+  if (section) jsonld.articleSection = section;
+} else if (is_home()) {
+  jsonld = {
+    ...BLOG,
+    name: config.title,
+    description: config.description,
+    url: abs(''),
+    inLanguage: 'ja',
+    publisher: PUBLISHER,
+  };
+} else if (page.author && String(path).indexOf('authors/') === 0) {
+  jsonld = {
+    '@type': 'ProfilePage',
+    name: pageName,
+    url: abs(page.path),
+    isPartOf: BLOG,
+    inLanguage: 'ja',
+    mainEntity: personOf(page.author),
+  };
+} else {
+  const isCollection =
+    is_category() || is_tag() || is_archive() || COLLECTION_PATHS.includes(page.path);
+  jsonld = {
+    '@type': isCollection ? 'CollectionPage' : 'WebPage',
+    name: pageName,
+    url: abs(page.path),
+    isPartOf: BLOG,
+    inLanguage: 'ja',
+  };
+  if (pageDescription) jsonld.description = pageDescription;
+}
+%>
+<%# JSON の中の < を退避する。本文が </script> を含んでもスクリプトが閉じない %>
+<script type="application/ld+json"><%- JSON.stringify({ '@context': 'https://schema.org', ...jsonld }).replace(/</g, '\\u003c') %></script>
