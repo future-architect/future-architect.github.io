@@ -353,7 +353,12 @@ bootstrap-subset → metronic → theme-styles.styl の順で `/css/site.css` �
 - **外部リンクの明示（#2346）**: サイトの導線（フッター・パネル・特設等）で、リンクテキストから
   外部と読めないものだけ「（外部サイト）」をテキストで付ける。ブランド名を名乗るリンク
   （connpass 等）と記事本文には付けない。同一サービス行きの一覧は枠の見出しが一括で名乗る
-  （「アドベントカレンダー（Qiita）」）。漏れは `/doctor/` が検出する（許容リストは `scripts/doctor.js`）
+  （「アドベントカレンダー（Qiita）」）。
+  - 検出は2箇所に分かれる（#2652）。**特設ページの Markdown（`source/specials/`）は textlint の
+    `no-unmarked-external-link`**（`--fix` でリンクテキストの末尾に足せる）、
+    **テーマの EJS と hiring パネルは `/doctor/`**。textlint は EJS を読めないので走査は分けているが、
+    許容リストは `.textlint/textlint-rule-no-unmarked-external-link/exempt.js` を両者で共有する
+  - `example.com` 等（RFC 2606）は記法ガイドの見本なので対象外
 - **特設・固定ページはルート直下に置かず `/specials/` 配下に切る**（#2344）。
   GitHub Pages のプロジェクトサイトが `future-architect.github.io/<リポジトリ名>/` に生えるため、
   ルート直下のパスは将来のリポジトリ名と衝突しうる（/arch-guidelines/ 等は既に別リポジトリが占有）。

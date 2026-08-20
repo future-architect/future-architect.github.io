@@ -10,7 +10,7 @@ mathjax: true
 
 本文の記法だけ気にしてもらえれば大丈夫です。**タイトル・タグ・カテゴリなどのフロントマターは、公開時にこちらで整えます。**
 
-見本は、上に書き方、下に実際の表示結果を並べています。規則の詳細（カテゴリの選び方、連載の扱い、文章のルール）は、リポジトリの [CLAUDE.md](https://github.com/future-architect/future-architect.github.io/blob/main/CLAUDE.md) を正とします。
+見本は、上に書き方、下に実際の表示結果を並べています。規則の詳細（カテゴリの選び方、連載の扱い、文章のルール）は、リポジトリの [CLAUDE.md（外部サイト）](https://github.com/future-architect/future-architect.github.io/blob/main/CLAUDE.md) を正とします。
 
 ## 基本の記法
 
@@ -318,7 +318,9 @@ fmt.Println("コードブロックも書けます")
 ![代替テキスト](/images/2026/20260114a/thumbnail.jpg)
 ```
 
+<!-- textlint-disable no-markdown-image -->
 ![](/images/2026/20260114a/thumbnail.jpg)
+<!-- textlint-enable no-markdown-image -->
 
 公開時にこちらで `<img>` へ変換し、**実寸の `width` と `height`** を付けます。読み込み中に本文が動くのを防ぐためで、書き手が意識する必要はありません。
 
@@ -335,8 +337,10 @@ fmt.Println("コードブロックも書けます")
 *図1: キャプションの文*
 ```
 
+<!-- textlint-disable no-markdown-image -->
 ![](/images/2026/20260114a/thumbnail.jpg)
 *図1: キャプションの文*
+<!-- textlint-enable no-markdown-image -->
 
 代替テキストとキャプションは役割が違います。代替テキストは画像が見えない人への説明、キャプションは全員に向けた補足なので、同じ文を両方に書く必要はありません。
 
@@ -398,4 +402,4 @@ store_id,item_id,sales_date,sales_quantity,sales_amount
 
 ## 迷ったとき
 
-ここに無い記法や、判断に迷う点は [CLAUDE.md](https://github.com/future-architect/future-architect.github.io/blob/main/CLAUDE.md) を見てください。
+ここに無い記法や、判断に迷う点は [CLAUDE.md（外部サイト）](https://github.com/future-architect/future-architect.github.io/blob/main/CLAUDE.md) を見てください。

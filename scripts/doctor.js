@@ -379,23 +379,15 @@ hexo.extend.helper.register('doctor_ontology', function () {
  * 記事本文は対象外（技術記事の参照は94%が外部で、マークは情報にならない）。
  *
  * テーマの ejs と、ラベルをデータで持つ hiring パネルを走査する。
+ * Markdown で書いた特設ページ（source/specials/）は textlint の
+ * no-unmarked-external-link が PR の時点で止めるので、ここでは見ない (#2652)。
  * 判定できない範囲: href が EJS 変数のリンク（現状 corporate_url のみで、
  * テキストが URL そのものなので自明）、scripts が生成する Tech Cast
  * （枠の見出しがポッドキャスト名を名乗る）
  */
-const LINK_TEXT_EXEMPT = [
-  '外部サイト', // 明示済み
-  // ブランド・メディア名を名乗っているもの
-  'connpass',
-  'Youtube',
-  'YouTube',
-  'Qiita',
-  'Feedly',
-  '公式note',
-  'LEAD TO THE FUTURE',
-  // X のフォローボタン。ブランドはアイコンが名乗る (#2036)
-  'フォロー',
-];
+// 許容する語彙は textlint ルールと共有する。走査は言語ごとに分かれていても
+// 「何を外部と名乗らせるか」は1つでなければ食い違う (#2652)
+const LINK_TEXT_EXEMPT = require('../.textlint/textlint-rule-no-unmarked-external-link/exempt.js');
 const LINK_EXEMPT_FILES = [
   // 枠の見出し「アドベントカレンダー（Qiita）」が一括で外部を名乗る
   '_widget/advent-calendar.ejs',
