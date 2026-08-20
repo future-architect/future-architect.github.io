@@ -2268,7 +2268,10 @@ a.series-nav-item:hover .series-nav-item-title {
 .post-list-icon {
   flex-shrink: 0;
 }
+/* ::before は隠れているランキングでサムネの代わりに置く空の箱。
+   content が無いと生成されないので、ここでは寸法だけ相乗りさせる */
 .post-list-icon img,
+.post-list-icon::before,
 .post-list-icon-empty {
   display: block;
   width: 48px;
@@ -2777,10 +2780,45 @@ input[name="tab_item"] {
   padding: 18px 22px;
 }
 
-/*選択されているタブのコンテンツのみを表示*/
-#monthly:checked ~ #popular_monthly,
-#yearly:checked ~ #popular_yearly {
+/* トレンドと年間人気を同じマスに重ね、枠の高さを常に両者の最大にする (#2683)。
+   以前はタブを切り替えるたびに枠の高さが変わり、下の「連載から探す」以降が
+   上下に動いていた。差は件数（どちらも10本）ではなくタイトルの折り返し数で、
+   幅が狭いほど開く（実測で 1280px 幅 12px・375px 幅 34px）。
+
+   隠す側を display: none にすると箱ごと消えて高さを取れないので、
+   grid の同じマスに重ねて visibility で隠す。visibility なら
+   display: none と同じく読み上げ・タブ移動からも外れる */
+.tab-stack {
+  display: grid;
+  clear: both;
+}
+.tab-stack > .tab_content {
+  grid-area: 1 / 1;
   display: block;
+  visibility: hidden;
+}
+#monthly:checked ~ .tab-stack > #popular_monthly,
+#yearly:checked ~ .tab-stack > #popular_yearly {
+  visibility: visible;
+}
+/* 隠れている側は「畳んだ状態」の高さで数える。開いたまま切り替えると、
+   開いた分の空白がもう片方の下に残ってしまう */
+#monthly:checked ~ .tab-stack > #popular_yearly .ranking-more > :not(summary),
+#yearly:checked ~ .tab-stack > #popular_monthly .ranking-more > :not(summary) {
+  display: none;
+}
+/* 隠れている側のサムネは読み込ませない。見えないのに初期表示で8枚・321KB
+   増える（残り2枚は両方のランキングに載っている記事で、どちらでも読む）。
+   ただし行の高さはサムネが決めるので、img を落とすだけだと折り返し数が
+   変わって高さが合わなくなる。同じ寸法の空の箱に差し替える。
+   寸法は .post-list-icon img と同じ1箇所で持つ（a 側の padding も効いたまま） */
+#monthly:checked ~ .tab-stack > #popular_yearly .post-list-icon img,
+#yearly:checked ~ .tab-stack > #popular_monthly .post-list-icon img {
+  display: none;
+}
+#monthly:checked ~ .tab-stack > #popular_yearly .post-list-icon::before,
+#yearly:checked ~ .tab-stack > #popular_monthly .post-list-icon::before {
+  content: '';
 }
 
 .github-edit-icon {
