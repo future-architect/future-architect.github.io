@@ -42,6 +42,8 @@
   line-height: 1.42857143;
   text-decoration: none;
   background-color: #fff;
+  transition: background-color hover-speed ease, color hover-speed ease,
+    border-color hover-speed ease;
 }
 .pagination > a:hover,
 .pagination > a:focus {
@@ -218,7 +220,7 @@ h4 {
   font-size: 1em;
   /* 既定の三角は位置を制御できないので消し、回転させられる疑似要素に置き換える */
   list-style: none;
-  transition: background-color 0.15s ease;
+  transition: background-color hover-speed ease;
 }
 .article-entry details > summary::-webkit-details-marker {
   display: none;
@@ -381,10 +383,24 @@ blockquote p {
   margin-right: 0.3em;
 }
 .thumb-link img {
-  transition-duration: 0.3s;
   border-radius: radius-small;
   display: block;
   max-width: 100%;
+}
+/* キーボードのフォーカスの輪郭 (#2686)。metronic に
+   `a, a:focus, a:hover, a:active { outline: 0 }` があってブラウザ既定の輪郭が
+   全リンクで消えており、hover の反応がキーボードの唯一の目印を兼ねていた。
+   そのため多くのルールが `:hover, :focus` を一緒に書く形になっていた。
+   反応（hover）と所在（focus）は別の役目なので、輪郭をここで1箇所持つ。
+   :focus ではなく :focus-visible なので、マウスで押したときには出ない。
+   色は選択・タブと同じインタラクションのネイビー。
+   タブ（.tab_item）は帯の中なので内側にずらす例外を自分で持つ */
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--brand-navy);
+  outline-offset: 2px;
 }
 /* 一覧カードのサムネは OGP 標準比（1200:630）の枠に固定し、中央で切り抜いて
    大きさを揃える (#2305)。既存サムネの49%（比率1.75以上）はほぼ無加工で収まる。
@@ -399,11 +415,11 @@ blockquote p {
   height: 100%;
   object-fit: cover;
 }
-/* thumb-link 自体がリンクなので :focus はここで受かる（入れ子のアンカーは無い） */
-.thumb-link:hover img,
-.thumb-link:focus img {
-  opacity: 0.6;
-}
+/* サムネの hover で opacity を落としていたのをやめた (#2686)。
+   .thumb-link は8箇所すべて .article-card の中にあり、カードが持ち上がる
+   反応を既に返している。画像のリンク先もタイトルと同じ記事なので、
+   別の反応を返す理由が無く、カーソルの位置で反応が変わる原因になっていた。
+   キーボードの所在は :focus-visible の輪郭が担う */
 .social-area {
 	padding: 1.5em 0;
 }
@@ -530,7 +546,7 @@ body.page-header-fixed .header {
   padding: 24px 20px 0px 20px;
   margin: 0 0 32px 0;
   border-radius: card-radius;
-  transition: box-shadow 0.3s, transform 0.3s;
+  transition: box-shadow hover-speed ease, transform hover-speed ease;
 }
 /* カードのタイトルは本文色（#424242・下線なし）で統一しているため、静止状態では
    押せるかどうかが影だけでは伝わらない。ホバーで持ち上げて反応を返す (#2449)。
@@ -540,6 +556,14 @@ body.page-header-fixed .header {
 .article-card:hover {
   box-shadow: card-shadow-raised;
   transform: translateY(-2px);
+}
+/* 動きを減らす設定なら位置は動かさない (#2686)。影は残るので反応は伝わる。
+   色や面の送り（0.1秒）は動きではないので止めない */
+@media (prefers-reduced-motion: reduce) {
+  .article-card:hover,
+  .link-preview-card:hover {
+    transform: none;
+  }
 }
 /* We're hiring のカード。以前は画像がカード幅の半分を占め、さらに
    .article-card の padding と Bootstrap の p-3 が二重にかかっていて、
@@ -636,9 +660,16 @@ body.page-header-fixed .header {
   font-size: 1.2em;
   font-weight: bold;
 }
-.panel-title:hover {
+/* カードの中のタイトルなので、ここでは反応を返さない (#2686)。
+   .panel-title は7箇所すべて .article-card の中にあり、カードが持ち上がる。
+   以前は下線も出していて、1回のカーソル移動で2つの反応が起きていた。
+   ルールを消すのではなく打ち消しで残すのは、消すと metronic の
+   `a:hover { color: var(--a-color); text-decoration: underline }`（0,1,1）が
+   .panel-title（0,1,0）に勝って、タイトルが青くなって下線が出るため */
+.panel-title:hover,
+.panel-title:focus {
   color: ink-strong;
-  text-decoration: underline;
+  text-decoration: none;
 }
 .panel-meta {
   color: ink-mute;
@@ -1135,10 +1166,14 @@ code {
 .archive-post-item a {
   color: ink-strong;
 }
+/* 新着記事もカード（.article-card）の中なので、ここでは反応を返さない (#2686)。
+   以前は文字を ink-mute に薄くしていた。他の反応は全て「一段強くなる」方向で、
+   ここだけ弱くなる逆行だった。カードが持ち上がるので合図は足りている。
+   text-decoration を残すのは metronic の a:hover の下線を止めるため */
 .archive-post-item a:hover,
 .archive-post-item a:active,
 .archive-post-item a:focus {
-  color: ink-mute;
+  color: ink-strong;
   text-decoration: none;
 }
 .archive-post-title {
@@ -1299,6 +1334,7 @@ code {
   padding: 6px 4px;
   display: block;
   text-decoration: none;
+  transition: background-color hover-speed ease;
 }
 .nav a:hover, .nav a:focus {
   background-color: surface-mute;
@@ -1314,6 +1350,7 @@ code {
   padding: 6px 10px;
   display: block;
   text-decoration: none;
+  transition: background-color hover-speed ease;
 }
 .nav-flex a:hover,
 .nav-flex a:focus {
@@ -1381,6 +1418,9 @@ ul.tag-list {
   font-size: 12px;
   color: ink-mute;
   line-height: 1.4;
+  /* ネイビーへの反転を一瞬で切り替えると硬く見えるので、短く送る (#2686) */
+  transition: background-color hover-speed ease, border-color hover-speed ease,
+    color hover-speed ease;
 }
 .tag-list-link:hover,
 .tag-list-link:focus {
@@ -1567,6 +1607,7 @@ ul.tag-list {
   text-decoration: none;
   line-height: 1.6;
   border-radius: radius-small;
+  transition: background-color hover-speed ease;
 }
 .toc-section a:hover, .toc-section a:focus {
   background-color: surface-mute;
@@ -1685,6 +1726,7 @@ ul.tag-list {
   border: 1px solid rule-weak;
   border-radius: card-radius;
   text-align: center;
+  transition: background-color hover-speed ease, border-color hover-speed ease;
 }
 .archive-list-item a {
   color: ink-strong;
@@ -2127,10 +2169,15 @@ ul.tag-list {
   color: ink-strong;
 }
 /* 背景色が変わることで押せると分かるので、文字色は本文と同じ黒のままにする。
-   a:hover のリンク色がここまで効くと、記事タイトルが青くなって落ち着かない */
+   a:hover のリンク色がここまで効くと、記事タイトルが青くなって落ち着かない。
+   面は surface-mute。行に敷く面は目次・サイドバー・年月カード・ランキングと
+   同じ値にする（以前はここだけ surface-tint で一段薄かった #2686） */
+a.series-nav-item {
+  transition: background-color hover-speed ease;
+}
 a.series-nav-item:hover,
 a.series-nav-item:hover .series-nav-item-title {
-  background: surface-tint;
+  background: surface-mute;
   color: ink-strong;
   text-decoration: none;
 }
@@ -2217,6 +2264,36 @@ a.series-nav-item:hover .series-nav-item-title {
   list-style: none;
   padding: 0.5em 0;
   border-bottom: 1px solid rule-weak;
+}
+/* ランキング・関連記事・被参照記事の行の反応 (#2686)。3つとも同じ部品
+   （postListItem）で組んだ「サムネ＋タイトル＋メタ」の行なので、反応も揃える。
+   1行が複数のリンクでできているので、リンク単位ではなく行（li）に面を敷く。
+
+   以前はランキングだけ .nav a:hover が文字とサムネに別々に付き、順位の丸は
+   白く残っていた。関連記事・被参照記事は .nav ではないので面が付かず、
+   下線だけだった。同じ見た目の3つで反応が2種類あった */
+.related-posts-item,
+.reference-posts-item,
+.featured-posts-item {
+  transition: background-color hover-speed ease;
+}
+.related-posts-item:hover,
+.reference-posts-item:hover,
+.featured-posts-item:hover {
+  background-color: surface-mute;
+}
+/* 反応は行の面だけにする。中のリンクの面（.nav a:hover はサイドバーの
+   「1リンク＝1行」のためのもの）と、metronic の a:hover の下線を止める。
+   .nav a:hover と同じ詳細度なので、後に置いて勝たせる */
+.related-posts-item a:hover,
+.related-posts-item a:focus,
+.reference-posts-item a:hover,
+.reference-posts-item a:focus,
+.featured-posts-item a:hover,
+.featured-posts-item a:focus {
+  background-color: transparent;
+  color: ink-strong;
+  text-decoration: none;
 }
 /* metronic に `.related-post-link a { font-size: 1.2em }` があり、関連記事の
    タイトルだけ大きくなっていた。参照記事側には同じ指定が無い。
@@ -2585,6 +2662,7 @@ a.series-nav-item:hover .series-nav-item-title {
   font-size: 1.15em;
   color: ink-strong;
   text-decoration: none;
+  transition: background-color hover-speed ease, border-color hover-speed ease;
 }
 /* メダルの円の中に受賞回数が入る（award-medal.ejs）。
    数字が読める大きさが必要なので、他のアイコンより一段大きくする。
@@ -2628,7 +2706,12 @@ a.series-nav-item:hover .series-nav-item-title {
    メダルはAAを満たす（灰 4.95 / 銅 4.53 / 金 5.21） */
 a.article-award {
   text-decoration: none;
+  transition: background-color hover-speed ease, border-color hover-speed ease;
 }
+/* チップの反応は地を一段動かす。ネイビーに反転できるのは、中身が色で情報を
+   持たないものだけ（#2686）。タグチップは文字だけなので反転するが、ここは
+   メダルの色が受賞回数を表しているのでグレーで止める。ネイビー地に載せると
+   灰 2.64 / 銅 3.11 / 金 2.70 でどれも AA に届かない（#eee なら 5.34 / 4.53 / 5.21） */
 a.article-award:hover,
 a.article-award:focus {
   border-color: rule-strong;
@@ -2658,6 +2741,7 @@ a.article-award:focus {
   color: #7a5f16;
   stroke-width: 2.6;
 }
+/* 地を一段動かすだけで止める理由は a.article-award と同じ（メダルの色） */
 .award-chip:hover,
 .award-chip:focus {
   border-color: rule-strong;
@@ -2766,7 +2850,8 @@ a.article-award:focus {
   border-radius: card-radius card-radius 0 0;
   /* 影と地色はカード（.tabs）が持つ。ここで面を分けない */
   cursor: pointer;
-  transition: background-color 0.1s ease, border-top-color 0.1s ease, color 0.1s ease;
+  transition: background-color hover-speed ease, border-top-color hover-speed ease,
+    color hover-speed ease;
 }
 .tab_item:hover {
   background-color: surface-mute;
@@ -2871,6 +2956,9 @@ input[name="tab_item"] {
   color: ink-strong;
   background: rgba(255,255,255,0.92);
   border-radius: 0 radius-small radius-small 0;
+  /* hover 側に書くとカーソルを乗せたときだけ送られて、離すと瞬時に戻る。
+     往復を同じ速さにするため基底に置く (#2686) */
+  transition: background-color hover-speed ease, color hover-speed ease;
 }
 .header-search button .svg-icon {
   margin-right: 0;
@@ -2880,7 +2968,6 @@ input[name="tab_item"] {
   color: #fff;
   /* ページャーの選択色と同じブランドネイビーに揃える */
   background: var(--brand-navy);
-  transition: all 0.1s linear;
 }
 /* 展開用の虫眼鏡ラベル。入力欄が常時出ている広い画面では使わない */
 .header-search-open {
@@ -3352,7 +3439,7 @@ note-alert-bg = #ffdbdb
   border: 1px solid rule-base;
   border-radius: card-radius;
   overflow: hidden;
-  transition: box-shadow 0.3s, transform 0.3s;
+  transition: box-shadow hover-speed ease, transform hover-speed ease;
   background-color: #fff;
 }
 
