@@ -103,7 +103,7 @@ fixed4 frag(v2f i) : SV_Target
 
 さて、この Shader を Skybox に適用するとどのように星が見えるかというと、こんな感じです。
 
-<img src="/images/2023/20230901a/image.png" alt="image.png" width="1200" height="602" loading="lazy">
+<img src="/images/2023/20230901a/image.png" alt="image.png" width="1200" height="602">
 
 結構それっぽい気がしますね。
 

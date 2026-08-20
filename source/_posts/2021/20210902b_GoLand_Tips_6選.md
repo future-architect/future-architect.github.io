@@ -39,7 +39,7 @@ https://www.jetbrains.com/ja-jp/go/
 
 `⌘ + B`もしくは`⌘ + Click`で関数や構造体などが宣言されているところへジャンプできます。
 
-<img src="/images/2021/20210902b/gif2.gif" alt="gif2.gif" width="600" height="258" loading="lazy">
+<img src="/images/2021/20210902b/gif2.gif" alt="gif2.gif" width="600" height="258">
 
 ### 元の場所に戻る
 

@@ -12,7 +12,7 @@ thumbnail: /images/2024/20240731a/thumbnail.png
 author: 岸下優介
 lede: "Google Cloud認定資格全冠を目指すべく、Professional Cloud DevOps Engineer 認定資格（PCDE）を受けてきました。無事に合格することができたので、本記事ではざっくりとした所感を書いていきたいと思います。"
 ---
-<img src="/images/2024/20240731a/image.png" alt="" width="537" height="560" loading="lazy">
+<img src="/images/2024/20240731a/image.png" alt="" width="537" height="560">
 
 ## はじめに
 

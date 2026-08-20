@@ -12,7 +12,7 @@ thumbnail: /images/2021/20211110a/thumbnail.png
 author: 武田拓己
 lede: "私が参画した案件で、Auth0に登録されているエンドユーザ向けのアカウントを用いてShopifyにSSOする検証をしたので、今回はその方法をご紹介します。"
 ---
-<img src="/images/2021/20211110a/サムネイル.png" alt="サムネイル.png" width="462" height="288" loading="lazy">
+<img src="/images/2021/20211110a/サムネイル.png" alt="サムネイル.png" width="462" height="288">
 
 ## はじめに
 

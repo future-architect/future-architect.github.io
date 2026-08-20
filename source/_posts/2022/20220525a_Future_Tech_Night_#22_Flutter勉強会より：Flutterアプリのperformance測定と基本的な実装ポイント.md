@@ -26,7 +26,7 @@ lede: "Flutterアプリのperformance測定と基本的な実装ポイントに�
 ## DevToolsについて
 
 [公式ページ](https://docs.flutter.dev/development/tools/devtools/overview)でも紹介されるように、`Widget inspector`, CPU profiler, Memory view, Performance view, Network view, Logging view, Debug機能を持っています。勉強会では、Performance viewと、Memory viewを紹介しました。
-<img src="/images/2022/20220525a/image.png" alt="DevToolsについて" width="1200" height="674" loading="lazy">
+<img src="/images/2022/20220525a/image.png" alt="DevToolsについて" width="1200" height="674">
 
 以前に技術ブログで紹介した[Performance viewの使い方](https://future-architect.github.io/articles/20220317a/)の振り返りにもなりましたが、勉強会では、さらに実装上の注意点をデモを交えてお話しました。
 <img src="/images/2022/20220525a/image_2.png" alt="DevToolsによる性能測定(Performance View)" width="1200" height="676" loading="lazy">

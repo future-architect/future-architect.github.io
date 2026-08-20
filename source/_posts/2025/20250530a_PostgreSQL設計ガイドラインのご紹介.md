@@ -23,7 +23,7 @@ lede: "フューチャー社内の有志メンバーでPostgreSQLDB設計ガイ�
 形になってから数ヶ月寝かせており、ある程度社内の指摘を取り込むことができたのでこのタイミングで告知します。
 
 <a href="https://future-architect.github.io/arch-guidelines/documents/forDB/postgresql_guidelines.html">
-<img src="/images/2025/20250530a/image.png" alt="" width="1200" height="800" loading="lazy">
+<img src="/images/2025/20250530a/image.png" alt="" width="1200" height="800">
 </a>
 
 ## よくあるDB設計規約との差別化ポイント

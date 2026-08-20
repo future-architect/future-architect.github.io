@@ -75,7 +75,7 @@ TBSテレビ様が、従来のオンプレミス中心のインフラからGCP�
 - 先着特典が欲しい場合は、早めの到着が吉。
   - イベント開始30分前の到着では、すでに配布が終了していました。確実に手に入れたい方は、開場時間を目指してみてはいかがでしょうか。
 
-  <img src="/images/2025/20250917a/image.png" alt="image.png" width="390" height="280" loading="lazy">
+  <img src="/images/2025/20250917a/image.png" alt="image.png" width="390" height="280">
 
   <ul>
 

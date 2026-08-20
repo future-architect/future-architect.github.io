@@ -32,7 +32,7 @@ lede: "プロジェクトでJenikisを利用する機会があり、初めてJen
 
 今回のアーキテクチャ図は以下の通りです。
 
-<img src="/images/2023/20230330a/architecture.drawio.png" alt="architecture.drawio.png" width="1200" height="492" loading="lazy">
+<img src="/images/2023/20230330a/architecture.drawio.png" alt="architecture.drawio.png" width="1200" height="492">
 
 まず、JenkinsサーバやJenkinsサーバに付随するリソース（Cloud Load Balancing/Cloud Armorなど）はローカルPCからTerraformを実行して作成していきます。Jenkinsサーバを構築後、諸々Jenkinsの設定を終えたのちはJenkins Consoleからボタンポチポチでterraform planからterraform applyを実行してほかのGoogle Cloudのリソースたちを構築できるようになります。
 

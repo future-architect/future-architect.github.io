@@ -50,7 +50,7 @@ https://redmine.tokyo/issues/1083
 
 プラグインのインストール後に設定画面で以下のようにチェックを入れることで設定できます。
 
-<img src="/images/2021/20211203a/インストール設定画面.png" alt="インストール設定画面.png" width="633" height="288" loading="lazy">
+<img src="/images/2021/20211203a/インストール設定画面.png" alt="インストール設定画面.png" width="633" height="288">
 
 ## 実装のポイント
 

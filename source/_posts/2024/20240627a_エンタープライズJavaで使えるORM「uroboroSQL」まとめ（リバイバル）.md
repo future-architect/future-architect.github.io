@@ -21,7 +21,7 @@ lede: "筆者自身もコミッターとして関わるJavaのDB永続化ライ�
 
 筆者自身もコミッターとして関わるJavaのDB永続化ライブラリ「uroboroSQL」の紹介です。
 
-<img src="/images/2024/20240627a/uroboroSQL.png" alt="" width="1200" height="288" loading="lazy">
+<img src="/images/2024/20240627a/uroboroSQL.png" alt="" width="1200" height="288">
 
 https://github.com/future-architect/uroborosql
 

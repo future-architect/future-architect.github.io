@@ -23,7 +23,7 @@ lede: "今年、社内のR&Dチームにて開発し利用を開始した汎用I
 デバイスの各辺の長さは約4.5cmの立方体で、異なる拡張モジュールを最大8つ内蔵、もしくはGroveコネクタ準拠のセンサーなどを外付けできる形になっています。
 
 こんな感じのサイコロ型のデバイスです。
-<img src="/images/2017/20171207/photo_20171207_02.jpeg" width="800" height="600" loading="lazy">
+<img src="/images/2017/20171207/photo_20171207_02.jpeg" width="800" height="600">
 
 アップすると FutureIoT のロゴが印字されています。
 <img src="/images/2017/20171207/asset_20171207_01.png" width="691" height="600" loading="lazy">

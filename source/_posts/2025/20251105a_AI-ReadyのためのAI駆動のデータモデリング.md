@@ -15,7 +15,7 @@ thumbnail: /images/2025/20251105a/thumbnail.png
 author: 大前七奈
 lede: "多くの企業がAI活用を模索する一方で、「AIに何を食べさせればよいか分からない」「データが散在・サイロ化していて使えない」といった課題に直面しています。フューチャー恒例の秋のブログ週間を機に、今回はAI（特にGEMINI-CLI）を利用して、どのようにAIと協働してデータモデリングできるか、直近のデータモデリングのトレンドを調べました。"
 ---
-<img src="/images/2025/20251105a/hierarchical_data_modeling_conce.png" alt="hierarchical_data_modeling_conce.png" width="1024" height="1024" loading="lazy">
+<img src="/images/2025/20251105a/hierarchical_data_modeling_conce.png" alt="hierarchical_data_modeling_conce.png" width="1024" height="1024">
 
 こんにちは。製造エネルギー事業部の大前七奈です。
 

@@ -28,7 +28,7 @@ lede: "夏の風物詩であるカブトムシやクワガタを識別するミ�
 「Swiftと機械学習あたりを絡めて何かできないかな？」と考えたところ、CreateMLという様々な機械学習モデルをGUIで作ることができると知ったため、カブトムシやクワガタの画像を学習させたモデルを使ったミニアプリを作ることにしました。
 
 今回は、作成したミニアプリをもとに、CreateMLの使い方について紹介したいと思います。
-<img src="/images/2023/20230831a/image.png" alt="" width="718" height="247" loading="lazy">
+<img src="/images/2023/20230831a/image.png" alt="" width="718" height="247">
 
 **作成したカブトムシ・クワガタを分類するミニアプリ**
 <img src="/images/2023/20230831a/beatle_app.gif" alt="" width="177" height="384" loading="lazy">

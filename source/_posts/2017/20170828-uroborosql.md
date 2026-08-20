@@ -51,7 +51,7 @@ uroboroSQLは、特定のWebアプリケーションフレームワークには�
 
 ## uroboroSQL PetClinic
 
-<img src="/images/2017/20170828/photo_20170828_01.jpg" class="img-middle-size" width="1194" height="763" loading="lazy">
+<img src="/images/2017/20170828/photo_20170828_01.jpg" class="img-middle-size" width="1194" height="763">
 
 トップページはSpring PetClinicをご存じの方だったら、ピンと来るかなと思います。
 基本的に仕様はほぼ踏襲しています。

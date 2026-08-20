@@ -11,7 +11,7 @@ thumbnail: /images/2024/20240905a/thumbnail.png
 author: 山本力世
 lede: "2024年初めから米国で発売開始されたApple Vision Proですが、国内でも販売が開始されたので、早速、当社でも手に入れてみました。"
 ---
-<img src="/images/2024/20240905a/Image_20240905_101403.png" alt="" width="1061" height="885" loading="lazy">
+<img src="/images/2024/20240905a/Image_20240905_101403.png" alt="" width="1061" height="885">
 
 *▼SoloニットバンドM/S、Soloニット用バッテリーホルダー、SoloTop、Lens Protectorを組み合わせた例*
 

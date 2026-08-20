@@ -24,7 +24,7 @@ https://auth0.com/blog/partners-with-hashicorp-terraform/
 
 ## Auth0とは
 
-<img src="/images/2021/20210326/image.png" width="534" height="192" loading="lazy">
+<img src="/images/2021/20210326/image.png" width="534" height="192">
 
 Auth0の概要については[Auth0導入編](/articles/20200122/)をご参照ください。他にも技術ブログには[Auth0関連の記事](/tags/Auth0/)が沢山あります。
 

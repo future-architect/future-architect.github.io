@@ -28,7 +28,7 @@ TIG コアテクチームの川口です。本記事は、[CNCF連載](/articles
 
 全体感を掴むため、それぞれの技術とそれらの関連について図示します。
 
-<img src="/images/2023/20230626a/image.png" alt="image.png" width="1166" height="788" loading="lazy">
+<img src="/images/2023/20230626a/image.png" alt="image.png" width="1166" height="788">
 
 #### Cloud Run （Knative）
 

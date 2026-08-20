@@ -22,7 +22,7 @@ Futureには[Cheetah Grid](https://future-architect.github.io/cheetah-grid/#/)�
 
 ↓CheetahGridの各種カラム形式に対応したバージョンが公開中です。
 
-<img src="/images/2021/20211104a/columns.png" alt="columns.png" width="1200" height="334" loading="lazy">
+<img src="/images/2021/20211104a/columns.png" alt="columns.png" width="1200" height="334">
 
 ## 今時のフロントエンドと、巨大コンポーネントのギャップ
 

@@ -96,7 +96,7 @@ D:\xxx\future_one_demo\future_one_demo.sln で ' dotnet restore ' を実行し�
 以下のように`Client/Server/Share`と役割が容易に分かるようにプロジェクトが構成されています。
 フロントエンドとバックエンドで開発部署が分かれているの場合などに好ましい構成ですね。
 
-<img src="/images/2022/20220412a/プロジェクト構成.png" alt="プロジェクト構成.png" width="302" height="760" loading="lazy">
+<img src="/images/2022/20220412a/プロジェクト構成.png" alt="プロジェクト構成.png" width="302" height="760">
 
 `Client`フォルダはフロントエンドのプロジェクトです。拡張子が`.razor`のファイルがありますが、これはRazorコンポーネントと呼ばれており、コンポーネントを組み合わせてWebページを作成するイメージとなります。[^1]
 

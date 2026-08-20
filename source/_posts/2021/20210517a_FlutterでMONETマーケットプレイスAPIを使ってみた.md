@@ -23,7 +23,7 @@ MONETマーケットプレイスAPIを使ってみた連載の第1弾では[MONE
 
 ## MONETマーケットプレイスとは
 
-<img src="/images/2021/20210517a/top_page_20210316.png" alt="MONETマーケットプレイストップページ" width="1200" height="554" loading="lazy">
+<img src="/images/2021/20210517a/top_page_20210316.png" alt="MONETマーケットプレイストップページ" width="1200" height="554">
 
 MONETマーケットプレイスAPIを使ってみた連載の[第1弾](/articles/20210404/)でも触れていますが、ここでもう一度MONETマーケットプレイスのおさらいをします。
 

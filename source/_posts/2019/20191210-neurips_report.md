@@ -25,7 +25,7 @@ NeurIPS(Conference on Neural Information Processing Systems)は、機械学習�
 
 それでも参加者が多く、入場の際には長蛇の列ができており、近年の機械学習分野への熱の凄さを体感しました。
 
-<img src="/images/2019/20191210/registration.jpg" width="1000" height="562" loading="lazy">
+<img src="/images/2019/20191210/registration.jpg" width="1000" height="562">
 
 この会場に入るまでにも長い列があり、ここからこのフロアを一周して、やっと受付です(^^;)
 

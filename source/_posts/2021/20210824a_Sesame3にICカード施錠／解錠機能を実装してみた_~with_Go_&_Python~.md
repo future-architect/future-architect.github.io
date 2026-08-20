@@ -14,7 +14,7 @@ author: 宮永崇史
 lede: "夏の自由研究ブログ連載2021の第2本目の投稿として、Sesame3にFelicaによる施錠解錠を実装しました。Sesame3はCANDY HOUSE JAPANが開発、販売しているスマートロックです。Sesame3本体に加えてwifiモジュールを購入すると、外出先から鍵の施錠/解錠を行うことができます。"
 ---
 
-<img src="/images/2021/20210824a/サムネ.png" alt="" width="800" height="450" loading="lazy">
+<img src="/images/2021/20210824a/サムネ.png" alt="" width="800" height="450">
 
 Photo by <a href="https://unsplash.com/@davidclode?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">David Clode</a> on <a href="https://unsplash.com/s/photos/python-programming?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>. The Gopher character is based on the Go mascot designed by [Renee French](http://reneefrench.blogspot.com/).
 

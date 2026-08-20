@@ -11,7 +11,7 @@ thumbnail: /images/2024/20240117a/thumbnail.png
 author: 岸下優介
 lede: "Developer力を試すべくProfessional Developer認定資格を受験し、無事に合格を果たすことができました。"
 ---
-<img src="/images/2024/20240117a/Professional_Level_Google_Meets_Background.png" alt="" width="1200" height="682" loading="lazy">
+<img src="/images/2024/20240117a/Professional_Level_Google_Meets_Background.png" alt="" width="1200" height="682">
 
 ## はじめに
 

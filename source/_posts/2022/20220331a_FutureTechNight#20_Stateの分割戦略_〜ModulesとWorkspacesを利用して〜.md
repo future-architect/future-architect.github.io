@@ -72,7 +72,7 @@ Stateの管理分掌は…
 当日いただいた質問の中で改めて回答ができるものについて、こちらで触れます。
 > modulesの例だとLBを2回書かないといけない（service_a, service_b両方分）のが少し手間だなあと思ったのですが、AWSリソース単位ではmoduleを作成しない理由をもう少し詳しくお伺いしたいです
 
-<img src="/images/2022/20220331a/2022_0217_Future_Tech_Night_20.png" alt="2022_0217_Future_Tech_Night_#20" width="960" height="540" loading="lazy">
+<img src="/images/2022/20220331a/2022_0217_Future_Tech_Night_20.png" alt="2022_0217_Future_Tech_Night_#20" width="960" height="540">
 
 (登壇スライドより引用)
 

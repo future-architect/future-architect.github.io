@@ -49,7 +49,7 @@ Goコードを生成可能な以下のツールを対象にします。今どき
 
 構成ですが、クライアントを `curl` で、JWTトークンをGo製のCLIツールで作成し、OAuth 2.0でいう認可サーバを無くした状態で検証しています（※本来は、公開鍵を `/oauth2/jwks` や `jwks_uri` で指定されたURLから取得できるようにすべきですが、ハードコードで省略しています）。
 
-<img src="/images/2024/20240829a/openapi.drawio_(2).png" alt="openapi.drawio_(2).png" width="1200" height="719" loading="lazy">
+<img src="/images/2024/20240829a/openapi.drawio_(2).png" alt="openapi.drawio_(2).png" width="1200" height="719">
 
 ## 利用するJWTトークンについて
 

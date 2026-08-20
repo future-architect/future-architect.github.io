@@ -14,7 +14,7 @@ Startup Geeks #1開催報告
 先月(2月8日月曜日)に弊社で開催した[Startup Geeks #1](http://startupgeeks.connpass.com/event/24126/)の開催報告です。
 <!-- more -->
 
-<img src="/images/2016/20160323/thumbnail_20160323.png" class="img-small-size" width="300" height="305" loading="lazy">
+<img src="/images/2016/20160323/thumbnail_20160323.png" class="img-small-size" width="300" height="305">
 
 当日は、合計80名ほどの方に参加頂き、弊社会議室で以下のタイムラインで開催しました。
 

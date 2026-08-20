@@ -221,7 +221,7 @@ if __name__ == "__main__":
 このスクリプトに関するPRを作成し、スクリプトを実行したところ、
 下記のようにPRのコード差分に対してレビューコメントが記載されることが確認できました。
 
-<img src="/images/2025/20250725a/image.png" alt="image.png" width="833" height="424" loading="lazy">
+<img src="/images/2025/20250725a/image.png" alt="image.png" width="833" height="424">
 
 ## おわりに
 

@@ -43,7 +43,7 @@ props down, event upの理解のためにMVVMについて簡単に触れてお�
 
 下の図はVue.jsの公式サイトから拝借しました。
 図で見ると何となく分かった感じがしますが、何となくの理解ではなく確実に理解しましょう。
-<img src="/images/2020/20200401/photo_20200401_01.png" width="1600" height="850" loading="lazy">
+<img src="/images/2020/20200401/photo_20200401_01.png" width="1600" height="850">
 
 [Vue.js 公式サイト(https://012-jp.vuejs.org/guide/)](https://012-jp.vuejs.org/guide/)より…
 

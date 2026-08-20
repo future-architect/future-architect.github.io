@@ -39,7 +39,7 @@ Spring Nativeでは、Spring Bootアプリケーションのネイティブイ�
 
 ### AOTコンパイル方式(上)とインタプリタ+JITコンパイル方式(下)の比較
 
-<img src="/images/2021/20210909a/コンパイルとインタプリタ.png" alt="コンパイルとインタプリタ.png" width="1200" height="354" loading="lazy">
+<img src="/images/2021/20210909a/コンパイルとインタプリタ.png" alt="コンパイルとインタプリタ.png" width="1200" height="354">
 
 ## GraalVMとは?
 

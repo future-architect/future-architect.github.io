@@ -24,7 +24,7 @@ golangだとGORMがデファクトスタンダードの位置を勝ち取りつ�
 
 ## entとは
 
-<img src="/images/2021/20210728a/ent_doc_top.png" alt="entドキュメントトップページ" width="1200" height="583" loading="lazy">
+<img src="/images/2021/20210728a/ent_doc_top.png" alt="entドキュメントトップページ" width="1200" height="583">
 
 公式から引用してくると以下の通りとのこと。
 

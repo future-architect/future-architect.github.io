@@ -13,7 +13,7 @@ thumbnail: /images/2026/20260501a/thumbnail.jpg
 author: 福島雅都
 lede: "Claude Design、最近話題になっていますね。"
 ---
-<img src="/images/2026/20260501a/imagetets.jpg" alt="imagetets.jpg" width="1200" height="648" loading="lazy">
+<img src="/images/2026/20260501a/imagetets.jpg" alt="imagetets.jpg" width="1200" height="648">
 
 ## はじめに
 

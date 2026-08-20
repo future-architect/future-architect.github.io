@@ -29,7 +29,7 @@ lede: "「オンコール通知も全自動で! AWS + Datadog + PagerDuty で作
 
 ### 監視基盤要件と設計
 
-<img src="/images/2021/20210608a/image.png" alt="運用監視基盤要件" width="1200" height="402" loading="lazy">
+<img src="/images/2021/20210608a/image.png" alt="運用監視基盤要件" width="1200" height="402">
 
 <img src="/images/2021/20210608a/image_2.png" alt="Why Datadog" width="1200" height="565" loading="lazy">
 

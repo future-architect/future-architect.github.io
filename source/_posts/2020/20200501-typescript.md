@@ -53,7 +53,7 @@ Reduxを使ったアプリケーションの心臓部のReducerとstoreです。
 
 依存関係を図示するとこんな感じでしょう。
 
-<img src="/images/2020/20200501/1.png" width="1544" height="338" loading="lazy">
+<img src="/images/2020/20200501/1.png" width="1544" height="338">
 
 これは処理の呼び出しの依存ですが、やっかいなのはaction creatorを実装するときのデータはreducerに流れる（Reduxがやってくれる）ので、実装するときの脳みそとしてはこちらの依存も解決する必要がありますが、あくまでもコードの依存だけ取り上げています。
 

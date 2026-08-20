@@ -101,7 +101,7 @@ export function Child() {
 
 どこがダメでしょうか？ 実行してみると、`createContext()`の呼出はダメよ、とエラーになっています。このファイルに"use client"を足してもダメです。
 
-<img src="/images/2023/20231214a/image.png" alt="image.png" width="1159" height="688" loading="lazy">
+<img src="/images/2023/20231214a/image.png" alt="image.png" width="1159" height="688">
 
 この`createContext()`を含むコードを全部クライアントコンポーネントに追い出せばOKです。次のステップでこれを直していきます。
 

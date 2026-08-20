@@ -51,7 +51,7 @@ go-swaggerがWAF(Webアプリケーションフレームワーク)というの�
 
 TypeScriptのフロントエンド側の生成は[openapi-generator](https://openapi-generator.tech/docs/generators/)を当社では採用することが多いです。あくまでサーバサイドの生成にgo-swaggerを用いています。go-swaggerもクライアントコードは生成でき、こちらはあるWeb APIロジック中で、別のWeb APIを呼び出す時に利用したりもします（下図のイメージ）
 
-<img src="/images/2020/20200630/photo_20200630_01.png" width="771" height="450" loading="lazy">
+<img src="/images/2020/20200630/photo_20200630_01.png" width="771" height="450">
 
 The Gopher character is based on the Go mascot designed by [Renée French](http://reneefrench.blogspot.com/).
 

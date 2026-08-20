@@ -97,7 +97,7 @@ Googleが公表している[GoogleTasksのREST Resourceの形式](https://develo
 
 構成図にするとこんなイメージです。
 
-<img src="/images/2024/20240426b/構成図.png" alt="" width="842" height="552" loading="lazy">
+<img src="/images/2024/20240426b/構成図.png" alt="" width="842" height="552">
 
 ### View
 

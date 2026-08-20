@@ -112,7 +112,7 @@ class DetailScreen extends StatelessWidget {
 
 こちらができあがりです。Android Studioで作った環境でウェブで表示してみたものになります。
 
-<img src="/images/2021/20210512a/スクリーンショット_2021-05-11_8.49.21.png" alt="Routerのデモをウェブ表示" width="1200" height="1659"  loading="lazy">
+<img src="/images/2021/20210512a/スクリーンショット_2021-05-11_8.49.21.png" alt="Routerのデモをウェブ表示" width="1200" height="1659">
 
 なお、URLの一部がエンティティのIDとしてパスパラメータとして使いたい場合は、RouteInformationParserを継承したクラスを作ってアプリに渡す必要があります。上記のmediumのページの中でRouteInformationParserで検索して見てみれば書き方がわかりますが、面倒です。ここはそのうち改善されるのでは、ということを期待しています。
 

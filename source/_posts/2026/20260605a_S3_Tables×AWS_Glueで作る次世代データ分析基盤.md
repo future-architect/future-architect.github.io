@@ -27,7 +27,7 @@ lede: "モダンなデータ分析基盤のベストプラクティスについ�
 
 本来、情報系システムは「新たな分析軸を追加したい」といったビジネス側の要求に対し、素早く対応できる必要があります。しかし、絶対に止めることが許されない基幹システムと密結合してしまっていると、改修のたびに厳密な影響調査が必要となり、身動きが取れなくなってしまいます。そのため、両者の間に中立なデータ保管層（データレイク）を挟み、切り離された**疎結合なアーキテクチャ**であることが理想とされています。
 
-<img src="/images/2026/20260605a/Gemini_Generated_Image_ienb2yienb2yienb.png" alt="Gemini_Generated_Image_ienb2yienb2yienb.png" width="1200" height="655" loading="lazy">
+<img src="/images/2026/20260605a/Gemini_Generated_Image_ienb2yienb2yienb.png" alt="Gemini_Generated_Image_ienb2yienb2yienb.png" width="1200" height="655">
 
 この「疎結合化」は、単にシステム間の影響を切り離すだけでなく、特定のDWH（データウェアハウス）製品に縛られない柔軟な情報基盤の構築にも直結します。
 

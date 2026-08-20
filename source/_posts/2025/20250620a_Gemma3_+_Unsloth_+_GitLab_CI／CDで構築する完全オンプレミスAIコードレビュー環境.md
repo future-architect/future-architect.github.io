@@ -199,7 +199,7 @@ sudo gitlab-ctl reconfigure
 上記の再設定には少々時間がかかりますが、完了すると、ブラウザでローカルホストへとアクセスできるようになります。
 
 <div class="img-frame-line">
-<img src="/images/2025/20250620a/Screenshot_from_2025-06-11_12-53-56.png" alt="Screenshot_from_2025-06-11_12-53-56.png" width="1200" height="910" loading="lazy">
+<img src="/images/2025/20250620a/Screenshot_from_2025-06-11_12-53-56.png" alt="Screenshot_from_2025-06-11_12-53-56.png" width="1200" height="910">
 </div>
 
 初期rootユーザーのパスワードを以下で確認します。

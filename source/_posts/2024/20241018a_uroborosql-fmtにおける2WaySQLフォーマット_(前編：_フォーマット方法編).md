@@ -51,7 +51,7 @@ and	emp.last_name	=	/*last_name*/'Smith'
 
 ## uroborosql-fmtのフォーマット方法概要
 
-<img src="/images/2024/20241018a/process_flow.png" alt="process_flow.png" width="1200" height="286" loading="lazy">
+<img src="/images/2024/20241018a/process_flow.png" alt="process_flow.png" width="1200" height="286">
 
 1. [tree-sitter-sql](https://github.com/future-architect/tree-sitter-sql)で入力SQLをパースしてCSTを取得
 1. 取得したCSTを解析して独自の木構造の構造体に変換

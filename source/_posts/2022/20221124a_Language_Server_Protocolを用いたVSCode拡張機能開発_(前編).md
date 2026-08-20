@@ -37,7 +37,7 @@ LSPがない場合は各IDEに対応した言語、仕様で言語サーバを�
 
 つまり、LSPを用いて開発した拡張機能はVSCodeだけでなく、VimやEmacsなどでも使用できます。
 
-<img src="/images/2022/20221124a/lsp-languages-editors.png" alt="lsp-languages-editors.png" width="1162" height="538" loading="lazy">
+<img src="/images/2022/20221124a/lsp-languages-editors.png" alt="lsp-languages-editors.png" width="1162" height="538">
 
 ## 本記事で説明すること
 

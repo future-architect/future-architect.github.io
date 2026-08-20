@@ -28,7 +28,7 @@ LLMが流行って久しいですが、MS、AWS、Googleクラウドベンダー
 とてもオーソドックスな構成だと思いましたし、拡張もしやすい印象を受けています。
 （間違っていたら指摘していただけると嬉しいです）
 
-<img src="/images/2024/20240822a/azure-sample-Azureリソース・アーキ図_(2).png" alt="azure-sample-Azureリソース・アーキ図_(2).png" width="1081" height="702" loading="lazy">
+<img src="/images/2024/20240822a/azure-sample-Azureリソース・アーキ図_(2).png" alt="azure-sample-Azureリソース・アーキ図_(2).png" width="1081" height="702">
 
 ## 3. 構成
 

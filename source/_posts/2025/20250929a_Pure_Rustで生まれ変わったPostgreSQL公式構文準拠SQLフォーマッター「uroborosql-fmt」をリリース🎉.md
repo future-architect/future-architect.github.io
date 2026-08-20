@@ -16,7 +16,7 @@ lede: "roborosql-fmtの新バージョンv1.0.0をリリースしました。当
 ---
 ## はじめに
 
-<img src="/images/2025/20250929a/top.png" alt="" width="630" height="229" loading="lazy">
+<img src="/images/2025/20250929a/top.png" alt="" width="630" height="229">
 
 コアテクノロジーグループの川渕です。
 

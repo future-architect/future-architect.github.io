@@ -24,7 +24,7 @@ GoでLambdaにデプロイするコードを書くにあたり、[aws-lambda-go]
 
 ## AWS LambdaにおけるGo Contextの取り扱い
 
-<img src="/images/2021/20210602a/lambda-39473.png" alt="" title="Clker-Free-Vector-ImagesによるPixabayからの画像" width="300" height="310" loading="lazy">
+<img src="/images/2021/20210602a/lambda-39473.png" alt="" title="Clker-Free-Vector-ImagesによるPixabayからの画像" width="300" height="310">
 
 ```go main.go
 package main

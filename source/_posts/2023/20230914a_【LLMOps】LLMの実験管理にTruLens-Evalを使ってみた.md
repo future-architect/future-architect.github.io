@@ -13,7 +13,7 @@ thumbnail: /images/2023/20230914a/thumbnail.png
 author: 吉田尚暉
 lede: "LLMの実験管理ツール候補として、TruLens-Evalを検証しました。合わせて、LLMの実験管理についてまとめてみました。"
 ---
-<img src="/images/2023/20230914a/top.png" alt="" width="800" height="418" loading="lazy">
+<img src="/images/2023/20230914a/top.png" alt="" width="800" height="418">
 
 ## はじめに
 

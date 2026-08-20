@@ -42,7 +42,7 @@ lede: "自動化できる業務ならば極力自動化したいというのは�
 
 ### 工場とクラウドを阻む最大の壁
 
-<img src="/images/2019/20191201/products_ux302nc-r.png" class="img-middle-size" width="900" height="600" loading="lazy">
+<img src="/images/2019/20191201/products_ux302nc-r.png" class="img-middle-size" width="900" height="600">
 
 工場現場の機器とインターネットを直接繋ぐのはセキュリティ上よろしくないので、例えば「工場→踏み台PC→クラウド」という構成が考えられます。また、新たに物理的なケーブルを用意するのも大変なので、踏み台PC→クラウドは SORACOM社の提供する USB wi-fi Network Adapter 「NCXX UX302NC-R」という製品を利用してみました。
 

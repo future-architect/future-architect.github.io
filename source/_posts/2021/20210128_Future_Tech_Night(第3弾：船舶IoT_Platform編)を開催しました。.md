@@ -27,7 +27,7 @@ lede: "2020/8/17にオンラインにてFuture Tech Nightという社外勉強�
 5. [〜AWS＆DataPlatform MaaSビジネス編〜](https://future.connpass.com/event/195568/)
 6. [GCP x インフラ構築編](https://future.connpass.com/event/201478/)
 
-<img src="/images/2021/20210128/ブログ＿図1.png" width="451" height="251" loading="lazy">
+<img src="/images/2021/20210128/ブログ＿図1.png" width="451" height="251">
 
 ## 概要
 

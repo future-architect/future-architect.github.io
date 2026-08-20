@@ -39,7 +39,7 @@ lede: "AWSの利用料金をSlackに通知する仕組みを作成したので�
 
 Webhookは、各サービスの利用料金を箇条書きで通知するために利用しており、files.uploadは円グラフをアップロードするために利用しています。
 
-<img src="/images/2021/20211015a/cost-explorer.drawio.png" alt="cost-explorer.drawio.png" width="570" height="352" loading="lazy">
+<img src="/images/2021/20211015a/cost-explorer.drawio.png" alt="cost-explorer.drawio.png" width="570" height="352">
 
 ### 投稿例
 

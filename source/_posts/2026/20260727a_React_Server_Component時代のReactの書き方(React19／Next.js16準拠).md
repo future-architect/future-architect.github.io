@@ -534,7 +534,7 @@ export function LikeCounter() {
 
 生成AIに何も指示せずに作らせると、すべてクライアントコンポーネント上の処理とされてしまいますがReact Server Componentの構成を生かすフォームはこのようになるはずです。ここはバリデーションとかは不要なので`useActionState()`は使ってませんが、もちろん組み合わせも可能です。
 
-<img src="/images/2026/20260727a/image.png" alt="image.png" width="1200" height="585" loading="lazy">
+<img src="/images/2026/20260727a/image.png" alt="image.png" width="1200" height="585">
 
 ```ts SearchPanel(クライアントコンポーネント)
 "use client";

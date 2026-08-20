@@ -142,7 +142,7 @@ vpncli -s < %HOMEPATH%\.vpn\CISCO_VPN.cre connect ${CISCO_VPN_NAME}
 Gitbashでエイリアスの設定まで成功するとこういったログが表示されます。
 `hogevpn`が「Cisco Anyconnect切断　➔　Windows標準接続」で`backToTheFutureVpn`がその逆です（普段はもっと短いエイリアス設定してます）。
 
-<img src="/images/2022/20221115a/無題3.png" alt="無題3.png" width="990" height="1893" loading="lazy">
+<img src="/images/2022/20221115a/無題3.png" alt="無題3.png" width="990" height="1893">
 
 ### エイリアス設定
 

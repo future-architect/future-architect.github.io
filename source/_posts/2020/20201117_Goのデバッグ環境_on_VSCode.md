@@ -12,7 +12,7 @@ thumbnail: /images/2020/20201117/thumbnail.png
 author: 富山龍之介
 lede: "私の使用するテキストエディタはVim一択でしたが、最近はVSCodeに浮気気味です。（言わずもがなVimプラグインは入れていますが）今回はVSCodeでGo言語用のデバッグ環境をテーマに執筆してみたいと思います！"
 ---
-<img src="/images/2020/20201117/image.png" width="626" height="307" loading="lazy">
+<img src="/images/2020/20201117/image.png" width="626" height="307">
 
 ## はじめに
 

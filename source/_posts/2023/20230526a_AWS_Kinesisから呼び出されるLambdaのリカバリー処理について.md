@@ -33,7 +33,7 @@ TIGの原木です。
 
 アーキテクチャ図をベースにフェールセーフ機能の全体概要について説明します。
 
-<img src="/images/2023/20230526a/Kinesis.drawio.png" alt="Kinesis.drawio.png" width="1200" height="321" loading="lazy">
+<img src="/images/2023/20230526a/Kinesis.drawio.png" alt="Kinesis.drawio.png" width="1200" height="321">
 
 ### 1~2. Kinesisからのデータ連携
 

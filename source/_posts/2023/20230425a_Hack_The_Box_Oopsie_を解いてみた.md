@@ -56,7 +56,7 @@ What is the path to the directory on the webserver that returns a login page?
 
 内容は下図のようになります。
 
-<img src="/images/2023/20230425a/image.png" alt="" width="1200" height="526" loading="lazy">
+<img src="/images/2023/20230425a/image.png" alt="" width="1200" height="526">
 
 `cdn-cgi/login` ディレクトリが存在しているのがわかるので、`http://{IPアドレス}/cdn-cgi/login` にアクセスしてみます。
 

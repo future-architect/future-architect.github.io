@@ -51,7 +51,7 @@ https://future-architect.github.io/articles/20231016a/
 
 まずはCloudflareの管理画面にログインし、R2を選択→「Add R2 subscription to my account」を押下します。
 
-<img src="/images/2024/20240327a/image.png" alt="Add R2 subscription to my accountをクリック" width="1200" height="615" loading="lazy">
+<img src="/images/2024/20240327a/image.png" alt="Add R2 subscription to my accountをクリック" width="1200" height="615">
 
 「Create bucket」 を押下します。
 

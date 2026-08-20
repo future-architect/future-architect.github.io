@@ -120,7 +120,7 @@ close FH;
   * ターミナルやコマンドプロンプトでGit ls-files -z してもNULは見えないのですが、Groovyで`'git ls-files -z'.execute().text`の実行結果をファイルに出力後、[Windows版Sublime Text](https://www.sublimetext.com/3)で確認しました。
 エディタやビューアによってはNUL文字表示をサポートしていないものがあるようです。
 
-<img src="/images/2022/20220221a/image.png" alt="NUL文字表示" width="941" height="162" loading="lazy">
+<img src="/images/2022/20220221a/image.png" alt="NUL文字表示" width="941" height="162">
 
 * `git log -m -r --name-only --no-color --pretty=raw -z`
   * `--name-only`で更新ファイルの情報を表示します。

@@ -89,7 +89,7 @@ services:
 docker compose up
 ```
 
-<img src="/images/2023/20230120a/スクリーンショット_2023-01-16_1.41.30.png" alt="スクリーンショット_2023-01-16_1.41.30.png" width="1200" height="684" loading="lazy">
+<img src="/images/2023/20230120a/スクリーンショット_2023-01-16_1.41.30.png" alt="スクリーンショット_2023-01-16_1.41.30.png" width="1200" height="684">
 
 ## テストコード作成
 

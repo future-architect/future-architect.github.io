@@ -71,7 +71,7 @@ PostgreSQL のパーサー[^5]はこのような構成だと認識していま�
 1. 構文解析器で構文解析[^8]
 
 パース過程のイメージ画像
-<img src="/images/2025/20250930a/2025-02-28_14h09_26.png" alt="2025-02-28_14h09_26.png" width="983" height="855" loading="lazy">
+<img src="/images/2025/20250930a/2025-02-28_14h09_26.png" alt="2025-02-28_14h09_26.png" width="983" height="855">
 
 ### porting の方針
 

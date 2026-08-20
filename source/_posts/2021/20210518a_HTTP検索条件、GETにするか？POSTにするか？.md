@@ -30,7 +30,7 @@ RESTfullとかRESTishな方針でWebA PIの横断検索を設計する際にチ�
 
 ## 背景と論点
 
-<img src="/images/2021/20210518a/choice-2692575_640.jpg" alt="アイキャッチ" title="Gerd AltmannによるPixabayからの画像" width="640" height="237" loading="lazy">
+<img src="/images/2021/20210518a/choice-2692575_640.jpg" alt="アイキャッチ" title="Gerd AltmannによるPixabayからの画像" width="640" height="237">
 
 やりたいことの背景です。
 

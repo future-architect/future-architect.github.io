@@ -32,7 +32,7 @@ Gitリポジトリ登録機能ですが、Redmineサーバ上で直接Gitリポ�
 
 （1）bareリポジトリをRedmineサーバ上にコピーし、定期的にリポジトリの更新を反映させる。
 
-<img src="/images/2021/20210908a/1.png" alt="1.png" width="507" height="320" loading="lazy">
+<img src="/images/2021/20210908a/1.png" alt="1.png" width="507" height="320">
 
 （2）リポジトリサーバをNFSマウントしRedmineサーバ上から直接参照できるようにする。
 

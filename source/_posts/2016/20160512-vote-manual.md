@@ -22,7 +22,7 @@ Space Apps Challenge は宇宙関係のオープンデータの活用を目指�
 
 また、People's Choice とは一般人による投票の意味で、各都市につき1作品が選ばれます。
 Space Apps Challenge では、25チームに絞られた後に一般投票が行われるようです。
-<img src="/images/2016/20160512/photo_20160512_01.png" class="img-middle-size" width="1719" height="792" loading="lazy">
+<img src="/images/2016/20160512/photo_20160512_01.png" class="img-middle-size" width="1719" height="792">
 
 2016年つくば会場のPeople's ChoiceはThe ZEN(ザ禅)が選ばれました！
 ぜひ以下の記事を確認下さい！

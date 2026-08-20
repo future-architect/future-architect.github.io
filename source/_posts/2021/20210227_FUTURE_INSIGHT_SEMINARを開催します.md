@@ -12,7 +12,7 @@ author: 松本妹子
 lede: "『現場力を活かす最適化とは？～企業の成長を阻害する“属人化した業務”からの脱却～』と題しまして、ウェビナー配信を行います。「最適化」というと皆さん、どのようなイメージを持たれるでしょうか？DX推進の一環として.."
 ---
 
-<img src="/images/2021/20210227/top.png" width="700" height="241" loading="lazy">
+<img src="/images/2021/20210227/top.png" width="700" height="241">
 
 こんにちは、Strategic AI Group松本妹子です。
 

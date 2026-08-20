@@ -36,7 +36,7 @@ Goの `context` パッケージは `Context` インターフェース(コンテ�
 
 以下のようなコンテキストを考えてみます。
 
-<img src="/images/2021/20210629a/d3199f99-d617-d616-6cb4-9f95910f44f3.png" alt="Contextのチェーン" width="361" height="441" loading="lazy">
+<img src="/images/2021/20210629a/d3199f99-d617-d616-6cb4-9f95910f44f3.png" alt="Contextのチェーン" width="361" height="441">
 
 コンテキストは `context.Context` でルートとなるコンテキストを作成できます。キャンセル処理は `context.WithCancel` タイムアウトは `context.WithTimeout` デッドラインは `context.WithDeadline` の関数を用いて、子コンテキストを生成できます。また値の伝播は `context.WithValue` で値を伝播できる子コンテキストを生成できます。
 

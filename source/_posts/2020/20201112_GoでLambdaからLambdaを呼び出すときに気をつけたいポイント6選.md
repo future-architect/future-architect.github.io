@@ -19,7 +19,7 @@ TIGの辻です。サーバーレスなアプリケーションを開発する�
 
 本記事ではGoで[AWS LambdaからAWS Lambdaを同期的に呼び出すとき](https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/invocation-sync.html)のハマりどころやTipsを紹介します。以下のような構成です。
 
-<img src="/images/2020/20201112/LambdaからLambda.png" width="481" height="281" loading="lazy">
+<img src="/images/2020/20201112/LambdaからLambda.png" width="481" height="281">
 
 - ライブラリのバージョン
 

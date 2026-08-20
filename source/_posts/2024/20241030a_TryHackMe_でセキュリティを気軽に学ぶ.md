@@ -52,7 +52,7 @@ TryHackMe は大きく Learn と Practice に分かれています。Learn は�
 
 からなります。Learning Path で１つずつステップアップすることも、Module 単位でツールをつまみ食いもできます。以下の画像は Learning Path の一部です。Penetration、SOC、Red Teaming などがあります。
 
-<img src="/images/2024/20241030a/image.png" alt="" width="1200" height="671" loading="lazy">
+<img src="/images/2024/20241030a/image.png" alt="" width="1200" height="671">
 
 Module は いくつかの Room で構成されています。各 Room ではツールの概要やオプションについての解説があり、その後学んだ内容を活かして Question に回答していきます。
 例として、後の Walkthrough でも登場する「[Hydra](https://tryhackme.com/r/room/hydra)」というツールの Room を見てみます（これは [Offensive Security Tooling](https://tryhackme.com/module/offensive-security-tooling) という Module に含まれています）。

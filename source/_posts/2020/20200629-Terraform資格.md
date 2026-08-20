@@ -15,7 +15,7 @@ lede: "5/24に受験したHashiCorpから出た資格の1つである、Terrafor
 ## はじめに
 
 こんにちは。TIG/DXユニットの[伊藤](https://twitter.com/kaedemalu)です。今回は、5/24に受験したHashiCorpから出た資格の1つである、Terraform Associateを受験したときの記事になります。結果としては無事に合格したので、受験前、そして受験当日のことを今回取り扱おうと思います。私はTerraform以外にも準備が必要だったので、この記事がこれから受験する人の一助となれば幸いです。
-<img src="/images/2020/20200629/1.png" class="img-small-size" width="340" height="340" loading="lazy">
+<img src="/images/2020/20200629/1.png" class="img-small-size" width="340" height="340">
 
 ## 本人のスペック
 

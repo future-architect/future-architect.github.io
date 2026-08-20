@@ -58,7 +58,7 @@ $ cd electron-quick-start
 $ npm install && npm start
 ```
 
-<img src="/images/2021/20210107/image.png" class="bordered" width="1171" height="344" loading="lazy">
+<img src="/images/2021/20210107/image.png" class="bordered" width="1171" height="344">
 
 `npm start`コマンドでアプリケーションが実行されます、公式にしては少々素朴ですがHello Worldが表示されます。
 

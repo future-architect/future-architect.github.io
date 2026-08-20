@@ -84,7 +84,7 @@ func Handle(ctx context.Context) error {
 
 デコレータの処理イメージですが、次のようなイメージです。先ほどの `plain/handler.go` で実装した `Handle()` 関数が真ん中のビジネスロジックの部分で、外側を1つ以上の共通処理でラップするようなことを行います。
 
-<img src="/images/2024/20240329a/godecorator.drawio.png" alt="godecorator.drawio.png" width="1030" height="459" loading="lazy">
+<img src="/images/2024/20240329a/godecorator.drawio.png" alt="godecorator.drawio.png" width="1030" height="459">
 
 次の章からは具体的に実装例を紹介していきます。
 

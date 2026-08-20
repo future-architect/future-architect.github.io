@@ -13,7 +13,7 @@ thumbnail: /images/2024/20240605a/thumbnail.png
 author: 橋本竜我
 lede: "AirPods Proの空間オーディオ機能にあるヘッドトラッキングを用いることで、頭の角度の取得をしてみました"
 ---
-<img src="/images/2024/20240605a/image.png" alt="" width="1200" height="390" loading="lazy">
+<img src="/images/2024/20240605a/image.png" alt="" width="1200" height="390">
 
 ## はじめに
 

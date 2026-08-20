@@ -81,7 +81,7 @@ cmdもなくして、全部をmainパッケージにしてしまうというさ�
 
 単純にフォルダを切ってコードをそっちに持っていくと、共通の定数やら型定義が`<projectroot>`にいるので、この`<projectroot>`と、サブフォルダで循環しちゃうのですよね。対策はいくつかあります。
 
-<img src="/images/2020/20200528/photo_20200528_01.png" class="img-small-size" width="496" height="325" loading="lazy">
+<img src="/images/2020/20200528/photo_20200528_01.png" class="img-small-size" width="496" height="325">
 
 ### common的なパッケージを作る
 

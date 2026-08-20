@@ -13,7 +13,7 @@ thumbnail: /images/2025/20250609a/thumbnail.png
 author: 橋本竜我
 lede: "Apple 純正のCI/CDサービスである Xcode Cloud を初めて導入するときに、導入時にまず押さえておきたいポイントを実際に試し、まとめた記事です。"
 ---
-<img src="/images/2025/20250609a/image.png" alt="" width="868" height="518" loading="lazy">
+<img src="/images/2025/20250609a/image.png" alt="" width="868" height="518">
 
 ## はじめに
 

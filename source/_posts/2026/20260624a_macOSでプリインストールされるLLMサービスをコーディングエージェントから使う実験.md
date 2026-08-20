@@ -17,7 +17,7 @@ lede: "みなさん、WWDC26の情報はみられましたか？昨年発表さ�
 
 たとえば、`$ fm chat`で起動すると以下のような画面が出てきます。
 
-<img src="/images/2026/20260624a/スクリーンショット_2026-06-13_20.51.48.png" alt="" width="635" height="267" loading="lazy">
+<img src="/images/2026/20260624a/スクリーンショット_2026-06-13_20.51.48.png" alt="" width="635" height="267">
 
 `$ fm serve`ではOpenAI互換のAPIサーバー
 

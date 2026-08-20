@@ -75,7 +75,7 @@ https://www.elastic.co/jp/blog/elastic-and-amazon-reach-agreement-on-trademark-i
 - 少しの手順、数分で構築が可能 (入門におすすめの理由)
 - Hot node、UltraWarm node とノードに種類があり、時系列コレクションの場合に直近24時間のデータはHot nodeにいれ、それ以降はUltraWarm nodeにいれることでノードの増大を防ぐ (Serverless版のいいところと思われ)
 
-<img src="/images/2023/20230525a/Black_Belt_Amazon_OpenSearch_Serverless_27スライド.png" alt="Black_Belt_Amazon_OpenSearch_Serverless_27スライド" width="1200" height="679" loading="lazy">
+<img src="/images/2023/20230525a/Black_Belt_Amazon_OpenSearch_Serverless_27スライド.png" alt="Black_Belt_Amazon_OpenSearch_Serverless_27スライド" width="1200" height="679">
 [引用元 2023/01 [AWS Black Belt Online Seminar] Amazon OpenSearch Serverless 27スライド目](https://pages.awscloud.com/rs/112-TZM-766/images/AWS-Black-Belt_2023_AmazonOpenSearchServerless_0131_v1.pdf)
 
 ### 公式ページはこちら

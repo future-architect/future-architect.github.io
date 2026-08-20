@@ -35,7 +35,7 @@ Google CloudでのIoTデータ蓄積基盤を構築する際、「データは�
 
 データ格納までの道中でメッセージングサービスを利用することも多く、アーキデザイン時の考慮事項として"QoSとの付き合い方"は欠かせません。
 
-<img src="/images/2022/20220509a/スクリーンショット_2022-05-06_19.47.04.png" alt="At least onceについて" width="1200" height="669" loading="lazy">
+<img src="/images/2022/20220509a/スクリーンショット_2022-05-06_19.47.04.png" alt="At least onceについて" width="1200" height="669">
 
 今回のアーキテクチャではPub/Subを採用したのですが、Pub/SubはAt least onceのQoSで動作するため、BigQuery到達までの道中で電文が重複してしまう可能性がありました。
 

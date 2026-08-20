@@ -31,7 +31,7 @@ lede: "現在開催中のWWDCで、Linuxコンテナネイティブサポート�
 - [github.com/apple/container](https://github.com/apple/container)
 - [github.com/apple/containerization](https://github.com/apple/containerization)
 
-<img src="/images/2025/20250610a/スクリーンショット_2025-06-10_8.38.48.png" alt="スクリーンショット_2025-06-10_8.38.48.png" width="732" height="560" loading="lazy">
+<img src="/images/2025/20250610a/スクリーンショット_2025-06-10_8.38.48.png" alt="スクリーンショット_2025-06-10_8.38.48.png" width="732" height="560">
 
 インストールしたら以下のコマンドを実行すると必要なものを追加でダウンロードしてきます。
 

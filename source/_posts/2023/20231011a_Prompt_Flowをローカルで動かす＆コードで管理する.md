@@ -61,7 +61,7 @@ Prompt FlowのVSCode拡張機能をインストールします。
 
 VSCodeの拡張機能にて「Prompt Flow」で検索すると出てきます。
 
-<img src="/images/2023/20231011a/image.png" alt="Prompt Flow for VS Code" width="1200" height="560" loading="lazy">
+<img src="/images/2023/20231011a/image.png" alt="Prompt Flow for VS Code" width="1200" height="560">
 
 VSCode拡張機能が無くてもPrompt Flow自体は動かせますが、フローの可視化機能があるので、VSCodeが使用できる場合は入れておきましょう。
 

@@ -26,7 +26,7 @@ lede: "先日2021.01.29にオンラインにてFuture Tech Nightという社外�
 
 ## 概要
 
-<img src="/images/2021/20210306/hero-cloud-infrastructure.png" width="684" height="486" loading="lazy">
+<img src="/images/2021/20210306/hero-cloud-infrastructure.png" width="684" height="486">
 
 > https://cloud.google.com/training/cloud-infrastructure より
 

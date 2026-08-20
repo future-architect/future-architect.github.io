@@ -51,7 +51,7 @@ Gitlabのマークはきつねではなくたぬきだったんですね...。
 
 もしSlackに登録しているメールアドレスがRedmineに登録しているものと異なる場合はSlack User IDを適宜手動で設定するようにしてください。
 
-<img src="/images/2021/20210927a/メールアドレス設定.png" alt="メールアドレス設定.png" width="753" height="564" loading="lazy">
+<img src="/images/2021/20210927a/メールアドレス設定.png" alt="メールアドレス設定.png" width="753" height="564">
 
 ## 動作確認
 

@@ -23,7 +23,7 @@ GCPリソースはTerraformで作成しています。CloudBuildとGitHubの連�
 
 ## デプロイフロー
 
-<img src="/images/2023/20230210a/Deploy_Architecture.drawio.png" alt="Deploy_Architecture.drawio.png" width="901" height="264" loading="lazy">
+<img src="/images/2023/20230210a/Deploy_Architecture.drawio.png" alt="Deploy_Architecture.drawio.png" width="901" height="264">
 
 デプロイフローは以下の流れになります。
 

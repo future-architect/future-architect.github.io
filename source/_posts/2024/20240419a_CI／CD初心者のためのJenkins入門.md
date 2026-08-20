@@ -110,7 +110,7 @@ docker run -p 8080:8080 jenkins/jenkins:2.440.3-lts-jdk17
 シェルスクリプトを実行してコンソールに出力してみます。
 
 1. 新規ジョブ作成をクリックします。
-  <img src="/images/2024/20240419a/image.png" alt="" width="1200" height="591" loading="lazy">
+  <img src="/images/2024/20240419a/image.png" alt="" width="1200" height="591">
 2. 適当なジョブ名を入力し、「フリースタイル・プロジェクトのビルド」を選択して「OK」
   <img src="/images/2024/20240419a/image_2.png" alt="" width="1200" height="609" loading="lazy">
 3. 適当な説明を入力して下にスクロールします。

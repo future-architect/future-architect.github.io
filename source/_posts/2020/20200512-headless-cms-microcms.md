@@ -93,7 +93,7 @@ HeadlessCMSは数多くのサービスが存在しています．
 
 料金体系は以下のようになっていますので，ご自身で利用したいプランを選択してください．
 本記事ではFreeプランを選択しています．
-<img src="/images/2020/20200512/photo_20200512_01.png" width="1256" height="857" loading="lazy">
+<img src="/images/2020/20200512/photo_20200512_01.png" width="1256" height="857">
 
 ### サービスの作成
 

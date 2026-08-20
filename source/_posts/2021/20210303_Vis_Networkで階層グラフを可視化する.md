@@ -111,7 +111,7 @@ const options = {
 
 上記のノード定義、エッジ定義、オプション定義を元に可視化できます。実際に可視化した例です。
 
-<img src="/images/2021/20210303/2021-01-19_14h29_14.png" width="531" height="374" loading="lazy">
+<img src="/images/2021/20210303/2021-01-19_14h29_14.png" width="531" height="374">
 ソースコードは [Edit fiddle \- JSFiddle \- Code Playground](https://jsfiddle.net/0bxLo6wt/) にて確認できます。
 
 これだけでは寂しいので、少しグラフを加工していきましょう。

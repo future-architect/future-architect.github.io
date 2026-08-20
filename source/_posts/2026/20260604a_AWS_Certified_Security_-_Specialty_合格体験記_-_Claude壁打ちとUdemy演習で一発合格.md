@@ -12,7 +12,7 @@ thumbnail: /images/2026/20260604a/thumbnail.png
 author: 棚井龍之介
 lede: "FutureVulsチームの棚井です。2026年5月18日に AWS Certified Security - Specialty で一発合格しました。"
 ---
-<img src="/images/2026/20260604a/aws-certified-security-specialty.png" alt="" width="600" height="600" loading="lazy">
+<img src="/images/2026/20260604a/aws-certified-security-specialty.png" alt="" width="600" height="600">
 
 ## はじめに
 

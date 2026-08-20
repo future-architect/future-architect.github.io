@@ -25,7 +25,7 @@ lede: "エンタープライズの領域ではAD認証が多く利用されて�
 
 ## Auth0とは？
 
-<img src="/images/2021/20210222/top.png" class="img-middle-size" width="534" height="192" loading="lazy">
+<img src="/images/2021/20210222/top.png" class="img-middle-size" width="534" height="192">
 
 [Auth0導入編](/articles/20200122/)をぜひ参照ください。他にも[Auth0関連](/tags/Auth0/)の記事があります。
 

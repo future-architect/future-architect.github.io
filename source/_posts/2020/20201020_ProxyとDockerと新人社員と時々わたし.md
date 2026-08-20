@@ -57,7 +57,7 @@ Firewallとしては社外からの攻撃を守ることはもちろんですが
 
 これは"PCの外からの防護壁"の役目を果たすもので、身近なものとしてはWindows Firewallかなと思います。このWindows Firewall、Windowsの通知などでたまに見かけるためFirewallのことをOSの機能とだけ認識されることもありますが、より広い概念になります。
 
-<img src="/images/2020/20201020/firewall_overview.png" width="791" height="611" loading="lazy">
+<img src="/images/2020/20201020/firewall_overview.png" width="791" height="611">
 
 ### Proxyサーバの位置
 

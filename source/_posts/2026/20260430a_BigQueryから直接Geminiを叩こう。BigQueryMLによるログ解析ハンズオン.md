@@ -70,7 +70,7 @@ graph LR
 
 BigQueryコンソールの「データ 追加」 > 「Vertex AI」のデータソースを選択（vertex aiで検索）
 
-<img src="/images/2026/20260430a/データ追加を選択してVertexAIのデータソースを選択.png" alt="データ追加を選択してVertexAIのデータソースを選択" width="1190" height="839" loading="lazy">
+<img src="/images/2026/20260430a/データ追加を選択してVertexAIのデータソースを選択.png" alt="データ追加を選択してVertexAIのデータソースを選択" width="1190" height="839">
 
 外部データへのアクセスで、BiqQueryフェデレーションを選択します。
 

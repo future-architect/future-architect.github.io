@@ -31,7 +31,7 @@ lede: "カタログ管理やデータ活用を行うツールとしてAmazon Sag
 
 公式のページのSageMakerの配下にはおなじみのRedshiftやGlueやAthenaなども記載されており、これらのデータを扱う既存のサービス群との連携を強化し、より利便性を高めていくのがAmazon SageMaker Unified Studioの役割になっていくと思います。
 
-<img src="/images/2025/20250527a/{C20B3C58-89A7-4E12-AEBE-2D121A57B936}.png" alt="{C20B3C58-89A7-4E12-AEBE-2D121A57B936}.png" width="1200" height="783" loading="lazy">
+<img src="/images/2025/20250527a/{C20B3C58-89A7-4E12-AEBE-2D121A57B936}.png" alt="{C20B3C58-89A7-4E12-AEBE-2D121A57B936}.png" width="1200" height="783">
 
 引用：[Amazon SageMaker（機械学習モデルを大規模に構築、トレーニング、デプロイ）| AWS](https://aws.amazon.com/jp/sagemaker)
 

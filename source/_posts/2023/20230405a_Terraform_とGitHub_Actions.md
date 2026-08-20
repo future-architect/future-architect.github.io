@@ -59,7 +59,7 @@ resource "aws_iam_openid_connect_provider" "github_actions" {
 Terraform 実行後、IAM コンソールにアクセスします。
 ID プロバイダ設定をクリックし、追加されていることを確認します。
 
-<img src="/images/2023/20230405a/image.png" alt="image.png" width="1200" height="659" loading="lazy">
+<img src="/images/2023/20230405a/image.png" alt="image.png" width="1200" height="659">
 
 ### IAM Role 追加
 

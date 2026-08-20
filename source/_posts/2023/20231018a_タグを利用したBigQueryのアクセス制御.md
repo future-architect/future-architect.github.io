@@ -65,7 +65,7 @@ resource "google_tags_tag_value" "prd_tag" {
 ```
 
 適用後、コンソールを見てみましょう。
-<img src="/images/2023/20231018a/71638260-a888-a69d-56d2-bcb92fb94825.png" alt="" width="1200" height="489" loading="lazy">
+<img src="/images/2023/20231018a/71638260-a888-a69d-56d2-bcb92fb94825.png" alt="" width="1200" height="489">
 
 `environment`に対して、`dev`, `stg`, `prd`というkey-valueペアが生成されました。
 

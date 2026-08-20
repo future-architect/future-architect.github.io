@@ -35,7 +35,7 @@ Flutter on Desktopはまだまだリリースから間もないため、安心�
 
 例えば[先日の記事](/articles/20211224a/)で技術検証した[google_maps_flutter](https://pub.dev/packages/google_maps_flutter)を利用したアプリケーションをデスクトップ向けにビルドすると、執筆時点ではアラートが表示され正常に動作しません。
 
-<img src="/images/2021/20211228a/image.png" alt="ビルドエラー" width="1200" height="937" loading="lazy">
+<img src="/images/2021/20211228a/image.png" alt="ビルドエラー" width="1200" height="937">
 
 同じソースコードをWeb向けにビルドし、Electronに組み込むと問題なく動作します。
 

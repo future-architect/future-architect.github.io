@@ -59,7 +59,7 @@ Artifact Registryのクリーンアップポリシーは、以下の2つをセ�
 
 つまり、 **「KEEPで守られていないものを、DELETEで消す」** という2段階の論理構成になっていることに気づかず、「設定を入れたのにイメージが全く消えない……」と頭を抱えることになりました。
 
-<img src="/images/2026/20260519a/Gemini_Generated_Image_.png" alt="Gemini_Generated_Image_.png" width="1200" height="603" loading="lazy">
+<img src="/images/2026/20260519a/Gemini_Generated_Image_.png" alt="Gemini_Generated_Image_.png" width="1200" height="603">
 
 ## 参考：環境ごとの設計方針
 

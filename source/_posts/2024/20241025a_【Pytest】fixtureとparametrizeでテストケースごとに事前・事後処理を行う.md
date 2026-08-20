@@ -192,7 +192,7 @@ def test_hoge_function(db_setup):  # 引数にfixtureを渡す
 
 以下の図ようなイメージで変数が渡されます。
 
-<img src="/images/2024/20241025a/fixture_parametrize.drawio.png" alt="fixture_parametrize.drawio.png" width="1122" height="562" loading="lazy">
+<img src="/images/2024/20241025a/fixture_parametrize.drawio.png" alt="fixture_parametrize.drawio.png" width="1122" height="562">
 
 ::: note warn
 重要: `fixture`を`indirect`に指定する

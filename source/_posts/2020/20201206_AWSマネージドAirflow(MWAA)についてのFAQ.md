@@ -25,7 +25,7 @@ AWS マネージド Airflow (MWAA) が 2020/11/24 にリリースされました
 
 サービスを利用するにあたって知りたかったことを調査し、FAQ ベースで整理しましたので公開します。
 
-<img src="/images/2020/20201206/wordmark_1.png" width="1200" height="464" loading="lazy">
+<img src="/images/2020/20201206/wordmark_1.png" width="1200" height="464">
 [Airflow logos](https://cwiki.apache.org/confluence/display/AIRFLOW/Airflow+logos) からの画像
 
 ## MWAA (Managed Workflow for Apache Airflow) とは?

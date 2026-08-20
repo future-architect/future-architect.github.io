@@ -12,7 +12,7 @@ thumbnail: /images/2016/20160511/thumbnail_20160511.jpg
 author: 川久保由紀
 lede: "IT歴約1年、社会人2年目新人女子のわたしがハッカソンに挑んだ全てをお伝えします！"
 ---
-<img src="/images/2016/20160511/photo_20160511_01.png" class="img-middle-size" width="610" height="610" loading="lazy">
+<img src="/images/2016/20160511/photo_20160511_01.png" class="img-middle-size" width="610" height="610">
 
 投票はこちら（※2016/05/16迄です！）。
 https://2016.spaceappschallenge.org/challenges/mars/space-recreation/projects/the-zen

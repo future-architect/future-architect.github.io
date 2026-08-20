@@ -37,7 +37,7 @@ lede: "GlyphFeedsCMSにおけるSpringを駆使したルールエンジンにつ
 
 新聞やニュースサイトに組み上げられるという大枠でのワークフローはあります。
 
-<img src="/images/2020/20200918/技術ブログ素材1.png" width="1200" height="511" loading="lazy">
+<img src="/images/2020/20200918/技術ブログ素材1.png" width="1200" height="511">
 
 ベースのワークフローをシステムで担保することは当然ですが、
 

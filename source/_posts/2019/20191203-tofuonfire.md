@@ -14,7 +14,7 @@ author: 澁川喜規
 lede: "Go Conferenceの📛を作る。このプログラムを実行する前に、まずはスポンサーしますというのを宣言します。フューチャーもイベント協賛はいろいろやっていますし、特にうちのユニットはGo案件の割合も多いので、OKはもらいやすくて助かります。今回は参加者、スピーカー、スポンサーあわせて240人とかで、なおかつ1つ120円ということが分かったので、コスト的にはイベントスポンサーと考えると費用対効果は高いです。"
 ---
 
-<img src="/images/2019/20191202/photo_20191202_02.jpeg" width="1000" height="750" loading="lazy">
+<img src="/images/2019/20191202/photo_20191202_02.jpeg" width="1000" height="750">
 
 [フューチャーアドベントカレンダー](https://qiita.com/advent-calendar/2019/future)の3日目のエントリーです。昨日は[rkyymmt@githubさんによる私のコンピュータ遍歴](https://qiita.com/rkyymmt@github/items/87b13b11dd1c9001592b)でした。
 

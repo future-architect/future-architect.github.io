@@ -78,7 +78,7 @@ flutter create flutter_swagger
 
 ※Flutter基本的なディレクトリ構造に関しての説明は今回は割愛します。
 
-<img src="/images/2021/20210511b/image.png" alt="ディレクトリ構成" width="580" height="758" loading="lazy">
+<img src="/images/2021/20210511b/image.png" alt="ディレクトリ構成" width="580" height="758">
 
 ### swagger.yaml配置
 

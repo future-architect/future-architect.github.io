@@ -67,7 +67,7 @@ Pulumiは無料で利用できますが、複数人での利用や、企業単�
 
 詳しくは[公式ドキュメント](https://www.pulumi.com/pricing/)を参照ください。
 
-<img src="/images/2023/20230426a/image.png" alt="" width="1200" height="779" loading="lazy">
+<img src="/images/2023/20230426a/image.png" alt="" width="1200" height="779">
 
 Pulumiは以下の構成をとります。詳しくは[公式ドキュメント](https://www.pulumi.com/docs/intro/concepts/)を参照ください。
 <img src="/images/2023/20230426a/image_2.png" alt="" width="617" height="440" loading="lazy">

@@ -13,7 +13,7 @@ thumbnail: /images/2024/20241023a/thumbnail.png
 author: 真野隼記
 lede: "PostgreSQL 17がリリースされたことを記念し、ブログ連載を始めます"
 ---
-<img src="/images/2024/20241023a/top.png" alt="top.png" width="761" height="366" loading="lazy">
+<img src="/images/2024/20241023a/top.png" alt="top.png" width="761" height="366">
 
 ## はじめに
 

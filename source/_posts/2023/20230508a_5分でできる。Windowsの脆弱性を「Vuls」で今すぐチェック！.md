@@ -37,7 +37,7 @@ lede:
 
 1万 GitHub Star目前！
 
-<img src="/images/2023/20230508a/vuls.png" alt="" width="300" height="100" loading="lazy">
+<img src="/images/2023/20230508a/vuls.png" alt="" width="300" height="100">
 
 そんな便利ツールのVulsですが、これまではWindowsはサポートしていませんでした。
 

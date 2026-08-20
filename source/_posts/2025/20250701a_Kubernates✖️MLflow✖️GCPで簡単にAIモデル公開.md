@@ -15,7 +15,7 @@ thumbnail: /images/2025/20250701a/thumbnail.png
 author: 大前七奈
 lede: "機械学習モデルを本番環境で運用する際、スケーラビリティや管理のしやすさは重要です。MLflowのFastAPIによるデプロイは手軽ですが、大規模運用には不向きな場合があります。本記事では、MLflowで管理されたモデルを、Kubernetes上で動作する高機能なMLモデルサービング基盤KServeにデプロイする方法を解説します。"
 ---
-<img src="/images/2025/20250701a/image.png" alt="image.png" width="1200" height="449" loading="lazy">
+<img src="/images/2025/20250701a/image.png" alt="image.png" width="1200" height="449">
 
 こんにちは！Energy Transformation Groupの大前七奈です。
 

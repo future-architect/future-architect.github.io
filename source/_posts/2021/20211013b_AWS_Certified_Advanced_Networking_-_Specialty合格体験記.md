@@ -22,7 +22,7 @@ TIGの伊藤真彦です。
 
 ## AWS Certified Advanced Networking - Specialtyとは
 
-<img src="/images/2021/20211013b/image.png" alt="合格バッチ" width="600" height="600" loading="lazy">
+<img src="/images/2021/20211013b/image.png" alt="合格バッチ" width="600" height="600">
 
 その名の通り高度なネットワーク知識に特化した試験です。
 オンプレミスとのハイブリッドクラウド、Direct Connect接続、複数社のVPCの合体技といった様々な前提条件ありきのセキュアな通信、ベストプラクティスの知識が求められます。

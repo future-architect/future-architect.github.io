@@ -27,7 +27,7 @@ lede: "最新テクノロジーでスポーツアイデアソンをやって中�
 「スポーツアイデアソン」とは、東京オリンピック・パラリンピック大会など、数年後東京で行われる大規模なスポーツイベントを、VRやMRなどの最新技術を使って課題解決するアイデアを生み出すイベントです。
 [スポーツアイデアソンの報告はこちら](http://fif.jp/kidsyouth/report/it/ideathon2017.html)
 
-<img src="/images/2017/20171113/photo_20171113_01.jpg" width="570" height="395" loading="lazy">
+<img src="/images/2017/20171113/photo_20171113_01.jpg" width="570" height="395">
 <img src="/images/2017/20171113/photo_20171113_02.jpg" width="570" height="395" loading="lazy">
 
 当日来てくれた中高生には、より良いアイデアを生み出してもらうために、**MRなど最新の"XRテクノロジー"**を実際に体験してもらいました。

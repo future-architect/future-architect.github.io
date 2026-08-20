@@ -37,7 +37,7 @@ Hue LEDのBluetoothの仕様ですが公式は存在しないようです。そ�
 
 1つ目のgistを見てもBLEをよくしらない人からするとサッパリだと思うので補足します。BLE論理的な構造は以下のように、あるDeviceには複数のServiceが紐づいており、その配下にCharacteristicと呼ばれる構造で管理されています。この構成によってデータをやり取りします。ServiceもCharacteristicも特定のためにUUIDを用いています。
 
-<img src="/images/2022/20220404b/ble_strucutre.png" alt="ble_strucutre.png" width="791" height="441" loading="lazy">
+<img src="/images/2022/20220404b/ble_strucutre.png" alt="ble_strucutre.png" width="791" height="441">
 
 さきほどのgistを確認すると、Service `932c32bd-0000-47a2-835a-a8d455b859dd` に、電源ON/OFFをする `932c32bd-0002-47a2-835a-a8d455b859dd` というCharacteristicがあり、そちらに 1/0 のバイナリを送信すると、LEDがついたり消えたりするわけです。何に使うかわからないCharacteristicもいくつかありますが、ライトの操作は大まかこのシートから推測して行うことができます。Python側のライブラリは補足情報としてあつかうと良いかなと思います。
 

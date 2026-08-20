@@ -11,7 +11,7 @@ author: 前川喜洋
 lede: "Elixir Conf Japan 2017 参加レポート"
 ---
 
-<img src="/images/2017/20170412/photo_20170412_01.png" class="img-small-size" width="948" height="950" loading="lazy">
+<img src="/images/2017/20170412/photo_20170412_01.png" class="img-small-size" width="948" height="950">
 
 ## Elixir Conf Japan 2017 に参加しました
 

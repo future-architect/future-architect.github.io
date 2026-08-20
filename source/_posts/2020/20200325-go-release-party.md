@@ -23,7 +23,7 @@ Go 1.14 のリリースノートは以下です。
 
 ## 発表1: hash/maphash コードリーディング
 
-<img src="/images/2020/20200325/3.png" class="img-middle-size" width="512" height="270" loading="lazy">
+<img src="/images/2020/20200325/3.png" class="img-middle-size" width="512" height="270">
 
 <img src="/images/2020/20200325/4.png" class="img-middle-size" width="512" height="269" loading="lazy">
 

@@ -69,7 +69,7 @@ OpenTelemtryはその名の通り「テレメトリー」のためのソフト�
 
 アプリケーションに組み込む方法を紹介します。スタートするにはまずOpenTelemetryのサイトのRegisteryを見ると良さそうです。生のAPIを叩いてもいいのですが、アプリケーションの特定のミドルウェアやフレームワークとのインターフェースがinstrumentationとして提供されています。アプリケーション側のトレース情報を取り出す便利ライブラリがいくつもあります。
 
-<img src="/images/2021/20211020a/スクリーンショット_2021-10-02_11.52.04.png" alt="スクリーンショット_2021-10-02_11.52.04.png" width="1200" height="725" loading="lazy">
+<img src="/images/2021/20211020a/スクリーンショット_2021-10-02_11.52.04.png" alt="スクリーンショット_2021-10-02_11.52.04.png" width="1200" height="725">
 
 ここに対応したいプラグインが登録されていれば、そのサンプルコードを参考にするのが簡単です。例えば、gorilla/muxを使っていれば、[gorilla/mux用のinstrumentation](https://github.com/open-telemetry/opentelemetry-go-contrib/tree/main/instrumentation/github.com/gorilla/mux)があるので[このサンプルの通り](https://github.com/open-telemetry/opentelemetry-go-contrib/blob/main/instrumentation/github.com/gorilla/mux/otelmux/example/server.go#L44)にアプリケーションに組み込めばいいので簡単ですね。gorilla/muxのミドルウェアとして実装されています。初期設定はありますが、実質一行です。
 

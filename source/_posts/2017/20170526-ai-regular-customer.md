@@ -47,7 +47,7 @@ lede: "AI(機械学習・Deep Learning等)を用いて、 **大量にある顔�
 
 「たくさんある画像から同じ人を見るけること」実現に向け、下記1～3で進めていきます。
 
-<img src="/images/2017/20170523/photo_20170523_01.png" width="1904" height="500" loading="lazy">
+<img src="/images/2017/20170523/photo_20170523_01.png" width="1904" height="500">
 
 1. OpenFace API(Deep Learning)を利用し、顔画像を抽出・表現獲得を行う
     * 結果は128次元ベクトルに変換される

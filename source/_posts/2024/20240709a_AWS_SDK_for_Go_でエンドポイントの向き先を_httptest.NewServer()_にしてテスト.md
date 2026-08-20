@@ -30,7 +30,7 @@ AWS SDK for Go を使ったコードをクラウドサービスに依存無し�
 
 フューチャーで実績が多いのはLocalStackですが、例えばECS (Elastic Container Service)は2024年7月時点でProイメージでしか利用できません。
 
-<img src="/images/2024/20240709a/image.png" alt="image.png" width="1200" height="468" loading="lazy">
+<img src="/images/2024/20240709a/image.png" alt="image.png" width="1200" height="468">
 
 https://docs.localstack.cloud/references/coverage/coverage_ecs/
 

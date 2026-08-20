@@ -142,7 +142,7 @@ A problem occurred configuring root project 'android'.
 
 以上の問題が解決され、正常に動作すれば環境構築完了です。以下のようにカウントアップアプリが起動し、操作できると思います。
 
-<img alt="flutter_demo_launch" src="/images/2021/20210715a/flutter_demo_launch.png" width="500" height="894" loading="lazy">
+<img alt="flutter_demo_launch" src="/images/2021/20210715a/flutter_demo_launch.png" width="500" height="894">
 
 ## まとめ
 

@@ -42,7 +42,7 @@ lede: "Raspberry Piに立てたWebサーバのブラウザから好きな文字�
 
 最終的に以下の図のような構成を予定しています。
 
-<img src="/images/2023/20230905a/image.png" alt="" width="987" height="197" loading="lazy">
+<img src="/images/2023/20230905a/image.png" alt="" width="987" height="197">
 
 ## Arduino→LCDへの表示
 

@@ -12,7 +12,7 @@ thumbnail: /images/2025/20250307a/thumbnail.png
 author: 棚井龍之介
 lede: "最近、担当サービスへの Datadog 導入に成功しまして、その「導入成功に至るまでのプロセス」をなんらかの方法でナレッジ化しておきたいと考えていました"
 ---
-<img src="/images/2025/20250307a/0c1ad1a65e3a410ecd85e9d1291a6a02.png" alt="" width="660" height="377" loading="lazy">
+<img src="/images/2025/20250307a/0c1ad1a65e3a410ecd85e9d1291a6a02.png" alt="" width="660" height="377">
 
 ## はじめに
 

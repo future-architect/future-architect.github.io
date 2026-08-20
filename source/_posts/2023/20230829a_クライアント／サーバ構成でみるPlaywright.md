@@ -38,7 +38,7 @@ Playwrightはさまざまな言語でテストを記述できます。
 
 クライアント／サーバ構成のイメージは下記の通りです。
 
-<img src="/images/2023/20230829a/Playwright_Architecture.drawio.png" alt="Playwright_Architecture" width="800" height="320" loading="lazy">
+<img src="/images/2023/20230829a/Playwright_Architecture.drawio.png" alt="Playwright_Architecture" width="800" height="320">
 
 サーバ側はWebSocketまたは標準入出力の口をもち、クライアントからのリクエストに応じて各ブラウザに対して操作します。クライアント側はテストスクリプトに応じてサーバに対してリクエストを送信します。
 

@@ -12,7 +12,7 @@ thumbnail: /images/2025/20250409a/thumbnail.png
 author: 伊藤太斉
 lede: "年始から、社員の有志でTerraform設計ガイドラインを編集し、先日公開したので公開までの経緯などについて触れていきます。"
 ---
-<img src="/images/2025/20250409a/スクリーンショット_2025-04-08_23.57.15.png" alt="" width="1200" height="650" loading="lazy">
+<img src="/images/2025/20250409a/スクリーンショット_2025-04-08_23.57.15.png" alt="" width="1200" height="650">
 
 こんにちは。TIGの伊藤です。
 

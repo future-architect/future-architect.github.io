@@ -225,7 +225,7 @@ if __name__ == "__main__":
 
 早速Pull Requestを出した直後が以下のイメージです。
 
-<img src="/images/2025/20250417a/image.png" alt="" width="864" height="541" loading="lazy">
+<img src="/images/2025/20250417a/image.png" alt="" width="864" height="541">
 
 <img src="/images/2025/20250417a/image_2.png" alt="png" width="809" height="756" loading="lazy">
 

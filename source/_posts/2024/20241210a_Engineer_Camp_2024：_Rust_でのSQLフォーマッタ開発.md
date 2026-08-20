@@ -56,7 +56,7 @@ uroboroSQL-fmtにはVSCode拡張機能が存在します。
 
 コマンドパレットから export コマンドを呼び出すことで、VSCodeの設定をフォーマッタの設定ファイル `.uroborosqlfmtrc.json` に反映できます。
 
-<img src="/images/2024/20241210a/export-demo.avif" alt="コマンドパレットでexportコマンドを実行" width="1200" height="675" loading="lazy">
+<img src="/images/2024/20241210a/export-demo.avif" alt="コマンドパレットでexportコマンドを実行" width="1200" height="675">
 
 ##### 2. import 機能
 

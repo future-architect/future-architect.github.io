@@ -16,7 +16,7 @@ thumbnail: /images/2025/20250901a/thumbnail.png
 author: 清水雄一郎
 lede: "スマホだけでスマホアプリ作れたらカッコよくないですか？楽しそうですよね？PCを触らずスマホ縛りというルールで開発したアプリは、こちらです。"
 ---
-<img src="/images/2025/20250901a/app_icon_1024x1024.png" alt="app_icon_1024x1024.png" width="600" height="600" loading="lazy">
+<img src="/images/2025/20250901a/app_icon_1024x1024.png" alt="app_icon_1024x1024.png" width="600" height="600">
 
 ## 1. はじめに
 

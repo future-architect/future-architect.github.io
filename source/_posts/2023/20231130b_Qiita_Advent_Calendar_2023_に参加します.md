@@ -12,7 +12,7 @@ thumbnail: /images/2023/20231130b/thumbnail.JPG
 author: 伊藤太斉
 lede: "Qiita Advent Calendarにフューチャーは今年も参加します。本記事ではこれまでの振り返りと今年の記事内容について触れます。"
 ---
-<img src="/images/2023/20231130b/IMG_0698.JPG" alt="" width="1181" height="1181" loading="lazy">
+<img src="/images/2023/20231130b/IMG_0698.JPG" alt="" width="1181" height="1181">
 
 ## はじめに
 

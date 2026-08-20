@@ -20,7 +20,7 @@ lede: "2024年8月17日に発売された、Software Design 2024年9月号の第
 
 このような貴重な機会をいただいた栗木さんをはじめ技術評論社の方々には、心からお礼申し上げます。
 
-<img src="/images/2024/20240827a/image.png" alt="" width="320" height="452" loading="lazy">
+<img src="/images/2024/20240827a/image.png" alt="" width="320" height="452">
 
 ## みどころ
 

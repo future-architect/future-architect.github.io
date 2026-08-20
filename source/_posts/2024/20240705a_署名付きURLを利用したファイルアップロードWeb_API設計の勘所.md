@@ -60,7 +60,7 @@ GitHubの[Contents API](https://docs.github.com/ja/rest/repos/contents?apiVersio
 
 署名付きURLを用いたファイルアップロードを行う場合、次のような処理フローが一般的です。各処理について詳しく説明していきます。
 
-<img src="/images/2024/20240705a/image.png" alt="image.png" width="800" height="380" loading="lazy">
+<img src="/images/2024/20240705a/image.png" alt="image.png" width="800" height="380">
 
 ### 1. 署名付きURLの生成
 

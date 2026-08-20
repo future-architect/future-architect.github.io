@@ -32,7 +32,7 @@ lede: "DynamoDB Streamsは、DynamoDBに対する項目の追加、変更、削�
 
 ## DynamoDB Streamsとは
 
-<img src="/images/2021/20210122/1_isSK76wQioKx8k3dXrDrZA.png" width="267" height="154" loading="lazy">
+<img src="/images/2021/20210122/1_isSK76wQioKx8k3dXrDrZA.png" width="267" height="154">
 
 DynamoDB Streamsは、DynamoDBに対する項目の追加、変更、削除をイベントとして検出できる機能です。テーブルの項目が変更されるとすぐに、新しいレコードがテーブルのストリームに表示されます。AWS Lambda はストリームをポーリングし、新しいストリームレコードを検出すると、Lambda 関数を同期的に呼び出します。
 

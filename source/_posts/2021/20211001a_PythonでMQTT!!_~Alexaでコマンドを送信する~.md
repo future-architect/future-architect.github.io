@@ -15,7 +15,7 @@ author: 宮永崇史
 lede: "この記事は温度と湿度、不快指数を定期投稿するbotの作成を目指してハンズオンを進める構成となっています。"
 ---
 
-<img src="/images/2021/20211001a/volodymyr-hryshchenko-V5vqWC9gyEU-unsplash.jpg" alt="" title="Volodymyr Hryshchenko on Unsplash" width="1200" height="800" loading="lazy">
+<img src="/images/2021/20211001a/volodymyr-hryshchenko-V5vqWC9gyEU-unsplash.jpg" alt="" title="Volodymyr Hryshchenko on Unsplash" width="1200" height="800">
 
 ## はじめに
 

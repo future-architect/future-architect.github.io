@@ -41,7 +41,7 @@ Technology Innovation Group DXチームの福井です。
 東京ミッドタウン内の複数エリアに2024年の全受賞作品が展示されており、かなりのボリュームがありました。
 プロダクトの展示、パネルでのサービス説明、実際に商品が購入できるポップアップストアなど、コンテンツは多岐にわたります。実際に触ったり、体験できるプロダクトもありました。
 
-<img src="/images/2025/20250916a/image.png" alt="image.png" width="1200" height="675" loading="lazy">
+<img src="/images/2025/20250916a/image.png" alt="image.png" width="1200" height="675">
 
 - [ASUS Zenbook DUO (2024)](https://www.g-mark.org/gallery/winners/23827)
 - [ゲルソノマ 15-50／1201A727](https://www.g-mark.org/gallery/winners/24475?years=2024)

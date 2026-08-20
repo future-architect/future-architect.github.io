@@ -61,7 +61,7 @@ Firebase Crashlyticsを導入することで、以下の情報を簡単に知る
 Android Studioで`Empty Activity`テンプレートをベースにした新規プロジェクトを作成します。
 ボタンを画像のように2つ追加します。
 
-<img src="/images/2020/20200330/1.png" class="img-small-size" width="636" height="1006" loading="lazy">
+<img src="/images/2020/20200330/1.png" class="img-small-size" width="636" height="1006">
 
 それぞれのボタンに`OnClickListener`を実装します。実装例は後述しますが、それぞれのボタンをクリックしたときの振る舞いを簡単に説明すると、以下のようになります。
 

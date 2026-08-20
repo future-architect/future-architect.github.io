@@ -20,7 +20,7 @@ DXアプローチ連載7本目として本記事では、デザインワーク�
 
 ## Desirability, Viability, Feasibility
 
-<img src="/images/2022/20220727a/スライド1.PNG" alt="" width="1200" height="675" loading="lazy">
+<img src="/images/2022/20220727a/スライド1.PNG" alt="" width="1200" height="675">
 
 デザイン思考は、Desirability（有用性）・Viability（持続可能性）・Feasibility（実現可能性）の3要素を全て満たすソリューションを生み出すことがゴールだと言われています[^1]。
 

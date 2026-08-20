@@ -12,7 +12,7 @@ thumbnail: /images/2025/20250616b/thumbnail.png
 author: 真野隼記
 lede: "CNCFのIncubatingプロジェクトである、Notary v2を用いて、コンテナイメージにデジタル署名してみた記事です。"
 ---
-<img src="/images/2025/20250616b/notary-horizontal-color-1110x298.png" alt="notary-horizontal-color-1110x298.png" width="1110" height="298" loading="lazy">
+<img src="/images/2025/20250616b/notary-horizontal-color-1110x298.png" alt="notary-horizontal-color-1110x298.png" width="1110" height="298">
 
 [CNCF連載](/articles/20250616a/ )の1本目です。
 

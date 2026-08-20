@@ -15,7 +15,7 @@ author: 多賀聡一朗
 lede: "TIG 多賀です。2021/3/19 を開催しました。 私は、Goの Web API 開発にて、API ドキュメントベースで開発していることについて話しました。なお、その他の登壇者の資料は こちら に公開済みですので、興味があれば参照ください。"
 ---
 
-<img src="/images/2021/20210427c/top.png" width="709" height="381" loading="lazy">
+<img src="/images/2021/20210427c/top.png" width="709" height="381">
 
 ## はじめに
 

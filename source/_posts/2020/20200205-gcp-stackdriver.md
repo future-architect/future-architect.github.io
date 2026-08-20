@@ -35,7 +35,7 @@ lede: "Google Cloudをテーマにした連載企画を始めるということ�
 
 ## Stackdriver Loggingについて
 
-<img src="/images/2020/20200205/photo_20200205_01.png" class="img-small-size" width="506" height="350" loading="lazy">
+<img src="/images/2020/20200205/photo_20200205_01.png" class="img-small-size" width="506" height="350">
 
 [Stackdriver Logging](https://cloud.google.com/logging)は、GCPやAWS(!)からのログの収集、検索、分析、モニタリング、通知といった機能を持つGCPのマネージドサービスの1つです。ユーザからするとログの収集・蓄積し、それらを検索するためのログ基盤を自前で構築するのはかなり大変ですが、全てStackdriver Loggingサービス側が面倒見てくれるため、よりアプリケーションなど自分たちの関心事に集中できるようになります。
 

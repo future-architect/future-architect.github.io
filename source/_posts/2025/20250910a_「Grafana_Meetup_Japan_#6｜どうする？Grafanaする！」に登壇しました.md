@@ -16,7 +16,7 @@ lede: "9/2に開催された「Grafana Meetup Japan #6｜どうする？Grafana�
 
 9/2に開催された「[Grafana Meetup Japan #6｜どうする？Grafanaする！](https://grafana-meetup-japan.connpass.com/event/362953/)」にLTで登壇してきたので、参加レポートも含めて記事にします。当日の[YouTube](https://www.youtube.com/watch?v=IQnWiOQHoM8)もアーカイブ公開されているのでそちらと合わせて読んでいただけると幸いです。
 
-<img src="/images/2025/20250910a/gfarana_meetup_6.png" alt="gfarana_meetup_6.png" width="660" height="371" loading="lazy">
+<img src="/images/2025/20250910a/gfarana_meetup_6.png" alt="gfarana_meetup_6.png" width="660" height="371">
 
 ## 自身のLT: Grafana Alloyのconfig運用
 

@@ -19,7 +19,7 @@ lede: "先日、業務の合間を縫って少しづつ勉強を進めていた�
 
 この記事がこれから受験する人の一助となれば幸いです。
 
-<img src="/images/2021/20210818b/AWS-SolArchitect-Associate-2020.png" alt="合格バッチ" width="340" height="340" loading="lazy">
+<img src="/images/2021/20210818b/AWS-SolArchitect-Associate-2020.png" alt="合格バッチ" width="340" height="340">
 
 ## AWS Certified Solutions Architect - Associate とは
 

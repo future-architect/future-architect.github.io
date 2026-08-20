@@ -44,7 +44,7 @@ LLM自体やLLMを活用したシステムを開発していく場合、MLOpsチ
 
 ## LLM開発の全体像
 
-<img src="/images/2023/20230913a/LLM_system_dev_flow.png" alt="LLM_system_dev_flow" width="960" height="344" loading="lazy">
+<img src="/images/2023/20230913a/LLM_system_dev_flow.png" alt="LLM_system_dev_flow" width="960" height="344">
 
 参考: [https://note.com/wandb_jp/n/n1aa6d77f33cf](https://note.com/wandb_jp/n/n1aa6d77f33cf)
 

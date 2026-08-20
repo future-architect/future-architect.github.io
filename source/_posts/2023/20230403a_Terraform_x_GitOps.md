@@ -165,7 +165,7 @@ PipeCD を扱うためには、 **Control Plane** と **Piped** を [インス�
 
 以下は上記リンクに記載がありました概念図になります。
 
-<img src="/images/2023/20230403a/image.png" alt="" width="1200" height="761" loading="lazy">
+<img src="/images/2023/20230403a/image.png" alt="" width="1200" height="761">
 
 Control Plane をインストールするには状態を永続化する必要があるため、Kubernetes Cluster の他に **[Data Store（Firestore, MySQL etc...）](https://pipecd.dev/docs-dev/user-guide/managing-controlplane/architecture-overview/#data-store), [File Store（GCS, S3, Minio etc...）](https://pipecd.dev/docs-dev/user-guide/managing-controlplane/architecture-overview/#file-store)** が [必要のようです](https://pipecd.dev/docs-dev/installation/install-controlplane/)。他にも Web コンソールに円滑にアクセスしようとなった場合には、いくつかのネットワークの設定（静的IP アドレスの付与や DNS の設定 etc...）もする必要がありそうですね！
 

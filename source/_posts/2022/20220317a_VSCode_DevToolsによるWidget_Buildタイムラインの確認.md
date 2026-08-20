@@ -35,7 +35,7 @@ Flutter公式の[DevTools](https://docs.flutter.dev/development/tools/devtools/o
 
 1. devTools起動: [公式手順](https://docs.flutter.dev/development/tools/devtools/vscode)に従って、アプリの起動後にDevToolsを起動します。
 2. DevToolsのPerformanceタブを開きます。
-<img src="/images/2022/20220317a/performance_tab.png" alt="performance_tab.png" width="1200" height="355" loading="lazy">
+<img src="/images/2022/20220317a/performance_tab.png" alt="performance_tab.png" width="1200" height="355">
 3. 「Enhance Tracing」から、Widget Builds, Layouts, PaintsをTrackするように設定します。
 <img src="/images/2022/20220317a/EnhanceTracing.png" alt="EnhanceTracing.png" width="797" height="262" loading="lazy">
 4. アプリを実行すると、タイムラインにFrameごとの処理時間が表示されます（#１）。Frame Time(UI)は、Dart VM内でビルドされるLayer treeと描画コマンドを含む軽量オブジェクトの作成時間を表しています。これらオブジェクトがGPUに渡されることでレンダリングが行われ、その実行時間が、Frame Time(Raster)になります。

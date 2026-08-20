@@ -37,7 +37,7 @@ Bicepコードの最新化に役立つのが、[Bicepリンター](https://learn
 
 今回は、`C:\Bicep` に配置した `main.bicep`* と呼び出されるモジュール群を対象にコードの最新化を行います。
 
-<img src="/images/2025/20250509b/image.png" alt="image.png" width="981" height="413" loading="lazy">
+<img src="/images/2025/20250509b/image.png" alt="image.png" width="981" height="413">
 
 ### 事前準備
 

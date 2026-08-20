@@ -26,7 +26,7 @@ IoTという言葉が話題になり始めてから、かなりの時間が経�
 
 ## 今回やること
 
-<img src="/images/2024/20240423a/image.png" alt="" width="1200" height="607" loading="lazy">
+<img src="/images/2024/20240423a/image.png" alt="" width="1200" height="607">
 
 今回はESP32というマイコンを利用して温度センサから定期的に温度を計測し、その情報をGoogleSpreadSheet上に保持するシステムを構築します。
 

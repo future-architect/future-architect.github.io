@@ -34,7 +34,7 @@ lede: "Google Chat APIに関しての記事となります。業務でGoogle Cha
 - 投稿を1つのスレッドにまとめる方法
 - カード型メッセージの送信方法
 
-<img src="/images/2021/20210913a/スクリーンショット_2021-09-07_17.18.14.png" alt="カード型メッセージ投稿例" width="476" height="598" loading="lazy">
+<img src="/images/2021/20210913a/スクリーンショット_2021-09-07_17.18.14.png" alt="カード型メッセージ投稿例" width="476" height="598">
 
 ## Google Chat API とは
 

@@ -38,7 +38,7 @@ lede: "今回は『Data Center』というゲームがリリースされ、一�
 - 開発元：Waseku
 - パブリッシャー：Waseku
 
-<img src="/images/2026/20260319a/スクリーンショット_2026-03-15_212110.png" alt="" width="1200" height="676" loading="lazy">
+<img src="/images/2026/20260319a/スクリーンショット_2026-03-15_212110.png" alt="" width="1200" height="676">
 
 <img src="/images/2026/20260319a/スクリーンショット_2026-03-15_204407.png" alt="" width="1200" height="675" loading="lazy">
 

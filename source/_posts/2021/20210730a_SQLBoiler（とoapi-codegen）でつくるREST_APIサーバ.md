@@ -67,7 +67,7 @@ SQLBoilerにはSchema Migration機能は含まれておらず、既存のデー�
 今回使用するテーブル定義です。
 ユーザ、イベント、イベント参加ユーザの3テーブルで、イベント・ユーザ間は `1 : 0...N` の関係です。
 
-<img src="/images/2021/20210730a/image.png" alt="テーブル定義" width="403" height="283" loading="lazy">
+<img src="/images/2021/20210730a/image.png" alt="テーブル定義" width="403" height="283">
 
 ```sql
 create table "user" (

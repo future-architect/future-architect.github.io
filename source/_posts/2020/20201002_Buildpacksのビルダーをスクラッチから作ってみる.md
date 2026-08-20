@@ -16,7 +16,7 @@ thumbnail: /images/2020/20201002/thumbnail.png
 author: 澁川喜規
 lede: "CNCF連載の第4回は、CNCFのSandboxプロジェクトのBuildpacksについて紹介します。* https://buildpacks.io"
 ---
-<img src="/images/2020/20201002/buildpacks-horizontal-color.png" width="1200" height="341" loading="lazy">
+<img src="/images/2020/20201002/buildpacks-horizontal-color.png" width="1200" height="341">
 
 TIGの渋川です。
 

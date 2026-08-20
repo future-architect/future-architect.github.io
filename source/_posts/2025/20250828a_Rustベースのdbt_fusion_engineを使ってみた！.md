@@ -12,7 +12,7 @@ thumbnail: /images/2025/20250828a/thumbnail.png
 author: 大前七奈
 lede: "dbtは、データエンジニアリングの現場に革新をもたらしましたが、プロジェクトが大規模になるにつれて、いくつかの課題も浮き彫りになってきました。その課題を解決するために開発された次世代のエンジン「dbt Fusion Engine」について..."
 ---
-<img src="/images/2025/20250828a/image.png" alt="image.png" width="600" height="339" loading="lazy">
+<img src="/images/2025/20250828a/image.png" alt="image.png" width="600" height="339">
 
 [夏の自由研究2025](/articles/20250825a/)ブログ連載の3日目です。
 

@@ -34,7 +34,7 @@ RDB（ここでは社内でも実績が多いPostgreSQLとさせてください�
 
 上記の4つのツールはどれも素晴らしいし、名前がたまたま挙がらなかったけど優れているツールもあるかと思います。そんな中で私が推したいのは、 **GoLand（JetBrainsの有償ライセンスを購入している人）を利用している人に対しては、Database Tools and SQLプラグインを利用する** ことです。GoLandはJetBrainsの提供するIDEの、Go言語版です。Python版のPyCharm(Professional)、Java（JVM）版のIntelliJ(Ultimate)などでも同様の機能を有すると思います。
 
-<img src="/images/2022/20221014a/image.png" alt="" width="1200" height="659" loading="lazy">
+<img src="/images/2022/20221014a/image.png" alt="" width="1200" height="659">
 
 私がちょうど開発で用いているGoLand 2022.2.3 のバージョンで説明していきます。
 

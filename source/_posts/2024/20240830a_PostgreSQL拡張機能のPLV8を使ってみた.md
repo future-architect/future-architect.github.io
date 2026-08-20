@@ -14,7 +14,7 @@ thumbnail: /images/2024/20240830a/thumbnail.png
 author: 岸本卓也
 lede: "PostgreSQLで手続き型処理を実装することにがっつりと向き合うことがなかったため手続き型処理の実装言語はPL/pgSQL一択だと思いこんでいたのですが、実は複数の選択肢がありました。PL/pgSQL、PL/Tcl、PL/Perl、PL/Pythonや、サードパーティ提供も含めると多数の言語が使えるようです使えるようです。"
 ---
-<img src="/images/2024/20240830a/plv8-eyecatch.png" alt="plv8-eyecatch.png" width="1200" height="437" loading="lazy">
+<img src="/images/2024/20240830a/plv8-eyecatch.png" alt="plv8-eyecatch.png" width="1200" height="437">
 
 ## はじめに
 

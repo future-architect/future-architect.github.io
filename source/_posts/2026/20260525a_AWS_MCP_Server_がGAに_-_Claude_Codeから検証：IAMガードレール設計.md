@@ -13,7 +13,7 @@ thumbnail: /images/2026/20260525a/thumbnail.png
 author: 棚井龍之介
 lede: "Claude Code から AWS MCP Server をセットアップし、提供される 11 ツール・IAM ガードレール・CloudTrail 監査までを実際に動かしながらまとめます。"
 ---
-<img src="/images/2026/20260525a/thumbnail-v4.png" alt="thumbnail-v4.png" width="1200" height="630" loading="lazy">
+<img src="/images/2026/20260525a/thumbnail-v4.png" alt="thumbnail-v4.png" width="1200" height="630">
 
 こんにちは、棚井龍之介です。
 

@@ -14,7 +14,7 @@ author: 染矢幸子
 lede: "IT未経験での入社だったため、インフラって何？というところから始まり、AWSやTerraformについてこの数か月間学んできました。"
 ---
 
-<img src="/images/2025/20250516a/image.png" alt="" width="976" height="269" loading="lazy">
+<img src="/images/2025/20250516a/image.png" alt="" width="976" height="269">
 
 [春の入門祭り2025](/articles/20250413a/) 17本目の記事です。
 

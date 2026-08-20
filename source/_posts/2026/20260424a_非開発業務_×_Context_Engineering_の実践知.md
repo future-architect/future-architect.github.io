@@ -14,7 +14,7 @@ thumbnail: /images/2026/20260424a/thumbnail.png
 author: 星名藍乃介
 lede: "お問い合わせ対応業務にLLM Agentを導入してみたお話です。"
 ---
-<img src="/images/2026/20260424a/サムネイル.png.png" alt="" width="1200" height="670" loading="lazy">
+<img src="/images/2026/20260424a/サムネイル.png.png" alt="" width="1200" height="670">
 
 [春の入門祭り2026](/articles/20260421a/)の3本目です。
 

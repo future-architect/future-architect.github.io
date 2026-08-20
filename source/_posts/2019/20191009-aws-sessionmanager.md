@@ -35,7 +35,7 @@ https://docs.aws.amazon.com/ja_jp/systems-manager/latest/userguide/session-manag
 
 ### 手順1　サービスメニューからSystems Managerをクリック
 
-<img src="/images/2019/20191009/1-a.png" class="bordered"  width="1000" height="387" loading="lazy">
+<img src="/images/2019/20191009/1-a.png" class="bordered"  width="1000" height="387">
 
 ### 手順2　セッションマネージャーをクリック
 

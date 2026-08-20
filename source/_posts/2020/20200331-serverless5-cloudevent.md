@@ -26,7 +26,7 @@ lede: "サーバレス連載企画の第5回はCloudEvents(https://cloudevents.i
 
 ## CloudEventsとは？
 
-<img src="/images/2020/20200331/photo_20200331_01.png" width="1200" height="289" loading="lazy">
+<img src="/images/2020/20200331/photo_20200331_01.png" width="1200" height="289">
 
 [CloudEvents](https://cloudevents.io/)は様々存在するイベントを統一的に扱いたいとの思いから登場した統一仕様です。
 2019.10.24に[CNCF](https://www.cncf.io/)のIncubatorプロジェクトに昇格したらしく、同時にv1.0のSpecificationがリリースされています。

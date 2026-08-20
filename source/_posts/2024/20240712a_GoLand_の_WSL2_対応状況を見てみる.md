@@ -13,7 +13,7 @@ thumbnail: /images/2024/20240712a/thumbnail.png
 author: 真野隼記
 lede: "Go開発者向けIDEであるGoLandの、Windows WSL2サポートを試しました。"
 ---
-<img src="/images/2024/20240712a/top.png" alt="" width="1200" height="548" loading="lazy">
+<img src="/images/2024/20240712a/top.png" alt="" width="1200" height="548">
 
 https://www.jetbrains.com/go/
 

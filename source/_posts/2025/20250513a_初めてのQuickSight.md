@@ -14,7 +14,7 @@ thumbnail: /images/2025/20250513a/thumbnail.png
 author: 板垣翼
 lede: "Amazon QuickSightの入門記事です。最近、業務で触れる機会があったので、これから入門される方々の取っ掛かりとなるような内容になるようまとめます。"
 ---
-<img src="/images/2025/20250513a/thumnail.png" alt="thumnail.png" width="1200" height="500" loading="lazy">
+<img src="/images/2025/20250513a/thumnail.png" alt="thumnail.png" width="1200" height="500">
 
 ## はじめに
 

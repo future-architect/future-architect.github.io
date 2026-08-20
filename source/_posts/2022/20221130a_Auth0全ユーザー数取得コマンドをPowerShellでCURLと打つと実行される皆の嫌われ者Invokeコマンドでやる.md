@@ -94,7 +94,7 @@ Auth0にいる総ユーザー数を取得を `Invoke-RestMethod` で記載する
 
 User Management APIの利用権限のあるAPIのtoken取得コマンドが、**API設定のTestタブに**以下の画像のように書いてあるので参照します。tokenを取得する`cURLコマンド`と、すごく親切にバックエンドでよく用いる言語での取得方法まで記載しているので参考になります。
 
-<img src="/images/2022/20221130a/0.png" alt="" width="1200" height="706" loading="lazy">
+<img src="/images/2022/20221130a/0.png" alt="" width="1200" height="706">
 
 ```bash:curlの実行例
 curl --request POST \

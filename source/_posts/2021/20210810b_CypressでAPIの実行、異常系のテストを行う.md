@@ -13,7 +13,7 @@ author: 伊藤真彦
 lede: "フューチャー技術ブログでも何度か取り上げているCypressですが、私も最近触り始めました。今回取り上げたいテーマは、フロントエンドアプリケーションで、特定の画面に表示する情報をサーバーから取得する機能や、ボタンを押すとバックエンドサーバーなどにHTTPリクエストを送信するような機能が実装されている場合の話です。"
 ---
 
-<img src="/images/2021/20210810b/landscape-2022147_640.jpg" alt="" title="Artturi MäntysaariによるPixabayからの画像" width="640" height="360" loading="lazy">
+<img src="/images/2021/20210810b/landscape-2022147_640.jpg" alt="" title="Artturi MäntysaariによるPixabayからの画像" width="640" height="360">
 
 TIGの伊藤真彦です。
 

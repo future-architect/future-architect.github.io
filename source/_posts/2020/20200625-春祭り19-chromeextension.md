@@ -14,7 +14,7 @@ lede: "現在業務では直接開発をする機会はないのですが、業�
 そんな中、お世話になっている先輩から手始めに、Google Chromeの拡張機能の作成方法を教えて頂いたので、拡張機能の作成方法入門を書いていこうと思います。"
 ---
 
-<img src="/images/2020/20200625/top.png" class="img-small-size" width="311" height="270" loading="lazy">
+<img src="/images/2020/20200625/top.png" class="img-small-size" width="311" height="270">
 
 [春の入門祭り](/articles/20200529/)の第19弾です。
 

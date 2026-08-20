@@ -12,7 +12,7 @@ thumbnail: /images/2023/20230307a/thumbnail.png
 author: 宮永崇史
 lede: "CircleCIでGitHubのPR作成時の負荷を軽減するために、PR作成者の自動アサインおよびラベルの付与を自動化した話をご紹介します。"
 ---
-<img src="/images/2023/20230307a/theme.png" alt="" width="1200" height="673" loading="lazy">
+<img src="/images/2023/20230307a/theme.png" alt="" width="1200" height="673">
 
 ## はじめに
 

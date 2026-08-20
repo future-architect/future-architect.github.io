@@ -13,7 +13,7 @@ thumbnail: /images/2023/20231116a/thumbnail.png
 author: 澁川喜規
 lede: "Python Distilledという本がオライリーから出版されました。作者のDave Beazleyはかなり昔からPythonを使い込んでいる人ですので、この本には信頼しかない、と思い読んでみました"
 ---
-<img src="/images/2023/20231116a/image.png" alt="" width="516" height="660" loading="lazy">
+<img src="/images/2023/20231116a/image.png" alt="" width="516" height="660">
 
 [秋のブログ週間2023](/articles/20231030a/)、3週目・13本目です。
 

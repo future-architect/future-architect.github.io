@@ -14,7 +14,7 @@ author: 真野隼記
 lede: "GitHub Actionsをローカル環境で実行できる nektos/act をMakefileやTaskfileなどのタスクランナーの代わりとして使えるのか、試してみた記事です"
 ---
 
-<img src="/images/2025/20250605a/unnamed.jpg" alt="unnamed.jpg" width="1024" height="1024" loading="lazy">
+<img src="/images/2025/20250605a/unnamed.jpg" alt="unnamed.jpg" width="1024" height="1024">
 
 ※画像はGemini Pro 2.5で作成しました。
 

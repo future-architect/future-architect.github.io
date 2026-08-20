@@ -28,7 +28,7 @@ Tenstorrent社が開発した、AI推論アクセラレーションチップで�
 ## 開封
 
 手前がブロアー（冷却ファン）の、奥がボード本体が入っている箱になります。
-<img src="/images/2024/20240417a/IMG_3148.jpg" alt="" width="1200" height="900" loading="lazy">
+<img src="/images/2024/20240417a/IMG_3148.jpg" alt="" width="1200" height="900">
 
 ブロアーは、ボードと接合部分のパーツは３Dプリンタで出力したものを使ってます。
 <img src="/images/2024/20240417a/IMG_3150.jpg" alt="" width="1200" height="900" loading="lazy">

@@ -75,7 +75,7 @@ pike経由で直接、IAMポリシーを直接AWS上にデプロイできるな�
 
 以下のような API Gateway + Lambda + DynamoDB（図にはないですがCloudWatchメトリクスやアラーム）を含んだリソースを持つTerraformコードを用意します。なお、図はinframapで生成したものを簡単に加筆したものです。
 
-<img src="/images/2025/20250401a/{28A12EA6-0F25-4E2C-8FDB-4BDCE8FC54AF}.png" alt="{28A12EA6-0F25-4E2C-8FDB-4BDCE8FC54AF}.png" width="491" height="560" loading="lazy">
+<img src="/images/2025/20250401a/{28A12EA6-0F25-4E2C-8FDB-4BDCE8FC54AF}.png" alt="{28A12EA6-0F25-4E2C-8FDB-4BDCE8FC54AF}.png" width="491" height="560">
 
 <details><summary>main.tf</summary>
 

@@ -14,7 +14,7 @@ author: 原木翔
 lede: "Dapr Agentsの検討記事です。Dapr Agents の技術的背景や意義を「Agentic AI」や「ワークフロー」の側面から探ります。"
 ---
 
-<img src="/images/2025/20250625a/ラジオ風カーソルその2.png" alt="ラジオ風カーソルその2.png" width="1200" height="800" loading="lazy">
+<img src="/images/2025/20250625a/ラジオ風カーソルその2.png" alt="ラジオ風カーソルその2.png" width="1200" height="800">
 
 > Today, we are excited to announce Dapr Agents, a framework built on top of Dapr that combines stateful workflow coordination with advanced Agentic AI features.
 > 本日、Dapr を基盤として構築された新たなフレームワーク「Dapr Agents」のリリースを発表いたします。Dapr Agents は、ステートフルなワークフロー調整機能と先進的な Agentic AI 機能を統合したソリューションです。

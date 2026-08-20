@@ -80,7 +80,7 @@ volumes:
 
 管理画面は動作も軽快だしなかなか良いですね。今まで触ったことのあるウェブを使ったファイル管理画面の中では一番スピードが速くて体験が良いですね。
 
-<img src="/images/2026/20260403a/screenshot_console.png" alt="" width="1137" height="713" loading="lazy">
+<img src="/images/2026/20260403a/screenshot_console.png" alt="" width="1137" height="713">
 
 ## Presigned URL
 

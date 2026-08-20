@@ -141,7 +141,7 @@ class MapSampleState extends State<MapSample> {
 
 `main.dart`を上記コードに置き換えてアプリケーションを起動すると画像のような状態になります。
 
-<img src="/images/2021/20211224a/image.png" alt="Google Mapサンプルアプリ" width="628" height="719" loading="lazy">
+<img src="/images/2021/20211224a/image.png" alt="Google Mapサンプルアプリ" width="628" height="719">
 
 実際のアプリケーションではGoogle Mapsウィジェットを全画面に表示するだけのものを作ることにはならないと思います。
 サンプルの様々な部分を参考に何らかの機能を追加したり、他のウィジェットと組み合わせたりと拡張していきましょう。

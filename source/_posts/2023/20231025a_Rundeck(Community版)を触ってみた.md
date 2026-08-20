@@ -66,7 +66,7 @@ Rundeckを構築するにあたりいくつかの構成を試してみました�
 
 Rundeckのジョブ管理の使用感などを試したいのであれば最も適しています。
 
-<img src="/images/2023/20231025a/image.png" alt="" width="264" height="258" loading="lazy">
+<img src="/images/2023/20231025a/image.png" alt="" width="264" height="258">
 
 ### 2. シングルインスタンス構成　＋　外部データベース
 

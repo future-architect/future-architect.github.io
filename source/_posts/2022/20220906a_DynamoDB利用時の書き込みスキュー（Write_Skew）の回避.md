@@ -32,7 +32,7 @@ DynamoDBは2018年に[トランザクションがサポート](https://aws.amazo
 1-1 及び 2-1 の処理にて現在の申し込み人数を取得する場合、両方の結果は2人となり、ユーザAもユーザBも登録が正常に完了してしまいます。
 しかしながら結果として申し込み人数は4人となってしまうため、これは要件を満たしていません。
 
-<img src="/images/2022/20220906a/DynamoDB_Write_Skew_Example_1.drawio.png" alt="DynamoDB_Write_Skew_Example_1.drawio" width="1101" height="341" loading="lazy">
+<img src="/images/2022/20220906a/DynamoDB_Write_Skew_Example_1.drawio.png" alt="DynamoDB_Write_Skew_Example_1.drawio" width="1101" height="341">
 
 このように、あるトランザクションにおける書き込みの結果が別のトランザクションの読み込み結果を変化させる（今回の場合はユーザAの書き込みによって、ユーザBの検索結果が過去のものになってしまっている）効果は**ファントムリード**と呼ばれ、このように読み込んだ結果を元に書き込みを行なう場合に生じる問題を**書き込みスキュー**と呼びます。
 

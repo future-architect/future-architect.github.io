@@ -13,7 +13,7 @@ author: 藤井亮佑
 lede: "Software Design 2025 年 12 月号特集の「今さら聞けない ID 管理 認証基盤を構築する際に知っておくべきこと」に、宮崎さん、市川さん、私の 3 名で寄稿をさせていただきました。"
 ---
 <a href="https://gihyo.jp/magazine/SD/archive/2025/202512">
-<img src="/images/2025/20251205a/image.png" alt="" width="400" height="565" loading="lazy">
+<img src="/images/2025/20251205a/image.png" alt="" width="400" height="565">
 </a>
 
 ## はじめに

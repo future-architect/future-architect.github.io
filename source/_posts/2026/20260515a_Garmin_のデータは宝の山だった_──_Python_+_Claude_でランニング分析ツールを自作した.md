@@ -16,7 +16,7 @@ lede: "ランニングにハマって、Garmin デバイスを使って走って
 
 ランニングにハマって、Garmin デバイスを使って走っている。走り終わったあと、Garmin Connect のアプリを開いてデータを眺めるのが楽しい。
 
-<img src="/images/2026/20260515a/image.png" alt="image.png" width="1083" height="1871" loading="lazy">
+<img src="/images/2026/20260515a/image.png" alt="image.png" width="1083" height="1871">
 
 ただ、毎日眺めているうちに、どこか使い切れていない感覚が残る。Garminは膨大な数字を出してくれるのに、「結局どこが悪かったのか」には踏み込んでくれない。
 

@@ -77,7 +77,7 @@ jobs:
 
 このワークフローを実行して GitHub Actions の実行結果サマリをみると [次のように](https://github.com/rhumie/github-annotation-demo/actions/runs/14806970834) アノテーションが出力されます。
 
-<img src="/images/2025/20250604a/annotations_in_summary.png" alt="annotations_in_summary.png" width="1200" height="653" loading="lazy">
+<img src="/images/2025/20250604a/annotations_in_summary.png" alt="annotations_in_summary.png" width="1200" height="653">
 
 また、このワークフローが PR（Pull Request）をトリガとして実行されている場合は、 [次のように](https://github.com/rhumie/github-annotation-demo/pull/1/files) PR の「Files changed」タブから該当する箇所にインラインでアノテーションが表示されていることが確認できます。
 

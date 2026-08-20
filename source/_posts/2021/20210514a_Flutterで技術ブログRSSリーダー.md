@@ -219,7 +219,7 @@ Androidの場合はブラウザの起動に権限設定が必要です。
 
 エミュレータで動かしてみるとこんな感じです。
 
-<img src="/images/2021/20210514a/Animation.gif" alt="モバイルアプリで実行例" wight="469" width="469" height="842" loading="lazy">
+<img src="/images/2021/20210514a/Animation.gif" alt="モバイルアプリで実行例" wight="469" width="469" height="842">
 
 ## スワイプでリストを閉じる
 

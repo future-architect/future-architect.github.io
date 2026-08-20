@@ -14,7 +14,7 @@ author: 多賀聡一朗
 lede: "今回は、errors package を一部利用して、エラーコードベースのエラーハンドリング処理を実装しました。また、morikuni/failure を利用した実装への書き換えも試してみています。"
 ---
 
-<img src="/images/2020/20200522/top.png" width="1354" height="688" loading="lazy">
+<img src="/images/2020/20200522/top.png" width="1354" height="688">
 
 ## 概要
 

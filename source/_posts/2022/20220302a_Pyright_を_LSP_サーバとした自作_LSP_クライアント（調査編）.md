@@ -40,7 +40,7 @@ https://github.com/microsoft/pyright/blob/main/docs/build-debug.md
 
 Pyright を VSCode 拡張としてデバッグ実行します。VSCode のサイドバーから「実行とデバッグ」を選択し、プルダウンメニューから "Pyright extension" を選択、実行します。なお、実行時のオプションについてはプルダウンメニュー横の歯車、あるいは [`.vscode/launch.json`](https://github.com/microsoft/pyright/blob/main/.vscode/launch.json) から確認できます。
 
-<img src="/images/2022/20220302a/s.png" alt="VS Codeデバッグ実行" width="1200" height="656" loading="lazy">
+<img src="/images/2022/20220302a/s.png" alt="VS Codeデバッグ実行" width="1200" height="656">
 
 実行すると、VSCode がもう1つ別のウィンドウで立ち上がります。上部に [拡張機能開発ホスト] と書かれていることを確認します。このウィンドウは現在実行している拡張機能が反映された VSCode になっています。
 <img src="/images/2022/20220302a/ss.png" alt="VSCode がもう一つ別のウィンドウ" width="1200" height="84" loading="lazy">

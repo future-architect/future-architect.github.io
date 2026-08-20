@@ -20,7 +20,7 @@ TIGのDXチームに所属している加部です。入社してからは主に
 
 ## DataTransferServiceとは
 
-<img src="/images/2020/20200214/photo_20200214_01.png" class="img-very-small-size" width="309" height="378" loading="lazy">
+<img src="/images/2020/20200214/photo_20200214_01.png" class="img-very-small-size" width="309" height="378">
 
 > BigQuery Data Transfer Service は、あらかじめ設定されたスケジュールに基づき、BigQuery BigQuery Data Transfer Service は、あらかじめ設定されたスケジュールに基づき、BigQuery へのデータの移動を自動化するマネージド サービスです。そのため、アナリティクス チームが BigQuery データ ウェアハウス基盤を構築する際にコードの作成はまったく必要ありません。
 > https://cloud.google.com/bigquery/transfer

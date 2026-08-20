@@ -45,7 +45,7 @@ lede: "普段の業務で使っているGeminiアプリで感じた「AIって�
 
 次のようにGeminiアプリからGoogle Workspaceのアプリにメンションする形で呼び出すことができます。
 
-<img src="/images/2025/20250728a/スクリーンショット_2025-07-28_10.27.18.png" alt="" width="1200" height="749" loading="lazy">
+<img src="/images/2025/20250728a/スクリーンショット_2025-07-28_10.27.18.png" alt="" width="1200" height="749">
 
 例えば、ToDoリストに「技術ブログを執筆する」というタスクを追加する場合、Geminiアプリから次のように追加できます。
 

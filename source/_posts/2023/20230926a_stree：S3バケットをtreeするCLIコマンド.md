@@ -14,7 +14,7 @@ thumbnail: /images/2023/20230926a/thumbnail.png
 author: 宮永崇史
 lede: "S3バケットをtreeするCLIコマンドを紹介します。"
 ---
-<img src="/images/2023/20230926a/stree-display.png" alt="" width="1200" height="600" loading="lazy">
+<img src="/images/2023/20230926a/stree-display.png" alt="" width="1200" height="600">
 
 ## はじめに
 

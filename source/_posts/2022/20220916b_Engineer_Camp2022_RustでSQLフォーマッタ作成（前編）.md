@@ -23,7 +23,7 @@ Future Engineer Camp 2022に参加した川渕と齋藤です。
 ## SQLフォーマッタとは
 
 SQLフォーマッタとはSQLを統一された体裁にフォーマットしてくれるツールです。体裁を統一することで他人が見ても読みやすいコードになり、生産性が向上します。
-<img src="/images/2022/20220916b/demo1.gif" alt="" width="1200" height="675" loading="lazy">
+<img src="/images/2022/20220916b/demo1.gif" alt="" width="1200" height="675">
 
 以下の図のように、インデントなどが揃って読みやすくなっていることがわかります。
 

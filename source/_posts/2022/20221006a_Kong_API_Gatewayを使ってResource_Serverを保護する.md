@@ -26,7 +26,7 @@ https://future-architect.github.io/articles/20210610a/
 
 ## Kong Gateway
 
-<img src="/images/2022/20221006a/gateway_overview.png" alt="gateway_overview.png" width="1200" height="507" loading="lazy">
+<img src="/images/2022/20221006a/gateway_overview.png" alt="gateway_overview.png" width="1200" height="507">
 
 [Kong](https://github.com/Kong/kong)はOSSから始まったAPIサーバのトラフィックを管理するためのミドルウェアです。
 

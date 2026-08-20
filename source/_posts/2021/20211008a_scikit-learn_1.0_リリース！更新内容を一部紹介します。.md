@@ -81,7 +81,7 @@ X = pd.DataFrame({
 
 Xは以下のようなデータフレームになります。
 
-<img src="/images/2021/20211008a/X_origin.png" alt="Xのデータフレーム" width="591" height="262" loading="lazy">
+<img src="/images/2021/20211008a/X_origin.png" alt="Xのデータフレーム" width="591" height="262">
 
 ColumnTransformerを用いて、Xのカテゴリ変数に対してはone-hot encoding、量的変数に対しては標準化を行います。
 

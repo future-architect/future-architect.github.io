@@ -14,7 +14,7 @@ lede: "Go tipsということで、シンプルネタを投稿します。
 
 検索窓に入れると「printデバッグでいつまで消耗しているの？」とか「printデバッグにさようなら」とかサジェストされつつも、根強く生き残っているのがprintデバッグです。むしろ、非同期だったり並列処理が増えてくると、同期的に動くデバッガーが逆に使いにくかったりもありますし、デバッガーを使うにしてもブレークポイントを仕掛ける場所のあたりをつけるためにprintデバッグの力を借りたりもあるし、いっそのことprintデバッグの方が進化しろ、と個人的には思っています。"
 ---
-<img src="/images/2020/20200527/top.png" class="img-small-size" width="632" height="428" loading="lazy">
+<img src="/images/2020/20200527/top.png" class="img-small-size" width="632" height="428">
 
 [Go Tips連載](/tags/GoTips%E9%80%A3%E8%BC%89/)の第8弾です。
 

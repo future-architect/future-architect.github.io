@@ -17,7 +17,7 @@ lede: "フューチャーの夏季インターンシップEngineer Camp 2021に�
 こんにちは。フューチャーの夏季インターンシップEngineer Camp 2021に参加した森下です。
 このインターンシップを通じて得た経験や学んだことをお話ししていきます。
 
-<img src="/images/2021/20211018a/5374a3ec-6860-bbad-4295-474880d81f10.png" alt="" title="illustACからカフェラテさんのイラスト" width="1200" height="900" loading="lazy">
+<img src="/images/2021/20211018a/5374a3ec-6860-bbad-4295-474880d81f10.png" alt="" title="illustACからカフェラテさんのイラスト" width="1200" height="900">
 
 ## インターンシップの内容
 

@@ -25,7 +25,7 @@ lede: "Draｗ.io（Diagrams.net）はとても便利ですが、VScodeやプラ�
 
 https://marketplace.visualstudio.com/items?itemName=hediet.vscode-drawio
 
-<img src="/images/2021/20210525b/vscode.gif" alt="VS Codeでdraw.ioを編集する動画" width="720" height="480" loading="lazy">
+<img src="/images/2021/20210525b/vscode.gif" alt="VS Codeでdraw.ioを編集する動画" width="720" height="480">
 
 ## Draｗ.io プラグイン
 

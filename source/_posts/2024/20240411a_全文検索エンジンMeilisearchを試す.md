@@ -12,7 +12,7 @@ thumbnail: /images/2024/20240411a/thumbnail.png
 author: 岸本卓也
 lede: "ある静的サイトジェネレーターで生成された膨大なドキュメントの検索において、全文検索機能はあるものの以下の課題を感じることがありました。"
 ---
-<img src="/images/2024/20240411a/meilisearch-logo-light.png" alt="" width="495" height="74" loading="lazy">
+<img src="/images/2024/20240411a/meilisearch-logo-light.png" alt="" width="495" height="74">
 
 ## はじめに
 

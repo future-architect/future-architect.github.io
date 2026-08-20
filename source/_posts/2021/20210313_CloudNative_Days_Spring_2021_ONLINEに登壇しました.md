@@ -17,7 +17,7 @@ lede: "今回は先日開催されました、CloudNative Days Spring 2021 ONLIN
 こんにちは。TIGの伊藤太斉です。
 今回は先日開催されました、[CloudNative Days Spring 2021 ONLINE](https://event.cloudnativedays.jp/cndo2021)に登壇しましたので、その内容について書いていきます。
 
-<img src="/images/2021/20210313/CNDO2021@2x.png" width="521" height="344" loading="lazy">
+<img src="/images/2021/20210313/CNDO2021@2x.png" width="521" height="344">
 
 ## CloudNative Daysについて
 

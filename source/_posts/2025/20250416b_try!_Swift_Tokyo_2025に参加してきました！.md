@@ -15,7 +15,7 @@ author: 橋本竜我
 lede: "初めてtry! Swift Tokyo 2025に参加してきました！参加報告として、興味深かったセッションや参加して感じたことなどを共有します。"
 ---
 
-<img src="/images/2025/20250416b/9addbdc8-d932-4dfc-ab35-fb5a7cf56fd0.jpeg" alt="" width="1080" height="1210" loading="lazy">
+<img src="/images/2025/20250416b/9addbdc8-d932-4dfc-ab35-fb5a7cf56fd0.jpeg" alt="" width="1080" height="1210">
 
 ## はじめに
 

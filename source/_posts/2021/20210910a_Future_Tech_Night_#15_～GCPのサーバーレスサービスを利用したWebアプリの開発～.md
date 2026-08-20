@@ -47,7 +47,7 @@ lede: "Future Tech Night #15への登壇レポートと、内容についての�
 これで、無事使うサービスがCloud Runに決定しましたので、インフラの概形が出来上がりました。
 次からはいよいよ内部の設定などを行っていきます。
 
-<img src="/images/2021/20210910a/Untitled_Diagram.png" alt="Untitled_Diagram.png" width="1011" height="541" loading="lazy">
+<img src="/images/2021/20210910a/Untitled_Diagram.png" alt="Untitled_Diagram.png" width="1011" height="541">
 
 ## Serverless NEGの利用
 

@@ -72,7 +72,7 @@ http://localhost/ にアクセスすると初回は「管理者アカウント�
 
 サインインしたら、右上のアカウント名をクリックして設定→モデルプロバイダー→Anthropicにマウスオーバーしてセットアップ、と進んでAPIキーを入力します。そのままだとシステムモデルに Claude 3 Opus が使われてしまうので Haiku を選択します。寄稿時点では `claude-3-haiku-20240307` というモデル名でした。ここでClaudeシリーズが選択できない場合は何かしらエラーが発生しています。原因が分からなければAPIキーを再発行＆再入力してください。
 
-<img src="/images/2024/20240402a/image.png" alt="" width="891" height="530" loading="lazy">
+<img src="/images/2024/20240402a/image.png" alt="" width="891" height="530">
 
 ちなみに OpenRouter を使用するなどして OpenAI 互換のモデルを使用する場合は一番下の `Model providers compatible with OpenAI's API standard, such as LM Studio.` で使用できます。が、恐らくDifyの不具合でそれだけではモデルとして使用可能になりません。一度保存したモデル情報を開いて保存しなおすと使用可能になります。
 

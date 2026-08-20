@@ -19,7 +19,7 @@ lede: "AWS SDK for Goを使ってAWSのAPIをコールする場合のリトラ�
 
 ## `AWS SDK for Go` のリトライ
 
-<img src="/images/2021/20210218/awsgo.png" class="img-middle-size" width="600" height="256" loading="lazy">
+<img src="/images/2021/20210218/awsgo.png" class="img-middle-size" width="600" height="256">
 
 `AWS SDK for Go` のバージョンは [`v1.37.6`](https://github.com/aws/aws-sdk-go/releases/tag/v1.37.6) です。
 

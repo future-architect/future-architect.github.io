@@ -22,7 +22,7 @@ lede: "Salesforce ApexというJava5に似た構文を持つ言語のパーサ�
 
 ## プロジェクトの概要
 
-<img src="/images/2026/20260225a/TeaVMによるclassファイルのコンパイル.png" alt="TeaVMによるclassファイルのコンパイル" width="1200" height="655" loading="lazy">
+<img src="/images/2026/20260225a/TeaVMによるclassファイルのコンパイル.png" alt="TeaVMによるclassファイルのコンパイル" width="1200" height="655">
 
 **目標**: 自作Java製Apexパーサーをブラウザで動かし、ApexソースコードのAST[^ast]をインタラクティブに可視化すること。
 

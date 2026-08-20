@@ -167,7 +167,7 @@ https://docs.aws.amazon.com/ja_jp/AWSCloudFormation/latest/UserGuide/using-cfn-s
 
 また、2025年11月からCloudFormationではテンプレートと実リソースの状態を⽐較し、ドリフト検知されたリソースをテンプレートの状態に修復できるようになっています（※CDK CLIからも`cdk deploy --revert-drift`で実行できるようです。[PR#1127](https://github.com/aws/aws-cdk-cli/pull/1127)）
 
-<img src="/images/2026/20260522a/image.png" alt="image.png" width="800" height="451" loading="lazy">
+<img src="/images/2026/20260522a/image.png" alt="image.png" width="800" height="451">
 
 [AWS Infrastructure as Code の新機能 2025 総まとめ 〜SA 4人による怒涛のデモ祭り〜](https://speakerdeck.com/konokenj/aws-iac-update-feb-2026?slide=32)より引用
 

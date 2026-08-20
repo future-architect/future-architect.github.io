@@ -34,7 +34,7 @@ EC2・RDSなどAWS主要サービスの機能・役割に対する知識はあ�
 **しかも無料！（ここ大事）**
 
 その他のロールは以下のようになっております。
-<img src="/images/2024/20240606a/cq_jp_2-1024x313.png" alt="" width="1024" height="313" loading="lazy">
+<img src="/images/2024/20240606a/cq_jp_2-1024x313.png" alt="" width="1024" height="313">
 
 ## 学習できるサービス内容
 

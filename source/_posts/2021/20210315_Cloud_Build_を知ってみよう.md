@@ -57,7 +57,7 @@ Cloud Build は、GCP が提供するビルドを行うサービスです。
 以下の図のようにCloud Build は、ソース、ビルド、デプロイから構成されています。
 ソースやデプロイは、例として記載しています。
 
-<img src="/images/2021/20210315/image.png" width="777" height="404" loading="lazy">
+<img src="/images/2021/20210315/image.png" width="777" height="404">
 
 ### ソース
 

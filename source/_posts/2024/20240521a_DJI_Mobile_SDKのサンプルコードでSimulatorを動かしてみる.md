@@ -27,7 +27,7 @@ lede: "ドローンを利用して自動操縦（Autopilot）のロジックを�
 - リモートコントローラー(以下、RC)
 - USBケーブル数本
 
-<img src="/images/2024/20240521a/image.png" alt="" width="1200" height="904" loading="lazy">
+<img src="/images/2024/20240521a/image.png" alt="" width="1200" height="904">
 
 ## バージョン
 

@@ -33,7 +33,7 @@ GitのBranch作成やCheckout, Commit, Pushまで使えた方向けに、次の�
 
 ### 初期状態
 
-<img src="/images/2021/20210420b/commit_base.png" alt="初期状態のブランチ" width="282" height="371" loading="lazy">
+<img src="/images/2021/20210420b/commit_base.png" alt="初期状態のブランチ" width="282" height="371">
 
 ### masterブランチへRebase
 

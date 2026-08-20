@@ -45,7 +45,7 @@ lede: "オンプレからクラウドへのデータ移行に関して、Azure�
 1. Data Box初期設定用PC
 1. データコピー用サーバ
 
-<img src="/images/2022/20221108a/WS000297.JPG" alt="WS000297.JPG" width="1037" height="736" loading="lazy">
+<img src="/images/2022/20221108a/WS000297.JPG" alt="WS000297.JPG" width="1037" height="736">
 
 Data Box初期設定用PCとデータコピー用サーバは今回の案件のために用意したので、以下に環境情報を記します。
 転送先はAzure Data Boxの領域であり、また転送元はユーザにより異なるため環境情報の説明は省きます。

@@ -37,7 +37,7 @@ CCS1とCCS2は通称**コンボ**と呼ばれています。
 
 実際に2020年にCHAdeMO、GB/T、コンボに互換性のあるCHAdeMO3.0が完成しました。
 
-<img src="/images/2022/20220127a/image.png" alt="チャデモ3.0" width="1200" height="620" loading="lazy">
+<img src="/images/2022/20220127a/image.png" alt="チャデモ3.0" width="1200" height="620">
 
 参考：https://www.chademo.com/ja/chademo3-0/
 

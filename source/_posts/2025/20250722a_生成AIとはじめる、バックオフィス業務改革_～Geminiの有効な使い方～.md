@@ -283,7 +283,7 @@ function moveCompletedTasks() {
 　・空白行なども含めておくと、より堅牢なテストができます。
 ```
 
-<img src="/images/2025/20250722a/image.png" alt="" width="576" height="461" loading="lazy">
+<img src="/images/2025/20250722a/image.png" alt="" width="576" height="461">
 
 ステップ1の中にて、添付スクショのように「データ準備の例」としてGoogleスプレッドシートにエクスポート可能な形でサンプルの「タスクリスト」シートと「完了リスト」シートも作成してくれているため、テスト用にどういった準備をすればいいかも丁寧にガイドしてくれます。
 

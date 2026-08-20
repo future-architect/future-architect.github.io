@@ -28,7 +28,7 @@ https://marketplace.visualstudio.com/items?itemName=wsysuper.vscode-pipe-run-not
 
 VSCode の拡張機能は、[マーケットプレイス](https://marketplace.visualstudio.com/search?target=VSCode&category=All%20categories&sortBy=Installs)で集中管理されています。現時点は 64000 以上の拡張機能が作られています。
 
-<img src="/images/2024/20241011a/1.png" alt="" width="1200" height="652" loading="lazy">
+<img src="/images/2024/20241011a/1.png" alt="" width="1200" height="652">
 
 OSS のおかげで、言語のパックだけではなく、スニペット、配色テーマ、フォーマッター、テストツール、AI/ML、データサイエンスに関わるツールなど、多彩な拡張機能が満載ですね。
 

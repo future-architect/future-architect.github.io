@@ -81,7 +81,7 @@ AWSの広告っぽくなってしまうので、サラッと記載します。
 ### 3rd-Party システムとの連携
 
 引用ですが、下記のスライドで説明がありました。
-<img src="/images/2018/20181202/photo_20181202_01.png" width="638" height="359" loading="lazy">
+<img src="/images/2018/20181202/photo_20181202_01.png" width="638" height="359">
 
 ### CCP（ソフトフォン）の拡張
 

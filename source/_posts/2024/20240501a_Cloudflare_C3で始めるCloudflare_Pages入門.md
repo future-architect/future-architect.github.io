@@ -25,7 +25,7 @@ Cloudflareが提供するCLIツール「Cloudflare C3」を利用して、Cloudf
 
 Cloudflare Pagesとは、一言で言えば **「Cloudflareが提供するWebサイトのホスティングサービス」** です。
 
-<img src="/images/2024/20240501a/ogp.png" alt="ogp.png" width="1200" height="630" loading="lazy">
+<img src="/images/2024/20240501a/ogp.png" alt="ogp.png" width="1200" height="630">
 
 みなさんは、静的Webサイトを作成した後どこにデプロイしますか？
 

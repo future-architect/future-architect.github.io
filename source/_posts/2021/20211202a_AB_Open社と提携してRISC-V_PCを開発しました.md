@@ -25,7 +25,7 @@ RISC-VはCPU命令セットアーキテクチャ（Instruction Set Architecture:
 
 ## 開発した RISC-V パーソナルコンピュータについて
 
-<img src="/images/2021/20211202a/future_rvpc_promo_1.jpg" alt="future_rvpc_promo_1.jpg" width="1200" height="802" loading="lazy">
+<img src="/images/2021/20211202a/future_rvpc_promo_1.jpg" alt="future_rvpc_promo_1.jpg" width="1200" height="802">
 
 <img src="/images/2021/20211202a/future_rvpc_promo_4.jpg" alt="future_rvpc_promo_4.jpg" width="1200" height="802" loading="lazy">
 

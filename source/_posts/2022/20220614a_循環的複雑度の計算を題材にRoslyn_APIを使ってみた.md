@@ -121,7 +121,7 @@ dotnet new console -o RoslynBlog
 さて、ここまでで C# の開発環境とプロジェクトの作成が済みましたが、まだデバッガが使用出来ない状態です。続いてデバッガの設定をしていきましょう。
 といっても手順は簡単で、Visual Studio Codeのデバッグパネルを開き、 `create a launch.json file` をクリックするだけです。
 これにより、`launch.json`が作成され、このようにデバッグが可能となります。
-<img src="/images/2022/20220614a/2022-06-01_16h51_12.png" alt="2022-06-01_16h51_12.png" width="540" height="256" loading="lazy">
+<img src="/images/2022/20220614a/2022-06-01_16h51_12.png" alt="2022-06-01_16h51_12.png" width="540" height="256">
 
 これで無事にデバッグできるようになりました。
 <img src="/images/2022/20220614a/2022-06-02_13h23_24.png" alt="2022-06-02_13h23_24.png" width="679" height="223" loading="lazy">

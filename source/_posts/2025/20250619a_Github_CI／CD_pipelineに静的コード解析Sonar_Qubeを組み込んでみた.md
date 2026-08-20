@@ -120,7 +120,7 @@ PJ_ROUTE/
 
 SonarCloud のウェブサイトにアクセスし、[Log in] or [Sign up] > [GitHub] を選択してGitHubアカウントで連携・登録する。
 
-<img src="/images/2025/20250619a/sonarqube_03.png" alt="sonarqube_03.png" width="1200" height="366" loading="lazy">
+<img src="/images/2025/20250619a/sonarqube_03.png" alt="sonarqube_03.png" width="1200" height="366">
 <div style="display: flex; align-items: flex-start;">
   <img src="/images/2025/20250619a/sonarqube_04.png" alt="sonarqube_04.png" width="603" height="843" loading="lazy">
   <img src="/images/2025/20250619a/sonarqube_05.png" alt="sonarqube_05.png" width="529" height="939" loading="lazy">

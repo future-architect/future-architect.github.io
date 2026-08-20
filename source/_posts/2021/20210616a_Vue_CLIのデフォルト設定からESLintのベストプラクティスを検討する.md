@@ -20,7 +20,7 @@ TIGの伊藤真彦です。
 
 今回は愛用しているVue CLIを利用して、フロントエンドアプリケーションの詳細な設定について調査してみました。
 
-<img src="/images/2021/20210616a/image.png" alt="Vue.jsアイコン" width="400" height="400" loading="lazy">
+<img src="/images/2021/20210616a/image.png" alt="Vue.jsアイコン" width="400" height="400">
 
 ## はじめに
 

@@ -13,7 +13,7 @@ author: 岡部公亮
 lede: "フューチャーのインターンEngineer Campに参加させていただいた岡部です。今回はタイトルにもある通り、2020年エンジニアキャンプのインターンの内容、学びについてお話しさせていただきます。"
 ---
 
-<img src="/images/2020/20200921/図2.png" width="1057" height="908" loading="lazy">
+<img src="/images/2020/20200921/図2.png" width="1057" height="908">
 
 ## はじめに
 
