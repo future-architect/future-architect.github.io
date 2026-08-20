@@ -34,9 +34,9 @@ TIGの伊藤真彦です。
 
 しかし、コード規約を明示しても、その全てを把握してルールを守ってコードを書くこと、ルールが守られている事を人が判断することは難しいです。そこで、Linterを採用することでコードの一貫性を自動で維持することが可能になります。
 
-(上記のJavaコード規約の著者である[Otaさん](https://github.com/ota-meshi)は奇しくも[eslint-plugin-vue](https://github.com/vuejs/eslint-plugin-vue)のメインコミッターです、凄い。
+(上記のJavaコード規約の著者である[Otaさん](https://github.com/ota-meshi)は奇しくも[eslint-plugin-vue](https://github.com/vuejs/eslint-plugin-vue)のメインコミッターです、凄い。)
 
-憧れのあの人と一緒に働いてみたい、そんな転職の応募はいつでもお待ちしていますよ...!)
+(憧れのあの人と一緒に働いてみたい、そんな転職の応募はいつでもお待ちしていますよ...!)
 
 ## Linterとは
 
