@@ -15,17 +15,37 @@ const RANKING_MAX_COUNT = 25;
 // PVの実測でテールに読む価値が残っているのは年間だけ
 // （25位: 年間4,532 / 月間336。トレンドの26位以下はほぼ横一線のノイズ帯）
 const RANKING_YEARLY_MAX_COUNT = 50;
+// 順位の丸をネイビーで塗る最後の順位 (#2681)。塗るのは表彰台の3件までで、
+// 4位以下は地のグレーに任せる。10位まで塗ると塗りの帯が強すぎた
+const RANK_NAVY_LAST = 3;
+
+// 順位の丸の中身と段のクラスを決める (#2681)。
+// 段は「1位＝クリムゾンに王冠 / 2〜3位＝ネイビーに数字 / 4位以下＝地のグレーに数字」。
+// 1位だけ数字を王冠に置き換えるので、読み上げには sr-only で順位を残す
+// （王冠の svg は aria-hidden なので、これが無いと1位だけ順位を名乗らなくなる）。
+// crownSvg は呼び出し側がアイコン辞書から取って渡す
+const rankMark = (rank, crownSvg) => {
+  if (rank === 1) {
+    return { html: `${crownSvg}<span class="sr-only">1</span>`, className: 'post-list-rank-first' };
+  }
+  return { html: String(rank), className: rank <= RANK_NAVY_LAST ? 'post-list-rank-high' : '' };
+};
 
 // caps は各段の終端順位（累積）。[10, 25] なら 10位まで表示 + 25位まで畳み
-const rankingList = (posts, caps = [RANKING_DISPLAY_COUNT, RANKING_MAX_COUNT]) => {
+const rankingList = (posts, crownSvg, caps = [RANKING_DISPLAY_COUNT, RANKING_MAX_COUNT]) => {
   // 順位はマークアップ側で振る。CSS カウンタだと「10件で畳む」定数と
   // 二重管理になる。畳んだ側は11位から続く
   const items = (list, offset) =>
     list
-      .map((post, i) => {
-        const rank = offset + i + 1;
-        return postListItem(post, 'featured-posts-item', undefined, true, rank, rankClass(rank));
-      })
+      .map((post, i) =>
+        postListItem(
+          post,
+          'featured-posts-item',
+          undefined,
+          true,
+          rankMark(offset + i + 1, crownSvg),
+        ),
+      )
       .join('\n');
   // 段の境界。残りが1件だけの段は畳む意味がないので前段に吸収する
   const bounds = [];
@@ -36,11 +56,6 @@ const rankingList = (posts, caps = [RANKING_DISPLAY_COUNT, RANKING_MAX_COUNT]) =
     }
     bounds.push(cap);
   }
-  // 順位の丸は「1位 / 畳まずに見えている残り / 畳んだ側」の3段で塗る (#2681)。
-  // 境目に bounds[0] を使うので、畳みを開くまで見えない側が丸ごと最下段になる。
-  // 表示件数の定数を再掲すると段と畳みがずれうるため、実際の境界から引く
-  const rankClass = (rank) =>
-    rank === 1 ? 'post-list-rank-first' : rank <= bounds[0] ? 'post-list-rank-high' : '';
   // 2段目は「開いた人がさらに深掘りする」動線なので、1段目の details の中に入れ子にする
   const build = (idx) => {
     if (idx >= bounds.length || bounds[idx - 1] >= posts.length) return '';
@@ -133,5 +148,11 @@ hexo.extend.helper.register('popular_posts', function (term = 'weekly') {
     term === 'yearly'
       ? [RANKING_DISPLAY_COUNT, RANKING_MAX_COUNT, RANKING_YEARLY_MAX_COUNT]
       : [RANKING_DISPLAY_COUNT, RANKING_MAX_COUNT];
-  return rankingList(popularPosts, caps);
+  // アイコンのパスは svg-icon.ejs の辞書が1箇所で持つ決まりなので、
+  // JS 側にパスを書き写さずヘルパーの実行文脈から partial を引く (#2681)
+  return rankingList(
+    popularPosts,
+    this.partial('_partial/svg-icon', { icon: 'crown' }).trim(),
+    caps,
+  );
 });

@@ -35,24 +35,16 @@ const newLabel = (date) => {
  * @param {string} itemClass     li に付けるクラス
  * @param {string} [titleAttr]   a の title 属性。省略時は lede
  * @param {boolean} [withThumb]  タイトルの左に小さいサムネを添える (#2230)
- * @param {number} [rank]        行頭に出す順位。ランキング用 (#2249)
- * @param {string} [rankClass]   順位の丸に足すクラス。段の分け方は呼び出し側が決める
+ * @param {{html: string, className: string}} [rankMark]
+ *        行頭に出す順位の丸。ランキング用 (#2249)。中身も段のクラスも呼び出し側が決める。
+ *        何位がどの段か・数字を出すか記号にするかはランキング側の都合なので、
+ *        ここは受け取った通りに包むだけにしている (#2681)
  */
-const postListItem = (
-  post,
-  itemClass,
-  titleAttr,
-  withThumb = false,
-  rank = null,
-  rankClass = '',
-) => {
+const postListItem = (post, itemClass, titleAttr, withThumb = false, rankMark = null) => {
   const attr = (titleAttr === undefined ? post.lede : titleAttr) || '';
-  // 段の判定は呼び出し側に置く。順位の何位までがどの段かはランキングの表示件数と
-  // 連動していて、その定数を持っているのは呼び出し側 (#2681)
-  const rankLabel =
-    rank === null
-      ? ''
-      : `<span class="post-list-rank${rankClass ? ' ' + rankClass : ''}">${rank}</span>`;
+  const rankLabel = rankMark
+    ? `<span class="post-list-rank${rankMark.className ? ' ' + rankMark.className : ''}">${rankMark.html}</span>`
+    : '';
   const body =
     `<a href="/${post.path}" title="${attr}">${post.title}</a>` +
     `${newLabel(post.date)}` +
