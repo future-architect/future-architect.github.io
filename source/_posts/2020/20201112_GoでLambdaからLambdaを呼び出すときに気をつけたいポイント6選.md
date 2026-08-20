@@ -330,7 +330,7 @@ func Handler(ctx context.Context, r model.Reader) error {
 
 - 実行結果(呼び出し先)
 
-またCloudwatch Logsの呼び出されたLambda関数のログを見るとLambda関数が呼び出されていることがわかります。また呼び出し時にセットされたペイロードが引数の値として含まれていることがわかります。
+またCloudwatch Logsの呼び出されたLambda関数のログを見るとLambda関数が呼び出されていることがわかります。呼び出し時にセットされたペイロードが引数の値として含まれていることがわかります。
 
 ```bash
 [DEBUG] 2020/10/11 03:05:17 hello invoked lambda!, model.Reader=model.Reader{Message:"hello world!"}

@@ -23,7 +23,7 @@ PlantUMLもMermaid.js同様、多様なダイアグラムをサポートして�
 
 jQuery用のコードが上記のページで紹介されています。そのまま使えば動きはすると思いますが、いかんせんcjs形式でES6 modules形式でもなく、scriptタグで読み込む形式なので手を加えたいところ。そしてやっていることはdeflateの圧縮とbase64なので、より良いコードがnpmにあるので苦労はないだろう・・・と思ったらなかなかうまくいかず。
 
-まずは高速という[pako](https://www.npmjs.com/package/pako)を使ってdeflateしてbtoaしたらplantuml.comがエラーに。次にzlib.jsとかいろいろ試したがダメ。で、ダメもとでbase64の部分をPlantUMLのサイトのコードを使ったらOKでした。で、再度pakoを使ったらOK。base64難しい。まあatobもいろいろdeprecatedであったりするのですが。最終形は以下の2つのコードになりました。このブログをかいているときに[plantuml-encoder](https://www.npmjs.com/package/plantuml-encoder)というのも見つけました。これもみたら同じような構成でした。
+まずは高速という[pako](https://www.npmjs.com/package/pako)を使ってdeflateしてbtoaしたらplantuml.comがエラーに。次にzlib.jsとかいろいろ試したがダメ。で、ダメもとでbase64の部分をPlantUMLのサイトのコードを使ったらOKでした。再度pakoを使ったらOK。base64難しい。まあatobもいろいろdeprecatedであったりするのですが。最終形は以下の2つのコードになりました。このブログをかいているときに[plantuml-encoder](https://www.npmjs.com/package/plantuml-encoder)というのも見つけました。これもみたら同じような構成でした。
 
 ```ts encode64.ts
 export function encode64(data: string) {
