@@ -159,7 +159,8 @@ class _MyHomePageState extends State<MyHomePage> {
 #### 比較（3）　ログインボタンの箱のみの出力
 
 |出力対象(Figma)|Figma to Code|FigmaToFlutter|Assistant by Grida|
-|---|---|---|---|211021a/box_figma2code.png" alt="figma to code結果" width="357" height="698" loading="lazy"> | <img src="/images/2021/20211021a/box_figma2flutter.png" alt="figma to flutter結果" width="357" height="698" loading="lazy"> | <img src="/images/2021/20211021a/box_assistantByGrida.png" alt="assistant by grida結果" width="357" height="698" loading="lazy"> |
+|---|---|---|---|
+|<img src="/images/2021/20211021a/スクリーンショット_2021-10-11_14.05.06.png" alt="Figmaログインボックスのみ" width="338" height="73" loading="lazy"> | <img src="/images/2021/20211021a/box_figma2code.png" alt="figma to code結果" width="357" height="698" loading="lazy"> | <img src="/images/2021/20211021a/box_figma2flutter.png" alt="figma to flutter結果" width="357" height="698" loading="lazy"> | <img src="/images/2021/20211021a/box_assistantByGrida.png" alt="assistant by grida結果" width="357" height="698" loading="lazy"> |
 
 最後に、ログインのボタンの箱（青い角丸の四角）部分のみを出力対象として、各プラグインで出力した結果を上に示しています。
 
