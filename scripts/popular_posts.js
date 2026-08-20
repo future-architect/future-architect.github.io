@@ -22,7 +22,10 @@ const rankingList = (posts, caps = [RANKING_DISPLAY_COUNT, RANKING_MAX_COUNT]) =
   // 二重管理になる。畳んだ側は11位から続く
   const items = (list, offset) =>
     list
-      .map((post, i) => postListItem(post, 'featured-posts-item', undefined, true, offset + i + 1))
+      .map((post, i) => {
+        const rank = offset + i + 1;
+        return postListItem(post, 'featured-posts-item', undefined, true, rank, rankClass(rank));
+      })
       .join('\n');
   // 段の境界。残りが1件だけの段は畳む意味がないので前段に吸収する
   const bounds = [];
@@ -33,6 +36,11 @@ const rankingList = (posts, caps = [RANKING_DISPLAY_COUNT, RANKING_MAX_COUNT]) =
     }
     bounds.push(cap);
   }
+  // 順位の丸は「1位 / 畳まずに見えている残り / 畳んだ側」の3段で塗る (#2681)。
+  // 境目に bounds[0] を使うので、畳みを開くまで見えない側が丸ごと最下段になる。
+  // 表示件数の定数を再掲すると段と畳みがずれうるため、実際の境界から引く
+  const rankClass = (rank) =>
+    rank === 1 ? 'post-list-rank-first' : rank <= bounds[0] ? 'post-list-rank-high' : '';
   // 2段目は「開いた人がさらに深掘りする」動線なので、1段目の details の中に入れ子にする
   const build = (idx) => {
     if (idx >= bounds.length || bounds[idx - 1] >= posts.length) return '';

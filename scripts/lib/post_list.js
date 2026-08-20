@@ -36,15 +36,23 @@ const newLabel = (date) => {
  * @param {string} [titleAttr]   a の title 属性。省略時は lede
  * @param {boolean} [withThumb]  タイトルの左に小さいサムネを添える (#2230)
  * @param {number} [rank]        行頭に出す順位。ランキング用 (#2249)
+ * @param {string} [rankClass]   順位の丸に足すクラス。段の分け方は呼び出し側が決める
  */
-const postListItem = (post, itemClass, titleAttr, withThumb = false, rank = null) => {
+const postListItem = (
+  post,
+  itemClass,
+  titleAttr,
+  withThumb = false,
+  rank = null,
+  rankClass = '',
+) => {
   const attr = (titleAttr === undefined ? post.lede : titleAttr) || '';
-  // 上位3件だけ見た目を変えるので、順位そのものではなく「上位かどうか」を
-  // クラスで渡す。順位ごとにクラスを増やすと CSS 側が順位の知識を持つことになる
+  // 段の判定は呼び出し側に置く。順位の何位までがどの段かはランキングの表示件数と
+  // 連動していて、その定数を持っているのは呼び出し側 (#2681)
   const rankLabel =
     rank === null
       ? ''
-      : `<span class="post-list-rank${rank <= 3 ? ' post-list-rank-top' : ''}">${rank}</span>`;
+      : `<span class="post-list-rank${rankClass ? ' ' + rankClass : ''}">${rank}</span>`;
   const body =
     `<a href="/${post.path}" title="${attr}">${post.title}</a>` +
     `${newLabel(post.date)}` +
