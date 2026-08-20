@@ -37,7 +37,7 @@ FigmaをFlutterに変換できると謳っているプラグインは複数存�
 
 **（1） Figma to Code（HTML, Tailwind, Flutter, SwiftUI）**
 
-<img src="/images/2021/20211021a/Figma_to_Code.png" alt="Figmaからコード生成イメージ" width="1200" height="600" loading="lazy">
+<img src="/images/2021/20211021a/Figma_to_Code.png" alt="Figmaからコード生成イメージ" width="1200" height="600">
 
 インストール数：28.5k
 *最終更新日：2021年3月9日*

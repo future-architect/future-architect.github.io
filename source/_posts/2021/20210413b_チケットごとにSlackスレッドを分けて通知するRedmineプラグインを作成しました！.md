@@ -98,7 +98,7 @@ Google Hangoutsは任意の値をスレッドIDとできるためRedmineチケ�
    * https://api.slack.com/apps/
 3. Slack App作成
    * 画面右上の「Create New App」をクリックしてください。
-   <img src="/images/2021/20210413b/20210302_050412_MUu9IrrIbg7w.png" alt="2021-03-02_17h02_40.png" width="985" height="447" loading="lazy">
+   <img src="/images/2021/20210413b/20210302_050412_MUu9IrrIbg7w.png" alt="2021-03-02_17h02_40.png" width="985" height="447">
 4. Slack App基本情報の入力
    * 立ち上がったポップアップへ以下情報を入力して、「Create App」をクリックして、保存してください。
    | 項目名 |値 | 説明 |

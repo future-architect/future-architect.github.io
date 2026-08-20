@@ -21,7 +21,7 @@ https://www.docker.com/pricing
 
 Freeはフューチャーの規模では使えませんので、除外してみると、Pro, Team, Businessがあります。2022年1月時点の一人/月あたりの金額は以下の通りです。
 
-<img src="/images/2022/20220124a/image.png" alt="ライセンス一覧" width="1200" height="725" loading="lazy">
+<img src="/images/2022/20220124a/image.png" alt="ライセンス一覧" width="1200" height="725">
 
 | Type  | 年契約 | 月契約 | メモ |
 |--- |:-:|:-:|:-|

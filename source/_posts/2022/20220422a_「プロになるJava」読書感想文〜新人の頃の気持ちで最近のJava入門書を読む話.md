@@ -27,7 +27,7 @@ HealthCare Innovation Group(HIG)の永井優斗です。
 
 なんと明日(2022/4/23)付で第2刷が出るそうです([著者の1人である、きしださんのtweet](https://twitter.com/kis/status/1515520867467337732)より)。すごいですね。
 
-<img src="/images/2022/20220422a/image.png" alt="" width="400" height="507" loading="lazy">
+<img src="/images/2022/20220422a/image.png" alt="" width="400" height="507">
 
 - https://gihyo.jp/book/2022/978-4-297-12685-8
 

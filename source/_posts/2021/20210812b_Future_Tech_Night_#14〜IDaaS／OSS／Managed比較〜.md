@@ -15,7 +15,7 @@ author: 山田勇一
 lede: "2021年7月21日にFuture Tech Night #14～認証認可（IDaaS）勉強会～で発表させてもらいました。元々は、Rails Devise+cancancan、Cognito User Pools（5年前）、Auth0の開発経験があり、改めてOSSも加えて学んでみたかったのが、テーマを決めた背景になります。"
 ---
 
-<img src="/images/2021/20210812b/key-2114046_1280.jpg" alt="" title="Arek SochaによるPixabayからの画像" width="800" height="450" loading="lazy">
+<img src="/images/2021/20210812b/key-2114046_1280.jpg" alt="" title="Arek SochaによるPixabayからの画像" width="800" height="450">
 
 ## はじめに
 

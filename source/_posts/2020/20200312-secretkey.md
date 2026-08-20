@@ -32,7 +32,7 @@ RSA暗号を解説しているページはたくさんありますが、この�
 
 図で表すとこんな感じです。
 
-<img src="/images/2020/20200312/photo_20200312_01.png" class="img-middle-size" width="599" height="387" loading="lazy">
+<img src="/images/2020/20200312/photo_20200312_01.png" class="img-middle-size" width="599" height="387">
 
 ## 暗号化式と復号式
 

@@ -11,7 +11,7 @@ thumbnail: /images/2022/20220415b/thumbnail.png
 author: 真野隼記
 lede: "2022/3/16（水）に開催されたAWS Partner Summit Japan 2022に縁あって登壇の機会をいただきました。オンラインでしたが、撮影は目黒セントラルスクエア。TV局かなと思うほどの撮影機材や、明らかにプロフェッショナルなスタッフの皆さまに囲まれての発表だったので非常によい刺激をいただけました。終わった後の達成感が凄く良かったです！"
 ---
-<img src="/images/2022/20220415b/top.png" alt="" width="1200" height="447" loading="lazy">
+<img src="/images/2022/20220415b/top.png" alt="" width="1200" height="447">
 
 ## はじめに
 

@@ -23,7 +23,7 @@ TIG DXチームの多賀です。[Good First Issue](https://goodfirstissue.dev/)
 サイトは、コードレビューツールを開発されている [deepsource](https://deepsource.io/?ref=gfi) 社によって、運営されています。対象のGitHub リポジトリは、[deepsourcelabs/good-first-issue](https://github.com/deepsourcelabs/good-first-issue#adding-a-new-project) にて、[コントリビュートしやすくするための条件](https://github.com/deepsourcelabs/good-first-issue#adding-a-new-project)をクリアしたものだけが管理されています。
 (PRを送ることで、リポジトリを追加することも歓迎されていそうです。)
 
-<img src="/images/2021/20210205/image.png" width="1200" height="623" loading="lazy">
+<img src="/images/2021/20210205/image.png" width="1200" height="623">
 
 ## OSS コントリビュート
 

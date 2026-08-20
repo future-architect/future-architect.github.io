@@ -14,7 +14,7 @@ thumbnail: /images/2024/20240311a/thumbnail.png
 author: 伊藤太斉
 lede: "Terraform連載を開始します。"
 ---
-<img src="/images/2024/20240311a/terraform.png" alt="" width="800" height="418" loading="lazy">
+<img src="/images/2024/20240311a/terraform.png" alt="" width="800" height="418">
 
 こんにちは。技術ブログ運営の伊藤です。
 本日、3/11よりTerraform連載を開始します。

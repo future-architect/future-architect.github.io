@@ -12,7 +12,7 @@ thumbnail: /images/2016/20160530/thumbnail_20160530.jpg
 author: 川久保由紀
 lede: "音楽フェス好きなリケジョが、ファッション×アウトドア×IoTがテーマなBEAMSハッカソンに参加しました！"
 ---
-<img src="/images/2016/20160530/photo_20160530_01.png" width="1000" height="565" loading="lazy">
+<img src="/images/2016/20160530/photo_20160530_01.png" width="1000" height="565">
 
 私が参加した、前回のハッカソン記録は[こちら](http://future-architect.github.io/articles/20160511/)を見て下さい！
 

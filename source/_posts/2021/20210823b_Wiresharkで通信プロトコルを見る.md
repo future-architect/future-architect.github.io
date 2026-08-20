@@ -43,7 +43,7 @@ Twitterで投稿するとき、YouTubeを見るときも、その裏側ではコ
 
 あるコンピュータ(PC)から別のコンピュータ(Server)に通信するとき、以下のようなやりとりが発生しています。
 
-<img src="/images/2021/20210823b/Screen_Shot_2021-08-23_at_3.37.34.png" alt="" width="1200" height="515" loading="lazy">
+<img src="/images/2021/20210823b/Screen_Shot_2021-08-23_at_3.37.34.png" alt="" width="1200" height="515">
 
 人間が会話するのと同様に…
 

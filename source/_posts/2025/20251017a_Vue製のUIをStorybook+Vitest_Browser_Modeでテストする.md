@@ -13,7 +13,7 @@ thumbnail: /images/2025/20251017a/thumbnail.png
 author: 小杉山護
 lede: "昨今では生成AIを用いたコーディング、Vibe Codingが盛んに行われていますね。人間の代わりに生成AIがコードを書いてくれるというのは非常に魅力的ですが、その過程で生み出されるコードの品質はまだまだ発展途上の段階にあります。"
 ---
-<img src="/images/2025/20251017a/testing-you-can-trust.png" alt="" width="800" height="640" loading="lazy">
+<img src="/images/2025/20251017a/testing-you-can-trust.png" alt="" width="800" height="640">
 
 [Vue.js連載](/articles/20251016a/)の2本目です。
 

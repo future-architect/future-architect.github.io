@@ -102,7 +102,7 @@ Windows 向けの診断ツールは Linux 向けに比べて簡素に結果を�
 ### 移行処理クラスタの作成
 
 Migrate for Anthos の実処理を行う GKE あるいは Anthos クラスタの設定を進めていきます。
-<img src="/images/2021/20210322/setting-up-workflow.png" width="698" height="391" loading="lazy">
+<img src="/images/2021/20210322/setting-up-workflow.png" width="698" height="391">
 
 ※図は[こちらの公式Doc](https://cloud.google.com/migrate/anthos/docs/setting-up-overview)から拝借しました。
 

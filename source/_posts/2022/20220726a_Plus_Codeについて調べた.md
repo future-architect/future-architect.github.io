@@ -29,7 +29,7 @@ Google Mapsのヘルプが簡易的でわかりやすかったため引用しま
 
 Google Mapsを開くと出てくる、`JPCG+XX 品川区、東京都` コードのことです（図はフューチャーの本社がある大崎アートヴィレッジタワー）の位置情報です。Google Maps上で表示・及び検索で使えるのは便利です。
 
-<img src="/images/2022/20220726a/image.png" alt="image.png" width="1200" height="761" loading="lazy">
+<img src="/images/2022/20220726a/image.png" alt="image.png" width="1200" height="761">
 
 Open Location Codeは[google/open-location-code](https://github.com/google/open-location-code)で実装も[仕様](https://github.com/google/open-location-code/blob/main/docs/specification.md)もApache License 2.0で公開されています。変換はこれらの実装を用いればオフラインで可能です。
 

@@ -27,7 +27,7 @@ PythonでWeb APIを構築する方法は[OpenAPI GeneratorでPython Web API構�
 
 本記事ではPython Web APIのアプリ実装は完成している前提で、下図の流れでデプロイする手順を解説します。
 
-<img src="/images/2023/20230105a/image.png" alt="PythonアプリをDockerコンテナイメージビルド→ECR→Lambdaにデプロイする" width="778" height="495" loading="lazy">
+<img src="/images/2023/20230105a/image.png" alt="PythonアプリをDockerコンテナイメージビルド→ECR→Lambdaにデプロイする" width="778" height="495">
 
 ## Lambda起動用のモジュール
 

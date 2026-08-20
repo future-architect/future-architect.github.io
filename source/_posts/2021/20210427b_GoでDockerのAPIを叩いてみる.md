@@ -24,7 +24,7 @@ lede: "Future Tech Night #7で「GoでDockerのAPIを叩いてみる」という
 
 近年、コンテナの利用はますます増えています。実行環境としても、クラウドサービスでコンテナをホストするサービスは増えています。コンテナを動かすサービスもあれば、K8Sの利用も増えています。Kubernetesも最小のビルディングブロックはコンテナです。K8SのKnativeベースのGCP Cloud Runが僕の最近のお気に入りです。
 
-<img src="/images/2021/20210427b/スクリーンショット_2021-03-18_23.43.23.png" alt="Clloud Runロゴ" width="1200" height="683" loading="lazy">
+<img src="/images/2021/20210427b/スクリーンショット_2021-03-18_23.43.23.png" alt="Clloud Runロゴ" width="1200" height="683">
 
 AWS Lambdaもコンテナを実行できるようになりました。
 

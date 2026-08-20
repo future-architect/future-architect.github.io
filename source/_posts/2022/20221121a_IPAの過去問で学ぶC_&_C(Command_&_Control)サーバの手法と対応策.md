@@ -12,7 +12,7 @@ author: 村瀬善則
 lede: 情報処理推進機構(IPA)のネットワークスペシャリスト試験の過去問からC&C(Command & Control)サーバの手法と対応策が興味深かったので自分の知識を整理するためブログにしてみました
 
 ---
-<img src="/images/2022/20221121a/candc.png" alt="" width="1200" height="700" loading="lazy">
+<img src="/images/2022/20221121a/candc.png" alt="" width="1200" height="700">
 
 ## はじめに
 

@@ -18,7 +18,7 @@ lede: "2021年のフューチャーのサマーインターン「Engineer Camp�
 
 インターンの振り返りも兼ねて、このブログを読んだ方にインターンの内容や雰囲気を伝えられたらと考えています。
 
-<img src="/images/2021/20210922a/profile.jpeg" alt="profile.jpeg" width="460" height="460" loading="lazy">
+<img src="/images/2021/20210922a/profile.jpeg" alt="profile.jpeg" width="460" height="460">
 
 ## インターン参加前
 

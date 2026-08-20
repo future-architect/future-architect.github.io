@@ -30,7 +30,7 @@ lede: "2019年4月入社_FRX_DigitalLibraryチームの丸野です。研修修�
 Reduxとは、React.jsで使用するstateつまりアプリケーションの状態を管理するフレームワークです
 簡単にReduxの概念の下記に図式化してみました。
 
-<img src="/images/2020/20200429/1.png" alt="Redux概念図" width="1766" height="794" loading="lazy">
+<img src="/images/2020/20200429/1.png" alt="Redux概念図" width="1766" height="794">
 
 **State**：アプリケーションの状態
 **Action**：ユーザーが何押したいかという情報を持つオブジェクト

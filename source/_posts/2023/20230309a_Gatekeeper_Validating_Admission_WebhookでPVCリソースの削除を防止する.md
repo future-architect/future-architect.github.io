@@ -195,7 +195,7 @@ spec:
 
 削除前のArgoCDの画面は以下の通りです。
 
-<img src="/images/2023/20230309a/image.png" alt="image.png" width="1200" height="386" loading="lazy">
+<img src="/images/2023/20230309a/image.png" alt="image.png" width="1200" height="386">
 
 ArgoCDの画面からアプリケーションをForegroundで削除した結果が以下になります。
 

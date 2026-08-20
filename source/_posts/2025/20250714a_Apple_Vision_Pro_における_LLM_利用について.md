@@ -25,7 +25,7 @@ Apple Vision ProでLLMを利用する方法について整理します（ユー�
 
 ## 1. クラウド上のLLMを利用する方法
 
-<img src="/images/2025/20250714a/cloudllm.png" alt="cloudllm.png" width="960" height="380" loading="lazy">
+<img src="/images/2025/20250714a/cloudllm.png" alt="cloudllm.png" width="960" height="380">
 
 Vision Pro を Wi-Fiなどを経由してインターネットに接続し、クラウド上で提供されているLLMサービスへアクセスする方法です。
 [OpenAI](https://openai.com/)、[Anthropic](https://www.anthropic.com/)、[Google](https://www.google.com/)などが提供しているLLMのAPIなどを利用する場合がこれに該当します。

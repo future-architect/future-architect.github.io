@@ -16,7 +16,7 @@ lede: "ひとえに読者の皆さんが買ってくれたおかげで、Real Wo
 ---
 
 <a href="https://www.oreilly.co.jp/books/9784814400669/">
-<img src="/images/2024/20240513a/PXL_20240404_001054780.jpg" alt="" width="1200" height="901" loading="lazy">
+<img src="/images/2024/20240513a/PXL_20240404_001054780.jpg" alt="" width="1200" height="901">
 </a>
 
 https://www.oreilly.co.jp/books/9784814400669/

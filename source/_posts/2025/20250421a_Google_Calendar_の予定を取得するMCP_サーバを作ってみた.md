@@ -102,7 +102,7 @@ https://github.com/menma-at-here/calendar-mcp-server
 
 まず、ユーザーは以下のような依頼を投げます。
 
-<img src="/images/2025/20250421a/79fae2d7-f302-43cf-9ff1-24840eb0b69e.png" alt="" width="1200" height="557" loading="lazy">
+<img src="/images/2025/20250421a/79fae2d7-f302-43cf-9ff1-24840eb0b69e.png" alt="" width="1200" height="557">
 
 この時、ユーザはAIエージェントが以下のようにタスクを分解してくれることを期待しています。
 

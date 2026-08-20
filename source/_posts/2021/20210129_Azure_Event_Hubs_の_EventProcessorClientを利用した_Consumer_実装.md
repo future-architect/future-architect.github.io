@@ -15,7 +15,7 @@ lede: "Azure が提供されている Event Hubs の Consumer 処理実装の Ev
 
 Azure が提供されている Event Hubs の Consumer 処理実装の EventProcessorClient について調査する機会があったため、整理した内容を公開いたします。
 
-<img src="/images/2021/20210129/EventHubs_logo.png" class="img-small-size" width="181" height="181" loading="lazy">
+<img src="/images/2021/20210129/EventHubs_logo.png" class="img-small-size" width="181" height="181">
 
 > [Azure アーキテクチャ アイコン](https://docs.microsoft.com/ja-jp/azure/architecture/icons/) からの画像
 

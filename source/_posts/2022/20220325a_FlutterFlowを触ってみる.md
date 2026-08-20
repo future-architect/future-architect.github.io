@@ -14,7 +14,7 @@ thumbnail: /images/2022/20220325a/thumbnail.png
 author: 宮崎将太
 lede: "Flutter連載6回目としてFlutterFlowについて調べてみました。GoogleI/O'21でFlutterFlowというFlutterのノーコードのサービスが発表されました。"
 ---
-<img src="/images/2022/20220325a/image.png" alt="image.png" width="1200" height="675" loading="lazy">
+<img src="/images/2022/20220325a/image.png" alt="image.png" width="1200" height="675">
 
 ## はじめに
 

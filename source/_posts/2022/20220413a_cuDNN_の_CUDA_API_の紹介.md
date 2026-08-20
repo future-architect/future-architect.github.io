@@ -21,7 +21,7 @@ cuDNN は TensorFlow や Keras で学習や推論を高速化するためのバ�
 
 個人的に作成したアプリケーションで CUDA API を叩く機会があり、社内の技術勉強会で紹介したところ好評だったため、こちらにも寄稿します。
 
-<img src="/images/2022/20220413a/ファイル名.png" alt="システム概念図" width="1200" height="591" loading="lazy">
+<img src="/images/2022/20220413a/ファイル名.png" alt="システム概念図" width="1200" height="591">
 
 ## cuDNN を叩くことになったきっかけ
 

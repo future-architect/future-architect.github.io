@@ -154,7 +154,7 @@ Google Cloud Next Tokyo 2024 に行った際、全冠特典でマグカップを
 
 https://cloudonair.withgoogle.com/events/next-tokyo-24
 
-<img src="/images/2024/20241101a/IMG20241025073005.jpg" alt="Google Cloudのログが付いたマグカップ" width="1200" height="900" loading="lazy">
+<img src="/images/2024/20241101a/IMG20241025073005.jpg" alt="Google Cloudのログが付いたマグカップ" width="1200" height="900">
 
 ## おわりに
 

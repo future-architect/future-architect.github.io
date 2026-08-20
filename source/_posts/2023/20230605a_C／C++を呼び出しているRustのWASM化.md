@@ -144,7 +144,7 @@ Rustのwasm化において一番メジャーで簡単な方法です。wasm-pack
 
     ブラウザで[http://localhost:8080/](http://localhost:8080/)にアクセスすると画面上にアラートボックスが現れ、`Hello, hello-wasm-pack!`と表示されたら成功です。
 
-<img src="/images/2023/20230602a/スクリーンショット_2023-03-24_18.40.13.png" alt="" width="1200" height="739" loading="lazy">
+<img src="/images/2023/20230602a/スクリーンショット_2023-03-24_18.40.13.png" alt="" width="1200" height="739">
 
 ### wasm-packは何をしてくれているのか
 

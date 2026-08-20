@@ -14,7 +14,7 @@ lede: "真野さん、松本さんと一緒にSoftware Designの特集記事に�
 ---
 
 <a href="https://gihyo.jp/magazine/SD/archive/2026/202601">
-<img src="/images/2025/20251218a/TH800_642601.jpg" alt="" width="500" height="706" loading="lazy">
+<img src="/images/2025/20251218a/TH800_642601.jpg" alt="" width="500" height="706">
 </a>
 
 真野さん、松本さんと一緒に[Software Design](https://gihyo.jp/magazine/SD/archive/2026/202601)の特集記事に寄稿しました。

@@ -229,7 +229,7 @@ $ gcloud functions deploy berglas-example-go \
 
 ちゃんとBerglasで作成したシークレットが取得できましたね！
 割と道のりが長いですが、GCPのサービスから簡単にアクセスできるのは気持ちが良いですね。
-<img src="/images/2020/20200212/photo_20200212_01.png" class="img-small-size" width="300" height="185" loading="lazy">
+<img src="/images/2020/20200212/photo_20200212_01.png" class="img-small-size" width="300" height="185">
 
 ## Secret Managerを利用
 

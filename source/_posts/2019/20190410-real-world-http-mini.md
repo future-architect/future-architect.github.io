@@ -16,7 +16,7 @@ author: 真野隼記
 lede: "Real World HTTPミニ版を記念にフューチャーのオフィスで勉強会を実施しましたら、リアル渋川さんに出会えました話です"
 ---
 
-<img src="/images/2019/20190410/top.png" class="img-small-size" width="515" height="660" loading="lazy">
+<img src="/images/2019/20190410/top.png" class="img-small-size" width="515" height="660">
 
 こんにちは、フーチャーのTIG所属、真野です。
 パネルディスカッションとして参加したらとても良い経験になったため、その流れで開催報告記事を担当させていただくことになりました。

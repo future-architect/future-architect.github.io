@@ -84,7 +84,7 @@ jobs:
 
 こちらをGitHub Actionsで実行してみると33秒かかりました。インストール時のGitHub Action側の混み具合やDL速度によって時間は上下するかと思いますので、実行時間に関してはあくまで目安としてご覧ください。
 
-<img src="/images/2023/20230828a/image.png" alt="image.png" width="654" height="457" loading="lazy">
+<img src="/images/2023/20230828a/image.png" alt="image.png" width="654" height="457">
 
 今回の場合テストしか入っていないリポジトリなので、`npm ci` (Install dependencies) の時間が最小限に収まっています。例えば、フロントエンドのリポジトリにE2Eテストを相乗りさせている場合には依存ライブラリのインストール時間が余計にかかってしまいます。
 

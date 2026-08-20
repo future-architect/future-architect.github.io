@@ -34,7 +34,7 @@ mathjax: true
 
 まずは元論文「Attention Is All You Need」から引用したTransformerの構成図を図1に示します。
 
-<img src="/images/2025/20250226a/new_ModalNet-21.jpg" alt="" width="750" height="1105" loading="lazy">
+<img src="/images/2025/20250226a/new_ModalNet-21.jpg" alt="" width="750" height="1105">
 
 *図 1．元論文から引用したTransformerの構成図*
 

@@ -41,7 +41,7 @@ SAIG（Strategic AI Group）の小橋です。生成AI関連の検証や、デ�
 
 上から落ちてくる単語をタイピングしていくゲームです。見たほうが早いと思うので、以下のスクリーンショットをご覧ください。
 
-<img src="/images/2025/20250428a/game_movie_3.gif" alt="game_movie_3.gif" width="700" height="616" loading="lazy">
+<img src="/images/2025/20250428a/game_movie_3.gif" alt="game_movie_3.gif" width="700" height="616">
 
 アプリを作る手順については、最近見かけたこの記事を参考にしました。
 

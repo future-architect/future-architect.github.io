@@ -71,7 +71,7 @@ lede: "Terraform を打ち込むことができる AWS エミュレータの「m
 put JSON --> [S3] --event--> [SQS] --ポーリング--> [ECS サービス 相当のコンテナ] --> ログ出力
 ```
 
-<img src="/images/2026/20260528a/image.png" alt="image.png" width="666" height="180" loading="lazy">
+<img src="/images/2026/20260528a/image.png" alt="image.png" width="666" height="180">
 
 - コンテナ : SQS をポーリングし、メッセージから S3 のキーを取り出してログ出力するコンテナ
 

@@ -28,7 +28,7 @@ lede: "2023年10月10日、とうとう発売されましたね。Meta Quest 3�
 それでは早速開封していきます。
 ケースと箱はシンプルで、思ったよりコンパクトでした（ダンボールに梱包されて届いた時点で想像より小さかったのでちょっと驚きました）。
 
-<img src="/images/2023/20231013a/box.jpg" alt="box.jpg" width="1200" height="1091" loading="lazy">
+<img src="/images/2023/20231013a/box.jpg" alt="box.jpg" width="1200" height="1091">
 
 箱から取り出して Quest2 と比較してみます。
 

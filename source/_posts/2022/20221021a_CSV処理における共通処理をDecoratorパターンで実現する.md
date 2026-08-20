@@ -24,7 +24,7 @@ Technogoly Innovation Group 辻です。
 
 他システムが出力した CSV ファイルを Go でデコードして、PostgreSQL にデータを投入するような処理がありました。簡略化したイメージは以下です。
 
-<img src="/images/2022/20221021a/abstract.png" alt="" width="666" height="156" loading="lazy">
+<img src="/images/2022/20221021a/abstract.png" alt="" width="666" height="156">
 
 このとき、連携元システムが出力した CSV ファイルにヌル文字（NUL）[^1] が稀に含まれることがわかりました。ヌル文字は PostgreSQL では扱えません。ヌル文字が含まれるデータを PostgreSQL に投入しようとするとエラーになります。
 

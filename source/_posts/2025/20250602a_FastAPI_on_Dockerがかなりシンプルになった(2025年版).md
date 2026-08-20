@@ -76,7 +76,7 @@ uv run fastapi run main.py --port 8000
 
 ブラウザでアクセスしてみて大丈夫だったら次に進みます。
 
-<img src="/images/2025/20250602a/スクリーンショット_2025-05-17_18.41.44.png" alt="スクリーンショット_2025-05-17_18.41.44.png" width="686" height="336" loading="lazy">
+<img src="/images/2025/20250602a/スクリーンショット_2025-05-17_18.41.44.png" alt="スクリーンショット_2025-05-17_18.41.44.png" width="686" height="336">
 
 ## Docker 化
 

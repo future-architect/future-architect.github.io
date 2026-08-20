@@ -20,7 +20,7 @@ lede: "昨年に続きGCP連載企画の参加です。私個人としてはGCP�
 
 ## Text-to-Speechとは
 
-<img src="/images/2021/20210312/Cloud_Text-to-Speech.png" width="800" height="333" loading="lazy">
+<img src="/images/2021/20210312/Cloud_Text-to-Speech.png" width="800" height="333">
 
 > https://cloud.google.com/blog/ja/products/ai-machine-learning/cloud-text-to-speech-expands-its-number-of-voices-now-covering-33-languages-and-variants より
 

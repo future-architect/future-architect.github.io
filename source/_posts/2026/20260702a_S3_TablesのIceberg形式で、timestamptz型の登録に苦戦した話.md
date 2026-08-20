@@ -31,7 +31,7 @@ timestamptzはApache Icebergにおける型の種類の1つで、タイムゾー
 
 Athenaからtimestamptz型を含むCREATE文を書いてS3 Tablesを登録してみましょう。するとこんなエラーがでます。
 
-<img src="/images/2026/20260702a/image.png" alt="image.png" width="1108" height="631" loading="lazy">
+<img src="/images/2026/20260702a/image.png" alt="image.png" width="1108" height="631">
 
 timestamp with timezoneに変えて実行してもうまくいきません。AWS公式サイトを確認してみると、以下の文言が。。。
 >CREATE TABLE などの Athena Iceberg DDL ステートメントでサポートされているのは、Iceberg タイムスタンプ (タイムゾーンなし) のみですが、Athena を介してすべてのタイムスタンプ型をクエリできます。

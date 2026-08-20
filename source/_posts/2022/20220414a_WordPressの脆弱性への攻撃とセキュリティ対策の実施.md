@@ -64,7 +64,7 @@ lede: "今回はIT未経験で入社した私が技術面のキャッチアッ�
 検証に使うPoCは[こちら](https://github.com/w4fz5uck5/wp-file-manager-0day/blob/master/elFinder.py)で公開されているコードを使用しました。
 
 このPoCは、攻撃対象サーバのconnector.minimal.phpというファイルに対してPOSTし、connector.minimal.phpを介してelFinder（サーバ内のファイルを扱うもの）インスタンスを呼び出すことで、x.phpというWebShellを配置します。そして配置したx.phpに対して任意のコマンドを送ります。
-<img src="/images/2022/20220414a/攻撃仕組み4_2022-04-08_085527.png" alt="攻撃仕組み4_2022-04-08_085527.png" width="934" height="631" loading="lazy">
+<img src="/images/2022/20220414a/攻撃仕組み4_2022-04-08_085527.png" alt="攻撃仕組み4_2022-04-08_085527.png" width="934" height="631">
 
 したがって、今回のFile Managerの脆弱性はconnector.minimal.phpが外部から実行できてしまうことに原因があると言えるでしょう。
 

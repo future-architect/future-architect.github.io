@@ -138,7 +138,7 @@ spanner> select * from Singers;
 
 ### ファイル構成
 
-<img src="/images/2021/20210323/image.png" width="1200" height="674" loading="lazy">
+<img src="/images/2021/20210323/image.png" width="1200" height="674">
 
 * **docker-compose.yaml** : docker-composeファイルです。これを立ち上げます
 * **migrations** : DB初期化時に適用するDDL&DMLを配置します

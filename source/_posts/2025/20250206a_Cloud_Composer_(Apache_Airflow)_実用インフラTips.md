@@ -12,7 +12,7 @@ thumbnail: /images/2025/20250206a/thumbnail.png
 author: 岸下優介
 lede: "Apache Airflowはワークフロー管理サービスで、スケジュールされた時間に一連の処理を行ってくれる便利なサービスです。"
 ---
-<img src="/images/2025/20250206a/image.png" alt="" width="1200" height="447" loading="lazy">
+<img src="/images/2025/20250206a/image.png" alt="" width="1200" height="447">
 
 ## はじめに
 

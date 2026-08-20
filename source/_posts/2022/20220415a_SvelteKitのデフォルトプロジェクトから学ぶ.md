@@ -45,7 +45,7 @@ $ npm run dev -- --open
 
 サンプルプロジェクトは3つのページがあります。静的なAbout以外に、よくあるカウンターと、ToDoがあります。カウンターはSvelte単体でも実現できるような内容で、ToDoはウェブサービスアクセスを伴うサンプルです。
 
-<img src="/images/2022/20220415a/スクリーンショット_2022-04-08_9.57.03.png" alt="カウンターのサンプル" width="1200" height="856" loading="lazy">
+<img src="/images/2022/20220415a/スクリーンショット_2022-04-08_9.57.03.png" alt="カウンターのサンプル" width="1200" height="856">
 
 <img src="/images/2022/20220415a/スクリーンショット_2022-04-08_9.58.41.png" alt="TODOのサンプル" width="1200" height="856" loading="lazy">
 

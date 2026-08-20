@@ -138,7 +138,7 @@ Playwright公式の[Docker Image](https://playwright.dev/docs/docker)を利用�
 npx playwright test --ui
 ```
 
-<img src="/images/2023/20230823a/Playwright.png" alt="Playwright.png" width="1200" height="738" loading="lazy">
+<img src="/images/2023/20230823a/Playwright.png" alt="Playwright.png" width="1200" height="738">
 
 ---
 

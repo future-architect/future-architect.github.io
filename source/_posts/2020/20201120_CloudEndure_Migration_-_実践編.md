@@ -25,7 +25,7 @@ lede: "前回記事「CloudEndure Migration - 導入編」の続きです。今�
 ## 今回の環境構成図
 
 CloudEndure Migrationを実施する環境は以下の通りです。
-<img src="/images/2020/20201120/CloudEndure-Diagram.png" width="772" height="419" loading="lazy">
+<img src="/images/2020/20201120/CloudEndure-Diagram.png" width="772" height="419">
 
 GCPに用意したGCEのVMインスタンスを、AWSへ移行してみます。
 移行元のサーバーとして、以下のVMインスタンスを用意しました。

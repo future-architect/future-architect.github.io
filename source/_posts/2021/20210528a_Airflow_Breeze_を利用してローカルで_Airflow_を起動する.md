@@ -25,7 +25,7 @@ Airflow では、 `Airflow Breeze` と呼ばれる環境が整備され、公式
 
 Airflow Breeze とは、ローカルで Airflow を簡単に実行できるように整備された環境を指します。実態はコンテナベースで構築され、Docker Compose が利用されています。
 
-<img src="/images/2021/20210528a/AirflowBreeze_logo.png" alt="Airflow Breezeロゴ" width="532" height="440" loading="lazy">
+<img src="/images/2021/20210528a/AirflowBreeze_logo.png" alt="Airflow Breezeロゴ" width="532" height="440">
 
 [airflow/AirflowBreeze_logo.png at master · apache/airflow](https://github.com/apache/airflow/blob/master/images/AirflowBreeze_logo.png)
 

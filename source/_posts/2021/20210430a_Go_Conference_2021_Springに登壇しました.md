@@ -18,7 +18,7 @@ lede: "Go Conference 2021 spring にTIGから渋川、辻の計2名が登壇し�
 
 こんにちは、辻です。先日開催されました [Go Conference 2021 spring](https://gocon.jp/) にTIGから渋川、辻の計2名が登壇しました。
 
-<img src="/images/2021/20210430a/logo_text.png" alt="gopher忍者" width="1200" height="558" loading="lazy">
+<img src="/images/2021/20210430a/logo_text.png" alt="gopher忍者" width="1200" height="558">
 
 > The Gopher character is based on the Go mascot designed by Renée French.
 

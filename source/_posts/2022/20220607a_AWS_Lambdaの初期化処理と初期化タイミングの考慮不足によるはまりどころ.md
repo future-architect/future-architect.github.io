@@ -32,7 +32,7 @@ AWS Lambda（以下Lambda）は様々なユースケースで利用できる、�
 
 Lambda実行環境のライフサイクルは3つに分かれています。INITとINVOKEとSHUTDOWNです。
 
-<img src="/images/2022/20220607a/Overview-Successful-Invokes.png" alt="Overview-Successful-Invokes.png" width="1200" height="225" loading="lazy">
+<img src="/images/2022/20220607a/Overview-Successful-Invokes.png" alt="Overview-Successful-Invokes.png" width="1200" height="225">
 
 *https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/lambda-runtime-environment.html より*
 

@@ -28,7 +28,7 @@ Cloudflare の CDN/WAF はルールという機能を提供しています。変
 
 SnippetsはCloudflare Workersのプラットフォームを流用することで、ルールとして新しくJavaScriptの断片（これをSnippetsと呼びます）を実行させることができるようになりました。
 
-<img src="/images/2024/20240614a/abstract.png" alt="" width="1200" height="325" loading="lazy">
+<img src="/images/2024/20240614a/abstract.png" alt="" width="1200" height="325">
 
 ## Cloudflare Workers との違い
 

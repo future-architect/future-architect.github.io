@@ -27,7 +27,7 @@ API GatewayですがPublicなエンドポイントがあれば `curl`コマン�
 
 API Gatewayのマネジメントコンソールには動作確認用の[テスト呼び出し機能](https://docs.aws.amazon.com/ja_jp/apigateway/latest/developerguide/how-to-test-method.html)が存在します。
 
-<img src="/images/2021/20210924a/image.png" alt="マネジメントコンソールのテスト呼び出し" width="1200" height="601" loading="lazy">
+<img src="/images/2021/20210924a/image.png" alt="マネジメントコンソールのテスト呼び出し" width="1200" height="601">
 
 こちらと同等の機能がawscliにも提供されています。[api gateway test-invoke-method](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/apigateway/test-invoke-method.html)コマンドです。これを利用することでマネジメントコンソール上と同等のリクエストをコマンドラインから確認できます。
 

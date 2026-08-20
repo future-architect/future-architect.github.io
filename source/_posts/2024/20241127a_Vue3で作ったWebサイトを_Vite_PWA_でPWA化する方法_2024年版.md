@@ -17,7 +17,7 @@ lede: "Vue3で作ったWebサイトをPWA(Progressive Web Apps)化する方法�
 ---
 ## はじめに
 
-<img src="/images/2024/20241127a/ogp-2.png" alt="ogp-2.png" width="1200" height="730" loading="lazy">
+<img src="/images/2024/20241127a/ogp-2.png" alt="ogp-2.png" width="1200" height="730">
 
 本記事は [Vue連載2024](/articles/20241125a/) 3日目の記事です。
 

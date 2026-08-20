@@ -14,7 +14,7 @@ thumbnail: /images/2025/20250617a/thumbnail.jpg
 author: 伊藤太斉
 lede: "このCNCF連載とタイミングを同じくして開催しているKubeCon + CloudNativeCon Japanに参加してきたので、1日目に私が回ったセッションや会場の雰囲気についてお伝えできればと思います。"
 ---
-<img src="/images/2025/20250617a/IMG_2577.jpg" alt="" width="1200" height="747" loading="lazy">
+<img src="/images/2025/20250617a/IMG_2577.jpg" alt="" width="1200" height="747">
 
 こんにちは。TIGの伊藤です。この記事は[CNCF連載2025](/articles/20250616a/)の2日目の記事です。
 

@@ -51,7 +51,7 @@ AWSを普段扱ってる人には正直馴染みがなさそうな...そんな�
 
 ### 明示的なプロビジョニング設定及び自動化～Tinkerbellの仕組み～
 
-<img src="/images/2023/20230622a/構成図.png" alt="" width="743" height="477" loading="lazy">
+<img src="/images/2023/20230622a/構成図.png" alt="" width="743" height="477">
 
 出典: [Tinkerbell Docs - Architecture](https://docs.tinkerbell.org/architecture/)
 

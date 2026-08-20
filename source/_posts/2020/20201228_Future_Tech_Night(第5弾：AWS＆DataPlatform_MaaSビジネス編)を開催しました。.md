@@ -25,7 +25,7 @@ lede: "先日2020/11/25にオンラインにてFuture Tech Nightという社外�
 * [Future Tech Night #4 〜Go x AWS スマート工場編〜](https://future.connpass.com/event/188742/)
 * [Future Tech Night #5 〜AWS＆DataPlatform MaaSビジネス編〜](https://future.connpass.com/event/195568/) ← 今回はここ
 
-<img src="/images/2020/20201228/74fb7c65c1ef518a159eb99b5105ef10.png" width="659" height="345" loading="lazy">
+<img src="/images/2020/20201228/74fb7c65c1ef518a159eb99b5105ef10.png" width="659" height="345">
 
 ## 概要
 

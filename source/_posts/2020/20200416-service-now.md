@@ -40,7 +40,7 @@ lede: "さて、皆さん、ServiceNow(以降：SNOW)というSaaSはご存知�
 - Terraform：インフラの構築を自動化する
 - Go：インターフェース役
 
-<img src="/images/2020/20200416/photo_20200416_01.png" width="1254" height="463" loading="lazy">
+<img src="/images/2020/20200416/photo_20200416_01.png" width="1254" height="463">
 
 ### 作るコンポーネント（上の図の番号と紐づいています）
 

@@ -13,7 +13,7 @@ author: 岸本卓也
 lede: "私は Java の経験が長いのですが、JVM やバイトコードといった Java で処理が実行される根本的な仕組みへの理解が薄かったため改めて向き合うことにしました。"
 ---
 
-<img src="/images/2025/20250529a/24527d79-8d12-4202-a59a-c6bc4f31173c.png" alt="" width="300" height="377" loading="lazy">
+<img src="/images/2025/20250529a/24527d79-8d12-4202-a59a-c6bc4f31173c.png" alt="" width="300" height="377">
 
 ## はじめに
 

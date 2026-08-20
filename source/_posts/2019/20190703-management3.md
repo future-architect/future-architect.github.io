@@ -12,7 +12,7 @@ thumbnail: /images/2019/20190703/photo_20190703_01.jpeg
 author: 近藤雅章
 lede: "OSSのBIツールであるMetabaseを利用して、Redmineのデータをグラフ表示する方法を紹介します"
 ---
-<img src="/images/2019/20190703/photo_20190703_01.jpeg" width="1024" height="683" loading="lazy">
+<img src="/images/2019/20190703/photo_20190703_01.jpeg" width="1024" height="683">
 
 ## はじめに
 

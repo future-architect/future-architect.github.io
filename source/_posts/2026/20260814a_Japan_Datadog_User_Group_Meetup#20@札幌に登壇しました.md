@@ -14,7 +14,7 @@ thumbnail: /images/2026/20260814a/thumbnail.png
 author: 棚井龍之介
 lede: "Japan Datadog User Group Meetup#20@札幌で「AI時代のひとりSREのすすめ」というテーマで登壇しました。Datadog MCP Serverを軸に、運用もチーム連携もコンプラ対応もひとりで進められるようになった経緯を話しました。"
 ---
-<img src="/images/2026/20260814a/top.png" alt="" width="660" height="374" loading="lazy">
+<img src="/images/2026/20260814a/top.png" alt="" width="660" height="374">
 
 ## はじめに
 

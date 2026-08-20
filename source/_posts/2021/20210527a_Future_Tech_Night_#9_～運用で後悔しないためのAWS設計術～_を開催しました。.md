@@ -41,7 +41,7 @@ lede: "2021/4/21を開催しました。私は、運用まで考慮したクラ�
 
 ### 内容をチラ見せ
 
-<img src="/images/2021/20210527a/p1.png" alt="AWSインフラの問題" width="956" height="536" loading="lazy">
+<img src="/images/2021/20210527a/p1.png" alt="AWSインフラの問題" width="956" height="536">
 
 <img src="/images/2021/20210527a/p2.png" alt="監視対象の図。LB,EC2,DB" width="959" height="539" loading="lazy">
 

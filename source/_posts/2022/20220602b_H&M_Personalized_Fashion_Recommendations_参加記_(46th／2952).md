@@ -70,7 +70,7 @@ implicitなデータとは、ユーザーから明示的(=explicit)なフィー�
 ## 解法のサマリ
 
 今回私はこの問題に対し、候補を高速に絞り込むretrievalステージと精度よく予測するrankingステージの二段階で予測する[two-tower model](https://research.google/pubs/pub48840/)を構築しました。解法については[kaggleのdiscussion](https://www.kaggle.com/competitions/h-and-m-personalized-fashion-recommendations/discussion/324205)にも投稿したので、ここではサマリで割愛させていただきます。
-<img src="/images/2022/20220602b/H&M_46th_solution_overview.drawio.png" alt="H&M_46th_solution_overview.drawio" width="811" height="531" loading="lazy">
+<img src="/images/2022/20220602b/H&M_46th_solution_overview.drawio.png" alt="H&M_46th_solution_overview.drawio" width="811" height="531">
 
 ### Retrieval Stage
 

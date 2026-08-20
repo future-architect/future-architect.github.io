@@ -12,7 +12,7 @@ author: 信田和哉
 lede: "今回はCheetahGrid＋Vue.jsでエンプラ系システムを構築した際の、採用した理由と実装のポイントのご紹介をしようと思います。CheetahGridについて存じ上げないよーとか、触ったことがないよーという方は、入門編も御覧くださいね。初めての投稿ですが、最後までお付き合いいただければ嬉しいです。"
 ---
 
-<img src="/images/2020/20200924/top.png" class="img-small-size" width="800" height="557" loading="lazy">
+<img src="/images/2020/20200924/top.png" class="img-small-size" width="800" height="557">
 
 ## はじめに
 

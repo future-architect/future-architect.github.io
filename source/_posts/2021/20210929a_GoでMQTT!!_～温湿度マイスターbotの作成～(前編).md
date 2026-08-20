@@ -15,7 +15,7 @@ thumbnail: /images/2021/20210929a/thumbnail.png
 author: 宮永崇史
 lede: "今回はAWSサービスのうちの一つAWS IoTを使用してRaspberryPiとのMQTTによる通信を行います。最終的には室内の快適な温湿度を教えてくれる「温湿度マイスターbot」を作成します。"
 ---
-<img src="/images/2021/20210929a/サムネイル1.png" alt="Louis Reed on unsplash.com Unsplash" title="" width="1200" height="676" loading="lazy">
+<img src="/images/2021/20210929a/サムネイル1.png" alt="Louis Reed on unsplash.com Unsplash" title="" width="1200" height="676">
 
 ## はじめに
 

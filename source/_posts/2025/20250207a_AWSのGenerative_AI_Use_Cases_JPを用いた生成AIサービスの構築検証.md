@@ -58,7 +58,7 @@ GenUについての詳しい情報は以下のリンクに記載されていま�
 - 基本部分はフルサーバーレスのため従量課金となり、小さく始めやすいという利点がある
 - 点線部分のRAG機能、検索エージェント機能、セキュリティ機能、モニタリング機能はオプションとしてデプロイすることが可能
 
-<img src="/images/2025/20250207a/arch.drawio.png" alt="arch.drawio.png" width="899" height="582" loading="lazy">
+<img src="/images/2025/20250207a/arch.drawio.png" alt="arch.drawio.png" width="899" height="582">
 
 ▲ [GitHub - aws-samples/generative-ai-use-cases-jp: すぐに業務活用できるビジネスユースケース集付きの安全な生成AIアプリ実装](https://github.com/aws-samples/generative-ai-use-cases-jp)より引用
 

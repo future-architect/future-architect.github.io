@@ -140,7 +140,7 @@ https://docs.python.org/ja/3/library/ast.html#ast.NodeVisitor.generic_visit
 
 今回の目標は、パッケージ・モジュール・クラスをノードとする図のようなツリーの作成です。パッケージとモジュールはディレクトリ構造にしたがってつなぎ、モジュールの下にはその中で定義されているクラスをつなぎます。作成にあたり、モジュール違いの同名クラスなどが出現することに注意します。
 
-<img src="/images/2021/20211019a/graph_sample.PNG" alt="graph_sample.PNG" width="1036" height="661" loading="lazy">
+<img src="/images/2021/20211019a/graph_sample.PNG" alt="graph_sample.PNG" width="1036" height="661">
 
 AST はディレクトリ構造までは表現しないため、今回は以下の手順で解析します。
 

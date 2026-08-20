@@ -39,7 +39,7 @@ GCEにTerraformをインストールし、Terraform Serverとしています。T
 
 この構成は皆さんお使いのいつもの構成だと思います。
 
-<img src="/images/2023/20230327b/architecture01.drawio.png" alt="" width="772" height="591" loading="lazy">
+<img src="/images/2023/20230327b/architecture01.drawio.png" alt="" width="772" height="591">
 
 ## Private Service Connectを利用した構成
 

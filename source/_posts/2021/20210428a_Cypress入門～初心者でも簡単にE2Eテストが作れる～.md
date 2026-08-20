@@ -52,7 +52,7 @@ Cypressを用いて自動化することで、コスト削減＆品質向上を�
 
 [Cypress](https://www.cypress.io/)とはWebテスト用に構築されたJava Scriptライブラリです。
 
-<img src="/images/2021/20210428a/image.png" alt="Cypressロゴ" width="135" height="56" loading="lazy">
+<img src="/images/2021/20210428a/image.png" alt="Cypressロゴ" width="135" height="56">
 
 特徴として、以下のができます。
 

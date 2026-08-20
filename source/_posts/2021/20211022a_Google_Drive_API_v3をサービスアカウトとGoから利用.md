@@ -39,7 +39,7 @@ Google Drive APIを使うための[認証方式](https://cloud.google.com/docs/a
 
 続いて、Projectの[Google Drive API](https://console.cloud.google.com/apis/library/drive.googleapis.com) から、Google Drive APIを有効にします。有効にしないとこのProjectから払い出したサービスアカウントの認証情報では、Google Drive APIを利用できないです。
 
-<img src="/images/2021/20211022a/Google_Drive_APIの有効化.png" alt="Google_Drive_APIの有効化.png" width="1200" height="640" loading="lazy">
+<img src="/images/2021/20211022a/Google_Drive_APIの有効化.png" alt="Google_Drive_APIの有効化.png" width="1200" height="640">
 
 続いて、[APIとサービスにある、Google Drive APIの認証情報](https://console.cloud.google.com/apis/api/drive.googleapis.com/credentials)タブから、「認証情報を作成」をクリックして、サービスアカウントを作成します。今回は適当に、google-drive-exampleという名前にしました。
 

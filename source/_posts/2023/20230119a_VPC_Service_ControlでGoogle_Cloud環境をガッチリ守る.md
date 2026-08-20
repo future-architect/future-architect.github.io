@@ -33,7 +33,7 @@ VPC Service Controlsを利用することによって、Google Cloudのリソー
 
 また境界の内外におけるデータ移動を制御できるため、データが境界の外へ持ち出されることも防ぎます（境界を超える通信はデフォルトでブロックされます）。
 
-<img src="/images/2023/20230119a/a864e1b2-7cd3-c69c-bf63-fe2b21622b6d.png" alt="" width="1200" height="640" loading="lazy">
+<img src="/images/2023/20230119a/a864e1b2-7cd3-c69c-bf63-fe2b21622b6d.png" alt="" width="1200" height="640">
 
 こちらの画像のように、境界（Service Perimeter）内に存在するBigQueryは認証されたVPC、VM（GCE）からのみアクセス可能となり、認証されていないリソースからは境界内へのアクセス・境界外へのアクセス共に制限されることになります。
 

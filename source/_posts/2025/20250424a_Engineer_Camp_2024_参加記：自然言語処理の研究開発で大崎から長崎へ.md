@@ -26,7 +26,7 @@ lede: "フューチャーのサマーインターン2024 Engineer Campに参加�
 
 詳細はそれぞれの章にまとめていきますので、気になるところだけでも読んでいただければと思います。
 
-<img src="/images/2025/20250424a/IMG_7896.jpg" alt="IMG_7896.jpg" width="1200" height="900" loading="lazy">
+<img src="/images/2025/20250424a/IMG_7896.jpg" alt="IMG_7896.jpg" width="1200" height="900">
 
 ### 応募から参加まで
 

@@ -50,7 +50,7 @@ FUSEとはFilesystem in Userspaceの略で、ユーザーランドで手軽に�
 
 下図は[Wikipedia](https://ja.wikipedia.org/wiki/Filesystem_in_Userspace)より引用した動作イメージです。左上の `ls -l` をされると、カーネルにシステム要求が飛び、それをFUSEの仕組みを経由してユーザーランドのアプリケーションが応答するような流れです。
 
-<img src="/images/2022/20220829a/800px-FUSE_structure.svg.png" alt="800px-FUSE_structure.svg.png" width="800" height="606" loading="lazy">
+<img src="/images/2022/20220829a/800px-FUSE_structure.svg.png" alt="800px-FUSE_structure.svg.png" width="800" height="606">
 
 今回は右上のユーザーランド側のプロセスで、AWS SDK for Goを用いてS3 on LocalStackをバックエンドにadaptorするようなコードを書きました。
 

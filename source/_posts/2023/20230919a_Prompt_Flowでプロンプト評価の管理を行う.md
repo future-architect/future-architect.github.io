@@ -78,7 +78,7 @@ AzureのPrompt Flowにはいくつか組み込みの評価指標が用意され�
 
 このうちの大半はLLMが評価を下す仕組みとなっています。
 
-<img src="/images/2023/20230919a/Alt_text.png" alt="Alt_text" width="1200" height="540" loading="lazy">
+<img src="/images/2023/20230919a/Alt_text.png" alt="Alt_text" width="1200" height="540">
 
 [Source](https://speakerdeck.com/nohanaga/azure-machine-learning-prompt-flow-ping-jia-metorikusujie-shuo?slide=8)
 

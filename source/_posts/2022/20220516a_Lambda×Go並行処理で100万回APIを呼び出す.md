@@ -24,7 +24,7 @@ lede: "業務でAPIを通して数万～100万のデータのバッチ処理を�
 
 参画しているプロジェクトでCSVデータをデータベースに登録する必要がありLambdaを開発しました。ちなみに所属しているチームではGo言語を採用しているので、Go言語で開発しました。データを登録するためのAPI(API Gateway + proxy統合Lambda)を活用してバッチ処理を行います。データの件数は数百件から数十万件と幅が広く、「数十万件ものリクエストをLambdaの実行時間制限である15分以内に処理しきれるのか？」というところから開発を始めました。
 
-<img src="/images/2022/20220516a/Image_from_iOS.jpg" alt="構成図" width="852" height="362" loading="lazy">
+<img src="/images/2022/20220516a/Image_from_iOS.jpg" alt="構成図" width="852" height="362">
 
 ちなみに、1Web API呼び出しに大体30ms~80msほどかかります。
 

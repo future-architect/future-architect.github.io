@@ -46,7 +46,7 @@ Vertex AI Pipelinesを使う際に参照することになる、Kubeflowの公�
   * （3） **Google Cloudパイプラインコンポーネント**を使う
     よく利用される処理についてはGoogle側がすでに用意してくれているため、事前に関数一発で呼び出して実行してくれるものになっています。
 
-<img src="/images/2023/20230213a/pipeline_example.png" alt="pipeline_example.png" width="960" height="540" loading="lazy">
+<img src="/images/2023/20230213a/pipeline_example.png" alt="pipeline_example.png" width="960" height="540">
 
 #### 参考
 

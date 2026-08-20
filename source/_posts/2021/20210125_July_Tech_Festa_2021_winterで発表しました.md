@@ -21,7 +21,7 @@ TIGの伊藤真彦です。
 
 昨今の情勢的に当然のごとくオンラインイベントでの参加です、手軽で良いのですが少し寂しさもあります。
 
-<img src="/images/2021/20210125/photo_20210125_01.png" width="1250" height="701" loading="lazy">
+<img src="/images/2021/20210125/photo_20210125_01.png" width="1250" height="701">
 
 ## July Tech Festaとは
 

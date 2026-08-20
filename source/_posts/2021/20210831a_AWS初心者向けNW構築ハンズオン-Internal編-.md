@@ -42,7 +42,7 @@ AWS初心者にとって、最初に躓きやすい部分がNWの構築かと思
 ### 1. VPCを作成
 
 VPCを2つ作成
-<img src="/images/2021/20210831a/vpc_a.png" alt="vpc_a.png" width="1008" height="266" loading="lazy">
+<img src="/images/2021/20210831a/vpc_a.png" alt="vpc_a.png" width="1008" height="266">
 <img src="/images/2021/20210831a/vpc_b.png" alt="vpc_b.png" width="1019" height="270" loading="lazy">
 参考：[Amazon VPC IPアドレス設計レシピ](https://dev.classmethod.jp/articles/vpc-cidr/)
 

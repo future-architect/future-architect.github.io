@@ -22,7 +22,7 @@ lede: "作成したフォーマッタの実装について説明します。前�
 
 前編でも示しましたが、今回作成したフォーマッタの処理の流れを再度示します。
 
-<img src="/images/2022/20220916c/nagare.png" alt="" width="960" height="228" loading="lazy">
+<img src="/images/2022/20220916c/nagare.png" alt="" width="960" height="228">
 
 ## 使用した技術
 

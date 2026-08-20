@@ -89,7 +89,7 @@ Node.js + PostgreSQLのベース設定をもとに環境を作ると、いきな
 
 Dev Containersは、.devcontainer/devcontainer.jsonが設定の大本です。ここで開発環境のDockerfile、もしくは既成のイメージを選択します。PostgreSQLなどのDBも併用する場合はcompose.yamlを間に挟むこともあります。プロキシを通過する場合はさまざまなこれらの設定ファイルに記述していく必要があります。その相関関係を記したのが以下の図です。
 
-<img src="/images/2026/20260213a/image.png" alt="image.png" width="484" height="488" loading="lazy">
+<img src="/images/2026/20260213a/image.png" alt="image.png" width="484" height="488">
 
 以下の3つのレイヤーの設定について紹介していきます。
 

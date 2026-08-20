@@ -18,7 +18,7 @@ lede: "先日開催された golang.tokyo #28 に当社から2名、登壇しま
 
 LT 景品で頂いた CNCF のキャラクターです。かわいいです。
 
-<img src="/images/2019/20191212/1.jpg" class="img-small-size" width="500" height="666" loading="lazy">
+<img src="/images/2019/20191212/1.jpg" class="img-small-size" width="500" height="666">
 
 https://www.cncf.io/phippy/
 

@@ -205,7 +205,7 @@ localstackは [2020-09-15リリース](https://github.com/localstack/localstack#
 
 backendとproviderの定義は完了したので、次は各種リソースを追加しましょう。本記事では、サーバレス構成でよくある「Kinesisでデータを受けて、Lambdaで取得し、S3に永続化」のインフラ環境を、Terraformを使ってLocalstack内に構築します。
 
-<img src="/images/2020/20201113/Screen_Shot_2020-10-29_at_15.12.54.png" width="1196" height="474" loading="lazy">
+<img src="/images/2020/20201113/Screen_Shot_2020-10-29_at_15.12.54.png" width="1196" height="474">
 
 上記構成をterraform定義するのに必要なresourceはこちらです。
 

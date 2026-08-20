@@ -66,7 +66,7 @@ sudo apt upgrade -y
 
 #### 物理的な構成図
 
-<img src="/images/2022/20220908a/Screenshot_from_2022-09-04_20-54-30.png" alt="Screenshot_from_2022-09-04_20-54-30.png" width="1200" height="732" loading="lazy">
+<img src="/images/2022/20220908a/Screenshot_from_2022-09-04_20-54-30.png" alt="Screenshot_from_2022-09-04_20-54-30.png" width="1200" height="732">
 
 <img src="/images/2022/20220908a/image.png" alt="image.png" width="939" height="730" loading="lazy">
 

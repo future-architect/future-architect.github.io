@@ -37,7 +37,7 @@ public class MyService {
 
 動的というのは、例えば、リクエストしてくるユーザーのランクを見て、VIPユーザー用ロジックを選択したい、みたいなストラテジーパターンです。ユーザーのランクの種類は動的に増えたりするのでハードコードしたくない、みたいな感じの要件だとします。
 
-<img src="/images/2022/20220729a/名称未設定ファイル.drawio.png" alt="名称未設定ファイル.drawio.png" width="460" height="191" loading="lazy">
+<img src="/images/2022/20220729a/名称未設定ファイル.drawio.png" alt="名称未設定ファイル.drawio.png" width="460" height="191">
 
 ## まずはロジックの登録機構
 

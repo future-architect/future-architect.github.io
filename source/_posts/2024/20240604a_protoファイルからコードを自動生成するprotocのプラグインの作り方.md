@@ -41,7 +41,7 @@ Protocol Buffersを利用する際の基本的なワークフローは以下で�
 
 ### 全体の流れ
 
-<img src="/images/2024/20240604a/overview.jpg" alt="overview.jpg" width="691" height="321" loading="lazy">
+<img src="/images/2024/20240604a/overview.jpg" alt="overview.jpg" width="691" height="321">
 
 まず、簡単な例を使って、全体の流れを説明します。`protoc-gen-myplugin`というプラグインを使ってコードを生成したいと仮定します。また、コンパイルの対象ファイルは`example1.proto`, `example2.proto`の2つであるとして、コンパイル結果の出力先ディレクトリは`out`ディレクトリであるとします。この時、protocの呼び出しは以下のように行います。
 

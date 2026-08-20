@@ -83,7 +83,7 @@ LocalStackの詳細については[こちらのブログ](/articles/20191115/)�
 
 ではまず同期型の呼び出しから設定/実装方法を見ていきましょう。今回はよくあるAPI Gateway --> Lambdaという構成を参考に進めていきます。
 
-<img src="/images/2020/20200722/2020-07-17T17.05.46.png" width="560" height="219" loading="lazy">
+<img src="/images/2020/20200722/2020-07-17T17.05.46.png" width="560" height="219">
 
 それでは早速構築してきましょう。まずは、APIのレスポンスを返すLambdaを作成します。
 

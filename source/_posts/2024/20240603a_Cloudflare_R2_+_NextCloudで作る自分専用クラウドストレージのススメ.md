@@ -124,7 +124,7 @@ https://wasabi.com/pricing
 
 今回はプロジェクトの後輩にRaspberry Piを布教する目的も兼ねて、手持ちのRaspberry Pi 3 Model BにNextCloudをインストールします。大学生時代に4台まとめ買いして家に転がっていたものです。
 
-<img src="/images/2024/20240603a/image.png" alt="image.png" width="677" height="353" loading="lazy">
+<img src="/images/2024/20240603a/image.png" alt="image.png" width="677" height="353">
 
 事前にIPアドレスを固定し、SSH接続できるようにしてあります。この方法は本題からそれてしまうので、割愛します。
 

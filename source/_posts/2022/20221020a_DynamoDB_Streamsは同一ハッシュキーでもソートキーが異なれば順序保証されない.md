@@ -41,7 +41,7 @@ DynamoDB Streamsについては1.5年前に似たような小ネタを投稿し�
 
 例を上げて説明します。
 
-<img src="/images/2022/20221020a/dynamodbstreams_構成.png" alt="dynamodbstreams_構成.png" width="1200" height="277" loading="lazy">
+<img src="/images/2022/20221020a/dynamodbstreams_構成.png" alt="dynamodbstreams_構成.png" width="1200" height="277">
 
 構成例のイメージです。何かしらスタッフの動作をセンシングするデバイスがあり、それをリアルタイムでDynamoDBに登録。そのデータをニアリアルタイムで別システムに連携する必要があるため、DynamoDB StreamsでS3に N 分間隔でタイムスタンプ付きのファイル名で出力。連携先の別システムはファイル名をもとに順次取り込む、といった連携方式です。
 

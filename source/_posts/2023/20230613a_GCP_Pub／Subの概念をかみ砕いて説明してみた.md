@@ -59,7 +59,7 @@ subscriberがメッセージを正常に受け取ったらsubscriptionに対し�
 
 ### 3. 実際の処理の流れの解説<a name="処理の流れの解説"></a>
 
-<img src="/images/2023/20230613a/pubsub_1.png" alt="pubsub" width="667" height="435" loading="lazy">
+<img src="/images/2023/20230613a/pubsub_1.png" alt="pubsub" width="667" height="435">
 
 上図がPubSubの基本的な処理の流れになっています。
 

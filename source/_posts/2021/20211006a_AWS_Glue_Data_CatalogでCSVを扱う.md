@@ -40,7 +40,7 @@ Glueといっても大きく下記の３種類、処理系をいれると4種類
 
 AWSが推奨する[ベストプラクティス](https://docs.aws.amazon.com/ja_jp/athena/latest/ug/glue-best-practices.html)では、「crawlerを利用することでデータをCatalog化し、多様や処理系で利用できる」とされていますが、’”’ダブルクォーテーションで囲まれたフィールドを持つCSV（TSVも同様）の場合、正しく読み込まれず（※）、AWS上の[ドキュメント](https://docs.aws.amazon.com/ja_jp/athena/latest/ug/csv-serde.html)でも対応が必要とされています。
 
-<img src="/images/2021/20211006a/名称未設定ファイル.drawio_(3).png" alt="クローラが利用できないイメージ図" width="689" height="209" loading="lazy">
+<img src="/images/2021/20211006a/名称未設定ファイル.drawio_(3).png" alt="クローラが利用できないイメージ図" width="689" height="209">
 
 ### 2. テーブルのデータ型を全てStringに設定する必要がある
 

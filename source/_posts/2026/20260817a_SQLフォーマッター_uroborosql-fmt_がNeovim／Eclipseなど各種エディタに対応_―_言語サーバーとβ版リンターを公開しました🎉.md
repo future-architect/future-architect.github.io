@@ -16,7 +16,7 @@ lede: "SQLフォーマッター uroborosql-fmt の言語サーバーとβ版リ�
 ---
 ## はじめに
 
-<img src="/images/2026/20260817a/top.png" alt="" width="630" height="229" loading="lazy">
+<img src="/images/2026/20260817a/top.png" alt="" width="630" height="229">
 
 コアテクノロジーグループでアルバイトをしている仲です。
 

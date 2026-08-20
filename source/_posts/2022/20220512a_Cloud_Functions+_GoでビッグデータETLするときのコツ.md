@@ -44,7 +44,7 @@ Cloud Storageに大量かつ、大きいログファイルが存在していま�
 
 Cloud Storageからログファイルを取ってきて、テキスト加工する処理は、Cloud FunctionsとPub/Subを使ったファンアウト構成にしました。
 
-<img src="/images/2022/20220512a/CloudFunction_ETL.drawio_(1).png" alt="CloudFunction_ETL" width="616" height="301" loading="lazy">
+<img src="/images/2022/20220512a/CloudFunction_ETL.drawio_(1).png" alt="CloudFunction_ETL" width="616" height="301">
 
 * 左のCloud Functionsが、Cloud Storageに存在するログファイルのリストを1件ずつPub/Subにpublishします。
 * 真ん中のCloud FunctionsはPub/Subをトリガーにして並行に起動させ、ログファイルをダウンロードして加工し、別のCloud Storageにアップロードします。Cloud Functionsの最大同時実行数までスケールさせることができ、同時に多くのログファイルを処理できます。

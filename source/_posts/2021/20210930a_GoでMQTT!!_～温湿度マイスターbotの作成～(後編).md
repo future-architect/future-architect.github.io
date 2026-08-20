@@ -17,7 +17,7 @@ lede: "AWS IoTを使用したMQTTのチュートリアルはAWS公式からも�
 mathjax: true
 ---
 
-<img src="/images/2021/20210930a/サムネイル2.png" alt="" title="Louis Reed on Unsplash" width="1200" height="675" loading="lazy">
+<img src="/images/2021/20210930a/サムネイル2.png" alt="" title="Louis Reed on Unsplash" width="1200" height="675">
 
 ## はじめに
 

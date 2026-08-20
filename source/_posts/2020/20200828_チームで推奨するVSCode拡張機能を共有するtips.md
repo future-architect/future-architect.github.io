@@ -32,7 +32,7 @@ TIG DXユニットの市川です。
 
 まず、VSCodeを起動してインストールを推奨したい拡張機能のページにアクセスします（今回はESLintを例に説明します）。
 
-<img src="/images/2020/20200828/image.png" width="900" height="443" loading="lazy">
+<img src="/images/2020/20200828/image.png" width="900" height="443">
 
 そのあと、下記画像のようにコマンドパレットを開き、`Extensions: Add to Recommended Extensions (Workspace Folder)` を選択します。
 

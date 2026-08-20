@@ -83,7 +83,7 @@ export CLOUDFLARE_ACCOUNT_ID=00000000000000000000000000
 
 これで、準備が整ったので、実際のリソースに対して実行しましょう。cf-terraformingには、`generate`と`import`の2つのコマンドがあります。ここからはそれぞれ使って、WorkersのKVを触ってみようと思います。名前は以下のように`SAMPLE_TF`としました。
 
-<img src="/images/2023/20230502a/image.png" alt="image.png" width="825" height="502" loading="lazy">
+<img src="/images/2023/20230502a/image.png" alt="image.png" width="825" height="502">
 
 ### generate
 

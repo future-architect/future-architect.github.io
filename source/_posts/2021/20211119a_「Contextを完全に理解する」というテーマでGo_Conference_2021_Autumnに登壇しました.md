@@ -19,7 +19,7 @@ TIGの伊藤真彦です。
 
 先日[Go Conference 2021 Autumn](https://gocon.jp/2021autumn/)に登壇させていただきました、リモート登壇です。
 
-<img src="/images/2021/20211119a/image.png" alt="image.png" width="1200" height="649" loading="lazy">
+<img src="/images/2021/20211119a/image.png" alt="image.png" width="1200" height="649">
 
 発表資料はこちらです。
 

@@ -35,7 +35,7 @@ GKEの場合は、ノードプールを構成するインスタンスグルー�
 
 構成は下図の通り、Pub/SubトリガーのCloud Functionとして動作します。
 
-<img src="/images/2019/20190713/photo_20190713_01.png" width="939" height="224" loading="lazy">
+<img src="/images/2019/20190713/photo_20190713_01.png" width="939" height="224">
 
 起動タイミングはCloud Schedulerで制御する構成です。
 そのため、「0 21 * * *」のようにCRON形式でスケジュールを定義すれば、毎日21時に停止させることができます。

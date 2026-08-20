@@ -45,7 +45,7 @@ VSCode を開いて以下ショートカットキーで出てきます。
 
 ### 1. Go: Restart Language Server
 
-<img src="/images/2020/20200707/photo_20200707_01.png" width="1492" height="260" loading="lazy">
+<img src="/images/2020/20200707/photo_20200707_01.png" width="1492" height="260">
 
 gopls を再起動するコマンドです。
 コードを実装していて、何かしらうまく動かない (おかしなエラーが出る、補完が効かなくなる、etc) 場合に即座に試します。 **大体治ります** 。

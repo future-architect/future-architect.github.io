@@ -33,7 +33,7 @@ Google Cloud Next Tokyo'25は、生成AIやAIエージェントをはじめと�
 - **セッション**: AI時代の開発スタイルや、Google Cloud製品を活用した企業の成功事例が紹介されました
 - **EXPO**: 参加企業のブースやライブデモ、展示を通じて、Google Cloudの活用事例が紹介されました
 
-<img src="/images/2025/20250826a/IMG_5382.jpg" alt="IMG_5382.jpg" width="1200" height="1210" loading="lazy">
+<img src="/images/2025/20250826a/IMG_5382.jpg" alt="IMG_5382.jpg" width="1200" height="1210">
 
 *東京ビッグサイト*
 

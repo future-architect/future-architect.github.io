@@ -14,7 +14,7 @@ thumbnail: /images/2023/20231206a/thumbnail.jpg
 author: 澁川喜規
 lede: "PyCon APAC 2023でDev Containersで発表してきました。"
 ---
-<img src="/images/2023/20231206a/53296952672_95495d5f01_k.jpg" alt="53296952672_95495d5f01_k.jpg" width="1200" height="800" loading="lazy">
+<img src="/images/2023/20231206a/53296952672_95495d5f01_k.jpg" alt="53296952672_95495d5f01_k.jpg" width="1200" height="800">
 
 PyCon APAC 2023でDev Containersで発表してきました。写真はスタッフに撮っていただいた写真のアルバムから引用させていただきました。本エントリーではその発表の元ネタとして半年ぐらい前にいろいろ調べていた内容をお伝えします。
 

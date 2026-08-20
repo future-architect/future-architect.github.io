@@ -46,7 +46,7 @@ AIモデルの中身では入力された特徴量に対して重み付け演算
 
 ## FlutterとTFLiteを用いてホットドッグ識別器を作ってみる
 
-<img src="/images/2022/20220321a/eca77278-952d-59c0-aa1b-97aa98a5d453.png" alt="ホットドッグ画像" width="533" height="1113" loading="lazy">
+<img src="/images/2022/20220321a/eca77278-952d-59c0-aa1b-97aa98a5d453.png" alt="ホットドッグ画像" width="533" height="1113">
 
 前置きはここまでにして、早速本題へ入っていきましょう！
 元ネタは海外ドラマの[シリコンバレー](https://www.amazon.co.jp/gp/video/detail/B07D43SV5F/ref=atv_dp_season_select_s4)です。

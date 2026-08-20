@@ -16,7 +16,7 @@ lede: "過去にいくつかEntraIDが、久々にMicrosoft 365 Developer Progra
 
 [Microsoft 365 Developer Programのウェブサイト](https://developer.microsoft.com/en-us/microsoft-365/dev-program)で上のメニューのDeveloper Programの「My Dashboard」を選びます。この遷移がわからなくていつもJoin Nowをしていました。
 
-<img src="/images/2024/20240401a/image.png" alt="image.png" width="610" height="287" loading="lazy">
+<img src="/images/2024/20240401a/image.png" alt="image.png" width="610" height="287">
 
 こちらがダッシュボードです。
 

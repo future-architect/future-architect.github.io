@@ -53,7 +53,7 @@ Embededed Swiftでは、以下のSwiftが提供する動的機能を制限する
 
 次の図は、Swiftランタイムと標準ライブラリのサイズ縮小に関する既存の取り組みとEmbedded Swiftがどのようにアプローチしているかを示しています。（[swiftlang/swift-evolution/visions/embedded-swift.md](https://github.com/swiftlang/swift-evolution/blob/main/visions/embedded-swift.md)より引用）
 
-<img src="/images/2025/20250416a/image.png" alt="" width="1200" height="651" loading="lazy">
+<img src="/images/2025/20250416a/image.png" alt="" width="1200" height="651">
 
 より詳細なEmbedded Swiftの制約は以下を参照してください。
 

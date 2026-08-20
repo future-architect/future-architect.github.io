@@ -18,7 +18,7 @@ TIGの伊藤真彦です。
 
 先日[Go Conference’20 in Autumn SENDAI](https://sendai.gocon.jp/)に登壇させていただきました、リモート登壇の為残念ながら現地には行きませんでした。
 
-<img src="/images/2020/20201010/image.png" width="1200" height="648" loading="lazy">
+<img src="/images/2020/20201010/image.png" width="1200" height="648">
 
 発表資料はこちらです。
 

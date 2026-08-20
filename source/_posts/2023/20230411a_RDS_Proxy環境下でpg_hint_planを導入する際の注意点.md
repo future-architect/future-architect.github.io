@@ -22,7 +22,7 @@ PostgreSQL を使用する際、最適な実行計画が選択されず、クエ
 
 以下に説明する環境の概要を示します。PostgreSQL のバージョンは 13.7 、`pg_hint_plan` のバージョンは 1.3.7 です。なお、Aurora インスタンス上に構築したデータベースは `sampledb` としています。
 
-<img src="/images/2023/20230411a/image.png" alt="image.png" width="600" height="208" loading="lazy">
+<img src="/images/2023/20230411a/image.png" alt="image.png" width="600" height="208">
 
 ## `pg_hint_plan` の導入方法
 

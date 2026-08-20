@@ -17,7 +17,7 @@ TIGの伊藤真彦です。先日社内の同じチームの[加藤さん](/auth
 
 ## AWS GameDay Onlineとは
 
-<img src="/images/2021/20211111a/image.png" alt="image.png" width="1200" height="885" loading="lazy">
+<img src="/images/2021/20211111a/image.png" alt="image.png" width="1200" height="885">
 
 日本語の情報としては[AWS公式ブログ](https://aws.amazon.com/jp/blogs/psa/aws-gameday-online-apn-cup-vol2-2021/)がわかりやすいでしょうか。
 

@@ -24,7 +24,7 @@ MONET Technologies Inc. の竹内です。このたび、フューチャー技�
 
 今回イメージしたデモアプリは「イベント会場へのマルチモーダル移動経路検索&予約&搭乗Webアプリ」です。
 
-<img src="/images/2021/20210826a/demo_short2.gif" alt="アプリデモ動画" width="640" height="400" loading="lazy">
+<img src="/images/2021/20210826a/demo_short2.gif" alt="アプリデモ動画" width="640" height="400">
 
 <img src="/images/2021/20210826a/image.png" alt="アプリ紹介" width="1200" height="367" loading="lazy">
 

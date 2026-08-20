@@ -45,7 +45,7 @@ lede: "[CP連載2021も折り返しの6本目です！陽光麗らかなある�
 
 ## Google Analytics for Firebaseとは
 
-<img src="/images/2021/20210316/image.png" width="1200" height="675" loading="lazy">
+<img src="/images/2021/20210316/image.png" width="1200" height="675">
 
 実態はGoogleのサービス`Google Analytics` (GA)をFirebaseで利用できるようにしたものです。
 [公式ドキュメント](https://firebase.google.com/docs/analytics/get-started?hl=ja&platform=android)では以下のように紹介されています。

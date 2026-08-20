@@ -89,7 +89,7 @@ Output Metricsについては、本記事を読んだ上で、こちらの記事
 `day.csv`ではデータ数が少ないので、`hour.csv`を使うことにします。\
 データの内容は以下のようになっています（最初の5行のみ表示）
 
-<img src="/images/2023/20230413a/image.png" alt="" width="1200" height="107" loading="lazy">
+<img src="/images/2023/20230413a/image.png" alt="" width="1200" height="107">
 
 主な説明変数として、気温(tmp), 湿度(hum), 風速(windspeed)等があります。目的変数はその時間のシェアバイク利用数(cnt)です。
 

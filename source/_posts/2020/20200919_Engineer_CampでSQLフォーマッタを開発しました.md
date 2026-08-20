@@ -32,7 +32,7 @@ lede: "フューチャーのインターンEngineer Campに参加した中村と
 今回のインターンで私は、SQLフォーマッタの作成に取り組みました。
 SQLフォーマッタとは以下のようにSQLのインデントなど整形するツールのことです。
 
-<img src="/images/2020/20200919/formatter.jpg" class="img-middle-size" width="592" height="261" loading="lazy">
+<img src="/images/2020/20200919/formatter.jpg" class="img-middle-size" width="592" height="261">
 
 SQLフォーマッタを用いることで、SQLの見た目を整える手間を削減したり、チームで統一感があるコーディングを実現できます。
 

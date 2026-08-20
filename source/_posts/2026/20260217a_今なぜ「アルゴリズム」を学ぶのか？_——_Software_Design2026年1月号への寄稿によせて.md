@@ -12,7 +12,7 @@ thumbnail: /images/2026/20260217a/thumbnail.jpg
 author: 真野隼記
 lede: "同僚の澁川さん、松本さんと一緒に、Software Design 2026年1月号の第1特集「アルゴリズムはどこに効く？」にて、第3章「パフォーマンス問題の診断とアーキテクチャの再考」を寄稿しました。"
 ---
-<img src="/images/2026/20260217a/pxl_20260121_025217424.jpg" alt="" width="1000" height="1333" loading="lazy">
+<img src="/images/2026/20260217a/pxl_20260121_025217424.jpg" alt="" width="1000" height="1333">
 
 同僚の澁川さん、松本さんと一緒に、[Software Design 2026年1月号](https://gihyo.jp/magazine/SD/archive/2026/202601)の第1特集「アルゴリズムはどこに効く？」にて、第3章「パフォーマンス問題の診断とアーキテクチャの再考」を寄稿しました。
 

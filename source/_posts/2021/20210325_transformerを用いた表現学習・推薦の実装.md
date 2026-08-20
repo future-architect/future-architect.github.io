@@ -109,7 +109,7 @@ self-attentionを行うクラスです。
 データをユーザーのIDによって訓練:テスト=9:1に分けて学習した際のcategorical crossentropyが以下の通りです。
 Tesla T4インスタンスで128epochの学習に1hかかりました。
 
-<img src="/images/2021/20210325/results___22_1.png" width="372" height="248" loading="lazy">
+<img src="/images/2021/20210325/results___22_1.png" width="372" height="248">
 
 次に解く問題について予測しその問題が何番目に出現したかについて計測したところ、64epoch目では訓練中に存在しないユーザーに対し13000問の問題からおおよそ700番目くらいの精度で推薦できました。
 

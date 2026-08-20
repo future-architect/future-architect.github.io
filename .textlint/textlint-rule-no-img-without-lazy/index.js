@@ -1,27 +1,49 @@
 /**
- * 記事の2枚目以降の `<img>` に `loading="lazy"` が無い箇所を検出する。
+ * 記事の `<img>` の `loading="lazy"` の付け方を検出する。向きは2つある。
  *
- * 画面外の画像まで先読みされ、通信と描画が無駄になる。記事の画像は
- * `loading="lazy"` を付ける決まり（CLAUDE.md の記法例）。
+ * 1. **2枚目以降に lazy が無い。** 画面外の画像まで先読みされ、通信と描画が
+ *    無駄になる。記事の画像は `loading="lazy"` を付ける決まり（CLAUDE.md の記法例）
+ * 2. **先頭画像に lazy が付いている。** 先頭は LCP 候補なので lazy を付けると
+ *    表示が遅れる。`scripts/lcp_image_priority.js` が描画時に外すため表示は
+ *    壊れないが、書いても消える指定が残ると意図が読めない (#2686 の調査で発覚)
  *
- * **先頭画像は対象外。** `scripts/lcp_image_priority.js` が描画後の本文から
- * 先頭画像の lazy を外して `fetchpriority="high"` を付ける（LCP候補に lazy が
- * 付いていると表示が遅れる）ため、先頭に無いのが正しい状態になる。
- * 何枚目かの数え方はこのフィルタと揃える必要があり、フィルタは Markdown 記法を
- * 展開した後の HTML を見るので、こちらも `![alt](src)` を数に入れる（記法の
- * 混在は #2644）。報告するのは生の img だけで、Markdown 記法には loading を
- * 書けないため対象にしない。
+ * 何枚目かの数え方は `lcp_image_priority.js` と揃える必要がある。あちらは
+ * Markdown 記法を展開した後の HTML の最初の `<img>` を見るので、こちらも
+ * `![alt](src)` を数に入れる（記法の混在は #2644）。報告するのは生の img だけで、
+ * Markdown 記法には loading を書けないため対象にしない。
+ *
+ * **1x1 の画像は 1 の対象外。** アフィリエイトの計測ピクセルがこの形で、
+ * 画面に入るかどうかに関係なく取得されることが目的なので lazy を付ける意味が無い。
+ * 記事側で `textlint-disable` して黙らせていたが、抑止の理由を記事本文に
+ * 書き残すことになるためルール側で外す。
+ * 数える順番からは外さない（`lcp_image_priority.js` は計測ピクセルであっても
+ * 最初の img を対象にするので、順番の数え方はあちらに合わせる）。
  *
  * 走査の構えは no-img-without-dimensions と同じ（Document の原文を舐め、
  * コードブロックとインラインコードの範囲だけ除外する）。属性がタイポで崩れた
  * タグは Html ノードにならず Str に落ちることがあるため、ノードを辿らない。
  *
- * 足す位置を機械的に決められる（タグの末尾）ので --fix を持つ。
+ * 足す位置・消す対象を機械的に決められるので --fix を持つ。
  */
 const IMG_RE = /<img\b((?:"[^"]*"|'[^']*'|[^<>"'])*)>/gi;
 // リンクで囲んだ画像 `[![alt](src)](url)` もこの形で一致する
 const MARKDOWN_IMG_RE = /!\[[^\]]*\]\([^)]+\)/g;
 const LOADING_RE = /\bloading\s*=\s*("[^"]*"|'[^']*'|[^\s"'=<>]+)/i;
+const WIDTH_RE = /\bwidth\s*=\s*("[^"]*"|'[^']*'|[^\s"'=<>]+)/i;
+const HEIGHT_RE = /\bheight\s*=\s*("[^"]*"|'[^']*'|[^\s"'=<>]+)/i;
+// lcp_image_priority.js と同じ形。同じタグに lazy が2回書かれた記事があるため
+// グローバルに消す
+const LAZY_ATTR_RE = /\s+loading\s*=\s*(["']?)lazy\1/gi;
+
+function attrValue(regexp, attrs) {
+  const match = regexp.exec(attrs);
+  return match ? match[1].replace(/^["']|["']$/g, "") : null;
+}
+
+// アフィリエイトの計測ピクセル
+function isTrackingPixel(attrs) {
+  return attrValue(WIDTH_RE, attrs) === "1" && attrValue(HEIGHT_RE, attrs) === "1";
+}
 
 function collectCodeRanges(node, ranges) {
   if (node.type === "CodeBlock" || node.type === "Code") {
@@ -73,6 +95,28 @@ function reporter(context) {
 
       for (const tag of htmlTags) {
         if (images.indexOf(tag) === 0) {
+          // 先頭画像は逆に lazy を外す側。検出は非グローバルの LOADING_RE で行う
+          // （LAZY_ATTR_RE は g 付きで test が lastIndex を動かすため判定に使わない）
+          if (attrValue(LOADING_RE, tag[1]) !== "lazy") {
+            continue;
+          }
+          report(
+            node,
+            new RuleError(
+              '先頭画像には loading="lazy" を付けません' +
+                "（LCP 候補になるため。lcp_image_priority.js が描画時に外すので、書いても消えます）",
+              {
+                index: tag.index,
+                fix: fixer.replaceTextRange(
+                  [tag.index, tag.index + tag[0].length],
+                  tag[0].replace(LAZY_ATTR_RE, "")
+                ),
+              }
+            )
+          );
+          continue;
+        }
+        if (isTrackingPixel(tag[1])) {
           continue;
         }
         const loading = LOADING_RE.exec(tag[1]);

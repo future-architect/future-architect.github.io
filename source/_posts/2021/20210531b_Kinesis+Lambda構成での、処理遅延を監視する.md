@@ -31,7 +31,7 @@ lede: "「Kinesis+Lambda構成」でのメトリクス監視について取り�
 
 AWS本家の[形で考えるサーバレス設計](https://aws.amazon.com/jp/serverless/patterns/serverless-pattern/)でも「流入データの連続処理」として取り上げられおり、サーバレスという用語に馴染みのないエンジニアにもよく知られたデータフロー構成ではないでしょうか。
 
-<img src="/images/2021/20210531b/Pattern-Streaming.7b2876deed217d21f4e4e326fe1535be25cb9603.png" alt="Kinesisで受けてLambdaからS3へ書き込む図" width="832" height="218" loading="lazy">
+<img src="/images/2021/20210531b/Pattern-Streaming.7b2876deed217d21f4e4e326fe1535be25cb9603.png" alt="Kinesisで受けてLambdaからS3へ書き込む図" width="832" height="218">
 
 大量データの受信にはKinesisを使い、受信データのコンピュートはLambdaでやりくりする。この構成はシンプルで分かりやすく、かつ、各リソースをスケールしやすいため、データ連携やデータ保存などのあらゆるケースに応用が効く、ベーシックなインフラ構成だと思います。
 

@@ -45,7 +45,7 @@ PostgreSQL 18ではUUIDv7生成に対応しました。今までのUUID v4(完�
 
 B-Treeはその名の通り木構造です。ソート順でデータが並ぶため、近いデータへのアクセスであればキャッシュ効率も上がります。
 
-<img src="/images/2025/20251006a/スクリーンショット_2025-10-03_18.03.47.png" alt="スクリーンショット_2025-10-03_18.03.47.png" width="844" height="261" loading="lazy">
+<img src="/images/2025/20251006a/スクリーンショット_2025-10-03_18.03.47.png" alt="スクリーンショット_2025-10-03_18.03.47.png" width="844" height="261">
 
 * Wikpedia [B木](https://ja.wikipedia.org/wiki/B木)より引用
 

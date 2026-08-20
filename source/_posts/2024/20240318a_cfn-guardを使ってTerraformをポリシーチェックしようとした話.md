@@ -51,7 +51,7 @@ Terraformのポリシーチェックとしては、過去にFuture技術ブロ�
 
 [CloudFormation Guard で Policy as Code！ 実際どうよ？ / Policy as Code with CloudFormation Guard](https://speakerdeck.com/ohmura/policy-as-code-with-cloudformation-guard?slide=7)のスライドをお借りすると次のようなイメージです。
 
-<img src="/images/2024/20240318a/image.png" alt="image.png" width="1200" height="682" loading="lazy">
+<img src="/images/2024/20240318a/image.png" alt="image.png" width="1200" height="682">
 
 このような **青写真** を描きました。
 

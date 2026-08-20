@@ -32,7 +32,7 @@ lede: "「Future Tech Night #21 Google Cloud: データエンジニア＋MLOps�
 機械学習プロジェクトが広く一般に普及してきた昨今、多くのカンファレンスや企業活動の中でMLOpsが注目を集めています。
 MLOpsとは、下記のライフサイクルを潤滑に回すための概念であり、Machine Learning + DevOps + Operateを合わせたものです。
 
-<img src="/images/2022/20220513a/image.png" alt="MLOps" width="800" height="450" loading="lazy">
+<img src="/images/2022/20220513a/image.png" alt="MLOps" width="800" height="450">
 
 本発表では、コーディングと学習のフェーズに焦点を当てています。
 如何にデータサイエンティストのためのコーディング環境や、ハイスペックな学習環境を用意するかといった環境面の問題や、実装されたアルゴリズムをどのようにサービスとして素早くデプロイするのか等が課題となってきます。

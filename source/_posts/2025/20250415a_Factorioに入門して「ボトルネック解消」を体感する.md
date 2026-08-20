@@ -14,7 +14,7 @@ lede: "現在、手元の Gemini を開いてみると、Deep Research は Deep 
 ---
 ## はじめに
 
-<img src="/images/2025/20250415a/スクリーンショット_2025-04-12_5.02.02.jpg" alt="" width="1200" height="861" loading="lazy">
+<img src="/images/2025/20250415a/スクリーンショット_2025-04-12_5.02.02.jpg" alt="" width="1200" height="861">
 
 [春の入門祭り2025](/articles/20250413a/) 2日目です。
 

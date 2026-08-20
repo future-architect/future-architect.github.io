@@ -37,7 +37,7 @@ lede: "前回の記事に続いて、シリコンバレーのIT企業につい�
 世界有数のIT企業がひしめいているシリコンバレー。
 そして、ここがシリコンバレー発祥の地といわれる**「ヒューレッド・パッカードのガレージ」**
 
-<img src="/images/2017/20170322/photo_20170322_01.jpeg" width="1000" height="562" loading="lazy">
+<img src="/images/2017/20170322/photo_20170322_01.jpeg" width="1000" height="562">
 
 <img src="/images/2017/20170322/photo_20170322_02.jpeg" width="1000" height="562" loading="lazy">
 

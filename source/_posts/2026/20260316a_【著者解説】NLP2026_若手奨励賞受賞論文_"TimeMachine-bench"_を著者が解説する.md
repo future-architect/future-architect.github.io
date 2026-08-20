@@ -20,7 +20,7 @@ lede: "この度、3/9 が若手奨励賞に選出されました。論文の審
 
 本記事では、当該論文、およびその拡張版であるEACL2026 (Main Conference) 採択論文 [TimeMachine-bench: A Benchmark for Evaluating Model Capabilities in Repository-Level Migration Tasks](https://arxiv.org/pdf/2601.22597) (3/24 〜, モロッコ・ラバトにて開催) を著者として解説します。
 
-<img src="/images/2026/20260316a/overview.png" alt="overview.png" width="1200" height="742" loading="lazy">
+<img src="/images/2026/20260316a/overview.png" alt="overview.png" width="1200" height="742">
 
 ### 背景
 

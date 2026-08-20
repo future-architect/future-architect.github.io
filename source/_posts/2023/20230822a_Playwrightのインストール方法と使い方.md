@@ -118,7 +118,7 @@ npx playwright codegen https://playwright.dev/
 
 実行すると下図のように playwright.devが立ち上がります。
 
-<img src="/images/2023/20230822a/画像2.png" alt="" width="1200" height="750" loading="lazy">
+<img src="/images/2023/20230822a/画像2.png" alt="" width="1200" height="750">
 
 今回はGitHubのアイコンをカーソルを当てると`getByLabel('GitHub repository')`と表示されます。
 

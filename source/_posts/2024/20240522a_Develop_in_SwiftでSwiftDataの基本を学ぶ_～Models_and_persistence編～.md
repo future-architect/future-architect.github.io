@@ -12,7 +12,7 @@ author: 橋本竜我
 lede: "公式チュートリアルDevelop in SwiftのModels and persistence、Data editing and navigation、Relationships and queriesという3つのセクションでSwiftDataを学べるとことで実際にやってみました。"
 ---
 
-<img src="/images/2024/20240522a/image.png" alt="" width="1103" height="542" loading="lazy">
+<img src="/images/2024/20240522a/image.png" alt="" width="1103" height="542">
 
 ## はじめに
 

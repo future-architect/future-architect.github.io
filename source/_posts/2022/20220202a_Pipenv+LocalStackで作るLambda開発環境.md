@@ -14,7 +14,7 @@ thumbnail: /images/2022/20220202a/thumbnail.png
 author: 宮永崇史
 lede: "PipenvとLocalStackを使用したLambda開発環境の構築を紹介します。本記事で作成するデモアプリは以下のGitHubリポジトリに格納しています。"
 ---
-<img src="/images/2022/20220202a/eyecatch.png" alt="" width="969" height="484" loading="lazy">
+<img src="/images/2022/20220202a/eyecatch.png" alt="" width="969" height="484">
 
 ## はじめに
 

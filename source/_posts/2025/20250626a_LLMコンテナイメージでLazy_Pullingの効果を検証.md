@@ -102,7 +102,7 @@ Snapshotterはデーモンとして起動させunix domain socketごしにcontai
 
 ということでRemote Snapshotterを使うにはコンテナイメージをSeekableなイメージに変換する必要があったり、どのファイルがどのレイヤーのどのオフセットに含まれているのかのインデックスをメタデータとして持たせたりする必要があります。
 
-<img src="/images/2025/20250626a/overview01.png" alt="overview01.png" width="1200" height="677" loading="lazy">
+<img src="/images/2025/20250626a/overview01.png" alt="overview01.png" width="1200" height="677">
 
 *[Containerd Stargz Snapshotter Plugin Overview](https://github.com/containerd/stargz-snapshotter/blob/main/docs/overview.md)*
 

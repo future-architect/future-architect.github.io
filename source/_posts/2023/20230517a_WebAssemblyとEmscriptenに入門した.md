@@ -13,7 +13,7 @@ thumbnail: /images/2023/20230517a/thumbnail.png
 author: 森直也
 lede: "EmscriptenはC/C++をWebAssemblyにコンパイルするツールである、Emscriptenに入門した際の流れや気付きについて紹介します。"
 ---
-<img src="/images/2023/20230517a/Emscripten_logo_full.png" alt="" width="612" height="167" loading="lazy">
+<img src="/images/2023/20230517a/Emscripten_logo_full.png" alt="" width="612" height="167">
 
 ## はじめに
 

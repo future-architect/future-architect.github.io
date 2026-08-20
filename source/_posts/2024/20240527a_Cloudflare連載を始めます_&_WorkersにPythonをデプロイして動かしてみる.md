@@ -14,7 +14,7 @@ thumbnail: /images/2024/20240527a/thumbnail.jpg
 author: 伊藤太斉
 lede: "Cloudflareは、インターネット上で運営されている最大のネットワークの1つです。ユーザーは、Webサイトやサービスのセキュリティとパフォーマンスを向上させる目的でCloudflareサービスを利用しています。"
 ---
-<img src="/images/2024/20240527a/CF_logo_stacked_blktype.jpg" alt="" width="1200" height="405" loading="lazy">
+<img src="/images/2024/20240527a/CF_logo_stacked_blktype.jpg" alt="" width="1200" height="405">
 
 ロゴは https://www.cloudflare.com/ja-jp/press-kit/ より引用
 

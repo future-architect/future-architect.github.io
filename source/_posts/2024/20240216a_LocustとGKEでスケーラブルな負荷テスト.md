@@ -112,7 +112,7 @@ gcloud app deploy sample-webapp/app.yaml --project=${PROJECT}
 
 App Engineへのデプロイが完了後、表示されたURLへ移動すると以下のような画面が表示されます。
 
-<img src="/images/2024/20240216a/image.png" alt="image.png" width="1084" height="283" loading="lazy">
+<img src="/images/2024/20240216a/image.png" alt="image.png" width="1084" height="283">
 <AppEngineの画面>
 
 次にGKEにLocustと負荷テスト用のタスクをデプロイしたいので、まずはLocustのイメージをビルドします。

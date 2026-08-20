@@ -29,7 +29,7 @@ JavaでWebサービス開発というと、SpringBoot、という時代が長く
 
 フォークしたけど、どちらもEclipse Foundationに入り、2020年からは仲良く歩調を合わせている、という感じですかね。Java EEやJakartaEEは過去との互換性を重視している感じで、MicroProfileの方はイケイケな感じということを当初狙っていたみたいですが、2022年12月に出た6.0では、含まれるプロファイルにJakartaEE 10 Core Profileという文字が見えます。
 
-<img src="/images/2023/20230308a/スクリーンショット_2023-02-21_18.44.43.png" alt="スクリーンショット_2023-02-21_18.44.43.png" width="1200" height="447" loading="lazy">
+<img src="/images/2023/20230308a/スクリーンショット_2023-02-21_18.44.43.png" alt="スクリーンショット_2023-02-21_18.44.43.png" width="1200" height="447">
 
 これまではJakartaEEの要素でもあったJSON-B、JSON-P、JAX-RS、CDIなどが個別に指定されていたのですが、最新版ではJakartaEE 10とも歩調を合わせた、と言う感じみたいです。それにしても、OpenTelemetry対応とか、イケイケですね。参考までにMicroProfile 5.0はこんな感じ。
 

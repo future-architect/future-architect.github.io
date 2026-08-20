@@ -21,7 +21,7 @@ TIGの伊藤真彦です。
 
 前提知識0の人も対象になるような記事を目指して記載します。
 
-<img src="/images/2020/20200729/badge.png" class="img-small-size" width="214" height="224" loading="lazy">
+<img src="/images/2020/20200729/badge.png" class="img-small-size" width="214" height="224">
 
 ## この記事の目的
 

@@ -75,7 +75,7 @@ https://googlecloudcertified.credential.net/?name=taisei%20ito
 $100で受験できて、ノベルティまでもらえるのは、もしかしたらノベルティの方が高いのかもしれません。
 私は、リュックを選びました。Google Cloudチョットワカルことが背中から知られるようになります。
 
-<img src="/images/2022/20220411a/スクリーンショット_2022-03-29_18.42.30.png" alt="ノベルティ" width="1200" height="434" loading="lazy">
+<img src="/images/2022/20220411a/スクリーンショット_2022-03-29_18.42.30.png" alt="ノベルティ" width="1200" height="434">
 
 ## まとめ
 

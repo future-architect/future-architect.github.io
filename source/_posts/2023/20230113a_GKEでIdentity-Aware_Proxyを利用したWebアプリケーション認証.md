@@ -26,7 +26,7 @@ lede: "GKE を利用したWebアプリケーションのGoogleアカウント認
 
 ### 認証・承認フロー
 
-<img src="/images/2023/20230113a/authenticate-flow.drawio.png" alt="authenticate-flow.drawio.png" width="487" height="564" loading="lazy">
+<img src="/images/2023/20230113a/authenticate-flow.drawio.png" alt="authenticate-flow.drawio.png" width="487" height="564">
 
 [公式ドキュメント](https://cloud.google.com/iap/docs/concepts-overview?hl=ja)はこちら
 

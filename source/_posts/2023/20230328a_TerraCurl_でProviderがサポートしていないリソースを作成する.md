@@ -12,7 +12,7 @@ thumbnail: /images/2023/20230328a/thumbnail.png
 author: 真野隼記
 lede: "TerraCurlというツールが面白そうだったので触ってみました。TerraCurlは以下の2023.2.22 のHashiCorpさんのブログで紹介されています。* Writing Terraform for unsupported resources - HashiCorp Blog"
 ---
-<img src="/images/2023/20230328a/top.png" alt="" width="600" height="356" loading="lazy">
+<img src="/images/2023/20230328a/top.png" alt="" width="600" height="356">
 
 ## はじめに
 

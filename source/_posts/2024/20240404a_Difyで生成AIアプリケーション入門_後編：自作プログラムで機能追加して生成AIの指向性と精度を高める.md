@@ -162,7 +162,7 @@ OpenAPI (Swagger) 準拠のスキーマが必要になります。上の例で�
 
 画面上部のメニュー右端の[ツール](http://localhost/tools?category=api)をクリックし、左上の「カスタムツールを作成する」をクリックします。
 
-<img src="/images/2024/20240404a/image.png" alt="" width="573" height="143" loading="lazy">
+<img src="/images/2024/20240404a/image.png" alt="" width="573" height="143">
 
 名前は適当につけて、APIのスキーマは手動でコピー&ペーストするか、（Dockerの設定でホスト名 `host.docker.internal` を有効にしているなら） [http://host.docker.internal:8080/v3/api-docs](http://host.docker.internal:8080/v3/api-docs) 等を使ってインポートします。ここで念のためテストして通れば準備OKです。保存してください。
 

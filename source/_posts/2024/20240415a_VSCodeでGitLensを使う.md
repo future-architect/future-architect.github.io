@@ -15,7 +15,7 @@ thumbnail: /images/2024/20240415a/thumbnail.png
 author: 棚井龍之介
 lede: "VSCodeの拡張機能である「GitLens — Supercharge Git in VS Codeを取り上げます"
 ---
-<img src="/images/2024/20240415a/gitlens-logo-anybg.png" alt="" width="952" height="300" loading="lazy">
+<img src="/images/2024/20240415a/gitlens-logo-anybg.png" alt="" width="952" height="300">
 
 [春の入門連載2024](/articles/20240408a/)、5本目の記事です。
 

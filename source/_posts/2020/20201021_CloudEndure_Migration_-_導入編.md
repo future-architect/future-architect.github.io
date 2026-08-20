@@ -59,7 +59,7 @@ CloudEndure Migrationの仕様と利用開始まで、以下の順番で説明�
 ## CloudEndure Migrationの全体像
 
 全体像を掴むには、以下の図が参考になります。
-<img src="/images/2020/20201021/00_00_NETWORK_DIAGRAM.png" width="1200" height="669" loading="lazy">
+<img src="/images/2020/20201021/00_00_NETWORK_DIAGRAM.png" width="1200" height="669">
 画像引用元： [Network Diagram](https://docs.cloudendure.com/#Preparing_Your_Environments/Network_Diagram/Network_Diagram.htm#Network_Diagram%3FTocPath%3DNavigation%7CPreparing%2520Your%2520Environments%7C_____2)
 
 主要なアクターは以下の通りです。

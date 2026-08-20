@@ -19,7 +19,7 @@ Docker Desktopの有償化と契約すべきライセンスについては以前
 
 [Docker Desktop](https://www.docker.com/products/docker-desktop/)の代替のものがいくつかでています。[Rancher Desktop](https://rancherdesktop.io/)と、[Podman Desktop](https://podman-desktop.io/)があります。Rancher Desktopは会社のプロキシの裏で動かすのが難しく、ちょっと苦戦した上に、WSLのコンテナが再作成されるタイミングでプロキシ設定がリセットされるということを聞いて、Podman Desktopを使ってみました。PodmanはRed Hatが開発しているコンテナのエコシステムで、コンテナエンジン（以下サーバーとします）、CLIツールで構成されます。それにデスクトップのUIとPodman自身のインストーラを組み合わせたものがPodman Desktopです。
 
-<img src="/images/2022/20221227a/image.png" alt="" width="1200" height="978" loading="lazy">
+<img src="/images/2022/20221227a/image.png" alt="" width="1200" height="978">
 
 ## インストール
 

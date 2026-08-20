@@ -14,7 +14,7 @@ thumbnail: /images/2023/20230329a/thumbnail.jpg
 author: 宮永崇史
 lede: "Terraformのtargetオプションを簡単に実行するためのCLIツールを紹介します。このCLIツールを開発するきっかけとなった経緯もご紹介します。"
 ---
-<img src="/images/2023/20230329a/tftarget-eyecatch.jpg" alt="" width="960" height="540" loading="lazy">
+<img src="/images/2023/20230329a/tftarget-eyecatch.jpg" alt="" width="960" height="540">
 
 ## 1 はじめに
 

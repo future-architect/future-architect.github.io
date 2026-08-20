@@ -37,7 +37,7 @@ CORSとは **オリジン間リソース共有**（Cross-Origin Resource Sharing
 
 `'Access-Control-Allo-Origin' header is present on the requested resource.` といったメッセージをブラウザのデベロッパーツールのコンソールで一度は見かけた人も多いのではないでしょうか？
 
-<img src="/images/2020/20200717/thumbnail.png" width="1147" height="515" loading="lazy">
+<img src="/images/2020/20200717/thumbnail.png" width="1147" height="515">
 
 ## CORSのプリフライトリクエストについて
 

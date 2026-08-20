@@ -12,7 +12,7 @@ author: 橋本竜我
 lede: "SwiftZoomin#20の内容から、Swift6移行に向けて理解が必要なSwift Concurrencyの重要な概念について簡単にまとめました。"
 skip_career: true
 ---
-<img src="/images/2024/20241208a/image.png" alt="" width="1200" height="416" loading="lazy">
+<img src="/images/2024/20241208a/image.png" alt="" width="1200" height="416">
 
 ::: note info
 本記事は、[Swift Advent Calendar 2024](https://qiita.com/advent-calendar/2024/swift)の8日目です。

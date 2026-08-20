@@ -12,7 +12,7 @@ thumbnail: /images/2023/20231226a/thumbnail.JPG
 author: 村上一彦
 lede: "Google Cloudの認定資格であるCloud Digital Leader認定資格を受験し、取得することができました。Cloud Digital Leader認定資格の合格に至った学習過程について書いていこうと思います。"
 ---
-<img src="/images/2023/20231226a/IMG_6276.JPG" alt="IMG_6276.JPG" width="509" height="509" loading="lazy">
+<img src="/images/2023/20231226a/IMG_6276.JPG" alt="IMG_6276.JPG" width="509" height="509">
 
 こんにちは。
 公共サービス事業部の村上一彦です。

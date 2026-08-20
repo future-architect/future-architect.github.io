@@ -30,7 +30,7 @@ AWSをフル活用した**コンテンツマネジメントシステム（以下
 
 つまり新聞社にとって非常に重要な基幹システムであり、ある意味ミッションクリティカルなシステムです。
 
-<img src="/images/2020/20200914/原稿.gif" width="1406" height="774" loading="lazy">
+<img src="/images/2020/20200914/原稿.gif" width="1406" height="774">
 
 <img src="/images/2020/20200914/画像編集.gif" width="1406" height="804" loading="lazy">
 

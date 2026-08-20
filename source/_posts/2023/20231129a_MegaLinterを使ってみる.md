@@ -43,7 +43,7 @@ Supporting 55 languages, 24 formats, 20 tooling formats and ready to use out of 
 
 <div align="center">
 ▼MegaLinterの基本的なフロー
-<img src="/images/2023/20231129a/属性.png" alt="属性" width="1200" height="621" loading="lazy">
+<img src="/images/2023/20231129a/属性.png" alt="属性" width="1200" height="621">
 
 </div>
 

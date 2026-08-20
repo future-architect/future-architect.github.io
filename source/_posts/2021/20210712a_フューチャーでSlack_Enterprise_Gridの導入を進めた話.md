@@ -36,7 +36,7 @@ TIGの山上・[村田](https://twitter.com/famipapamart)です。
 ## Slack Enterprise Grid 導入前どうなっていたか？
 
 会社としてはGSuiteが標準だったためHangoutsやChatの利用が大半、TIGを中心とした一部でSlackを利用していました。
-<img src="/images/2021/20210712a/image.png" alt="社内チャットツールのタイムチャート図" width="720" height="405" loading="lazy">
+<img src="/images/2021/20210712a/image.png" alt="社内チャットツールのタイムチャート図" width="720" height="405">
 
 ## Slack Enterprise Grid 導入経緯
 

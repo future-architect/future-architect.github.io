@@ -78,7 +78,7 @@ HTTP APIにマッピングする方法はさらに2つに分けられ、RPC定�
 
 次の図のように、protoファイルよりproxy用のコードを生成し、それを利用したリバースプロキシを実装することで、gRPCサーバにREST APIとしてのインターフェースを設けることが可能です。
 
-<img src="/images/2022/20220624a/image.png" alt="image.png" width="1200" height="813" loading="lazy">
+<img src="/images/2022/20220624a/image.png" alt="image.png" width="1200" height="813">
 
 ※図は [公式リポジトリ](https://github.com/grpc-ecosystem/grpc-gateway) より引用
 

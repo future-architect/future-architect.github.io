@@ -17,7 +17,7 @@ TIGの伊藤真彦です。
 
 これにて専門知識以外はコンプリートしました、[Machine learning specialtyも合格している](/articles/20200729/)ので7冠です。
 
-<img src="/images/2021/20210825a/image.png" alt="合格バッチ" width="450" height="450" loading="lazy">
+<img src="/images/2021/20210825a/image.png" alt="合格バッチ" width="450" height="450">
 
 ## AWS Certified DevOps Engineer – Professionalとは
 

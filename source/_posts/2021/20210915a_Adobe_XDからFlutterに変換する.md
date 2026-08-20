@@ -20,7 +20,7 @@ lede: "モバイル開発をする場合、デザインはAdobe XDかFigmaか何
 
 スターターパックをインストールしたら、Creative Cloudアプリ（タスクバーに常駐していると思います）のマーケットプレースから、XD to Flutterというプラグインを入れます。[AdobeとGoogleが協力して開発している](https://blog.adobe.com/jp/publish/2020/09/25/cc-web-xd-flutter-plugin-now-available.html)プラグインで、これがあるのとないのでは開発効率が大きく変わります。なお、この常駐アプリ、結構CPUを持っていくっぽいので、プラグインを入れた後は終了させたほうが良いかも？ プラグインのインストール以外はXDのバージョンアップでは使いましたが、使うのはそれぐらいかと。
 
-<img src="/images/2021/20210915a/スクリーンショット_2021-09-08_17.06.46.png" alt="XD to Flutterプラグイン" width="1136" height="752" loading="lazy">
+<img src="/images/2021/20210915a/スクリーンショット_2021-09-08_17.06.46.png" alt="XD to Flutterプラグイン" width="1136" height="752">
 
 ## 基本はCopy Selected
 

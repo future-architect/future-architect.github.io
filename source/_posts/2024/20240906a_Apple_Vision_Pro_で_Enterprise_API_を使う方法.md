@@ -11,7 +11,7 @@ thumbnail: /images/2024/20240906a/thumbnail.png
 author: 山本力世
 lede: "WWDC2024: visionOS向けエンタープライズAPIのご紹介 よりvisionOS 2.0からはEnterprise APIという、企業向けのAPIを利用できます。ただし、利用するにはAppleへ申請し、承認されると送られてくるライセンスファイルをプロジェクト内に含めてビルドする必要がありますので、利用までの一連の手続きをまとめておきたいと思います。"
 ---
-<img src="/images/2024/20240906a/スクリーンショット_2024-09-05_16.04.34.png" alt="" width="604" height="345" loading="lazy">
+<img src="/images/2024/20240906a/スクリーンショット_2024-09-05_16.04.34.png" alt="" width="604" height="345">
 
 *▼WWDC2024: visionOS向けエンタープライズAPIのご紹介 より*
 

@@ -72,7 +72,7 @@ https://cloud.google.com/about/locations?hl=ja#network
 
 こちらの [Compute Engine リージョンとゾーン](https://cloud.google.com/compute/docs/regions-zones?hl=ja) に記載の全Region を対象にします。
 ※すいません、ムンバイだけ、QuotaがデフォルトでCPUS:0となっており、上げるリクエストを出したんですが、拒否されてしまいました。その関係で、ムンバイだけ計測が出来ませんでした🙇‍♂️
-<img src="/images/2020/20200813/2020-08-02_233921.png" width="722" height="734" loading="lazy">
+<img src="/images/2020/20200813/2020-08-02_233921.png" width="722" height="734">
 
 ###
 

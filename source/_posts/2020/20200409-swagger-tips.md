@@ -22,7 +22,7 @@ lede: "みなさん、Swagger使ってますか？本記事では実際にSwagge
 
 ## はじめに
 
-<img src="/images/2020/20200409/1.png" class="bordered" width="1054" height="592" loading="lazy">
+<img src="/images/2020/20200409/1.png" class="bordered" width="1054" height="592">
 
 みなさん、Swagger使ってますか？
 Swaggerや周辺ツールについては [某先輩の記事](/articles/20191008/) にて丁寧に解説されていますので、

@@ -14,7 +14,7 @@ thumbnail: /images/2022/20220623a/thumbnail.jpg
 author: 澁川喜規
 lede: "6/1に公開されたばかりのgRPC関連のライブラリのConnectを紹介することにしました。"
 ---
-<img src="/images/2022/20220623a/スクリーンショット_2022-06-22_21.04.jpg" alt="スクリーンショット_2022-06-22_21.04.jpg" width="1200" height="405" loading="lazy">
+<img src="/images/2022/20220623a/スクリーンショット_2022-06-22_21.04.jpg" alt="スクリーンショット_2022-06-22_21.04.jpg" width="1200" height="405">
 
 [サービス間通信とIDL（インターフェース記述言語）連載](/articles/20220622a/)の2日目のエントリーです。
 

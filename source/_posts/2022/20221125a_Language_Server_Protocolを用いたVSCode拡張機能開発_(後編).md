@@ -129,7 +129,7 @@ connection.onCodeAction((params) => {
 
 診断に「利用できるクイックフィックス」が追加されます。
 
-<img src="/images/2022/20221125a/codeAction.drawio.png" alt="codeAction.drawio.png" width="1200" height="230" loading="lazy">
+<img src="/images/2022/20221125a/codeAction.drawio.png" alt="codeAction.drawio.png" width="1200" height="230">
 
 クイックフィックスを実行するとその単語が小文字に自動で修正されます。
 

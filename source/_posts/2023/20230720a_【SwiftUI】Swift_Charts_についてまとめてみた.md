@@ -47,7 +47,7 @@ Swift Chartsとは、WWDC2022で発表されたカスタマイズされたグラ
 https://developer.apple.com/documentation/charts
 
 イメージとしては、以下のように様々なグラフを描くことができます。
-<img src="/images/2023/20230720a/image.png" alt="" width="1200" height="424" loading="lazy">
+<img src="/images/2023/20230720a/image.png" alt="" width="1200" height="424">
 
 また、WWDC2023のセッション([Explore pie charts and interactivity in Swift Charts](https://developer.apple.com/videos/play/wwdc2023/10037/))で7つ目となる`SectorMark`が発表されました。`SectorMark`を使うことで簡単にPie Chartを作ることがiOS17から可能になるとのことです。
 

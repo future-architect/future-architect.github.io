@@ -26,7 +26,7 @@ lede: "プロキシが存在するネットワーク内で、Androidエミュレ
 </style>
 
 <a  target="_blank" rel="noopener" class="linkable_img" title="PostPix | 旅行を通じた、ノスタルジックエクスペリエンスサービス" href="https://postpix.jp/" >
-    <img src="/images/2023/20231026a/b6fc4438-8326-63c9-a373-1143d4d88207.png" alt="" width="1200" height="1067" loading="lazy">
+    <img src="/images/2023/20231026a/b6fc4438-8326-63c9-a373-1143d4d88207.png" alt="" width="1200" height="1067">
 </a>
 
 ## Androidエミュレータからプロキシサーバを超えてインターネットに出たい

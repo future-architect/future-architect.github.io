@@ -25,7 +25,7 @@ lede: "2020/9/25にオンラインにてFuture Tech Nightという社外勉強�
 - [第3弾【On-Line】Future Tech Night ～船舶IoT Platform編～](https://future.connpass.com/event/185051/)
 - [第4弾【On-Line】Future Tech Night #4 〜Go x AWS スマート工場編〜](https://future.connpass.com/event/188742/) <----- 今回はこれ
 
-<img src="/images/2020/20200925/image.png" width="660" height="372" loading="lazy">
+<img src="/images/2020/20200925/image.png" width="660" height="372">
 
 Gopherのアイキャッチのおかげか、Future Tech Night史上過去最高の参加人数となり大盛況で終わりました。
 

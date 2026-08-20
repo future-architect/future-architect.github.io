@@ -27,7 +27,7 @@ ML監視についての概要や意義については、[こちらの記事](/ar
 
 ## 2. Great Expectationsの概要
 
-<img src="/images/2023/20230531a/2023-05-10-16-41-00.png" alt="" width="500" height="133" loading="lazy">
+<img src="/images/2023/20230531a/2023-05-10-16-41-00.png" alt="" width="500" height="133">
 
 *※[公式サイト](https://docs.greatexpectations.io/docs/)ロゴ*
 

@@ -524,7 +524,7 @@ numeric_typmod_scale(int32 typmod)
 まとめると、NUMERIC型と型修飾子で表現された`327686`とい
 う値をbit表現に変換してヘッダーを引いた場合は、以下のようなイメージで復元をされます。
 
-<img src="/images/2024/20241023b/image.png" alt="image.png" width="518" height="105" loading="lazy">
+<img src="/images/2024/20241023b/image.png" alt="image.png" width="518" height="105">
 
 型修飾子と文字列の相互変換というものは、それぞれ対象としたい型ごとのビット表現を把握して実装する必要があるので、自作するのであればかなり手間になりそうということは伝わったのではないでしょうか？
 

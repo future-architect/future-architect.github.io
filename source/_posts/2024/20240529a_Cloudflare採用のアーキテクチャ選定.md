@@ -15,7 +15,7 @@ author: 宮崎将太
 lede: "どんなアーキテクチャでCloudflareを採用したのか？結論ですが、ハイブリッドクラウド構成でのCDN/WAFとして"
 ---
 
-<img src="/images/2024/20240529a/image.png" alt="" width="1200" height="404" loading="lazy">
+<img src="/images/2024/20240529a/image.png" alt="" width="1200" height="404">
 
 [Cloudflare連載](/articles/20240527a/)3日目の記事です。
 

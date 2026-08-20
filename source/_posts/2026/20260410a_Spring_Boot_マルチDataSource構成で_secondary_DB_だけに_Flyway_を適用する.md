@@ -171,7 +171,7 @@ Flyway は通常、空のスキーマに対して V1 から順にマイグレー
 
 実際に `flyway_schema_history` を見ると、V1 が `TYPE=BASELINE` として記録されていることが確認できます。`execution_time` は 0、つまり SQL は実行されていません。
 
-<img src="/images/2026/20260410a/flyway_schema_history_の_BASELINE_レコード.png" alt="flyway_schema_history の BASELINE レコード" width="1200" height="321" loading="lazy">
+<img src="/images/2026/20260410a/flyway_schema_history_の_BASELINE_レコード.png" alt="flyway_schema_history の BASELINE レコード" width="1200" height="321">
 
 ### V1 に何を書くべきか
 

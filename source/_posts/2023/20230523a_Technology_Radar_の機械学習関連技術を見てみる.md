@@ -26,7 +26,7 @@ IT業界に身を置いていると、今の技術トレンドが気になると
 
 Technology Radarではその名の通り、レーダー状の円の中に個々の注目する技術を表記しています。
 
-<img src="/images/2023/20230523a/image.png" alt="" width="681" height="674" loading="lazy">
+<img src="/images/2023/20230523a/image.png" alt="" width="681" height="674">
 
 https://www.thoughtworks.com/content/dam/thoughtworks/documents/radar/2023/04/tr_technology_radar_vol_28_en.pdf より引用
 

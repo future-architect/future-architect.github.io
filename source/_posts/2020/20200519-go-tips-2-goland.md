@@ -13,7 +13,7 @@ author: 真野隼記
 lede: "今回はGoでアプリ開発するときにお世話になっている人が多い、GolandのTipsを紹介します。"
 ---
 
-<img src="/images/2020/20200519/top.png" width="676" height="392" loading="lazy">
+<img src="/images/2020/20200519/top.png" width="676" height="392">
 
 ## はじめに
 

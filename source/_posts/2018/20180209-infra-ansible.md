@@ -37,7 +37,7 @@ Ansible？ な方に対して、軽く説明させていただきます。Ansibl
 
 * Infrastructure as Codeとは「自動実行可能なコードの形でインフラの状態を記述し、インフラ構築を自動化するプロセス」です。
 
-<img src="/images/2018/20180209/photo_20180209_03.png" width="960" height="540" loading="lazy">
+<img src="/images/2018/20180209/photo_20180209_03.png" width="960" height="540">
 
 * インフラ構築を3つに分類すると以下のようになり、それぞれの分類に対応する自動化ツールがあります。
 

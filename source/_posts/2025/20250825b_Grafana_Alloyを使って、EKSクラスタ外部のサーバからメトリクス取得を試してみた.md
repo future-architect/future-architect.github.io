@@ -43,7 +43,7 @@ lede: "Grafana Alloyの豊富な機能の一部を利用してEKSクラスタ外
     | Grafana Alloy | 1.8.3 |
     | Prometheus | 3.4.1 |
 
-<img src="/images/2025/20250825b/Alloy記事作成_構成図.drawio.png" alt="Alloy記事作成_構成図.drawio.png" width="882" height="537" loading="lazy">
+<img src="/images/2025/20250825b/Alloy記事作成_構成図.drawio.png" alt="Alloy記事作成_構成図.drawio.png" width="882" height="537">
 
 ## 3. 今回の検証で利用するAlloyコンポーネントの概要
 

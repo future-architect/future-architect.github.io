@@ -30,7 +30,7 @@ TIG DXユニット真野です。2022/04/06にGAになったと発表された�
 
 Lambdaについては「関数URLを有効化」し、cURLやブラウザなどで簡易的に疎通したかったので認証タイプは「NONE」を選択します。関数名は「my-function-url-lambda」とします。
 
-<img src="/images/2022/20220510a/lambda_create_resource.png" alt="lambda_create_resource" width="1200" height="987" loading="lazy">
+<img src="/images/2022/20220510a/lambda_create_resource.png" alt="lambda_create_resource" width="1200" height="987">
 
 Lambda設定は、ランタイムを「Go 1.x」、ハンドラは適当に「lambda」にしています。Lambdaリソースのタイムアウトは「15分0秒」（最長）にします。
 

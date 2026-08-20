@@ -14,7 +14,7 @@ thumbnail: /images/2026/20260813a/thumbnail.png
 author: 棚井龍之介
 lede: "Cyber Security Innovation Group、FutureVulsチームの棚井です。2026年7月25日に「AWS Certified Solutions Architect - Professional 」を受験し、812点/1000点（合格ラインは750点）で一発合格しました。"
 ---
-<img src="/images/2026/20260813a/aws-certified-solutions-architect-professional.png" alt="aws-certified-solutions-architect-professional.png" width="600" height="600" loading="lazy">
+<img src="/images/2026/20260813a/aws-certified-solutions-architect-professional.png" alt="aws-certified-solutions-architect-professional.png" width="600" height="600">
 
 ## はじめに
 

@@ -18,7 +18,7 @@ lede: "先日、弊社デザインワークスチームにて、2度目のハッ
 先日、弊社デザインワークスチームにて、 2度目のハッカソンとなる[SPAJAM2016](http://spajam.jp/)に参加しました。
 今回はその様子をお伝えしたいと思います。
 （前回挑戦したサバフェスの様子は[こちら](http://future-architect.github.io/articles/20160406/)）。
-<img src="/images/2016/20160420/photo_20160420_01.jpg" class="img-small-size" width="512" height="512" loading="lazy">
+<img src="/images/2016/20160420/photo_20160420_01.jpg" class="img-small-size" width="512" height="512">
 
 SPAJAMは「温泉でスマホアプリを作る」ことをテーマにしたハッカソンです。
 予選は6地域9会場で開催され、**国内でも有数の規模** を誇ります。

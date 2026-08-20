@@ -13,7 +13,7 @@ lede: "AWS Certified Database - Specialtyに合格しました。これにて202
 ---
 
 TIGの伊藤真彦です。
-<img src="/images/2021/20211112b/image.png" alt="image.png" width="512" height="512" loading="lazy">
+<img src="/images/2021/20211112b/image.png" alt="image.png" width="512" height="512">
 
 AWS Certified Database - Specialtyに合格しました。
 

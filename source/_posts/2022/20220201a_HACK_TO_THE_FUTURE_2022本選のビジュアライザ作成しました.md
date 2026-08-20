@@ -45,7 +45,7 @@ output欄に1文字ずつ「r」と入力→simulateボタン押下→「r」の
 ※実際には作成したプログラムで出力した文字を貼り付けるとsimulateボタンを押下せず一気にロボット動かせます。
 
 入力前のビジュアライザの状態
-<img src="/images/2022/20220201a/2022-01-20_11h20_48.png" alt="2022-01-20_11h20_48.png" width="982" height="918" loading="lazy">
+<img src="/images/2022/20220201a/2022-01-20_11h20_48.png" alt="2022-01-20_11h20_48.png" width="982" height="918">
 
 入力後のビジュアライザの状態
 <img src="/images/2022/20220201a/2022-01-20_11h15_49.png" alt="2022-01-20_11h15_49.png" width="987" height="915" loading="lazy">

@@ -40,7 +40,7 @@ Collibra, Atlan, AlationといったSaaS、OpenMetadata, DataHubといったOSS�
 
 Microsoft PurviewとはData Security, Data Governance, Risk & Complianceにおけるソリューションを統合したサービスです。
 
-<img src="/images/2025/20250526a/image.png" alt="PurviewはData Security、Data Govenance、Rist & Complianceの機能を持つ" width="1001" height="582" loading="lazy">
+<img src="/images/2025/20250526a/image.png" alt="PurviewはData Security、Data Govenance、Rist & Complianceの機能を持つ" width="1001" height="582">
 
 引用: [Microsoft Purview の詳細](https://learn.microsoft.com/ja-jp/purview/purview)
 

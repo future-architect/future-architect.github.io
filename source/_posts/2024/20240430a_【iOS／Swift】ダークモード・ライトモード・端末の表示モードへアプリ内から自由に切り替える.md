@@ -23,7 +23,7 @@ HealthCare Innovation Group(HIG)[^1]所属の橋本です。
 
 それとも、Automaticに設定していますか。
 
-<img src="/images/2024/20240430a/46491578-7e42-ab93-f1eb-793c2d70c499.jpeg" alt="" width="863" height="721" loading="lazy">
+<img src="/images/2024/20240430a/46491578-7e42-ab93-f1eb-793c2d70c499.jpeg" alt="" width="863" height="721">
 
 私は、単純に黒っぽい画面にテンションが上がるタイプなので常時ダークモードで使っています。
 

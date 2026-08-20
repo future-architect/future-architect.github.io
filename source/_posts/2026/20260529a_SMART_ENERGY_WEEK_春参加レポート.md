@@ -39,7 +39,7 @@ VPPを実現する技術やエネマネ・蓄電池などの設備が出展す�
 - ZERO-E THERMAL EXPO ゼロエミッション火力発電展
 電力・ガス会社、発電事業者、プラントメーカーなど火力発電の専門家が全国から来場。
 
-<img src="/images/2026/20260529a/IMG_5199.jpg" alt="IMG_5199.jpg" width="1200" height="900" loading="lazy">
+<img src="/images/2026/20260529a/IMG_5199.jpg" alt="IMG_5199.jpg" width="1200" height="900">
 
 ## 会場の様子(公式YouTubeより)
 

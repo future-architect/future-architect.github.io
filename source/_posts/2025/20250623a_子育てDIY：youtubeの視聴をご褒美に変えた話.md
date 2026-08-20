@@ -36,7 +36,7 @@ lede: "子育てをする中で、意外にも本職の知識でDIYして役に�
 * まず、子どもがYouTubeを見ることが出来るフローチャートはこんな感じです
 * 基本的には、生活の上で最低限やるべきことをやった後で、ご褒美的な位置づけに変えました
 
-<img src="/images/2025/20250623a/flowchart.png" alt="flowchart.png" width="481" height="381" loading="lazy">
+<img src="/images/2025/20250623a/flowchart.png" alt="flowchart.png" width="481" height="381">
 
 ## 構成
 

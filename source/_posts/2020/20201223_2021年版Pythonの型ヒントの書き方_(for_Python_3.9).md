@@ -60,7 +60,7 @@ python setup.py install
 
 PyCharmはPythonインタプリタ(IntelliJ IDEA Ultimateを使っている場合はSDK設定で追加)の設定をすればmypyのインストールは不要です。
 
-<img src="/images/2020/20201223/スクリーンショット_2020-12-20_10.30.58.png" alt="IntelliJ IDEA Ultimateを使っている場合はSDK設定で追加の様子" width="1200" height="940" loading="lazy">
+<img src="/images/2020/20201223/スクリーンショット_2020-12-20_10.30.58.png" alt="IntelliJ IDEA Ultimateを使っている場合はSDK設定で追加の様子" width="1200" height="940">
 
 ## 変数の型の型付け
 

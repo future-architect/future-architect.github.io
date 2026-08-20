@@ -35,7 +35,7 @@ npx playwright codegen アクセス先のURL
 npx playwright codegen https://www.google.com/
 ```
 
-<img src="/images/2023/20230824a/image.png" alt="" width="1200" height="566" loading="lazy">
+<img src="/images/2023/20230824a/image.png" alt="" width="1200" height="566">
 
 検索フォームにマウスオーバーすると、
 

@@ -22,7 +22,7 @@ VSCodeだと思っていたのですが、厳密（？）にはVS Codeである�
 <details><summary>参考画像: MicrosoftのVS Codeダウンロードサイトでの表記</summary>
 
 https://azure.microsoft.com/ja-jp/products/visual-studio-code
-<img src="/images/2025/20250425a/image.png" alt="image.png" width="842" height="518" loading="lazy">
+<img src="/images/2025/20250425a/image.png" alt="image.png" width="842" height="518">
 </details>
 
 [春の入門祭り2025](/articles/20250413a/) 10日目の記事です。

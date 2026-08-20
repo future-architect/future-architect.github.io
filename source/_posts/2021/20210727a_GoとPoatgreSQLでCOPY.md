@@ -39,7 +39,7 @@ PostgreSQLには高速にファイルの読み込みを行うCOPY FROMがある�
 
 ## GoとCOPY
 
-<img src="/images/2021/20210727a/top.png" alt="" width="800" height="425" loading="lazy">
+<img src="/images/2021/20210727a/top.png" alt="" width="800" height="425">
 
 by [Renée French](http://reneefrench.blogspot.com/)
 
