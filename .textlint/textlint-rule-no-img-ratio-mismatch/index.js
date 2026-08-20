@@ -100,6 +100,13 @@ function measure(root, src) {
 
 module.exports = function (context, options = {}) {
   const { Syntax, RuleError, report, getSource, getFilePath } = context;
+  // 記事の Markdown 専用。EJS（textlint-plugin-ejs）は原文をそのまま渡すので、
+  // 拡張子で降りないとテンプレートの JavaScript（`/<img [^>]*src=…/` の
+  // 正規表現リテラル等）を画像タグとして拾う (#2652)
+  if (!/\.md$/i.test(context.getFilePath() || "")) {
+    return {};
+  }
+
   const tolerance = typeof options.tolerance === "number" ? options.tolerance : DEFAULT_TOLERANCE;
 
   return {

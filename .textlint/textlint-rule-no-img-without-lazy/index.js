@@ -51,6 +51,12 @@ function collect(source, regexp, base, codeRanges) {
 
 function reporter(context) {
   const { Syntax, RuleError, report, getSource, fixer } = context;
+  // 記事の Markdown 専用。EJS（textlint-plugin-ejs）は原文をそのまま渡すので、
+  // 拡張子で降りないとテンプレートの JavaScript（`/<img [^>]*src=…/` の
+  // 正規表現リテラル等）を画像タグとして拾う (#2652)
+  if (!/\.md$/i.test(context.getFilePath() || "")) {
+    return {};
+  }
 
   return {
     [Syntax.Document](node) {
