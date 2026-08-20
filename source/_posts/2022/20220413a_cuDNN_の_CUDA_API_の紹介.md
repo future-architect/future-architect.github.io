@@ -29,7 +29,7 @@ cuDNN は TensorFlow や Keras で学習や推論を高速化するためのバ�
 最終的には以下の手法で解決することにしました。
 
 1. Windows API でゲームウィンドウをキャプチャ
-1. [waifu2x]("https://github.com/nagadomi/waifu2x") という CNN の超解像モデルでキレイに拡大
+1. [waifu2x](https://github.com/nagadomi/waifu2x) という CNN の超解像モデルでキレイに拡大
 1. ウィンドウをもう一枚作り、拡大後の画像を表示
 
 この一連のフローをリアルタイムで行います。Python でもできないことはないのですが、今回はパフォーマンスチューニングのしやすさを考慮して CUDA を選択しました。
@@ -66,7 +66,7 @@ cudnnCreate(&cudnn_handle);
 
 ### 2. モデルのフィルタの重みをRAM（ホスト）に読み込む
 
-今回は JSON 形式で保存されているモデルのフィルタの重みを、[picojson]("https://github.com/kazuho/picojson") で読込みました。
+今回は JSON 形式で保存されているモデルのフィルタの重みを、[picojson](https://github.com/kazuho/picojson) で読込みました。
 
 <img src="/images/2022/20220413a/0cda6e32-95a9-385b-22fb-726db27156b6.png" alt="モデルをRAMに読み込む概念図" width="1089" height="523" loading="lazy">
 
@@ -179,7 +179,7 @@ cudnnSetConvolution2dDescriptor(conv_desc_.get(), padH, padW, dH, dW, 1, 1, cudn
 
 ### 7. 活性化関数の記述子の準備
 
-cuDNN ではデフォルトで ReLU や Swish などの活性化関数が準備されています（[提供されている活性化関数の一覧]("https://docs.nvidia.com/deeplearning/cudnn/api/index.html#cudnnActivationMode_t")）。
+cuDNN ではデフォルトで ReLU や Swish などの活性化関数が準備されています（[提供されている活性化関数の一覧](https://docs.nvidia.com/deeplearning/cudnn/api/index.html#cudnnActivationMode_t)）。
 
 ただ、waifu2x で使用されている leakyReLU は cuDNN では提供されていないため、自前で準備する必要があります。
 
@@ -209,7 +209,7 @@ __global__ void leakyRelu_(float* vec, int n) {
 
 ### 8. 畳込みの内部アルゴリズムを設定する
 
-cuDNN では畳込みの内部アルゴリズムがいくつか用意されていて、それぞれメモリ使用量や計算速度にトレードオフがあります（[提供されている内部アルゴリズムの一覧]("https://docs.nvidia.com/deeplearning/cudnn/api/index.html#cudnnConvolutionFwdAlgo_t")）。
+cuDNN では畳込みの内部アルゴリズムがいくつか用意されていて、それぞれメモリ使用量や計算速度にトレードオフがあります（[提供されている内部アルゴリズムの一覧](https://docs.nvidia.com/deeplearning/cudnn/api/index.html#cudnnConvolutionFwdAlgo_t)）。
 
 これまで設定してきたフィルタ記述子や畳込み記述子の情報を使用して、cuDNN に自動で選択させることもできます。
 

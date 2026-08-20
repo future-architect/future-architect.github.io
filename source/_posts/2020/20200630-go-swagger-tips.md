@@ -92,7 +92,7 @@ swagger generate server -a routemanagement -A routemanagement \
 
 ### 3. パッケージ構造
 
-先ほど、出力先ディレクトリを `gen` に指定しましたが、[公式ドキュメントにもgenで生成する例](ttps://goswagger.io/tutorial/custom-server.html)が書いてありました。最初は `generated` にしようか迷いましたが、短いですし `gen` に合わせることをおすすめします。
+先ほど、出力先ディレクトリを `gen` に指定しましたが、[公式ドキュメントにもgenで生成する例](https://goswagger.io/tutorial/custom-server.html)が書いてありました。最初は `generated` にしようか迷いましたが、短いですし `gen` に合わせることをおすすめします。
 
 genの意味が何か？ というのは新規参画者が全員抱く疑問だと思うので、READMEの上の方にディレクトリ構成を書くようにしています。
 

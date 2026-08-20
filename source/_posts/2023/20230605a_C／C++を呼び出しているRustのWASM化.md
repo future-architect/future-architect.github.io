@@ -423,7 +423,7 @@ napi-rsを用いてNodeアドオン化して拡張機能に載せたフォーマ
 |napi-rs|73.89|
 |wasm |171.10|
 
-他の方の調査([1]([https://namazu-tech.hatenablog.com/entry/2017/12/02/012600]), [2](https://niba1122.dev/js-wasm-benchmark/), [3](https://t-yng.jp/post/wasm-othello), [4](http://nmi.jp/2022-05-14-Dynamically-created-WebAssembly))ではwasmはネイティブレベルかそれ以上の性能を叩き出していたので、wasmの方が2倍ほど遅いと言う結果は意外でした。しかし、遅いと言っても10200行のSQLで171msなので十分実用的な速度だと思います。
+他の方の調査([1](https://namazu-tech.hatenablog.com/entry/2017/12/02/012600), [2](https://niba1122.dev/js-wasm-benchmark/), [3](https://t-yng.jp/post/wasm-othello), [4](http://nmi.jp/2022-05-14-Dynamically-created-WebAssembly))ではwasmはネイティブレベルかそれ以上の性能を叩き出していたので、wasmの方が2倍ほど遅いと言う結果は意外でした。しかし、遅いと言っても10200行のSQLで171msなので十分実用的な速度だと思います。
 
 ## 最適化検証
 

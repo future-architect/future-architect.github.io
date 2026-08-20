@@ -27,7 +27,7 @@ TIG 岸下です。
 
 過去記事：
 
-- [【合格記】Google Cloud Professional Data Engineer認定資格を振り返る](https/articles/20211013a/)
+- [【合格記】Google Cloud Professional Data Engineer認定資格を振り返る](/articles/20211013a/)
 
 Google Cloud 認定資格関連の過去記事：
 
