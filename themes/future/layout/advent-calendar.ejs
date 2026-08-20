@@ -1,8 +1,10 @@
 <%# アドベントカレンダーの特設ページ (#2464)。歴代の Qiita カレンダーへの
     入口と、ブログ側にあるアドベントカレンダー記事をまとめる。
     年の一覧は source/_data/advent_calendar.yml が持ち、サイドバーの
-    ウィジェットと共用する。記事はタグ・series から自動収集するので、
-    手で更新するのは年1回の yml だけ。
+    ウィジェットと共用する。手で更新するのは年1回の yml だけ。
+
+    歴代は表で出す。各年の中身は「カレンダーへのリンク1〜2本と記事0〜3本」で、
+    パネルにすると絵の無い枠が11個並ぶだけになる（レビューで確定）。
 
     その年の記事は yml の posts が持つ。Qiita のカレンダー12ページの
     エントリを機械で読み、このブログ行きの枠を拾った8本（2017〜2020・2022）。
@@ -19,7 +21,7 @@
   <section id="main" class="margin-top-30">
     <div class="footer-gap">
       <h1 class="list-page margin-bottom-20">アドベントカレンダー</h1>
-      <p class="specials-text">フューチャーは2015年から毎年 Qiita Advent Calendar に参加しています。IT技術であること以外はフリーテーマで、毎年12月に社員がリレー形式で記事を公開しています。参加記事は原則として Qiita 側に投稿するので、各年の枠に挙げているのはこのブログで公開した記事だけです。残りはカレンダーのページから辿れます。</p>
+      <p class="specials-text">フューチャーは2015年から毎年 Qiita Advent Calendar に参加しています。IT技術であること以外はフリーテーマで、毎年12月に社員がリレー形式で記事を公開しています。参加記事は原則として Qiita 側に投稿するので、各年に挙げているのはこのブログで公開した記事だけです。残りはカレンダーのページから辿れます。</p>
 
       <%- partial('_partial/section-heading', {id: 'calendars', text: '歴代のアドベントカレンダー（Qiita）'}) %>
       <%
@@ -47,36 +49,39 @@
           reports[p.date.year()] = p;
         });
       %>
-      <div class="series-panels row g-4">
-        <% calendars.forEach(function(c){ %>
-        <div class="col-12 col-md-6 col-lg-4">
-          <div class="article-card series-panel h-100">
-            <%# 歴代に共通する絵が無いので空き枠。連載パネルと同じ扱い %>
-            <span class="panel-thumb panel-thumb-empty"></span>
-            <div class="panel-body">
-              <a href="<%= c.url %>" class="panel-title" target="_blank" rel="noopener"><%= c.name %> Advent Calendar <%= c.year %></a>
-              <%# 行き先が Qiita であることは節の見出しが一括で名乗る (#2346)。
-                  パネルは11枚とも同じ行き先なので個別には付けない %>
-              <% if (c.series2) { %>
-              <div class="panel-meta"><a href="<%= c.series2 %>" target="_blank" rel="noopener">シリーズ2</a></div>
-              <% } %>
-              <% if (reports[c.year]) { %>
-              <div class="panel-meta"><a href="<%- url_for(reports[c.year].path) %>">参加レポートを読む</a></div>
-              <% } %>
-              <%# このブログに載った枠だけを挙げる。残りの枠は Qiita 側の記事なので
-                  カレンダーのページが持っている %>
-              <% const entries = (c.posts || []).map(a => byId[String(a)]).filter(Boolean); %>
-              <% if (entries.length) { %>
-              <ul class="panel-entry-list">
-                <% entries.forEach(function(p){ %>
-                <li><a href="<%- url_for(p.path) %>"><%= p.title %></a></li>
-                <% }) %>
-              </ul>
-              <% } %>
-            </div>
-          </div>
-        </div>
-        <% }) %>
+      <%# .scroll は記事中の表と同じ横スクロール枠（scripts/table_filter.js が付けるもの）%>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>年</th>
+              <th>カレンダー</th>
+              <th>このブログの記事</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% calendars.forEach(function(c){ %>
+            <%
+              const entries = (c.posts || []).map(a => byId[String(a)]).filter(Boolean);
+              const report = reports[c.year];
+            %>
+            <tr>
+              <%# 年の列も td にする。サイト内の他の表は本文セルがすべて td で、
+                  th にすると1列目だけ地色が付いて見た目が割れる %>
+              <td><%= c.year %>年</td>
+              <td><a href="<%= c.url %>" target="_blank" rel="noopener"><%= c.name %></a><% if (c.series2) { %>・<a href="<%= c.series2 %>" target="_blank" rel="noopener">シリーズ2</a><% } %></td>
+              <td>
+                <% if (report || entries.length) { %>
+                <ul class="cell-list">
+                  <% if (report) { %><li><a href="<%- url_for(report.path) %>">参加レポート</a></li><% } %>
+                  <% entries.forEach(function(p){ %><li><a href="<%- url_for(p.path) %>"><%= p.title %></a></li><% }) %>
+                </ul>
+                <% } else { %>—<% } %>
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
       </div>
 
       <%- partial('_partial/section-heading', {id: 'revival', text: 'ブログで読めるアドベントカレンダー記事'}) %>
