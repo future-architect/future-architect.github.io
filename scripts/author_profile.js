@@ -9,6 +9,10 @@ const loadYamlFile = (filename) => {
 
 const profile = loadYamlFile('./_profile.yml');
 
+// JSON-LD 用の生データ (#2462)。get_profile は HTML を組み立てて返すため、
+// 構造化データ側からは値そのものを取れない
+hexo.extend.helper.register('get_profile_data', (authorName) => profile[authorName] || null);
+
 hexo.extend.helper.register('get_profile', (authorName) => {
   const authorProfile = profile[authorName];
   if (!authorProfile) {
