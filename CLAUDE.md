@@ -253,6 +253,17 @@ make mermaid # mermaid 図のSVGキャッシュ更新（Docker必須、記事の
       （合格体験記が続く限り増える）ので、いたちごっこになる
     - 直す余地があったのは `障害発生時対応方法説明` のような複合名詞の積み上げ2件だけで、
       ルールを残して固有名詞を毎回黙らせる手間に見合わない
+- **`.ejs` も textlint の対象**（`.textlint/textlint-plugin-ejs`、#2652）。外部リンクの明示チェックのため。
+  - プラグインは **`<a href>` だけを Link ノードにして渡す。** 地の文・EJS コメント・属性値は
+    AST に出さない。テンプレート中の日本語は UI ラベルと実装コメントで、記事の文章向けの
+    ルール（文長・助詞の連続・句点）を当てても意味が無い
+  - **加工した文字列を `{ text, ast }` で返してはいけない。** `--fix` がその加工後の文字列を
+    「直した結果」としてファイルに書き戻し、**EJS が空白の塊になる**（実際に壊して気づいた）。
+    原文をそのまま渡す
+  - そのため Document の原文を直接舐めるルール（`no-img-without-dimensions` /
+    `no-img-without-lazy` / `no-img-ratio-mismatch` / `no-glued-html-attributes`）は
+    **`.md` 以外では降りる**。ガードが無いと `<%= image_size_attribute(…) %>` や
+    JavaScript 中の `/<img [^>]*src=…/` を画像タグとして拾う
 - `.markdownlint-cli2.jsonc`: 行長・生URL・インラインHTMLなどは無効化済み
 - PR には reviewdog が textlint を回し、変更行にレビューコメントを付ける（`.github/workflows/reviewdog.yml`）
 
@@ -354,11 +365,19 @@ bootstrap-subset → metronic → theme-styles.styl の順で `/css/site.css` �
   外部と読めないものだけ「（外部サイト）」をテキストで付ける。ブランド名を名乗るリンク
   （connpass 等）と記事本文には付けない。同一サービス行きの一覧は枠の見出しが一括で名乗る
   （「アドベントカレンダー（Qiita）」）。
-  - 検出は2箇所に分かれる（#2652）。**特設ページの Markdown（`source/specials/`）は textlint の
-    `no-unmarked-external-link`**（`--fix` でリンクテキストの末尾に足せる）、
-    **テーマの EJS と hiring パネルは `/doctor/`**。textlint は EJS を読めないので走査は分けているが、
-    許容リストは `.textlint/textlint-rule-no-unmarked-external-link/exempt.js` を両者で共有する
-  - `example.com` 等（RFC 2606）は記法ガイドの見本なので対象外
+  - **対象かどうかは記述言語で分かれる**（#2652）。EJS で書いたページ（フッター・パネル・
+    `/specials/guidelines/` 等のポータル）はサイトの部品なので対象。
+    **`layout: page` の Markdown で書いた特設ページ（`/specials/markdown/` 等）は本文**として扱い、
+    記事と同じく対象外。読み物の中の参照リンクに毎回「（外部サイト）」が挟まると読みにくく、
+    記事本文に付けない判断（技術記事の参照は94%が外部）と同じ理由が当てはまる
+  - 漏れは **textlint の `no-unmarked-external-link`** が止める。`/doctor/` にあった
+    同じ検査は消した（hexo generate して運営ページを開かないと気づけず、PR では誰も見なかった）。
+    許容リストは `.textlint/textlint-rule-no-unmarked-external-link/exempt.js`、
+    枠の見出しが一括で名乗るファイルは `.textlintrc` の `exemptFiles`
+  - `--fix` は持たない。付ける位置が導線ごとに違う（フッターはアイコンが絵で名乗るので
+    `<span class="sr-only">`、ポータルはリンクテキストの末尾）ので機械には決められない
+  - **`scripts/hiring_panels.js` のラベルは検査対象から外れた。** JS の中の文字列は
+    textlint から読めない。現状は「フューチャー採用ページ（外部サイト）」で明示済み
 - **特設・固定ページはルート直下に置かず `/specials/` 配下に切る**（#2344）。
   GitHub Pages のプロジェクトサイトが `future-architect.github.io/<リポジトリ名>/` に生えるため、
   ルート直下のパスは将来のリポジトリ名と衝突しうる（/arch-guidelines/ 等は既に別リポジトリが占有）。
