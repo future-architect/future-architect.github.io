@@ -1,7 +1,21 @@
 <div class="row article-card">
   <% if (post.thumbnail) { %>
   <a href="<%- url_for(post.path) %>" title="<%= post.title %>" class="col-sm-4 col-md-4 thumb-link card-thumb">
-    <img src="<%= post.thumbnail %>" class="img-responsive" alt="" <%= image_size_attribute(post.thumbnail) %> loading="lazy">
+    <%# image_size_attribute は width="300" height="225" というタグの断片を返す。
+        エスケープする出力に渡すと引用符が &#34; になって属性として壊れるので、生で出す %>
+    <img src="<%= post.thumbnail %>" class="img-responsive" alt="" <%- image_size_attribute(post.thumbnail) %> loading="lazy">
+    <%# サムネイルの左下にカテゴリを重ねる (#2566)。一覧では分野の手がかりが
+        lede とタグしか無かった（記事ページはパンくずが担うので出さない #2037）。
+        カテゴリページは全件が同じカテゴリなので出さない。is_category() は
+        「◯◯ 以外の記事」（/categories/<名>/<タグ>/）でも真になる。
+        あちらの generator が data.category を持たせているため、1つの条件で両方外れる。
+        カード全体がリンクなので、中を別リンクにすると入れ子のアンカーになる。
+        ラベルに留める（1記事1カテゴリなので先頭の1つで足りる） %>
+    <% const thumbCategories = post.categories ? post.categories.toArray() : []; %>
+    <% const thumbCategory = !is_category() && thumbCategories.length ? thumbCategories[0].name : null; %>
+    <% if (thumbCategory) { %>
+    <span class="thumb-category"><%- partial('category-icon', {name: thumbCategory}) %><%= thumbCategory %></span>
+    <% } %>
   </a>
   <div class="col-sm-8 col-md-8">
   <% } else { %>
