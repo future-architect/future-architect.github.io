@@ -95,7 +95,7 @@ Microsoft社が提供している[Quantum Katas](https://github.com/microsoft/Qu
 
 10日間は長いようで短かったです。
 
-イベント期間中は[Slack](qiskit.slack.com)でのコミュニケーションが頻繁に行われており、質問やお互いを褒めあう文化が溢れていて気持ちの良いものでした。
+イベント期間中はSlackでのコミュニケーションが頻繁に行われており、質問やお互いを褒めあう文化が溢れていて気持ちの良いものでした。
 
 <img src="/images/2021/20211115b/quantum_challenge_slack.png" alt="quantum_challenge_slack.png" width="1200" height="211" loading="lazy">
 
