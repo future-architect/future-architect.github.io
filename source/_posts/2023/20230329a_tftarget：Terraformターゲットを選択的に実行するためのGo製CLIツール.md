@@ -35,8 +35,9 @@ lede: "Terraformのtargetオプションを簡単に実行するためのCLIツ�
 
 この状況下で、各開発者が無条件で`terraform apply`を実行すると、リソースが突然消えることがあります。
 
-▼開発環境における各人の開発の様子
 <img src="/images/2023/20230329a/image.png" alt="" width="1200" height="826" loading="lazy">
+
+*開発環境における各人の開発の様子*
 
 そこで、新しい機能を作成する際は、まず`terraform plan`を実行し、自分の変更点以外の差分が出た場合は`terraform apply -target=`コマンドを用意するようにしていました。
 

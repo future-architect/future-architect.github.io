@@ -178,11 +178,13 @@ stree my-bucket/test/dir2 -r us-east-1 -e http://localhost:4537
 
 `--no-color(-n)`でカラー出力を無効化できます。
 
-▼カラーつき
 <img src="/images/2023/20230926a/color.png" alt="color.png" width="479" height="391" loading="lazy">
 
-▼カラーなし
+*カラーつき*
+
 <img src="/images/2023/20230926a/no-color.png" alt="no-color.png" width="504" height="391" loading="lazy">
+
+*カラーなし*
 
 ## さいごに
 
