@@ -6,6 +6,7 @@ tags:
   - AWS
   - ハンズオン
   - コールセンター
+  - アドベントカレンダー
 categories:
   - Cloud
 thumbnail: /images/2018/20181202/thumbnail.jpeg

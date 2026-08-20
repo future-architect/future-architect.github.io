@@ -8,6 +8,7 @@ tags:
   - Docker
   - Python
   - Lambda
+  - アドベントカレンダー
 categories:
   - DevOps
 thumbnail: /images/2023/20230105a/thumbnail.png

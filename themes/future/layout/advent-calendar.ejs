@@ -1,0 +1,111 @@
+<%# アドベントカレンダーの特設ページ (#2464)。歴代の Qiita カレンダーへの
+    入口と、ブログ側にあるアドベントカレンダー記事をまとめる。
+    年の一覧は source/_data/advent_calendar.yml が持ち、サイドバーの
+    ウィジェットと共用する。手で更新するのは年1回の yml だけ。
+
+    歴代は表で出す。各年の中身は「カレンダーへのリンク1〜2本と記事0〜3本」で、
+    パネルにすると絵の無い枠が11個並ぶだけになる（レビューで確定）。
+
+    その年の記事は yml の posts が持つ。Qiita のカレンダー12ページの
+    エントリを機械で読み、このブログ行きの枠を拾った8本（2017〜2020・2022）。
+    参加記事は原則 Qiita 側に投稿する方針なのでこの数で、2021・2023〜2025は0本 %>
+<div class="container">
+  <%# ページ自身は名乗らない。主題は真下の h1 が示している（#2580）%>
+  <%- partial('_partial/breadcrumb', {items: [
+        {label: 'ホーム', url: '/'},
+        {label: '特設', url: '/specials/'}
+      ]}) %>
+  <%# 記事・トップページと同じ「本文 + サイドバー」の幅にする %>
+  <div class="row">
+    <main class="col-md-9 blog-posts">
+  <section id="main" class="margin-top-30">
+    <div class="footer-gap">
+      <h1 class="list-page margin-bottom-20">アドベントカレンダー</h1>
+      <p class="specials-text">フューチャーは2015年から毎年 Qiita Advent Calendar に参加しています。IT技術であること以外はフリーテーマで、毎年12月に社員がリレー形式で記事を公開しています。参加記事は原則として Qiita 側に投稿しています。</p>
+
+      <%- partial('_partial/section-heading', {id: 'calendars', text: '歴代のアドベントカレンダー（Qiita）'}) %>
+      <%
+        const calendars = site.data.advent_calendar || [];
+        // 記事ID -> 記事。yml の posts を引くため
+        const byId = {};
+        site.posts.forEach(function(p){
+          const m = String(p.path || '').match(/^articles\/(.+?)\/$/);
+          if (m) byId[m[1]] = p;
+        });
+        // カレンダーに登録された記事。参加レポートと区別するため先に集める。
+        // YAML は 20191201 を数値として読むので String で揃える
+        // （20230105a だけ文字列になり、型が混ざる）
+        const entryIds = new Set();
+        calendars.forEach(c => (c.posts || []).forEach(a => entryIds.add(String(a))));
+        // 参加レポート（「Qiita Advent Calendar 20XX に参加します」）を公開年で引く。
+        // タグ「アドベントカレンダー」のうち、series を持つもの（リバイバル連載の
+        // 索引記事）とカレンダーに登録された記事そのものを除いた残り
+        const reports = {};
+        const reportTag = site.tags.findOne({name: 'アドベントカレンダー'});
+        if (reportTag) reportTag.posts.forEach(function(p){
+          if (p.series) return;
+          const m = String(p.path || '').match(/^articles\/(.+?)\/$/);
+          if (m && entryIds.has(m[1])) return;
+          reports[p.date.year()] = p;
+        });
+      %>
+      <%# .scroll は記事中の表と同じ横スクロール枠（scripts/table_filter.js が付けるもの）%>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>年</th>
+              <th>カレンダー</th>
+              <th class="cell-mark">参加レポート</th>
+              <th>このブログの記事</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% calendars.forEach(function(c){ %>
+            <%
+              const entries = (c.posts || []).map(a => byId[String(a)]).filter(Boolean);
+              const report = reports[c.year];
+            %>
+            <tr>
+              <%# 年の列も td にする。サイト内の他の表は本文セルがすべて td で、
+                  th にすると1列目だけ地色が付いて見た目が割れる %>
+              <td><%= c.year %>年</td>
+              <%# 別URLを持つシリーズだけ挙げる。2023年は同じページの中に
+                  シリーズ2があるが、タブの切り替えでURLが変わらないので出せない %>
+              <td><a href="<%= c.url %>" target="_blank" rel="noopener">シリーズ1</a><% if (c.series2) { %>・<a href="<%= c.series2 %>" target="_blank" rel="noopener">シリーズ2</a><% } %></td>
+              <%# 有無だけを示す列。● は絵なので、読み上げには用途を渡す %>
+              <td class="cell-mark"><% if (report) { %><a href="<%- url_for(report.path) %>" title="<%= report.title %>" aria-label="<%= report.title %>">●</a><% } else { %>—<% } %></td>
+              <td>
+                <% if (entries.length) { %>
+                <ul class="cell-list">
+                  <% entries.forEach(function(p){ %><li><a href="<%- url_for(p.path) %>"><%= p.title %></a></li><% }) %>
+                </ul>
+                <% } else { %>—<% } %>
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+
+      <%- partial('_partial/section-heading', {id: 'revival', text: 'ブログで読めるアドベントカレンダー記事'}) %>
+      <p class="specials-text margin-bottom-20">過去のアドベントカレンダーで反響の大きかった Qiita 記事を、内容を最新化してこのブログに再掲した連載です。当時の記事をそのまま写すのではなく、公開後に変わった前提や書き足りなかった点を著者自身が加えています。</p>
+      <%
+        // series 名に「アドベントカレンダー」を含む連載を集める。連載名を直書きすると
+        // 次のリバイバル（年が変わると別の series 名になる）で書き換えが要る
+        const revivalPosts = site.posts.toArray()
+          .filter(p => String(p.series || '').includes('アドベントカレンダー'))
+          .sort((a, b) => b.date - a.date);
+      %>
+      <%- partial('_partial/post-panel-grid', {posts: revivalPosts}) %>
+    </div>
+  </section>
+    </main>
+    <aside class="col-md-3 blog-sidebar">
+      <%- partial('_partial/sidebar', {specialsToc: [
+        {id: 'calendars', text: '歴代のアドベントカレンダー（Qiita）'},
+        {id: 'revival', text: 'ブログで読めるアドベントカレンダー記事'},
+      ]}) %>
+    </aside>
+  </div>
+</div>

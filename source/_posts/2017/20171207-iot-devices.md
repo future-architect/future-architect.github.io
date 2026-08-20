@@ -5,6 +5,7 @@ postid: ""
 tags:
   - FutureIoT
   - 3Dプリンタ
+  - アドベントカレンダー
 categories:
   - IoT
 thumbnail: /images/2017/20171207/thumbnail_20171207.png
