@@ -11,7 +11,7 @@ const recruitPanel = {
   title: 'フューチャー採用情報',
   // 「採用ページ」はブログ内のページとも読めるため外部であることを名乗る (#2346)。
   // 名乗り方は矢印と sr-only で、描画側（_partial/article.ejs）が付ける (#2729)。
-  // note・LEAD TO THE FUTURE は外部メディア名を名乗っているので付けない
+  // 「未来報（フューチャー公式note）」は note を名乗っているので付けない
   label: 'フューチャー採用ページ',
   external: true,
   image: '/career_official.jpg',
@@ -30,6 +30,9 @@ const contentPanels = [
     url: 'https://www.future.co.jp/lttf/',
     title: 'LEAD TO THE FUTURE',
     label: 'LEAD TO THE FUTURE',
+    // 自社のオウンドメディア名で、サービス名として広く知られているわけではない。
+    // 読者には別サイトへ出ると読めないので印を付ける (#2729)
+    external: true,
     image: '/lttf.jpg',
     lede: 'フューチャーのオウンドメディア。AI・テクノロジーや業界のインサイト、プロジェクトの裏側を発信しています。',
   },
