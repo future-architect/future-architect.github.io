@@ -53,9 +53,9 @@ lede: "昨年に続きGCP連載企画の参加です。私個人としてはGCP�
 
 必要なロールはありませんということなのでロールを選択せず作成します。
 
-<img src="/images/2021/20210312/02pre.png" class="img-large-size bordered" width="908" height="652" loading="lazy">
+<img src="/images/2021/20210312/02pre.png" class="bordered" width="908" height="652" loading="lazy">
 
-<img src="/images/2021/20210312/03pre.png" class="img-large-size bordered" width="824" height="650" loading="lazy">
+<img src="/images/2021/20210312/03pre.png" class="bordered" width="824" height="650" loading="lazy">
 
 <img src="/images/2021/20210312/04pre.png" class="img-middle-size bordered" width="633" height="320" loading="lazy">
 
