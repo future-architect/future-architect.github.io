@@ -7,7 +7,6 @@ tags:
   - 参加レポート
   - GoogleCloudNext
   - GoogleCloudNext2019
-  - カンファレンス
 categories:
   - Cloud
 author: 村田靖拓

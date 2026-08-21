@@ -6,7 +6,6 @@ tags:
   - Go
   - GoConference
   - スクレイピング
-  - カンファレンス
   - アドベントカレンダー
 categories:
   - Programming

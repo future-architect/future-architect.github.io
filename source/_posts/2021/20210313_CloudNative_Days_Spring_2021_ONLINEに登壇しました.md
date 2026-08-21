@@ -7,7 +7,6 @@ tags:
   - OpenPolicyAgent
   - CNCF
   - Policy-as-Code
-  - カンファレンス
 categories:
   - DevOps
 thumbnail: /images/2021/20210313/thumbnail.png
