@@ -8,6 +8,7 @@ tags:
   - Lambda
   - SAM
   - テスト
+  - CLI
 categories:
   - IaC
 series: "Terraform2026"

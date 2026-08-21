@@ -7,6 +7,7 @@ tags:
   - BigQuery
   - TechNight
   - 登壇レポート
+  - JSON
 categories:
   - DataEngineering
 thumbnail: /images/2022/20220509a/thumbnail.png

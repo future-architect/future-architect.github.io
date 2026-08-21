@@ -6,6 +6,7 @@ tags:
   - AWS
   - TechNight
   - 保守運用
+  - Datadog
 categories:
   - DevOps
 thumbnail: /images/2021/20210608a/thumbnail.png

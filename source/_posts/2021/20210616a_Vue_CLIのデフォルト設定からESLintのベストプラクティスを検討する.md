@@ -7,6 +7,7 @@ tags:
   - Node.js
   - ESLint
   - EditorConfig
+  - CLI
 categories:
   - Frontend
 series: "フロントエンド"
