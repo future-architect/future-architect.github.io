@@ -6,9 +6,6 @@ tags:
   - AWS
   - 合格記
   - IAM
-  - CodeArtifact
-  - CloudFormation
-  - TrustedAdvisor
 categories:
   - DevOps
 thumbnail: /images/2026/20260821a/thumbnail.png
