@@ -454,10 +454,20 @@ bootstrap-subset → metronic → theme-styles.styl の順で `/css/site.css` �
 ## その他
 
 - URL の付け替え（タグ→カテゴリの統合、タグの名寄せ）は `_config.yml` の `alias` に記述する
-- **外部リンクの明示（#2346）**: サイトの導線（フッター・パネル・特設等）で、リンクテキストから
-  外部と読めないものだけ「（外部サイト）」をテキストで付ける。ブランド名を名乗るリンク
-  （connpass 等）と記事本文には付けない。同一サービス行きの一覧は枠の見出しが一括で名乗る
-  （「アドベントカレンダー（Qiita）」）。
+- **外部リンクの明示（#2346 / #2729）**: サイトの導線（フッター・パネル・特設等）で、
+  リンクテキストから外部と読めないものだけに印を付ける。ブランド名を名乗るリンク
+  （connpass・note・YouTube 等）と記事本文には付けない。
+  - **印は矢印（`external-link` アイコン）＋読み上げ用の `<span class="sr-only">（外部サイト）</span>`**。
+    `svg-icon` に `class_name: 'svg-icon-trailing'` を渡して文字の後ろに置く。
+    #2346 では「アイコンは導入せずテキストで書く」としていたが、フッター刷新（#2664）で
+    アイコン方式が入り、テキスト・アイコン・見出しに書いたサービス名の3通りが混在していた。
+    フッターの形に統一し、**見出しからサービス名を外した**
+    （「アドベントカレンダー（Qiita）」→「アドベントカレンダー」）。
+    見出しに行き先を書くと、枠の名前と行き先の説明が1行に混ざって読みにくい
+  - **リンクを組み立てるのは EJS 側に置く。** アイコンは `_partial/svg-icon.ejs` の辞書が
+    1箇所で持つので、JS の中で HTML を作ると絵柄を二重に持つことになる。
+    Tech Cast は helper（`techcast_items`）がデータだけ返し、
+    `_widget/techcast.ejs` が描く形にした。textlint から見える場所にリンクが来るのも利点
   - **対象かどうかは記述言語で分かれる**（#2652）。EJS で書いたページ（フッター・パネル・
     `/specials/guidelines/` 等のポータル）はサイトの部品なので対象。
     **`layout: page` の Markdown で書いた特設ページ（`/specials/markdown/` 等）は本文**として扱い、
@@ -465,12 +475,15 @@ bootstrap-subset → metronic → theme-styles.styl の順で `/css/site.css` �
     記事本文に付けない判断（技術記事の参照は94%が外部）と同じ理由が当てはまる
   - 漏れは **textlint の `no-unmarked-external-link`** が止める。`/doctor/` にあった
     同じ検査は消した（hexo generate して運営ページを開かないと気づけず、PR では誰も見なかった）。
-    許容リストは `.textlint/textlint-rule-no-unmarked-external-link/exempt.js`、
-    枠の見出しが一括で名乗るファイルは `.textlintrc` の `exemptFiles`
-  - `--fix` は持たない。付ける位置が導線ごとに違う（フッターはアイコンが絵で名乗るので
-    `<span class="sr-only">`、ポータルはリンクテキストの末尾）ので機械には決められない
-  - **`scripts/hiring_panels.js` のラベルは検査対象から外れた。** JS の中の文字列は
-    textlint から読めない。現状は「フューチャー採用ページ（外部サイト）」で明示済み
+    許容リストは `.textlint/textlint-rule-no-unmarked-external-link/exempt.js`。
+    ルールは `<a>` の中のテキストを見るので、`sr-only` に書いた「（外部サイト）」でも通る。
+    **`exemptFiles` は空にした**（#2729）。アドベントカレンダーは見出しが一括で名乗る形をやめ、
+    個別のリンクが名乗るようになったので、除外する理由が無くなった
+  - `--fix` は持たない。印を付ける位置（リンクテキストの末尾）は決まったが、
+    「そのリンクテキストから外部と読めるか」は機械には判断できない
+  - **パネルのラベルは JS がデータを持ち、印は EJS が付ける**（`scripts/hiring_panels.js` の
+    `external: true` を `_partial/article.ejs` が見る）。JS の中の文字列は textlint から
+    読めないので、印そのものを JS に書くと検査の外に出てしまう
 - **特設・固定ページはルート直下に置かず `/specials/` 配下に切る**（#2344）。
   GitHub Pages のプロジェクトサイトが `future-architect.github.io/<リポジトリ名>/` に生えるため、
   ルート直下のパスは将来のリポジトリ名と衝突しうる（/arch-guidelines/ 等は既に別リポジトリが占有）。
