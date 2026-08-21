@@ -15,13 +15,6 @@ hexo.extend.generator.register('doctor', function (locals) {
   });
 });
 
-// タイトル照合の対象とするタグ名。短い名前は一般語に当たりやすい
-// （Go が Google に当たる等）ので、英数3文字・和文4文字を下限にする
-function matchableTag(name) {
-  if (/^[\x20-\x7e]+$/.test(name)) return name.length >= 3;
-  return name.length >= 4;
-}
-
 // カテゴリ提案（leave-one-out のタグ投票）は廃止した。
 // タグ共起は「そのタグ群が普段いるカテゴリ」しか測れず記事の主題を見ないため、
 // 一括監査（#2286 / #2288 / 2026-08-13 の /doctor 掃討）では精度25%、
@@ -33,7 +26,6 @@ hexo.extend.helper.register('doctor_checks', function () {
 
   const untagged = [];
   const overTagged = [];
-  const missingByTag = new Map(); // タグ名 -> {path, posts: []}
 
   // タグ -> 記事IDの集合。ほぼ重なるタグ（統合候補）と1記事タグの検出に使う
   const tagPostSets = new Map();
@@ -41,13 +33,6 @@ hexo.extend.helper.register('doctor_checks', function () {
   this.site.tags.forEach((tag) => {
     tagPath.set(tag.name, tag.path);
     tagPostSets.set(tag.name, new Set(tag.posts.map((p) => p._id)));
-  });
-
-  const allTagNames = [];
-  this.site.tags.forEach((tag) => {
-    if (tag.length >= 3 && matchableTag(tag.name)) {
-      allTagNames.push({ name: tag.name, path: tag.path });
-    }
   });
 
   posts.forEach((post) => {
@@ -62,42 +47,9 @@ hexo.extend.helper.register('doctor_checks', function () {
     if (tagNames.length >= 10) {
       overTagged.push({ title: post.title, path: post.path, count: tagNames.length });
     }
-
-    // 2) タイトルにタグ名を含むのに、そのタグが付いていない
-    const has = new Set(tagNames);
-    for (const t of allTagNames) {
-      if (has.has(t.name)) continue;
-      // タイトルに連載名を含む記事（「Go 1.27 リリース連載：uuid」等）では、
-      // 連載名の一部（リリース 等）に当たっても記事の主題ではない
-      if (post.series && String(post.series).includes(t.name)) continue;
-      // 系統タグを既に持っていれば提案しない。DockerCompose が付いた記事に
-      // Docker を、Go1.22 が付いた記事に Go を重ねて振る必要はない
-      if (
-        tagNames.some(
-          (mine) => mine !== t.name && mine.toLowerCase().includes(t.name.toLowerCase()),
-        )
-      )
-        continue;
-      let hit;
-      if (/^[\x20-\x7e]+$/.test(t.name)) {
-        // 英数タグは単語境界で照合する（SQL が PostgreSQL に当たるのを防ぐ）
-        const escaped = t.name.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
-        hit = new RegExp(`(^|[^A-Za-z0-9])${escaped}([^A-Za-z0-9]|$)`, 'i').test(post.title);
-      } else {
-        hit = post.title.includes(t.name);
-      }
-      if (hit) {
-        if (!missingByTag.has(t.name)) missingByTag.set(t.name, { path: t.path, posts: [] });
-        missingByTag.get(t.name).posts.push({ title: post.title, path: post.path });
-      }
-    }
   });
 
   overTagged.sort((a, b) => b.count - a.count);
-  const missing = [...missingByTag.entries()]
-    .map(([name, v]) => ({ name, path: v.path, posts: v.posts }))
-    .sort((a, b) => b.posts.length - a.posts.length);
-  const missingTotal = missing.reduce((acc, m) => acc + m.posts.length, 0);
 
   // 4) ほぼ重なるタグ（統合候補）。A の記事がすべて B にも付いていて、
   //    B 側の差分も2本以内なら、実質同じ集合に2つの名前が付いている。
@@ -174,8 +126,6 @@ hexo.extend.helper.register('doctor_checks', function () {
   return {
     untagged,
     overTagged,
-    missing,
-    missingTotal,
     nearDuplicates,
     categoryDupTags,
     singleUse,

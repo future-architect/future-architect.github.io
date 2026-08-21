@@ -5,6 +5,7 @@ postid: a
 tags:
   - TailwindCSS
   - CSS
+  - ドキュメント
 categories:
   - Frontend
 thumbnail: /images/2025/20250314a/thumbnail.png

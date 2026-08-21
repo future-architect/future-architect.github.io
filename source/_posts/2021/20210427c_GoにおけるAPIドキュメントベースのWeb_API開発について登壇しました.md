@@ -8,6 +8,7 @@ tags:
   - 登壇レポート
   - OpenAPI
   - Swagger
+  - ドキュメント
 categories:
   - Programming
 thumbnail: /images/2021/20210427c/thumbnail.png

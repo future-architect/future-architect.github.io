@@ -144,7 +144,8 @@ make g      # 静的ファイル生成（public/）
 make css    # public/css/site.css だけ再生成（0.3秒。CSSの確認用）
 make clean  # キャッシュ・生成物の削除
 make fix    # textlint --fix（source/_posts 配下）
-make fmt    # markdownlint-cli2 --fix ＋ prettier（scripts/*.js と *.mjs のみ。記事MDは対象外 #2307）
+make fmt    # markdownlint-cli2 --fix（全 *.md。記事も対象なので、無関係な記事まで書き換わる）
+            # ＋ prettier（scripts/**/*.js と *.mjs のみ #2307）
 make lint   # npx lint-staged（git add 済みの記事のみ textlint）
 make mermaid # mermaid 図のSVGキャッシュ更新（Docker必須、記事の図を追加・編集したら実行してコミット）
 ```

@@ -6,6 +6,7 @@ tags:
   - dbt
   - Docker
   - Kubernetes
+  - コンテナ
 categories:
   - DataEngineering
 series: "CNCF2025"

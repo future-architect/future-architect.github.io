@@ -7,6 +7,7 @@ tags:
   - text/template
   - OpenSearch
   - DynamoDB
+  - JSON
 categories:
   - Programming
 thumbnail: /images/2024/20240920a/thumbnail.jpg
