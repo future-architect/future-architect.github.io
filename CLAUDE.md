@@ -468,16 +468,25 @@ bootstrap-subset → metronic → theme-styles.styl の順で `/css/site.css` �
     1箇所で持つので、JS の中で HTML を作ると絵柄を二重に持つことになる。
     Tech Cast は helper（`techcast_items`）がデータだけ返し、
     `_widget/techcast.ejs` が描く形にした。textlint から見える場所にリンクが来るのも利点
-  - **対象かどうかは役割で分かれる**（#2652 / #2729）。**外に出すことが目的の部品は対象**
-    （フッター・サイドバーの枠・記事末のパネル・`/specials/guidelines/` のようなポータル）。
-    **読み物は対象外**（記事、`layout: page` の Markdown 特設、
-    `/specials/advent-calendar/` や `/specials/httf/` のような歴代の記録）。
-    読み物の中の参照リンクに毎回印が挟まると読みにくく、記事本文に付けない判断
-    （技術記事の参照は94%が外部）と同じ理由が当てはまる。記録のページは本文が
-    行き先を名乗っている（「Qiita Advent Calendar に参加しています」「毎年 AtCoder…」）
+  - **名乗り方は場所で決まる。例外は作らない**（#2652 / #2729）
+
+    | 場所 | 名乗り方 |
+    | --- | --- |
+    | 全ページ共通の枠（フッター・サイドバー）と記事末のパネル | **リンクごとに矢印＋`sr-only`** |
+    | 読み物（記事・特設ページ**すべて**） | **ページの本文で一度名乗る。リンクに印は付けない** |
+
+    読み物の中の参照リンクに毎回印が挟まると読みにくい（記事本文に付けない判断＝
+    技術記事の参照は94%が外部、と同じ理由）。特設ページは本文が行き先を名乗る形に揃えた
+    （「Qiita Advent Calendar に参加しています」「2018年から毎年 AtCoder…」
+    「いずれもこのブログとは別のサイトで公開しており」）
     - **記述言語（EJS か Markdown か）では決めない。** #2652 ではその線で切っていたが、
-      EJS の特設ページには導線（ポータル）と読み物（年表）の両方があり、実態と合わなかった
+      EJS の特設ページには導線と読み物の両方があり、実態と合わなかった
+    - `/specials/guidelines/` は最後まで例外にする案もあった。3つの実体は
+      **同じホストの別リポジトリ**（`future-architect.github.io/arch-guidelines/` 等）で、
+      ドメインが変わらないぶん見分けが付きにくい。それでも「読み物は本文で名乗る」に
+      揃えたのは、例外を1つ持つと次にどちらへ寄せるかの判断ができなくなるため
     - 読み物として扱う EJS のページは `.textlintrc` の `exemptFiles` に挙げる
+      （`layout/advent-calendar.ejs` / `layout/httf.ejs` / `layout/guidelines.ejs`）
   - 漏れは **textlint の `no-unmarked-external-link`** が止める。`/doctor/` にあった
     同じ検査は消した（hexo generate して運営ページを開かないと気づけず、PR では誰も見なかった）。
     許容リストは `.textlint/textlint-rule-no-unmarked-external-link/exempt.js`。
