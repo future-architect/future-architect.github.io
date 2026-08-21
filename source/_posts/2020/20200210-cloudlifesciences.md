@@ -24,7 +24,7 @@ lede: "本記事を書くためのモチベーションとしては、現在は�
 
 ## [Cloud Life Sciences](https://cloud.google.com/life-sciences)について
 
-<img src="/images/2020/20200210/1.png" class="img-very-small-size" width="256" height="256">
+<img src="/images/2020/20200210/1.png" class="img-small-size" width="256" height="256">
 
 GCPの中ではビッグデータに属するサービスになります。大規模な生物医学データの処理を費用対効果が高くできることがウリで、対象ユーザーは`ライフ サイエンス機関と学術研究機関向け`となっています。特に強く謳われているのが、研究に集中できることと結果の再現性にです。遺伝子情報は特に大きなデータ量になるので、得たデータの検証をスピードアップさせることは研究スピード全体を上げることにも繋がります。
 
