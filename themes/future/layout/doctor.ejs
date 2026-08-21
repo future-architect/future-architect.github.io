@@ -6,88 +6,20 @@
   <section id="main" class="margin-top-30">
     <div class="footer-gap">
       <h1 class="list-page margin-bottom-20">記事ドクター</h1>
-      ※運営向けのメンテナンス画面です。タグ・カテゴリの付与漏れの候補を機械判定で列挙します（提案であって、正とは限りません）
+      ※運営向けのメンテナンス画面です。人の判断が要るものだけを並べます（提案であって、正とは限りません）。答えが決まっているもの（タグ無し・カテゴリと同名のタグ・未登録のカテゴリ）は textlint の <code>no-invalid-post-taxonomy</code> が PR で止めます（#2706）
       <% const checks = doctor_checks(); %>
       <ul class="summary">
-        <li><span class="summary-count"><%= checks.untagged.length %></span><br><span class="summary-label">タグ無し</span></li>
-        <li><span class="summary-count"><%= checks.overTagged.length %></span><br><span class="summary-label">タグ付けすぎ</span></li>
         <li><span class="summary-count"><%= checks.nearDuplicates.length %></span><br><span class="summary-label">統合候補のタグ</span></li>
-        <li><span class="summary-count"><%= checks.categoryDupTags.length %></span><br><span class="summary-label">カテゴリと同名のタグ</span></li>
         <li><span class="summary-count"><%= checks.singleUse.length %></span><br><span class="summary-label">1記事タグ</span></li>
         <% const dormant = doctor_dormant_authors(); %>
         <% const thisYear = new Date().getFullYear(); %>
         <li><span class="summary-count"><%= dormant.length %></span><br><span class="summary-label">投稿が途切れた著者</span></li>
       </ul>
 
-      <%# 並びは #2442 の指定。サイト全体のレイアウト → カテゴリ → タグ の順に、
-          関係の近い検査どうしを2列に組んで縦の長さを詰める。
-          外部リンクの明示（#2346）はここには無い。textlint の
-          no-unmarked-external-link が PR の変更行で止めるようになった (#2652) %>
-
-      <%# カテゴリ系。説明の抜けと、カテゴリと語彙がぶつかるタグを並べる %>
-      <div class="doctor-cols">
-        <section>
-          <h2 class="bottom-content-header">カテゴリの説明の抜け・食い違い</h2>
-          ※カテゴリの一言説明は <code>source/_data/categories.yml</code>（#2405）。新設カテゴリの説明漏れと、実在しないカテゴリの説明（改名・統合後の消し忘れ）を両方向で照合します
-          <% const catDescs = doctor_category_descriptions(); %>
-          <% if (catDescs.missing.length || catDescs.orphaned.length) { %>
-          <ul class="doctor-list">
-            <% catDescs.missing.forEach(function(name){ %>
-            <li><%= name %><span class="doctor-note">説明が無い</span></li>
-            <% }) %>
-            <% catDescs.orphaned.forEach(function(name){ %>
-            <li><%= name %><span class="doctor-note">カテゴリとして実在しない</span></li>
-            <% }) %>
-          </ul>
-          <% } else { %>
-          <p>該当なし</p>
-          <% } %>
-        </section>
-        <section>
-          <h2 class="bottom-content-header">カテゴリと同名のタグ</h2>
-          ※カテゴリとタグで語彙が重複しています。タグ側を記事から外し、_config.yml の alias でタグURLをカテゴリへ転送してください（大文字小文字違いも同一視して照合）
-          <% if (checks.categoryDupTags.length) { %>
-          <ul class="doctor-list">
-            <% checks.categoryDupTags.forEach(function(d){ %>
-            <li>
-              <a href="<%- url_for(d.path) %>"><%= d.name %></a>（タグ <%= d.n %>本）＝ <a href="<%- url_for(d.catPath) %>"><%= d.cat %></a>（カテゴリ <%= d.catN %>本）
-            </li>
-            <% }) %>
-          </ul>
-          <% } else { %>
-          <p>該当なし</p>
-          <% } %>
-        </section>
-      </div>
-
-      <%# ここからタグメンテ系。まず記事単位の粗さ（タグ無し・付けすぎ） %>
-      <div class="doctor-cols">
-        <section>
-          <h2 class="bottom-content-header">タグが1つも無い記事</h2>
-          <% if (checks.untagged.length) { %>
-          <ul class="doctor-list">
-            <% checks.untagged.forEach(function(p){ %>
-            <li><a href="<%- url_for(p.path) %>"><%= p.title %></a></li>
-            <% }) %>
-          </ul>
-          <% } else { %>
-          <p>該当なし</p>
-          <% } %>
-        </section>
-        <section>
-          <h2 class="bottom-content-header">タグが付きすぎている記事</h2>
-          ※10タグ以上を見直し候補として出しています（記事あたりのタグ数の中央値は3）
-          <% if (checks.overTagged.length) { %>
-          <ul class="doctor-list">
-            <% checks.overTagged.forEach(function(p){ %>
-            <li><a href="<%- url_for(p.path) %>"><%= p.title %></a><span class="doctor-note-inline"><%= p.count %>タグ</span></li>
-            <% }) %>
-          </ul>
-          <% } else { %>
-          <p>該当なし</p>
-          <% } %>
-        </section>
-      </div>
+      <%# 並びはタグ → 著者。判断の重い順に置く。
+          決定的な検査を linter へ移したので（#2706）、残っているのは
+          「候補を見て人が決める」ものだけ。外部リンクの明示（#2346）も
+          textlint の no-unmarked-external-link へ移してある (#2652) %>
 
       <%# 統合候補はペア（A ⊆ B）を1行に書くので幅が要る。単独で出す %>
       <div class="doctor-single">

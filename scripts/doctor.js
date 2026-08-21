@@ -24,9 +24,6 @@ hexo.extend.generator.register('doctor', function (locals) {
 hexo.extend.helper.register('doctor_checks', function () {
   const posts = this.site.posts.sort('-date');
 
-  const untagged = [];
-  const overTagged = [];
-
   // タグ -> 記事IDの集合。ほぼ重なるタグ（統合候補）と1記事タグの検出に使う
   const tagPostSets = new Map();
   const tagPath = new Map();
@@ -37,19 +34,7 @@ hexo.extend.helper.register('doctor_checks', function () {
 
   posts.forEach((post) => {
     const tagNames = post.tags.map((t) => t.name);
-
-    // 1) タグ無し
-    if (tagNames.length === 0) {
-      untagged.push({ title: post.title, path: post.path });
-    }
-    // タグの付けすぎ。10タグ以上を見直し候補にする。
-    // 中央値3の倍（7タグ）で拾うと件数が多すぎて手が付かない (#2259)
-    if (tagNames.length >= 10) {
-      overTagged.push({ title: post.title, path: post.path, count: tagNames.length });
-    }
   });
-
-  overTagged.sort((a, b) => b.count - a.count);
 
   // 4) ほぼ重なるタグ（統合候補）。A の記事がすべて B にも付いていて、
   //    B 側の差分も2本以内なら、実質同じ集合に2つの名前が付いている。
@@ -82,29 +67,6 @@ hexo.extend.helper.register('doctor_checks', function () {
   }
   nearDuplicates.sort((x, y) => x.bN - x.aN - (y.bN - y.aN) || y.aN - x.aN);
 
-  // 5) カテゴリと同名のタグ。語彙が重複しているので、タグ側を削除して
-  //    _config.yml の alias でタグURLをカテゴリへ転送する運用（IaC の前例 #2291）。
-  //    大文字小文字違いの表記ゆれも同一視して拾う
-  const categoryDupTags = [];
-  const catByLower = new Map();
-  this.site.categories.forEach((cat) => {
-    catByLower.set(cat.name.toLowerCase(), { name: cat.name, path: cat.path, n: cat.length });
-  });
-  this.site.tags.forEach((tag) => {
-    const cat = catByLower.get(tag.name.toLowerCase());
-    if (cat) {
-      categoryDupTags.push({
-        name: tag.name,
-        path: tag.path,
-        n: tag.length,
-        cat: cat.name,
-        catPath: cat.path,
-        catN: cat.n,
-      });
-    }
-  });
-  categoryDupTags.sort((a, b) => b.n - a.n);
-
   // 6) 1記事タグ。同じ記事に1記事タグ同士が同居している場合は、その記事の
   //    タグ付けがまとめて薄い可能性が高いので印を付ける
   //    （タグクラウドで * / ** として出していた仕様の移設）
@@ -124,10 +86,7 @@ hexo.extend.helper.register('doctor_checks', function () {
   singleUse.sort((x, y) => y.lonelyPair - x.lonelyPair || (x.name < y.name ? -1 : 1));
 
   return {
-    untagged,
-    overTagged,
     nearDuplicates,
-    categoryDupTags,
     singleUse,
   };
 });
@@ -355,17 +314,4 @@ hexo.extend.helper.register('doctor_dormant_authors', function () {
   // 表示は本数でまとめるので本数の多い順。同数なら最近まで書いていた人を先に
   rows.sort((a, b) => b.count - a.count || a.gap - b.gap || (a.name < b.name ? -1 : 1));
   return rows;
-});
-
-/**
- * 説明の無いカテゴリ（新設時の書き忘れ）と、カテゴリとして実在しない
- * 説明（改名・統合後の消し忘れやタイプミス）を両方向で検出する。
- */
-hexo.extend.helper.register('doctor_category_descriptions', function () {
-  const described = new Set(Object.keys((this.site.data && this.site.data.categories) || {}));
-  const actual = new Set(this.site.categories.map((c) => c.name));
-  return {
-    missing: [...actual].filter((name) => !described.has(name)).sort(),
-    orphaned: [...described].filter((name) => !actual.has(name)).sort(),
-  };
 });
