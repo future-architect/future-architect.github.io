@@ -152,7 +152,7 @@ make g      # 静的ファイル生成（public/）
 make css    # public/css/site.css だけ再生成（0.3秒。CSSの確認用）
 make clean  # キャッシュ・生成物の削除
 make fix    # textlint --fix（source/_posts 配下）
-make fmt    # markdownlint-cli2 --fix（全 *.md。記事も対象なので、無関係な記事まで書き換わる）
+make fmt    # markdownlint-cli2 --fix（リポジトリ自身の *.md。node_modules と .claude は対象外 #2712）
             # ＋ prettier（scripts/**/*.js と *.mjs のみ #2307）
 make lint   # npx lint-staged（git add 済みの記事のみ textlint）
 make mermaid # mermaid 図のSVGキャッシュ更新（Docker必須、記事の図を追加・編集したら実行してコミット）
@@ -175,9 +175,12 @@ make mermaid # mermaid 図のSVGキャッシュ更新（Docker必須、記事の
 
 ## Lint ルール
 
-- `.textlintrc`: `preset-ja-technical-writing` + `spellcheck-tech-word`。一文200文字まで。感嘆符・疑問符と弱い表現は許容
+- `.textlintrc`: `preset-ja-technical-writing` + `prh` + `.textlint/` のローカルルール。一文200文字まで。感嘆符・疑問符と弱い表現は許容
   - 誤検知は `.textlintrc` の `filters.allowlist.allow` に単語を追加して黙らせる
-  - `spellcheck-tech-word` は「インターフェース→インタフェース」「% → ％」など表記統一を強制する
+  - **表記統一は `prh.yml` に書いた4件だけ**（`インタフェース` → `インターフェース`、
+    `プリフィックス` → `プレフィックス`、`Webブラウザ` → `ブラウザ`、掛け算の `x` → `×`）。
+    `spellcheck-tech-word` は個別の変換を止める手段が無く、誤検知のたびに allowlist へ
+    単語を足す運用になっていたので #2184 で外した。**辞書に無い表記は直されない**
   - **`no-mix-dearu-desumasu` は無効**（#2381）。文体は「である」「ですます」どちらでもよく、
     段落単位で切り替える書き方（数学の証明、脚注、エッセイ、分析メモ）を許容する。
     このルールは `です／ます／である` の明示マーカーしか数えず `〜だ。` `〜する。` を

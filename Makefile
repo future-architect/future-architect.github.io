@@ -8,9 +8,12 @@ fmt:
 	node_modules/.bin/markdownlint-cli2 --fix "**/*.md"
 	node_modules/.bin/prettier --write "scripts/**/*.js" "*.mjs"
 
+# グロブはクォートして textlint に展開させる。裸で書くと bash が展開し、
+# globstar 無しの ** は1階層しか辿らない。以前は source/_posts/*.md の行が
+# 先にあり、記事は年ディレクトリの下にあって1件も一致しないため
+# SearchFilesNoTargetFileError で止まり、本命の行に到達していなかった (#2712)
 fix:
-	node_modules/.bin/textlint --fix source/_posts/*.md
-	node_modules/.bin/textlint --fix source/_posts/**/*.md
+	node_modules/.bin/textlint --fix "source/_posts/**/*.md"
 
 g:
 	node_modules/.bin/hexo g
