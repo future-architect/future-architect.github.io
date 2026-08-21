@@ -29,35 +29,18 @@ let feedItems = [];
     });
 })();
 
-hexo.extend.helper.register('generate_techcast_post', function () {
-  const currentTime = new Date();
-  const pastDate = currentTime.getDate() - 15; // 2week
-  currentTime.setDate(pastDate);
+// サイドバーの Tech Cast（_widget/techcast.ejs）に渡す最新3本。
+// 以前はここで HTML を組み立てていたが、リンクが textlint の
+// no-unmarked-external-link から見えない場所にあった（#2729）。
+// マークアップは EJS に置き、ここは「どの3本か」と「NEW を付けるか」だけを決める
+hexo.extend.helper.register('techcast_items', function () {
+  const threshold = new Date();
+  // 公開から2週間は NEW を付ける
+  threshold.setDate(threshold.getDate() - 15);
 
-  const label = (item) => {
-    if (currentTime.toISOString() <= item.isoDate) {
-      return `<span class="newitem">NEW</span>`;
-    }
-    return '';
-  };
-
-  const feedHTML = feedItems
-    .slice(0, 3)
-    .map(
-      (item) =>
-        `<li><a href="${item.link}" title="フューチャーがお届けするポッドキャストです。${
-          item.title
-        }" target="_blank" rel="noopener">${label(item)} ${item.title}</a></li>`,
-    )
-    .join('\n');
-
-  return `
-  <div class="class="widget-wrap">
-  <div class="widget">
-    <ul class="nav techcast">
-      ${feedHTML}
-    </ul>
-  </div>
-  </div>
-  `;
+  return feedItems.slice(0, 3).map((item) => ({
+    title: item.title,
+    link: item.link,
+    isNew: threshold.toISOString() <= item.isoDate,
+  }));
 });
