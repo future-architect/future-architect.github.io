@@ -4,7 +4,6 @@ date: 2025/04/16 00:00:01
 postid: b
 tags:
   - Swift
-  - カンファレンス
   - iOS
   - Xcode
   - 参加レポート

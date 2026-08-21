@@ -7,7 +7,6 @@ tags:
   - コードリーディング
   - GoConference
   - 登壇レポート
-  - カンファレンス
   - context
 categories:
   - Programming
