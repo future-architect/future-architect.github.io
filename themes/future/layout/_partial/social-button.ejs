@@ -104,5 +104,71 @@
       <% if (s.count) { %><span class="share-count" aria-hidden="true"><%= s.count %></span><% } %>
     </li>
     <% }) %>
+    <%# リンクのコピーと他アプリへの共有 (#2565)。記事ページだけに出す
+        （呼び出し側が actions を渡す）。一覧は次に読む記事を選ぶ場所で、
+        共有はまだ起きない。
+
+        JS を使うのはこのブログで2つ目の例外（1つ目は #1949 のいいね）。
+        Clipboard API / Web Share API はどちらも JS 無しでは呼べない。
+        外部ライブラリは足さず、素の navigator.clipboard / navigator.share を使う。
+
+        li に hidden を付けておき、対応している環境でだけ script が外す。
+        押しても何も起きないボタンを見せない（Web Share はモバイル中心で、
+        デスクトップは非対応が多い）。li 側に付けるのは、button だけ隠すと
+        空の li が ul の gap を作って並びに穴があくため %>
+    <% if (typeof actions !== 'undefined' && actions) { %>
+    <li class="share-item" data-share-action="copy" hidden>
+      <button type="button" class="share-btn" title="リンクをコピーする">
+        <%- partial('svg-icon', {icon: 'link'}) %>
+        <span class="share-icon-done"><%- partial('svg-icon', {icon: 'check'}) %></span>
+        <%# aria-live で、コピーしたことを読み上げに伝える %>
+        <span class="sr-only" aria-live="polite">リンクをコピーする</span>
+      </button>
+    </li>
+    <li class="share-item" data-share-action="share" hidden>
+      <button type="button" class="share-btn" title="他のアプリで共有する">
+        <%- partial('svg-icon', {icon: 'share'}) %>
+        <span class="sr-only">他のアプリで共有する</span>
+      </button>
+    </li>
+    <% } %>
   </ul>
+<% if (typeof actions !== 'undefined' && actions) { %>
+<script>
+  (function () {
+    var url = <%- JSON.stringify(link) %>;
+    var title = <%- JSON.stringify(title) %>;
+    var enable = function (name, handler) {
+      var item = document.querySelector('[data-share-action="' + name + '"]');
+      if (!item) return;
+      item.hidden = false;
+      item.querySelector('button').addEventListener('click', handler);
+    };
+    // 書き込みは https（と localhost）でしか許可されない
+    if (navigator.clipboard && window.isSecureContext) {
+      enable('copy', function () {
+        var button = this;
+        navigator.clipboard.writeText(url).then(function () {
+          // アイコンをチェックに差し替え、読み上げにも結果を伝える。
+          // 2秒で元に戻す（押した合図としてはこれで足りる）
+          button.classList.add('is-copied');
+          button.title = 'リンクをコピーしました';
+          button.querySelector('.sr-only').textContent = 'リンクをコピーしました';
+          setTimeout(function () {
+            button.classList.remove('is-copied');
+            button.title = 'リンクをコピーする';
+            button.querySelector('.sr-only').textContent = 'リンクをコピーする';
+          }, 2000);
+        });
+      });
+    }
+    if (navigator.share) {
+      enable('share', function () {
+        // 共有シートを閉じただけでも reject されるので、失敗は黙って捨てる
+        navigator.share({ title: title, url: url }).catch(function () {});
+      });
+    }
+  })();
+</script>
+<% } %>
 <!-- シェアボタン END -->
