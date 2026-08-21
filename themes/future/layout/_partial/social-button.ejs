@@ -104,5 +104,65 @@
       <% if (s.count) { %><span class="share-count" aria-hidden="true"><%= s.count %></span><% } %>
     </li>
     <% }) %>
+    <%# リンクのコピー (#2565)。記事ページだけに出す（呼び出し側が actions を
+        渡す）。一覧は次に読む記事を選ぶ場所で、共有はまだ起きない。
+
+        JS を使うのはこのブログで2つ目の例外（1つ目は #1949 のいいね）。
+        Clipboard API は JS 無しでは呼べない。外部ライブラリは足さず、
+        素の navigator.clipboard を使う。
+
+        **他アプリへの共有（navigator.share）は置かない。** モバイルの
+        ブラウザは共有シートをツールバー／メニューに最初から持っており、
+        ページ側に置いても同じ機能が二重になるだけ。コピーの方は
+        ブラウザ UI からだと共有シート経由で2手かかるので、ここに置く意味がある。
+
+        li に hidden を付けておき、対応している環境でだけ script が外す。
+        押しても何も起きないボタンを見せない（クリップボードへの書き込みは
+        https と localhost だけ）。li 側に付けるのは、button だけ隠すと
+        空の li が ul の gap を作って並びに穴があくため %>
+    <% if (typeof actions !== 'undefined' && actions) { %>
+    <li class="share-item" data-share-action="copy" hidden>
+      <button type="button" class="share-btn" title="リンクをコピーする">
+        <%- partial('svg-icon', {icon: 'link'}) %>
+        <span class="share-icon-done"><%- partial('svg-icon', {icon: 'check'}) %></span>
+        <%# aria-live で、コピーしたことを読み上げに伝える %>
+        <span class="sr-only" aria-live="polite">リンクをコピーする</span>
+      </button>
+      <%# 押したことが見えるように吹き出しを出す。読み上げには上の sr-only が
+          伝えるので、こちらは aria-hidden にして二重に読ませない %>
+      <span class="share-copied" aria-hidden="true">コピーしました</span>
+    </li>
+    <% } %>
   </ul>
+<% if (typeof actions !== 'undefined' && actions) { %>
+<script>
+  (function () {
+    var url = <%- JSON.stringify(link) %>;
+    var enable = function (name, handler) {
+      var item = document.querySelector('[data-share-action="' + name + '"]');
+      if (!item) return;
+      item.hidden = false;
+      item.querySelector('button').addEventListener('click', handler);
+    };
+    // 書き込みは https（と localhost）でしか許可されない
+    if (navigator.clipboard && window.isSecureContext) {
+      enable('copy', function () {
+        var button = this;
+        navigator.clipboard.writeText(url).then(function () {
+          // アイコンをチェックに差し替え、読み上げにも結果を伝える。
+          // 2秒で元に戻す（押した合図としてはこれで足りる）
+          button.classList.add('is-copied');
+          button.title = 'リンクをコピーしました';
+          button.querySelector('.sr-only').textContent = 'リンクをコピーしました';
+          setTimeout(function () {
+            button.classList.remove('is-copied');
+            button.title = 'リンクをコピーする';
+            button.querySelector('.sr-only').textContent = 'リンクをコピーする';
+          }, 2000);
+        });
+      });
+    }
+  })();
+</script>
+<% } %>
 <!-- シェアボタン END -->
