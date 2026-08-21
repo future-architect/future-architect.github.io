@@ -3061,6 +3061,33 @@ a.article-award:focus {
 input[name="tab_item"] {
   display: none;
 }
+/* 中身の切り替えに動きを付ける (#2728)。タブ帯（ラベル）の hover と選択は
+   すでに hover-speed で送っているが、中身は瞬時に入れ替わるので、押した結果が
+   同じ場所で差し替わったことに気づきにくかった。
+
+   こちらのタブは display で出し入れしているため transition が効かない。
+   表示された瞬間に動く animation を使う。ランキング（.tab-stack）は
+   重ねてあるので透明度の遷移側で送る */
+@keyframes tab-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.chart-tabs input:checked + .tab_item + .tab_content,
+.year-tabs input:checked + .tab_item + .tab_content {
+  animation: tab-fade-in tab-speed ease;
+}
+/* 動きを減らす設定では切り替えを瞬時に戻す。0.05秒の色や面の送りは
+   動きではないので止めない（#2686 と同じ線引き） */
+@media (prefers-reduced-motion: reduce) {
+  .chart-tabs input:checked + .tab_item + .tab_content,
+  .year-tabs input:checked + .tab_item + .tab_content {
+    animation: none;
+  }
+}
 /* 選択されているタブ。上辺にブランドネイビーのアクセントを置いて
    所在をはっきりさせる（選択状態＝インタラクションなので --brand-navy の
    守備範囲。ページャーの選択色と同じ扱い）。
@@ -3099,10 +3126,27 @@ input[name="tab_item"] {
   grid-area: 1 / 1;
   display: block;
   visibility: hidden;
+  /* 切り替えに動きを付ける (#2728)。ここは display で出し入れせず同じマスに
+     重ねてあるので、透明度を送れる */
+  opacity: 0;
 }
+/* **transition は表示される側に書く。** 基底（上）に置くと消える側も
+   0.18秒かけて薄くなり、同じマスに重ねてある2枚が同時に見えて文字が重なる。
+   「出るときだけ送る」形にしたいので、#2686 の「transition は基底側」の
+   原則をここでは意図して外す */
 #monthly:checked ~ .tab-stack > #popular_monthly,
 #yearly:checked ~ .tab-stack > #popular_yearly {
   visibility: visible;
+  opacity: 1;
+  transition: opacity tab-speed ease;
+}
+/* 動きを減らす設定では瞬時に切り替える。詳細度が同じなので、打ち消しは
+   必ず上のルールより後ろに置く（メディアクエリは詳細度を上げない） */
+@media (prefers-reduced-motion: reduce) {
+  #monthly:checked ~ .tab-stack > #popular_monthly,
+  #yearly:checked ~ .tab-stack > #popular_yearly {
+    transition: none;
+  }
 }
 /* 隠れている側は「畳んだ状態」の高さで数える。開いたまま切り替えると、
    開いた分の空白がもう片方の下に残ってしまう */
