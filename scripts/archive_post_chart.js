@@ -73,6 +73,56 @@ const generatePostsSeries = (posts, year) => {
   return series;
 };
 
+// 全期間ページの「年別」タブ (#2757)。月を横軸に、年ごとの折れ線を重ねる。
+// 「4月が山」「12月が落ちる」のような年をまたいだ月の傾向と、
+// 今年が去年に比べて多いか少ないかを1枚で見るためのもの。
+//
+// 出すのは直近5年で、初期表示は直近3年（残りは凡例で足す）。11年すべてを
+// 重ねると、月1〜2本だった2016〜2018年の平坦な線が読み取りの邪魔になる。
+// 色は新しい年ほど濃い同系の濃淡で、凡例の並びと濃さが年代の順に対応する
+const YEAR_OVERLAY_SPAN = 5;
+const YEAR_OVERLAY_SHOWN = 3;
+
+hexo.extend.helper.register('posts_year_overlay_series', function () {
+  const counts = new Map(); // 'YYYY-M' -> 本数
+  let latest = null;
+  let earliest = null;
+  this.site.posts.forEach((post) => {
+    const y = post.date.year();
+    const key = `${y}-${post.date.month() + 1}`;
+    counts.set(key, (counts.get(key) || 0) + 1);
+    if (latest === null || y > latest) latest = y;
+    if (earliest === null || y < earliest) earliest = y;
+  });
+  if (latest === null) return JSON.stringify({ months: [], series: [], selected: {} });
+
+  const years = Array.from({ length: YEAR_OVERLAY_SPAN }, (_, i) => latest - i).filter(
+    (y) => y >= earliest,
+  );
+  // まだ来ていない月は 0 ではなく null にして線を切る。0 を描くと投稿が
+  // 急に止まったように見える。過去の月の 0 は実際に投稿が無かった月なので残す
+  const nowY = new Date().getFullYear();
+  const nowM = new Date().getMonth() + 1;
+  const monthCount = (y) => (y === nowY ? nowM : 12);
+
+  const series = years.map((y) => ({
+    name: `${y}年`,
+    data: Array.from({ length: 12 }, (_, i) =>
+      i + 1 <= monthCount(y) ? counts.get(`${y}-${i + 1}`) || 0 : null,
+    ),
+  }));
+  const selected = {};
+  years.forEach((y, i) => {
+    selected[`${y}年`] = i < YEAR_OVERLAY_SHOWN;
+  });
+
+  return JSON.stringify({
+    months: Array.from({ length: 12 }, (_, i) => `${i + 1}月`),
+    series,
+    selected,
+  });
+});
+
 // 積み上げの内訳データ。年ページは月の棒を週で、全期間は四半期の棒を月で割る。
 //
 // 年ページの週は「その月の何日目か」で決める（1〜7日 = 第1週）。ISO週にすると

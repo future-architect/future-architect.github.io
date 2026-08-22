@@ -3,27 +3,31 @@
     それは月の単位で見るもの。個別ページ（カテゴリ・タグ・著者）も月なので、
     ページをまたいでも同じ密度で読める。
 
-    年ページだけタブを出す。期間タブは「バケットの中の内訳」を見るためのもので、
-    月バケットの内訳は週。全期間ページでも同じことをすると「10年分の月の中の
-    第何週か」になり、読み取るべき問いが無くなるのでタブごと出さない %>
-<% if (year) { %>
+    2枚目のタブはページの単位で変える。年ページは「バケットの中の内訳」で
+    月の中の週。全期間で同じことをすると「10年分の月の中の第何週か」になり
+    読み取るべき問いが無くなるので、代わりに年を重ねた月の推移を出す (#2757) %>
 <div class="nav tabs chart-tabs">
-  <%# 既定はカテゴリ別。週の粗密より、何のジャンルが書かれているかの方が
+  <%# 既定はカテゴリ別。粗密より、何のジャンルが書かれているかの方が
       最初に見たい情報 %>
   <input id="chart-tab-category" type="radio" name="chart_tab" checked>
   <label tabindex="0" class="tab_item" for="chart-tab-category">カテゴリ別</label>
   <div class="tab_content">
     <div id="chart-category" style="width:100%;min-height:250px"></div>
   </div>
+  <% if (year) { %>
   <input id="chart-tab-period" type="radio" name="chart_tab">
   <label tabindex="0" class="tab_item" for="chart-tab-period">週別</label>
   <div class="tab_content">
     <div id="chart-period" style="width:100%;min-height:250px"></div>
   </div>
+  <% } else { %>
+  <input id="chart-tab-years" type="radio" name="chart_tab">
+  <label tabindex="0" class="tab_item" for="chart-tab-years">年別</label>
+  <div class="tab_content">
+    <div id="chart-years" style="width:100%;min-height:250px"></div>
+  </div>
+  <% } %>
 </div>
-<% } else { %>
-<div id="chart-category" style="width:100%;min-height:250px"></div>
-<% } %>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.1.2/dist/echarts.min.js" integrity="sha384-QqZssazD9IzPiEJz2lyFewTMgYObqDWxBfCX5k5E4n4fH7ygMIqp6A6Ek8HIrRyQ" crossorigin="anonymous"></script>
 <script type="text/javascript">
 <% if (year) { %>
@@ -50,6 +54,30 @@
       type: 'bar',
       stack: 'posts',
       data
+    }))
+  });
+<% } else { %>
+  const yearData = <%- posts_year_overlay_series() %>;
+  echarts.init(document.getElementById('chart-years')).setOption({
+    <%# 同じ月の全年を1つの吹き出しに出す。年どうしの差を読むグラフなので、
+        1本ずつ見るより並べた方が速い %>
+    tooltip: { trigger: 'axis' },
+    legend: { bottom: 0, type: 'scroll', selected: yearData.selected },
+    grid: { left: 0, right: '2%', bottom: 32, containLabel: true },
+    <%# 折れ線なので端に余白を作らない。1月と12月が軸の端に来る %>
+    xAxis: { type: 'category', data: yearData.months, boundaryGap: false },
+    <%# 上限は自動。カテゴリ別のタブは全11年ぶんの月を積んでいて最大が違うので、
+        タブをまたいで目盛は揃わない（見ている年の範囲が違うため） %>
+    yAxis: { type: 'value', min: 0 },
+    <%# 年は順序があるので同系の濃淡で、新しい年を濃くする。既存の週別タブの
+        5段は下3段が白地で 2.16 / 1.61 / 1.32 と細い線には薄すぎるため、
+        #337ab7 の色相・彩度のまま明度を振って全段 3:1 以上にした
+        （8.46 / 6.25 / 4.56 / 3.93 / 3.12）%>
+    color: ['#215078', '#2a6496', '#337ab7', '#3885c7', '#5597d0'],
+    series: yearData.series.map(s => ({
+      name: s.name,
+      type: 'line',
+      data: s.data
     }))
   });
 <% } %>
