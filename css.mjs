@@ -4,8 +4,8 @@
 // 処理が毎回走るため。書き出し0ファイルでも同じ）。CSS の見た目を確かめる
 // だけならページの再生成は要らないので、連結済みの CSS を直接置き換える。
 //
-// 連結の順序と内容は scripts/combine_css.js と同じにすること。
-// あちらが公開ビルドの正で、ここはその写し。順序を変えると表示が壊れる。
+// 連結そのものは公開ビルド（scripts/combine_css.js）と同じ
+// scripts/lib/site_css.js を呼ぶ。ここが持つのは Stylus の描画だけ。
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
@@ -13,6 +13,7 @@ import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
 const stylus = require('stylus');
+const { combineCss } = require('./scripts/lib/site_css');
 
 const root = dirname(fileURLToPath(import.meta.url));
 const themeDir = join(root, 'themes/future');
@@ -23,14 +24,11 @@ stylus.render(readFileSync(stylPath, 'utf8'), { filename: stylPath }, (err, css)
     console.error(err.message);
     process.exit(1);
   }
-  const combined = [
-    '/* bootstrap-subset.css */',
-    readFileSync(join(themeDir, 'css-src/bootstrap-subset.css'), 'utf8'),
-    '/* metronic/assets/style.css */',
-    readFileSync(join(themeDir, 'metronic-src/assets/style.css'), 'utf8'),
-    '/* theme-styles.styl */',
-    css,
-  ].join('\n');
+  const combined = combineCss({
+    bootstrap: readFileSync(join(themeDir, 'css-src/bootstrap-subset.css'), 'utf8'),
+    metronic: readFileSync(join(themeDir, 'metronic-src/assets/style.css'), 'utf8'),
+    themeStyles: css,
+  });
 
   const out = join(root, 'public/css/site.css');
   writeFileSync(out, combined);

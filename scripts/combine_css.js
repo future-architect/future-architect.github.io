@@ -4,6 +4,7 @@ const path = require('path');
 const fs = require('hexo-fs');
 const fsNode = require('fs');
 const crypto = require('crypto');
+const { combineCss } = require('./lib/site_css');
 
 // CSS の URL に付ける内容ハッシュ。URL が /css/site.css 固定だと、
 // スタイルを変えてもブラウザがキャッシュを返し続けて反映されない。
@@ -26,8 +27,7 @@ hexo.extend.helper.register('css_version', function () {
  * Lighthouse でも「レンダリングをブロックしているリクエスト」として
  * 約290msの削減余地が指摘されていた。
  *
- * 読み込み順は従来の head.ejs と同じ（Bootstrap → metronic → テーマ）。
- * CSS は後勝ちなので、この順序を変えると表示が壊れる。
+ * 連結そのものは scripts/lib/site_css.js が持つ（make css と共用）。
  *
  * 元ファイルは themes/future/source/ の外（css-src / metronic-src）に置いている。
  * source/ 配下だと Hexo が public/ にそのまま複製してしまい、
@@ -45,17 +45,8 @@ hexo.extend.generator.register('site_css', async function () {
     engine: 'styl',
   });
 
-  const combined = [
-    '/* bootstrap-subset.css */',
-    bootstrap,
-    '/* metronic/assets/style.css */',
-    metronic,
-    '/* theme-styles.styl */',
-    themeStyles,
-  ].join('\n');
-
   return {
     path: 'css/site.css',
-    data: combined,
+    data: combineCss({ bootstrap, metronic, themeStyles }),
   };
 });
