@@ -3,27 +3,31 @@
     それは月の単位で見るもの。個別ページ（カテゴリ・タグ・著者）も月なので、
     ページをまたいでも同じ密度で読める。
 
-    年ページだけタブを出す。期間タブは「バケットの中の内訳」を見るためのもので、
-    月バケットの内訳は週。全期間ページでも同じことをすると「10年分の月の中の
-    第何週か」になり、読み取るべき問いが無くなるのでタブごと出さない %>
-<% if (year) { %>
+    2枚目のタブはページの単位で変える。年ページは「バケットの中の内訳」で
+    月の中の週。全期間で同じことをすると「10年分の月の中の第何週か」になり
+    読み取るべき問いが無くなるので、代わりに年を重ねた月の推移を出す (#2757) %>
 <div class="nav tabs chart-tabs">
-  <%# 既定はカテゴリ別。週の粗密より、何のジャンルが書かれているかの方が
+  <%# 既定はカテゴリ別。粗密より、何のジャンルが書かれているかの方が
       最初に見たい情報 %>
   <input id="chart-tab-category" type="radio" name="chart_tab" checked>
   <label tabindex="0" class="tab_item" for="chart-tab-category">カテゴリ別</label>
   <div class="tab_content">
     <div id="chart-category" style="width:100%;min-height:250px"></div>
   </div>
+  <% if (year) { %>
   <input id="chart-tab-period" type="radio" name="chart_tab">
   <label tabindex="0" class="tab_item" for="chart-tab-period">週別</label>
   <div class="tab_content">
     <div id="chart-period" style="width:100%;min-height:250px"></div>
   </div>
+  <% } else { %>
+  <input id="chart-tab-years" type="radio" name="chart_tab">
+  <label tabindex="0" class="tab_item" for="chart-tab-years">年別</label>
+  <div class="tab_content">
+    <div id="chart-years" style="width:100%;min-height:250px"></div>
+  </div>
+  <% } %>
 </div>
-<% } else { %>
-<div id="chart-category" style="width:100%;min-height:250px"></div>
-<% } %>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.1.2/dist/echarts.min.js" integrity="sha384-QqZssazD9IzPiEJz2lyFewTMgYObqDWxBfCX5k5E4n4fH7ygMIqp6A6Ek8HIrRyQ" crossorigin="anonymous"></script>
 <script type="text/javascript">
 <% if (year) { %>
@@ -50,6 +54,43 @@
       type: 'bar',
       stack: 'posts',
       data
+    }))
+  });
+<% } else { %>
+  const yearData = <%- posts_year_overlay_series() %>;
+  <%# 直近の年を強く出す。太さを1pxずつ段にする %>
+  const yearWidths = [8, 7, 6, 5, 4];
+  echarts.init(document.getElementById('chart-years')).setOption({
+    <%# 同じ月の全年を1つの吹き出しに出す。年どうしの差を読むグラフなので、
+        1本ずつ見るより並べた方が速い %>
+    tooltip: { trigger: 'axis' },
+    legend: { bottom: 0, type: 'scroll', selected: yearData.selected },
+    grid: { left: 0, right: '2%', bottom: 32, containLabel: true },
+    <%# 折れ線なので端に余白を作らない。1月と12月が軸の端に来る %>
+    xAxis: { type: 'category', data: yearData.months, boundaryGap: false },
+    <%# 上限は自動。カテゴリ別のタブは全11年ぶんの月を積んでいて最大が違うので、
+        タブをまたいで目盛は揃わない（見ている年の範囲が違うため） %>
+    yAxis: { type: 'value', min: 0 },
+    <%# 5本を濃淡だけで分けると、細い線では隣り合う段の区別が付かない。
+        年ごとに色相を変えて、古い年ほど彩度を落として引かせる。
+        echarts の option では CSS 変数を参照できないので、ブランド色は
+        同値をリテラルで持つ（フッターの波と同じ扱い）。
+        線は図形なので基準は 3:1。明るい黄色（#FFC107 は 1.63、#E6A700 でも
+        2.12）は細い線だと消えるため、3:1 を満たす一番明るい黄色を選ぶ。
+        白地とのコントラストは 5.35 / 16.34 / 3.25 / 3.18 / 3.23 %>
+    color: ['#D5004A', '#0A1461', '#B8860B', '#689F38', '#8f8f8f'],
+    <%# 点は出さない。5本 × 12か月で60個並ぶと線の形が読み取れない。
+        ホバーしたときだけ echarts が点を出すので、値は読める %>
+    series: yearData.series.map((s, i) => ({
+      name: s.name,
+      type: 'line',
+      showSymbol: false,
+      lineStyle: { width: yearWidths[i] },
+      <%# 系列は新しい年が先。echarts は後の系列を上に描くので、
+          そのままだと古い年が前に出る。z を逆順に振って新しい年を上に置く。
+          既定の 2 より下に落とすと軸の補助線に潜るので +2 する %>
+      z: yearData.series.length - i + 2,
+      data: s.data
     }))
   });
 <% } %>
