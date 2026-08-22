@@ -1,14 +1,34 @@
+<%# 期間の一覧を時系列で並べる。全期間は年ごと、年ページは月ごとに束ねる (#2754)。
+    月ページはカード一覧（_partial/archive-post）なのでここを通らない %>
 <div class="row">
   <main class="blog-posts">
-      <%# アーカイブページの最後の要素なので footer-gap でフッター前の間隔を持つ %>
-      <ul class="article-list footer-gap">
-        <% page.posts.each(function(post, i){ %>
-        <li>
-          <span class="date"><%= date(post.date, 'YYYY.MM.DD') %></span>
-          <span class="count">&#9825;<%= totalSNSCnt(post.permalink) %></span>
-          <span class="title"><a href="<%- url_for(post.path) %>" title="<%= post.lede %>"><%= post.title %></a></span>
-        </li>
+    <%
+      const groups = [];
+      page.posts.each(function(post){
+        const key = is_year() ? post.date.format('MM') : post.date.format('YYYY');
+        if (!groups.length || groups[groups.length - 1].key !== key) {
+          groups.push({key: key, posts: []});
+        }
+        groups[groups.length - 1].posts.push(post);
+      });
+    %>
+    <% groups.forEach(function(group, gi){ %>
+    <%
+      const id = is_year() ? 'posts-' + page.year + '-' + group.key : 'posts-' + group.key;
+      const label = is_year() ? Number(group.key) + '月' : group.key + '年';
+    %>
+    <%# アンカーの形は _partial/section-heading と同じ。アイコンと末尾への移動は headerlink.js が補う %>
+    <h3 id="<%= id %>" class="article-list-period"><a href="#<%= id %>" class="headerlink" title="<%= label %>"></a><%= label %></h3>
+    <%# アーカイブページの最後の要素なので footer-gap でフッター前の間隔を持つ %>
+    <ul class="article-list<%= gi === groups.length - 1 ? ' footer-gap' : '' %>">
+      <% group.posts.forEach(function(post){ %>
+      <li>
+        <span class="date"><%= date(post.date, 'YYYY.MM.DD') %></span>
+        <span class="count">&#9825;<%= totalSNSCnt(post.permalink) %></span>
+        <span class="title"><a href="<%- url_for(post.path) %>" title="<%= post.lede %>"><%= post.title %></a></span>
+      </li>
       <% }) %>
     </ul>
+    <% }) %>
   </main>
 </div>
