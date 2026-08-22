@@ -44,12 +44,30 @@ hexo.extend.helper.register('article_award', function (post) {
 
 hexo.extend.helper.register('author_awards', function (author) {
   const rows = (this.site.data && this.site.data.awards) || [];
-  const years = rows
-    .filter((r) => r.author === author)
-    .map((r) => r.year)
-    .sort((a, b) => b - a); // 新しい年を先に
-  if (years.length === 0) return null;
-  return { years, hallOfFame: years.length >= HALL_OF_FAME_WINS };
+  const mine = rows.filter((r) => r.author === author).sort((a, b) => b.year - a.year); // 新しい年を先に
+  if (mine.length === 0) return null;
+  // 受賞年のバッジは代表記事へのリンクにする (#2760)。article が無い年
+  // （2020年）と、書かれていても記事が見つからない場合は article を null で
+  // 返し、EJS 側はリンクにしない
+  const years = mine.map((r) => {
+    const post = r.article ? this.site.posts.findOne({ path: `articles/${r.article}/` }) : null;
+    return {
+      year: r.year,
+      article: post ? post.path : null,
+      title: post ? post.title : null,
+    };
+  });
+  return { years, hallOfFame: mine.length >= HALL_OF_FAME_WINS };
+});
+
+// 賞の名前から受賞発表・振り返りの記事一覧へ飛ばす (#2760)。URL は
+// _config.yml の tag_map で変わりうるので、名前からタグの path を引く。
+// タグが無ければ null を返し、EJS 側はリンクにしない
+const AWARD_TAG = 'ベスブロ';
+
+hexo.extend.helper.register('award_tag_path', function () {
+  const tag = this.site.tags && this.site.tags.findOne({ name: AWARD_TAG });
+  return tag ? tag.path : null;
 });
 
 // /authors/ の表彰一覧 (#2409)。受賞バッジは著者ページにしか出ないため、
