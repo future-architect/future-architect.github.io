@@ -396,10 +396,10 @@ bootstrap-subset → metronic → theme-styles.styl の順で `/css/site.css` �
   | --- | --- | --- |
   | `body` | 13px | `theme-styles.styl` |
   | 本文（`p` / `li` / `summary`） | `1.2em` = 15.6px | 〃 |
-  | 記事タイトル | `clamp(26px, 1.325rem + 0.9vw, 32px)` ＋ `text-wrap: balance` | 〃（1箇所のみ） |
+  | 記事タイトル | `clamp(26px, 1.325rem + 0.9vw, 32px)` ＋ `text-wrap: pretty`（#2655。均等化すると「列幅の半分×2行」に縮む） | 〃（1箇所のみ） |
   | クラス無しの `h2`（関連記事・We're hiring 等） | `1.85em` = 24.05px | 〃 |
   | サイドバーの `h2` | `1.4em` = 18.2px | 〃 |
-  | 本文見出し h2〜h6 | `1.85 / 1.5 / 1.3 / 1.2 / 1.1em` = 24.05 / 19.5 / 16.9 / 15.6 / 14.3px（太さは全て700。直前の空きは h2 56px / h3 32px / h4 以下 24px） | 〃 |
+  | 本文見出し h2〜h6 | `1.85 / 1.5 / 1.3 / 1.2 / 1.1em` = 24.05 / 19.5 / 16.9 / 15.6 / 14.3px（太さは全て700。直前の空きは h2 56px / h3 32px / h4 以下 24px）＋ `text-wrap: balance`（#2776。タイトルと逆で、中央値7文字なので2行を均等に割る） | 〃 |
   | 本文見出し h1（`.article-entry h1`） | 記事タイトルと同じ（`.article-title` / `.list-page` と同一ルール。直前の空き 64px・罫線 2px はここで持つ） | 〃 |
   | 一覧ページの見出し `.list-page` | 記事タイトルと同じ（`.article-title` と同一ルール） | 〃 |
   | 一覧ページの統計（数値 / ラベル） | `clamp(17px, 1rem + 0.4vw, 20px)` / 12px | 〃 |
