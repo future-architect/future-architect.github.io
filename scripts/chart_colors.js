@@ -18,10 +18,12 @@ const NAVY_STEPS = ['#0a1461', '#3f4577', '#9e9e9e', '#c6c6c6', '#e0e0e0'];
 const LINE_ACCENT = '#d5004a';
 
 // kind ごとに要る本数だけ返す。echarts の color は系列の順に当たるので、
-// 著者の推移は「継続・再開・新規・常連（線）」の順に並べる
+// 著者の推移は「継続・再開・新規・常連（線）」の順に並べる。
+// 2色しか使わないタグの定着は、淡い端ではなくグレーの一番濃い段を取る
+// （段を飛ばすと相手が無いので、薄い側が弱いだけになる）
 const PALETTES = {
   weeks: NAVY_STEPS,
-  retention: [NAVY_STEPS[0], NAVY_STEPS[4]],
+  retention: [NAVY_STEPS[0], NAVY_STEPS[2]],
   author_types: [NAVY_STEPS[0], NAVY_STEPS[1], NAVY_STEPS[2], LINE_ACCENT],
 };
 
