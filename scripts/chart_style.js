@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * カテゴリ由来でない系列の色 (#2767)。ここが唯一の定義場所で、
+ * カテゴリ由来でない系列の色と、折れ線の太さ (#2767)。ここが唯一の定義場所で、
  * 週別の積み上げ・タグの定着・著者の推移が同じ段を共有する。
  *
  * 濃い2段はブランドネイビー、淡い側は無彩色に抜ける。青は主役の2段だけなので、
@@ -29,4 +29,17 @@ const PALETTES = {
 
 hexo.extend.helper.register('chart_series_colors', function (kind) {
   return JSON.stringify(PALETTES[kind] || NAVY_STEPS);
+});
+
+// 重ねた折れ線の太さ。先頭が「いま見るべき線」で、そこから1pxずつ落とす。
+// 全期間ページの年別（最新年から遡る5本）と、著者の推移の「常連」が
+// 同じ強さで出るよう、値をここでしか持たない
+const LINE_WIDTHS = [8, 7, 6, 5, 4];
+
+hexo.extend.helper.register('chart_line_widths', function () {
+  return JSON.stringify(LINE_WIDTHS);
+});
+
+hexo.extend.helper.register('chart_accent_line_width', function () {
+  return LINE_WIDTHS[0];
 });
