@@ -296,13 +296,11 @@ hexo.extend.helper.register('doctor_ontology', function () {
  * 「投稿した年が2年以上」ではなく累計本数で絞るのは、1年に数本書いて止まった人
  * （両列で10名）を残すため。企画で数本書いた人は声かけの有力候補になる。
  *
- * あわせて、連続3年以上書いていた実績のある著者を別に返す。
- * 「続けていた人が離れた」は声かけの重みが違うので、上の2列より範囲を広げて
- * 最終投稿5年以内まで見る。ただし2列に出る人は除く（同じ人が2回並ぶのを避ける）。
+ * 連続3年以上書いていた実績は、その2列の中で名前に添えて示す。
+ * 続けていた人が途切れたかどうかで声かけの重みが違う。
  */
 const DORMANT_MIN_POSTS = 2;
 const DORMANT_STREAK = 3;
-const DORMANT_STREAK_MAX_GAP = 5;
 
 // 連続して投稿していた最長の年数
 const longestStreak = (years) => {
@@ -332,7 +330,6 @@ hexo.extend.helper.register('doctor_dormant_authors', function () {
 
   const recent = [];
   const singleOnly = {}; // 年 -> 落とした「1本だけ」の人数
-  const longGone = [];
   for (const [name, entry] of byAuthor) {
     if (entry.years.has(thisYear)) continue;
     const last = Math.max(...entry.years);
@@ -344,16 +341,11 @@ hexo.extend.helper.register('doctor_dormant_authors', function () {
       count: entry.count,
       streak: longestStreak(entry.years),
     };
-    if (gap === 1 || gap === 2) {
-      if (entry.count >= DORMANT_MIN_POSTS) recent.push(row);
-      else singleOnly[last] = (singleOnly[last] || 0) + 1;
-    } else if (gap <= DORMANT_STREAK_MAX_GAP && row.streak >= DORMANT_STREAK) {
-      longGone.push(row);
-    }
+    if (gap !== 1 && gap !== 2) continue;
+    if (entry.count >= DORMANT_MIN_POSTS) recent.push(row);
+    else singleOnly[last] = (singleOnly[last] || 0) + 1;
   }
   // 表示は本数でまとめるので本数の多い順。同数なら最近まで書いていた人を先に
   recent.sort((a, b) => b.count - a.count || a.gap - b.gap || (a.name < b.name ? -1 : 1));
-  // こちらは年でまとめる。新しい年から、同じ年なら続けた年数の長い人を先に
-  longGone.sort((a, b) => b.last - a.last || b.streak - a.streak || (a.name < b.name ? -1 : 1));
-  return { recent, singleOnly, longGone, streakYears: DORMANT_STREAK };
+  return { recent, singleOnly, streakYears: DORMANT_STREAK };
 });
