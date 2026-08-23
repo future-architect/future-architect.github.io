@@ -13,7 +13,8 @@
         <li><span class="summary-count"><%= checks.singleUse.length %></span><br><span class="summary-label">1記事タグ</span></li>
         <% const dormant = doctor_dormant_authors(); %>
         <% const thisYear = new Date().getFullYear(); %>
-        <li><span class="summary-count"><%= dormant.length %></span><br><span class="summary-label">投稿が途切れた著者</span></li>
+        <li><span class="summary-count"><%= dormant.recent.length %></span><br><span class="summary-label">投稿が途切れた著者</span></li>
+        <li><span class="summary-count"><%= dormant.longGone.length %></span><br><span class="summary-label">続けた後に離れた著者</span></li>
       </ul>
 
       <%# 並びはタグ → 著者。判断の重い順に置く。
@@ -169,12 +170,12 @@
           声かけは「まず昨年まで書いていた人、駄目なら一昨年の人」の順に進めるので、
           左に昨年・右に一昨年を並べて、そのまま上から当たれるようにする %>
       <h2 class="bottom-content-header">投稿が途切れている著者</h2>
-      ※今年まだ投稿が無い著者。声をかけると再開してくれるかもしれない候補です（/authors/ に <code>*</code> / <code>**</code> で出していたものの移設。読者向けのページには凡例の無い記号を置かない #2418）
-      <% if (dormant.length) { %>
+      ※今年まだ投稿が無く、累計2本以上の著者。声をかけると再開してくれるかもしれない候補です（/authors/ に <code>*</code> / <code>**</code> で出していたものの移設。読者向けのページには凡例の無い記号を置かない #2418）。<code>連続N年</code> は続けて書いていた最長の年数で、<%= dormant.streakYears %>年以上を出しています
+      <% if (dormant.recent.length) { %>
       <div class="doctor-cols">
         <% [thisYear - 1, thisYear - 2].forEach(function(y){ %>
         <section>
-          <% const members = dormant.filter(d => d.last === y); %>
+          <% const members = dormant.recent.filter(d => d.last === y); %>
           <h3 class="doctor-subhead"><%= y %>年まで（<%= members.length %>名）</h3>
           <% if (members.length) { %>
           <ul class="doctor-list">
@@ -184,16 +185,39 @@
             <% counts.forEach(function(c){ %>
             <li class="doctor-inline-row">
               <span class="doctor-note"><%= c %>本</span>
-              <% members.filter(d => d.count === c).forEach(function(d){ %><a href="<%- url_for('authors/' + d.name + '/') %>"><%= d.name %></a><span class="doctor-note-inline"></span><% }) %>
+              <% members.filter(d => d.count === c).forEach(function(d){ %><a href="<%- url_for('authors/' + d.name + '/') %>"><%= d.name %></a><span class="doctor-note-inline"><% if (d.streak >= dormant.streakYears) { %>連続<%= d.streak %>年<% } %></span><% }) %>
             </li>
             <% }) %>
           </ul>
+          <%# 絞って落とした人は数だけ残す。列を短くしつつ、何人を見ていないかが分かる %>
+          <% if (dormant.singleOnly[y]) { %>
+          <p class="doctor-note">ほかに1本だけの著者が<%= dormant.singleOnly[y] %>名</p>
+          <% } %>
           <% } else { %>
           <p>該当なし</p>
           <% } %>
         </section>
         <% }) %>
       </div>
+      <% } else { %>
+      <p>該当なし</p>
+      <% } %>
+
+      <%# 上の2列は昨年・一昨年しか見ないので、続けていた人が3年以上前に離れると
+          画面から消える。声かけの重みが違うのでここだけ範囲を広げる。
+          2列に出る人は入れない（同じ人が1ページに2回並ぶのを避ける）%>
+      <h2 class="bottom-content-header">続けた後に離れた著者</h2>
+      ※<%= dormant.streakYears %>年以上続けて書いていて、最終投稿が3年以上前（5年以内）の著者。上の2列には出ません
+      <% if (dormant.longGone.length) { %>
+      <ul class="doctor-list">
+        <% const goneYears = [...new Set(dormant.longGone.map(d => d.last))].sort((a, b) => b - a); %>
+        <% goneYears.forEach(function(y){ %>
+        <li class="doctor-inline-row">
+          <span class="doctor-note"><%= y %>年まで</span>
+          <% dormant.longGone.filter(d => d.last === y).forEach(function(d){ %><a href="<%- url_for('authors/' + d.name + '/') %>"><%= d.name %></a><span class="doctor-note-inline">連続<%= d.streak %>年・<%= d.count %>本</span><% }) %>
+        </li>
+        <% }) %>
+      </ul>
       <% } else { %>
       <p>該当なし</p>
       <% } %>
