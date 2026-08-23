@@ -57,7 +57,7 @@ const postListItem = (post, itemClass, titleAttr, withThumb = false, rankMark = 
   // タイトルと重複するリンクなので、タブ移動と読み上げからは外す。
   // サムネの無い記事は同じ大きさの空き枠を置いて行頭を揃える
   const thumb = post.thumbnail
-    ? `<a href="/${post.path}" class="post-list-icon" tabindex="-1" aria-hidden="true"><img src="${post.thumbnail}" alt="" width="48" height="32" loading="lazy"></a>`
+    ? `<a href="/${post.path}" class="post-list-icon" tabindex="-1" aria-hidden="true"><img src="${post.thumbnail}" alt="" width="72" height="48" loading="lazy"></a>`
     : `<span class="post-list-icon post-list-icon-empty"></span>`;
   return `<li class="${itemClass} post-list-item-thumb">${rankLabel}${thumb}<div class="post-list-body">${body}</div></li>`;
 };
