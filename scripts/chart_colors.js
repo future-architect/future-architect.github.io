@@ -1,0 +1,30 @@
+'use strict';
+
+/**
+ * カテゴリ由来でない系列の色 (#2767)。ここが唯一の定義場所で、
+ * 週別の積み上げ・タグの定着・著者の推移が同じ段を共有する。
+ *
+ * 濃い2段はブランドネイビー、淡い側は無彩色に抜ける。青は主役の2段だけなので、
+ * 積み上げのどこまでが手前の段かがひと目で分かる。
+ * echarts の option では CSS 変数を参照できないため、ネイビーとクリムゾンは
+ * 同値をリテラルで持つ（フッターの波と同じ扱い）。
+ *
+ * カテゴリの色は category_chart_helpers.js が持つ。混ぜない
+ * （カテゴリは順序に意味が無いので色相で分ける、こちらは順序があるので濃淡）。
+ */
+const NAVY_STEPS = ['#0a1461', '#3f4577', '#9e9e9e', '#c6c6c6', '#e0e0e0'];
+
+// 積み上げの上に重なる折れ線は、濃淡では沈むので色相を変える
+const LINE_ACCENT = '#d5004a';
+
+// kind ごとに要る本数だけ返す。echarts の color は系列の順に当たるので、
+// 著者の推移は「継続・再開・新規・常連（線）」の順に並べる
+const PALETTES = {
+  weeks: NAVY_STEPS,
+  retention: [NAVY_STEPS[0], NAVY_STEPS[4]],
+  author_types: [NAVY_STEPS[0], NAVY_STEPS[1], NAVY_STEPS[2], LINE_ACCENT],
+};
+
+hexo.extend.helper.register('chart_series_colors', function (kind) {
+  return JSON.stringify(PALETTES[kind] || NAVY_STEPS);
+});
