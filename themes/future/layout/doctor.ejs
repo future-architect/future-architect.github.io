@@ -3,15 +3,20 @@
         {label: 'ホーム', url: '/'},
         {label: '記事ドクター'}
       ]}) %>
-  <%# 節の見出しはここで1箇所に持ち、本文とサイドバーの目次の両方から使う。
-      2箇所に書くと片方だけ直して食い違う %>
+  <%# 節はここで1箇所に持ち、冒頭の件数・目次・本文の見出しの3つから使う。
+      別々に書くと数や並びが食い違う（label は件数の下に出す短い名前）%>
   <%
+    const checks = doctor_checks();
+    const ontoSuggest = doctor_ontology_suggestions();
+    const onto = doctor_ontology();
+    const dormant = doctor_dormant_authors();
+    const thisYear = new Date().getFullYear();
     const SECTIONS = [
-      {id: 'duplicates', text: 'ほぼ重なるタグ（統合候補）'},
-      {id: 'single-use', text: '1記事にしか使われていないタグ'},
-      {id: 'ontology-suggestions', text: 'オントロジーへの追加提案（親子の候補）'},
-      {id: 'ontology', text: 'タグの親子関係（オントロジー）'},
-      {id: 'dormant', text: '投稿が途切れている著者'},
+      {id: 'duplicates', text: 'ほぼ重なるタグ（統合候補）', label: '統合候補のタグ', count: checks.nearDuplicates.length},
+      {id: 'single-use', text: '1記事にしか使われていないタグ', label: '1記事タグ', count: checks.singleUse.length},
+      {id: 'ontology-suggestions', text: 'オントロジーへの追加提案（親子の候補）', label: '親子の候補', count: ontoSuggest.suggestions.length},
+      {id: 'ontology', text: 'タグの親子関係（オントロジー）', label: 'オントロジー登録', count: onto.nodeCount},
+      {id: 'dormant', text: '投稿が途切れている著者', label: '投稿が途切れた著者', count: dormant.recent.length},
     ];
     const heading = (id) => partial('_partial/section-heading', SECTIONS.find(s => s.id === id));
   %>
@@ -21,14 +26,18 @@
     <div class="footer-gap">
       <h1 class="list-page margin-bottom-20">記事ドクター</h1>
       ※運営向けの画面です。人の判断が要る候補だけを並べます（提案であって、正とは限りません）。タグ無し・カテゴリと同名のタグ・未登録のカテゴリは PR の検査が止めるので、ここには出ません
-      <% const checks = doctor_checks(); %>
       <ul class="summary">
-        <li><span class="summary-count"><%= checks.nearDuplicates.length %></span><br><span class="summary-label">統合候補のタグ</span></li>
-        <li><span class="summary-count"><%= checks.singleUse.length %></span><br><span class="summary-label">1記事タグ</span></li>
-        <% const dormant = doctor_dormant_authors(); %>
-        <% const thisYear = new Date().getFullYear(); %>
-        <li><span class="summary-count"><%= dormant.recent.length %></span><br><span class="summary-label">投稿が途切れた著者</span></li>
+        <% SECTIONS.forEach(function(sec){ %>
+        <li><span class="summary-count"><%= sec.count %></span><br><span class="summary-label"><%= sec.label %></span></li>
+        <% }) %>
       </ul>
+
+      <%# 992px 未満ではサイドバーが本文の下に落ちて目次が末尾に出るので、
+          記事ページと同じく本文の前に折りたたみで出す %>
+      <details class="toc-mobile" data-nosnippet>
+        <summary>目次</summary>
+        <div class="toc-section"><%- partial('_partial/toc-list', {items: SECTIONS}) %></div>
+      </details>
 
       <%# 並びはタグ → 著者。判断の重い順に置く。
           決定的な検査を linter へ移したので（#2706）、残っているのは
@@ -125,7 +134,6 @@
         <section>
           <%- heading('ontology-suggestions') %>
           ※左のタグの記事が<strong>すべて</strong>右のタグにも付いている関係です。多くは「A は B の一種」ですが、機械には「話題として広い」と「記事の種類が同じ」の区別が付きません（春の入門祭り ⊆ インデックス のような包含も混ざります）。認めたものを <code>source/_data/tag_ontology.yml</code> の <code>broader</code> に書くと、そのタグページの関連タグで「もっと広いタグで探す」に出ます。差が2本以内のペアは上の「ほぼ重なるタグ（統合候補）」の担当
-          <% const ontoSuggest = doctor_ontology_suggestions(); %>
           <% if (ontoSuggest.suggestions.length) { %>
           <p class="doctor-note">候補 <%= ontoSuggest.suggestions.length %>件 / タグ <%= ontoSuggest.childCount %>件</p>
           <ul class="doctor-list">
@@ -144,7 +152,6 @@
 
       <%- heading('ontology') %>
       ※<code>source/_data/tag_ontology.yml</code> に登録した親子の可視化。関連記事の計算に使う辺で、「子タグの記事に親タグを打つのは冗長」と言える自明な包含だけを登録します。灰色はタグとして実在しない概念ノード。「系統」は自分＋子孫のユニーク記事数。「版」はバージョン同義（Go1.27 は Go を書いたのと同じ扱い）で語幹に吸収されるタグ
-      <% const onto = doctor_ontology(); %>
       <%
         function renderNode(n) { %>
         <li>
