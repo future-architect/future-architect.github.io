@@ -31,15 +31,18 @@ hexo.extend.helper.register('chart_series_colors', function (kind) {
   return JSON.stringify(PALETTES[kind] || NAVY_STEPS);
 });
 
-// 重ねた折れ線の太さ。先頭が「いま見るべき線」で、そこから1pxずつ落とす。
-// 全期間ページの年別（最新年から遡る5本）と、著者の推移の「常連」が
-// 同じ強さで出るよう、値をここでしか持たない
+// 年別の折れ線（最新年から遡る5本）の太さ。先頭が最新年で、そこから1pxずつ落とす。
+// 重なりの前後と太さを同じ向きに揃えて、古い年が背景になるようにする
 const LINE_WIDTHS = [8, 7, 6, 5, 4];
+
+// 積み上げの上に重ねる1本の太さ（著者の推移の「常連」）。上の5本とは役割が
+// 違うので値を分ける。あちらは並んだ線の順序を太さで表すが、こちらは1本しかない
+const ACCENT_LINE_WIDTH = 6;
 
 hexo.extend.helper.register('chart_line_widths', function () {
   return JSON.stringify(LINE_WIDTHS);
 });
 
 hexo.extend.helper.register('chart_accent_line_width', function () {
-  return LINE_WIDTHS[0];
+  return ACCENT_LINE_WIDTH;
 });
