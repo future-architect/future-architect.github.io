@@ -1,20 +1,43 @@
-<div class="container doctor-page">
+<div class="container">
   <%- partial('_partial/breadcrumb', {items: [
         {label: 'ホーム', url: '/'},
         {label: '記事ドクター'}
       ]}) %>
+  <%# 節はここで1箇所に持ち、冒頭の件数・目次・本文の見出しの3つから使う。
+      別々に書くと数や並びが食い違う（label は件数の下に出す短い名前）%>
+  <%
+    const checks = doctor_checks();
+    const ontoSuggest = doctor_ontology_suggestions();
+    const onto = doctor_ontology();
+    const dormant = doctor_dormant_authors();
+    const thisYear = new Date().getFullYear();
+    const SECTIONS = [
+      {id: 'duplicates', text: 'ほぼ重なるタグ（統合候補）', label: '統合候補のタグ', count: checks.nearDuplicates.length},
+      {id: 'single-use', text: '1記事にしか使われていないタグ', label: '1記事タグ', count: checks.singleUse.length},
+      {id: 'ontology-suggestions', text: 'オントロジーへの追加提案（親子の候補）', label: '親子の候補', count: ontoSuggest.suggestions.length},
+      {id: 'ontology', text: 'タグの親子関係（オントロジー）', label: 'オントロジー登録', count: onto.nodeCount},
+      {id: 'dormant', text: '投稿が途切れている著者', label: '投稿が途切れた著者', count: dormant.recent.length},
+    ];
+    const heading = (id) => partial('_partial/section-heading', SECTIONS.find(s => s.id === id));
+  %>
+  <div class="row">
+    <main class="col-md-9 blog-posts">
   <section id="main" class="margin-top-30">
     <div class="footer-gap">
       <h1 class="list-page margin-bottom-20">記事ドクター</h1>
-      ※運営向けのメンテナンス画面です。人の判断が要るものだけを並べます（提案であって、正とは限りません）。答えが決まっているもの（タグ無し・カテゴリと同名のタグ・未登録のカテゴリ）は textlint の <code>no-invalid-post-taxonomy</code> が PR で止めます（#2706）
-      <% const checks = doctor_checks(); %>
+      ※運営向けの画面です。人の判断が要る候補だけを並べます（提案であって、正とは限りません）。タグ無し・カテゴリと同名のタグ・未登録のカテゴリは PR の検査が止めるので、ここには出ません
       <ul class="summary">
-        <li><span class="summary-count"><%= checks.nearDuplicates.length %></span><br><span class="summary-label">統合候補のタグ</span></li>
-        <li><span class="summary-count"><%= checks.singleUse.length %></span><br><span class="summary-label">1記事タグ</span></li>
-        <% const dormant = doctor_dormant_authors(); %>
-        <% const thisYear = new Date().getFullYear(); %>
-        <li><span class="summary-count"><%= dormant.length %></span><br><span class="summary-label">投稿が途切れた著者</span></li>
+        <% SECTIONS.forEach(function(sec){ %>
+        <li><span class="summary-count"><%= sec.count %></span><br><span class="summary-label"><%= sec.label %></span></li>
+        <% }) %>
       </ul>
+
+      <%# 992px 未満ではサイドバーが本文の下に落ちて目次が末尾に出るので、
+          記事ページと同じく本文の前に折りたたみで出す %>
+      <details class="toc-mobile" data-nosnippet>
+        <summary>目次</summary>
+        <div class="toc-section"><%- partial('_partial/toc-list', {items: SECTIONS}) %></div>
+      </details>
 
       <%# 並びはタグ → 著者。判断の重い順に置く。
           決定的な検査を linter へ移したので（#2706）、残っているのは
@@ -24,7 +47,7 @@
       <%# 統合候補はペア（A ⊆ B）を1行に書くので幅が要る。単独で出す %>
       <div class="doctor-single">
         <section>
-          <h2 class="bottom-content-header">ほぼ重なるタグ（統合候補）</h2>
+          <%- heading('duplicates') %>
           ※片方の記事すべてがもう片方にも付いていて、差が2本以内のペア。実質同じ集合に2つの名前が付いています。Go1.27 ⊆ Go のような差の大きい健全な階層は出しません
           <% if (checks.nearDuplicates.length) { %>
           <ul class="doctor-list">
@@ -45,7 +68,7 @@
           2列（英数字／和文）に割って情報密度を上げたので全幅で使う %>
       <div class="doctor-single">
         <section>
-      <h2 class="bottom-content-header">1記事にしか使われていないタグ</h2>
+      <%- heading('single-use') %>
       ※「同居」は、同じ記事に1記事タグ同士が付いているもの。その記事のタグ付けがまとめて薄い可能性が高い
       <%# 1タグ1行で並べると縦に長すぎる。辞書の索引のように、英数字は先頭の
           1文字（大文字に寄せる）、カナは五十音の行（濁音・半濁音は元の行）で
@@ -109,9 +132,8 @@
           気づく流れではなく、候補を見て yml に足し、ツリーで結果を確かめる流れ %>
       <div class="doctor-single">
         <section>
-          <h2 class="bottom-content-header">オントロジーへの追加提案（親子の候補）</h2>
-          ※左のタグの記事が<strong>すべて</strong>右のタグにも付いている関係を共起から拾ったものです。多くは「A は B の一種」で <code>broader</code> の候補になりますが、機械には「話題として広い」と「記事の種類が同じ」の区別が付きません（春の入門祭り ⊆ インデックス のような包含も混ざります）。認めたものを <code>source/_data/tag_ontology.yml</code> に書くと、そのタグページの関連タグで「もっと広いタグで探す」に出ます（#2597）。差が2本以内のペアは上の「ほぼ重なるタグ（統合候補）」の担当
-          <% const ontoSuggest = doctor_ontology_suggestions(); %>
+          <%- heading('ontology-suggestions') %>
+          ※左のタグの記事が<strong>すべて</strong>右のタグにも付いている関係です。多くは「A は B の一種」ですが、機械には「話題として広い」と「記事の種類が同じ」の区別が付きません（春の入門祭り ⊆ インデックス のような包含も混ざります）。認めたものを <code>source/_data/tag_ontology.yml</code> の <code>broader</code> に書くと、そのタグページの関連タグで「もっと広いタグで探す」に出ます。差が2本以内のペアは上の「ほぼ重なるタグ（統合候補）」の担当
           <% if (ontoSuggest.suggestions.length) { %>
           <p class="doctor-note">候補 <%= ontoSuggest.suggestions.length %>件 / タグ <%= ontoSuggest.childCount %>件</p>
           <ul class="doctor-list">
@@ -128,9 +150,8 @@
         </section>
       </div>
 
-      <h2 class="bottom-content-header">タグの親子関係（オントロジー）</h2>
-      ※<code>source/_data/tag_ontology.yml</code> の broader の可視化。関連記事の計算が辿る辺で、「子タグの記事に親タグを打つのは冗長」という自明な包含だけを登録しています（#2292）。灰色はタグとして実在しない概念ノード。「系統」は自分＋子孫のユニーク記事数。「版」はバージョン同義（Go1.27 は Go を書いたのと同じ扱い。<code>scripts/version_tags.js</code>）で語幹に吸収されるタグ
-      <% const onto = doctor_ontology(); %>
+      <%- heading('ontology') %>
+      ※<code>source/_data/tag_ontology.yml</code> に登録した親子の可視化。関連記事の計算に使う辺で、「子タグの記事に親タグを打つのは冗長」と言える自明な包含だけを登録します。灰色はタグとして実在しない概念ノード。「系統」は自分＋子孫のユニーク記事数。「版」はバージョン同義（Go1.27 は Go を書いたのと同じ扱い）で語幹に吸収されるタグ
       <%
         function renderNode(n) { %>
         <li>
@@ -168,13 +189,13 @@
       <%# タグ系の検査とは対象が違うので最後に置く。
           声かけは「まず昨年まで書いていた人、駄目なら一昨年の人」の順に進めるので、
           左に昨年・右に一昨年を並べて、そのまま上から当たれるようにする %>
-      <h2 class="bottom-content-header">投稿が途切れている著者</h2>
-      ※今年まだ投稿が無い著者。声をかけると再開してくれるかもしれない候補です（/authors/ に <code>*</code> / <code>**</code> で出していたものの移設。読者向けのページには凡例の無い記号を置かない #2418）
-      <% if (dormant.length) { %>
+      <%- heading('dormant') %>
+      ※今年まだ投稿が無い著者。<code>連続N年</code> は続けて書いていた最長の年数で、<%= dormant.streakYears %>年以上のときだけ出します
+      <% if (dormant.recent.length) { %>
       <div class="doctor-cols">
         <% [thisYear - 1, thisYear - 2].forEach(function(y){ %>
         <section>
-          <% const members = dormant.filter(d => d.last === y); %>
+          <% const members = dormant.recent.filter(d => d.last === y); %>
           <h3 class="doctor-subhead"><%= y %>年まで（<%= members.length %>名）</h3>
           <% if (members.length) { %>
           <ul class="doctor-list">
@@ -184,7 +205,7 @@
             <% counts.forEach(function(c){ %>
             <li class="doctor-inline-row">
               <span class="doctor-note"><%= c %>本</span>
-              <% members.filter(d => d.count === c).forEach(function(d){ %><a href="<%- url_for('authors/' + d.name + '/') %>"><%= d.name %></a><span class="doctor-note-inline"></span><% }) %>
+              <% members.filter(d => d.count === c).forEach(function(d){ %><a href="<%- url_for('authors/' + d.name + '/') %>"><%= d.name %></a><span class="doctor-note-inline"><% if (d.streak >= dormant.streakYears) { %>連続<%= d.streak %>年<% } %></span><% }) %>
             </li>
             <% }) %>
           </ul>
@@ -199,4 +220,9 @@
       <% } %>
     </div>
   </section>
+    </main>
+    <aside class="col-md-3 blog-sidebar">
+      <%- partial('_partial/sidebar', {specialsToc: SECTIONS}) %>
+    </aside>
+  </div>
 </div>

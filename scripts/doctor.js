@@ -289,7 +289,27 @@ hexo.extend.helper.register('doctor_ontology', function () {
  * 今年まだ投稿が無く、最後の投稿が昨年か一昨年の著者を返す。
  * それより古い著者は「途切れている」ではなく「離れた」なので出さない
  * （声かけの候補として現実的な範囲に絞る）。
+ *
+ * 本数では絞らない (#2744)。1本だけの著者こそ2本目を誘導する価値があるので、
+ * 列が長くなっても名前を出す。表示は本数でまとめるので1本の人は最後の行に来る。
+ *
+ * 連続3年以上書いていた実績は名前に添えて示す。
+ * 続けていた人が途切れたかどうかで声かけの重みが違う。
  */
+const DORMANT_STREAK = 3;
+
+// 連続して投稿していた最長の年数
+const longestStreak = (years) => {
+  const ys = [...years].sort((a, b) => a - b);
+  let best = 0;
+  let cur = 0;
+  ys.forEach((y, i) => {
+    cur = i > 0 && y - ys[i - 1] === 1 ? cur + 1 : 1;
+    if (cur > best) best = cur;
+  });
+  return best;
+};
+
 hexo.extend.helper.register('doctor_dormant_authors', function () {
   const thisYear = new Date().getFullYear();
   const byAuthor = new Map(); // 著者 -> {years:Set, count}
@@ -304,14 +324,22 @@ hexo.extend.helper.register('doctor_dormant_authors', function () {
     });
   });
 
-  const rows = [];
+  const recent = [];
   for (const [name, entry] of byAuthor) {
     if (entry.years.has(thisYear)) continue;
     const last = Math.max(...entry.years);
     const gap = thisYear - last;
-    if (gap === 1 || gap === 2) rows.push({ name, last, count: entry.count, gap });
+    const row = {
+      name,
+      last,
+      gap,
+      count: entry.count,
+      streak: longestStreak(entry.years),
+    };
+    if (gap !== 1 && gap !== 2) continue;
+    recent.push(row);
   }
   // 表示は本数でまとめるので本数の多い順。同数なら最近まで書いていた人を先に
-  rows.sort((a, b) => b.count - a.count || a.gap - b.gap || (a.name < b.name ? -1 : 1));
-  return rows;
+  recent.sort((a, b) => b.count - a.count || a.gap - b.gap || (a.name < b.name ? -1 : 1));
+  return { recent, streakYears: DORMANT_STREAK };
 });
