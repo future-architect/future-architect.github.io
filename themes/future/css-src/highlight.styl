@@ -143,6 +143,63 @@ $line-numbers
     // タブが乗る側だけ角を落として、タブと本体をつなげて見せる
     figcaption + table
       border-top-left-radius: 0
+    // 折り返しトグル (#2752)。scripts/code_wrap_toggle.js が、横に溢れる
+    // ブロックにだけ input と label を差し込む。JS は使わず、ランキングの
+    // タブと同じ `input:checked` と兄弟結合子で切り替える。
+    // 幅768px以上では収まるブロック（code-wrap-narrow）は末尾で隠す
+    //
+    // input は隠すが display: none にはしない。タブ（radio）はそうしているが、
+    // あちらはラベルが常に見えていて選択状態も面で分かる。こちらは
+    // 単独の切り替えなので、キーボードで辿れないと押せなくなる
+    .code-wrap-input
+      position: absolute
+      width: 1px
+      height: 1px
+      opacity: 0
+    // ファイル名のタブ（figcaption）と同じ帯の右端に置く。float なのは、
+    // ブロックにすると帯が2段になってコードが下がるため。
+    // タブより低くしてあるので、両方あるときの帯の高さは今までと変わらない
+    .code-wrap-label
+      float: right
+      // 操作の札なので、名指ししているコードと同格のタブ（1em）より一段小さい
+      font-size: 12px
+      line-height: 1.4
+      padding: 2px 10px
+      margin-bottom: 4px
+      // 小物の段（_variables.styl の3段のうち radius-small）
+      border-radius: radius-small
+      border: 1px solid rule-base
+      color: ink-mute
+      background-color: transparent
+      font-family: font-ja
+      cursor: pointer
+      user-select: none
+      transition: background-color hover-speed ease, color hover-speed ease
+    .code-wrap-label:hover
+      background-color: surface-mute
+      color: ink-strong
+    // 入は塗りで示す。チップと同じネイビーの面で、押していない状態（枠だけ）と
+    // 見間違えない
+    .code-wrap-input:checked + .code-wrap-label
+      background-color: var(--brand-navy)
+      border-color: var(--brand-navy)
+      color: #fff
+    // input 自体は見えないので、輪郭はラベルに出す
+    .code-wrap-input:focus-visible + .code-wrap-label
+      outline: 2px solid var(--brand-navy)
+      outline-offset: 2px
+    // float の下にコードを送る。トグルのあるブロックにだけ効かせる
+    .code-wrap-input ~ table
+      clear: both
+    .code-wrap-input:checked ~ table
+      // 折り返すので内容ぶんの幅は要らない
+      width: auto
+      // pre の white-space はブラウザ既定が要素に直接当たるので、
+      // table 側に書いても継承では上書きできない
+      pre
+        white-space: pre-wrap
+        // URL や base64 のような切れ目の無い並びも箱に収める
+        overflow-wrap: anywhere
     .gutter pre
       @extend $line-numbers
       text-align: right
@@ -376,3 +433,14 @@ pre
       // タブは内容幅のまま。左は画面端に接するので落とし、右上だけ残す
       figcaption
         border-radius: 0 card-radius 0 0
+      // 画面端まで伸びたぶん、トグルもコードの1文字目と同じだけ内側へ入れる
+      .code-wrap-label
+        margin-right: article-padding-narrow
+
+// 幅768px以上ではコードに使える幅が最小でも 656px あるので、それより狭い
+// ブロックは横スクロールしない。押しても何も起きないトグルになるので隠す
+// （判定は scripts/code_wrap_toggle.js が最長行を測って行う）。
+// 640px より広いブロックは、サイドバーが出る 1025px 以上で溢れうるため残す
+@media (min-width: 768px)
+  .article-entry .highlight .code-wrap-narrow
+    display: none
