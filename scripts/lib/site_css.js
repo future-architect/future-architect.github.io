@@ -25,15 +25,14 @@ function stripComments(css) {
 }
 
 /**
- * 読み込み順は従来の head.ejs と同じ（Bootstrap → metronic → テーマ）。
- * CSS は後勝ちなので、この順序を変えると表示が壊れる。
+ * 読み込み順は Bootstrap → テーマ。CSS は後勝ちなので、この順序を変えると
+ * 表示が壊れる。サイトの土台（旧 metronic-src/assets/style.css）は
+ * theme-styles.styl の先頭に畳んである (#2759)。
  */
-function combineCss({ bootstrap, metronic, themeStyles }) {
+function combineCss({ bootstrap, themeStyles }) {
   return [
     '/* bootstrap-subset.css */',
     stripComments(bootstrap),
-    '/* metronic/assets/style.css */',
-    stripComments(metronic),
     '/* theme-styles.styl */',
     stripComments(themeStyles),
   ].join('\n');

@@ -1,3 +1,464 @@
+/* サイトの土台。body / 見出し / リンク / ヘッダー / パンくず / ページャー /
+   フッター / details / .blog-info / 404 と、ブランド色の :root 宣言。
+
+   もとは metronic というテンプレート由来だったが、実体はこのプロジェクトが
+   書いたもの（#2759）。残っていた元テンプレートの死んだルールは削除済み。
+   下の theme-styles とはファイル内の順序でカスケードが決まるので、
+   この塊は必ず先頭に置く（後勝ちで theme-styles が上書きする前提）*/
+
+:root {
+  --main-font-color: #292929;
+  /* リンクの青の唯一の定義源。bootstrap-subset にあったリンク色
+     （#0d6efd / hover #0a58ca）は常にここに上書きされる死に宣言
+     だったため削除した。濃い地（#eee）の上ではこの色は 3.99 で AA を
+     下回るので、a code 用の濃色 #0a58ca を theme-styles / highlight が持つ */
+  --a-color: #0072E5;
+  /* コーポレートのブランドネイビー（FA Concept Book 2025 の実測値）。
+     塗り面（フッター）とインタラクション（selection / hover / focus）専用。
+     文字色には使わない。本文 #424242 とのコントラスト比が 1.63 しかなく、
+     文字にすると黒と区別が付かないため（リンクに使うと走査性が死ぬ） */
+  --brand-navy: #0A1461;
+  /* コンセプトブックのライトグレー（ページ地の色）。サイトの surface-* より
+     一段濃く、白地の上で「面」としてはっきり見せたいところに使う。
+     使うのはフッターの地とその ::selection だけ。小物（チップ）には広げない。
+     地の濃さで輪郭を作ろうとすると、白に近い2段（#2534）から外れる (#2681) */
+  --brand-gray: #E3E3E2;
+  /* コーポレートのクリムゾン（FA Concept Book 2025 の実測値）。
+     ブックの文法どおり、画面内で同時に1箇所だけの差し色に限定する
+     （フッターの波のリボンと、ホームのランキング1位の丸 #2681。
+     ページは縦に長く、この2つが同じ視界に入ることはない）。
+     SVGデータURIの中では変数を参照できないため、波は同値をリテラルで持つ。
+     白文字で 5.35（AA） */
+  --brand-crimson: #D5004A;
+}
+
+/* General body settings */
+body {
+	color: #424242;
+	direction: ltr;
+	font: 400 13px 'Open Sans', Arial, sans-serif;
+	background: #fff;
+}
+
+/***
+General typography
+***/
+h1, h2, h3, h4, h5, h6 {
+	font: 300 'Open Sans', sans-serif;
+	margin: 0 0 10px;
+}
+
+/* ホバーで現れる見出しアンカーの目印は theme-styles.styl が持つ (#2736)。
+   ここにあった `h2:hover ::before { content:'#' }` は、見出しの子孫の全要素を
+   対象にしていて <a> や <strong> を含む見出しで # が複数出るうえ、
+   絶対配置で見出しの箱の外に浮いていて押せなかった */
+h1 {
+	margin-bottom: 15px;
+}
+
+/***
+Fix link outlines after click
+***/
+a {
+  color: var(--a-color);
+}
+a, a:focus, a:hover, a:active {
+	outline: 0;
+ 	text-decoration: none;
+}
+a:hover, a:focus {
+	color: var(--a-color);
+	text-decoration: underline;
+}
+.article-entry a {
+	text-decoration: none;
+}
+/* hover で変わるのは text-decoration-line だけで、この属性はアニメーション
+   できない（色は a:hover と同値のまま）。効いていない transition-duration が
+   残っていると hover の速さの定義が2箇所あるように見えるので消した。
+   速さは _variables.styl の hover-speed が1箇所で持つ (#2693) */
+.article-entry a:hover,
+.article-entry a:focus {
+	text-decoration: underline;
+}
+.article-entry a:visited {
+	color: #590fc7;
+}
+
+/***
+Misc tools
+***/
+.margin-bottom-20 {
+	margin-bottom: 20px !important;
+}
+.margin-bottom-40 {
+	margin-bottom: 40px !important;
+}
+.margin-top-30 {
+  margin-top: 30px !important;
+}
+
+/* overides metro scrolbars in IE10 and makes them look like a default scrollbar */
+@-ms-viewport{
+	width: auto !important;
+}
+
+::-moz-selection {
+  color: #fff;
+  background: var(--brand-navy);
+}
+::selection {
+  color: #fff;
+  background: var(--brand-navy);
+}
+/* 本文のリンクは下線が hover 時にしか無く、選択の白文字では本文と
+   区別が付かなくなる。::selection に text-decoration は効かない
+   （Chromium 非対応）ため文字色で区別する。水色はネイビーの選択地で
+   読める明るさ（8.45）を持つリンク系の色。
+   対象は本文（.article-entry）だけに絞る。素の a まで広げると、
+   青いリンクの見た目をしていないもの（タグチップ・著者名などの
+   グレーのメタリンク）まで選択で水色になってしまう */
+.article-entry a::-moz-selection {
+  color: #57c8eb;
+}
+.article-entry a::selection {
+  color: #57c8eb;
+}
+/* コピーライト帯はネイビー地なので、ネイビーの選択色では選択が見えない。
+   塗りと文字を反転させる（ネイビー文字とグレー地で 12.72）。
+   footer 要素で絞ると記事内の <footer>（関連記事など、白地）にも
+   誤爆するため、ネイビーの面を持つクラスで絞る。
+   上段（.pre-footer）はグレー地で、既定の選択色（ネイビー地・白文字）が
+   そのまま見えるため上書きしない */
+.footer ::-moz-selection {
+  color: var(--brand-navy);
+  background: var(--brand-gray);
+}
+.footer ::selection {
+  color: var(--brand-navy);
+  background: var(--brand-gray);
+}
+
+/***
+Header and header elements
+***/
+.header {
+	box-shadow: 0 1px 3px #ddd;
+	background: #fff;
+	border-radius: 0;
+	margin-bottom: 23px;
+	z-index: 999;
+	position: relative;
+}
+/* breadcrumb */
+.breadcrumb {
+	background: none;
+	padding: 0;
+	font: 14px "Open Sans", sans-serif;
+	color: #5f6d7b;
+	margin-bottom: 4px;
+}
+.breadcrumb > li + li:before {
+  	content: ">";
+    -moz-osx-font-smoothing: grayscale;
+    display: inline-block;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1;
+    color: #5f6d7b;
+    padding: 0 5px; /* 記号の左右に余白を追加 */
+}
+.breadcrumb a {
+	color: #5f6d7b;
+}
+.pagination {
+	border-radius: 0;
+	margin: 0;
+}
+
+/* 404 page */
+.corporate .page-404 {
+ 	text-align: center;
+ 	padding-top: 60px;
+ 	padding-bottom: 125px;
+}
+.page-404 .number {
+	position: relative;
+	top: 35px;
+	display: inline-block;
+	letter-spacing: -10px;
+	margin-top: 0px;
+	margin-bottom: 10px;
+	line-height: 128px;
+	font-size: 128px;
+	font-weight: 300;
+	/* ページのほぼ全てがこの数字なので、ブランドの面として塗る */
+	color: var(--brand-navy);
+	text-align: right;
+}
+.page-404 .details {
+	margin-left: 40px;
+	display: inline-block;
+	padding-top: 0px;
+	text-align: left;
+	top: 15px;
+	position: relative;
+}
+
+/***
+Pre-Footer and pre-footer elements
+***/
+/* ブランドPDF（コンセプトブック）の文法は「グレーの地の上にネイビーの
+   塗り面」。全面ネイビーは地と図が逆だったので、上段を地のグレーにして
+   ネイビーは見出しの円・文字と下段の帯（図）に回す。
+   地のグレー自体は外枠（.site-footer）が1枚で持つ。ここに背景を持たせると
+   四角い背景が外枠の角丸の外側を塗り潰し、上辺の弧が消える */
+.pre-footer {
+	/* ink-strong と同値。グレー地で 7.83（AA） */
+	color: #424242;
+}
+.pre-footer .container {
+	/* 円ラベルの開始位置を下げる。グレー領域の総高さを保つため、
+	   増やした分は列の padding-bottom から詰めている（そちらは使い切り） */
+	padding-top: 60px;
+}
+/* リンクの識別は下線が担う。リンク青 #0072E5 はグレー地で 3.60 と
+   AA を満たさないため、ここではネイビー（12.72）を使う */
+.pre-footer a {
+	color: var(--brand-navy);
+	text-decoration: underline;
+}
+.pre-footer a:hover,
+.pre-footer a:focus {
+	color: var(--brand-navy);
+	text-decoration: none;
+}
+/* 見出しはPDFの「グレー地の上のネイビーの円」を真円のラベルとして引き継ぐ。
+   径は3列で揃える。円にするのは列を横に並べる md 以上だけで、そこでは内幅
+   216px 以上があるため 160px が3つとも通る。md 未満はピルに替える（下の
+   メディアクエリ）。max-width は念のための歯止め (#2667) */
+.pre-footer h2,
+.ecommerce .pre-footer h2 {
+	font-size: 21px;
+	color: #fff;
+	background: var(--brand-navy);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	width: 160px;
+	max-width: 100%;
+	aspect-ratio: 1;
+	border-radius: 50%;
+	line-height: 1.2;
+	/* 円を大きく取るぶん下の余白は最小限に（h2 既定は 10px） */
+	margin: 0 auto 4px;
+}
+.pre-footer p {
+	margin-bottom: 20px;
+}
+
+/* pre-footer twitter block */
+.pre-footer address {
+	line-height: 1.7;
+}
+.pre-footer-col {
+	/* 元は22px。.container の padding-top へ移した（開始位置を下げる） */
+	padding-bottom: 0;
+	/* 見出しが円になり、左寄せだと列の重心が円とずれる。中身ごと中央に揃える */
+	text-align: center;
+}
+/* md 未満は3列を縦に積むので、見出しは円ではなくピルのラベルにする (#2667)。
+   円は径160pxで1つが1行を占め、3つ積むとフッターだけで約750px になる。
+   「グレー地にネイビーの塗り面」という文法は保ち、形だけ #2659 の角丸3段の
+   うち「ピル」に落とす。文字サイズは円と同じ21pxのまま（1要素のサイズは
+   1箇所で決める）。列の中身も左寄せにして行頭を揃える */
+@media (max-width: 767px) {
+	.pre-footer h2,
+	.ecommerce .pre-footer h2 {
+		display: inline-flex;
+		width: auto;
+		aspect-ratio: auto;
+		padding: 6px 18px;
+		border-radius: 999px;
+		/* 円のときは auto で中央に置いていた。左寄せなので左マージンは 0 */
+		margin: 0 0 12px;
+	}
+	.pre-footer-col {
+		text-align: left;
+	}
+	/* X フォローと Feedly 購読は width: fit-content のブロックで、中央寄せを
+	   text-align ではなく左右の auto マージンが作っている。列を左寄せにしても
+	   auto は効いたままなので、ここで戻す（margin-top: 8px は残す）。
+	   詳細度は theme-styles.styl 側（0,1,0 と 0,2,0）に勝つ形で書く */
+	.pre-footer .x-btn-follow,
+	.pre-footer .feedly-btn.feedly-btn-follow {
+		margin-left: 0;
+		margin-right: 0;
+	}
+	/* 列の切れ目に余白が無く、次の列のラベルが前の列のボタンに貼り付いていた。
+	   .row の gutter-y は 0、列自身も padding-bottom: 0 なので、
+	   積んだときだけここで空ける */
+	.pre-footer-col + .pre-footer-col {
+		padding-top: 40px;
+	}
+	/* アイコンの行も列の寄せに従う（円のときは中央だった）。中央寄せは
+	   後ろの theme-styles.styl が 0,2,0 で持つので、こちらは1段強い
+	   0,3,0 で書いて順序に依存させない */
+	.pre-footer .footer-links .icon-row {
+		justify-content: flex-start;
+	}
+}
+/* footer */
+/* フッター全体の外枠。地のグレーはここで1枚持つ。本体の白との境目は
+   直線（波は下段のグレー→ネイビーの1本に絞る） */
+.site-footer {
+	background-color: var(--brand-gray);
+}
+/* コピーライト帯は「グレー地の上のネイビーの面」として残す。
+   上段との境目は、繰り返しタイルではなく画面幅いっぱいに引き伸ばす
+   1枚ものの波（Get Waves 系の有機的な波形）。上側をグレーで塗って
+   ネイビーの上に重ねる。高さ56pxに潰して使い、波は 17〜45px の間で
+   うねるので、上の padding 52px で文字を逃がす */
+.footer {
+	/* 波のキャンバスを上に31.5px拡張したぶん負マージンで引き上げる。
+	   レイアウト上の位置・グレー領域の高さは変わらず、クリムゾンの山だけが
+	   旧境界を越えてグレー領域に食い込める */
+	margin-top: -31.5px;
+	/* 帯のネイビーは背景色ではなく5枚目のグラデーション層が塗る。
+	   背景色だと負マージンで重ねた上端31.5pxの帯（グレー領域側）まで
+	   ネイビーに塗られてしまう。5枚目は下寄せで高さ calc(100% - 31.5px)、
+	   つまり上端の帯だけを除いた領域を塗る。
+	   1枚目（上）がクリムゾンの波: 境界の曲線をまたいで、グレー側へ約25px・
+	   ネイビー側へ約10px膨らむ閉じたレンズ形（大うねりの区間 x=400〜920 で
+	   自然に現れて消える）。キャンバスは上に180units（31.5px）拡張してあり、
+	   グレーの波（4枚目）は拡張部のうち上端 1.75px（170〜180units）だけ
+	   塗って5枚目のネイビー層に重ね、丸め誤差の隙間からネイビーの線が
+	   漏れないようにしている（背後も同じグレーなので見た目は変わらない）。
+	   それより上は透明で、山だけが旧境界を越えてグレー領域に食い込む。グレー側に見せるためグレーの波（2枚目）より
+	   上に重ねる。フェードも透過も使わないフラットな面。
+	   2・3枚目は同じ作りの白の波（左のうねり x=120〜420 と
+	   右のうねり x=1040〜1380。左はグレー側へ約10px・ネイビー側へ約7px、
+	   右はさらに低く約5px/約3px。いずれもクリムゾンより控えめ）。
+	   repeat / position / size は全レイヤー共通なので1値に畳んでいる
+	   （background-size は 100% 56px が全4枚に適用される）。
+	   4枚は同じ座標系（viewBox 500units = 87.5px）で重なる前提。
+	   差し色はこの3つの波だけ */
+	background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxNDQwIDUwMCcgcHJlc2VydmVBc3BlY3RSYXRpbz0nbm9uZSc+PHBhdGggZD0nTTQwMCwzNzIuNUw0MDUsMzc0LjZMNDEwLDM3Ni42TDQxNSwzNzguNEw0MjAsMzgwLjBMNDI1LDM4MS4zTDQzMCwzODIuM0w0MzUsMzgzLjFMNDQwLDM4My41TDQ0NSwzODMuN0w0NTAsMzgzLjZMNDU1LDM4My4yTDQ2MCwzODIuNUw0NjUsMzgxLjZMNDcwLDM4MC41TDQ3NSwzNzkuMUw0ODAsMzc3LjVMNDg1LDM3NS43TDQ5MCwzNzMuNkw0OTUsMzcxLjRMNTAwLDM2OS4wTDUwNSwzNjYuNUw1MTAsMzYzLjhMNTE1LDM2MC45TDUyMCwzNTcuOUw1MjUsMzU0LjlMNTMwLDM1MS43TDUzNSwzNDguNEw1NDAsMzQ1LjFMNTQ1LDM0MS44TDU1MCwzMzguNEw1NTUsMzM1LjBMNTYwLDMzMS42TDU2NSwzMjguMkw1NzAsMzI0LjhMNTc1LDMyMS41TDU4MCwzMTguMkw1ODUsMzE1LjBMNTkwLDMxMS45TDU5NSwzMDkuMEw2MDAsMzA2LjFMNjA1LDMwMy4zTDYxMCwzMDAuN0w2MTUsMjk4LjNMNjIwLDI5Ni4wTDYyNSwyOTMuOUw2MzAsMjkyLjBMNjM1LDI5MC4zTDY0MCwyODguOEw2NDUsMjg3LjVMNjUwLDI4Ni40TDY1NSwyODUuNUw2NjAsMjg0LjhMNjY1LDI4NC40TDY3MCwyODQuMkw2NzUsMjg0LjJMNjgwLDI4NC40TDY4NSwyODQuOEw2OTAsMjg1LjVMNjk1LDI4Ni40TDcwMCwyODcuNEw3MDUsMjg4LjdMNzEwLDI5MC4yTDcxNSwyOTEuOEw3MjAsMjkzLjZMNzI1LDI5NS42TDczMCwyOTcuN0w3MzUsMzAwLjBMNzQwLDMwMi40TDc0NSwzMDQuOUw3NTAsMzA3LjVMNzU1LDMxMC4yTDc2MCwzMTMuMEw3NjUsMzE1LjlMNzcwLDMxOC43TDc3NSwzMjEuNkw3ODAsMzI0LjVMNzg1LDMyNy41TDc5MCwzMzAuM0w3OTUsMzMzLjJMODAwLDMzNi4wTDgwNSwzMzguN0w4MTAsMzQxLjNMODE1LDM0My45TDgyMCwzNDYuM0w4MjUsMzQ4LjZMODMwLDM1MC44TDgzNSwzNTIuOEw4NDAsMzU0LjZMODQ1LDM1Ni4yTDg1MCwzNTcuN0w4NTUsMzU4LjlMODYwLDM2MC4wTDg2NSwzNjAuOEw4NzAsMzYxLjNMODc1LDM2MS43TDg4MCwzNjEuOEw4ODUsMzYxLjZMODkwLDM2MS4yTDg5NSwzNjAuNUw5MDAsMzU5LjVMOTA1LDM1OC4zTDkxMCwzNTYuOEw5MTUsMzU1LjFMOTIwLDM1My41TDkyMCwzNTMuNUw5MTUsMzU1LjJMOTEwLDM1Ny4wTDkwNSwzNTguOUw5MDAsMzYwLjlMODk1LDM2My4wTDg5MCwzNjUuMkw4ODUsMzY3LjVMODgwLDM2OS45TDg3NSwzNzIuNEw4NzAsMzc1LjBMODY1LDM3Ny43TDg2MCwzODAuNUw4NTUsMzgzLjNMODUwLDM4Ni4zTDg0NSwzODkuMkw4NDAsMzkyLjNMODM1LDM5NS40TDgzMCwzOTguNUw4MjUsNDAxLjdMODIwLDQwNC45TDgxNSw0MDguMUw4MTAsNDExLjRMODA1LDQxNC43TDgwMCw0MTcuOUw3OTUsNDIxLjJMNzkwLDQyNC40TDc4NSw0MjcuN0w3ODAsNDMwLjlMNzc1LDQzNC4wTDc3MCw0MzcuMkw3NjUsNDQwLjJMNzYwLDQ0My4zTDc1NSw0NDYuMkw3NTAsNDQ5LjFMNzQ1LDQ1MS45TDc0MCw0NTQuNkw3MzUsNDU3LjJMNzMwLDQ1OS44TDcyNSw0NjIuMkw3MjAsNDY0LjVMNzE1LDQ2Ni43TDcxMCw0NjguOEw3MDUsNDcwLjdMNzAwLDQ3Mi41TDY5NSw0NzQuMkw2OTAsNDc1LjdMNjg1LDQ3Ny4xTDY4MCw0NzguNEw2NzUsNDc5LjVMNjcwLDQ4MC40TDY2NSw0ODEuMkw2NjAsNDgxLjhMNjU1LDQ4Mi4zTDY1MCw0ODIuNkw2NDUsNDgyLjhMNjQwLDQ4Mi43TDYzNSw0ODIuNkw2MzAsNDgyLjJMNjI1LDQ4MS44TDYyMCw0ODEuMUw2MTUsNDgwLjNMNjEwLDQ3OS4zTDYwNSw0NzguMkw2MDAsNDc2LjlMNTk1LDQ3NS41TDU5MCw0NzQuMEw1ODUsNDcyLjNMNTgwLDQ3MC40TDU3NSw0NjguNEw1NzAsNDY2LjNMNTY1LDQ2NC4xTDU2MCw0NjEuOEw1NTUsNDU5LjRMNTUwLDQ1Ni44TDU0NSw0NTQuMkw1NDAsNDUxLjVMNTM1LDQ0OC43TDUzMCw0NDUuOEw1MjUsNDQyLjlMNTIwLDQzOS45TDUxNSw0MzYuOUw1MTAsNDMzLjhMNTA1LDQzMC43TDUwMCw0MjcuNkw0OTUsNDI0LjVMNDkwLDQyMS40TDQ4NSw0MTguM0w0ODAsNDE1LjJMNDc1LDQxMi4xTDQ3MCw0MDkuMUw0NjUsNDA2LjBMNDYwLDQwMy4xTDQ1NSw0MDAuMUw0NTAsMzk3LjNMNDQ1LDM5NC40TDQ0MCwzOTEuN0w0MzUsMzg5LjBMNDMwLDM4Ni40TDQyNSwzODMuOUw0MjAsMzgxLjRMNDE1LDM3OS4xTDQxMCwzNzYuOEw0MDUsMzc0LjZMNDAwLDM3Mi41WicgZmlsbD0nI0Q1MDA0QScvPjwvc3ZnPg=="), url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxNDQwIDUwMCcgcHJlc2VydmVBc3BlY3RSYXRpbz0nbm9uZSc+PHBhdGggZD0nTTEyMCwyOTAuNUwxMjUsMjkxLjNMMTMwLDI5Mi4wTDEzNSwyOTIuOEwxNDAsMjkzLjZMMTQ1LDI5NC4zTDE1MCwyOTQuNUwxNTUsMjk0LjJMMTYwLDI5My43TDE2NSwyOTIuN0wxNzAsMjkxLjRMMTc1LDI4OS44TDE4MCwyODguMEwxODUsMjg1LjlMMTkwLDI4My42TDE5NSwyODEuMkwyMDAsMjc4LjdMMjA1LDI3Ni4yTDIxMCwyNzMuOEwyMTUsMjcxLjRMMjIwLDI2OS4xTDIyNSwyNjcuMEwyMzAsMjY1LjJMMjM1LDI2My42TDI0MCwyNjIuNEwyNDUsMjYxLjVMMjUwLDI2MS4wTDI1NSwyNjEuMEwyNjAsMjYxLjRMMjY1LDI2Mi4yTDI3MCwyNjMuNUwyNzUsMjY1LjNMMjgwLDI2Ny41TDI4NSwyNzAuMkwyOTAsMjczLjRMMjk1LDI3Ny4wTDMwMCwyODAuOUwzMDUsMjg1LjJMMzEwLDI4OS45TDMxNSwyOTQuOEwzMjAsMzAwLjBMMzI1LDMwNS4zTDMzMCwzMTAuOEwzMzUsMzE2LjNMMzQwLDMyMS45TDM0NSwzMjcuNEwzNTAsMzMyLjlMMzU1LDMzOC4yTDM2MCwzNDMuM0wzNjUsMzQ4LjFMMzcwLDM1Mi43TDM3NSwzNTcuMEwzODAsMzYwLjlMMzg1LDM2NC40TDM5MCwzNjcuNkwzOTUsMzcwLjNMNDAwLDM3Mi41TDQwNSwzNzQuNkw0MTAsMzc2LjZMNDE1LDM3OC42TDQyMCwzODAuNkw0MjAsMzgwLjZMNDE1LDM3OC43TDQxMCwzNzcuMEw0MDUsMzc1LjVMNDAwLDM3NC4yTDM5NSwzNzMuMkwzOTAsMzcyLjNMMzg1LDM3MS41TDM4MCwzNzEuMEwzNzUsMzcwLjZMMzcwLDM3MC4zTDM2NSwzNzAuMUwzNjAsMzcwLjBMMzU1LDM3MC4xTDM1MCwzNzAuMUwzNDUsMzcwLjJMMzQwLDM3MC40TDMzNSwzNzAuNUwzMzAsMzcwLjZMMzI1LDM3MC42TDMyMCwzNzAuNkwzMTUsMzcwLjVMMzEwLDM3MC4zTDMwNSwzNzAuMEwzMDAsMzY5LjZMMjk1LDM2OS4wTDI5MCwzNjguMkwyODUsMzY3LjNMMjgwLDM2Ni4yTDI3NSwzNjQuOUwyNzAsMzYzLjVMMjY1LDM2MS45TDI2MCwzNjAuMEwyNTUsMzU4LjBMMjUwLDM1NS45TDI0NSwzNTMuNUwyNDAsMzUxLjBMMjM1LDM0OC40TDIzMCwzNDUuNkwyMjUsMzQyLjdMMjIwLDMzOS44TDIxNSwzMzYuN0wyMTAsMzMzLjZMMjA1LDMzMC40TDIwMCwzMjcuMkwxOTUsMzI0LjBMMTkwLDMyMC45TDE4NSwzMTcuOEwxODAsMzE0LjdMMTc1LDMxMS44TDE3MCwzMDkuMEwxNjUsMzA2LjNMMTYwLDMwMy43TDE1NSwzMDEuM0wxNTAsMjk5LjFMMTQ1LDI5Ny4yTDE0MCwyOTUuNEwxMzUsMjkzLjhMMTMwLDI5Mi41TDEyNSwyOTEuNEwxMjAsMjkwLjVaJyBmaWxsPScjZmZmJy8+PC9zdmc+"), url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxNDQwIDUwMCcgcHJlc2VydmVBc3BlY3RSYXRpbz0nbm9uZSc+PHBhdGggZD0nTTEwNDAsMzE5LjRMMTA0NSwzMTguM0wxMDUwLDMxNy4yTDEwNTUsMzE2LjFMMTA2MCwzMTUuMUwxMDY1LDMxNC4wTDEwNzAsMzEyLjhMMTA3NSwzMTEuNUwxMDgwLDMxMC4xTDEwODUsMzA4LjdMMTA5MCwzMDcuMUwxMDk1LDMwNS40TDExMDAsMzAzLjdMMTEwNSwzMDIuMEwxMTEwLDMwMC4xTDExMTUsMjk4LjNMMTEyMCwyOTYuNEwxMTI1LDI5NC42TDExMzAsMjkyLjdMMTEzNSwyOTAuOUwxMTQwLDI4OS4xTDExNDUsMjg3LjRMMTE1MCwyODUuOEwxMTU1LDI4NC4yTDExNjAsMjgyLjhMMTE2NSwyODEuNUwxMTcwLDI4MC4yTDExNzUsMjc5LjJMMTE4MCwyNzguM0wxMTg1LDI3Ny41TDExOTAsMjc2LjlMMTE5NSwyNzYuNUwxMjAwLDI3Ni4zTDEyMDUsMjc2LjJMMTIxMCwyNzYuM0wxMjE1LDI3Ni42TDEyMjAsMjc3LjFMMTIyNSwyNzcuN0wxMjMwLDI3OC42TDEyMzUsMjc5LjZMMTI0MCwyODAuN0wxMjQ1LDI4Mi4wTDEyNTAsMjgzLjRMMTI1NSwyODUuMEwxMjYwLDI4Ni43TDEyNjUsMjg4LjRMMTI3MCwyOTAuM0wxMjc1LDI5Mi4zTDEyODAsMjk0LjJMMTI4NSwyOTYuM0wxMjkwLDI5OC40TDEyOTUsMzAwLjRMMTMwMCwzMDIuNUwxMzA1LDMwNC42TDEzMTAsMzA2LjZMMTMxNSwzMDguNkwxMzIwLDMxMC41TDEzMjUsMzEyLjRMMTMzMCwzMTQuMUwxMzM1LDMxNS44TDEzNDAsMzE3LjRMMTM0NSwzMTguOEwxMzUwLDMyMC4yTDEzNTUsMzIxLjRMMTM2MCwzMjIuNUwxMzY1LDMyMy41TDEzNzAsMzI0LjZMMTM3NSwzMjUuNkwxMzgwLDMyNi43TDEzODAsMzI2LjdMMTM3NSwzMjUuN0wxMzcwLDMyNC43TDEzNjUsMzIzLjlMMTM2MCwzMjMuMUwxMzU1LDMyMi40TDEzNTAsMzIxLjhMMTM0NSwzMjEuM0wxMzQwLDMyMC44TDEzMzUsMzIwLjVMMTMzMCwzMjAuMkwxMzI1LDMyMC4wTDEzMjAsMzE5LjhMMTMxNSwzMTkuN0wxMzEwLDMxOS42TDEzMDUsMzE5LjZMMTMwMCwzMTkuN0wxMjk1LDMxOS43TDEyOTAsMzE5LjhMMTI4NSwzMTkuOUwxMjgwLDMyMC4xTDEyNzUsMzIwLjJMMTI3MCwzMjAuM0wxMjY1LDMyMC41TDEyNjAsMzIwLjZMMTI1NSwzMjAuN0wxMjUwLDMyMC44TDEyNDUsMzIwLjhMMTI0MCwzMjAuOUwxMjM1LDMyMC45TDEyMzAsMzIwLjhMMTIyNSwzMjAuOEwxMjIwLDMyMC43TDEyMTUsMzIwLjVMMTIxMCwzMjAuM0wxMjA1LDMyMC4xTDEyMDAsMzE5LjhMMTE5NSwzMTkuNUwxMTkwLDMxOS4yTDExODUsMzE4LjhMMTE4MCwzMTguNEwxMTc1LDMxOC4wTDExNzAsMzE3LjZMMTE2NSwzMTcuMkwxMTYwLDMxNi43TDExNTUsMzE2LjNMMTE1MCwzMTUuOEwxMTQ1LDMxNS40TDExNDAsMzE1LjBMMTEzNSwzMTQuNkwxMTMwLDMxNC4yTDExMjUsMzEzLjlMMTEyMCwzMTMuNkwxMTE1LDMxMy40TDExMTAsMzEzLjJMMTEwNSwzMTMuMUwxMTAwLDMxMy4wTDEwOTUsMzEzLjBMMTA5MCwzMTMuMUwxMDg1LDMxMy4zTDEwODAsMzEzLjZMMTA3NSwzMTQuMEwxMDcwLDMxNC41TDEwNjUsMzE1LjBMMTA2MCwzMTUuN0wxMDU1LDMxNi41TDEwNTAsMzE3LjNMMTA0NSwzMTguM0wxMDQwLDMxOS40WicgZmlsbD0nI2ZmZicvPjwvc3ZnPg=="), url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxNDQwIDUwMCcgcHJlc2VydmVBc3BlY3RSYXRpbz0nbm9uZSc+PHBhdGggZD0nTTAsMjc2LjBMNiwyNzYuN0wxMiwyNzcuM0wxOCwyNzguMEwyNCwyNzguNkwzMCwyNzkuM0wzNiwyODAuMEw0MiwyODAuNkw0OCwyODEuM0w1NCwyODIuMEw2MCwyODIuN0w2NiwyODMuNEw3MiwyODQuMUw3OCwyODQuOUw4NCwyODUuNkw5MCwyODYuNEw5NiwyODcuMkwxMDIsMjg4LjBMMTA4LDI4OC44TDExNCwyODkuNkwxMjAsMjkwLjVMMTI2LDI5MS40TDEzMiwyOTIuNEwxMzgsMjkzLjNMMTQ0LDI5NC4zTDE1MCwyOTUuM0wxNTYsMjk2LjRMMTYyLDI5Ny41TDE2OCwyOTguNkwxNzQsMjk5LjdMMTgwLDMwMC45TDE4NiwzMDIuMUwxOTIsMzAzLjRMMTk4LDMwNC43TDIwNCwzMDYuMEwyMTAsMzA3LjRMMjE2LDMwOC44TDIyMiwzMTAuMkwyMjgsMzExLjdMMjM0LDMxMy4zTDI0MCwzMTQuOUwyNDYsMzE2LjVMMjUyLDMxOC4yTDI1OCwzMTkuOUwyNjQsMzIxLjdMMjcwLDMyMy41TDI3NiwzMjUuNEwyODIsMzI3LjNMMjg4LDMyOS4zTDI5NCwzMzEuM0wzMDAsMzMzLjRMMzA2LDMzNS41TDMxMiwzMzcuN0wzMTgsMzM5LjlMMzI0LDM0Mi4xTDMzMCwzNDQuNEwzMzYsMzQ2LjdMMzQyLDM0OS4wTDM0OCwzNTEuNEwzNTQsMzUzLjhMMzYwLDM1Ni4yTDM2NiwzNTguN0wzNzIsMzYxLjFMMzc4LDM2My41TDM4NCwzNjYuMEwzOTAsMzY4LjRMMzk2LDM3MC45TDQwMiwzNzMuM0w0MDgsMzc1LjhMNDE0LDM3OC4yTDQyMCwzODAuNkw0MjYsMzgzLjBMNDMyLDM4NS4zTDQzOCwzODcuN0w0NDQsMzkwLjBMNDUwLDM5Mi4yTDQ1NiwzOTQuNEw0NjIsMzk2LjZMNDY4LDM5OC44TDQ3NCw0MDAuOEw0ODAsNDAyLjlMNDg2LDQwNC45TDQ5Miw0MDYuOEw0OTgsNDA4LjZMNTA0LDQxMC40TDUxMCw0MTIuMUw1MTYsNDEzLjhMNTIyLDQxNS4zTDUyOCw0MTYuOEw1MzQsNDE4LjJMNTQwLDQxOS41TDU0Niw0MjAuN0w1NTIsNDIxLjlMNTU4LDQyMi45TDU2NCw0MjMuOEw1NzAsNDI0LjZMNTc2LDQyNS4zTDU4Miw0MjUuOUw1ODgsNDI2LjRMNTk0LDQyNi44TDYwMCw0MjcuMUw2MDYsNDI3LjNMNjEyLDQyNy40TDYxOCw0MjcuNEw2MjQsNDI3LjNMNjMwLDQyNy4xTDYzNiw0MjYuOEw2NDIsNDI2LjRMNjQ4LDQyNi4wTDY1NCw0MjUuNEw2NjAsNDI0LjhMNjY2LDQyNC4xTDY3Miw0MjMuM0w2NzgsNDIyLjVMNjg0LDQyMS42TDY5MCw0MjAuNkw2OTYsNDE5LjVMNzAyLDQxOC40TDcwOCw0MTcuMkw3MTQsNDE2LjBMNzIwLDQxNC43TDcyNiw0MTMuM0w3MzIsNDExLjlMNzM4LDQxMC40TDc0NCw0MDguOUw3NTAsNDA3LjRMNzU2LDQwNS43TDc2Miw0MDQuMUw3NjgsNDAyLjRMNzc0LDQwMC43TDc4MCwzOTguOUw3ODYsMzk3LjJMNzkyLDM5NS4zTDc5OCwzOTMuNUw4MDQsMzkxLjZMODEwLDM4OS43TDgxNiwzODcuOEw4MjIsMzg1LjlMODI4LDM4My45TDgzNCwzODIuMEw4NDAsMzgwLjBMODQ2LDM3OC4wTDg1MiwzNzYuMEw4NTgsMzc0LjBMODY0LDM3Mi4wTDg3MCwzNzAuMEw4NzYsMzY4LjBMODgyLDM2Ni4wTDg4OCwzNjQuMEw4OTQsMzYyLjBMOTAwLDM2MC4xTDkwNiwzNTguMUw5MTIsMzU2LjFMOTE4LDM1NC4yTDkyNCwzNTIuMkw5MzAsMzUwLjNMOTM2LDM0OC40TDk0MiwzNDYuNUw5NDgsMzQ0LjdMOTU0LDM0Mi44TDk2MCwzNDEuMEw5NjYsMzM5LjJMOTcyLDMzNy40TDk3OCwzMzUuN0w5ODQsMzMzLjlMOTkwLDMzMi4yTDk5NiwzMzAuNkwxMDAyLDMyOC45TDEwMDgsMzI3LjNMMTAxNCwzMjUuOEwxMDIwLDMyNC4yTDEwMjYsMzIyLjhMMTAzMiwzMjEuM0wxMDM4LDMxOS45TDEwNDQsMzE4LjVMMTA1MCwzMTcuMkwxMDU2LDMxNS45TDEwNjIsMzE0LjdMMTA2OCwzMTMuNUwxMDc0LDMxMi40TDEwODAsMzExLjNMMTA4NiwzMTAuMkwxMDkyLDMwOS4yTDEwOTgsMzA4LjNMMTEwNCwzMDcuNUwxMTEwLDMwNi42TDExMTYsMzA1LjlMMTEyMiwzMDUuMkwxMTI4LDMwNC42TDExMzQsMzA0LjBMMTE0MCwzMDMuNUwxMTQ2LDMwMy4xTDExNTIsMzAyLjdMMTE1OCwzMDIuNEwxMTY0LDMwMi4xTDExNzAsMzAxLjlMMTE3NiwzMDEuOEwxMTgyLDMwMS44TDExODgsMzAxLjhMMTE5NCwzMDEuOUwxMjAwLDMwMi4wTDEyMDYsMzAyLjJMMTIxMiwzMDIuNEwxMjE4LDMwMi43TDEyMjQsMzAzLjBMMTIzMCwzMDMuNEwxMjM2LDMwMy45TDEyNDIsMzA0LjRMMTI0OCwzMDQuOUwxMjU0LDMwNS41TDEyNjAsMzA2LjJMMTI2NiwzMDYuOUwxMjcyLDMwNy42TDEyNzgsMzA4LjNMMTI4NCwzMDkuMkwxMjkwLDMxMC4wTDEyOTYsMzEwLjlMMTMwMiwzMTEuOEwxMzA4LDMxMi44TDEzMTQsMzEzLjhMMTMyMCwzMTQuOEwxMzI2LDMxNS45TDEzMzIsMzE3LjBMMTMzOCwzMTguMUwxMzQ0LDMxOS4zTDEzNTAsMzIwLjRMMTM1NiwzMjEuN0wxMzYyLDMyMi45TDEzNjgsMzI0LjJMMTM3NCwzMjUuNEwxMzgwLDMyNi43TDEzODYsMzI4LjBMMTM5MiwzMjkuM0wxMzk4LDMzMC42TDE0MDQsMzMyLjBMMTQxMCwzMzMuM0wxNDE2LDMzNC42TDE0MjIsMzM2LjBMMTQyOCwzMzcuM0wxNDM0LDMzOC43TDE0NDAsMzQwLjBMMTQ0MCwxNzBMMCwxNzBaJyBmaWxsPScjRTNFM0UyJy8+PC9zdmc+"), linear-gradient(var(--brand-navy), var(--brand-navy));
+	background-repeat: no-repeat;
+	background-position: top center, top center, top center, top center, center bottom;
+	background-size: 100% 87.5px, 100% 87.5px, 100% 87.5px, 100% 87.5px, 100% calc(100% - 31.5px);
+	color: #fff;
+	font-size: 12px;
+	padding: 93.5px 0 15px;
+}
+.footer a {
+	color: #fff;
+	text-decoration: underline;
+}
+.footer a:hover {
+	text-decoration: none;
+}
+/* 方針・規約類は最下段の帯に置く定石に従う。コピーライトの右に出す */
+.footer .footer-policy {
+	text-align: right;
+}
+/* md 未満は上段と同じく縦積みになる。右寄せのままだとコピーライトが左端・
+   ポリシーが右端に割れて2行が繋がらないので、上段に合わせて左で揃える。
+   基底の text-align: right と詳細度が同じ (0,2,0) なので、順序で勝つよう
+   この直後に置く (#2667) */
+@media (max-width: 767px) {
+	.footer .footer-policy {
+		text-align: left;
+		margin-top: 6px;
+	}
+}
+
+/* Blog Page */
+.blog-posts h2,
+.ecommerce .blog-posts h2 {
+  padding-top: 0;
+}
+.blog-posts p {
+  text-align: justify;
+}
+.blog-info {
+  list-style: none;
+  margin: 24px 0 0 0;
+  padding-left:0;
+}
+.blog-info li {
+  padding: 0;
+  color: #555;
+  font-size: 13px;
+  display: inline-block;
+}
+.blog-sidebar {
+  padding-bottom: 40px;
+}
+
+/*
+  style-responsive.css
+  https://purifycss.online/
+*/
+@media (max-width:767px){
+  .pagination{float:left!important;padding-top:10px}
+}
+@media (max-width:576px){
+  .blog-posts h2{padding-top:15px}
+}
+@media screen and (max-width: 992px){
+  .advent-calendar {
+    display:none;
+  }
+}
+
+/* 折りたたみ */
+summary {
+  padding-top: 10px;
+  cursor: pointer;
+}
+summary:hover, summary:focus {
+  color: var(--main-font-color);
+}
+details {
+  padding-bottom: 24px;
+}
+
+aside h2 {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.featured-post,
+.related-post {
+  padding: 20px 0px 0px 10px;
+  border-radius: 8px; /* theme の card-radius と同値。素の CSS なので直書き */
+}
+.featured-post h2,
+.related-post h2{
+  font-size: 18px;
+}
+.featured-post-link a,
+.related-post-link a {
+  font-size: 1.2em;
+  color: #424242;
+}
+.featured-post-link li,
+.related-post-link li {
+  padding: 8px 0px 6px 0px;
+}
+.snscount {
+  padding: 0px 10px 0px 10px;
+}
+.MathJax {
+  padding: 1px 8px 1px 8px;
+}
+#footnotes {
+  display: inline-block;
+  _display: inline;
+}
+
 /* General Overrides of Metronic */
 @import "_variables"
 @import "highlight"

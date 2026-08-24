@@ -367,7 +367,7 @@ Hexo は記事の描画結果を `db.json` に持っていて、記事の内容�
 ## CSS / 文字サイズの方針
 
 CSS は `themes/future/css-src/` にあり、`scripts/combine_css.js` が
-bootstrap-subset → metronic → theme-styles.styl の順で `/css/site.css` に連結する。
+bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する。
 **この順序は後勝ちの前提なので変えると表示が壊れる。**
 
 文字サイズは過去に「どこで最終値が決まるか追えない」ことが原因の不具合を
@@ -409,7 +409,7 @@ bootstrap-subset → metronic → theme-styles.styl の順で `/css/site.css` �
   | 記事概要文 `.lede`（一覧 / We're hiring カード） | `1.2em` = 15.6px / 継承 = 13px | 〃 |
   | 特設ページの本文 `.specials-text` | `1.2em` = 15.6px（`.article-entry` 外なので明示） | 〃 |
   | コードブロック | 13px（`line-height` は `font-size × 1.6` で追従） | `highlight.styl` の変数 |
-  | パンくず（`.breadcrumb`） | 14px | metronic の `font:` 一括指定（フォント名だけ `theme-styles.styl` で上書き） |
+  | パンくず（`.breadcrumb`） | 14px | `theme-styles.styl` 冒頭（土台の塊）の `font:` 一括指定。フォント名だけ後方で上書き |
 
 - コードブロックのサイズは本文との相対バランスを見て 15px → 14px → 13px と
   調整した経緯がある（#1927 / #1929）。安易に変えない
@@ -461,8 +461,8 @@ bootstrap-subset → metronic → theme-styles.styl の順で `/css/site.css` �
   - **腐るのは値を名指しした形だけ。** 構造の話（「ホームと同じ形」「著者ページのバッジと
     同じ部品」）は相手が動いても意味が変わらないので対象外
   - 一致が意味を持つなら値を1箇所に置いて両方から参照する。グラフの色と線の太さは
-    `scripts/chart_style.js`、CSS の色・段・サイズは `_variables.styl` と metronic の
-    `:root` が持つ
+    `scripts/chart_style.js`、CSS の色・段・サイズは `_variables.styl` と
+    `theme-styles.styl` 冒頭の `:root` が持つ
   - 残っている例はインラインコードのリンク色 `#0a58ca` で、`theme-styles.styl` と
     `highlight.styl` の両方に書いてコメントがそれを説明している（詳細度の都合で両方に
     必要）。Stylus の変数に寄せれば主張が要らなくなる
