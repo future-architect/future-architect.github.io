@@ -89,6 +89,10 @@ $line-numbers
   // 背景を figure ではなく table に持たせる。figure が背景を持つと
   // ファイル名の行まで幅いっぱいに暗くなり、暗い面積がその分増える
   .highlight
+    // 「この箱は今スクロールできるか」を CSS から見るためのコンテナ (#2752)。
+    // 折り返しトグルを、実際に溢れているブロックにだけ出すのに使う。
+    // scroll-state は寸法の封じ込め（containment）を伴わないのでレイアウトは変わらない
+    container-type: scroll-state
     margin: 0
     overflow: auto
     scrollbar-color: highlight-scrollbar transparent
@@ -497,10 +501,44 @@ pre
       .code-wrap-label
         margin-right: article-padding-narrow
 
-// 幅768px以上ではコードに使える幅が最小でも 656px あるので、それより狭い
-// ブロックは横スクロールしない。押しても何も起きないトグルになるので隠す
-// （判定は scripts/code_wrap_toggle.js が最長行を測って行う）。
+// **実際に横スクロールできるブロックにだけトグルを出す** (#2752)。
+//
+// ビルド時に測れるのは行の幅までで、読者の画面幅・当たる等幅フォントの字送り
+// （SF Mono 0.6em / Consolas 0.55em）・拡大率は分からない。そのため
+// scripts/code_wrap_toggle.js の閾値は余裕を取った見積もりでしかなく、
+// 「押しても何も起きないトグル」が残る。scroll-state のコンテナクエリなら
+// ブラウザに「今スクロールできるか」を聞けるので、見積もりが要らない。
+//
+// **未対応のブラウザでは出したままになる**（安全側）。未知の機能名を含む
+// コンテナクエリは条件が unknown になり、not を付けても一致しないため。
+// その場合は下のメディアクエリだけが効く。
+// **@css で素の CSS として通す。** Stylus は @container を知らず、条件を
+// 落として `@container;` だけを出す。中身が無条件で効いてトグルが全部消える
+@css {
+  @container not scroll-state(scrollable: inline) {
+    .article-entry .highlight .code-wrap-input,
+    .article-entry .highlight .code-wrap-label {
+      display: none;
+    }
+    /* 折り返しを入にすると溢れが消えてこの条件に入るので、入のときは出したまま。
+       でないと一度折り返したら戻せなくなる */
+    .article-entry .highlight .code-wrap-input:checked {
+      display: inline-block;
+    }
+    .article-entry .highlight .code-wrap-input:checked + .code-wrap-label {
+      display: block;
+    }
+  }
+}
+
+// scroll-state に未対応のブラウザ向けの見積もり。幅768px以上ではコードに
+// 使える幅が最小でも 656px あるので、それより狭いブロックは横スクロールしない。
 // 640px より広いブロックは、サイドバーが出る 1025px 以上で溢れうるため残す
 @media (min-width: 768px)
-  .article-entry .highlight .code-wrap-narrow
+  .article-entry .highlight .code-wrap-narrow,
+  .article-entry .highlight .code-wrap-narrow + .code-wrap-label
     display: none
+  .article-entry .highlight .code-wrap-narrow:checked
+    display: inline-block
+  .article-entry .highlight .code-wrap-narrow:checked + .code-wrap-label
+    display: block

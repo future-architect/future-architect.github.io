@@ -14,6 +14,11 @@
  * 判定は描画後の HTML から最長行を測って行う。フェンスの記法（``` と ~~~、
  * csv / diff_* の自前描画）に依らず、実際に出た行を見るため。
  *
+ * **ここで測るのは見積もりでしかない。** 読者の画面幅・当たる等幅フォントの
+ * 字送り・拡大率は分からないので、実際に溢れるかは描画時にしか決まらない。
+ * 最終的な出し分けは CSS の scroll-state コンテナクエリがブラウザに聞く
+ * （highlight.styl の末尾）。ここの閾値は、それに未対応のブラウザ向けの見積もり。
+ *
  * ラベルは絵柄だけで、絵柄は CSS（highlight.styl）が持つ。アイコンの辞書は
  * `_partial/svg-icon.ejs` が1箇所で持つ決まり (#2774) だが、フィルターからは
  * partial を呼べない。JS の中に SVG を書くと絵柄が2箇所になるため、CSS 側に置く。
@@ -100,8 +105,9 @@ function addToggles(content, prefix) {
     if (width <= NARROW_PX) return figure;
 
     const id = `code-wrap-${prefix}-${++n}`;
-    // PC では収まるブロックは、そちらでラベルを隠す（CSS 側のメディアクエリ）
-    const cls = width <= WIDE_PX ? 'code-wrap-label code-wrap-narrow' : 'code-wrap-label';
+    // PC では収まるブロックに印を付ける。scroll-state に未対応のブラウザ向けの
+    // 見積もりで、CSS 側のメディアクエリが input と label の両方を隠す
+    const cls = width <= WIDE_PX ? 'code-wrap-input code-wrap-narrow' : 'code-wrap-input';
     // input は table より前に置く。切り替えは `input:checked ~ table` で効かせる。
     // label は for で結ぶので、置く位置は CSS の都合で決めてよい。
     //
@@ -109,8 +115,8 @@ function addToggles(content, prefix) {
     // mask で描くため、読み上げに渡せる要素が中に無い）。title は目で見る
     // 読者向けの吹き出し
     const control =
-      `<input type="checkbox" id="${id}" class="code-wrap-input" aria-label="${LABEL}">` +
-      `<label class="${cls}" for="${id}" title="${LABEL}"></label>`;
+      `<input type="checkbox" id="${id}" class="${cls}" aria-label="${LABEL}">` +
+      `<label class="code-wrap-label" for="${id}" title="${LABEL}"></label>`;
     return figure.replace(/^(<figure class="highlight\b[^>]*>)/, `$1${control}`);
   });
 }
