@@ -7,6 +7,7 @@ const {
   getHatebuCnt,
   getPocketCnt,
   getFeedlyCnt,
+  snsHeart,
 } = require('./lib/sns');
 
 // シェア数はそのまま返す。0 のときはボタン側が数字を出さない (#2716)。
@@ -34,4 +35,11 @@ hexo.extend.helper.register('get_feedly_count', (url) => {
 
 hexo.extend.helper.register('totalSNSCnt', (url) => {
   return getSNSCnt(url);
+});
+
+// 反響の段は lib/sns.js が1箇所で持つ (#2755)。ここは記号とクラスを返すだけで、
+// 組み立ては EJS 側（_partial/archive-all.ejs）に置く
+hexo.extend.helper.register('sns_heart', (url) => {
+  const count = getSNSCnt(url);
+  return Object.assign({ count: count }, snsHeart(count));
 });

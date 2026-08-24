@@ -1,6 +1,6 @@
 'use strict';
 
-const { getSNSCnt } = require('./sns');
+const { getSNSCnt, snsHeart } = require('./sns');
 
 /**
  * 記事リストの li マークアップを組み立てる。
@@ -18,9 +18,10 @@ const { getSNSCnt } = require('./sns');
 // 数字は日付と同じ大きさに揃えたいため（#2453）
 const snsLabel = (permalink) => {
   const n = getSNSCnt(permalink);
-  return n > 0
-    ? `<span class="snscount"><span class="snscount-icon">&#9825;</span>${n}</span>`
-    : '';
+  if (n <= 0) return '';
+  const heart = snsHeart(n);
+  const cls = heart.className ? ` ${heart.className}` : '';
+  return `<span class="snscount"><span class="snscount-icon${cls}">${heart.glyph}</span>${n}</span>`;
 };
 
 // 公開から30日以内なら NEW を付ける
