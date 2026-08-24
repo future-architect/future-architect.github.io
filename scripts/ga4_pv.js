@@ -19,6 +19,11 @@ hexo.extend.helper.register('get_ga4_pv', (url) => {
   return pv > 0 ? pv.toLocaleString() : '';
 });
 
+// 全ページのヘッダー（検索窓のパネル #2791）から呼ぶので結果を持ち回る。
+// 714タグ×所属記事を毎ページ舐めると、その分だけビルドが伸びる。
+// 記事数が変わったら作り直すため、server での編集にも追随する
+const popularTagsCache = new Map();
+
 // トップの「人気のタグ」(#2358)。以前は全期間のSNSシェア合計順で、
 // 古い大型タグが上位に固定されいまの人気を反映しなかった。
 // 公開が1年以内の記事の PV 合計で選ぶ（直近1年の記事はシェア数の
@@ -26,25 +31,27 @@ hexo.extend.helper.register('get_ga4_pv', (url) => {
 // 直近3本未満のタグは、話題の勢いではなく単発のバズなので出さない
 // （「3件あれば選択肢として成立する」の related_tags と同じ基準）
 hexo.extend.helper.register('recent_popular_tags', function (limit = 10, minRecent = 3) {
+  const cacheKey = `${limit}:${minRecent}:${this.site.posts.length}`;
+  if (popularTagsCache.has(cacheKey)) return popularTagsCache.get(cacheKey);
   const YEAR = 365 * 24 * 60 * 60 * 1000;
   const now = Date.now();
-  return (
-    this.site.tags
-      .map((tag) => {
-        const recent = tag.posts.toArray().filter((p) => now - p.date.valueOf() <= YEAR);
-        return {
-          name: tag.name,
-          path: tag.path,
-          count: tag.length,
-          recent: recent.length,
-          pv: recent.reduce((sum, p) => sum + getGA4PV('/' + p.path), 0),
-        };
-      })
-      .filter((t) => t.recent >= minRecent && t.pv > 0)
-      // 同点は名前で決める（決着が無いとビルドごとに並びが変わる）
-      .sort((a, b) => b.pv - a.pv || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
-      .slice(0, limit)
-  );
+  const tags = this.site.tags
+    .map((tag) => {
+      const recent = tag.posts.toArray().filter((p) => now - p.date.valueOf() <= YEAR);
+      return {
+        name: tag.name,
+        path: tag.path,
+        count: tag.length,
+        recent: recent.length,
+        pv: recent.reduce((sum, p) => sum + getGA4PV('/' + p.path), 0),
+      };
+    })
+    .filter((t) => t.recent >= minRecent && t.pv > 0)
+    // 同点は名前で決める（決着が無いとビルドごとに並びが変わる）
+    .sort((a, b) => b.pv - a.pv || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
+    .slice(0, limit);
+  popularTagsCache.set(cacheKey, tags);
+  return tags;
 });
 
 // 推薦の件数は記事数から決める。推薦が全記事の半分を超えると

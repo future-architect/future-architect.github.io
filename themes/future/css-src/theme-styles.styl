@@ -3958,7 +3958,10 @@ input[name="tab_item"] {
 .header-search {
   position: absolute;
   top: 10px;
-  right: 12px;
+  /* 端からの距離は変数で1箇所に持つ。下に開くパネルは右端をここに合わせ、
+     幅をこの2倍だけ縮めることで左右の隙間が揃う */
+  --header-search-inset: 12px;
+  right: var(--header-search-inset);
   display: flex;
   align-items: center;
 }
@@ -4045,8 +4048,82 @@ input[name="tab_item"] {
 @media (max-width: 558px) {
   .header-search {
     top: 6px;
-    right: 8px;
+    --header-search-inset: 8px;
   }
+}
+/* 検索窓を押したときに出る行き先の一覧 (#2791)。フォームの :focus-within で開き、
+   input:placeholder-shown で「打ち始めたら閉じる」を作る。JS は使わない。
+   影は持たない (#2747)。白い面と枠で本文から浮かせる */
+.header-search-hint {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  /* カテゴリを3列に並べられる幅。最長の「DataEngineering 45」が実測150px */
+  width: unquote('min(530px, calc(100vw - var(--header-search-inset) * 2))');
+  padding: 16px 14px 4px;
+  /* 320px 幅では1列に落ちて縦に伸びるので、面の中で送れるようにする */
+  max-height: unquote('calc(100vh - 60px)');
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid rule-base;
+  border-radius: 4px;
+  /* ヘッダーは中央揃えなので、面の中だけ戻す */
+  text-align: left;
+  color: ink-strong;
+  visibility: hidden;
+  opacity: 0;
+  /* 閉じるときだけ visibility を遅らせる。Safari はクリックでリンクに
+     フォーカスを与えず、blur で先に閉じるとタップが着地しない（送信ボタンを
+     モバイルで出していないのと同じ理由）。消えるまでの間に click が届く */
+  transition: opacity 0.12s ease, visibility 0s 0.3s;
+}
+.header-search:focus-within input:placeholder-shown ~ .header-search-hint {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.12s ease;
+}
+/* 枠の中のラベル。見出しではなく面の中の仕切りなので h2 は使わない */
+.header-search-hint-label {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: bold;
+  color: ink-mute;
+}
+/* チップはホームでは 12px。あちらは本文と並ぶ添えの情報だが、こちらは
+   面の中の行き先そのものなので、カテゴリの行と同じ大きさまで上げる */
+.header-search-hint .tag-list-link {
+  font-size: 13px;
+  margin: 5px 12px 12px 4px;
+}
+/* ラベルは面の端、項目は一段下げて、カテゴリのアイコンとチップの枠を
+   同じ位置から始める。チップ側は ul.tag-list の -13px と自身の左マージン
+   4px を織り込んだ差 */
+.header-search-hint .blog-tags {
+  margin-left: 18px;
+}
+.header-search-hint-categories {
+  margin: 0 0 28px 9px;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  /* 13件が幅530pxの面で3列5行、幅375pxの端末で2列7行になる */
+  grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+  gap: 10px 14px;
+  font-size: 14px;
+}
+.header-search-hint-categories li {
+  list-style: none;
+}
+/* 太字はラベルとチップが担う。ここは13行あるので、素の太さで面を静める */
+.header-search-hint-categories .article-category-link {
+  font-weight: normal;
+}
+/* 右肩の件数はタグのチップと同じく「総数」の意味 (#2129) */
+.header-search-hint-count {
+  margin-left: 4px;
+  font-size: 0.75em;
+  font-weight: normal;
+  color: ink-faint;
 }
 .blog-news {
   padding-top: 20px;
