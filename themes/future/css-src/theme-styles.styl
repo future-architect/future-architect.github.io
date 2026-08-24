@@ -143,7 +143,7 @@ Misc tools
 Header and header elements
 ***/
 .header {
-	box-shadow: 0 1px 3px #ddd;
+	/* 影は持たない (#2747)。ここは写真バナーで、下辺は写真と白地の境目が作る */
 	background: #fff;
 	border-radius: 0;
 	margin-bottom: 23px;
@@ -982,12 +982,10 @@ summary:focus-visible,
   width: 100%;
   height: 100%;
   object-fit: cover;
+  /* カードの囲みが無くなったぶん、角を丸めて「置かれている」形にする (#2747)。
+     サムネイルは小物なので radius-small */
+  border-radius: radius-small;
 }
-/* サムネの hover で opacity を落としていたのをやめた (#2686)。
-   .thumb-link は8箇所すべて .article-card の中にあり、カードが持ち上がる
-   反応を既に返している。画像のリンク先もタイトルと同じ記事なので、
-   別の反応を返す理由が無く、カーソルの位置で反応が変わる原因になっていた。
-   キーボードの所在は :focus-visible の輪郭が担う */
 .social-area {
 	padding: 1.5em 0;
 }
@@ -1109,28 +1107,124 @@ body.page-header-fixed .header {
     font-size: 36px;
   }
 }
+/* カードは囲みを持たない (#2747)。1件のまとまりは項目の外（80px）と
+   中（タイトル→概要 8px / 概要→メタ 12px / メタ→シェアボタン 8px）の
+   間隔の差が作る。中の最大が 12px なので、外はその6倍以上を取っている。
+
+   40px → 64px → 80px と広げた。1件はサムネイル・タイトル・概要2行・メタ行・
+   シェアボタンの5段で縦に長く（実測で約160px）、見出しの前の空き（56px）と
+   同じ程度では隣の記事と地続きに見える。見出しは1行で、比べる相手が違う。
+   横に並んで箱でないと成立しない部品（連載・特設パネル / We're hiring / タブ）は
+   個別に枠線を持つ */
 .article-card {
-  box-shadow: card-shadow;
-  padding: 24px 20px 0px 20px;
-  margin: 0 0 32px 0;
-  border-radius: card-radius;
-  transition: box-shadow hover-speed ease, transform hover-speed ease;
+  margin: 0 0 80px 0;
 }
-/* カードのタイトルは本文色（#424242・下線なし）で統一しているため、静止状態では
-   押せるかどうかが影だけでは伝わらない。ホバーで持ち上げて反応を返す (#2449)。
-   .article-card は新着一覧・連載／特設パネル・We're hiring で共用しており、
-   いずれも中身がリンクのカードなので一律に効かせる。
-   幅と時間は先例の .link-preview-card にそろえる */
-.article-card:hover {
-  box-shadow: card-shadow-raised;
-  transform: translateY(-2px);
+/* カードのタイトルは本文色・下線なしで統一しているため、押せるかどうかを
+   伝えるのは hover だけ (#2449)。影が無くなったので、持ち上がりの代わりに
+   中身を一段引かせる。
+
+   文字は色を ink-mute に落とす。**カード全体の透明度では下げない。**
+   0.7 だと本文の文字が白地に対して 4.23、0.8 でもメタ行の文字が 3.89 で
+   AA を割る（透明度は文字と画像を区別せず、薄い方から先に読めなくなる）。
+   画像は文字ではないので透明度でよい。
+   img をまとめて指すのは、一覧のサムネ・パネルのサムネ・We're hiring のロゴを
+   同じだけ引かせるため */
+.article-card .archive-post-item a,
+.article-card .panel-title,
+.article-card .hiring-card-label {
+  transition: color hover-speed ease;
 }
-/* 動きを減らす設定なら位置は動かさない (#2686)。影は残るので反応は伝わる。
-   色や面の送り（0.1秒）は動きではないので止めない */
-@media (prefers-reduced-motion: reduce) {
-  .article-card:hover,
-  .link-preview-card:hover {
-    transform: none;
+.article-card img {
+  transition: opacity hover-speed ease;
+}
+.article-card:hover .archive-post-item a,
+.article-card:hover .panel-title,
+.article-card:hover .hiring-card-label {
+  color: ink-mute;
+}
+.article-card:hover img {
+  opacity: 0.7;
+}
+/* 一覧の1件の中を詰める (#2747)。囲みが無いぶん、1件のまとまりは
+   「外の空き（.article-card の下マージン）が中の空きより十分大きい」ことで作る。
+   metronic の既定のままだと差が2倍に届かず、メタ行が次の記事の見出しと
+   同じ間隔で並んで見える。
+   .blog-info を持つ .article-card は一覧の1件だけ（パネルは .panel-meta） */
+.article-card .blog-info {
+  margin-top: 12px;
+}
+/* シェアボタンは1件の最後の要素なので、その下に余白を残さない。
+   ul は Bootstrap の既定で下に 1rem 持っており、1件の外の空きに上乗せされて
+   いた（80px のつもりが 96px）。サムネイルの下辺をここにそろえるので、
+   残っていると画像だけが 16px 長く伸びる */
+.article-card .social-button {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+/* 一覧ではシェア数を絶対配置にして、行の高さの計算から外す。
+   そろえたいのは丸ボタンの下辺とサムネイルの下辺なので、数字は下にはみ出す。
+   記事ページ側は文字どおり最後の要素なので、そちらは流れの中に残す */
+.archives > .article-card .share-count {
+  position: absolute;
+  top: calc(100% + 3px);
+  left: 0;
+  right: 0;
+  text-align: center;
+}
+/* 記事の間の罫線。空き（80px）の真ん中に置いて上下に 40px ずつ残す。
+   区切りの線なので rule-weak（記事本文の h2 の下と同じ役）。
+
+   .row に border を引くと、行が持つ負のマージン（ガターの半分）ぶん
+   左右に線がはみ出す。行の外に線を置いてガターぶん戻すと、
+   サムネイルの左端から本文の右端までに幅が合う。
+
+   最後の1件の下には引かない。ページャーとの境目は空きが持つ */
+.archives > .article-card {
+  position: relative;
+  /* シェア数は絶対配置で高さの外に出してあるので、その分を箱の下に足す。
+     箱の下辺が数字の下端に来るので、外の空き（80px）も罫線の位置も
+     数字から測られる。足さないと空きが数字のぶん食われる */
+  padding-bottom: 14px;
+}
+.archives > .article-card:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: calc(var(--bs-gutter-x) * 0.5);
+  right: calc(var(--bs-gutter-x) * 0.5);
+  bottom: -40px;
+  border-bottom: 1px solid rule-weak;
+}
+/* 列が横に並ぶ幅では、サムネイルの高さを本文列に合わせる (#2747)。
+   シェアボタンは本文列の最後にあるので、これで画像の下辺とボタンの下辺が
+   そろう。以前は画像が OGP 比で止まり、ボタンだけが下にはみ出していた。
+
+   **画像を絶対配置にするのが要点。** 高さは .row の既定（align-items: stretch）
+   から受け取りたいので、画像には高さに口を出させない。ふつうに置くと画像
+   自身の縦横比がサムネイルの高さになり、元画像が縦長の記事では画像の方が
+   高くなって本文列が引き伸ばされる（一覧のサムネイルは 300x109 から
+   300x300 までばらばら）。
+
+   左右は列の padding のぶんだけ内側に入れる。絶対配置の基準は padding box
+   なので、inset: 0 だと画像が本文列との間隔を埋めてしまう。
+
+   OGP 比の枠（#2305）は縦積みのときだけ効かせる。列が縦に並ぶ幅では
+   サムネイルが1行を独り占めするので、比が無いと高さが0になる */
+@media (min-width: 576px) {
+  .archives > .article-card > .card-thumb {
+    aspect-ratio: auto;
+    position: relative;
+  }
+  /* **幅と高さは必ず値で持たせる。** 絶対配置の置換要素（img）は
+     width / height が auto だと、left と right の両方を指定しても
+     元画像の寸法が使われる（bottom / right は無視される）。
+     auto にしていたときは 300px 幅のまま左上に置かれ、
+     object-fit の中央切り抜きが効いていなかった */
+  .archives > .article-card > .card-thumb img {
+    position: absolute;
+    top: 0;
+    left: calc(var(--bs-gutter-x) * 0.5);
+    width: calc(100% - var(--bs-gutter-x));
+    height: 100%;
   }
 }
 /* We're hiring のカード。以前は画像がカード幅の半分を占め、さらに
@@ -1145,7 +1239,10 @@ body.page-header-fixed .header {
   align-items: center;
   padding: 18px;
   margin: 0;
-  border: 1px solid rule-weak;
+  /* 囲みは .article-card ではなくここが持つ (#2747)。枠は「カード・箱を囲む線」
+     なので rule-weak（区切りの線）ではなく rule-base */
+  border: 1px solid rule-base;
+  border-radius: card-radius;
 }
 .hiring-card-thumb {
   flex: 0 0 88px;
@@ -1168,14 +1265,16 @@ body.page-header-fixed .header {
   font-weight: bold;
   margin-bottom: 4px;
 }
-/* 反応はカードの持ち上がりだけにする (#2699)。節が class="nav" を持つため
-   .nav a:hover の灰色の面がサムネとラベルの両方に付き、そこに
+/* 反応はカードの引き（.article-card:hover）だけにする (#2699)。節が class="nav" を
+   持つため .nav a:hover の灰色の面がサムネとラベルの両方に付き、そこに
    .article-entry a:hover の下線と metronic の a:hover の青が重なっていた。
-   関連記事・ランキングが #2686 で同じ面を打ち消しているのと同じ形 */
+   関連記事・ランキングが #2686 で同じ面を打ち消しているのと同じ形。
+   色はカード側と同じ ink-mute にする。ink-strong のままだと、このルールの方が
+   詳細度が高く、ラベルを直接指したときだけ引かなくなる (#2747) */
 .career-counseling .article-card a:hover,
 .career-counseling .article-card a:focus {
   background-color: transparent;
-  color: ink-strong;
+  color: ink-mute;
   text-decoration: none;
 }
 /* カテゴリの支配的なタグを除いた一覧への導線 */
@@ -1204,7 +1303,10 @@ body.page-header-fixed .header {
   align-items: center;
   padding: 18px;
   margin: 0;
-  border: 1px solid rule-weak;
+  /* 囲みは .article-card ではなくここが持つ (#2747)。枠は「カード・箱を囲む線」
+     なので rule-weak（区切りの線）ではなく rule-base */
+  border: 1px solid rule-base;
+  border-radius: card-radius;
 }
 .panel-thumb {
   flex: 0 0 88px;
@@ -1242,15 +1344,15 @@ body.page-header-fixed .header {
   font-size: 1.2em;
   font-weight: bold;
 }
-/* カードの中のタイトルなので、ここでは反応を返さない (#2686)。
-   .panel-title は7箇所すべて .article-card の中にあり、カードが持ち上がる。
+/* 反応を返すのはカード（.article-card:hover の引き）で、ここでは足さない (#2686)。
    以前は下線も出していて、1回のカーソル移動で2つの反応が起きていた。
    ルールを消すのではなく打ち消しで残すのは、消すと metronic の
    `a:hover { color: var(--a-color); text-decoration: underline }`（0,1,1）が
-   .panel-title（0,1,0）に勝って、タイトルが青くなって下線が出るため */
+   .panel-title（0,1,0）に勝って、タイトルが青くなって下線が出るため。
+   色はカード側の引きと同じ ink-mute にそろえる (#2747) */
 .panel-title:hover,
 .panel-title:focus {
-  color: ink-strong;
+  color: ink-mute;
   text-decoration: none;
 }
 .panel-meta {
@@ -1807,14 +1909,14 @@ code {
 .archive-post-item a {
   color: ink-strong;
 }
-/* 新着記事もカード（.article-card）の中なので、ここでは反応を返さない (#2686)。
-   以前は文字を ink-mute に薄くしていた。他の反応は全て「一段強くなる」方向で、
-   ここだけ弱くなる逆行だった。カードが持ち上がるので合図は足りている。
+/* 反応を返すのはカード（.article-card:hover の引き）で、ここでは足さない。
+   色をそちらと同じ ink-mute にするのは、サムネイル側に乗せたときと
+   タイトルに乗せたときで引きが変わらないようにするため (#2747)。
    text-decoration を残すのは metronic の a:hover の下線を止めるため */
 .archive-post-item a:hover,
 .archive-post-item a:active,
 .archive-post-item a:focus {
-  color: ink-strong;
+  color: ink-mute;
   text-decoration: none;
 }
 .archive-post-title {
@@ -1890,11 +1992,6 @@ code {
      例外的な見え方ではなく既定として効く */
   line-height: 1.4;
 }
-/* トップページのソーシャルボタン */
-.archive-social-button {
-  margin-left: 0px;
-}
-
 /* 入れ子のマーカーはブラウザ既定だと ● → ○ → ■ と切り替わり、3段でひと回りして
    繰り返す。4段目以降は形で段を区別できず、段の深さは字下げで読み取れるので
    全段 ● にそろえる (#2540)。
@@ -3371,9 +3468,10 @@ a.series-nav-item:hover .series-nav-item-title {
   padding: 18px 22px;
   border: 1px solid #e8dcb0;
   border-radius: card-radius;
-  /* 淡い金のグラデーション。単色より奥行きが出て、賞状の紙の質感に寄る */
+  /* 淡い金のグラデーション。単色より奥行きが出て、賞状の紙の質感に寄る。
+     質感を担うのはこの色と枠線で、影は持たない (#2747)。1つだけ影を残すと
+     「どこに影を使うか」の判断が戻ってくる */
   background: linear-gradient(135deg, #fdf9ec, #f7edcf);
-  box-shadow: 0 2px 10px rgba(122,95,22,0.12);
 }
 .awards-hall-label {
   display: flex;
@@ -3652,19 +3750,19 @@ a.award-badge:focus {
      見えてしまった。帯は端まで伸ばす */
   background-color: surface-tint;
   border-radius: card-radius;
-  box-shadow: card-shadow;
+  /* 輪郭は影ではなく枠線が持つ (#2747)。横に並ぶタブと本体を包む箱なので、
+     一覧のように間隔だけでは成立しない */
+  border: 1px solid rule-base;
 }
 .tab_item {
   float: left;
-  /* 上辺のアクセントをカードの外に出す。負のマージンで持ち上げた分を
-     padding-top で戻すので、文字の位置と下辺は動かない
-     （margin -8 + border 3 + padding 18 = 13。未選択も選択も同じ）。
+  /* 上辺のアクセントは箱の内側に置く。以前は負のマージン（-8px）でカードの外へ
+     出していたが、枠線を持つと線がタブを横切るので内側に収めた (#2747)。
+     文字の位置は変わらない（border 3 + padding 10 = 13。未選択も選択も同じ）。
 
-     全タブに掛けるのが要点で、選択やホバーのときだけ持ち上げると
-     マウスを乗せるたびにタブが跳ねてしまう。
      未選択時の枠は透明なので、何も起きていないように見える */
-  padding: 18px 22px 10px;
-  margin: -8px 4px 0 0;
+  padding: 10px 22px 10px;
+  margin: 0 4px 0 0;
   font-size: 1.15em;
   line-height: 1.4;
   letter-spacing: 0.02em;
@@ -4363,16 +4461,20 @@ note-alert-bg = #ffdbdb
   border: 1px solid rule-base;
   border-radius: card-radius;
   overflow: hidden;
-  transition: box-shadow hover-speed ease, transform hover-speed ease;
   background-color: #fff;
 }
-
-/* このカードは静止状態で影を持たず、枠線で立っている。持ち上がる先は
-   card-shadow-raised ではなく card-shadow（静止しているカードと同じ高さ）。
-   影の段は2つしか置かないので、無地から一段上がるとここに着く (#2681) */
-.link-preview-card:hover {
-  box-shadow: card-shadow;
-  transform: translateY(-2px);
+.link-preview-card-title,
+.link-preview-card-image {
+  transition: color hover-speed ease, opacity hover-speed ease;
+}
+/* 反応は他のカードと同じ「中身が一段引く」 (#2747)。以前は影に上がって
+   いたが、影を1段だけ残すとサイト全体から影を落としきれない。
+   画像は background-image なので、img ではなく要素の透明度を落とす */
+.link-preview-card:hover .link-preview-card-title {
+  color: ink-mute;
+}
+.link-preview-card:hover .link-preview-card-image {
+  opacity: 0.7;
 }
 
 .link-preview-card-anchor {
