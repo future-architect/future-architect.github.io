@@ -26,7 +26,6 @@ stylus.render(readFileSync(stylPath, 'utf8'), { filename: stylPath }, (err, css)
   }
   const combined = combineCss({
     bootstrap: readFileSync(join(themeDir, 'css-src/bootstrap-subset.css'), 'utf8'),
-    metronic: readFileSync(join(themeDir, 'metronic-src/assets/style.css'), 'utf8'),
     themeStyles: css,
   });
 
