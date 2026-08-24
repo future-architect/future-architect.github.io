@@ -31,18 +31,13 @@ hexo.extend.helper.register('chart_series_colors', function (kind) {
   return JSON.stringify(PALETTES[kind] || NAVY_STEPS);
 });
 
-// 年別の折れ線（最新年から遡る5本）の太さ。先頭が最新年で、そこから1pxずつ落とす。
-// 重なりの前後と太さを同じ向きに揃えて、古い年が背景になるようにする
-const LINE_WIDTHS = [8, 7, 6, 5, 4];
+// 折れ線の太さ (#2794)。年別の重ね描きも、積み上げの上に重ねるアクセント線も
+// 同じ値にする。年の前後は色と描画順（z）が表すので、太さは順序を持たない。
+//
+// 投稿数の推移は軸の上限30件・プロット高141pxで 1件 = 4.7px。4px の線は
+// 値0.85件ぶんで、これより太いと隣の年の線と接する月が 2/12 から 6/12 に増える
+const LINE_WIDTH = 4;
 
-// 積み上げの上に重ねる1本の太さ（著者の推移の「常連」）。上の5本とは役割が
-// 違うので値を分ける。あちらは並んだ線の順序を太さで表すが、こちらは1本しかない
-const ACCENT_LINE_WIDTH = 6;
-
-hexo.extend.helper.register('chart_line_widths', function () {
-  return JSON.stringify(LINE_WIDTHS);
-});
-
-hexo.extend.helper.register('chart_accent_line_width', function () {
-  return ACCENT_LINE_WIDTH;
+hexo.extend.helper.register('chart_line_width', function () {
+  return LINE_WIDTH;
 });
