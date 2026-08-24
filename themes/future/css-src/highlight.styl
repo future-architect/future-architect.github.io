@@ -89,6 +89,10 @@ $line-numbers
   // 背景を figure ではなく table に持たせる。figure が背景を持つと
   // ファイル名の行まで幅いっぱいに暗くなり、暗い面積がその分増える
   .highlight
+    // 「この箱は今スクロールできるか」を CSS から見るためのコンテナ (#2752)。
+    // 折り返しトグルを、実際に溢れているブロックにだけ出すのに使う。
+    // scroll-state は寸法の封じ込め（containment）を伴わないのでレイアウトは変わらない
+    container-type: scroll-state
     margin: 0
     overflow: auto
     scrollbar-color: highlight-scrollbar transparent
@@ -143,6 +147,123 @@ $line-numbers
     // タブが乗る側だけ角を落として、タブと本体をつなげて見せる
     figcaption + table
       border-top-left-radius: 0
+    // 折り返しトグル (#2752)。scripts/code_wrap_toggle.js が、横に溢れる
+    // ブロックにだけ input と label を差し込む。JS は使わず、ランキングの
+    // タブと同じ `input:checked` と兄弟結合子で切り替える。
+    // 幅768px以上では収まるブロック（code-wrap-narrow）は末尾で隠す
+    //
+    // input は隠すが display: none にはしない。タブ（radio）はそうしているが、
+    // あちらはラベルが常に見えていて選択状態も面で分かる。こちらは
+    // 単独の切り替えなので、キーボードで辿れないと押せなくなる
+    .code-wrap-input
+      position: absolute
+      width: 1px
+      height: 1px
+      opacity: 0
+    // ファイル名のタブ（figcaption）と同じ帯の右端に置く。float なのは、
+    // ブロックにすると帯が2段になってコードが下がるため。
+    // タブより低くしてあるので、両方あるときの帯の高さは今までと変わらない
+    .code-wrap-label
+      float: right
+      padding: 5px
+      margin-bottom: 4px
+      // 小物の段（_variables.styl の3段のうち radius-small）
+      border-radius: radius-small
+      // 触っていないときは絵柄だけ。枠も面も出さない。
+      // 枠を消すのではなく透明にするのは、hover と入で寸法が変わって
+      // 帯の高さがずれるのを防ぐため（.tab_item と同じ理屈）
+      border: 1px solid transparent
+      color: ink-mute
+      background-color: transparent
+      cursor: pointer
+      transition: background-color hover-speed ease, color hover-speed ease
+    // 折り返しのアイコン（Tabler Icons v3.31 の text-wrap）。
+    //
+    // **絵柄をここに置いているのは、フィルターから辞書を引けないため。**
+    // アイコンの辞書は _partial/svg-icon.ejs が1箇所で持つ決まり (#2774) だが、
+    // このラベルを差し込むのは scripts/code_wrap_toggle.js で、EJS の partial を
+    // 呼べない。JS の中に SVG を書くと絵柄が「辞書」と「JS」の2箇所になるので、
+    // 絵柄はここだけに置く。EJS 側でも同じ絵柄が要るようになったら、辞書を
+    // 共有モジュールへ切り出して両方から引く形にする。
+    //
+    // mask にするのは色を状態へ追従させるため。background-image だと入
+    // （ネイビーの面）で絵柄が黒のまま残る。ラベル自身に mask を掛けると
+    // 枠と面まで削られるので、擬似要素に掛ける
+    .code-wrap-label::before
+      content: ''
+      display: block
+      width: 16px
+      height: 16px
+      background-color: currentColor
+      wrap-icon = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6h16'/%3E%3Cpath d='M4 18h5'/%3E%3Cpath d='M4 12h13a3 3 0 0 1 0 6h-4l2 -2m0 4l-2 -2'/%3E%3C/svg%3E"
+      -webkit-mask: url(wrap-icon) center / 16px 16px no-repeat
+      mask: url(wrap-icon) center / 16px 16px no-repeat
+    .code-wrap-label:hover
+      background-color: surface-mute
+      color: ink-strong
+    // 入は塗りで示す。チップと同じネイビーの面で、押していない状態（枠だけ）と
+    // 見間違えない
+    .code-wrap-input:checked + .code-wrap-label
+      background-color: var(--brand-navy)
+      border-color: var(--brand-navy)
+      color: #fff
+    // input 自体は見えないので、輪郭はラベルに出す
+    .code-wrap-input:focus-visible + .code-wrap-label
+      outline: 2px solid var(--brand-navy)
+      outline-offset: 2px
+    // float の下にコードを送る。トグルのあるブロックにだけ効かせる
+    .code-wrap-input ~ table
+      clear: both
+    .code-wrap-input:checked ~ table
+      // 折り返すので内容ぶんの幅は要らない
+      width: auto
+      // pre の white-space はブラウザ既定が要素に直接当たるので、
+      // table 側に書いても継承では上書きできない
+      pre
+        white-space: pre-wrap
+        // 印は本文の左（コードブロックのパディング側）へはみ出すので、
+        // pre では切り取らない。pre は $code-block から overflow: auto を
+        // 継いでいるが、.highlight の中では padding が 0 なので印がそのまま
+        // 切られる。折り返し中は横に溢れないため、隠す必要も無い
+        overflow: visible
+        // 行を埋めてから割る。overflow-wrap（anywhere / break-word）は
+        // 「入らない語をまず次の行へ送り、それでも入らないときだけ割る」ため、
+        // `$ curl <長いURL>` が「$ curl」だけの行と URL の行に分かれて3行になる。
+        // word-break なら1行目を埋めてから割るので2行で済む。
+        // 識別子が途中で切れるが、エディタのワードラップと同じ振る舞い
+        word-break: break-all
+        // 折り返しで生まれた行に印を出す。行番号が無いので、印が無いと
+        // 2行目が続きなのか元からの改行なのか読めない。
+        //
+        // **折り返したかどうかを選ぶセレクタは無いが、「2行目以降」は塗れる。**
+        // 論理行をブロックにして、背景を1行ぶん下へずらして敷く。1行に収まった
+        // 行では高さが 0 以下になり何も出ないので、実際の描画に対して正確に出る。
+        // ビルド時に行の幅を測ってメディアクエリで出し分ける手もあるが、
+        // 768px 未満はコードの幅が画面幅に連動して連続に変わるので当たらない。
+        //
+        // **ぶら下げインデントは置かない。** padding で content edge を動かすと
+        // タブ幅（tab-size: 2em）の起点もそこへ移り、字下げの深さごとにコードの
+        // 位置がずれる。折り返しの入切で字下げが動いてはいけない
+        .line
+          display: block
+          // 印は本文の左に出す。負のマージンで箱をパディング側へ広げ、同じ幅の
+          // padding で戻すので content edge は動かない（＝字下げも変わらない）
+          margin-left: -8px
+          padding-left: 8px
+          // 素の .line は1行ぶんの固定高。折り返すと足りなくなる。
+          // 空行は中身が無く高さを持てないので下限を置く
+          height: auto
+          min-height: font-size * line-height
+          // 2行目の頭から下端まで1本の縦線を引く。1行ぶん（20.8px）に
+          // 丸め誤差の余裕を足して 21 / 22px にしている（20.8 のままだと
+          // 折り返していない行にも1px の切れ端が出る）
+          background-image: linear-gradient(highlight-comment, highlight-comment)
+          background-repeat: no-repeat
+          background-size: 2px unquote('calc(100% - 22px)')
+          background-position: left 2px top 21px
+        // 論理行が block になったぶん、行区切りの <br> は空行を1つ増やしてしまう
+        br
+          display: none
     .gutter pre
       @extend $line-numbers
       text-align: right
@@ -376,3 +497,48 @@ pre
       // タブは内容幅のまま。左は画面端に接するので落とし、右上だけ残す
       figcaption
         border-radius: 0 card-radius 0 0
+      // 画面端まで伸びたぶん、トグルもコードの1文字目と同じだけ内側へ入れる
+      .code-wrap-label
+        margin-right: article-padding-narrow
+
+// **実際に横スクロールできるブロックにだけトグルを出す** (#2752)。
+//
+// ビルド時に測れるのは行の幅までで、読者の画面幅・当たる等幅フォントの字送り
+// （SF Mono 0.6em / Consolas 0.55em）・拡大率は分からない。そのため
+// scripts/code_wrap_toggle.js の閾値は余裕を取った見積もりでしかなく、
+// 「押しても何も起きないトグル」が残る。scroll-state のコンテナクエリなら
+// ブラウザに「今スクロールできるか」を聞けるので、見積もりが要らない。
+//
+// **未対応のブラウザでは出したままになる**（安全側）。未知の機能名を含む
+// コンテナクエリは条件が unknown になり、not を付けても一致しないため。
+// その場合は下のメディアクエリだけが効く。
+// **@css で素の CSS として通す。** Stylus は @container を知らず、条件を
+// 落として `@container;` だけを出す。中身が無条件で効いてトグルが全部消える
+@css {
+  @container not scroll-state(scrollable: inline) {
+    .article-entry .highlight .code-wrap-input,
+    .article-entry .highlight .code-wrap-label {
+      display: none;
+    }
+    /* 折り返しを入にすると溢れが消えてこの条件に入るので、入のときは出したまま。
+       でないと一度折り返したら戻せなくなる */
+    .article-entry .highlight .code-wrap-input:checked {
+      display: inline-block;
+    }
+    .article-entry .highlight .code-wrap-input:checked + .code-wrap-label {
+      display: block;
+    }
+  }
+}
+
+// scroll-state に未対応のブラウザ向けの見積もり。幅768px以上ではコードに
+// 使える幅が最小でも 656px あるので、それより狭いブロックは横スクロールしない。
+// 640px より広いブロックは、サイドバーが出る 1025px 以上で溢れうるため残す
+@media (min-width: 768px)
+  .article-entry .highlight .code-wrap-narrow,
+  .article-entry .highlight .code-wrap-narrow + .code-wrap-label
+    display: none
+  .article-entry .highlight .code-wrap-narrow:checked
+    display: inline-block
+  .article-entry .highlight .code-wrap-narrow:checked + .code-wrap-label
+    display: block
