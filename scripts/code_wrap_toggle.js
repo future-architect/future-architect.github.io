@@ -14,8 +14,9 @@
  * 判定は描画後の HTML から最長行を測って行う。フェンスの記法（``` と ~~~、
  * csv / diff_* の自前描画）に依らず、実際に出た行を見るため。
  *
- * ラベルに絵柄を入れないのは、アイコンの辞書を `_partial/svg-icon.ejs` が
- * 1箇所で持つ決まりのため (#2774)。フィルターからは辞書を引けない。
+ * ラベルは絵柄だけで、絵柄は CSS（highlight.styl）が持つ。アイコンの辞書は
+ * `_partial/svg-icon.ejs` が1箇所で持つ決まり (#2774) だが、フィルターからは
+ * partial を呼べない。JS の中に SVG を書くと絵柄が2箇所になるため、CSS 側に置く。
  */
 
 // 等幅13pxの字送り。ui-monospace が当たる SF Mono / Cascadia Code /
@@ -33,6 +34,9 @@ const NARROW_PX = 351;
 // **1025pxでサイドバーが出て656pxに戻り**、1200pxで791px と単調ではないので、
 // 「PC では必ず収まる」と言えるのは最小値の側。16px の余裕を見て切る
 const WIDE_PX = 640;
+
+// トグルの名前。読み上げ（aria-label）と吹き出し（title）で同じ文言を使う
+const LABEL = 'コードの折り返しを切り替える';
 
 const FIGURE = /<figure class="highlight\b[\s\S]*?<\/figure>/g;
 const PRE = /<pre>([\s\S]*?)<\/pre>/;
@@ -93,10 +97,14 @@ function addToggles(content, prefix) {
     // PC では収まるブロックは、そちらでラベルを隠す（CSS 側のメディアクエリ）
     const cls = width <= WIDE_PX ? 'code-wrap-label code-wrap-narrow' : 'code-wrap-label';
     // input は table より前に置く。切り替えは `input:checked ~ table` で効かせる。
-    // label は for で結ぶので、置く位置は CSS の都合で決めてよい
+    // label は for で結ぶので、置く位置は CSS の都合で決めてよい。
+    //
+    // ラベルは絵柄だけなので、名前は input の aria-label が持つ（絵柄は CSS の
+    // mask で描くため、読み上げに渡せる要素が中に無い）。title は目で見る
+    // 読者向けの吹き出し
     const control =
-      `<input type="checkbox" id="${id}" class="code-wrap-input">` +
-      `<label class="${cls}" for="${id}">折り返す</label>`;
+      `<input type="checkbox" id="${id}" class="code-wrap-input" aria-label="${LABEL}">` +
+      `<label class="${cls}" for="${id}" title="${LABEL}"></label>`;
     return figure.replace(/^(<figure class="highlight\b[^>]*>)/, `$1${control}`);
   });
 }
