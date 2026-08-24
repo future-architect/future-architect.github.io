@@ -123,7 +123,7 @@ function generateRelatedPostsHtml(posts, series) {
   const item = (related) => {
     const scoreText = related.score ? `スコア: ${related.score.toFixed(4)}` : '';
     const titleAttr = `${related.lede} ${scoreText}`.trim();
-    return postListItem(related, 'related-posts-item', titleAttr, true);
+    return postListItem(related, 'related-posts-item', { titleAttr, withThumb: true });
   };
 
   // 語彙と作りはランキング・参照記事の畳みに揃える (#2249)

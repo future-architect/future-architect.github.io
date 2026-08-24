@@ -38,13 +38,13 @@ const rankingList = (posts, crownSvg, caps = [RANKING_DISPLAY_COUNT, RANKING_MAX
   const items = (list, offset) =>
     list
       .map((post, i) =>
-        postListItem(
-          post,
-          'featured-posts-item',
-          undefined,
-          true,
-          rankMark(offset + i + 1, crownSvg),
-        ),
+        // NEW を出すのはここだけ (#2788)。PV 順の並びは新しさと無関係なので、
+        // 「まだ読んでいないかもしれない新顔」の合図として働く
+        postListItem(post, 'featured-posts-item', {
+          withThumb: true,
+          rankMark: rankMark(offset + i + 1, crownSvg),
+          withNew: true,
+        }),
       )
       .join('\n');
   // 段の境界。残りが1件だけの段は畳む意味がないので前段に吸収する
