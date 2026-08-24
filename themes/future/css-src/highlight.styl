@@ -21,6 +21,9 @@ highlight-caption-background = #3c3f41   // Darcula のエディタタブ相当
 // 見えるが文字と競合しない明るさにする
 highlight-scrollbar = #7f8b9c
 highlight-caption-border = #4e5254
+// タブの根本が外へ広がる量 (#2818)。角丸の「箱」の段と同じ 8px で、
+// 上の角の丸みと根本のふくらみが同じ半径で釣り合う
+tab-flare = 8px
 // 差分専用。文字列の緑（#6a8759）だと削除側の赤に対して弱く見えるため、
 // 追加・削除を同じくらいの鮮やかさに揃える
 highlight-diff-added = #89d185
@@ -130,12 +133,18 @@ $line-numbers
       // ブロックのまま内容幅に縮める
       display: block
       width: fit-content
-      max-width: 100%
+      // 根本のふくらみのぶんだけ狭める。100% のままだと長いファイル名で
+      // タブが幅いっぱいになり、ふくらみが figure の外へ出て横スクロールが
+      // 生まれる。溢れの有無は折り返しトグルの出し分けに使っているので、
+      // 飾りでスクロールを作らない
+      max-width: unquote("calc(100% - " + tab-flare + ")")
       margin: 0
       padding: 6px article-padding
       background: highlight-caption-background
       border-radius: card-radius card-radius 0 0
       color: highlight-foreground
+      // ふくらみを外へ出すための土台
+      position: relative
       // ファイル名はコードではなくブロックのラベルなので、本文と同じ書体にする。
       // Astro（Expressive Code）も UI と中身で書体を分けている
       // （--ec-uiFontFamily はサンセリフ、コードだけ等幅） (#2456)
@@ -150,10 +159,29 @@ $line-numbers
       // 両方に最適な1つの値は無い。中身と同じという説明できる値に置く (#2456)
       font-size: 1em
       line-height: 1.6
+      // 長いファイル名は省略記号で切る。ellipsis には overflow が要るが、
+      // hidden だと根本のふくらみ（::after）まで切られる。clip に替えて
+      // 切り取りの範囲を外へ 8px だけ広げる。overflow-clip-margin に
+      // 未対応なら border box で切られ、ふくらみが出ないだけで壊れない
       overflow: hidden
+      overflow: clip
+      overflow-clip-margin: tab-flare
       text-overflow: ellipsis
       white-space: nowrap
       vertical-align: bottom
+    // 根本のふくらみ (#2818)。Chrome や Windows ターミナルのタブと同じで、
+    // タブの側面から本体の上辺へ弧でつなぐ。タブ色の正方形から四分円を
+    // 抜いて作る（弧の内側は背後の白地が見える）。
+    // 左側は付けない。タブは本体と左端が揃っていて、間に広げる隙間が無い
+    figcaption::after
+      content: ''
+      position: absolute
+      right: -(tab-flare)
+      bottom: 0
+      width: tab-flare
+      height: tab-flare
+      // 0.5px ずらすのは、抜いた四分円の縁に地の色が線で残るのを防ぐため
+      background: unquote("radial-gradient(circle at 100% 0, transparent " + tab-flare + ", " + highlight-caption-background + " " + (tab-flare + 0.5px) + ")")
     // タブが乗る側だけ角を落として、タブと本体をつなげて見せる
     figcaption + table
       border-top-left-radius: 0
