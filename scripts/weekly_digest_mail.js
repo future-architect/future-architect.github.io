@@ -28,7 +28,7 @@ hexo.extend.helper.register('weekly_digest_mail_body', function () {
           <td style="padding:4%">
               <h1 style="text-align:center">Future Tech Blog Weekly Digest</h1>
               <p style="text-align:center"><a href="https://future-architect.github.io/">フューチャー技術ブログ</a>の${currentYear}年${currentMonth}月${weeknumber}週目の投稿サマリです🚀</p>
-              <p style="text-align:center"> 経営とITをデザインする、フューチャーが運営しており、業務で利用している幅広い技術について紹介しています。 </p>
+              <p style="text-align:center"> 経営とAIをデザインする、フューチャーが運営しており、業務で利用している幅広い技術について紹介しています。 </p>
 
               <h2 style="text-align:center"> 最近投稿された記事 <img goomoji="2764" data-goomoji="2764"
                   style="margin:0 0.2ex;vertical-align:middle;max-height:24px" alt="❤"
