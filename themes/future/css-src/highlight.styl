@@ -85,6 +85,16 @@ $line-numbers
       background: none
       border-radius: 0
       padding: 0
+  // 折り返しトグルの付くブロックだけ、scripts/code_wrap_toggle.js が
+  // figure を1枚包む。役割はトグルの位置の基準を横スクロールの外に作ること
+  // だけで、この箱自体は背景も余白も持たない (#2821)
+  .code-block
+    position: relative
+  // 折り返しトグルはファイル名のタブと同じ帯に置く。タブが無いブロックは
+  // 帯そのものが無いので、ラベルのぶんだけ上を空けてコードを下げる。
+  // 28px（枠1＋padding5＋絵柄16＋padding5＋枠1）にタブとの間隔4pxを足した値
+  .highlight:has(> .code-wrap-input):not(:has(> figcaption))
+    padding-top: 32px
   // コードブロックの構造は figure.highlight > figcaption + table。
   // 背景を figure ではなく table に持たせる。figure が背景を持つと
   // ファイル名の行まで幅いっぱいに暗くなり、暗い面積がその分増える
@@ -160,13 +170,18 @@ $line-numbers
       width: 1px
       height: 1px
       opacity: 0
-    // ファイル名のタブ（figcaption）と同じ帯の右端に置く。float なのは、
-    // ブロックにすると帯が2段になってコードが下がるため。
-    // タブより低くしてあるので、両方あるときの帯の高さは今までと変わらない
+    // ファイル名のタブ（figcaption）と同じ帯の右端に置く。
+    // タブより低くしてあるので、両方あるときの帯の高さは今までと変わらない。
+    //
+    // **基準は figure の外の .code-block** (#2821)。figure は横スクロールを
+    // 受ける箱なので、その中を基準にすると（float でも sticky でも絶対配置でも）
+    // 中身と一緒に左へ流れて画面外へ出る。sticky が効かないのは、包含ブロックが
+    // figure の「見えている幅」しかなく右へ動く余地が無いため
     .code-wrap-label
-      float: right
+      position: absolute
+      top: 0
+      right: 0
       padding: 5px
-      margin-bottom: 4px
       // 小物の段（_variables.styl の3段のうち radius-small）
       border-radius: radius-small
       // 触っていないときは絵柄だけ。枠も面も出さない。
@@ -211,9 +226,6 @@ $line-numbers
     .code-wrap-input:focus-visible + .code-wrap-label
       outline: 2px solid var(--brand-navy)
       outline-offset: 2px
-    // float の下にコードを送る。トグルのあるブロックにだけ効かせる
-    .code-wrap-input ~ table
-      clear: both
     .code-wrap-input:checked ~ table
       // 折り返すので内容ぶんの幅は要らない
       width: auto
@@ -483,14 +495,21 @@ pre
     // 端まで伸ばすのは .article-entry の直下にあるコードだけ (#2568 と同じ形)。
     // calc(50% - 50vw) の 50% は包む箱の幅を指すので、折りたたみ（141件）や
     // 箇条書き（117件）の中では包む箱のぶんだけ余分に外へ出てしまう。
-    // details の中では overflow: hidden に切り落とされる
+    // details の中では overflow: hidden に切り落とされる。
+    //
+    // トグルの付くブロックは figure が .code-block に包まれている (#2821)。
+    // **伸ばすのは包む箱の側**で、figure ではない。ラベルの位置は
+    // .code-block を基準にするので、箱が画面端まで伸びていないと
+    // ラベルだけコードの内側に取り残される
     > figure.highlight,
+    > .code-block,
     > pre
       margin-inline: calc(50% - 50vw)
     // 画面端まで伸びた面に角丸は掛からない
     > pre
       border-radius: 0
-    > figure.highlight
+    > figure.highlight,
+    > .code-block > figure.highlight
       table
         border-radius: 0
       // タブは内容幅のまま。左は画面端に接するので落とし、右上だけ残す
@@ -498,7 +517,7 @@ pre
         border-radius: 0 card-radius 0 0
       // 画面端まで伸びたぶん、トグルもコードの1文字目と同じだけ内側へ入れる
       .code-wrap-label
-        margin-right: article-padding-narrow
+        right: article-padding-narrow
 
 // **実際に横スクロールできるブロックにだけトグルを出す** (#2752)。
 //

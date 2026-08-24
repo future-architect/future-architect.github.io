@@ -117,7 +117,14 @@ function addToggles(content, prefix) {
     const control =
       `<input type="checkbox" id="${id}" class="${cls}" aria-label="${LABEL}">` +
       `<label class="code-wrap-label" for="${id}" title="${LABEL}"></label>`;
-    return figure.replace(/^(<figure class="highlight\b[^>]*>)/, `$1${control}`);
+    // figure を1枚包む。ラベルは figure の中に置いたまま、位置だけこの箱を
+    // 基準にする（#2821）。figure は横スクロールを受ける箱なので、その中に
+    // 包含ブロックがあるとラベルが中身と一緒に流れる。外に基準を作れば
+    // スクロールからも overflow の切り取りからも外れる。
+    // ラベルを figure の外へ出さないのは、トグルの出し分けが
+    // `@container scroll-state` で figure の子孫にしか効かせられないため
+    const withControl = figure.replace(/^(<figure class="highlight\b[^>]*>)/, `$1${control}`);
+    return `<div class="code-block">${withControl}</div>`;
   });
 }
 
