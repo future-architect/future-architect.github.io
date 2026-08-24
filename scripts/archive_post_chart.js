@@ -79,7 +79,6 @@ const generatePostsSeries = (posts, year) => {
 //
 // 出すのは直近5年で、初期表示は直近3年（残りは凡例で足す）。11年すべてを
 // 重ねると、月1〜2本だった2016〜2018年の平坦な線が読み取りの邪魔になる。
-// 色は新しい年ほど濃い同系の濃淡で、凡例の並びと濃さが年代の順に対応する
 const YEAR_OVERLAY_SPAN = 5;
 const YEAR_OVERLAY_SHOWN = 3;
 
