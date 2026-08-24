@@ -692,6 +692,65 @@ body.page-header-fixed .header {
 .article-card .blog-info {
   margin-top: 12px;
 }
+/* 記事の間の罫線。空き（80px）の真ん中に置いて上下に 40px ずつ残す。
+   区切りの線なので rule-weak（記事本文の h2 の下と同じ役）。
+
+   .row に border を引くと、行が持つ負のマージン（ガターの半分）ぶん
+   左右に線がはみ出す。行の外に線を置いてガターぶん戻すと、
+   サムネイルの左端から本文の右端までに幅が合う。
+
+   最後の1件の下には引かない。ページャーとの境目は空きが持つ */
+.archives > .article-card {
+  position: relative;
+}
+.archives > .article-card:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: calc(var(--bs-gutter-x) * 0.5);
+  right: calc(var(--bs-gutter-x) * 0.5);
+  bottom: -40px;
+  border-bottom: 1px solid rule-weak;
+}
+/* シェアボタンは .row の直接の子なので、列と同じ左右の余白を自分で持つ。
+   ul.social-button の padding（左右 0）の方が .row > * の左右 padding より
+   詳細度が高いため、戻さないとサムネイルや本文より左に出る */
+.archives > .article-card > .social-button {
+  padding-left: calc(var(--bs-gutter-x) * 0.5);
+  padding-right: calc(var(--bs-gutter-x) * 0.5);
+}
+/* 列が横に並ぶ幅では、シェアボタンをサムネイルの真下に置いて上辺を
+   画像の下辺にそろえる (#2747)。
+
+   **3行目を 1fr にするのが要点。** 本文は3行すべてにまたがるので、本文が
+   サムネイル＋シェアより高いぶんは伸び縮みする3行目が吸う。auto の2行で
+   受けると余りが1行目にも配分され、画像とボタンの間が開く。
+
+   Bootstrap の .row（flex）を上書きするため、列の幅指定を 100% に戻して
+   1fr : 2fr の2列に置き換える。列の左右 padding は .row > * のものが
+   そのまま効くので、サムネイルと本文の間隔は変わらない。
+
+   サムネイルの無い記事（2021年4月より前）はグリッドにしない。
+   1列目が空いて本文が右に寄り、その左にシェアボタンだけが残る */
+@media (min-width: 576px) {
+  .archives > .article-card:has(.card-thumb) {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    grid-template-rows: min-content min-content 1fr;
+    grid-template-areas: 'thumb body' 'share body' '. body';
+  }
+  .archives > .article-card:has(.card-thumb) > * {
+    width: 100%;
+  }
+  .archives > .article-card > .card-thumb {
+    grid-area: thumb;
+  }
+  .archives > .article-card > .archive-post-body {
+    grid-area: body;
+  }
+  .archives > .article-card > .social-button {
+    grid-area: share;
+  }
+}
 /* We're hiring のカード。以前は画像がカード幅の半分を占め、さらに
    .article-card の padding と Bootstrap の p-3 が二重にかかっていて、
    場所を取る割に情報量が薄かった。
