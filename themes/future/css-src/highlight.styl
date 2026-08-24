@@ -198,6 +198,11 @@ $line-numbers
       // table 側に書いても継承では上書きできない
       pre
         white-space: pre-wrap
+        // 印はパディング側へはみ出させるので、pre では切り取らない。
+        // pre は $code-block から overflow: auto を継いでいるが、
+        // .highlight の中では padding が 0 なので印がそのまま切られる。
+        // 折り返し中は横に溢れないため、隠す必要も無い
+        overflow: visible
         // 行を埋めてから割る。overflow-wrap（anywhere / break-word）は
         // 「入らない語をまず次の行へ送り、それでも入らないときだけ割る」ため、
         // `$ curl <長いURL>` が「$ curl」だけの行と URL の行に分かれて3行になる。
@@ -214,17 +219,24 @@ $line-numbers
         // 印は ::before なので、コードをコピーしても入らない
         .line
           display: block
-          // ぶら下げインデント。印は左に出し、折り返した続きはコードの左端に揃う
+          position: relative
+          // ぶら下げインデント。padding と同じ幅を text-indent で打ち消すので、
+          // **論理行の1文字目は折り返しの入切で動かない**。下がるのは続きの行だけ
           padding-left: 2ch
           text-indent: -2ch
-          // 素の .line は1行ぶんの固定高。折り返すと足りなくなる
+          // 素の .line は1行ぶんの固定高。折り返すと足りなくなる。
+          // 印を絶対配置にしたぶん、空行は中身が無く高さを持てないので下限を置く
           height: auto
+          min-height: font-size * line-height
         .line::before
           content: '·'
-          display: inline-block
-          width: 2ch
-          // inline-block はブロックコンテナなので、継承した text-indent が
-          // 中身にも効いて印が箱の外へ出る。ここで戻す
+          // 印はコードブロックの左パディング側に絶対配置で出す。inline に置くと
+          // 印のぶんコード本体が右へずれて、折り返しの入切で1文字目が動く。
+          // パディングは狭い画面で 12px・広い画面で 20px あり、
+          // 中黒1文字（1ch = 7.8px）はそこに収まる
+          position: absolute
+          left: -1.4ch
+          // 継承した text-indent が中身にも効いて印が箱の外へ出るので戻す
           text-indent: 0
           // 印は読むものではなく行の起点を示すだけ。コメントと同じ濃さにする。
           // $line-numbers の #666 は地とのコントラストが 2.47 しかなく、
