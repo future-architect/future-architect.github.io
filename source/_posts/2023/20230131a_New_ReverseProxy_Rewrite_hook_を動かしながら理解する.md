@@ -5,7 +5,6 @@ postid: a
 tags:
   - Go
   - Go1.20
-  - リバースプロキシ
   - RFC
 categories:
   - Programming

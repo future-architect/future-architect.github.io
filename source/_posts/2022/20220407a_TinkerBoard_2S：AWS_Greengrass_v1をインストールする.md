@@ -5,7 +5,6 @@ postid: a
 tags:
   - AWS
   - 電子工作
-  - シングルボード
 categories:
   - IoT
 series: "電子工作/IoT"

@@ -4,7 +4,6 @@ date: 2020/06/25 10:34:33
 postid: ""
 tags:
   - JavaScript
-  - ChromeExtension
 categories:
   - Frontend
 series: "春の入門祭り2020"
