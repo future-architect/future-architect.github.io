@@ -21,8 +21,32 @@ hexo.extend.generator.register('doctor', function (locals) {
 // しかも票の高さが正しさと逆相関で、しきい値では直せなかった。
 // 監査のネタ出しとしての役目は上記3回で回収済み
 
+/**
+ * 直近1年に記事の無いタグは候補から外す。見送りを決めたタグが毎回並ぶと、
+ * 新しく増えた分が埋もれる。
+ *
+ * 包含の候補（統合候補・親子の候補）は子の記事集合が親に含まれるので、
+ * 子が活きていれば親も必ず活きている。判定は子だけで足りる。
+ */
+const ACTIVE_DAYS = 365;
+
+const activeTagNames = (tags) => {
+  const limit = Date.now() - ACTIVE_DAYS * 24 * 60 * 60 * 1000;
+  const active = new Set();
+  tags.forEach((tag) => {
+    let newest = 0;
+    tag.posts.forEach((post) => {
+      const t = post.date ? post.date.valueOf() : 0;
+      if (t > newest) newest = t;
+    });
+    if (newest >= limit) active.add(tag.name);
+  });
+  return active;
+};
+
 hexo.extend.helper.register('doctor_checks', function () {
   const posts = this.site.posts.sort('-date');
+  const active = activeTagNames(this.site.tags);
 
   // タグ -> 記事IDの集合。ほぼ重なるタグ（統合候補）と1記事タグの検出に使う
   const tagPostSets = new Map();
@@ -42,6 +66,7 @@ hexo.extend.helper.register('doctor_checks', function () {
   const nearDuplicates = [];
   const tagEntries = [...tagPostSets.entries()].filter(([, set]) => set.size >= 2);
   for (const [a, A] of tagEntries) {
+    if (!active.has(a)) continue;
     for (const [b, B] of tagEntries) {
       if (a === b || B.size < A.size || B.size - A.size > 2) continue;
       if (A.size === B.size && a > b) continue; // 完全一致ペアの重複を防ぐ
@@ -72,7 +97,7 @@ hexo.extend.helper.register('doctor_checks', function () {
   //    （タグクラウドで * / ** として出していた仕様の移設）
   const singleUse = [];
   for (const [name, set] of tagPostSets) {
-    if (set.size !== 1) continue;
+    if (set.size !== 1 || !active.has(name)) continue;
     const postId = [...set][0];
     let lonelyPair = false;
     for (const [other, otherSet] of tagPostSets) {
@@ -152,8 +177,10 @@ hexo.extend.helper.register('doctor_ontology_suggestions', function () {
   };
 
   const entries = [...sets.entries()].filter(([, s]) => s.size >= ONTOLOGY_SUGGEST_MIN_POSTS);
+  const active = activeTagNames(this.site.tags);
   const suggestions = [];
   for (const [child, C] of entries) {
+    if (!active.has(child)) continue;
     const stem = stemOf(child);
     const known = ancestorsOf(child);
     for (const [parent, P] of entries) {
