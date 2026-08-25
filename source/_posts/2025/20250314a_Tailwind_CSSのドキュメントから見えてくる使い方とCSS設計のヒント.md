@@ -4,7 +4,6 @@ date: 2025/03/14 00:00:00
 postid: a
 tags:
   - TailwindCSS
-  - CSS
   - ドキュメント
 categories:
   - Frontend

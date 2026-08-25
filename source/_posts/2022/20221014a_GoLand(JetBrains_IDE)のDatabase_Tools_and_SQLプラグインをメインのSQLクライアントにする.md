@@ -7,7 +7,6 @@ tags:
   - JetBrains
   - 便利ツール
   - SQL
-  - IDE
 categories:
   - DB
 thumbnail: /images/2022/20221014a/thumbnail.png
