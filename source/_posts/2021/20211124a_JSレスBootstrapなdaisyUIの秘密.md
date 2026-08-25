@@ -3,7 +3,6 @@ title: "JSレスBootstrapなdaisyUIの秘密"
 date: 2021/11/24 00:00:00
 postid: a
 tags:
-  - CSS
   - TailwindCSS
   - daisyUI
 categories:

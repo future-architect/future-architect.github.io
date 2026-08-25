@@ -6,7 +6,6 @@ tags:
   - Go
   - GoLand
   - WSL
-  - IDE
 categories:
   - Programming
 thumbnail: /images/2024/20240712a/thumbnail.png
