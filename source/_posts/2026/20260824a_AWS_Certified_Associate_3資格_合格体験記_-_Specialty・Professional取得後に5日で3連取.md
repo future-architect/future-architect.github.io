@@ -11,7 +11,7 @@ thumbnail: /images/2026/20260824a/thumbnail.png
 author: 棚井龍之介
 lede: "Specialty・Professionalの取得後に、AWS認定のAssociateレベル3資格を5日間で連続受験し、すべて一発合格しました。上位資格の学習でカバーできた範囲とできなかった範囲を、試験ごとの学習量とあわせて整理します。"
 ---
-<img src="/images/2026/20260824a/aws-associate-3badges.png" alt="" width="1140" height="1065">
+<img src="/images/2026/20260824a/aws-associate-3badges.png" alt="" width="512" height="478">
 
 ## はじめに
 
