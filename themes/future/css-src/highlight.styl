@@ -133,13 +133,15 @@ $line-numbers
       // ブロックのまま内容幅に縮める
       display: block
       width: fit-content
-      // 根本のふくらみのぶんだけ狭める。100% のままだと長いファイル名で
+      // 左右のふくらみのぶんだけ狭める。100% のままだと長いファイル名で
       // タブが幅いっぱいになり、ふくらみが figure の外へ出て横スクロールが
       // 生まれる。溢れの有無は折り返しトグルの出し分けに使っているので、
       // 飾りでスクロールを作らない
-      max-width: unquote("calc(100% - " + tab-flare + ")")
-      margin: 0
-      padding: 6px article-padding
+      max-width: unquote("calc(100% - " + (tab-flare * 2) + ")")
+      // 左のふくらみが広がる隙間を空ける。離したぶんは padding から引いて、
+      // ファイル名の1文字目がコードの1文字目に揃う位置を保つ（8 + 12 = 20）
+      margin: 0 0 0 tab-flare
+      padding: 6px article-padding 6px (article-padding - tab-flare)
       background: highlight-caption-background
       border-radius: card-radius card-radius 0 0
       color: highlight-foreground
@@ -172,15 +174,21 @@ $line-numbers
     // 根本のふくらみ (#2818)。Chrome や Windows ターミナルのタブと同じで、
     // タブの側面から本体の上辺へ弧でつなぐ。タブ色の正方形から四分円を
     // 抜いて作る（弧の内側は背後の白地が見える）。
-    // 左側は付けない。タブは本体と左端が揃っていて、間に広げる隙間が無い
+    // 円の中心を外側の上隅に置くので、タブ側は全高が塗られ、外へ行くほど
+    // 高さが減って 8px 地点で 0 になる。0.5px ずらすのは、抜いた縁に
+    // 地の色が線で残るのを防ぐため
+    figcaption::before,
     figcaption::after
       content: ''
       position: absolute
-      right: -(tab-flare)
       bottom: 0
       width: tab-flare
       height: tab-flare
-      // 0.5px ずらすのは、抜いた四分円の縁に地の色が線で残るのを防ぐため
+    figcaption::before
+      left: -(tab-flare)
+      background: unquote("radial-gradient(circle at 0 0, transparent " + tab-flare + ", " + highlight-caption-background + " " + (tab-flare + 0.5px) + ")")
+    figcaption::after
+      right: -(tab-flare)
       background: unquote("radial-gradient(circle at 100% 0, transparent " + tab-flare + ", " + highlight-caption-background + " " + (tab-flare + 0.5px) + ")")
     // タブが乗る側だけ角を落として、タブと本体をつなげて見せる
     figcaption + table
@@ -518,8 +526,13 @@ pre
         padding-left: article-padding-narrow
         padding-right: article-padding-narrow
       figcaption
+        // 左端に接する作りなので左のふくらみは出さない (#2818)。
+        // 離す隙間が無く、離すとコードの1文字目との揃いも崩れる
+        margin-left: 0
         padding-left: article-padding-narrow
         padding-right: article-padding-narrow
+        &::before
+          display: none
     // 端まで伸ばすのは .article-entry の直下にあるコードだけ (#2568 と同じ形)。
     // calc(50% - 50vw) の 50% は包む箱の幅を指すので、折りたたみ（141件）や
     // 箇条書き（117件）の中では包む箱のぶんだけ余分に外へ出てしまう。
