@@ -4,7 +4,6 @@ date: 2025/06/05 00:00:00
 postid: a
 tags:
   - Makefile
-  - タスクランナー
   - GitHubActions
 categories:
   - DevOps
