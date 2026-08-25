@@ -4,7 +4,6 @@ date: 2019/12/01 12:02:03
 postid: ""
 tags:
   - Ruby
-  - Selenium
   - アドベントカレンダー
 categories:
   - IoT
