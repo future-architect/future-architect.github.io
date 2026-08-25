@@ -5,7 +5,6 @@ postid: a
 tags:
   - Terraform
   - マルチリージョン
-  - 海外展開
 categories:
   - IaC
 series: "Terraform2024"
