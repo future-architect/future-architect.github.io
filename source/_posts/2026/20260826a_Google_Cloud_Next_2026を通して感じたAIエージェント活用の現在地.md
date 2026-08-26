@@ -15,7 +15,7 @@ thumbnail: /images/2026/20260826a/thumbnail.png
 author: 柴田健太
 lede: "Google Cloud Next 2026に参加してきました。混沌としてきたGemini Enterprise周りの名称整理、秘書型と独立型という2種類のエージェント、そしてデータ基盤のAIエージェントReady化について、現地で感じた温度感を整理します。"
 ---
-<img src="/images/2026/20260826a/top.png" alt="" width="1024" height="577">
+<img src="/images/2026/20260826a/top.png" alt="" width="600" height="338">
 
 ## はじめに
 
