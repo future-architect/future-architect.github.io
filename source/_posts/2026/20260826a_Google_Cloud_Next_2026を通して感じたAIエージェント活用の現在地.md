@@ -7,7 +7,7 @@ tags:
   - GoogleCloudNext
   - GoogleCloudNext2026
   - AIエージェント
-  - GeminiEnterprise
+  - Gemini
   - BigQuery
 categories:
   - AIDD
