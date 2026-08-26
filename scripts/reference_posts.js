@@ -43,9 +43,7 @@ hexo.extend.helper.register('list_reference_posts', function () {
       <ul class="reference-post-link">${items(hidden)}</ul>
     </details>`;
 
+  // 見出しは呼び出し側の EJS が section-heading で出す
   return `
-  <div class="card">
-    <div id="reference" class="reference-lede"><a href="#reference" class="headerlink" title="参照されている記事"></a>この記事を参照している記事</div>
-    <ul class="reference-post-link">${items(shown)}</ul>${more}
-  </div>`;
+  <ul class="reference-post-link">${items(shown)}</ul>${more}`;
 });
