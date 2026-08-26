@@ -2,16 +2,20 @@
 /**
  * パンくずリスト。items は [{label, url}] の配列で渡す。
  *
- * url を持たない項目が現在地。逆に言えば、全項目が url を持つページでは
- * 現在地がパンくずに現れない。記事ページがこれで、
- * 「ホーム > カテゴリ > Programming」の3つともリンクになる。
- * 記事そのものは真下の h1 が示すので、題名は重ねない。
+ * 出し方の規則は3つ (#2837)。
  *
- * 結果として記事ページとカテゴリ一覧ページのパンくずは同じ並びになるが、
- * 末尾がリンクかどうかで「そこにいるか」が分かれる。この違いを3方向に渡す。
- * 目で見る読者には色と太さ（.breadcrumb > li.active）、支援技術には
- * aria-current="page"、機械には itemprop="item" の有無 (#2705)。
- * リンクの有無だけでは、下線が出るまで見た目が同じだった。
+ * 1. 道筋（上位階層）はリンクとして全部出す
+ * 2. 現在地は出さない。真下の h1 が名乗るため。
+ *    ただし h1 が名乗らない絞り込み（Nページ目）だけは現在地として残す
+ * 3. 2項目未満になるなら、パンくず自体を出さない（下の early return）
+ *
+ * url を持たない項目が現在地。2 の結果、現在地を持つのはページャのある
+ * 2ページ目以降だけになる。現在地は3方向に違いを渡す。目で見る読者には
+ * 太さ（.breadcrumb > li.active）、支援技術には aria-current="page"、
+ * 機械には itemprop="item" の有無 (#2705 / #2722)。
+ *
+ * icon には描画済みの SVG を渡す（絵柄の辞書は _partial/svg-icon.ejs が1箇所で持つ）。
+ * itemprop="name" の外に出して、機械に渡す名前を文字だけに保つ。
  *
  * ここだけ microdata で書く。項目の並び・現在地・位置がマークアップと
  * 一体で、リンクの有無がそのまま itemprop="item" の有無になるため、
@@ -20,12 +24,14 @@
  * BreadcrumbList は itemprop を持たない独立した item なので混在してよい。
  */
 %>
+<% if (items.length >= 2) { %>
 <%# data-nosnippet: パンくずの定型文をスニペットに出さない (#2359) %>
 <ul class="breadcrumb" data-nosnippet itemscope itemtype="https://schema.org/BreadcrumbList">
   <% items.forEach(function(item, i){ %>
   <li<%- item.url ? '' : ' class="active" aria-current="page"' %> itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
-    <% if (item.url) { %><a itemprop="item" href="<%- url_for(item.url) %>"><span itemprop="name"><%= item.label %></span></a><% } else { %><span itemprop="name"><%= item.label %></span><% } %>
+    <% if (item.url) { %><a itemprop="item" href="<%- url_for(item.url) %>"><%- item.icon || '' %><span itemprop="name"><%= item.label %></span></a><% } else { %><%- item.icon || '' %><span itemprop="name"><%= item.label %></span><% } %>
     <meta itemprop="position" content="<%= i + 1 %>">
   </li>
   <% }) %>
 </ul>
+<% } %>
