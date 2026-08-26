@@ -26,7 +26,10 @@ hexo.extend.filter.register('before_post_render', function (data) {
   // 種別のあとに任意のタイトルを受け取る (#2490)。以前は種別を (\w+) で拾って
   // いたため、日本語のタイトルを書くと正規表現ごとマッチせず、note にならずに
   // ::: が本文に出ていた（書いた側は気づけない）
-  const regex = /^([ \t]*):::[ \t]+note(?:[ \t]+(\S+))?(?:[ \t]+([^\n]*))?\n([\s\S]+?)\n\1:::$/gm;
+  // ::: と note の間の空白は任意 (#2835)。Qiita の正規記法は `:::note info` で、
+  // 記事の大半はその下書きから来る。空白を必須にすると素通りして本文に ::: が出る。
+  // note の直後は空白を要求したままなので `:::noteworthy` は note にならない
+  const regex = /^([ \t]*):::[ \t]*note(?:[ \t]+(\S+))?(?:[ \t]+([^\n]*))?\n([\s\S]+?)\n\1:::$/gm;
 
   // コードフェンスの中の ::: は記法の見本なので置換しない (#2549)
   data.content = replaceOutsideFences(
