@@ -22,7 +22,8 @@ hexo.extend.generator.register('doctor', function (locals) {
 // 監査のネタ出しとしての役目は上記3回で回収済み
 
 /**
- * 直近1年に記事の無いタグは候補から外す。見送りを決めたタグが毎回並ぶと、
+ * 直近1年より古いものは候補から外す。タグの節（統合候補・1記事タグ・親子の候補）は
+ * 記事の無いタグ、本文照合の節は記事そのものを外す。見送りを決めたものが毎回並ぶと、
  * 新しく増えた分が埋もれる。
  *
  * 包含の候補（統合候補・親子の候補）は子の記事集合が親に含まれるので、
@@ -231,7 +232,6 @@ hexo.extend.helper.register('doctor_ontology_suggestions', function () {
  * 判断と突き合わせると値の帯が重なり、付与判断と相関しなかった。
  */
 const TEXT_SUGGEST_MIN_COUNT = 12; // 下げると急に増える（8回で109件、3回で573件）
-const TEXT_SUGGEST_DAYS = 730;
 const TEXT_SUGGEST_MIN_POSTS = 3; // 1〜2記事のタグは偶然の一致になりやすい
 
 // 短い名前は一般語に当たりやすい（Go が Google に当たる等）ので、
@@ -260,7 +260,7 @@ const countRegExp = (name) => {
 
 hexo.extend.helper.register('doctor_text_suggestions', function () {
   const ontology = (this.site.data && this.site.data.tag_ontology) || {};
-  const limit = Date.now() - TEXT_SUGGEST_DAYS * 24 * 60 * 60 * 1000;
+  const limit = Date.now() - ACTIVE_DAYS * 24 * 60 * 60 * 1000;
 
   const candidates = [];
   this.site.tags.forEach((tag) => {
@@ -332,7 +332,7 @@ hexo.extend.helper.register('doctor_text_suggestions', function () {
   });
   rows.sort((a, b) => b.top - a.top || (a.title < b.title ? -1 : 1));
 
-  return { posts: rows, total, minCount: TEXT_SUGGEST_MIN_COUNT, years: TEXT_SUGGEST_DAYS / 365 };
+  return { posts: rows, total, minCount: TEXT_SUGGEST_MIN_COUNT };
 });
 
 /**
