@@ -435,10 +435,17 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
   - **記事本文で h1 を使わない。** 記事タイトルが h1 相当なので `##` から始める。
     h1 を節見出しに使うと記事タイトルと同じ大きさで出る（#2526 も参照）
 - 色を変えるときは WCAG AA（コントラスト比 4.5）を満たすか計算してから入れる
+  - **計算結果はスタイルガイド（`/specials/styleguide/`）が出す**（#2856）。18トークンの
+    見本・16進数・コントラスト比はすべて `_variables.styl` の変数から生成しているので、
+    変数を変えればページの表示もそのまま変わる。**この表に数字を書き写さない**
+  - 文字の大きさの見本も同じ考え方で、コア側のセレクタに `.sg-title` / `.sg-h2`〜`.sg-h6`
+    を足して実物の値を借りている。見本のために `font-size` を書くと、サイズを決める
+    場所が2つに増える（#1927 / #1928 の再来）
 - **暗い地の上には別の段を使う**（#2839）。`ink` / `rule` / `surface` は白地の上で
   決めた値で、ネイビー地では `ink-strong` が 1.63 しか出ず1つも使えない。
-  暗地用の段は `:root` が持つ（`--on-dark-strong` / `--on-dark` / `--on-dark-mute` /
-  `--navy-raised` / `--rule-on-dark` / `--crimson-on-dark`）。いずれもブランド色の
+  暗地用の段は `_variables.styl` が持つ（`on-dark-strong` / `on-dark` / `on-dark-mute` /
+  `navy-raised` / `rule-on-dark` / `crimson-on-dark`。CSS からは `--on-dark-strong`
+  のように CSS 変数で引く）。いずれもブランド色の
   明度違いか無彩色で、**新しい色相は足していない**。ダークモード（#2746）でも同じ役
   - **暗地では「面」と「線」を同じ値にしない。** 明度だけ上げると彩度が残るので
     （地も `--navy-raised` も彩度 81%）、1px にすると鮮やかな青の筋に見える。
@@ -463,9 +470,11 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
   リンクの hover だけ下線が左から伸びる（0.25秒）。反応の速さは `hover-speed` の
   1つだけという規則の例外で、読者がわざわざ辿り着いた先なので動きを持たせても
   認知負荷にならない、という判断。**影と持ち上がりは入れない**（#2747 のまま）
-  - **CSS は `@import "_variables"` より後ろに置く。** `theme-styles.styl` の前半は
-    metronic の上書き（土台の塊）で、import がその後ろにあるため Stylus 変数が
-    解決されず `hover-speed` のような文字列がそのまま出力される（#2753 でも踏んだ）
+  - `@import "_variables"` は `theme-styles.styl` の**先頭**にある（#2856）。
+    以前は土台の塊より後ろにあり、それより前で変数を書くと解決されず
+    `hover-speed` のような文字列がそのまま出力されていた（#2753 で踏んだ）。
+    変数ファイルは CSS を1行も出さないので、先頭に移してもカスケードは変わらない
+    （連結後の CSS が `--main-font-color` の宣言順を除いて同一であることを確認済み）
 - **パンくずは道筋だけを出す**（#2837）。規則は3つ。
   ①道筋（上位階層）はリンクとして全部出す
   ②**現在地は出さない。真下の h1 が名乗るから。** ただし h1 が名乗らない絞り込み
@@ -524,8 +533,9 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
   - **腐るのは値を名指しした形だけ。** 構造の話（「ホームと同じ形」「著者ページのバッジと
     同じ部品」）は相手が動いても意味が変わらないので対象外
   - 一致が意味を持つなら値を1箇所に置いて両方から参照する。グラフの色と線の太さは
-    `scripts/chart_style.js`、CSS の色・段・サイズは `_variables.styl` と
-    `theme-styles.styl` 冒頭の `:root` が持つ
+    `scripts/chart_style.js`、CSS の色と段は `_variables.styl` が持つ
+    （`theme-styles.styl` 冒頭の `:root` はそれを CSS 変数として配るだけ #2856）。
+    サイズは `theme-styles.styl` の各ルールが1箇所ずつ持つ
   - 残っている例はインラインコードのリンク色 `#0a58ca` で、`theme-styles.styl` と
     `highlight.styl` の両方に書いてコメントがそれを説明している（詳細度の都合で両方に
     必要）。Stylus の変数に寄せれば主張が要らなくなる
