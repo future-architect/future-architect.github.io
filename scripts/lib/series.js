@@ -196,6 +196,8 @@ function build(site) {
       return {
         name,
         total: posts.length,
+        // 直近の投稿だけを見たい呼び出し側（人気の連載 #2855）のために本体を渡す
+        posts,
         // 年ごとの著者数は連載をまたいで重複するため、数ではなく名前で持つ
         authors: [...authorsOf(posts)],
         index: index || posts[0],
