@@ -44,3 +44,22 @@ hexo.extend.helper.register('techcast_items', function () {
     isNew: threshold.toISOString() <= item.isoDate,
   }));
 });
+
+// itunes:duration は "00:34:25" の形。1時間未満の回は先頭の "00:" を落とす
+function formatDuration(duration) {
+  const match = /^0+:(\d{1,2}:\d{2})$/.exec(String(duration || ''));
+  return match ? match[1] : String(duration || '');
+}
+
+// 特設ページ（/specials/techcast/）のエピソード一覧に渡す全話 (#2854)。
+// 並びは RSS のまま（新しい順）。回数を返さないのは、itunes:episode の実データが
+// 壊れているため（#17 が 1、#5 が 4、#15 と #3 が空）。番号を名乗れるのは
+// 収録側が付けたタイトルの「#N」だけなので、そのままタイトルとして出す
+hexo.extend.helper.register('techcast_episodes', function () {
+  return feedItems.map((item) => ({
+    title: item.title,
+    link: item.link,
+    date: new Date(item.isoDate),
+    duration: formatDuration(item.itunes && item.itunes.duration),
+  }));
+});
