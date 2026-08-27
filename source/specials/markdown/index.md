@@ -10,7 +10,7 @@ mathjax: true
 
 本文の記法だけ気にしてもらえれば大丈夫です。**タイトル・タグ・カテゴリなどのフロントマターは、公開時にこちらで整えます。**
 
-見本は、上に書き方、下に実際の表示結果を並べています。規則の詳細（カテゴリの選び方、連載の扱い、文章のルール）は、リポジトリの [CLAUDE.md](https://github.com/future-architect/future-architect.github.io/blob/main/CLAUDE.md) を正とします。
+見本は、上に書き方、下に実際の表示結果を並べています。見た目そのものの決まり（色・文字の大きさ・行間・間隔）は [スタイルガイド](/specials/styleguide/) にまとめています。
 
 ## 基本の記法
 
@@ -400,4 +400,4 @@ store_id,item_id,sales_date,sales_quantity,sales_amount
 
 ## 迷ったとき
 
-ここに無い記法や、判断に迷う点は [CLAUDE.md](https://github.com/future-architect/future-architect.github.io/blob/main/CLAUDE.md) を見てください。
+ここに無い記法や、どう書くか迷う箇所は、いったん普通の Markdown のまま書いて渡してください。表示の細かい調整は公開時にこちらで整えます。

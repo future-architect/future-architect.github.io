@@ -7,9 +7,9 @@ layout: page
 
 このブログの見た目の決まりと、その実物を並べたページです。
 
-決まりの正はリポジトリの [CLAUDE.md](https://github.com/future-architect/future-architect.github.io/blob/main/CLAUDE.md) で、このページはそれを目で確かめる場所です。記事を書くときの記法は [記法ガイド](/specials/markdown/) が担います。
+記事を書くときの記法は [記法ガイド](/specials/markdown/) が担います。
 
-**このページに数字を手で書いていません。** 色の見本・16進数・コントラスト比は `themes/future/css-src/_variables.styl` の変数から、文字の大きさと太さは実際のルールから出しています。
+**このページの数字は手で書いていません。** 色の見本・16進数・コントラスト比、文字の大きさ・太さ・行間、間隔の刻みのどれも、実際にサイトを描いている値をそのまま出しています。片方だけ直したときにページが嘘をつかないようにするためです。
 
 ## 色
 
@@ -80,7 +80,7 @@ layout: page
 
 ### トークンにない色
 
-上の18個以外にも、`theme-styles.styl` には変数になっていない色が残っています。役があって残しているものと、まだ整理できていないものが混ざっています。
+上の18個以外にも、トークンになっていない色が残っています。役があって残しているものと、まだ整理できていないものが混ざっています。
 
 - **役があるもの** — note の4色（色相を持つ地。`code-bg()` がその地から一段濃いインラインコードの地を作る）、表彰・殿堂の淡金、visited リンク、インラインコードの中のリンク色（詳細度の都合で2ファイルに書いている）
 - **整理できていないもの** — `--main-font-color`（`summary` の hover の1箇所だけ。`ink` の3段の外にある値）と、`.category-index-desc` / `.pagination-info` の青みのあるグレー（コメントには「メタと同じ従属情報のグレー」と書いてあるのに `ink-mute` ではない）
@@ -94,23 +94,52 @@ layout: page
 下の見本は実際のルールをそのまま借りて描いています。**記事タイトルと本文 h2 が同着になっていないか**は、この並びで確かめられます。
 
 <div class="sg-type">
-<p class="sg-type-label">記事タイトル・ページ見出し（<code>.article-title</code> / <code>.list-page</code> / <code>.article-entry h1</code>）</p>
+<div class="sg-type-label">記事タイトル・ページ見出し（<code>.article-title</code> / <code>.list-page</code> / <code>.article-entry h1</code>）</div>
 <div class="sg-title">見出しはこの大きさで出ます</div>
-<p class="sg-type-label">本文見出し h2（節の始まり。直前の空き 56px と罫線を持つ）</p>
+<div class="sg-type-label">本文見出し h2（節の始まり。直前の空き 56px と罫線を持つ）</div>
 <div class="sg-h2">見出しはこの大きさで出ます</div>
-<p class="sg-type-label">本文見出し h3（直前の空き 32px）</p>
+<div class="sg-type-label">本文見出し h3（直前の空き 32px）</div>
 <div class="sg-h3">見出しはこの大きさで出ます</div>
-<p class="sg-type-label">本文見出し h4（直前の空き 24px）</p>
+<div class="sg-type-label">本文見出し h4（直前の空き 24px）</div>
 <div class="sg-h4">見出しはこの大きさで出ます</div>
-<p class="sg-type-label">本文見出し h5（本文と同じ大きさ。太字であることが見出しの印）</p>
+<div class="sg-type-label">本文見出し h5（本文と同じ大きさ。太字であることが見出しの印）</div>
 <div class="sg-h5">見出しはこの大きさで出ます</div>
-<p class="sg-type-label">本文見出し h6（最下層）</p>
+<div class="sg-type-label">本文見出し h6（最下層）</div>
 <div class="sg-h6">見出しはこの大きさで出ます</div>
 </div>
 
 見出しの階層はサイズだけでなく、**サイズ・太さ・直前の空き・罫線**の4つで作ります。サイズだけで表そうとすると上下が詰まります。避けたいのは同着で、比を大きく取ること自体が目的ではありません。記事タイトルの下限を上げるとモバイルで字数が足りなくなるため、太さ（800 対 700）とページ先頭という位置、h2 側の空きと罫線が階層を支えています。
 
-本文（`p` / `li` / `summary`）・目次・パンくず・脚注・コードブロックの大きさは CLAUDE.md の表が持ちます。
+### 行間
+
+段は3つだけです。1つの役に1つの値しか持ちません。下の見本は同じ大きさの文字を3つの段で組んだもので、差は行送りだけです。
+
+<div class="sg-leading sg-leading-heading">
+<div class="sg-leading-label">見出し<span class="sg-leading-value"></span></div>
+<div class="sg-leading-lines">見出しは1〜2行で終わるので、行を追うための空きは要りません。長い記事タイトルが2行になったときに、上下の行が1つの塊として読める程度に留めます。</div>
+</div>
+
+<div class="sg-leading sg-leading-body">
+<div class="sg-leading-label">読み下す文章<span class="sg-leading-value"></span></div>
+<div class="sg-leading-lines">和文は仮想ボディいっぱいに字が入るので、欧文と同じ行送りでは行が貼り付いて見えます。段落を何行も読み下す場所は、目が次の行の頭へ戻れるところまで開けます。</div>
+</div>
+
+<div class="sg-leading sg-leading-row">
+<div class="sg-leading-label">行として並ぶもの<span class="sg-leading-value"></span></div>
+<div class="sg-leading-lines">一覧の1件・目次・チップ・タブは読み下す対象ではなく、目で拾う対象です。開けるほど帯が縦に伸びて、一度に見える件数が減ります。</div>
+</div>
+
+役の割り当ては次のとおりです。
+
+| 段 | 使うところ |
+| --- | --- |
+| 見出し | 記事タイトル・ページ見出し・本文の h1〜h6・サイト名・カードとパネルの見出し |
+| 読み下す文章 | 記事本文・特設ページの本文・note の中・フッターの説明 |
+| 行として並ぶもの | 記事一覧・年別一覧・目次・パンくず・ページャ・タグのチップ・タブ・カードの説明・コードブロックの1行 |
+
+**行間を書かないままにしません。** 指定が無いとブラウザやフォントの既定値が効き、環境によって行送りが変わります。実際、以前は本文見出しの h3・h5・h6 とパンくずが指定を持たず、フォント依存の値で描かれていました。
+
+アイコンや順位の丸のように**1行しか入らない小さな箱**では、`line-height` は行間ではなく箱の高さを決める値です。字を丸の中心に置くために 1 を使う場所があり、これは行間の段の外にあります。
 
 ### 太さ
 
@@ -123,6 +152,27 @@ layout: page
 | 800 | ページの主題（記事タイトル・ページ見出し） |
 
 13〜14.3px の記事名を太らせると、隣のメタより先に帯全体が重くなります。行の中の主従は「**メタから太字を外す**」側で作ります。
+
+## 間隔
+
+**間隔は4の倍数だけを使います。** 上限は決めず、刻みだけを置いています。
+
+<div class="sg-spaces">
+<div class="sg-space-item sg-space-1"><span class="sg-space-bar"></span><span class="sg-space-value"></span></div>
+<div class="sg-space-item sg-space-2"><span class="sg-space-bar"></span><span class="sg-space-value"></span></div>
+<div class="sg-space-item sg-space-3"><span class="sg-space-bar"></span><span class="sg-space-value"></span></div>
+<div class="sg-space-item sg-space-4"><span class="sg-space-bar"></span><span class="sg-space-value"></span></div>
+<div class="sg-space-item sg-space-5"><span class="sg-space-bar"></span><span class="sg-space-value"></span></div>
+<div class="sg-space-item sg-space-6"><span class="sg-space-bar"></span><span class="sg-space-value"></span></div>
+<div class="sg-space-item sg-space-7"><span class="sg-space-bar"></span><span class="sg-space-value"></span></div>
+<div class="sg-space-item sg-space-8"><span class="sg-space-bar"></span><span class="sg-space-value"></span></div>
+<div class="sg-space-item sg-space-10"><span class="sg-space-bar"></span><span class="sg-space-value"></span></div>
+<div class="sg-space-item sg-space-12"><span class="sg-space-bar"></span><span class="sg-space-value"></span></div>
+</div>
+
+段を数え上げないのは、使う値が並びの間隔だけでも 4〜48px と幅広く、どこで打ち切る理由も無いからです。刻みを4pxに揃えておけば隣の段が必ず 4px 差になり、5px と 6px のように**見分けの付かない差**が生まれません。色を3段に絞ったのと狙いは同じで、迷う余地を減らすためです。
+
+以前は 2 / 3 / 5 / 6 / 10 / 14 / 25px が混ざっていました。多くは「円の直径の半分」「チップの左パディングの分」のようにその場で計算した値で、隣の部品と揃える理由が無いまま1pxずつ違っていました。
 
 ## 形と反応
 
@@ -166,6 +216,47 @@ layout: page
 キーボードで辿っている場所の目印は、ネイビー 2px の輪郭1つです。反応（hover）と所在（focus）は別の役なので、**輪郭に差し色を使いません**。
 
 暗い地（フッターとヘッダーの帯）ではネイビーが見えないので、`on-dark-strong` に替えます。白地の入力欄のように地が明るいまま暗い場所に置かれる部品は、色ではなく `outline-offset: -2px` で内側に逃がします。
+
+## 状態
+
+部品が「今どうなっているか」は、**新しい色を足さずに、すでにある段の中で1つだけ動かして**表します。動かすのは太さか面のどちらか一方で、両方は動かしません。
+
+### 現在地（active / current）
+
+表し方は2通りあり、**その部品が押す面を持つかどうか**で決まります。文字だけが並ぶ帯では太字にし、丸や箱の的を持つ部品では面を塗ります。帯の中で面を塗ると現在地だけが浮き、的を持つ部品で太字にすると押せる範囲が変わらないので所在が読めません。
+
+<div class="sg-state">
+<div class="sg-state-row">
+<span class="sg-state-item"><span class="sg-crumb">リンク</span><span class="sg-state-label">素</span></span>
+<span class="sg-state-item"><span class="sg-crumb sg-crumb-hover">hover 中のリンク</span><span class="sg-state-label">下線</span></span>
+<span class="sg-state-item"><span class="sg-crumb sg-crumb-current">現在地</span><span class="sg-state-label">太字</span></span>
+</div>
+</div>
+
+パンくずの帯がこの形です。3つが同じ色のまま**素・下線・太字**で見分けられます。**色は動かしません。** 14px の帯の中で色と太さを同時に動かすと、現在地だけが黒く浮いて見えます。
+
+| 部品 | 表し方 | 実物 |
+| --- | --- | --- |
+| パンくず | 太字 | [すべての記事](/articles/) の2ページ目 |
+| サイドバーのカテゴリ | 太字 | [Programming カテゴリ](/categories/Programming/) |
+| ページャ | 現在のページだけネイビーの丸で塗る。省略の「…」は塗らない | [すべての記事](/articles/) の2ページ目 |
+| タブ | 本体と同じ白地になり、上辺にネイビーの線が1本入る。塗りにすると中身より目立つ | [トップページ](/) |
+
+現在地は**リンクにしません**。押しても同じ場所に来るリンクは、行き先を辿るときに空振りになります。目で見る読者・支援技術・機械の3方向に同じ違いを渡すため、太字と併せて `aria-current="page"` を付けます。
+
+### 無効・空（disabled）
+
+このサイトには押せなくなるボタンやフォームがありません。代わりに「まだ無い」「もう押せない」を表す形が3つあります。
+
+| かたち | 表し方 | 実物 |
+| --- | --- | --- |
+| 中身が無い | 文字は `ink-faint`、面は `surface-mute`。枠と大きさは中身があるときと同じに保ち、場所だけ空けておく | [すべての記事](/articles/) の投稿が無い月、[連載一覧](/series/) のサムネイルが無い連載 |
+| 押せない | リンクにせず、hover にも応えない。手の形のカーソルが出る部品では `cursor` を既定の矢印に戻す | [すべての記事](/articles/) の投稿が無い月、ページャの「…」 |
+| 押す対象ではない添え | 押せる部品の**外**に出す。シェア数はボタンの下に置き、押せる範囲と数字が別だと位置で示す | [記事ページ](/articles/20260804a/) のシェア数 |
+
+**歯抜けを詰めません。** 投稿が無い月を一覧から落とすと、無いのか見落としなのかが読者に区別できません。同じ大きさの空き枠を置いて、無いことを見えるようにします。
+
+`ink-faint` は白地でコントラスト比 4.5 を満たす最も薄い文字色です。**これより薄くしません。** 「無効だから読めなくてよい」ではなく、無効な項目も何であるかは読める必要があります。
 
 ## 部品
 

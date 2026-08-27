@@ -32,7 +32,6 @@ article-padding = 20px
 // 段落の左端に揃う（詳細は末尾のメディアクエリのコメント）
 article-padding-narrow = 12px
 font-size = 13px
-line-height = 1.6em
 
 $code-block
   background: highlight-background
@@ -56,7 +55,9 @@ $code-block
   // 等幅フォントは同じ値でも字面が大きく見え、暗い背景では膨張して見えるため、
   // 本文よりわずかに小さい 14px にしている（このファイルが元々持っていた値）
   font-size: font-size
-  line-height: font-size * line-height
+  // コードの1行は「行として並ぶもの」なので行の段（_variables.styl の
+  // leading-row）。px で持つのは行番号・折り返しトグルが同じ値で高さを揃えるため
+  line-height: font-size * leading-row
 
 $line-numbers
   color: #666
@@ -145,7 +146,7 @@ $line-numbers
       // 半分強しか埋めない。同じ font-size でも和文だけ大きく見えるため、
       // 両方に最適な1つの値は無い。中身と同じという説明できる値に置く (#2456)
       font-size: 1em
-      line-height: 1.6
+      line-height: leading-row
       overflow: hidden
       text-overflow: ellipsis
       white-space: nowrap
@@ -284,14 +285,16 @@ $line-numbers
           // 素の .line は1行ぶんの固定高。折り返すと足りなくなる。
           // 空行は中身が無く高さを持てないので下限を置く
           height: auto
-          min-height: font-size * line-height
-          // 2行目の頭から下端まで1本の縦線を引く。1行ぶん（20.8px）に
-          // 丸め誤差の余裕を足して 21 / 22px にしている（20.8 のままだと
-          // 折り返していない行にも1px の切れ端が出る）
+          min-height: font-size * leading-row
+          // 2行目の頭から下端まで1本の縦線を引く。始点は1行ぶんを整数に切り上げた
+          // 位置で、丸め誤差で1行目に線の切れ端が乗らないようにする。
+          // 引く長さを始点より 2px 多く削るので、折り返していない行では
+          // 長さが負になり線そのものが出ない
+          wrap-line-top = ceil(font-size * leading-row)
           background-image: linear-gradient(highlight-comment, highlight-comment)
           background-repeat: no-repeat
-          background-size: 2px unquote('calc(100% - 22px)')
-          background-position: left 2px top 21px
+          background-size: 2px unquote('calc(100% - ' + (wrap-line-top + 2px) + ')')
+          background-position: left 2px top wrap-line-top
         // 論理行が block になったぶん、行区切りの <br> は空行を1つ増やしてしまう
         br
           display: none
@@ -300,7 +303,7 @@ $line-numbers
       text-align: right
       padding-right: 20px
     .line
-      height: font-size * line-height
+      height: font-size * leading-row
   .gist
     margin: 0 article-padding * -1
     border-style: solid
