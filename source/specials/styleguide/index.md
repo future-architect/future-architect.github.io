@@ -13,25 +13,25 @@ layout: page
 
 ## 色
 
-黒・灰色は値ではなく**役割**で選びます。段数は「読み手が区別できるか」で決めていて、区別できない差に2つの役割を割り当てないようにしています。以前は `#616161` と `#6e6e6e` が別の役として並んでいましたが、明度差 13/255 では見分けられず、どちらを使うかの判断ができなくなっていました。
+黒・灰色は値ではなく**役割**で選びます。段階の数は「読み手が区別できるか」で決めていて、区別できない差に2つの役割を割り当てません。目安は明度差で、13/255 ほどしか違わない2色は見分けられないので、同じ色と見なしてどちらかの段階に寄せます。
 
-### 文字（ink）は3段
+### 文字（ink）は3段階
 
-3段とも白地でコントラスト比 4.5（WCAG AA）を満たします。`ink-faint` はその条件で置ける最も薄い値で、これより薄くしたいときは文字ではなく別の表現（余白・記号）に変えます。
+3段階とも白背景でコントラスト比 4.5（WCAG AA）を満たします。`ink-faint` はその条件で置ける最も薄い値で、これより薄くしたいときは文字ではなく別の表現（余白・記号）に変えます。
 
-| | 変数 | 値 | 白地との比 | 使うところ |
+| | 変数 | 値 | 白背景との比 | 使うところ |
 | --- | --- | --- | --- | --- |
 | <span class="sg-chip sg-ink-strong"></span> | `ink-strong` | <span class="sg-hex sg-ink-strong"></span> | <span class="sg-ratio sg-ink-strong"></span> | 本文・見出し・リンク |
-| <span class="sg-chip sg-ink-mute"></span> | `ink-mute` | <span class="sg-hex sg-ink-mute"></span> | <span class="sg-ratio sg-ink-mute"></span> | 本文に添える属性（日付・著者・タグ・件数・注記）と引用の地の文 |
-| <span class="sg-chip sg-ink-faint"></span> | `ink-faint` | <span class="sg-hex sg-ink-faint"></span> | <span class="sg-ratio sg-ink-faint"></span> | 空表示・無効と、添えの中でさらに弱くする記号（パンくずの `>`・折りたたみの三角） |
+| <span class="sg-chip sg-ink-mute"></span> | `ink-mute` | <span class="sg-hex sg-ink-mute"></span> | <span class="sg-ratio sg-ink-mute"></span> | 本文に添える補助情報（日付・著者・タグ・件数・注記）と引用の本文 |
+| <span class="sg-chip sg-ink-faint"></span> | `ink-faint` | <span class="sg-hex sg-ink-faint"></span> | <span class="sg-ratio sg-ink-faint"></span> | 空表示・無効と、補助情報の中でさらに弱くする記号（パンくずの `>`・折りたたみの三角） |
 
-白は段のひとつではなく地の色そのもので、役割を選ぶ余地がないため変数にしていません。
+白はスケールの1段階ではなく背景の色そのもので、役割を選ぶ余地がないため変数にしていません。
 
-### 罫線（rule）は3段
+### 罫線（rule）は3段階
 
-罫線は「囲うための線」と「切るための線」で役割が違います。枠は形を作るので見え、区切りは読みの邪魔をしない濃さで足ります。ここの比は文字の読みやすさではなく**白地との差の強さ**を表す数字です。
+罫線は「囲うための線」と「切るための線」で役割が違います。枠は形を作るので見え、区切りは読みの邪魔をしない濃さで足ります。ここの比は文字の読みやすさではなく**白背景との差の強さ**を表す数字です。
 
-| | 変数 | 値 | 白地との差 | 使うところ |
+| | 変数 | 値 | 白背景との差 | 使うところ |
 | --- | --- | --- | --- | --- |
 | <span class="sg-chip sg-rule-base"></span> | `rule-base` | <span class="sg-hex sg-rule-base"></span> | <span class="sg-ratio sg-rule-base"></span> | 枠。カード・チップ・箱・画像枠 |
 | <span class="sg-chip sg-rule-weak"></span> | `rule-weak` | <span class="sg-hex sg-rule-weak"></span> | <span class="sg-ratio sg-rule-weak"></span> | 区切り。見出しの下・リストの行間 |
@@ -39,26 +39,26 @@ layout: page
 
 見出しの下の罫線が薄いのは意図です。節の区切りは直前の空き（56px）が担っていて、線は「そこに境目がある」と気づかせる程度で足ります。読みやすさの指標ではないので濃くしません。
 
-### 面（surface）は2段
+### 面（surface）は2段階
 
-面は白地との差だけで意味を出します。濃くすると上に載る文字のコントラストが動くため、白に近い2段に留めています。
+面は白背景との差だけで意味を出します。濃くすると上に載る文字のコントラストが動くため、白に近い2段階に留めています。
 
-| | 変数 | 値 | 白地との差 | 使うところ |
+| | 変数 | 値 | 白背景との差 | 使うところ |
 | --- | --- | --- | --- | --- |
 | <span class="sg-chip sg-surface-tint"></span> | `surface-tint` | <span class="sg-hex sg-surface-tint"></span> | <span class="sg-ratio sg-surface-tint"></span> | 静止した面。チップ・タブ帯・表のヘッダ |
-| <span class="sg-chip sg-surface-mute"></span> | `surface-mute` | <span class="sg-hex sg-surface-mute"></span> | <span class="sg-ratio sg-surface-mute"></span> | hover / focus の面と、空・無効の面・インラインコードの地 |
+| <span class="sg-chip sg-surface-mute"></span> | `surface-mute` | <span class="sg-hex sg-surface-mute"></span> | <span class="sg-ratio sg-surface-mute"></span> | hover / focus の面と、空・無効の面・インラインコードの背景 |
 
 ### リンクの色は4値・3状態
 
-リンクは**地が濃くなるぶん暗い側へ振った段**を持ちます。`link-blue` は白地で AA を満たしますが、インラインコードの地や note の色地に乗ると下回るため、同系色のまま暗くした値に替えます。訪問済みは紫で、こちらは白地でもコードの地でも足ります。
+リンクは**背景が濃くなるぶん暗い側へ振った段階**を持ちます。`link-blue` は白背景で AA を満たしますが、インラインコードの背景や note の色の付いた背景に乗ると下回るため、同系色のまま暗くした値に替えます。訪問済みは紫で、こちらは白背景でもコードの背景でも足ります。
 
-比の地が3種類あるので、下の表は**それぞれの地に対する比**です。note は4色あるので、そのうち**いちばん厳しい地との比**を載せています（AA を満たすかはそこで決まります）。
+比を取る背景が3種類あるので、下の表は**それぞれの背景に対する比**です。note は4色あるので、そのうち**いちばん厳しい背景との比**を載せています（AA を満たすかはそこで決まります）。
 
-| | 変数 | 値 | 地 | 地との比 | 使うところ |
+| | 変数 | 値 | 背景 | 背景との比 | 使うところ |
 | --- | --- | --- | --- | --- | --- |
 | <span class="sg-chip sg-link-blue"></span> | `link-blue` | <span class="sg-hex sg-link-blue"></span> | 白 | <span class="sg-ratio sg-link-blue"></span> | リンク（`--a-color`） |
 | <span class="sg-chip sg-link-visited"></span> | `link-visited` | <span class="sg-hex sg-link-visited"></span> | 白 | <span class="sg-ratio sg-link-visited"></span> | 訪問済み。インラインコードの中でも同じ値 |
-| <span class="sg-chip-ground sg-chip-tint"><span class="sg-chip sg-link-on-tint"></span></span> | `link-on-tint` | <span class="sg-hex sg-link-on-tint"></span> | インラインコードの地 | <span class="sg-ratio sg-link-on-tint"></span> | インラインコードの中のリンク |
+| <span class="sg-chip-ground sg-chip-tint"><span class="sg-chip sg-link-on-tint"></span></span> | `link-on-tint` | <span class="sg-hex sg-link-on-tint"></span> | インラインコードの背景 | <span class="sg-ratio sg-link-on-tint"></span> | インラインコードの中のリンク |
 | <span class="sg-chip-ground sg-chip-note"><span class="sg-chip sg-link-on-note"></span></span> | `link-on-note` | <span class="sg-hex sg-link-on-note"></span> | note の4色 | <span class="sg-ratio sg-link-on-note"></span> | note の中のリンク |
 | <span class="sg-chip-ground sg-chip-note"><span class="sg-chip sg-link-on-note-visited"></span></span> | `link-on-note-visited` | <span class="sg-hex sg-link-on-note-visited"></span> | note の4色 | <span class="sg-ratio sg-link-on-note-visited"></span> | note の中の訪問済み |
 
@@ -68,43 +68,43 @@ layout: page
 
 ネイビーは塗り面（フッター）とインタラクション（selection / hover / focus）専用で、**文字色には使いません**。本文の `ink-strong` との比が 1.63 しかなく、文字にすると黒と区別が付かないためです。クリムゾンはコンセプトブックの文法どおり、画面内で同時に1箇所だけの差し色に限定しています。
 
-| | 変数 | 値 | 白地との比 | 使うところ |
+| | 変数 | 値 | 白背景との比 | 使うところ |
 | --- | --- | --- | --- | --- |
-| <span class="sg-chip sg-brand-navy"></span> | `brand-navy` | <span class="sg-hex sg-brand-navy"></span> | <span class="sg-ratio sg-brand-navy"></span> | 塗り面とインタラクション。フッターの地・チップ・ページャの現在地・フォーカスの輪郭 |
-| <span class="sg-chip sg-brand-gray"></span> | `brand-gray` | <span class="sg-hex sg-brand-gray"></span> | <span class="sg-ratio sg-brand-gray"></span> | 白地の上で面としてはっきり見せたいところ。小物には広げない |
+| <span class="sg-chip sg-brand-navy"></span> | `brand-navy` | <span class="sg-hex sg-brand-navy"></span> | <span class="sg-ratio sg-brand-navy"></span> | 塗り面とインタラクション。フッターの背景・チップ・ページャの現在地・フォーカスリング |
+| <span class="sg-chip sg-brand-gray"></span> | `brand-gray` | <span class="sg-hex sg-brand-gray"></span> | <span class="sg-ratio sg-brand-gray"></span> | 白背景の上で面としてはっきり見せたいところ。小さな部品には広げない |
 | <span class="sg-chip sg-brand-crimson"></span> | `brand-crimson` | <span class="sg-hex sg-brand-crimson"></span> | <span class="sg-ratio sg-brand-crimson"></span> | 差し色。フッターの波・ランキング1位・フッターの hover |
 
 ネイビーの比 16.34 は「白文字を載せられる濃さ」を、クリムゾンの 5.35 は「白文字で AA を満たす」ことを表します。どちらも**文字色としての比ではありません**。
 
-### 暗い地の上は別の段
+### 暗い背景の上は別のスケール
 
-`ink` / `rule` / `surface` は白地の上で決めた値なので、ネイビー地では1つも使えません（`ink-strong` は 1.63 しか出ません）。白地に3段置いたのと同じ考え方で、暗地の上にも段を置いています。比はネイビー地に対する値です。
+`ink` / `rule` / `surface` は白背景の上で決めた値なので、ネイビー背景では1つも使えません（`ink-strong` は 1.63 しか出ません）。白背景に3段階置いたのと同じ考え方で、暗い背景の上にもスケールを置いています。比はネイビー背景に対する値です。
 
-| | 変数 | 値 | ネイビー地との比 | 使うところ |
+| | 変数 | 値 | ネイビー背景との比 | 使うところ |
 | --- | --- | --- | --- | --- |
-| <span class="sg-chip-ground"><span class="sg-chip sg-on-dark-strong"></span></span> | `on-dark-strong` | <span class="sg-hex sg-on-dark-strong"></span> | <span class="sg-ratio sg-on-dark-strong"></span> | 見出し・強調と、暗地でのフォーカスの輪郭 |
+| <span class="sg-chip-ground"><span class="sg-chip sg-on-dark-strong"></span></span> | `on-dark-strong` | <span class="sg-hex sg-on-dark-strong"></span> | <span class="sg-ratio sg-on-dark-strong"></span> | 見出し・強調と、暗い背景でのフォーカスリング |
 | <span class="sg-chip-ground"><span class="sg-chip sg-on-dark"></span></span> | `on-dark` | <span class="sg-hex sg-on-dark"></span> | <span class="sg-ratio sg-on-dark"></span> | リンク・本文 |
-| <span class="sg-chip-ground"><span class="sg-chip sg-on-dark-mute"></span></span> | `on-dark-mute` | <span class="sg-hex sg-on-dark-mute"></span> | <span class="sg-ratio sg-on-dark-mute"></span> | 添えの情報 |
-| <span class="sg-chip-ground"><span class="sg-chip sg-navy-raised"></span></span> | `navy-raised` | <span class="sg-hex sg-navy-raised"></span> | <span class="sg-ratio sg-navy-raised"></span> | 暗地の上の面 |
-| <span class="sg-chip-ground"><span class="sg-chip sg-rule-on-dark"></span></span> | `rule-on-dark` | <span class="sg-hex sg-rule-on-dark"></span> | — | 暗地の上の線 |
-| <span class="sg-chip-ground"><span class="sg-chip sg-crimson-on-dark"></span></span> | `crimson-on-dark` | <span class="sg-hex sg-crimson-on-dark"></span> | <span class="sg-ratio sg-crimson-on-dark"></span> | 暗地の上の差し色（線・記号） |
+| <span class="sg-chip-ground"><span class="sg-chip sg-on-dark-mute"></span></span> | `on-dark-mute` | <span class="sg-hex sg-on-dark-mute"></span> | <span class="sg-ratio sg-on-dark-mute"></span> | 補助情報 |
+| <span class="sg-chip-ground"><span class="sg-chip sg-navy-raised"></span></span> | `navy-raised` | <span class="sg-hex sg-navy-raised"></span> | <span class="sg-ratio sg-navy-raised"></span> | 暗い背景の上の面 |
+| <span class="sg-chip-ground"><span class="sg-chip sg-rule-on-dark"></span></span> | `rule-on-dark` | <span class="sg-hex sg-rule-on-dark"></span> | — | 暗い背景の上の線 |
+| <span class="sg-chip-ground"><span class="sg-chip sg-crimson-on-dark"></span></span> | `crimson-on-dark` | <span class="sg-hex sg-crimson-on-dark"></span> | <span class="sg-ratio sg-crimson-on-dark"></span> | 暗い背景の上の差し色（線・記号） |
 
-**面と線を同じ値にしません。** 明度だけ上げると彩度が残るので（地も `navy-raised` も彩度 81%）、1px にすると鮮やかな青の筋に見えます。線は白を薄く重ねた `rule-on-dark` を使うと、明るくなると同時に彩度が落ちて（50%）色味が引きます。`rule-on-dark` だけ比が空欄なのは、半透明で明度が確定しないためです。
+**面と線を同じ値にしません。** 明度だけ上げると彩度が残るので（背景も `navy-raised` も彩度 81%）、1px にすると鮮やかな青の筋に見えます。線は白を薄く重ねた `rule-on-dark` を使うと、明るくなると同時に彩度が落ちて（50%）色味が引きます。`rule-on-dark` だけ比が空欄なのは、半透明で明度が確定しないためです。
 
-**差し色は役で分けます。** `brand-crimson` は暗地で 3.06 しかなく線や記号として見えないので、そこには一段明るい `crimson-on-dark` を使います。逆に塗り面は `brand-crimson` のままです（白文字で 5.35。明るい方は 4.51 で余裕がありません）。暗地で「読める差し色」と「白文字を載せられる差し色」は同時に成立しません。
+**差し色は役割で分けます。** `brand-crimson` は暗い背景で 3.06 しかなく線や記号として見えないので、そこには1段階明るい `crimson-on-dark` を使います。逆に塗り面は `brand-crimson` のままです（白文字で 5.35。明るい方は 4.51 で余裕がありません）。暗い背景で「読める差し色」と「白文字を載せられる差し色」は同時に成立しません。
 
 ### トークンにない色
 
-上の22個以外に残っている色は13箇所で、**どれも役があって残しているもの**です。
+上の22個以外に残っている色は13箇所で、**どれも役割があって残しているもの**です。
 
-- **note の4色** — 色相を持つ地。`code-bg()` がその地から一段濃いインラインコードの地を作ります
+- **note の4色** — 色相を持つ背景。`code-bg()` がその背景から1段階濃いインラインコードの背景を作ります
 - **表彰・殿堂の淡金9箇所** — メダルは灰→銅→金、殿堂のカードは淡金。ブランド色は表彰に広げません
 
-`ink` / `rule` / `surface` の**段の外にある色はありません**。以前は記事のメタ行が `#555`、畳みの三角が `#767676`、カテゴリの説明とページング情報が青みのあるグレー `#5f6d7b`、ツールチップの点線が `#bbb`、RSS アイコンの hover が純黒というように、段と 1〜17 しか違わない値が7箇所に散っていました。**差が見分けられないのに別の役として置かれていると、どちらを使うかの判断ができなくなります。**
+`ink` / `rule` / `surface` の**スケールの外にある色はありません**。**段階と数しか違わない色を別の役割として置くと、どちらを使うかの判断ができなくなります。** 新しい色を入れるときは、まず近い段階との差を見て寄せられないかを確かめます。
 
 ## 文字
 
-サイズは過去に「どこで最終値が決まるか追えない」ことが原因の不具合を2回出しているため、**1つの要素のサイズは1箇所でしか決めない**という規則にしています。幅によって変える場合もメディアクエリを重ねず `clamp()` で1行にまとめます。
+**1つの要素のサイズは1箇所でしか決めません。** 決める場所が2つあると、最終値がどこで決まるのか追えなくなります。幅によって変える場合もメディアクエリを重ねず `clamp()` で1行にまとめます。
 
 ### 大きさ
 
@@ -129,7 +129,7 @@ layout: page
 
 ### 行間
 
-段は3つだけです。1つの役に1つの値しか持ちません。下の見本は同じ大きさの文字を3つの段で組んだもので、差は行送りだけです。
+段階は3つだけです。1つの役割に1つの値しか持ちません。下の見本は同じ大きさの文字を3つの段階で組んだもので、差は行送りだけです。
 
 <div class="sg-leading sg-leading-heading">
 <div class="sg-leading-label">見出し<span class="sg-leading-value"></span></div>
@@ -146,21 +146,21 @@ layout: page
 <div class="sg-leading-lines">一覧の1件・目次・チップ・タブは読み下す対象ではなく、目で拾う対象です。開けるほど帯が縦に伸びて、一度に見える件数が減ります。</div>
 </div>
 
-役の割り当ては次のとおりです。
+役割の割り当ては次のとおりです。
 
-| 段 | 使うところ |
+| 段階 | 使うところ |
 | --- | --- |
 | 見出し | 記事タイトル・ページ見出し・本文の h1〜h6・サイト名・カードとパネルの見出し |
 | 読み下す文章 | 記事本文・特設ページの本文・note の中・フッターの説明 |
 | 行として並ぶもの | 記事一覧・年別一覧・目次・パンくず・ページャ・タグのチップ・タブ・カードの説明・コードブロックの1行 |
 
-**行間を書かないままにしません。** 指定が無いとブラウザやフォントの既定値が効き、環境によって行送りが変わります。実際、以前は本文見出しの h3・h5・h6 とパンくずが指定を持たず、フォント依存の値で描かれていました。
+**行間を書かないままにしません。** 指定が無いとブラウザやフォントの既定値が効き、環境によって行送りが変わります。
 
-アイコンや順位の丸のように**1行しか入らない小さな箱**では、`line-height` は行間ではなく箱の高さを決める値です。字を丸の中心に置くために 1 を使う場所があり、これは行間の段の外にあります。
+アイコンや順位の丸のように**1行しか入らない小さな箱**では、`line-height` は行間ではなく箱の高さを決める値です。字を丸の中心に置くために 1 を使う場所があり、これは行間のスケールの外にあります。
 
 ### 太さ
 
-段は3つだけです。中間の段（500 / 600）は置きません。フォント側に該当ウェイトがないとブラウザの合成太字になり、輪郭が濁ります。
+段階は3つだけです。中間の段階（500 / 600）は置きません。フォント側に該当ウェイトがないとブラウザの合成太字になり、輪郭が濁ります。
 
 | 太さ | 使うところ |
 | --- | --- |
@@ -187,27 +187,25 @@ layout: page
 <div class="sg-space-item sg-space-12"><span class="sg-space-bar"></span><span class="sg-space-value"></span></div>
 </div>
 
-段を数え上げないのは、使う値が並びの間隔だけでも 4〜48px と幅広く、どこで打ち切る理由も無いからです。刻みを4pxに揃えておけば隣の段が必ず 4px 差になり、5px と 6px のように**見分けの付かない差**が生まれません。色を3段に絞ったのと狙いは同じで、迷う余地を減らすためです。
-
-以前は 2 / 3 / 5 / 6 / 10 / 14 / 25px が混ざっていました。多くは「円の直径の半分」「チップの左パディングの分」のようにその場で計算した値で、隣の部品と揃える理由が無いまま1pxずつ違っていました。
+段階を数え上げないのは、使う値が並びの間隔だけでも 4〜48px と幅広く、どこで打ち切る理由も無いからです。刻みを4pxに揃えておけば隣の段階が必ず 4px 差になり、5px と 6px のように**見分けの付かない差**が生まれません。色を3段階に絞ったのと狙いは同じで、迷う余地を減らすためです。
 
 ## 形と反応
 
-### 角丸は3段
+### 角丸は3段階
 
-小物・箱・ピル（と円）の3つだけで、中間の段（3 / 5 / 6 / 10px）は置きません。段が増えると「どれを使うか」の判断ができなくなります。
+小さな部品・箱・ピル（と円）の3つだけで、中間の段階（3 / 5 / 6 / 10px）は置きません。段階が増えると「どれを使うか」の判断ができなくなります。
 
 <div class="sg-shapes">
-<span class="sg-shape sg-shape-small">小物 4px</span>
+<span class="sg-shape sg-shape-small">小さな部品 4px</span>
 <span class="sg-shape sg-shape-card">箱 8px</span>
 <span class="sg-shape sg-shape-pill">ピル 999px</span>
 </div>
 
-小物はチップ・サムネイル・操作部品、箱はカード・コードブロック・note・`details` です。
+小さな部品はチップ・サムネイル・操作部品、箱はカード・コードブロック・note・`details` です。
 
 ### 影は持たない
 
-影は0段です。以前は静止と持ち上がりの2段がありましたが、カードと影の見せ方をやめて「輪郭はなるべく作らない」方針に寄せました。一覧の1件は囲みを持たず間隔だけで分け、**横に並んで箱でないと成立しない部品**（連載・特設パネル / We're hiring / タブ / リンクプレビュー）だけが枠線を持ちます。
+影は1段階も持ちません。**輪郭はなるべく作りません。** 一覧の1件は囲みを持たず間隔だけで分け、**横に並んで箱でないと成立しない部品**（連載・特設パネル / We're hiring / タブ / リンクプレビュー）だけが枠線を持ちます。
 
 **新しい影を足しません。** 1つ足すと「どこに影を使うか」の判断が戻ってきます。
 
@@ -221,29 +219,29 @@ layout: page
 
 | 部品 | 反応 | 実物 |
 | --- | --- | --- |
-| カード | 中身が一段引く | [トップページ](/)の連載・特設パネル |
+| カード | 中身が1段階引く | [トップページ](/)の連載・特設パネル |
 | 行 | 面が付く | [トップページ](/)の「よく読まれている記事」 |
 | リンク | 下線が付く | このページの本文のリンク |
-| チップ | 地が一段変わる | [タグ一覧](/tags/) |
-| アイコンだけのリンク | 地が一段変わる（チップと同じ） | [記事ページ](/articles/20260804a/)のシェアボタン |
+| チップ | 背景が1段階変わる | [タグ一覧](/tags/) |
+| アイコンだけのリンク | 背景が1段階変わる（チップと同じ） | [記事ページ](/articles/20260804a/)のシェアボタン |
 
-アイコンだけのリンクにチップと同じ反応を持たせるのは、**下線が引く相手を持たない**からです。絵柄に下線を引いても何も起きたように見えないので、丸い地を持たせてそこを一段変えます。
+アイコンだけのリンクにチップと同じ反応を持たせるのは、**下線が引く相手を持たない**からです。絵柄に下線を引いても何も起きたように見えないので、丸い背景を持たせてそこを1段階変えます。
 
 フッターのリンクだけは例外で、下線が左から 0.25 秒で伸びます。読者がわざわざ辿り着いた先なので動きを持たせても認知負荷にならない、という判断です。タブの切り替え（0.18 秒）と `details` の開閉は反応ではなく状態の変化なので、それぞれ別の時間を持ちます。
 
-### フォーカスの輪郭
+### フォーカスリング
 
-キーボードで辿っている場所の目印は、ネイビー 2px の輪郭1つです。反応（hover）と所在（focus）は別の役なので、**輪郭に差し色を使いません**。
+キーボードで辿っている場所の目印は、ネイビー 2px のフォーカスリング1つです。反応（hover）と所在（focus）は別の役割なので、**フォーカスリングに差し色を使いません**。
 
-暗い地（フッターとヘッダーの帯）ではネイビーが見えないので、`on-dark-strong` に替えます。白地の入力欄のように地が明るいまま暗い場所に置かれる部品は、色ではなく `outline-offset: -2px` で内側に逃がします。
+暗い背景（フッターとヘッダーの帯）ではネイビーが見えないので、`on-dark-strong` に替えます。白背景の入力欄のように背景が明るいまま暗い場所に置かれる部品は、色ではなく `outline-offset: -2px` で内側に逃がします。
 
 ## 状態
 
-部品が「今どうなっているか」は、**新しい色を足さずに、すでにある段の中で1つだけ動かして**表します。動かすのは太さか面のどちらか一方で、両方は動かしません。
+部品が「今どうなっているか」は、**新しい色を足さずに、すでにあるスケールの中で1つだけ動かして**表します。動かすのは太さか面のどちらか一方で、両方は動かしません。
 
 ### 現在地（active / current）
 
-表し方は2通りあり、**その部品が押す面を持つかどうか**で決まります。文字だけが並ぶ帯では太字にし、丸や箱の的を持つ部品では面を塗ります。帯の中で面を塗ると現在地だけが浮き、的を持つ部品で太字にすると押せる範囲が変わらないので所在が読めません。
+表し方は2通りあり、**その部品がクリックできる面（ヒットエリア）を持つかどうか**で決まります。文字だけが並ぶ帯では太字にし、ヒットエリアを持つ部品では面を塗ります。帯の中で面を塗ると現在地だけが浮き、ヒットエリアを持つ部品で太字にすると押せる範囲が変わらないので所在が読めません。
 
 <div class="sg-state">
 <div class="sg-state-row">
@@ -260,7 +258,7 @@ layout: page
 | パンくず | 太字 | [すべての記事](/articles/) の2ページ目 |
 | サイドバーのカテゴリ | 太字 | [Programming カテゴリ](/categories/Programming/) |
 | ページャ | 現在のページだけネイビーの丸で塗る。省略の「…」は塗らない | [すべての記事](/articles/) の2ページ目 |
-| タブ | 本体と同じ白地になり、上辺にネイビーの線が1本入る。塗りにすると中身より目立つ | [トップページ](/) |
+| タブ | 本体と同じ白背景になり、上辺にネイビーの線が1本入る。塗りにすると中身より目立つ | [トップページ](/) |
 
 現在地は**リンクにしません**。押しても同じ場所に来るリンクは、行き先を辿るときに空振りになります。目で見る読者・支援技術・機械の3方向に同じ違いを渡すため、太字と併せて `aria-current="page"` を付けます。
 
@@ -272,17 +270,17 @@ layout: page
 | --- | --- | --- |
 | 中身が無い | 文字は `ink-faint`、面は `surface-mute`。枠と大きさは中身があるときと同じに保ち、場所だけ空けておく | [すべての記事](/articles/) の投稿が無い月、[連載一覧](/series/) のサムネイルが無い連載 |
 | 押せない | リンクにせず、hover にも応えない。手の形のカーソルが出る部品では `cursor` を既定の矢印に戻す | [すべての記事](/articles/) の投稿が無い月、ページャの「…」 |
-| 押す対象ではない添え | 押せる部品の**外**に出す。シェア数はボタンの下に置き、押せる範囲と数字が別だと位置で示す | [記事ページ](/articles/20260804a/) のシェア数 |
+| 押す対象ではない補助情報 | 押せる部品の**外**に出す。シェア数はボタンの下に置き、押せる範囲と数字が別だと位置で示す | [記事ページ](/articles/20260804a/) のシェア数 |
 
 **歯抜けを詰めません。** 投稿が無い月を一覧から落とすと、無いのか見落としなのかが読者に区別できません。同じ大きさの空き枠を置いて、無いことを見えるようにします。
 
-`ink-faint` は白地でコントラスト比 4.5 を満たす最も薄い文字色です。**これより薄くしません。** 「無効だから読めなくてよい」ではなく、無効な項目も何であるかは読める必要があります。
+`ink-faint` は白背景でコントラスト比 4.5 を満たす最も薄い文字色です。**これより薄くしません。** 「無効だから読めなくてよい」ではなく、無効な項目も何であるかは読める必要があります。
 
 ## 部品
 
 同じ見た目のものは同じ部品を使います。新しいクラスを足す前にここを探してください。呼び出し元の多い順です。
 
-| 部品 | 呼び出し元 | 役 | 実物 |
+| 部品 | 呼び出し元 | 役割 | 実物 |
 | --- | --- | --- | --- |
 | `_partial/section-heading` | 19 | 節見出しの共通形。アンカー付き | [タグ一覧](/tags/) |
 | `_partial/breadcrumb` | 17 | パンくず。道筋だけを出し、現在地は h1 に任せる | [カテゴリ一覧](/categories/) |
@@ -296,7 +294,7 @@ layout: page
 
 クラスで共有しているものは次のとおりです。
 
-| クラス | 役 | 実物 |
+| クラス | 役割 | 実物 |
 | --- | --- | --- |
 | `summary-panel` / `summary` | ページ冒頭の統計 | [カテゴリ一覧](/categories/) |
 | `article-card` / `panel-*` | 一覧の1件とパネルの中身 | [トップページ](/) |
@@ -306,31 +304,31 @@ layout: page
 | `scroll` / `cell-list` / `cell-nowrap` / `cell-mark` | 表の受け皿とセル | [アドベントカレンダー](/specials/advent-calendar/) |
 | `sr-only` | 目で見えないが読み上げられる文 | 外部リンクの「（外部サイト）」 |
 | `more-link` | 枠の下の「すべての◯◯を見る」 | [トップページ](/) |
-| `specials-text` | 特設ページの地の文（`.article-entry` の外で本文サイズを出す） | [HACK TO THE FUTURE](/specials/httf/) |
+| `specials-text` | 特設ページの本文（`.article-entry` の外で本文サイズを出す） | [HACK TO THE FUTURE](/specials/httf/) |
 
 ### note
 
-4色あり、地は色相を持ちます。中のインラインコードの地は `code-bg()` が「地より一段濃い同じ色」として作るので、4色でも表のヘッダでも同じ規則が効きます。書き方は[記法ガイド](/specials/markdown/)にあります。
+4色あり、背景は色相を持ちます。中のインラインコードの背景は `code-bg()` が「背景より1段階濃い同じ色」として作るので、4色でも表のヘッダでも同じ規則が効きます。書き方は[記法ガイド](/specials/markdown/)にあります。
 
 ::: note tip
-`tip` の地です。知っておくと得をすることに使います。
+`tip` の背景です。知っておくと得をすることに使います。
 :::
 
 ::: note info
-`info` の地です。読み進めるうえで知っておいてほしいことに使います。
+`info` の背景です。読み進めるうえで知っておいてほしいことに使います。
 :::
 
 ::: note warn
-`warn` の地です。気をつけないと困ることに使います。
+`warn` の背景です。気をつけないと困ることに使います。
 :::
 
 ::: note alert
-`alert` の地です。踏むと壊れることに使います。
+`alert` の背景です。踏むと壊れることに使います。
 :::
 
 ### 表
 
-ヘッダに地色（`surface-tint`）を敷き、本文行は白で揃えます。全セルの罫線が行を追う役を果たしているので、縞は入れません。横に溢れる表は `.scroll` が受けます。
+ヘッダに背景色（`surface-tint`）を敷き、本文行は白で揃えます。全セルの罫線が行を追う役割を果たしているので、縞は入れません。横に溢れる表は `.scroll` が受けます。
 
 | 列 | 列 | 列 |
 | --- | --- | --- |
@@ -339,4 +337,4 @@ layout: page
 
 ### チップ
 
-タグは静止時は `surface-tint` の地で、hover でネイビーに変わります。件数は文字ではなく添えなので `ink-mute` です。実物は[タグ一覧](/tags/)にあります。
+タグは静止時は `surface-tint` の背景で、hover でネイビーに変わります。件数は本文ではなく補助情報なので `ink-mute` です。実物は[タグ一覧](/tags/)にあります。
