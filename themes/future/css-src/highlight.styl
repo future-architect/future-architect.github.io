@@ -91,11 +91,6 @@ $line-numbers
   // だけで、この箱自体は背景も余白も持たない (#2821)
   .code-block
     position: relative
-  // 折り返しトグルはファイル名のタブと同じ帯に置く。タブが無いブロックは
-  // 帯そのものが無いので、ラベルのぶんだけ上を空けてコードを下げる。
-  // 28px（枠1＋padding5＋絵柄16＋padding5＋枠1）にタブとの間隔4pxを足した値
-  .highlight:has(> .code-wrap-input):not(:has(> figcaption))
-    padding-top: 32px
   // コードブロックの構造は figure.highlight > figcaption + table。
   // 背景を figure ではなく table に持たせる。figure が背景を持つと
   // ファイル名の行まで幅いっぱいに暗くなり、暗い面積がその分増える
@@ -172,12 +167,28 @@ $line-numbers
     //
     // input は隠すが display: none にはしない。タブ（radio）はそうしているが、
     // あちらはラベルが常に見えていて選択状態も面で分かる。こちらは
-    // 単独の切り替えなので、キーボードで辿れないと押せなくなる
+    // 単独の切り替えなので、キーボードで辿れないと押せなくなる。
+    //
+    // **ラベルを置く帯の高さはこの input が流れの中で作る** (#2844)。
+    // ラベルは絶対配置なので場所を空けられず、figure に padding を持たせると
+    // figure 自身がコンテナ（container-type: scroll-state）なので
+    // 「トグルが今出ているか」で消せない。input なら下の出し分けが
+    // そのまま display: none になり、帯も一緒に畳まれる
     .code-wrap-input
-      position: absolute
+      display: block
+      appearance: none
       width: 1px
-      height: 1px
+      height: 0
+      margin: 0
       opacity: 0
+      // 幅1pxとはいえ帯の高さぶん伸びるので、押せる的にしない
+      pointer-events: none
+    // 帯はファイル名のタブと同じ役。タブがあるブロックはタブ自身が帯なので、
+    // 無いブロックだけこの高さを持つ。28px（枠1＋padding5＋絵柄16＋padding5＋枠1）に
+    // タブとの間隔4pxを足した値
+    &:not(:has(> figcaption)) > .code-wrap-input
+      height: wrap-toggle-size
+      margin-bottom: 4px
     // ファイル名のタブ（figcaption）と同じ帯の右端に置く。
     // タブより低くしてあるので、両方あるときの帯の高さは今までと変わらない。
     //
@@ -549,7 +560,7 @@ pre
     /* 折り返しを入にすると溢れが消えてこの条件に入るので、入のときは出したまま。
        でないと一度折り返したら戻せなくなる */
     .article-entry .highlight .code-wrap-input:checked {
-      display: inline-block;
+      display: block;
     }
     .article-entry .highlight .code-wrap-input:checked + .code-wrap-label {
       display: block;
@@ -565,6 +576,6 @@ pre
   .article-entry .highlight .code-wrap-narrow + .code-wrap-label
     display: none
   .article-entry .highlight .code-wrap-narrow:checked
-    display: inline-block
+    display: block
   .article-entry .highlight .code-wrap-narrow:checked + .code-wrap-label
     display: block
