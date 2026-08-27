@@ -407,9 +407,8 @@ services:
 ```
 
 opaコンテナは以下のconfig.yamlを読み込んでいます。
-config.yaml
 
-```yaml
+```yaml config.yaml
 services:
   nginx:
     url: http://bundle_server

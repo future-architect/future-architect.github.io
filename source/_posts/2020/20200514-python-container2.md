@@ -146,7 +146,7 @@ CMD ["gunicorn", "--workers=5", "--threads=2", "--capture-output", "--bind=0.0.0
 
 せっかくなのでこちらも試してみましたこれの有無でできることがかなり変わってきますので。画像処理パッケージのPillowを使ってみます。requirements.txtに一行追加して、reuirements.lockを更新します。
 
-```:requirements.txt
+```text requirements.txt
 django
 gunicorn
 Pillow

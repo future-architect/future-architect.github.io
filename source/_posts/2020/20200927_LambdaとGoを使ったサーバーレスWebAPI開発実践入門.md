@@ -903,9 +903,7 @@ func TestGetUsers(t *testing.T) {
 ]
 ```
 
-* testdata/want_get_users_2.json
-
-```json
+```json testdata/want_get_users_2.json
 []
 ```
 

@@ -418,7 +418,7 @@ func HandleRequest(e InEvent) (*OutEvent, error) {
 
 出力のイメージは、例えば4並列であれば次のようなJSON配列になるイメージです。
 
-```json:出力イメージ
+```json 出力イメージ
 {
   "task_definitions": [
     {"total": 4, "seg": 0},

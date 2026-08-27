@@ -141,9 +141,7 @@ public class OwnerController extends BaseController {
 }
 ```
 
-**owner-find.sql**
-
-```sql
+```sql owner-find.sql
 SELECT /* _SQL_ID_ */
   OWNERS.ID
 , OWNERS.FIRST_NAME

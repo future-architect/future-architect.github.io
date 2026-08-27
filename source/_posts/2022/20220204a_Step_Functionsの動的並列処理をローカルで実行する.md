@@ -195,7 +195,7 @@ services:
 
 `stepfunctions`の`env_file`で環境変数を渡しています。`env_file`の中身を以下記載します。
 
-```stepfunctions-credentials.env
+```ini stepfunctions-credentials.env
 AWS_ACCOUNT_ID=test
 AWS_DEFAULT_REGION=us-east-1
 AWS_ACCESS_KEY_ID=test

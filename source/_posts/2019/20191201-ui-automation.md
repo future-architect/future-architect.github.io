@@ -96,7 +96,7 @@ Ruby設定ファイルの編集:
 （筆者の環境では以下のパスにありました）。
 `C:¥Ruby25-x64¥lib¥ruby¥gems¥2.5.0gems¥eventmachine-1.2.7-x64-mingw32¥lib¥eventmachine.rb`
 
-```ruby:eventmachine.rb
+```ruby eventmachine.rb
 require 'em/pure_ruby'
 ```
 

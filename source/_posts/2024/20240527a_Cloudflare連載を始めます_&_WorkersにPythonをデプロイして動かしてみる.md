@@ -115,7 +115,7 @@ You can currently only use built-in packages in local development. Support for d
 
 と書いてある様にPythonの標準パッケージは使えるものの、外部のパッケージについては現時点ではデプロイできない状態です。実際に試してみましたが、エラーとなり、その文面にもまだサポートされていないことが書かれていました。
 
-```requirements.txt
+```text requirements.txt
 fastapi
 ```
 

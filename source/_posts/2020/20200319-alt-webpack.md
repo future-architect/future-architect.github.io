@@ -63,7 +63,7 @@ npm install -D fuse-box@next
 
 4系の最小は以下の通りです。これはデバッグビルドのための開発サーバーを立ち上げて開発支援をする、という設定ファイルです。
 
-```js:fuse.ts
+```js fuse.ts
 import { fusebox } from 'fuse-box';
 fusebox({
   target: 'browser',

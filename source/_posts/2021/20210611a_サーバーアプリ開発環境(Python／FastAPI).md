@@ -138,7 +138,7 @@ linterはコード入力の中でリアルタイムで適用してチェック�
 
 無視するファイルも登録しておきます。
 
-``` .gitignore
+```text .gitignore
 __pycache__
 .venv
 .pytest_cache
@@ -219,7 +219,7 @@ INFO:     Application startup complete.```
 
 Dockerのイメージにするところまで作っておきましょう。まずはビルド時に不要なファイルを設定する.dockerignoreファイルを作ります。
 
-``` .dockerignore
+```text .dockerignore
 __pycache__
 .venv
 .pytest_cache

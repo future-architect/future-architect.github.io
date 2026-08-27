@@ -267,7 +267,7 @@ terraformファイルが作成され始めました！
 terraform planで構築内容を確認します。
 <details><summary>terraform planの結果</summary>
 
-```tfplan.log
+```console tfplan.log
 Terraform used the selected providers to generate the following execution plan. Resource actions are indicated with the following symbols:
   + create
 
@@ -812,7 +812,7 @@ plan結果を確認したところ、想定していた主要リソースが作�
 
 CloudWatch Logsの保持期間やECSタスク数など、コストに関わる設定は環境に応じて調整余地がありますが、今回は検証後すぐにdestroyする前提のため、このままterraform applyで構築を実施します。
 
-```tfapply.log
+```console tfapply.log
 Apply complete! Resources: 18 added, 0 changed, 0 destroyed.
 ```
 

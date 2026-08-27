@@ -185,11 +185,11 @@ func download(ctx context.Context, srv *drive.Service, name, id string) error {
 
 次のようにSuppourtsAllDrives()で設定します。
 
-```go:List()の場合
+```go List()の場合
 	r, err := srv.Files.List().SupportsAllDrives(true).PageSize(1000).
 ```
 
-```go:ダウンロードの場合
+```go ダウンロードの場合
 	resp, err := srv.Files.Get(id).SupportsAllDrives(true).Context(ctx).Download()
 ```
 

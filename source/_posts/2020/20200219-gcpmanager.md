@@ -322,7 +322,7 @@ def GenerateConfig(context):
 
 ネットワークを定義します。
 
-```python:network_template.py
+```python network_template.py
 def GenerateConfig(context):
   resources = [{
       'name': context.env['name'],
@@ -339,7 +339,7 @@ def GenerateConfig(context):
 
 ファイアウォールを定義します。
 
-```python:firewall_template.py
+```python firewall_template.py
 def GenerateConfig(context):
   resources = [{
       'name': context.env['name'],
@@ -393,7 +393,7 @@ def GenerateConfig(unused_context):
 
 最後にテンプレートをインポートするための定義ファイルを作成します。
 
-```yaml:vms.yaml
+```yaml vms.yaml
 imports:
 - path: vm_template.py
 - path: network_template.py
