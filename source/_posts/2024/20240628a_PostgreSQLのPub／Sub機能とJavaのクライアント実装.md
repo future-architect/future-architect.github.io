@@ -72,7 +72,7 @@ UNLISTEN foo;
 * 1つのセッションで複数のチャネルをLISTENできます。
 * チャネルに指定できる文字は、ASCIIの場合英数字とアンダースコア(_)が使用できます。大文字/小文字は区別されません。なお、マルチバイト文字も使用できることを確認しています。
 
-    ```sql:マルチバイト文字のチャネルに通知
+    ```sql マルチバイト文字のチャネルに通知
     NOTIFY こんにちは, '世界';
 
     -- Asynchronous notification "こんにちは" with payload "世界" received from server process with PID 14728.

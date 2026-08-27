@@ -251,9 +251,7 @@ func Handler(ctx context.Context) error {
 }
 ```
 
-- model.go
-
-```go
+```go model.go
 package model
 
 type Reader struct {

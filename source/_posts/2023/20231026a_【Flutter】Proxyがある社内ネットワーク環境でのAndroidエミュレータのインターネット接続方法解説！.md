@@ -53,7 +53,7 @@ lede: "プロキシが存在するネットワーク内で、Androidエミュレ
 
 `%USERPROFILE%/.android`に `advancedFeatures.ini` を作成し、以下の2行を追加します。
 
-```ini
+```ini advancedFeatures.ini
 Vulkan = off
 GLDirectMem = on
 ```

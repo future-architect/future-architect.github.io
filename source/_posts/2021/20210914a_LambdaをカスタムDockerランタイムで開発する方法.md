@@ -142,7 +142,7 @@ ECR + Lambdaという構成になる、という概要だけでも覚えてお�
 
 CLIで構築する場合は下記のコマンドでリポジトリを作成します。
 
-```deploy.sh
+```sh deploy.sh
 aws ecr create-repository --repository-name myapp
 ```
 

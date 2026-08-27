@@ -264,7 +264,7 @@ aws glue create-job (または update-job) を実行する際、--default-argume
 
 例えば、デプロイコマンドで DEPLOY_ENV=dev と指定した際に読み込まれる、開発環境用の設定ファイル（dev.env）の中身は以下のようになっています。
 
-```sh
+```sh dev.env
 Properties
 # Shared settings for development environment (dev.env)
 S3_SCRIPT_BUCKET=s3://aws-glue-assets-<AWS_ACCOUNT_ID>-ap-northeast-1/scripts

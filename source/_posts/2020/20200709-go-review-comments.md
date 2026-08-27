@@ -72,7 +72,7 @@ Goを初めて使うよってメンバーも多いので、インプット情報
 
 ちなみに、golangci-lintの設定は、スピード重視で最低限にしています。
 
-```bash:golangciの設定
+```bash golangciの設定
 golangci-lint run --tests --disable-all \
   --enable=goimports --enable=govet --enable=errcheck --enable=staticcheck
 ```

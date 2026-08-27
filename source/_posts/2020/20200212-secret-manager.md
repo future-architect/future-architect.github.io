@@ -330,7 +330,7 @@ def print_secret(request):
 
 ライブラリ`google-cloud-secret-manager`が必要なので、`requirements.txt`も作成しましょう。
 
-```requirements.txt
+```text requirements.txt
 google-cloud-secret-manager==0.1.1
 ```
 

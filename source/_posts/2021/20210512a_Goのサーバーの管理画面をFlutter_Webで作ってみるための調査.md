@@ -420,12 +420,12 @@ class _KenAllState extends State<KenAll> {
 
 このHTTPアクセスには外部パッケージが必要なため、pubspec.yamlとHTTPリクエストを送っているコードへimportを追加します。
 
-```yaml:pubspec.yaml
+```yaml pubspec.yaml
 dependencies:
  http: ^0.13.3
 ```
 
-```dart:lib/main.dart
+```dart lib/main.dart
 import 'package:http/http.dart' as http;
 ```
 

@@ -436,7 +436,7 @@ records_df["pace_sec_per_km"] = records_df[speed_col].apply(
 
 ラップ毎ペース・前後半スプリット判定・ペース変動係数（CV）を計算する。
 
-```python
+```python pace_analyzer.py
 # ペース変動係数: レースがどれだけ均一に走れたかの指標
 # マラソンでは 5% 以下が理想
 p_series = records_df["pace_min_per_km"].dropna()
@@ -450,7 +450,7 @@ pace_cv = p_series.std() / p_series.mean() * 100
 
 Garmin の 5 ゾーン基準（最大心拍の 50/60/70/80/90/100%）に従ってゾーン分布を算出する。加えて、前後半の平均心拍差（心拍ドリフト）とペースとの相関係数も計算する。
 
-```python
+```python hr_analyzer.py
 HR_ZONE_BOUNDS = [0.50, 0.60, 0.70, 0.80, 0.90, 1.00]
 
 for i, name in enumerate(HR_ZONE_NAMES):
@@ -464,7 +464,7 @@ for i, name in enumerate(HR_ZONE_NAMES):
 
 ケイデンス・上下動・接地時間・垂直比を前後半で比較する。さらに、独自の **フォームスコア（100 点満点）** を算出して「どこをどう改善すべきか」を定量化している。閾値はランニングエコノミー研究で一般的に参照される市民ランナー向けの目安値（ケイデンス 170〜180 spm、垂直比 8% 以下、接地時間 250ms 以下が効率的とされる）をもとに設定した。
 
-```python
+```python form_analyzer.py
 score = 100
 if cadence_total < 160:
     score -= 20  # ケイデンス不足

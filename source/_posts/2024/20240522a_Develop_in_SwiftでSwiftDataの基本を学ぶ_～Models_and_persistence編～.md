@@ -157,9 +157,7 @@ struct ContentView: View {
 - `struct`から`class`に書き換えます
 - `class`は`struct`と異なり、自動でイニシャライザが生成されないため、イニシャライザを用意します
 
-**Friend.swift**
-
-```diff
+```diff Friend.swift
 import Foundation
 + import SwiftData
 
@@ -180,9 +178,7 @@ import Foundation
 `SwiftData`と`SwiftUI`の`View`を連携させます。
 `SwiftUI`におけるエントリーポイントである`~App.swift`に次のコードを追加することで、`SwiftData`によって永続化させたデータの保存場所と`View`を連携させることができます。
 
-**BirthdaysApp.swift**
-
-```diff
+```diff BirthdaysApp.swift
 import SwiftUI
 + import SwiftData
 

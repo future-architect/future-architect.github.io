@@ -294,7 +294,7 @@ gcloud builds submit --config build.yaml
 
 * Dockerfileを以下のように変更
 
-    ```Dockerfile:Dockerfile
+    ```Dockerfile Dockerfile
     FROM pytorch/pytorch:1.9.1-cuda11.1-cudnn8-runtime
 
     WORKDIR /pipeline

@@ -420,7 +420,7 @@ GitHubのリポジトリ > Actions > 最新のワークフローに移動し、�
 1. package.jsonを作成 (nameはパッケージ名)
    フォーマッタの名前がuroborosql-fmtであるため、パッケージ名はuroborosql-fmt-napiとしました。
 
-    ```json: package.json
+    ```json package.json
     {
       "name": "uroborosql-fmt-napi",
       "version": "0.0.0",

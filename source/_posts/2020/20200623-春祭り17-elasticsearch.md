@@ -285,7 +285,7 @@ curlコマンドを使ってバシバシ叩いてみましょう。
 
 リクエストのため以下のファイルを作成します。
 
-```json:my_analyze_1.json
+```json my_analyze_1.json
 {
     "analyzer": "kuromoji",
     "text": "春の入門祭り　Elasticsearch入門"

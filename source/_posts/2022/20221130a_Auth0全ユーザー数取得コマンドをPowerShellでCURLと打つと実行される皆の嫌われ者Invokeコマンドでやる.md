@@ -30,7 +30,7 @@ CLIから通信を行える便利コマンド `curl` は元々UNIX系のコマ�
 
 ここで大事なことですが、2018年までcurlが使えなかった時代の名残なのか、 **PowerShellの場合、`curl` と打つとWindows用の`curl`であった`Invoke-WebRequest`が実行されてしまいます**（curl.exeだとcurlが動くが、curlにはinvokeコマンドのエイリアスが貼ってある）。普段Windows環境を触らない人にとって、高度な罠ですね。
 
-```sh:powershellでcurlと入力した場合の挙動例
+```console powershellでcurlと入力した場合の挙動例
 PS C:\Users\xxxx> curl
 
 コマンド パイプライン位置 1 のコマンドレット Invoke-WebRequest
@@ -96,7 +96,7 @@ User Management APIの利用権限のあるAPIのtoken取得コマンドが、**
 
 <img src="/images/2022/20221130a/0.png" alt="" width="1200" height="706">
 
-```bash:curlの実行例
+```bash curlの実行例
 curl --request POST \
   --url https://$domain/oauth/token \
   --header 'content-type: application/json' \

@@ -184,7 +184,7 @@ https://github.com/go-swagger/go-swagger/blob/master/generator/types.go#L45
 
 `type=string`を指定した時に、`format`には、`date`, `date-time` などが[指定できます](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#data-types)。
 
-```yml:設定例
+```yml 設定例
 event_time:
   type: string
   format: date-time

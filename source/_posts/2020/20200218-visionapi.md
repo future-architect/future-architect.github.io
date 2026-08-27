@@ -221,7 +221,7 @@ descriptionだけ抜き出して整理すると…
 curl -H 'Content-Type:application/json' -d '{"requests":[{"image":{"source":{"imageUri":"https://www.future.co.jp/recruit/common/img/member/chart_14_pc.png"}},"features":[{"type":"TEXT_DETECTION"}]}]}' https://vision.googleapis.com/v1/images:annotate?key=xxxxxxxxxxx
 ```
 
-```json:Response
+```json Response
 {
   "responses": [
     {
