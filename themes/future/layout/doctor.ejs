@@ -8,6 +8,7 @@
     const checks = doctor_checks();
     const ontoSuggest = doctor_ontology_suggestions();
     const onto = doctor_ontology();
+    const textSuggest = doctor_text_suggestions();
     const dormant = doctor_dormant_authors();
     const thisYear = new Date().getFullYear();
     const SECTIONS = [
@@ -15,6 +16,7 @@
       {id: 'single-use', text: '1記事にしか使われていないタグ', label: '1記事タグ', count: checks.singleUse.length},
       {id: 'ontology-suggestions', text: 'オントロジーへの追加提案（親子の候補）', label: '親子の候補', count: ontoSuggest.suggestions.length},
       {id: 'ontology', text: 'タグの親子関係（オントロジー）', label: 'オントロジー登録', count: onto.nodeCount},
+      {id: 'text-suggestions', text: '本文に何度も出てくるのにタグが付いていない記事', label: 'タグ付け漏れ候補', count: textSuggest.posts.length},
       {id: 'dormant', text: '投稿が途切れている著者', label: '投稿が途切れた著者', count: dormant.recent.length},
     ];
     const heading = (id) => partial('_partial/section-heading', SECTIONS.find(s => s.id === id));
@@ -24,7 +26,7 @@
   <section id="main" tabindex="-1" class="margin-top-30">
     <div class="footer-gap">
       <h1 class="list-page margin-bottom-20">記事ドクター</h1>
-      ※運営向けの画面です。人の判断が要る候補だけを並べます（提案であって、正とは限りません）。タグ無し・カテゴリと同名のタグ・未登録のカテゴリは PR の検査が止めるので、ここには出ません。タグの3節（統合候補・1記事タグ・親子の候補）は、直近1年間に記事のあるタグだけを対象にします
+      ※運営向けの画面です。人の判断が要る候補だけを並べます（提案であって、正とは限りません）。タグ無し・カテゴリと同名のタグ・未登録のカテゴリは PR の検査が止めるので、ここには出ません。タグの3節（統合候補・1記事タグ・親子の候補）は直近1年間に記事のあるタグ、タグ付け漏れ候補は直近2年間の記事だけを対象にします
       <ul class="summary">
         <% SECTIONS.forEach(function(sec){ %>
         <li><span class="summary-count"><%= sec.count %></span><br><span class="summary-label"><%= sec.label %></span></li>
@@ -184,6 +186,29 @@
           <% onto.standalone.forEach(function(n){ %><a href="<%- url_for(n.path) %>"><%= n.name %></a><span class="ontology-count doctor-note-inline"><%= n.posts %>本<%= (n.versions || []).length ? '・版' + n.versions.length : '' %></span><% }) %>
         </li>
       </ul>
+
+      <%# 直す単位は記事のフロントマターなので、タグごとではなく記事ごとにまとめる。
+          畳まない。運営が上から順に見て潰していく作業リストなので、
+          開く操作を挟むと候補の全体量が掴めない %>
+      <div class="doctor-single">
+        <section>
+          <%- heading('text-suggestions') %>
+          ※本文の散文（コードブロック・インラインコード・URL・HTMLタグの中は除く）に<%= textSuggest.minCount %>回以上出てくるのに、その記事に付いていないタグです。3記事以上に使われている英数3文字・和文4文字以上のタグだけを見ます。lede や章・節・項といった<strong>位置は見ません</strong>（語がどこに出るかは主題を示さないため。見出しは本文の一部なので、章立て全体に渡って出てくる語は回数で上がります）。同名衝突・一般語で照合に使えないタグは <code>source/_data/tag_ontology.yml</code> の <code>notInText</code> で外します
+          <% if (textSuggest.posts.length) { %>
+          <p class="doctor-note">候補 <%= textSuggest.total %>件 / 記事 <%= textSuggest.posts.length %>件</p>
+          <ul class="doctor-list">
+            <% textSuggest.posts.forEach(function(p){ %>
+            <li>
+              <a href="<%- url_for(p.path) %>"><%= p.title %></a>
+              <span class="doctor-note"><% p.tags.forEach(function(t, i){ %><a href="<%- url_for(t.path) %>"><%= t.name %></a>（<%= t.count %>回）<%= i < p.tags.length - 1 ? '、' : '' %><% }) %></span>
+            </li>
+            <% }) %>
+          </ul>
+          <% } else { %>
+          <p>該当なし</p>
+          <% } %>
+        </section>
+      </div>
 
       <%# タグ系の検査とは対象が違うので最後に置く。
           声かけは「まず昨年まで書いていた人、駄目なら一昨年の人」の順に進めるので、
