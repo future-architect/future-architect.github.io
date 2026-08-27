@@ -7,6 +7,7 @@ tags:
   - CloudRun
   - Python
   - 可視化
+  - Docker
 categories:
   - DataEngineering
 series: "春の入門祭り2025"

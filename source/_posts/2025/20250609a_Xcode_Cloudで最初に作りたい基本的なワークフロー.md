@@ -6,6 +6,7 @@ tags:
   - iOS
   - CI/CD
   - Xcode
+  - Slack
 categories:
   - Mobile
 series: "CI/CD"

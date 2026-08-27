@@ -5,6 +5,9 @@ postid: a
 tags:
   - Terraform
   - モック
+  - SQS
+  - コンテナ
+  - AWS
 categories:
   - IaC
 series: "Terraform2026"

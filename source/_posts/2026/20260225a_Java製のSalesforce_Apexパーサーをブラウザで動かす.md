@@ -6,6 +6,7 @@ tags:
   - Java
   - Salesforce
   - WebAssembly
+  - JavaScript
 categories:
   - Programming
 thumbnail: /images/2026/20260225a/thumbnail.png

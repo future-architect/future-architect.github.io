@@ -7,6 +7,7 @@ tags:
   - S3
   - データレイク
   - AWS
+  - DWH
 categories:
   - DataEngineering
 thumbnail: /images/2026/20260605a/thumbnail.png

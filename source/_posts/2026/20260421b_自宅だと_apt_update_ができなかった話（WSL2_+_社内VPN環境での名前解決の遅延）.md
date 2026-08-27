@@ -8,6 +8,7 @@ tags:
   - Ubuntu
   - 環境構築
   - トラブルシュート
+  - プロキシ
 categories:
   - Infrastructure
 series: "春の入門祭り2026"

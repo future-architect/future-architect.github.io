@@ -22,7 +22,8 @@ hexo.extend.generator.register('doctor', function (locals) {
 // 監査のネタ出しとしての役目は上記3回で回収済み
 
 /**
- * 直近1年に記事の無いタグは候補から外す。見送りを決めたタグが毎回並ぶと、
+ * 直近1年より古いものは候補から外す。タグの節（統合候補・1記事タグ・親子の候補）は
+ * 記事の無いタグ、本文照合の節は記事そのものを外す。見送りを決めたものが毎回並ぶと、
  * 新しく増えた分が埋もれる。
  *
  * 包含の候補（統合候補・親子の候補）は子の記事集合が親に含まれるので、
@@ -54,10 +55,6 @@ hexo.extend.helper.register('doctor_checks', function () {
   this.site.tags.forEach((tag) => {
     tagPath.set(tag.name, tag.path);
     tagPostSets.set(tag.name, new Set(tag.posts.map((p) => p._id)));
-  });
-
-  posts.forEach((post) => {
-    const tagNames = post.tags.map((t) => t.name);
   });
 
   // 4) ほぼ重なるタグ（統合候補）。A の記事がすべて B にも付いていて、
@@ -215,6 +212,127 @@ hexo.extend.helper.register('doctor_ontology_suggestions', function () {
 
   const childCount = new Set(suggestions.map((s) => s.child)).size;
   return { suggestions, childCount };
+});
+
+/**
+ * 本文に何度も出てくるのにタグが付いていない記事 (#2784)。
+ *
+ * タイトル照合（#2708 で一巡して廃止）を lede と章・節・項に広げる案を測ったが、
+ * 候補が1,493行に膨らみ、目視の妥当率が lede 30%・見出し 10% まで落ちた。
+ * lede は背景を書く場所なので「A ではなく B の話」の A を拾い（GitLab の記事に
+ * GitHub、Vue.js の記事に React、PostgreSQL 全文検索の記事に Elasticsearch）、
+ * 見出しは節の粒度なので手順の1ステップを拾う（「Linuxインストール」
+ * 「Dockerイメージをプッシュ」）。語がどこに出るかは主題を示さない。
+ *
+ * 効いたのは位置ではなく本文全体での出現回数だった。見出しも本文の一部なので、
+ * 章立て全体に渡って出てくる語は回数で上がり、1回だけ出る手順の語は落ちる。
+ *
+ * 照合に使えない語は notInText で1つずつ外す。語の一般性を機械で測る手
+ * （その語が本文に出る記事のうち実際にタグが付いている割合）は #2708 の
+ * 判断と突き合わせると値の帯が重なり、付与判断と相関しなかった。
+ */
+const TEXT_SUGGEST_MIN_COUNT = 12; // 下げると急に増える（8回で109件、3回で573件）
+const TEXT_SUGGEST_MIN_POSTS = 3; // 1〜2記事のタグは偶然の一致になりやすい
+
+// 短い名前は一般語に当たりやすい（Go が Google に当たる等）ので、
+// 英数3文字・和文4文字を下限にする
+const matchableTag = (name) => (/^[\x20-\x7e]+$/.test(name) ? name.length >= 3 : name.length >= 4);
+
+// 散文だけを数える。コード・インラインコード・URL・HTMLタグの中に出る語は
+// 記事の主題ではなく識別子や参照先で、見出しのリンク先（Go の issue へのリンクが
+// GitHub に当たる等）もここで落ちる
+const proseOf = (md) =>
+  md
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/~~~[\s\S]*?~~~/g, ' ')
+    .replace(/`[^`\n]*`/g, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+    .replace(/https?:\/\/\S+/g, ' ');
+
+// 英数タグは単語境界で数える（SQL が PostgreSQL に当たるのを防ぐ）
+const countRegExp = (name) => {
+  const escaped = name.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
+  return /^[\x20-\x7e]+$/.test(name)
+    ? new RegExp(`(?:^|[^A-Za-z0-9])${escaped}(?=[^A-Za-z0-9]|$)`, 'gi')
+    : new RegExp(escaped, 'g');
+};
+
+hexo.extend.helper.register('doctor_text_suggestions', function () {
+  const ontology = (this.site.data && this.site.data.tag_ontology) || {};
+  const limit = Date.now() - ACTIVE_DAYS * 24 * 60 * 60 * 1000;
+
+  const candidates = [];
+  this.site.tags.forEach((tag) => {
+    if (tag.posts.length < TEXT_SUGGEST_MIN_POSTS || !matchableTag(tag.name)) return;
+    // 同名衝突（連載の索引を指す「インデックス」が DB インデックスに当たる）と
+    // 一般語は照合に使えない。判断は tag_ontology.yml の notInText が持つ
+    if ((ontology[tag.name] || {}).notInText) return;
+    candidates.push({
+      name: tag.name,
+      path: tag.path,
+      lower: tag.name.toLowerCase(),
+      re: countRegExp(tag.name),
+    });
+  });
+
+  // 抽象タグは書かなくてよい (#2292) ので、記事のタグから broader を辿って
+  // 届く語は提案しない（Dev Containers の記事に Docker、MCP の記事に LLM）
+  const ancestorMemo = new Map();
+  const ancestorsOf = (name) => {
+    if (ancestorMemo.has(name)) return ancestorMemo.get(name);
+    const acc = new Set();
+    const walk = (n, trail) => {
+      const node = ontology[n] || {};
+      for (const p of node.broader || []) {
+        if (trail.has(p)) continue;
+        trail.add(p);
+        acc.add(p);
+        walk(p, trail);
+      }
+      if (typeof node.versionOf === 'string' && !trail.has(node.versionOf)) {
+        trail.add(node.versionOf);
+        acc.add(node.versionOf);
+        walk(node.versionOf, trail);
+      }
+    };
+    walk(name, new Set([name]));
+    ancestorMemo.set(name, acc);
+    return acc;
+  };
+
+  const rows = [];
+  let total = 0;
+  this.site.posts.forEach((post) => {
+    if (!post.date || post.date.valueOf() < limit) return;
+    const prose = proseOf(String(post._content || post.raw || ''));
+    const lower = prose.toLowerCase();
+    const tagNames = post.tags.map((t) => t.name);
+    const own = new Set(tagNames);
+    const reachable = new Set();
+    tagNames.forEach((t) => ancestorsOf(t).forEach((a) => reachable.add(a)));
+
+    const hits = [];
+    for (const c of candidates) {
+      if (own.has(c.name) || reachable.has(c.name)) continue;
+      // タイトルに連載名を含む記事では、連載名の一部に当たっても主題ではない
+      if (post.series && String(post.series).includes(c.name)) continue;
+      // 系統タグを既に持っていれば提案しない（Go1.27 の記事に Go を重ねない）
+      if (tagNames.some((mine) => mine !== c.name && mine.toLowerCase().includes(c.lower)))
+        continue;
+      if (!lower.includes(c.lower)) continue; // 回数を数える前の粗い篩
+      const count = (prose.match(c.re) || []).length;
+      if (count >= TEXT_SUGGEST_MIN_COUNT) hits.push({ name: c.name, path: c.path, count });
+    }
+    if (!hits.length) return;
+    hits.sort((a, b) => b.count - a.count);
+    total += hits.length;
+    // 直す単位は記事のフロントマターなので、記事ごとにまとめる
+    rows.push({ title: post.title, path: post.path, tags: hits, top: hits[0].count });
+  });
+  rows.sort((a, b) => b.top - a.top || (a.title < b.title ? -1 : 1));
+
+  return { posts: rows, total, minCount: TEXT_SUGGEST_MIN_COUNT };
 });
 
 /**

@@ -10,6 +10,7 @@ tags:
   - インターン2024
   - Rust
   - 2WaySQL
+  - uroboroSQL
 categories:
   - DB
 thumbnail: /images/2024/20241210a/thumbnail.gif

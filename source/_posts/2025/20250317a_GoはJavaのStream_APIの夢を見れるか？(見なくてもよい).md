@@ -7,6 +7,7 @@ tags:
   - Java
   - ジェネリクス
   - イテレータ
+  - slices
 categories:
   - Programming
 thumbnail: /images/2025/20250317a/thumbnail.png
