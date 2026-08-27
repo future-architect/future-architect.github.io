@@ -5,6 +5,7 @@ postid: a
 tags:
   - Dify
   - AIエージェント
+  - Gemini
 categories:
   - AIDD
 thumbnail: /images/2026/20260212a/thumbnail.png

@@ -6,6 +6,8 @@ tags:
   - AWS
   - 合格記
   - ネットワーク
+  - VPC
+  - DNS
 categories:
   - Cloud
 thumbnail: /images/2026/20260708a/thumbnail.png

@@ -8,6 +8,7 @@ tags:
   - OAuth
   - Googleカレンダー
   - TypeScript
+  - AIエージェント
 categories:
   - AIDD
 series: "春の入門祭り2025"

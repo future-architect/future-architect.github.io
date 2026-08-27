@@ -7,6 +7,7 @@ tags:
   - PostgreSQL
   - 構文解析
   - 2WaySQL
+  - uroboroSQL
 categories:
   - DB
 thumbnail: /images/2025/20250930a/thumbnail.png
