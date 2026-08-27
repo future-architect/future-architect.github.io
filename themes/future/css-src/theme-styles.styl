@@ -175,14 +175,19 @@ Header and header elements
 .header-nav-link:hover,
 .header-nav-link:focus,
 .header-dropdown-item:hover,
-.header-dropdown-item:focus {
+.header-dropdown-item:focus,
+.header-dropdown-more:hover,
+.header-dropdown-more:focus {
   text-decoration: none;
 }
 /* サイト名。ホームでは h1、それ以外のページでは div で出している。見た目は同じ */
+/* 帯が詰まったときに縮むのは検索欄だけ。サイト名とナビは縮めない
+   （サイト名が折り返すと帯の高さが動き、ナビは white-space: nowrap で縮めない）。
+   ナビ4つが並ぶ 992〜1199px では余りが 14px しか無いので、フォントの実寸が
+   違う環境でも崩れないように、逃げ場を検索欄の側に作っておく */
 .header-brand {
   margin: 0;
-  /* 帯が詰まったときに縮むのは文字の側。ロゴは縮めない */
-  min-width: 0;
+  flex-shrink: 0;
 }
 .header-brand-link {
   display: flex;
@@ -232,6 +237,9 @@ Header and header elements
 
 /* 行き先の帯。畳んだ中身は :hover と :focus-within で開く。JS は使わない
    ——検索窓のヒントパネル (#2791) と同じ形 */
+.header-nav {
+  flex-shrink: 0;
+}
 .header-nav-list {
   display: flex;
   align-items: center;
@@ -309,8 +317,45 @@ Header and header elements
   text-decoration: none;
   transition: background-color hover-speed ease;
 }
-.header-dropdown-item:hover {
+.header-dropdown-item:hover,
+.header-dropdown-more:hover {
   background: surface-mute;
+}
+/* パネルの中の仕切り。見出しではなく面の中のラベルなので h2 は使わない
+   （検索のヒントパネルと同じ扱い） */
+.header-dropdown-label {
+  margin: 0 0 (space-step * 2);
+  padding: 0 (space-step * 3);
+  font-size: 12px;
+  line-height: leading-row;
+  font-weight: 700;
+  color: ink-mute;
+}
+/* カテゴリ・連載の行。リソース / コミュニティの行と違って説明を持たない。
+   名前が主題そのもので、6行並ぶので太字にもしない（検索パネルのカテゴリ行を
+   素の太さにしたのと同じ理由）。説明はカテゴリ個別ページが持つ */
+.header-dropdown-row {
+  display: block;
+  font-size: 13px;
+  line-height: leading-row;
+  color: ink-strong;
+}
+/* 右肩の件数は「総数」の意味 (#2129)。押す対象ではない添えなので薄い段に置く */
+.header-dropdown-count {
+  margin-left: space-step;
+  font-size: 0.75em;
+  font-weight: normal;
+  color: ink-faint;
+}
+/* 全件への導線。行の並びとは役が違うので、仕切りの線を1本入れて下に置く */
+.header-dropdown-more {
+  display: block;
+  margin-top: space-step;
+  padding: (space-step * 2) (space-step * 3);
+  border-top: 1px solid rule-weak;
+  font-size: 12px;
+  line-height: leading-row;
+  color: ink-mute;
 }
 .header-dropdown-name {
   display: block;
@@ -4140,6 +4185,8 @@ a.award-badge:focus {
 .header-search {
   display: flex;
   align-items: center;
+  /* 帯が詰まったときに縮むのはここ（上の .header-brand の段を参照） */
+  min-width: 0;
   border: 1px solid rule-base;
   border-radius: radius-small;
   background: surface-tint;
@@ -4154,6 +4201,7 @@ a.award-badge:focus {
 }
 .header-search input {
   width: 200px;
+  min-width: 0;
   height: 32px;
   padding: 0 (space-step * 3);
   font-size: 16px; /* 16px 未満だと iOS がフォーカス時に画面をズームする */
@@ -4240,9 +4288,10 @@ a.award-badge:focus {
   position: absolute;
   top: 100%;
   right: 0;
-  /* カテゴリを3列に並べられる幅。最長の「DataEngineering 45」が実測150px。
+  /* タグのチップが3〜4個ずつ折り返す幅。カテゴリを3列に並べるための 530px は、
+     カテゴリと連載をヘッダーのナビへ移して要らなくなった (#2877)。
      引く 24px は .container の左右の余白 12px × 2 */
-  width: unquote('min(530px, calc(100vw - 24px))');
+  width: unquote('min(420px, calc(100vw - 24px))');
   padding: 16px 14px 4px;
   /* 320px 幅では1列に落ちて縦に伸びるので、面の中で送れるようにする */
   max-height: unquote('calc(100vh - ' + header-height + ')');
@@ -4271,45 +4320,11 @@ a.award-badge:focus {
   color: ink-mute;
 }
 /* チップはホームでは 12px。あちらは本文と並ぶ添えの情報だが、こちらは
-   面の中の行き先そのものなので、カテゴリの行と同じ大きさまで上げる */
+   面の中の行き先そのものなので一段上げる。左マージンを落として、
+   チップの枠の左端をラベルの文字の左端に揃える */
 .header-search-hint .tag-list-link {
   font-size: 13px;
-  margin: 5px 12px 12px 4px;
-}
-/* ラベルは面の端、項目は一段下げて、カテゴリのアイコンとチップの枠を
-   同じ位置から始める。チップ側は ul.tag-list の -13px と自身の左マージン
-   4px を織り込んだ差 */
-.header-search-hint .blog-tags {
-  margin-left: 18px;
-}
-.header-search-hint-categories {
-  margin: 0 0 28px 9px;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  /* 13件が幅530pxの面で3列5行、幅375pxの端末で2列7行になる */
-  grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
-  gap: 12px 16px;
-  font-size: 14px;
-}
-.header-search-hint-categories li {
-  list-style: none;
-}
-/* 太字はラベルとチップが担う。ここは13行あるので、素の太さで面を静める */
-.header-search-hint-categories .article-category-link {
-  font-weight: normal;
-}
-/* 連載のチップの塊 (#2855)。チップ自身が下に 12px 持つので、
-   カテゴリの塊と同じ 28px の空きになるよう差分だけ足す */
-.header-search-hint-series {
-  margin-bottom: 16px;
-}
-/* 右肩の件数はタグのチップと同じく「総数」の意味 (#2129) */
-.header-search-hint-count {
-  margin-left: 4px;
-  font-size: 0.75em;
-  font-weight: normal;
-  color: ink-faint;
+  margin: 5px 12px 12px 0;
 }
 .reference-posts-item a {
   color: ink-strong;
