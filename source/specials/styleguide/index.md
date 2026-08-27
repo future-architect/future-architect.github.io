@@ -45,8 +45,12 @@ layout: page
 
 | | 変数 | 値 | 白地との差 | 使うところ |
 | --- | --- | --- | --- | --- |
-| <span class="sg-chip sg-surface-tint"></span> | `surface-tint` | <span class="sg-hex sg-surface-tint"></span> | <span class="sg-ratio sg-surface-tint"></span> | 静止した面。チップ・タブ帯・表のヘッダ |
-| <span class="sg-chip sg-surface-mute"></span> | `surface-mute` | <span class="sg-hex sg-surface-mute"></span> | <span class="sg-ratio sg-surface-mute"></span> | hover / focus の面と、空・無効の面・インラインコードの地 |
+| <span class="sg-chip sg-surface-tint"></span> | `surface-tint` | <span class="sg-hex sg-surface-tint"></span> | <span class="sg-ratio sg-surface-tint"></span> | 薄い地。枠と対で使う（チップ・タブ帯・表のヘッダ） |
+| <span class="sg-chip sg-surface-mute"></span> | `surface-mute` | <span class="sg-hex sg-surface-mute"></span> | <span class="sg-ratio sg-surface-mute"></span> | 面。hover / focus と、囲み・空・無効・インラインコードの地 |
+
+**面は白と `surface-mute` の2値で、反応は必ずもう一方へ動きます。** 白地の行に `surface-mute` を敷くのと、`surface-mute` の囲みの中の行が白へ抜けるのは同じ差なので、地がどちらでも反応の強さが変わりません。
+
+`surface-tint` は面だけで輪郭を作る役には使えません。白地との差は上の表のとおり、罫線の最も薄い段（白地の `rule-weak`）より小さく、実際の使いどころはすべて `rule-base` の枠と対になっています。
 
 ### リンクの色は4値・3状態
 
@@ -207,9 +211,11 @@ layout: page
 
 ### 影は持たない
 
-影は0段です。以前は静止と持ち上がりの2段がありましたが、カードと影の見せ方をやめて「輪郭はなるべく作らない」方針に寄せました。一覧の1件は囲みを持たず間隔だけで分け、**横に並んで箱でないと成立しない部品**（連載・特設パネル / We're hiring / タブ / リンクプレビュー）だけが枠線を持ちます。
+影は0段です。以前は静止と持ち上がりの2段がありましたが、カードと影の見せ方をやめて「輪郭はなるべく作らない」方針に寄せました。一覧の1件は囲みを持たず間隔だけで分け、**横に並んで箱でないと成立しない部品**（連載・特設パネル / タブ / リンクプレビュー）だけが枠線を持ちます。
 
 **新しい影を足しません。** 1つ足すと「どこに影を使うか」の判断が戻ってきます。
+
+囲みの持たせ方は**置かれる場所**で決まります。一覧ページのパネルは横に並ぶ箱なので枠線、読み下しの流れの中にある囲み（記事末の[著者紹介と連載ナビ](/articles/20260807a/)、[年月アーカイブ](/articles/2026/08/)の期間ページャ）は `surface-mute` の面です。線で1本だけ残すより、面の方が「本文の外側」であることが伝わります。
 
 ### hover は1部品1反応
 
@@ -222,7 +228,7 @@ layout: page
 | 部品 | 反応 | 実物 |
 | --- | --- | --- |
 | カード | 中身が一段引く | [トップページ](/)の連載・特設パネル |
-| 行 | 面が付く | [トップページ](/)の「よく読まれている記事」 |
+| 行 | 面が入れ替わる。白地なら `surface-mute` が付き、`surface-mute` の囲みの中なら白へ抜ける | [トップページ](/)の「よく読まれている記事」、[記事ページ](/articles/20260807a/)の連載ナビ |
 | リンク | 下線が付く | このページの本文のリンク |
 | チップ | 地が一段変わる | [タグ一覧](/tags/) |
 | アイコンだけのリンク | 地が一段変わる（チップと同じ） | [記事ページ](/articles/20260804a/)のシェアボタン |
