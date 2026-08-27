@@ -3796,6 +3796,8 @@ a.award-badge:focus {
 }
 .tab_item {
   float: left;
+  /* 真下に出す .tab-hint の基準 (#2852) */
+  position: relative;
   /* 上辺のアクセントは箱の内側に置く。以前は負のマージン（-8px）でカードの外へ
      出していたが、枠線を持つと線がタブを横切るので内側に収めた (#2747)。
      文字の位置は変わらない（border 3 + padding 10 = 13。未選択も選択も同じ）。
@@ -3828,24 +3830,44 @@ a.award-badge:focus {
   border-top-color: rule-strong;
   color: ink-strong;
 }
-/* 矢印キーで切り替えられることは画面に出ていない (#2852)。キーボードで帯に
-   入ったときだけ、帯の上に小さく出す。絶対配置なのでレイアウトは動かず、
-   マウスの読者には一度も出ない。
-   帯の中に置くと、著者ページの年タブ（右端に「全期間」があり空きは5px）
-   だけ入らないので、4か所とも帯の上に出す */
+/* 矢印キーで切り替えられることは画面に出ていない (#2852)。キーボードで
+   フォーカスしているタブの真下（本体の上の余白 18px の中）にだけ出す。
+   絶対配置なのでレイアウトは動かず、マウスの読者には一度も出ない。
+
+   帯の右や上ではなく真下なのは、離れていると気づかないため。右端に置くと
+   ホームの帯では最後のタブから 700px 離れ、上の余白（20px）は見出しが
+   左半分を占めていて左に寄せられない。
+
+   文字は label の中の span が持ち（_partial/tab-hint.ejs が1箇所で持つ）、
+   ::after の生成文字列にはしない。生成文字列はラジオの読み上げ名に
+   混ざる（「トレンド ← → で切り替え」になった）。span 側は aria-hidden で外す。
+
+   色は同時に出るフォーカスの輪郭と同じネイビー。2つを1つの信号として読ませる
+   （白地で 16.34。差し色のクリムゾンは 5.35 で ink-mute の 6.19 より低い）*/
 .tab-hint {
   position: absolute;
-  right: 0;
-  bottom: unquote('calc(100% + 4px)');
-  /* 3px 下に同時に出るフォーカスの輪郭と同じ色にして、1つの信号として読ませる。
-     白地で 16.34 あり、差し色のクリムゾン（5.35）より実際に読みやすい */
+  /* 枠の 1px ぶん下。ラベルの下辺と本体の境目にそろう */
+  top: unquote('calc(100% + 1px)');
+  /* ラベルの左 padding 22px − 枠 1px。タブの文字の頭にそろう */
+  left: 21px;
   color: var(--brand-navy);
   font-size: 12px;
+  line-height: 1.4;
+  font-weight: 400;
+  letter-spacing: 0;
   white-space: nowrap;
   visibility: hidden;
 }
-.tabs input[type="radio"]:focus-visible ~ .tab-hint {
+.tabs input[type="radio"]:focus-visible + .tab_item .tab-hint {
   visibility: visible;
+}
+/* 幅が足りずタブが2行に折り返すと、真下の文字が2行目のタブに重なる
+   （著者ページの年タブが 992px 未満で折り返す）。狭い幅では出さない。
+   矢印キーを使う読者はキーボードのある画面幅にいる */
+@media (max-width: 991px) {
+  .tab-hint {
+    display: none;
+  }
 }
 /* 輪郭は見えない radio ではなく、その label に描く。
    帯の中なので内側にずらす（#2686 の例外はこれ）*/
