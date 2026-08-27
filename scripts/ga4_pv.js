@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const { snsLabel } = require('./lib/post_list');
+const { allSeries } = require('./lib/series');
 
 const load = JSON.parse(fs.readFileSync('ga4_pv.json', 'utf-8'));
 const map = new Map();
@@ -52,6 +53,36 @@ hexo.extend.helper.register('recent_popular_tags', function (limit = 10, minRece
     .slice(0, limit);
   popularTagsCache.set(cacheKey, tags);
   return tags;
+});
+
+// 検索窓のパネルの「人気の連載」(#2855)。物差しは人気のタグと揃える。
+// 同じ面に並ぶ3つの入口が別々の基準で選ばれていると、どれが「いま」を
+// 指しているのか読者には区別できない。
+// 行き先は索引記事（無ければ1本目）で、/series/ の一覧と同じ規則
+const popularSeriesCache = new Map();
+
+hexo.extend.helper.register('recent_popular_series', function (limit = 6, minRecent = 3) {
+  const cacheKey = `${limit}:${minRecent}:${this.site.posts.length}`;
+  if (popularSeriesCache.has(cacheKey)) return popularSeriesCache.get(cacheKey);
+  const YEAR = 365 * 24 * 60 * 60 * 1000;
+  const now = Date.now();
+  const series = allSeries(this.site)
+    .map((s) => {
+      const recent = s.posts.filter((p) => now - p.date.valueOf() <= YEAR);
+      return {
+        name: s.name,
+        path: s.index.path,
+        total: s.total,
+        recent: recent.length,
+        pv: recent.reduce((sum, p) => sum + getGA4PV('/' + p.path), 0),
+      };
+    })
+    .filter((s) => s.recent >= minRecent && s.pv > 0)
+    // 同点は名前で決める（決着が無いとビルドごとに並びが変わる）
+    .sort((a, b) => b.pv - a.pv || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
+    .slice(0, limit);
+  popularSeriesCache.set(cacheKey, series);
+  return series;
 });
 
 // 推薦の件数は記事数から決める。推薦が全記事の半分を超えると
