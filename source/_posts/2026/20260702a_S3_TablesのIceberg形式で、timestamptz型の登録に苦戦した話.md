@@ -5,6 +5,7 @@ postid: a
 tags:
   - S3
   - AWS
+  - Glue
 categories:
   - DataEngineering
 series: "データエンジニアリング"
