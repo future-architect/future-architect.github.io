@@ -43,7 +43,7 @@ hexo.extend.helper.register('list_reference_posts', function () {
       <ul class="reference-post-link">${items(hidden)}</ul>
     </details>`;
 
-  // 見出しは呼び出し側の EJS が footer-section-heading で出す
+  // 見出しは呼び出し側の EJS が section-heading で出す
   return `
   <ul class="reference-post-link">${items(shown)}</ul>${more}`;
 });
