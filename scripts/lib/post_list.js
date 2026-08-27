@@ -44,10 +44,12 @@ const newLabel = (date) => {
  * 隣のタイトルと同じ行き先のリンクなので、タブ移動と読み上げからは外す (#2845)。
  * サムネの無い記事は同じ大きさの空き枠を置いて行頭を揃える
  */
+const emptyThumbIcon = () => `<span class="post-list-icon post-list-icon-empty"></span>`;
+
 const thumbIcon = (post) =>
   post.thumbnail
     ? `<a href="/${post.path}" class="post-list-icon" tabindex="-1" aria-hidden="true"><img src="${post.thumbnail}" alt="" width="72" height="48" loading="lazy"></a>`
-    : `<span class="post-list-icon post-list-icon-empty"></span>`;
+    : emptyThumbIcon();
 
 /**
  * @param {object} post          Hexo の post
@@ -82,4 +84,4 @@ const postListItem = (
   return `<li class="${itemClass} post-list-item-thumb">${rankLabel}${thumbIcon(post)}<div class="post-list-body">${body}</div></li>`;
 };
 
-module.exports = { snsLabel, newLabel, postListItem, thumbIcon };
+module.exports = { snsLabel, newLabel, postListItem, thumbIcon, emptyThumbIcon };
