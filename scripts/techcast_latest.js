@@ -29,21 +29,13 @@ let feedItems = [];
     });
 })();
 
-// サイドバーの Tech Cast（_widget/techcast.ejs）に渡す最新3本。
-// 以前はここで HTML を組み立てていたが、リンクが textlint の
-// no-unmarked-external-link から見えない場所にあった（#2729）。
-// マークアップは EJS に置き、ここは「どの3本か」と「NEW を付けるか」だけを決める
-hexo.extend.helper.register('techcast_items', function () {
+// 公開から15日以内を新着として扱う。記事一覧の NEW（scripts/lib/post_list.js）が
+// 30日なのに対して短いのは、こちらが「今週出た回」の合図で、記事の新顔とは役が違うため
+function isNewEpisode(isoDate) {
   const threshold = new Date();
-  // 公開から2週間は NEW を付ける
   threshold.setDate(threshold.getDate() - 15);
-
-  return feedItems.slice(0, 3).map((item) => ({
-    title: item.title,
-    link: item.link,
-    isNew: threshold.toISOString() <= item.isoDate,
-  }));
-});
+  return threshold.toISOString() <= isoDate;
+}
 
 // itunes:duration は "00:34:25" の形。1時間未満の回は先頭の "00:" を落とす
 function formatDuration(duration) {
@@ -51,7 +43,8 @@ function formatDuration(duration) {
   return match ? match[1] : String(duration || '');
 }
 
-// 特設ページ（/specials/techcast/）のエピソード一覧に渡す全話 (#2854)。
+// エピソード一覧の全話。特設ページ（/specials/techcast/）が表に出し、
+// ホームの特設パネル（#2880）は先頭1件の isNew だけを見る。
 // 並びは RSS のまま（新しい順）。回数を返さないのは、itunes:episode の実データが
 // 壊れているため（#17 が 1、#5 が 4、#15 と #3 が空）。番号を名乗れるのは
 // 収録側が付けたタイトルの「#N」だけなので、そのままタイトルとして出す
@@ -61,5 +54,6 @@ hexo.extend.helper.register('techcast_episodes', function () {
     link: item.link,
     date: new Date(item.isoDate),
     duration: formatDuration(item.itunes && item.itunes.duration),
+    isNew: isNewEpisode(item.isoDate),
   }));
 });
