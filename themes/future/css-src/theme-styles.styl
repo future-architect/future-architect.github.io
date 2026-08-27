@@ -396,6 +396,29 @@ Header and header elements
   height: (space-step * 6);
   background: rule-base;
 }
+/* 全幅で覆っている間、後ろの本文をぼかす面 (#2888)。Cloudflare と同じ形で、
+   開いたパネルと帯だけがはっきり見える。ぼかしの量は向こうの実測値（8px）。
+   出るのは**全幅で覆う2つの状態だけ**——モバイルの引き出しと、575px 以下で
+   広がった検索。PC の hover のドロップダウンには出さない。カーソルが乗った
+   だけで本文全体がぼけるのは意図しない発火になる。
+   開いているかは :has() で拾う。引き金（:checked / :focus-within）が帯の中に
+   あるので、兄弟結合子では外の面まで届かない。
+   **position: fixed にはしない。** ヘッダーは追従しない (#2877) ので、開いたまま
+   送られると引き出しは一緒に上へ動くのにぼかしだけ残る。引き出しと同じく
+   ヘッダーを基準にした絶対配置で、帯の下から 100vh 分だけ敷く。
+   開閉に合わせて出し入れするのは display で、透過は動かさない。
+   visibility では隠れている間も 100vh の箱が残り、短いページに縦の
+   スクロールが生まれる。引き出し自体も瞬時に開くので合わせている */
+.header-backdrop {
+  display: none;
+  position: absolute;
+  top: header-height;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(8px);
+}
 /* 引き出しの引き金。992px 以上では要らないので display: none で消す
    （タブ順からも外れる）。狭い幅では下のメディアクエリが形を与える */
 .header-drawer-input,
@@ -470,6 +493,9 @@ Header and header elements
   }
   /* 開いた引き出しは帯の下に敷く。帯の高さを押し広げないように絶対配置で、
      縦に溢れる中身は面の中で送れるようにする */
+  .site-header:has(.header-drawer-input:checked) .header-backdrop {
+    display: block;
+  }
   .header-drawer-input:checked ~ .header-nav {
     display: block;
     position: absolute;
@@ -4411,23 +4437,42 @@ a.award-badge:focus {
   .header-search button {
     display: none;
   }
+  .site-header:has(.header-search:focus-within) .header-backdrop {
+    display: block;
+  }
   /* 展開中は帯を覆う。入力欄だけを伸ばすとサイト名を押し出して帯が崩れる。
-     覆ったフォームが位置の基準になるので、下に開くパネルは帯の下辺と
-     内側の余白にそのまま揃う */
+     覆ったフォームが位置の基準になるので、下に開くパネルは帯の下辺に揃う。
+     **左右の余白はフォームではなく中の部品が持つ** (#2888)。フォームに
+     padding を置くと、全幅で出すパネルを同じ量だけ外へ出し戻す指定が要る */
   .header-search:focus-within {
     position: absolute;
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
-    padding: 0 (space-step * 3);
+    padding: 0;
     border-color: transparent;
     border-radius: 0;
     background: #fff;
   }
+  .header-search:focus-within .header-search-open {
+    padding: space-step (space-step * 2);
+  }
   .header-search:focus-within input {
     width: 100%;
     opacity: 1;
+  }
+  /* パネルも全幅にする。端に接するので左右の枠と角丸は落とし、
+     中の余白はページの左右の余白（.container の 12px）に揃える */
+  .header-search:focus-within .header-search-hint {
+    left: 0;
+    right: 0;
+    width: auto;
+    padding-left: (space-step * 3);
+    padding-right: (space-step * 3);
+    border-left: 0;
+    border-right: 0;
+    border-radius: 0;
   }
   /* 広がっているときだけ右端に出す。押せる面は 24×24px を下回らないように
      上下左右に 4px ずつ取る */
@@ -4435,7 +4480,7 @@ a.award-badge:focus {
     display: flex;
     align-items: center;
     flex-shrink: 0;
-    padding: space-step;
+    padding: space-step (space-step * 2);
     font-size: 20px; /* アイコン（.svg-icon = 1em）の実寸を決める */
     color: ink-mute;
     cursor: pointer;
