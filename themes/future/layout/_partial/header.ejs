@@ -1,31 +1,129 @@
 <!-- BEGIN HEADER -->
 <%# data-nosnippet: サイト名の定型文をスニペットに出さない (#2359) %>
-<header class="header" data-nosnippet>
-	<div class="header-overlay">
-		<div class="header-menu"></div>
-		<%# サイト内検索 (#2399)。全ページで使えるようサイドバーから昇格した。
-		    素の CSE フォームなので JS は増えない。
-		    モバイルは虫眼鏡だけ出し、label タップで入力欄にフォーカスして
-		    :focus-within で展開する（CSSのみ）。送信はキーボードの検索キーが担う %>
-		<form action="https://google.com/cse" target="_blank" class="header-search">
-			<label for="header-search-q" class="header-search-open" aria-label="検索を開く"><%- partial('svg-icon', {icon: 'search'}) %></label>
-			<%# autocomplete: ブラウザが出す入力履歴のポップアップが、下に開く
-			    パネルと同じ場所に重なる (#2791) %>
-			<input type="text" id="header-search-q" name="q" placeholder="検索" aria-label="サイト内検索キーワード" autocomplete="off" />
-			<button type="submit" aria-label="サイト内検索"><%- partial('svg-icon', {icon: 'search'}) %></button>
-			<input type="hidden" name="cx" value="7f77887fafdb7bb62" />
-			<input type="hidden" name="ie" value="UTF-8" />
-			<%# input より後ろに置く。開閉は input の兄弟結合子で決める (#2791) %>
-			<%- partial('search-hint') %>
-		</form>
-		<%# ホームではここがページの見出しそのものなので h1 にする。記事ページは
-		    記事タイトルが h1 なので div のまま。見た目は同じ %>
-		<% if (is_home()) { %>
-		<h1 class="header-title"><a href="/">Future Tech Blog</a></h1>
-		<% } else { %>
-		<div class="header-title"><a href="/">Future Tech Blog</a></div>
-		<% } %>
-		<div class="header-title-sub">フューチャー技術ブログ</div>
+<%# ホームではここがページの見出しそのものなので h1、それ以外のページは div。
+    記事ページは記事タイトルが h1 になる。見た目は同じ。
+    パンくずを1項目では出さない判断 (#2837) は、ホームの h1 がここにあることを前提にしている %>
+<% const brandTag = is_home() ? 'h1' : 'div'; %>
+<header class="site-header" data-nosnippet>
+	<div class="container header-bar">
+		<<%= brandTag %> class="header-brand">
+			<a class="header-brand-link" href="/">
+				<%# コーポレートのロゴ。名乗るのは隣の文字なので alt は空にする (#2845 と同じ理由)。
+				    /logo.svg（favicon / mask-icon 用）と絵柄は同じだが、あちらは
+				    prefers-color-scheme: dark で文字を白に反転する。帯は OS の設定に
+				    関わらず白なので、反転しないこちらを使う。ダークモード (#2746) が
+				    入って帯も暗くなったら1本にまとめられる %>
+				<img class="header-logo" src="/logo-future.svg" alt="" width="88" height="28">
+				<span class="header-brand-text">
+					<span class="header-title">Future Tech Blog</span>
+					<span class="header-title-sub">フューチャー技術ブログ</span>
+				</span>
+			</a>
+		</<%= brandTag %>>
+
+		<div class="header-utility">
+			<%# 992px 未満の引き出し (#2877)。JS は使わない。checked の兄弟結合子で
+			    下の nav を開くので、input は nav より前に置く。
+			    **label に tabindex を付けて凌がない** (#2852)。label はクリックのときだけ
+			    転送する要素で Enter も Space も発火しないため、フォーカスは当たるのに
+			    切り替えられない状態になる。input を「見えないがフォーカスできる」形に
+			    すると、ブラウザ標準のチェックボックスの振る舞い（Space で開閉）が効く。
+			    名前は中の sr-only が持つ（label に絵しか無いと読み上げる名前が無い） %>
+			<input type="checkbox" id="header-drawer" class="header-drawer-input">
+			<label for="header-drawer" class="header-drawer-toggle"><%- partial('svg-icon', {icon: 'menu-2'}) %><span class="sr-only">メニュー</span></label>
+
+			<%# 行き先の帯。畳んだ中身は :hover と :focus-within で開く（JS は使わない）。
+			    開く合図がフォーカスなので、押す必要のあるボタンにはしていない
+			    ——検索窓のヒントパネル (#2791) と同じ形。
+			    ラベルに対応する1枚のページが無いので button で、リンクにはしない。
+			    行き先の網羅はフッター4列 (#2839) が持ち、ここは各3件に絞る %>
+			<nav class="header-nav" aria-label="サイト内の行き先">
+				<ul class="header-nav-list">
+					<li class="header-nav-item">
+						<button type="button" class="header-nav-trigger">リソース<%- partial('svg-icon', {icon: 'chevron-down', class_name: 'svg-icon-trailing header-nav-caret'}).trim() %></button>
+						<div class="header-dropdown">
+							<a class="header-dropdown-item" href="/specials/guidelines/">
+								<span class="header-dropdown-name">フューチャーのガイドライン</span>
+								<span class="header-dropdown-desc">設計ガイドライン・コーディング規約</span>
+							</a>
+							<a class="header-dropdown-item" href="https://future-architect.github.io/typescript-guide/" target="_blank" rel="noopener">
+								<span class="header-dropdown-name">仕事ですぐに使えるTypeScript<span class="sr-only">（外部サイト）</span><%- partial('svg-icon', {icon: 'external-link', class_name: 'svg-icon-trailing'}).trim() %></span>
+								<span class="header-dropdown-desc">実務向けの実践テキスト</span>
+							</a>
+							<a class="header-dropdown-item" href="https://github.com/future-architect" target="_blank" rel="noopener">
+								<span class="header-dropdown-name">OSS / ツール<span class="sr-only">（外部サイト）</span><%- partial('svg-icon', {icon: 'external-link', class_name: 'svg-icon-trailing'}).trim() %></span>
+								<span class="header-dropdown-desc">Cheetah Grid / uroboroSQL / Vuls</span>
+							</a>
+						</div>
+					</li>
+					<li class="header-nav-item">
+						<button type="button" class="header-nav-trigger">コミュニティ<%- partial('svg-icon', {icon: 'chevron-down', class_name: 'svg-icon-trailing header-nav-caret'}).trim() %></button>
+						<div class="header-dropdown">
+							<a class="header-dropdown-item" href="/specials/httf/">
+								<span class="header-dropdown-name">HACK TO THE FUTURE</span>
+								<span class="header-dropdown-desc">フューチャー主催のプログラミングコンテスト</span>
+							</a>
+							<a class="header-dropdown-item" href="/specials/techcast/">
+								<span class="header-dropdown-name">Future Tech Cast</span>
+								<span class="header-dropdown-desc">技術ブログ発のポッドキャスト</span>
+							</a>
+							<a class="header-dropdown-item" href="/specials/advent-calendar/">
+								<span class="header-dropdown-name">アドベントカレンダー</span>
+								<span class="header-dropdown-desc">2015年からの歴代一覧</span>
+							</a>
+						</div>
+					</li>
+					<%# カテゴリと連載は行き先そのものを畳む。
+					    カテゴリは /categories/ と同じ全件（category_index の並び＝累計の多い順）。
+					    全件なので「一部だけ」を名乗るラベルは置かない。
+					    /categories/ へも送らない。あの一覧は運営用で、読者向けには作っていない %>
+					<li class="header-nav-item">
+						<button type="button" class="header-nav-trigger">カテゴリ<%- partial('svg-icon', {icon: 'chevron-down', class_name: 'svg-icon-trailing header-nav-caret'}).trim() %></button>
+						<div class="header-dropdown header-dropdown-grid">
+							<% category_index().forEach(function(c){ %>
+							<a class="header-dropdown-item" href="<%- url_for(c.path) %>" title="<%= c.name %> カテゴリの記事 累計<%= c.count %>本（直近1年 <%= c.recent %>本）">
+								<span class="header-dropdown-row"><%- partial('category-icon', {name: c.name}) %><%= c.name %><span class="header-dropdown-count"><%= c.count %></span></span>
+							</a>
+							<% }) %>
+						</div>
+					</li>
+					<li class="header-nav-item">
+						<button type="button" class="header-nav-trigger">連載<%- partial('svg-icon', {icon: 'chevron-down', class_name: 'svg-icon-trailing header-nav-caret'}).trim() %></button>
+						<div class="header-dropdown">
+							<%# 連載の行き先は索引記事（/series/ の一覧と同じ規則）。物差しはタグと同じ
+							    「直近1年のPV」(#2855)。カテゴリと違って一覧ページが読者向けにあるので、
+							    最後に全件への導線を置く %>
+							<p class="header-dropdown-label"><%- partial('svg-icon', {icon: 'run-baton'}) %>人気の連載</p>
+							<% recent_popular_series(6).forEach(function(s){ %>
+							<a class="header-dropdown-item" href="<%- url_for(s.path) %>" title="<%= s.name %> 連載 全<%= s.total %>本（直近1年 <%= s.recent %>本・<%= s.pv.toLocaleString() %> View）">
+								<span class="header-dropdown-row"><%= s.name %></span>
+							</a>
+							<% }) %>
+							<a class="header-dropdown-more" href="/series/">連載の一覧を見る</a>
+						</div>
+					</li>
+				</ul>
+			</nav>
+
+			<%# ナビと検索の境目。ナビと同じ幅で畳む %>
+			<span class="header-divider" aria-hidden="true"></span>
+
+			<%# サイト内検索 (#2399)。全ページで使えるようサイドバーから昇格した。
+			    素の CSE フォームなので JS は増えない。
+			    狭い幅では虫眼鏡だけ出し、label タップで入力欄にフォーカスして
+			    :focus-within で展開する（CSSのみ）。送信はキーボードの検索キーが担う %>
+			<form action="https://google.com/cse" target="_blank" class="header-search">
+				<label for="header-search-q" class="header-search-open" aria-label="検索を開く"><%- partial('svg-icon', {icon: 'search'}) %></label>
+				<%# autocomplete: ブラウザが出す入力履歴のポップアップが、下に開く
+				    パネルと同じ場所に重なる (#2791) %>
+				<input type="text" id="header-search-q" name="q" placeholder="記事を検索" aria-label="サイト内検索キーワード" autocomplete="off" />
+				<button type="submit" aria-label="サイト内検索"><%- partial('svg-icon', {icon: 'search'}) %></button>
+				<input type="hidden" name="cx" value="7f77887fafdb7bb62" />
+				<input type="hidden" name="ie" value="UTF-8" />
+				<%# input より後ろに置く。開閉は input の兄弟結合子で決める (#2791) %>
+				<%- partial('search-hint') %>
+			</form>
+		</div>
 	</div>
 </header>
 <!-- Header END -->

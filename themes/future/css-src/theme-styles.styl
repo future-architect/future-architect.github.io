@@ -141,13 +141,364 @@ Misc tools
 /***
 Header and header elements
 ***/
-.header {
-	/* 影は持たない (#2747)。ここは写真バナーで、下辺は写真と白地の境目が作る */
-	background: #fff;
-	border-radius: 0;
-	margin-bottom: 23px;
-	z-index: 999;
-	position: relative;
+/* ヘッダーは1段・64px の帯 (#2877)。以前は 1500×360 の写真バナーの上に 80px の
+   中央タイトルを載せた 151px の塊で、全ページの先頭でそれだけ縦を使っていた。
+   縦に返した約90px のぶん、空いた横にサイト名・ナビ・検索を1行で並べる。
+   **追従（sticky）はしない。** 帯を固定すると本文の上に常に乗るので、
+   固定サイドバーを置かないのと同じ理由で採らない。
+   影は持たない (#2747)。下辺の 1px の罫線が本文との境目を作る */
+.site-header {
+  position: relative;
+  background: #fff;
+  border-bottom: 1px solid rule-weak;
+  margin-bottom: 23px;
+  /* 下に開くドロップダウンと検索のヒントパネルが本文の上に出る */
+  z-index: 999;
+}
+/* 帯の中身。左端はページ本文と同じ .container の内側に揃える。
+   下に開くパネルの位置の基準もここが持つ（top: 100% が帯の下辺になる） */
+.header-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: (space-step * 4);
+  height: header-height;
+}
+/* 帯の中のリンクは下線で反応しない。土台の `a:hover, a:focus` が青（--a-color）と
+   下線を当ててくるので、当たる箇所で明示して外す。`:hover` だけ書くと
+   **Tab で来たときに土台が勝って青くなる**（詳細度は 0,1,1 対 0,1,0）。
+   所在は輪郭（focus-visible）だけで示し、hover は色か面のどちらか一方で受ける。
+   64px の帯の中で下線を重ねると合図が2つになる */
+.header-brand-link:hover,
+.header-brand-link:focus,
+.header-nav-link:hover,
+.header-nav-link:focus,
+.header-dropdown-item:hover,
+.header-dropdown-item:focus,
+.header-dropdown-more:hover,
+.header-dropdown-more:focus {
+  text-decoration: none;
+}
+/* サイト名。ホームでは h1、それ以外のページでは div で出している。見た目は同じ */
+/* 帯が詰まったときに縮むのは検索欄だけ。サイト名とナビは縮めない
+   （サイト名が折り返すと帯の高さが動き、ナビは white-space: nowrap で縮めない）。
+   ナビ4つが並ぶ 992〜1199px では余りが 14px しか無いので、フォントの実寸が
+   違う環境でも崩れないように、逃げ場を検索欄の側に作っておく */
+.header-brand {
+  margin: 0;
+  flex-shrink: 0;
+}
+.header-brand-link {
+  display: flex;
+  align-items: center;
+  gap: (space-step * 3);
+  text-decoration: none;
+}
+/* コーポレートのロゴ。実寸 257.99×81.92 のうち FUTURE の文字は下の31%で、
+   上はクリムゾンの2本の線。だからブログ名より小さく見えるのが正しい */
+.header-logo {
+  display: block;
+  flex-shrink: 0;
+  width: 88px;
+  height: 28px;
+}
+.header-brand-text {
+  display: flex;
+  flex-direction: column;
+}
+/* 英字の見た目は Web フォント無しの範囲で作る (#2131)。Avenir Next（macOS/iOS の
+   幾何学グロテスク）と Segoe UI Variable Display（Win11 の見出し用）を優先し、
+   無い環境は従来のシステムスタックに落ちる。固定の英字なので絵文字フォントは要らない */
+.header-title {
+  font-size: 17px;
+  line-height: leading-heading;
+  font-family: "Avenir Next", "Segoe UI Variable Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  font-weight: 700;
+  /* 英字の見出しは字間を詰めると締まる */
+  letter-spacing: -0.01em;
+  color: ink-strong;
+}
+/* 和文は英字に添える名前なので一段落とす。写真の上に置いていた頃の
+   字間 0.35em と影は、白地では役が無い。
+   太さを書かないとホームだけ 500 になる。囲みがホームは h1・他ページは div で、
+   bootstrap の h1〜h6（font-weight: 500）を継ぐため。#2585 で line-height が
+   同じ形の差を生んだのと同じ罠で、500 は太さの段（400 / 700 / 800）にも無い */
+.header-title-sub {
+  font-size: 12px;
+  line-height: leading-heading;
+  font-weight: 400;
+  color: ink-mute;
+}
+/* サイト名は hover に応えない。フッターの .footer-logo も同じで、あちらは
+   周りのリンクの下線が伸びる反応から外すために text-decoration: none を
+   固定している。ロゴは行き先を示す部品ではなくサイトの名前で、絵柄には
+   下線を引く相手も無い。所在はリンク全体に出る focus の輪郭が示す */
+
+/* 行き先の帯。畳んだ中身は :hover と :focus-within で開く。JS は使わない
+   ——検索窓のヒントパネル (#2791) と同じ形 */
+.header-nav {
+  flex-shrink: 0;
+}
+.header-nav-list {
+  display: flex;
+  align-items: center;
+  gap: (space-step * 7);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.header-nav-item {
+  /* ドロップダウンの位置の基準。帯と同じ高さを持たせて、引き金とパネルの間に
+     隙間を作らない。1px でも空くとそこでカーソルが外れてパネルが閉じる */
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: header-height;
+}
+.header-nav-link,
+.header-nav-trigger {
+  display: flex;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: leading-row;
+  color: ink-mute;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color hover-speed ease;
+}
+/* 反応は色を一段濃くするだけ。`:focus` も書くのは、書かないと土台の
+   `a:focus` の青が勝つため（上の下線の話と同じ詳細度） */
+.header-nav-link:hover,
+.header-nav-link:focus,
+.header-nav-trigger:hover,
+.header-nav-item:focus-within .header-nav-trigger {
+  color: ink-strong;
+}
+.header-nav-caret {
+  color: ink-faint;
+  transition: transform hover-speed ease;
+}
+.header-nav-item:hover .header-nav-caret,
+.header-nav-item:focus-within .header-nav-caret {
+  transform: rotate(180deg);
+}
+/* 畳んだ行き先。影は持たない (#2747) ので、白い面と枠で本文から浮かせる。
+   閉じるときだけ visibility を遅らせるのはヒントパネルと同じ理由で、
+   Safari が消える前にタップを着地させるため */
+.header-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 288px;
+  padding: (space-step * 2);
+  background: #fff;
+  border: 1px solid rule-base;
+  border-radius: card-radius;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.12s ease, visibility 0s 0.3s;
+}
+/* カテゴリは18件あるので2列にする。列数は数えず**列幅の下限**で決める。
+   最長の行は DataEngineering の101px（13px・Noto Sans CJK の実測）＋
+   アイコン 16.9px ＋3桁の件数 33.7px = 151px で、行の左右の余白 24px を足すと
+   175px。下限を 190px に置くと 420px のパネルで必ず2列になり（190×2+8 ≤ 404）、
+   引き出しに入る狭い幅では自動で1列に落ちる（幅375pxの端末が境目）。
+   行は折り返さない指定なので、列が細るより列数が減る方が正しい */
+.header-dropdown-grid {
+  width: 420px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 0 (space-step * 2);
+}
+.header-nav-item:hover .header-dropdown,
+.header-nav-item:focus-within .header-dropdown {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.12s ease;
+}
+/* 行として並ぶものなので、反応は面を一段 (#2686) */
+.header-dropdown-item {
+  display: block;
+  padding: (space-step * 2) (space-step * 3);
+  border-radius: radius-small;
+  text-decoration: none;
+  transition: background-color hover-speed ease;
+}
+.header-dropdown-item:hover,
+.header-dropdown-more:hover {
+  background: surface-mute;
+}
+/* パネルの中の仕切り。見出しではなく面の中のラベルなので h2 は使わない
+   （検索のヒントパネルと同じ扱い） */
+.header-dropdown-label {
+  margin: 0 0 (space-step * 2);
+  padding: 0 (space-step * 3);
+  font-size: 12px;
+  line-height: leading-row;
+  font-weight: 700;
+  color: ink-mute;
+}
+/* カテゴリ・連載の行。リソース / コミュニティの行と違って説明を持たない。
+   名前が主題そのもので、6行並ぶので太字にもしない（検索パネルのカテゴリ行を
+   素の太さにしたのと同じ理由）。説明はカテゴリ個別ページが持つ */
+.header-dropdown-row {
+  display: block;
+  font-size: 13px;
+  line-height: leading-row;
+  color: ink-strong;
+  /* 1行1件の並びなので折り返させない。折り返すと行の高さが揃わず、
+     2列のときは左右の行がずれる */
+  white-space: nowrap;
+}
+/* 右肩の件数は「総数」の意味 (#2129)。押す対象ではない添えなので薄い段に置く */
+.header-dropdown-count {
+  margin-left: space-step;
+  font-size: 0.75em;
+  font-weight: normal;
+  color: ink-faint;
+}
+/* 全件への導線。行の並びとは役が違うので、仕切りの線を1本入れて下に置く */
+.header-dropdown-more {
+  display: block;
+  margin-top: space-step;
+  padding: (space-step * 2) (space-step * 3);
+  border-top: 1px solid rule-weak;
+  font-size: 12px;
+  line-height: leading-row;
+  color: ink-mute;
+}
+.header-dropdown-name {
+  display: block;
+  font-size: 13px;
+  line-height: leading-heading;
+  font-weight: 700;
+  color: ink-strong;
+}
+.header-dropdown-desc {
+  display: block;
+  margin-top: space-step;
+  font-size: 12px;
+  line-height: leading-row;
+  color: ink-mute;
+}
+.header-utility {
+  display: flex;
+  align-items: center;
+  gap: (space-step * 6);
+}
+.header-divider {
+  width: 1px;
+  height: (space-step * 6);
+  background: rule-base;
+}
+/* 引き出しの引き金。992px 以上では要らないので display: none で消す
+   （タブ順からも外れる）。狭い幅では下のメディアクエリが形を与える */
+.header-drawer-input,
+.header-drawer-toggle {
+  display: none;
+}
+/* ナビは 992px 未満では帯から降りて引き出しに入る (#2877)。帯に並べると検索と
+   重なるが、消してしまうとカテゴリと連載への行き先がモバイルから無くなる
+   （フッター4列はリソースとコミュニティしか持たず、サイドバーのカテゴリは
+   記事ページでは意図して伏せている）。
+   開閉はチェックボックスの :checked と兄弟結合子で作る。JS は使わない
+   ——ランキングのタブ（.tabs input:checked + .tab_item）と同じ手 */
+@media (max-width: 991px) {
+  .header-divider {
+    display: none;
+  }
+  /* 見えないがフォーカスできる形 (#2852)。display: none にすると Space で
+     開閉できなくなり、代わりに label へ tabindex を付けると今度は発火しない */
+  .header-drawer-input {
+    display: block;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .header-drawer-toggle {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding: space-step;
+    font-size: 24px; /* アイコン（.svg-icon = 1em）の実寸を決める */
+    color: ink-mute;
+    cursor: pointer;
+  }
+  .header-drawer-toggle .svg-icon {
+    margin-right: 0;
+  }
+  /* 輪郭は見えない input ではなく label に描く (#2852) */
+  .header-drawer-input:focus-visible + .header-drawer-toggle {
+    outline: 2px solid var(--brand-navy);
+    outline-offset: 2px;
+  }
+  .header-nav {
+    display: none;
+  }
+  /* 開いた引き出しは帯の下に敷く。帯の高さを押し広げないように絶対配置で、
+     縦に溢れる中身は面の中で送れるようにする */
+  .header-drawer-input:checked ~ .header-nav {
+    display: block;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: unquote('calc(100vh - ' + header-height + ')');
+    overflow-y: auto;
+    padding: (space-step * 2) 0 (space-step * 4);
+    background: #fff;
+    border-bottom: 1px solid rule-base;
+  }
+  /* 中は縦積み。横帯のための指定（高さ・折り返さない並び）を戻す */
+  .header-nav-list {
+    display: block;
+  }
+  .header-nav-item {
+    display: block;
+    height: auto;
+  }
+  /* 引き金は畳みの引き金ではなく、組のラベルとして残る。
+     中身は常に開いているので三角は出さない */
+  .header-nav-trigger {
+    padding: (space-step * 2) (space-step * 3);
+    font-weight: 700;
+    color: ink-strong;
+  }
+  .header-nav-caret {
+    display: none;
+  }
+  .header-nav-link {
+    padding: (space-step * 2) (space-step * 3);
+    font-weight: 700;
+    color: ink-strong;
+  }
+  /* パネルは畳まれず、その場に並ぶ。浮かせる必要が無いので枠も影も持たない */
+  .header-dropdown,
+  .header-dropdown-grid {
+    position: static;
+    visibility: visible;
+    opacity: 1;
+    width: auto;
+    padding: 0 0 (space-step * 3);
+    border: 0;
+    border-radius: 0;
+    transition: none;
+  }
+  .header-dropdown-item {
+    padding: (space-step * 2) (space-step * 3);
+  }
+  /* ラベルは組の見出し（引き金）が兼ねるが、「人気の」は条件なので残す */
+  .header-dropdown-label {
+    padding: 0 (space-step * 3);
+  }
 }
 /* breadcrumb */
 .breadcrumb {
@@ -1146,13 +1497,11 @@ summary:focus-visible,
   color: var(--on-dark-strong);
   text-decoration: none;
 }
-/* 暗い地の上では輪郭も暗地用の段にする (#2847 / #2839)。ネイビーの輪郭は
-   フッターの地（同じ --brand-navy）で 1.00、ヘッダーの帯（暗くしたバナー写真）でも
-   平均 2.30・面積の75%が 3:1 を割っていて、所在の目印になっていなかった。
-   白なら 16.34 / 平均 9.44（3:1 を割るのは写真の 1.6%）。
+/* 暗い地の上では輪郭も暗地用の段にする (#2847 / #2839)。フッターの地
+   （同じ --brand-navy）ではネイビーの輪郭が 1.00 で、所在の目印になっていない。
+   白なら 16.34。ヘッダーは白地になったので対象から外した (#2877)。
    反応（hover）の色とは別に保つため、差し色ではなく無彩色の最上段を使う */
 .site-footer :focus-visible,
-.header-title a:focus-visible,
 .skip-link:focus-visible {
   outline-color: var(--on-dark-strong);
 }
@@ -1204,100 +1553,6 @@ body {
     clear: both;
 }
 
-.header {
-  position: relative !important;
-  background-image: url("/banner.jpg");
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: 50% 50%;
-}
-.header .container {
-  height: 100%;
-  background-color: rgba(0,0,0,0.2);
-}
-body.page-header-fixed {
-  padding-top: 0px !important;
-}
-body.page-header-fixed .header {
-  position: relative !important;
-}
-
-.header-overlay {
-  background-color: rgba(0,0,0,0.3);
-}
-.header-menu {
-  height: 3px;
-  background-color: var(--brand-navy);
-}
-/* サイト名の見た目は Web フォント無しの範囲で作る (#2131)。
-   Avenir Next（macOS/iOS の幾何学グロテスク）と Segoe UI Variable Display
-   （Win11 の見出し用）を優先し、無い環境は従来のシステムスタックに落ちる。
-   サイト名は固定の英字なので絵文字フォントは要らない */
-/* サイト名。ホームでは h1、それ以外のページでは div で出している
-   （ホームではここがページの見出しそのものなので）。見た目は同じにしたい。
-
-   line-height を書いていなかったため、ホームは Bootstrap の
-   h1〜h6（1.2）が効き、それ以外のページは body から継いだ normal で
-   出ていた。normal はフォント依存（Avenir Next は約1.36）なので、
-   ヘッダーの高さがホームと他ページで違い、しかも環境によって差が変わる。
-   大きな見出しなので詰まった 1.2 を明示して両方揃える (#2585)。
-   letter-spacing を詰めているのと同じ理由 */
-.header-title {
-  margin: 1px 0 0;
-  font-size: 80px;
-  line-height: leading-heading;
-  font-family: "Avenir Next", "Segoe UI Variable Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-  font-weight: 800;
-  /* 大型の見出しは字間を詰めると締まる */
-  letter-spacing: -0.02em;
-  color: #fff;
-  text-align: center;
-  /* 三重の影は古びて見える。画像上の可読性に必要な最小限だけ残す */
-  text-shadow: 0 2px 12px rgba(0,0,0,0.45);
-}
-.header-title a {
-  color: #fff;
-  text-decoration: none;
-}
-/* 見出しホバーで「#」を出す仕掛け（metronic の h1:hover ::before）は
-   本文見出しのアンカー用。ホームでは h1 になるサイト名には出さない */
-.header-title:hover ::before {
-  content: none;
-}
-/* 大きく締めた英字に対して、和文サブタイトルは小さく字間を開けて対比させる */
-.header-title-sub {
-  padding-bottom: 15px;
-  font-size: 20px;
-  font-family: 'Segoe UI', 'Helvetica Neue', 'Hiragino Kaku Gothic ProN', 'メイリオ', 'meiryo', 'sans-serif';
-  /* 和文システムフォントのウェイトは実質 400/600 の二値（ヒラギノは W3/W6）で、
-     600 は太すぎ 400 は写真に沈む。400 のまま、タイトな影で輪郭を立てて
-     視認性を補う */
-  font-weight: 400;
-  letter-spacing: 0.35em;
-  /* 字間は各字の右に付くため、中央揃えが右へズレて見える。先頭を同量で戻す */
-  text-indent: 0.35em;
-  color: #fff;
-  text-align: center;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.8), 0 2px 12px rgba(0,0,0,0.45);
-}
-.site-logo {
-  padding: 0px;
-  margin: 20px 0px 20px 10px;
-}
-@media (max-width: 1204px) {
-  body.page-header-fixed {
-    padding-top: 0px !important;
-  }
-  .header-title {
-    margin-top: 15px;
-    font-size: 65px;
-  }
-}
-@media (max-width: 558px) {
-  .header-title {
-    font-size: 36px;
-  }
-}
 /* カードは囲みを持たない (#2747)。1件のまとまりは項目の外（80px）と
    中（タイトル→概要 8px / 概要→メタ 12px / メタ→シェアボタン 8px）の
    間隔の差が作る。中の最大が 12px なので、外はその6倍以上を取っている。
@@ -4086,130 +4341,127 @@ a.award-badge:focus {
   line-height: leading-row;
   vertical-align: middle;
 }
-/* ヘッダー右上のサイト内検索 (#2399)。サイドバーから昇格し、全ページで同じ位置に出す。
-   .header は position: relative 指定済み。狭い幅では中央タイトルと重なるため、
-   通常フローに落としてタイトルの上に右寄せで出す */
+/* ヘッダーの右端のサイト内検索 (#2399)。サイドバーから昇格し、全ページで同じ位置に出す。
+   枠を持つのはフォーム1つだけで、中の入力欄と送信ボタンは地も枠も持たない。
+   反応もフォームの側だけに置く（1部品1反応・外側優先 #2686）。
+   帯が写真でなくなったので絶対配置をやめ、通常のフローで並べている (#2877) */
 .header-search {
-  position: absolute;
-  top: 10px;
-  /* 端からの距離は変数で1箇所に持つ。下に開くパネルは右端をここに合わせ、
-     幅をこの2倍だけ縮めることで左右の隙間が揃う */
-  --header-search-inset: 12px;
-  right: var(--header-search-inset);
   display: flex;
   align-items: center;
+  /* 帯が詰まったときに縮むのはここ（上の .header-brand の段を参照） */
+  min-width: 0;
+  border: 1px solid rule-base;
+  border-radius: radius-small;
+  background: surface-tint;
+  transition: border-color hover-speed ease, background-color hover-speed ease;
+}
+.header-search:hover {
+  border-color: rule-strong;
+}
+.header-search:focus-within {
+  border-color: rule-strong;
+  background: #fff;
 }
 .header-search input {
   width: 200px;
-  height: 34px;
-  padding: 6px 12px;
+  min-width: 0;
+  height: 32px;
+  padding: 0 (space-step * 3);
   font-size: 16px; /* 16px 未満だと iOS がフォーカス時に画面をズームする */
   border: 0;
+  background: none;
   border-radius: radius-small 0 0 radius-small;
-  background: rgba(255,255,255,0.92);
 }
-/* 輪郭は入力欄の内側に出す。ヘッダーは暗くしたバナー写真で、外側に出すと
-   ネイビーのコントラストが 2.25〜3.92 しか取れない（内側の白地なら 14.5）。
-   隣接する送信ボタンにも被らない */
-.header-search input:focus-visible {
-  outline-offset: -2px;
-}
-/* 送信ボタンも内側に出す。focus では地がネイビーに変わる（下の :focus）ので、
-   入力欄と違って色は暗地用の白にする（16.34）。外側に出すと写真と、
-   隣り合う入力欄の白の両方に重なる (#2847) */
-.header-search button:focus-visible {
-  outline-color: var(--on-dark-strong);
-  outline-offset: -2px;
+.header-search input::placeholder {
+  color: ink-faint;
 }
 .header-search button {
   display: flex;
   align-items: center;
-  height: 34px;
-  padding: 0 10px;
+  height: 32px;
+  padding: 0 (space-step * 2);
   border: 0;
   cursor: pointer;
   font-size: 16px; /* アイコン（.svg-icon = 1em）の実寸を決める */
-  color: ink-strong;
-  background: rgba(255,255,255,0.92);
+  color: ink-mute;
+  background: none;
   border-radius: 0 radius-small radius-small 0;
-  /* hover 側に書くとカーソルを乗せたときだけ送られて、離すと瞬時に戻る。
-     往復を同じ速さにするため基底に置く (#2686) */
-  transition: background-color hover-speed ease, color hover-speed ease;
 }
-.header-search button .svg-icon {
+.header-search button .svg-icon,
+.header-search-open .svg-icon {
   margin-right: 0;
-}
-.header-search button:hover,
-.header-search button:focus {
-  color: #fff;
-  /* ページャーの選択色と同じブランドネイビーに揃える */
-  background: var(--brand-navy);
 }
 /* 展開用の虫眼鏡ラベル。入力欄が常時出ている広い画面では使わない */
 .header-search-open {
   display: none;
 }
-/* 検索は常に絶対配置にする。フローに置くとヘッダーの高さを押し広げ、
-   タイトルが検索の分だけ下へずれる (#2428)。
-   畳む幅の下限は「展開した入力欄（約240px）が中央のタイトルに被らない幅」。
-   タイトルは1204px以下で65pxになり "Future Tech Blog" が約540px を占めるので、
-   ここから下は虫眼鏡だけにする。タップ（label→input フォーカス）で
-   :focus-within により展開する。JS は使わない。
+/* 幅575px以下では虫眼鏡だけにして、帯の残りをサイト名に譲る。
+   タップ（label→input フォーカス）で :focus-within により展開する。JS は使わない。
    送信はキーボードの検索キーが担うため、送信ボタンは出さない
    （タップでの送信は Safari が button にフォーカスを与えず、
    blur で先に閉じてしまうため成立しない） */
-@media (max-width: 1204px) {
+@media (max-width: 575px) {
+  .header-search {
+    border-color: transparent;
+    background: none;
+  }
   .header-search-open {
     display: flex;
     align-items: center;
     margin: 0;
-    padding: 4px;
+    padding: space-step;
     font-size: 20px;
-    color: #fff;
+    color: ink-mute;
     cursor: pointer;
-    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.6));
   }
   .header-search input {
     width: 0;
-    height: 30px;
     padding: 0;
     opacity: 0;
     transition: width 0.15s ease, opacity 0.15s ease;
   }
-  .header-search:focus-within input {
-    width: 150px;
-    padding: 4px 10px;
-    opacity: 1;
-  }
   .header-search button {
     display: none;
   }
-}
-/* 狭い画面ではタイトルが横幅いっぱいに近いので、虫眼鏡を角へ寄せて間合いを取る */
-@media (max-width: 558px) {
-  .header-search {
-    top: 6px;
-    --header-search-inset: 8px;
+  /* 展開中は帯を覆う。入力欄だけを伸ばすとサイト名を押し出して帯が崩れる。
+     覆ったフォームが位置の基準になるので、下に開くパネルは帯の下辺と
+     内側の余白にそのまま揃う */
+  .header-search:focus-within {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 0 (space-step * 3);
+    border-color: transparent;
+    border-radius: 0;
+    background: #fff;
+  }
+  .header-search:focus-within input {
+    width: 100%;
+    opacity: 1;
   }
 }
 /* 検索窓を押したときに出る行き先の一覧 (#2791)。フォームの :focus-within で開き、
    input:placeholder-shown で「打ち始めたら閉じる」を作る。JS は使わない。
    影は持たない (#2747)。白い面と枠で本文から浮かせる */
+/* 位置の基準は .header-bar（狭い幅で展開したときだけ .header-search）。
+   どちらでも top: 100% が帯の下辺、right: 0 が本文と同じ右端になる */
 .header-search-hint {
   position: absolute;
-  top: calc(100% + 6px);
+  top: 100%;
   right: 0;
-  /* カテゴリを3列に並べられる幅。最長の「DataEngineering 45」が実測150px */
-  width: unquote('min(530px, calc(100vw - var(--header-search-inset) * 2))');
+  /* タグのチップが3〜4個ずつ折り返す幅。カテゴリを3列に並べるための 530px は、
+     カテゴリと連載をヘッダーのナビへ移して要らなくなった (#2877)。
+     引く 24px は .container の左右の余白 12px × 2 */
+  width: unquote('min(420px, calc(100vw - 24px))');
   padding: 16px 14px 4px;
   /* 320px 幅では1列に落ちて縦に伸びるので、面の中で送れるようにする */
-  max-height: unquote('calc(100vh - 60px)');
+  max-height: unquote('calc(100vh - ' + header-height + ')');
   overflow-y: auto;
   background: #fff;
   border: 1px solid rule-base;
   border-radius: 4px;
-  /* ヘッダーは中央揃えなので、面の中だけ戻す */
-  text-align: left;
   color: ink-strong;
   visibility: hidden;
   opacity: 0;
@@ -4231,45 +4483,11 @@ a.award-badge:focus {
   color: ink-mute;
 }
 /* チップはホームでは 12px。あちらは本文と並ぶ添えの情報だが、こちらは
-   面の中の行き先そのものなので、カテゴリの行と同じ大きさまで上げる */
+   面の中の行き先そのものなので一段上げる。左マージンを落として、
+   チップの枠の左端をラベルの文字の左端に揃える */
 .header-search-hint .tag-list-link {
   font-size: 13px;
-  margin: 5px 12px 12px 4px;
-}
-/* ラベルは面の端、項目は一段下げて、カテゴリのアイコンとチップの枠を
-   同じ位置から始める。チップ側は ul.tag-list の -13px と自身の左マージン
-   4px を織り込んだ差 */
-.header-search-hint .blog-tags {
-  margin-left: 18px;
-}
-.header-search-hint-categories {
-  margin: 0 0 28px 9px;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  /* 13件が幅530pxの面で3列5行、幅375pxの端末で2列7行になる */
-  grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
-  gap: 12px 16px;
-  font-size: 14px;
-}
-.header-search-hint-categories li {
-  list-style: none;
-}
-/* 太字はラベルとチップが担う。ここは13行あるので、素の太さで面を静める */
-.header-search-hint-categories .article-category-link {
-  font-weight: normal;
-}
-/* 連載のチップの塊 (#2855)。チップ自身が下に 12px 持つので、
-   カテゴリの塊と同じ 28px の空きになるよう差分だけ足す */
-.header-search-hint-series {
-  margin-bottom: 16px;
-}
-/* 右肩の件数はタグのチップと同じく「総数」の意味 (#2129) */
-.header-search-hint-count {
-  margin-left: 4px;
-  font-size: 0.75em;
-  font-weight: normal;
-  color: ink-faint;
+  margin: 5px 12px 12px 0;
 }
 .reference-posts-item a {
   color: ink-strong;
