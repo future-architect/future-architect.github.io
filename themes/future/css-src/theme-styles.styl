@@ -303,13 +303,16 @@ Header and header elements
   opacity: 0;
   transition: opacity 0.12s ease, visibility 0s 0.3s;
 }
-/* カテゴリは18件あるので2列にする。幅は「最長の行が折り返さない」で決めた:
-   DataEngineering が13pxで101px（Noto Sans CJK 実測）、アイコン 16.9px と
-   3桁の件数 33.7px を足して1行151px。列の内寸を174pxまで取れる 420px にしている */
+/* カテゴリは18件あるので2列にする。列数は数えず**列幅の下限**で決める。
+   最長の行は DataEngineering の101px（13px・Noto Sans CJK の実測）＋
+   アイコン 16.9px ＋3桁の件数 33.7px = 151px で、行の左右の余白 24px を足すと
+   175px。下限を 190px に置くと 420px のパネルで必ず2列になり（190×2+8 ≤ 404）、
+   引き出しに入る狭い幅では自動で1列に落ちる（幅375pxの端末が境目）。
+   行は折り返さない指定なので、列が細るより列数が減る方が正しい */
 .header-dropdown-grid {
   width: 420px;
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
   gap: 0 (space-step * 2);
 }
 .header-nav-item:hover .header-dropdown,
@@ -393,13 +396,108 @@ Header and header elements
   height: (space-step * 6);
   background: rule-base;
 }
-/* ナビは 992px 未満では畳む。帯に並べると検索と重なり、畳んだ中身を出す
-   引き出しは JS 無しでは作れない。行き先の網羅はフッター4列 (#2839) が
-   持っているので、狭い画面ではそちらに任せる */
+/* 引き出しの引き金。992px 以上では要らないので display: none で消す
+   （タブ順からも外れる）。狭い幅では下のメディアクエリが形を与える */
+.header-drawer-input,
+.header-drawer-toggle {
+  display: none;
+}
+/* ナビは 992px 未満では帯から降りて引き出しに入る (#2877)。帯に並べると検索と
+   重なるが、消してしまうとカテゴリと連載への行き先がモバイルから無くなる
+   （フッター4列はリソースとコミュニティしか持たず、サイドバーのカテゴリは
+   記事ページでは意図して伏せている）。
+   開閉はチェックボックスの :checked と兄弟結合子で作る。JS は使わない
+   ——ランキングのタブ（.tabs input:checked + .tab_item）と同じ手 */
 @media (max-width: 991px) {
-  .header-nav,
   .header-divider {
     display: none;
+  }
+  /* 見えないがフォーカスできる形 (#2852)。display: none にすると Space で
+     開閉できなくなり、代わりに label へ tabindex を付けると今度は発火しない */
+  .header-drawer-input {
+    display: block;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .header-drawer-toggle {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding: space-step;
+    font-size: 24px; /* アイコン（.svg-icon = 1em）の実寸を決める */
+    color: ink-mute;
+    cursor: pointer;
+  }
+  .header-drawer-toggle .svg-icon {
+    margin-right: 0;
+  }
+  /* 輪郭は見えない input ではなく label に描く (#2852) */
+  .header-drawer-input:focus-visible + .header-drawer-toggle {
+    outline: 2px solid var(--brand-navy);
+    outline-offset: 2px;
+  }
+  .header-nav {
+    display: none;
+  }
+  /* 開いた引き出しは帯の下に敷く。帯の高さを押し広げないように絶対配置で、
+     縦に溢れる中身は面の中で送れるようにする */
+  .header-drawer-input:checked ~ .header-nav {
+    display: block;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: unquote('calc(100vh - ' + header-height + ')');
+    overflow-y: auto;
+    padding: (space-step * 2) 0 (space-step * 4);
+    background: #fff;
+    border-bottom: 1px solid rule-base;
+  }
+  /* 中は縦積み。横帯のための指定（高さ・折り返さない並び）を戻す */
+  .header-nav-list {
+    display: block;
+  }
+  .header-nav-item {
+    display: block;
+    height: auto;
+  }
+  /* 引き金は畳みの引き金ではなく、組のラベルとして残る。
+     中身は常に開いているので三角は出さない */
+  .header-nav-trigger {
+    padding: (space-step * 2) (space-step * 3);
+    font-weight: 700;
+    color: ink-strong;
+  }
+  .header-nav-caret {
+    display: none;
+  }
+  .header-nav-link {
+    padding: (space-step * 2) (space-step * 3);
+    font-weight: 700;
+    color: ink-strong;
+  }
+  /* パネルは畳まれず、その場に並ぶ。浮かせる必要が無いので枠も影も持たない */
+  .header-dropdown,
+  .header-dropdown-grid {
+    position: static;
+    visibility: visible;
+    opacity: 1;
+    width: auto;
+    padding: 0 0 (space-step * 3);
+    border: 0;
+    border-radius: 0;
+    transition: none;
+  }
+  .header-dropdown-item {
+    padding: (space-step * 2) (space-step * 3);
+  }
+  /* ラベルは組の見出し（引き金）が兼ねるが、「人気の」は条件なので残す */
+  .header-dropdown-label {
+    padding: 0 (space-step * 3);
   }
 }
 /* breadcrumb */
