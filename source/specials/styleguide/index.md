@@ -48,13 +48,28 @@ layout: page
 | <span class="sg-chip sg-surface-tint"></span> | `surface-tint` | <span class="sg-hex sg-surface-tint"></span> | <span class="sg-ratio sg-surface-tint"></span> | 静止した面。チップ・タブ帯・表のヘッダ |
 | <span class="sg-chip sg-surface-mute"></span> | `surface-mute` | <span class="sg-hex sg-surface-mute"></span> | <span class="sg-ratio sg-surface-mute"></span> | hover / focus の面と、空・無効の面・インラインコードの地 |
 
-### リンクとブランド色
+### リンクの色は4値・3状態
+
+リンクは**地が濃くなるぶん暗い側へ振った段**を持ちます。`link-blue` は白地で AA を満たしますが、インラインコードの地や note の色地に乗ると下回るため、同系色のまま暗くした値に替えます。訪問済みは紫で、こちらは白地でもコードの地でも足ります。
+
+比の地が3種類あるので、下の表は**それぞれの地に対する比**です。note は4色あるので、そのうち**いちばん厳しい地との比**を載せています（AA を満たすかはそこで決まります）。
+
+| | 変数 | 値 | 地 | 地との比 | 使うところ |
+| --- | --- | --- | --- | --- | --- |
+| <span class="sg-chip sg-link-blue"></span> | `link-blue` | <span class="sg-hex sg-link-blue"></span> | 白 | <span class="sg-ratio sg-link-blue"></span> | リンク（`--a-color`） |
+| <span class="sg-chip sg-link-visited"></span> | `link-visited` | <span class="sg-hex sg-link-visited"></span> | 白 | <span class="sg-ratio sg-link-visited"></span> | 訪問済み。インラインコードの中でも同じ値 |
+| <span class="sg-chip-ground sg-chip-tint"><span class="sg-chip sg-link-on-tint"></span></span> | `link-on-tint` | <span class="sg-hex sg-link-on-tint"></span> | インラインコードの地 | <span class="sg-ratio sg-link-on-tint"></span> | インラインコードの中のリンク |
+| <span class="sg-chip-ground sg-chip-note"><span class="sg-chip sg-link-on-note"></span></span> | `link-on-note` | <span class="sg-hex sg-link-on-note"></span> | note の4色 | <span class="sg-ratio sg-link-on-note"></span> | note の中のリンク |
+| <span class="sg-chip-ground sg-chip-note"><span class="sg-chip sg-link-on-note-visited"></span></span> | `link-on-note-visited` | <span class="sg-hex sg-link-on-note-visited"></span> | note の4色 | <span class="sg-ratio sg-link-on-note-visited"></span> | note の中の訪問済み |
+
+`link-on-tint` は `theme-styles.styl` と `highlight.styl` の両方に書く必要があります（詳細度の都合）。**値は1箇所から引いているので、揃っていることをコメントで主張する必要がありません。**
+
+### ブランド色
 
 ネイビーは塗り面（フッター）とインタラクション（selection / hover / focus）専用で、**文字色には使いません**。本文の `ink-strong` との比が 1.63 しかなく、文字にすると黒と区別が付かないためです。クリムゾンはコンセプトブックの文法どおり、画面内で同時に1箇所だけの差し色に限定しています。
 
 | | 変数 | 値 | 白地との比 | 使うところ |
 | --- | --- | --- | --- | --- |
-| <span class="sg-chip sg-link-blue"></span> | `link-blue` | <span class="sg-hex sg-link-blue"></span> | <span class="sg-ratio sg-link-blue"></span> | リンク（`--a-color`） |
 | <span class="sg-chip sg-brand-navy"></span> | `brand-navy` | <span class="sg-hex sg-brand-navy"></span> | <span class="sg-ratio sg-brand-navy"></span> | 塗り面とインタラクション。フッターの地・チップ・ページャの現在地・フォーカスの輪郭 |
 | <span class="sg-chip sg-brand-gray"></span> | `brand-gray` | <span class="sg-hex sg-brand-gray"></span> | <span class="sg-ratio sg-brand-gray"></span> | 白地の上で面としてはっきり見せたいところ。小物には広げない |
 | <span class="sg-chip sg-brand-crimson"></span> | `brand-crimson` | <span class="sg-hex sg-brand-crimson"></span> | <span class="sg-ratio sg-brand-crimson"></span> | 差し色。フッターの波・ランキング1位・フッターの hover |
@@ -80,11 +95,10 @@ layout: page
 
 ### トークンにない色
 
-上の18個以外にトークンになっていない色は18箇所あり、**どれも役があって残しているもの**です。
+上の22個以外に残っている色は13箇所で、**どれも役があって残しているもの**です。
 
 - **note の4色** — 色相を持つ地。`code-bg()` がその地から一段濃いインラインコードの地を作ります
 - **表彰・殿堂の淡金9箇所** — メダルは灰→銅→金、殿堂のカードは淡金。ブランド色は表彰に広げません
-- **リンクの状態色5箇所** — visited と、インラインコードや note の中で地が濃くなるぶん暗くしたリンク色。役はありますがまだトークンになっていません
 
 `ink` / `rule` / `surface` の**段の外にある色はありません**。以前は記事のメタ行が `#555`、畳みの三角が `#767676`、カテゴリの説明とページング情報が青みのあるグレー `#5f6d7b`、ツールチップの点線が `#bbb`、RSS アイコンの hover が純黒というように、段と 1〜17 しか違わない値が7箇所に散っていました。**差が見分けられないのに別の役として置かれていると、どちらを使うかの判断ができなくなります。**
 

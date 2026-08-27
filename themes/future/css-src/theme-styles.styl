@@ -85,7 +85,7 @@ a:hover, a:focus {
 	text-decoration: underline;
 }
 .article-entry a:visited {
-	color: #590fc7;
+	color: link-visited;
 }
 
 /***
@@ -2090,16 +2090,16 @@ code {
   color: ink-strong;
 }
 
-/* インラインコードの背景 #eee に対してリンク色 #0072E5（--a-color）は
-   3.99 で AA を下回るため、同系色のまま暗くする（5.55）。
-   highlight.styl 側にも同じ指定があるが、
-   こちらの方が詳細度が高く後勝ちするので両方を揃えておく */
+/* インラインコードの地の上では link-blue が AA を下回るため、
+   一段暗い link-on-tint に替える。highlight.styl 側にも同じ指定があるが、
+   こちらの方が詳細度が高く後勝ちするので両方を揃えておく。
+   値は _variables.styl の1箇所から引くので、揃っていることを主張する必要が無い */
 .article-entry a code {
-  color: #0a58ca;
+  color: link-on-tint;
 }
 
 .article-entry a:visited code {
-  color: #590fc7;
+  color: link-visited;
 }
 
 .nav {
@@ -4561,17 +4561,18 @@ note-alert-bg = #ffdbdb
   background-color: code-bg(note-alert-bg);
 }
 
-/* note の中のリンクは一段暗い青にする。地を濃くした分、本文色（#424242）は
-   まだ 6.5〜8.9 と余裕があるが、リンク色 #0a58ca は alert の上で 4.13 まで
-   落ちて AA を割る。参考サイトも枠の中のリンク色を枠ごとに変えている。
-   この色なら4色すべてで 6.0 以上を保てる */
+/* note の中のリンクは一段暗い青にする。地を濃くした分、本文色（ink-strong）は
+   4色すべてで余裕があるが、link-blue は alert の上で AA を割る。
+   参考サイトも枠の中のリンク色を枠ごとに変えている。
+   比はスタイルガイド（/specials/styleguide/）が note の4色すべてに対して
+   計算で出すので、ここには書かない */
 .article-entry .note-container a,
 .article-entry .note-container a code {
-  color: #084298;
+  color: link-on-note;
 }
 .article-entry .note-container a:visited,
 .article-entry .note-container a:visited code {
-  color: #4a0ba6;
+  color: link-on-note-visited;
 }
 
 /* :not(pre) > code でインラインコードだけに効かせる。付けないと
@@ -4789,6 +4790,22 @@ sg-ratios(map, ground)
       content: unquote('"' + sg-contrast(value, ground) + '"')
     }
 
+// 地が複数ある色（note の4色の上のリンク）は最小の比を出す。AA を満たすかは
+// いちばん厳しい地で決まるので、範囲ではなくその1つを載せる
+sg-contrast-min(fg, grounds)
+  lowest = 21
+  for ground in grounds
+    ratio = sg-contrast(fg, ground)
+    if ratio < lowest
+      lowest = ratio
+  lowest
+
+sg-ratios-min(map, grounds)
+  for name, value in map
+    .sg-ratio.sg-{name}::after {
+      content: unquote('"' + sg-contrast-min(value, grounds) + '"')
+    }
+
 sg-on-white = {
   'ink-strong': ink-strong,
   'ink-mute': ink-mute,
@@ -4798,7 +4815,6 @@ sg-on-white = {
   'rule-strong': rule-strong,
   'surface-tint': surface-tint,
   'surface-mute': surface-mute,
-  'link-blue': link-blue,
   'brand-navy': brand-navy,
   'brand-gray': brand-gray,
   'brand-crimson': brand-crimson,
@@ -4813,12 +4829,31 @@ sg-on-navy = {
 sg-no-ratio = {
   'rule-on-dark': rule-on-dark,
 }
+// リンクの段。地が3種類あるので比の出し方も3つに分ける (#2860)
+sg-link-on-white = {
+  'link-blue': link-blue,
+  'link-visited': link-visited,
+}
+sg-link-on-tint = {
+  'link-on-tint': link-on-tint,
+}
+sg-link-on-note = {
+  'link-on-note': link-on-note,
+  'link-on-note-visited': link-on-note-visited,
+}
+sg-note-grounds = note-tip-bg note-info-bg note-warn-bg note-alert-bg
 
 sg-swatches(sg-on-white)
 sg-swatches(sg-on-navy)
 sg-swatches(sg-no-ratio)
+sg-swatches(sg-link-on-white)
+sg-swatches(sg-link-on-tint)
+sg-swatches(sg-link-on-note)
 sg-ratios(sg-on-white, #fff)
 sg-ratios(sg-on-navy, brand-navy)
+sg-ratios(sg-link-on-white, #fff)
+sg-ratios(sg-link-on-tint, surface-mute)
+sg-ratios-min(sg-link-on-note, sg-note-grounds)
 
 /* トークンの一覧は素の表で組む。見本・16進数・比だけがこの3つのクラスで、
    変数名と用途は文章なので Markdown 側が持つ */
@@ -4844,6 +4879,19 @@ sg-ratios(sg-on-navy, brand-navy)
 }
 .sg-chip-ground .sg-chip {
   border-color: var(--rule-on-dark);
+}
+/* リンクの段は地の上に置く。白地の見本と並べたときに「どの地での色か」が
+   見本そのもので分かる (#2860)。alert を使うのは note の4色でいちばん厳しい地 */
+.sg-chip-tint {
+  background: surface-mute;
+}
+.sg-chip-note {
+  background: note-alert-bg;
+}
+/* 明るい地の上では枠を戻す。上の rule-on-dark は白の半透明なので見えない */
+.sg-chip-tint .sg-chip,
+.sg-chip-note .sg-chip {
+  border-color: rule-base;
 }
 
 /* 文字の見本。大きさと太さはコア側のルールから借りる */
