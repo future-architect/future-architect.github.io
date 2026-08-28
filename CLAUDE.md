@@ -686,6 +686,13 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
     （このファイルの `段`・`地`・`輪郭`・`添え`・`的` に対応する）。
     **トークン名と1対1の語はそのまま**（面＝`surface`・罫線＝`rule`・文字＝`ink`）。
     CLAUDE.md 側は内部の語彙のままでよく、揃えるのはページの本文だけ
+- **添えの小さい数字・注記は `ink-mute` × `0.85em`**（`body` 13px に対して 11.05px）。
+  `.archive-list-count`（年月一覧の件数）・`.tendency-panel-count`（「n本で使用」）・
+  `.ontology-count`・`.summary-panel-label`（累計 / 直近1年）の4件がこの型。
+  **px に直さない**（#2911 で一度 13px にして戻した）
+  - `.summary-count` の「em の連鎖をやめて px で1箇所に書く」（#1927 / #1928）は
+    **2段の掛け算**（`1.2em × 1.6em = 25px`）が追えなくなった話で、`body` に1回掛けるだけの
+    ものには当たらない。このファイルは em 指定63件・px 指定53件で、em のほうが多数派
 - **暗い地の上には別の段を使う**（#2839）。`ink` / `rule` / `surface` は白地の上で
   決めた値で、ネイビー地では `ink-strong` が 1.63 しか出ず1つも使えない。
   暗地用の段は `_variables.styl` が持つ（`on-dark-strong` / `on-dark` / `on-dark-mute` /
@@ -872,12 +879,8 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
   - **節の見出しは置かない。** 「累計」「直近1年」のラベルと数字が並んでいれば何のブロックかは
     見て分かる。目で見えない読者には `<section aria-label="統計">` が名乗る。
     **時間軸のラベルを強めない。** 主役は数値（20px 太字）で、箱の名前はその上に
-    小さく添えるもの。本文の統計と同じ `summary-panel-label`（13px・`ink-mute`・通常）の
+    小さく添えるもの。本文の統計と同じ `summary-panel-label`（`ink-mute` × `0.85em`）の
     ままにして、サイドバー用の上書きを持たない
-  - **箱の名前を中身より小さくしない。** `.summary-panel-label` は `0.85em` で、
-    `body` の 13px に掛かって 11.05px になり、タイルのラベル（12px）にも
-    サイドバーの行のラベル（13px）にも負けていた。em の連鎖をやめて **13px** で
-    1箇所に書く。効くのは `/series/`・`/tags/`・著者ページの表彰パネルも同じ
   - **グラフの凡例は出さない。** カテゴリ別の積み上げは最長の `DataEngineering` だけで
     117.9px あり、`type: scroll` の横送りになって場所だけ取る。どの色が何かは
     ツールチップ（`trigger: 'axis'`）が名乗る。高さは本文にあった 250px から 120px へ下げる
