@@ -105,9 +105,7 @@ hexo.extend.helper.register('get_monthly_category_data', function (year) {
   // 並びはその年の多い順ではなく、全期間ページと同じサイト累計の多い順で
   // 固定する。年ごとに入れ替わると、年を移動したとき凡例と積み上げの
   // 色の位置が動いて比較しにくい (#2201)
-  const series = this.site.categories
-    .toArray()
-    .sort((a, b) => b.length - a.length || (a.name < b.name ? -1 : 1))
+  const series = orderedCategories(this.site)
     .filter((c) => byCat.has(c.name))
     .map((c) => ({ name: c.name, data: byCat.get(c.name) }));
   return JSON.stringify({ months, series });
@@ -131,12 +129,54 @@ hexo.extend.helper.register('get_weekly_category_data', function (year, month) {
   });
   const weeks = Array.from({ length: weekCount }, (_, i) => `第${i + 1}週`);
   // 並びは年ページと同じサイト累計の多い順で固定 (#2201)
-  const series = this.site.categories
-    .toArray()
-    .sort((a, b) => b.length - a.length || (a.name < b.name ? -1 : 1))
+  const series = orderedCategories(this.site)
     .filter((c) => byCat.has(c.name))
     .map((c) => ({ name: c.name, data: byCat.get(c.name) }));
   return JSON.stringify({ weeks, series });
+});
+
+// カテゴリの並びはサイト全体で1つ (#2959)。累計の多い順で、同点は
+// **より新しい記事を出した方を上**にする。同点のカテゴリは次に記事が出た側の
+// 累計が先に進むので、そのとき順位が入れ替わる向きに最初から並べておく。
+// 最後に名前で決めるのは、最新記事の時刻まで同じだったときの保険
+// （同日複数投稿は date を秒でずらす規約があるので実際には起きない）。
+//
+// 同点は3組ある: DevOps / Frontend（134）、DB / Infrastructure（70）、
+// IaC / Mobile（57）。決着が無いと toArray() の順序次第でビルドごとに
+// 入れ替わっていた (#2959)。
+//
+// 記事数を鍵にして持ち回る。18カテゴリ×所属記事を毎ページ4回舐めると
+// その分ビルドが伸びる（呼ぶのはヘッダー・サイドバー・ポータル・グラフ）。
+// 記事数が変わったら作り直すので server での編集にも追随する
+const categoryOrderCache = new Map();
+
+function latestPostTime(category) {
+  let latest = 0;
+  category.posts.forEach((post) => {
+    const t = post.date.valueOf();
+    if (t > latest) latest = t;
+  });
+  return latest;
+}
+
+function orderedCategories(site) {
+  const key = String(site.posts.length);
+  if (categoryOrderCache.has(key)) return categoryOrderCache.get(key);
+  const latest = new Map();
+  const cats = site.categories.toArray();
+  cats.forEach((c) => latest.set(c.name, latestPostTime(c)));
+  const sorted = cats.sort(
+    (a, b) =>
+      b.length - a.length || latest.get(b.name) - latest.get(a.name) || (a.name < b.name ? -1 : 1),
+  );
+  categoryOrderCache.set(key, sorted);
+  return sorted;
+}
+
+// サイドバー（_widget/category.ejs）から呼ぶ。並びを1箇所に保つため、
+// テンプレート側で sort し直さない
+hexo.extend.helper.register('category_order', function () {
+  return orderedCategories(this.site);
 });
 
 /**
@@ -182,12 +222,10 @@ function buildCategoryStats(category) {
   };
 }
 
-// /categories/ の一覧用データ (#2056)
+// /categories/ の一覧用データ (#2056)。ヘッダーのドロップダウン (#2877) も呼ぶ。
+// 並びは orderedCategories が1箇所で持つ
 hexo.extend.helper.register('category_index', function () {
-  return this.site.categories
-    .toArray()
-    .sort((a, b) => b.length - a.length)
-    .map((category) => buildCategoryStats.call(this, category));
+  return orderedCategories(this.site).map((category) => buildCategoryStats.call(this, category));
 });
 
 // 絞り込んだ一覧用。カテゴリと同じ統計を、記事の部分集合に対して出す (#2038)
@@ -245,10 +283,7 @@ function monthlyBuckets(posts) {
 
 /** 積む順（＝凡例の順）はサイト累計の多い順で固定する (#2201) */
 function siteCategoryOrder() {
-  return this.site.categories
-    .toArray()
-    .sort((a, b) => b.length - a.length || (a.name < b.name ? -1 : 1))
-    .map((c) => c.name);
+  return orderedCategories(this.site).map((c) => c.name);
 }
 
 /**
