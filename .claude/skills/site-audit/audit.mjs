@@ -223,7 +223,7 @@ const inspect = () => {
 };
 
 // ---- キーボードでタブ順を辿る ----
-const tabWalk = async (page, limit = 45) => {
+const tabWalk = async (page, limit = 80) => {
   await page.evaluate(() => {
     document.body.focus();
     if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
@@ -378,11 +378,15 @@ for (const [urlPath, name] of targets) {
       const stops = await tabWalk(page);
       const reached = !!(stops.at(-1) && stops.at(-1).inMain);
       walks.push({where, stops: stops.length, reached});
-      // スキップリンクがあっても、押さずに Tab を送る読者は全部踏む
-      if (reached && stops.length > 10) {
-        const byClass = new Map();
-        for (const s2 of stops.slice(0, -1)) byClass.set(s2.el, (byClass.get(s2.el) || 0) + 1);
-        const top = [...byClass.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3).map(([k, v]) => `${k}×${v}`).join(' / ');
+      const byClass = new Map();
+      for (const s2 of stops) byClass.set(s2.el, (byClass.get(s2.el) || 0) + 1);
+      const top = [...byClass.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4).map(([k, v]) => `${k}×${v}`).join(' / ');
+      // スキップリンクがあっても、押さずに Tab を送る読者は全部踏む。
+      // **到達しなかった走査を黙って捨てない。** 上限まで踏んでも本文に届かないのが
+      // いちばん重い状態なのに、以前は所見にせず数字の一覧にだけ出していた
+      if (!reached) {
+        add('ERROR', `Tab を ${stops.length} 回押しても本文に届かない`, where, `内訳: ${top}`);
+      } else if (stops.length > 10) {
         add('WARN', `本文まで ${stops.length} 回タブ停止する`, where, `内訳: ${top}`);
       }
       const first = stops[0];
