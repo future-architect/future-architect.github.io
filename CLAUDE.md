@@ -1040,6 +1040,13 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
     - サイドバー（`<aside>`）は `<main>` の**兄弟**に置く。本文ではないため
     - パンくずは `<main>` の外なので、`_partial/breadcrumb.ejs` 側が
       `<nav aria-label="パンくず">` で自前のランドマークになる
+    - **全18ページ種がこの形**（#2953）。以前は `<main>` と `#main` を別要素に
+      分けた形が9本あり、着地点が `<main>` の内側（8本）と外側（1本＝記事ページ）に
+      割れていた。余白のための入れ物は `<div class="margin-top-30">` として残っている
+      （`<section>` のままだと見出しを持たない節に見える）
+    - 記事ページの `id="main"` は `_partial/article.ejs` の `<main>` が持つ。
+      **この partial は1ページに1回しか描かない**（`_partial/archive.ejs` の
+      `pagination == 2` の枝がループで呼ぶ形だが、`config.archive` が undefined で通らない）
   - `position: fixed` にする。絶対配置だと押される前にブラウザがページを
     先頭まで送ってしまい、読んでいた位置を失う
   - 検索パネルのリンクをタブ順から外す案は採らない。キーボードだけの読者が
