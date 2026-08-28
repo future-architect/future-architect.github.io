@@ -123,6 +123,45 @@ layout: page
 <div class="sg-h6">見出しはこの大きさで出ます</div>
 </div>
 
+**部品の大きさは7つの段から選びます。** 値ではなく役で選べるように、段に名前が付いています。
+
+<div class="sg-sizes">
+<div class="sg-size sg-size-meta">
+<div class="sg-size-label">添え・注記・件数・小ラベル<span class="sg-size-value"></span></div>
+<div class="sg-size-sample">メタ行・パネルの説明・タグの件数。読者の行動を変えない数字と、部品の名前</div>
+</div>
+<div class="sg-size sg-size-base">
+<div class="sg-size-label">土台<span class="sg-size-value"></span></div>
+<div class="sg-size-sample">ページ全体の既定値。コードブロックの1行もこの大きさです</div>
+</div>
+<div class="sg-size sg-size-row">
+<div class="sg-size-label">行として並ぶもの<span class="sg-size-value"></span></div>
+<div class="sg-size-sample">ナビ・目次・パンくず・全件への導線。読み下す対象ではなく、目で拾う対象です</div>
+</div>
+<div class="sg-size sg-size-body">
+<div class="sg-size-label">読み下す文章<span class="sg-size-value"></span></div>
+<div class="sg-size-sample">記事本文・特設ページの本文・記事の概要文・カードの題。段落を何行も追う場所です</div>
+</div>
+<div class="sg-size sg-size-lead">
+<div class="sg-size-label">サイト名・サイドバーの見出し<span class="sg-size-value"></span></div>
+<div class="sg-size-sample">枠の名前</div>
+</div>
+<div class="sg-size sg-size-title">
+<div class="sg-size-label">見出し・ロゴ<span class="sg-size-value"></span></div>
+<div class="sg-size-sample">一覧カードの記事名</div>
+</div>
+<div class="sg-size sg-size-display">
+<div class="sg-size-label">大見出し<span class="sg-size-value"></span></div>
+<div class="sg-size-sample">節の始まり</div>
+</div>
+</div>
+
+段の外にあるのは3つだけです。**記事タイトル**は幅で変わるので `clamp` で持ちます。**404 ページの数字**と**タグの件数の上付き**は、それぞれ1箇所でしか使わない一点ものです。
+
+**見分けの付かない差に2つの役を割り当てません。** 新しい部品の大きさを決めるときは、まず近い段との差を見て寄せられないかを確かめます。1px 未満しか違わない2つの値は、読者には同じ大きさに見えます。
+
+上の**本文見出し h2〜h6 は段の外**です。あちらは互いの比が階層を作る列なので、土台の大きさに追従する必要があります。
+
 見出しの階層はサイズだけでなく、**サイズ・太さ・直前の空き・罫線**の4つで作ります。サイズだけで表そうとすると上下が詰まります。避けたいのは同着で、比を大きく取ること自体が目的ではありません。記事タイトルの下限を上げるとモバイルで字数が足りなくなるため、太さ（800 対 700）とページ先頭という位置、h2 側の空きと罫線が階層を支えています。
 
 ### 行間
