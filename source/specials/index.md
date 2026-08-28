@@ -13,9 +13,9 @@ layout: page
 
 - [フューチャーのガイドライン](/specials/guidelines/) — 設計ガイドライン・コーディング規約・TypeScript 教材の入口
 
-## コミュニティ
+## アクティビティ
 
-技術を通じた社外との接点です。
+技術を通じた社外向けの活動です。
 
 - [HACK TO THE FUTURE](/specials/httf/) — フューチャー主催のプログラミングコンテストと、競技プログラミング記事の入口
 - [アドベントカレンダー](/specials/advent-calendar/) — 2015年から毎年参加している Qiita Advent Calendar の歴代一覧
