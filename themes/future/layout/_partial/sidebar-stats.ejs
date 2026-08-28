@@ -1,0 +1,116 @@
+<%# カテゴリ・タグ・著者ページの統計とグラフ (#2911)。本文の先頭に置いていたものを
+    サイドバーへ逃がす。読者がこれらのページに来る目的は「その記事を読む」ことで、
+    総シェア数の内訳も投稿数の推移もその判断には効かない。消さないのは運営と
+    書き手がこの数字を見に来るため。1ページ目だけに出す %>
+<%
+  // 3種のどれかを見分けて、数字とグラフのヘルパーを揃える。
+  // 著者はシェア数がページのローカル（author_generator.js）に載っている
+  let stats = null;
+  if (page.tag) {
+    const s = summary_tag(page.tag);
+    const t = tag_stats(page.tag);
+    stats = {
+      total: [
+        {label: '投稿', value: count_tag(page.tag)},
+        {label: '著者数', value: s.authors},
+        {label: '総シェア数', value: s.total},
+        {label: 'X', value: s.twitter},
+        {label: 'Facebook', value: s.facebook},
+        {label: 'はてブ', value: s.hatebu},
+        {label: 'Pocket', value: s.pocket},
+      ],
+      recent: t && t.recent > 0
+        ? [{label: '投稿', value: t.recent}, {label: '著者数', value: t.recentAuthorCount}]
+        : [],
+      chart: tag_monthly_chart(page.tag),
+    };
+  } else if (page.category) {
+    const s = summary_category(page.category);
+    const c = category_stats(page.category);
+    stats = {
+      total: [
+        {label: '投稿', value: count_category(page.category)},
+        {label: '著者数', value: s.authors},
+        {label: '総シェア数', value: s.total},
+        {label: 'X', value: s.twitter},
+        {label: 'Facebook', value: s.facebook},
+        {label: 'はてブ', value: s.hatebu},
+        {label: 'Pocket', value: s.pocket},
+      ],
+      recent: c && c.recent > 0
+        ? [{label: '投稿', value: c.recent}, {label: '著者数', value: c.recentAuthorCount}]
+        : [],
+      chart: category_monthly_chart(page.category),
+    };
+  } else if (page.author) {
+    const a = author_stats(page.author);
+    stats = {
+      total: [
+        {label: '投稿', value: count_author(page.author)},
+        {label: '総シェア数', value: page.authorSNSCnt},
+        {label: 'X', value: page.twitterShare},
+        {label: 'Facebook', value: page.facebookShare},
+        {label: 'はてブ', value: page.hatebu},
+        {label: 'Pocket', value: page.pocket},
+      ],
+      recent: a && a.recent > 0 ? [{label: '投稿', value: a.recent}] : [],
+      chart: author_monthly_chart(page.author),
+    };
+  }
+%>
+<% if (stats) { %>
+<section class="sidebar-stats" data-nosnippet>
+  <h2 class="margin-top-30">統計</h2>
+  <%# 箱と時間軸のラベルは本文の統計と同じ部品。中身だけタイルから行に替える。
+      208px の列にタイルを7つ並べると3.4倍の幅が要る %>
+  <div class="summary-panels">
+    <section class="summary-panel">
+      <span class="summary-panel-label">累計</span>
+      <ul class="sidebar-stats-list">
+        <% stats.total.forEach(function(r){ %>
+        <li><span class="sidebar-stats-label"><%= r.label %></span><span class="sidebar-stats-value"><%= r.value %></span></li>
+        <% }) %>
+      </ul>
+    </section>
+    <section class="summary-panel">
+      <span class="summary-panel-label">直近1年</span>
+      <% if (stats.recent.length) { %>
+      <ul class="sidebar-stats-list">
+        <% stats.recent.forEach(function(r){ %>
+        <li><span class="sidebar-stats-label"><%= r.label %></span><span class="sidebar-stats-value"><%= r.value %></span></li>
+        <% }) %>
+      </ul>
+      <% } else { %>
+      <p class="summary-note">投稿はありません</p>
+      <% } %>
+    </section>
+  </div>
+  <% if (stats.chart) { %>
+  <%# 凡例は出さない。カテゴリ別の積み上げは最長の「DataEngineering」だけで
+      117.9px あり、208px の列では横送りになって場所だけ取る。
+      どの色が何かはツールチップ（trigger: axis）が名乗る %>
+  <div id="chart" class="sidebar-stats-chart"></div>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.1.2/dist/echarts.min.js" integrity="sha384-QqZssazD9IzPiEJz2lyFewTMgYObqDWxBfCX5k5E4n4fH7ygMIqp6A6Ek8HIrRyQ" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    const chartData = <%- stats.chart %>;
+    const catColors = <%- category_colors() %>;
+    echarts.init(document.getElementById('chart')).setOption({
+      <%# タイトルは直上の h2 が担うので、チャート内では重ねない %>
+      title: {},
+      tooltip: { trigger: 'axis' },
+      <%# 既定の grid.left 10% で右へズレて見える。軸ラベル込みで左端に寄せる %>
+      grid: { left: 0, right: 0, top: 8, bottom: 0, containLabel: true },
+      xAxis: {
+        type: 'category',
+        boundaryGap: true,
+        data: chartData.months,
+        axisLabel: <%- partial('chart-xaxis-year-labels', {months: 'chartData.months', el: 'chart'}).trim() %>
+      },
+      yAxis: <%- partial('chart-yaxis-count', {series: 'chartData.series'}).trim() %>,
+      <%# 色はカテゴリ名で固定 (#2170) %>
+      series: chartData.series.map(s => Object.assign({}, s, { itemStyle: { color: catColors[s.name] } }))
+    });
+  </script>
+  <% } %>
+</section>
+<% } %>
