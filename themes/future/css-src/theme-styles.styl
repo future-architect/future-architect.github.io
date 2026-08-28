@@ -293,6 +293,28 @@ Header and header elements
   align-items: center;
   height: header-height;
 }
+/* details は帯の中では箱としてだけ働く。高さを引き継がないと引き金が上に寄る。
+   padding を戻すのは、本文の折りたたみ用に素の details が padding-bottom: 24px を
+   持っているため。そのぶん中身の箱が縮んで、引き金が 12px 上にずれる */
+.header-nav-disclosure {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 0;
+}
+/* 引き出し用の組ラベル。帯では summary が引き金を兼ねるので出さない */
+.header-nav-label {
+  display: none;
+  margin: 0;
+}
+/* summary の既定の三角は消す。開閉の向きは .header-nav-caret が示す */
+.header-nav-trigger {
+  list-style: none;
+  cursor: pointer;
+}
+.header-nav-trigger::-webkit-details-marker {
+  display: none;
+}
 .header-nav-link,
 .header-nav-trigger {
   display: flex;
@@ -321,7 +343,7 @@ Header and header elements
   transition: transform hover-speed ease;
 }
 .header-nav-item:hover .header-nav-caret,
-.header-nav-item:focus-within .header-nav-caret {
+.header-nav-disclosure[open] .header-nav-caret {
   transform: rotate(180deg);
 }
 /* 畳んだ行き先。影は持たない (#2747) ので、白い面と枠で本文から浮かせる。
@@ -353,10 +375,21 @@ Header and header elements
   gap: 0 (space-step * 2);
 }
 .header-nav-item:hover .header-dropdown,
-.header-nav-item:focus-within .header-dropdown {
+.header-nav-disclosure[open] ~ .header-dropdown {
   visibility: visible;
   opacity: 1;
   transition: opacity 0.12s ease;
+}
+/* 開いたままカーソルもフォーカスも離れたら畳んで見せる（open 属性は残る）。
+   これが無いと、別の引き金にカーソルを乗せたときに2枚が同じ位置で重なる。
+   引き金へ戻れば また出るので、開いた読者の意図は保たれる。
+   **幅で囲むのは、引き出し（1024px 以下）ではパネルを常時開いて並べているため。**
+   囲まないとこの規則の詳細度が勝ち、引き出しで引き金を押した瞬間に消える */
+@media (min-width: 1025px) {
+  .header-nav-item:not(:hover):not(:focus-within) .header-nav-disclosure[open] ~ .header-dropdown {
+    visibility: hidden;
+    opacity: 0;
+  }
 }
 /* 行として並ぶものなので、反応は面を一段 (#2686) */
 .header-dropdown-item {
@@ -553,15 +586,19 @@ Header and header elements
     display: block;
     height: auto;
   }
-  /* 引き金は畳みの引き金ではなく、組のラベルとして残る。
-     中身は常に開いているので三角は出さない */
-  .header-nav-trigger {
+  /* 中身は常に並ぶので畳みの引き金は出さず、組のラベルに替える (#2945)。
+     summary のままにすると open が false のまま中身が見えていて、
+     支援技術に「折りたたみ（閉）」と読まれる */
+  .header-nav-disclosure {
+    display: none;
+  }
+  .header-nav-label {
+    display: block;
     padding: (space-step * 2) (space-step * 3);
+    font-size: 14px;
+    line-height: leading-row;
     font-weight: 700;
     color: ink-strong;
-  }
-  .header-nav-caret {
-    display: none;
   }
   .header-nav-link {
     padding: (space-step * 2) (space-step * 3);
