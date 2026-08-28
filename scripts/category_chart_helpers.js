@@ -173,10 +173,75 @@ function orderedCategories(site) {
   return sorted;
 }
 
-// サイドバー（_widget/category.ejs）から呼ぶ。並びを1箇所に保つため、
-// テンプレート側で sort し直さない
-hexo.extend.helper.register('category_order', function () {
-  return orderedCategories(this.site);
+// カテゴリを群に束ねる (#2908)。所属は source/_data/category_groups.yml が持ち、
+// 並びはここで決める。群は所属カテゴリの累計本数の合計が多い順、群の中は
+// orderedCategories と同じ（累計の多い順）。読者が見る3箇所——ヘッダーの
+// ドロップダウン・サイドバー・/categories/——で同じ群・同じ並びになる。
+//
+// 群に属さないカテゴリは黙って消さずに「その他」へ出す。カテゴリは
+// 記事への行き先なので、登録漏れで navigation から消える方が害が大きい。
+// 色の対応表（CATEGORY_COLORS）と同じく、ビルドログの警告で気づく形にする
+const UNGROUPED = 'その他';
+
+// 直近1年の本数。ドロップダウンの title が「累計と直近1年」の対を出すのに使う。
+// orderedCategories と同じく記事数を鍵にして持ち回る（全カテゴリの所属記事を
+// 毎ページ舐めるとビルドが伸びる）
+const recentCountCache = new Map();
+
+function recentCounts(site) {
+  const key = String(site.posts.length);
+  if (recentCountCache.has(key)) return recentCountCache.get(key);
+  const oneYearAgo = Date.now() - 365 * 24 * 60 * 60 * 1000;
+  const counts = new Map();
+  site.categories.forEach((category) => {
+    let recent = 0;
+    category.posts.forEach((post) => {
+      if (post.date.valueOf() >= oneYearAgo) recent++;
+    });
+    counts.set(category.name, recent);
+  });
+  recentCountCache.set(key, counts);
+  return counts;
+}
+
+function groupedCategories(site) {
+  const membership = (site.data && site.data.category_groups) || {};
+  const groupOf = new Map();
+  Object.keys(membership).forEach((group) => {
+    (membership[group] || []).forEach((name) => groupOf.set(name, group));
+  });
+  const members = new Map(Object.keys(membership).map((group) => [group, []]));
+  const recent = recentCounts(site);
+  orderedCategories(site).forEach((category) => {
+    let group = groupOf.get(category.name);
+    if (!group) {
+      group = UNGROUPED;
+      hexo.log.warn(
+        `source/_data/category_groups.yml に「${category.name}」の群がありません。「${UNGROUPED}」として描画します`,
+      );
+      if (!members.has(group)) members.set(group, []);
+    }
+    members.get(group).push({
+      name: category.name,
+      path: category.path,
+      count: category.length,
+      recent: recent.get(category.name) || 0,
+    });
+  });
+  return [...members.entries()]
+    .filter(([, categories]) => categories.length)
+    .map(([name, categories]) => ({
+      name,
+      categories,
+      count: categories.reduce((sum, c) => sum + c.count, 0),
+    }))
+    .sort((a, b) => b.count - a.count || (a.name < b.name ? -1 : 1));
+}
+
+// ヘッダーのドロップダウン (#2877) とサイドバー（_widget/category.ejs）から呼ぶ。
+// 並びを1箇所に保つため、テンプレート側で sort し直さない
+hexo.extend.helper.register('category_groups', function () {
+  return groupedCategories(this.site);
 });
 
 /**
@@ -222,10 +287,16 @@ function buildCategoryStats(category) {
   };
 }
 
-// /categories/ の一覧用データ (#2056)。ヘッダーのドロップダウン (#2877) も呼ぶ。
-// 並びは orderedCategories が1箇所で持つ
-hexo.extend.helper.register('category_index', function () {
-  return orderedCategories(this.site).map((category) => buildCategoryStats.call(this, category));
+// /categories/ の一覧用データ (#2056)。群ごとに、カテゴリ1件ずつの統計を返す (#2908)。
+// 群と並びは groupedCategories が1箇所で持つ
+hexo.extend.helper.register('category_group_index', function () {
+  return groupedCategories(this.site).map((group) => ({
+    name: group.name,
+    count: group.count,
+    categories: group.categories.map((c) =>
+      buildCategoryStats.call(this, this.site.categories.findOne({ name: c.name })),
+    ),
+  }));
 });
 
 // 絞り込んだ一覧用。カテゴリと同じ統計を、記事の部分集合に対して出す (#2038)
