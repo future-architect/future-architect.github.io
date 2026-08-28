@@ -11,6 +11,10 @@ categories:
 thumbnail: /images/2022/20220721b/thumbnail.jpg
 author: 武田大輝
 lede: "先日（2022年7月15日）発売された技術評論社の Software Design 2022年 8月号 に寄稿させていただきました。まずはじめに、このような寄稿の機会をくださった技術評論社の方々には、心からお礼申し上げます。"
+magazines:
+  - name: "Software Design 2022年8月号"
+    url: https://gihyo.jp/magazine/SD/archive/2022/202208
+    work: "OpenAPIを使ったWeb API開発の実際"
 ---
 
 <img src="/images/2022/20220721b/TH320_642208.jpg" alt="" width="320" height="452">
