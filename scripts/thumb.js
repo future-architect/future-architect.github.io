@@ -4,11 +4,11 @@
  * 索引記事の表にサムネイルを出すタグ (#2790)。日付のセルに入れ、日付の上に積む。
  *
  *   | {% thumb 20260827b %} 8/27（木） | 澁川喜規 | [タイトル](/articles/20260827b/) |
- *   | {% thumb %} 8/28（金）           | 井上拓   | まだ公開していない記事のテーマ    |
+ *   | 8/28（金）                       | 井上拓   | まだ公開していない記事のテーマ    |
  *
- * 記事IDを渡さない形は空き枠を出す。予定表なので未公開の行の方が多い時期があり、
- * 何も置かないと書き忘れと見分けが付かない。枠と大きさは中身があるときと
- * 同じに保って場所だけ空けておく（投稿が無い月・サムネの無い連載と同じ扱い）。
+ * 絵が無ければ何も出さない。予定表なので未公開の行の方が多い時期があり、
+ * 空き枠を並べると来ない絵を待っているように見える。セルには日付が残るので、
+ * 何も無くても書き忘れには見えない。
  *
  * 表そのものは生成に寄せない。索引の表は公開済み記事の一覧ではなく**予定表**で、
  * データ行714行のうち258行がまだリンクを持たない（「調整中」「〜（仮）」）。
@@ -20,19 +20,18 @@
  * この時点で全記事が DB に入っている。
  */
 
-const { thumbIcon, emptyThumbIcon } = require('./lib/post_list');
+const { thumbIcon } = require('./lib/post_list');
 
 hexo.extend.tag.register('thumb', function (args) {
   const id = (args[0] || '').trim();
-  if (!id) return emptyThumbIcon();
+  if (!id) return '';
   const post = hexo.locals
     .get('posts')
     .toArray()
     .find((p) => p.path === `articles/${id}/`);
   if (!post) {
     hexo.log.warn(`thumb: 記事 ${id} が見つかりません`);
-    // 列がずれると表全体が読めなくなるので、箱だけは残す
-    return emptyThumbIcon();
+    return '';
   }
   return thumbIcon(post);
 });

@@ -42,14 +42,13 @@ const newLabel = (date) => {
  * サムネの箱。索引記事の表（thumb タグ #2790）も同じ markup を使う。
  *
  * 同じ行のタイトルと同じ行き先のリンクなので、タブ移動と読み上げからは外す (#2845)。
- * サムネの無い記事は同じ大きさの空き枠を置いて行頭を揃える
+ * サムネの無い記事は空文字を返す。行の左端を揃える必要がある一覧・ランキングだけ、
+ * 呼び出し側（postListItem）が同じ大きさの空き枠に差し替える
  */
-const emptyThumbIcon = () => `<span class="post-list-icon post-list-icon-empty"></span>`;
-
 const thumbIcon = (post) =>
   post.thumbnail
     ? `<a href="/${post.path}" class="post-list-icon" tabindex="-1" aria-hidden="true"><img src="${post.thumbnail}" alt="" width="72" height="48" loading="lazy"></a>`
-    : emptyThumbIcon();
+    : '';
 
 /**
  * @param {object} post          Hexo の post
@@ -81,7 +80,9 @@ const postListItem = (
   if (!withThumb) {
     return `<li class="${itemClass}">${rankLabel}${body}</li>`;
   }
-  return `<li class="${itemClass} post-list-item-thumb">${rankLabel}${thumbIcon(post)}<div class="post-list-body">${body}</div></li>`;
+  // 行の左端を揃えるため、サムネの無い記事はここでだけ同じ大きさの空き枠に置き換える
+  const thumb = thumbIcon(post) || `<span class="post-list-icon post-list-icon-empty"></span>`;
+  return `<li class="${itemClass} post-list-item-thumb">${rankLabel}${thumb}<div class="post-list-body">${body}</div></li>`;
 };
 
-module.exports = { snsLabel, newLabel, postListItem, thumbIcon, emptyThumbIcon };
+module.exports = { snsLabel, newLabel, postListItem, thumbIcon };
