@@ -322,7 +322,7 @@ fmt.Println("コードブロックも書けます")
 ![代替テキスト](/images/2026/20260114a/thumbnail.jpg)
 ```
 
-![](/images/2026/20260114a/thumbnail.jpg)
+<img src="/images/2026/20260114a/thumbnail.jpg" alt="EDIFACTの文字列を字句解析してから構文解析し、構造化データにする流れ図" width="300" height="93">
 
 公開時にこちらで `<img>` へ変換し、**実寸の `width` と `height`** を付けます。読み込み中に本文が動くのを防ぐためで、書き手が意識する必要はありません。
 
@@ -335,11 +335,11 @@ fmt.Println("コードブロックも書けます")
 画像の直下の行を `*` で挟むと、キャプションになります。
 
 ```markdown
-![](/images/2026/20260114a/thumbnail.jpg)
+![代替テキスト](/images/2026/20260114a/thumbnail.jpg)
 *図1: キャプションの文*
 ```
 
-![](/images/2026/20260114a/thumbnail.jpg)
+<img src="/images/2026/20260114a/thumbnail.jpg" alt="EDIFACTの文字列を字句解析してから構文解析し、構造化データにする流れ図" width="300" height="93" loading="lazy">
 *図1: キャプションの文*
 
 代替テキストとキャプションは役割が違います。代替テキストは画像が見えない人への説明、キャプションは全員に向けた補足なので、同じ文を両方に書く必要はありません。
