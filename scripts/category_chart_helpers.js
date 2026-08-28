@@ -173,10 +173,13 @@ function orderedCategories(site) {
   return sorted;
 }
 
-// カテゴリを群に束ねる (#2908)。所属は source/_data/category_groups.yml が持ち、
-// 並びはここで決める。群は所属カテゴリの累計本数の合計が多い順、群の中は
-// orderedCategories と同じ（累計の多い順）。読者が見る3箇所——ヘッダーの
-// ドロップダウン・サイドバー・/categories/——で同じ群・同じ並びになる。
+// カテゴリを群に束ねる (#2908)。所属と群の並びは source/_data/category_groups.yml が
+// 持ち、群の中の並びはここで決める（orderedCategories と同じ累計の多い順）。
+// 読者が見る3箇所——ヘッダーのドロップダウン・サイドバー・/categories/——で
+// 同じ群・同じ並びになる。
+//
+// 群の並びだけ本数から出さないのは、5つの群が読者にとって対等ではないため。
+// 大きい順に並べても意味は増えず、並べ替えの理由がファイルの外に出てしまう。
 //
 // 群に属さないカテゴリは黙って消さずに「その他」へ出す。カテゴリは
 // 記事への行き先なので、登録漏れで navigation から消える方が害が大きい。
@@ -228,14 +231,11 @@ function groupedCategories(site) {
       recent: recent.get(category.name) || 0,
     });
   });
+  // Map は挿入順を保つので、yml のキーの順がそのまま群の並びになる
+  // （「その他」は登録漏れのときだけ末尾に足される）
   return [...members.entries()]
     .filter(([, categories]) => categories.length)
-    .map(([name, categories]) => ({
-      name,
-      categories,
-      count: categories.reduce((sum, c) => sum + c.count, 0),
-    }))
-    .sort((a, b) => b.count - a.count || (a.name < b.name ? -1 : 1));
+    .map(([name, categories]) => ({ name, categories }));
 }
 
 // ヘッダーのドロップダウン (#2877) とサイドバー（_widget/category.ejs）から呼ぶ。
@@ -292,7 +292,6 @@ function buildCategoryStats(category) {
 hexo.extend.helper.register('category_group_index', function () {
   return groupedCategories(this.site).map((group) => ({
     name: group.name,
-    count: group.count,
     categories: group.categories.map((c) =>
       buildCategoryStats.call(this, this.site.categories.findOne({ name: c.name })),
     ),
