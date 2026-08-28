@@ -182,11 +182,14 @@ function buildCategoryStats(category) {
   };
 }
 
-// /categories/ の一覧用データ (#2056)
+// /categories/ の一覧用データ (#2056)。ヘッダーのドロップダウン (#2877) も呼ぶ。
+// 同点は名前で決める（このファイルのグラフ2箇所と同じ式。#2959）。
+// 同点は3組あり、決着が無いとビルドごとに入れ替わっていた:
+// DevOps / Frontend（134）、DB / Infrastructure（70）、IaC / Mobile（57）
 hexo.extend.helper.register('category_index', function () {
   return this.site.categories
     .toArray()
-    .sort((a, b) => b.length - a.length)
+    .sort((a, b) => b.length - a.length || (a.name < b.name ? -1 : 1))
     .map((category) => buildCategoryStats.call(this, category));
 });
 
