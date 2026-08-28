@@ -284,24 +284,21 @@ hexo.extend.helper.register('category_monthly_chart', function (name) {
  * 絞り込みが無いぶん、CSS 版は読み手の使い勝手が落ちていた。グラフは
  * echarts に統一する。
  *
- * ただしタグは数が桁違い（約700）で、1〜4本のタグが半分以上を占める。
- * 棒が数本立つだけのグラフは「いつ書かれたか」を示すが、それは直下の
- * 記事一覧の日付と同じ情報でしかない。5本以上あり、かつ投稿のある月が
- * 2つ以上（＝時間の中で動きがある）タグにだけ出す。
+ * 記事の本数では出し分けない (#2911)。以前は5本以上かつ投稿のある月が2つ以上の
+ * タグにだけ出していたが、グラフは統計と一緒に <details> へ畳んだので、
+ * 「一覧より前に場所を取る」という出し惜しみの理由が無くなった。
+ * 出るページと出ないページがあると、畳んだ枠の中身がタグによって変わる。
  *
  * 積み上げはカテゴリ別。タグは複数のカテゴリにまたがるので、
  * 「このタグがどの分野で書かれてきたか」「その構成が時期で変わったか」まで
  * 読める。色は他ページと同じくカテゴリ名で固定 (#2170)、積む順と凡例の順は
  * サイト累計の多い順で固定する (#2201)。
  */
-const TAG_CHART_MIN_POSTS = 5;
-const TAG_CHART_MIN_MONTHS = 2;
-
 hexo.extend.helper.register('tag_monthly_chart', function (name) {
   const tag = this.site.tags.findOne({ name });
-  if (!tag || tag.length < TAG_CHART_MIN_POSTS) return null;
+  if (!tag) return null;
   const buckets = monthlyBuckets(tag.posts.toArray());
-  if (!buckets || buckets.byMonth.size < TAG_CHART_MIN_MONTHS) return null;
+  if (!buckets) return null;
   const { byMonth, months } = buckets;
 
   const series = siteCategoryOrder
