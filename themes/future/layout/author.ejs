@@ -12,39 +12,18 @@
   <div class="margin-top-30">
     <h1 class="list-page"><%- partial('_partial/svg-icon', {icon: 'user'}) %><%- page.author %><span class="list-sub-text">さんのページ</span></h1>
     <% if (page.current === 1) { %>
-    <% const as = author_stats(page.author); %>
-    <%# 累計と直近1年（#2082）は時間軸が違うので、パネルで束ねて区別する (#2276)。
-        カテゴリ・タグページと同じ構成 %>
+    <%# 累計・直近1年の数字と推移はサイドバーへ移した (#2911)。表彰とプロフィールは
+        本文に残す。表彰は書き手にとっての意味が大きく、プロフィールは読者が
+        その人を知る手がかりで、どちらも添えの数字とは別 %>
+    <% const awards = author_awards(page.author); %>
+    <% if (awards) { %>
     <div class="summary-panels">
-      <section class="summary-panel">
-        <span class="summary-panel-label">累計</span>
-        <ul class="summary">
-          <li><span class="summary-count"><%= count_author(page.author) %></span><br><span class="summary-label">投稿</span></li>
-          <li><span class="summary-count"><%= page.authorSNSCnt %></span><br><span class="summary-label">総シェア数</span></li>
-          <li class="summary-sub"><span class="summary-count"><%= page.twitterShare %></span><br><span class="summary-label">X</span></li>
-          <li class="summary-sub"><span class="summary-count"><%= page.facebookShare %></span><br><span class="summary-label">Facebook</span></li>
-          <li class="summary-sub"><span class="summary-count"><%= page.hatebu %></span><br><span class="summary-label">はてブ</span></li>
-          <li class="summary-sub"><span class="summary-count"><%= page.pocket %></span><br><span class="summary-label">Pocket</span></li>
-        </ul>
-      </section>
-      <section class="summary-panel">
-        <span class="summary-panel-label">直近1年</span>
-        <% if (as.recent > 0) { %>
-        <ul class="summary">
-          <li><span class="summary-count"><%= as.recent %></span><br><span class="summary-label">投稿</span></li>
-        </ul>
-        <% } else { %>
-        <p class="summary-note">投稿はありません</p>
-        <% } %>
-      </section>
       <%# 表彰の記録 (#2149)。受賞者のページにだけパネルが出る。
           機械算出のバッジは付けない方針（理由は scripts/awards.js）。
           受賞年を1つずつメダルのバッジで出し、殿堂入り（3回受賞）は
           濃い金の別バッジで格を分ける。
           アイコンは /authors/ の表彰一覧と同じ部品を使い、殿堂入りは王冠、
           受賞年はメダルで揃える (#2409) %>
-      <% const awards = author_awards(page.author); %>
-      <% if (awards) { %>
       <section class="summary-panel">
         <span class="summary-panel-label">表彰</span>
         <p class="award-name"><%- partial('_partial/award-name') %></p>
@@ -69,8 +48,8 @@
           <% }) %>
         </ul>
       </section>
-      <% } %>
     </div>
+    <% } %>
     <%# プロフィールと外部への導線 (#2774)。アイコンはフッターと同じ svg-icon の
         辞書から取り、形も同じ .icon-link（28px の円）にそろえる。
         ブランドの絵が名乗るリンクなので「（外部サイト）」の印は付けない (#2729) %>
@@ -91,45 +70,6 @@
       <% } %>
     </div>
     <% } %>
-    <%# 並びはカテゴリ・タグページの「統計 → よく読まれている記事 → 新着」に
-        揃える (#2191)。月別投稿数のグラフは統計の一種とみなして統計の直後に置く %>
-    <%# 見出しは他のチャートと同じ「◯別 △の推移」の型 (#2212) %>
-    <%- partial('_partial/section-heading', {id: 'trend', text: '月別 投稿数の推移'}) %>
-    <div id="chart" style="width:100%;min-height:250px"></div>
-    <script src="https://cdn.jsdelivr.net/npm/echarts@5.1.2/dist/echarts.min.js" integrity="sha384-QqZssazD9IzPiEJz2lyFewTMgYObqDWxBfCX5k5E4n4fH7ygMIqp6A6Ek8HIrRyQ" crossorigin="anonymous"></script>
-    <script type="text/javascript">
-      <%# カテゴリごとの積み上げ棒 (#2138)。期間の穴埋めと軸の下限12ヶ月は
-          ヘルパー側（author_monthly_chart）が持つ (#2140) %>
-      const chartData = <%- author_monthly_chart(page.author) %>;
-      const catColors = <%- category_colors() %>;
-      let myChart = echarts.init(document.getElementById('chart'));
-      let option = {
-        <%# タイトルは直上の h2 が担うので、チャート内では重ねない %>
-        title: {},
-        <%# 凡例は下端に置く。echarts の既定は上部中央で、grid に上の余白が
-            無いためプロット領域に被る。カテゴリは最大18系列あるので
-            type: 'scroll' で溢れさせない（#2430 で投稿推移グラフに入れたのと同じ形）%>
-        legend: { bottom: 0, type: 'scroll' },
-        tooltip: {
-            trigger: 'axis'
-        },
-        <%# 既定の grid.left 10% で右へズレて見える。軸ラベル込みで左端に寄せる。
-            bottom は凡例の分 %>
-        grid: { left: 0, right: '2%', bottom: 32, containLabel: true },
-        toolbox: {},
-        xAxis: {
-            type: 'category',
-            boundaryGap: true,
-            data: chartData.months,
-            axisLabel: <%- partial('_partial/chart-xaxis-year-labels', {months: 'chartData.months', el: 'chart'}).trim() %>
-        },
-        yAxis: <%- partial('_partial/chart-yaxis-count', {series: 'chartData.series'}).trim() %>,
-        <%# 色はカテゴリ名で固定 (#2170)。系列順に任せると著者ごとに
-            同じカテゴリの色が変わってしまう %>
-        series: chartData.series.map(s => Object.assign({}, s, { itemStyle: { color: catColors[s.name] } }))
-      };
-      myChart.setOption(option);
-    </script>
     <%# その著者の中でよく読まれている記事。タグ・カテゴリページと同じく
         新着一覧の直前に置き、ページ間でコンテンツ構成を揃える (#2189)。
         順位・件数の規則は共有ヘルパー（popular_posts_in）側 %>
@@ -143,14 +83,16 @@
     <%- partial('_partial/pagination-info', {total: count_author(page.author)}) %>
     <% } %>
     <%# 見出しの語彙はホーム・カテゴリ・タグページに合わせる %>
-    <%- partial('_partial/archive', {pagination: config.author, index: true, list_heading: page.current === 1 ? '新着記事' : '記事一覧'}) %>
+    <%- partial('_partial/archive', {pagination: config.author, index: true, list_heading: page.current === 1 ? '新着記事' : '記事一覧', list_total: page.current === 1 ? count_author(page.author) : null}) %>
   </div>
     </main>
-    <%# サイドバーの中身はこのページでは出さない（読者は既にこの軸で絞り込んでいる
-        #2880 / #2885）が、列は残す。畳むと本文の幅がこのページだけ広くなり、
+    <%# 記事を見つける軸（カテゴリー・連載・タグ）はこのページでは出さない。
+        読者は既にこの軸で絞り込んでいる（#2880 / #2885）。
+        出すのはこのページ自身の統計だけ (#2911)。
+        列そのものは中身が無くても残す。畳むと本文の幅がこのページだけ広くなり、
         一覧を行き来したときにカードの幅が揃わない (#2944) %>
     <aside class="col-xs-12 col-sm-12 col-md-3 blog-sidebar">
-      <%- partial('_partial/sidebar') %>
+      <%- partial('_partial/sidebar', {showStats: true}) %>
     </aside>
   </div>
 </div>
