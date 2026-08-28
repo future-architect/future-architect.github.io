@@ -238,10 +238,33 @@ function groupedCategories(site) {
     .map(([name, categories]) => ({ name, categories }));
 }
 
-// ヘッダーのドロップダウン (#2877) とサイドバー（_widget/category.ejs）から呼ぶ。
+// ヘッダーのドロップダウン (#2877) から呼ぶ。全18件を出す。
 // 並びを1箇所に保つため、テンプレート側で sort し直さない
 hexo.extend.helper.register('category_groups', function () {
   return groupedCategories(this.site);
+});
+
+// サイドバー（_widget/category.ejs）から呼ぶ。**活発なカテゴリだけ**を出す (#2908)。
+// 群のラベルを枠にしたぶんサイドバーが縦に伸びたので、全件はヘッダーの
+// ドロップダウンに任せて、ここは間引く。
+//
+// 直近1年の本数は 33〜0 本に散っていて、いちばん大きい切れ目が 4本と2本の間。
+// 4本＝四半期に1本のペースなので、そこで切る（Mobile 2 / IoT 1 / 認証認可 1 /
+// VR 0 が外れて14件）。
+//
+// **いま見ているカテゴリは本数に関わらず残す。** 現在地が一覧から消えると、
+// そのカテゴリのページに来た読者が自分の居場所を見失う
+const SIDEBAR_ACTIVE_MIN = 4;
+
+hexo.extend.helper.register('active_category_groups', function (current) {
+  return groupedCategories(this.site)
+    .map((group) => ({
+      name: group.name,
+      categories: group.categories.filter(
+        (c) => c.recent >= SIDEBAR_ACTIVE_MIN || c.name === current,
+      ),
+    }))
+    .filter((group) => group.categories.length);
 });
 
 /**
