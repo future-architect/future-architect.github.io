@@ -17,7 +17,7 @@ layout: page
 
 3段階とも白背景でコントラスト比 4.5（WCAG AA）を満たします。`ink-faint` はその条件で置ける最も薄い値で、これより薄くしたいときは文字ではなく別の表現（余白・記号）に変えます。
 
-| | 変数 | 値 | 白背景との比 | 使うところ |
+| <span class="sr-only">見本</span> | 変数 | 値 | 白背景との比 | 使うところ |
 | --- | --- | --- | --- | --- |
 | <span class="sg-chip sg-ink-strong"></span> | `ink-strong` | <span class="sg-hex sg-ink-strong"></span> | <span class="sg-ratio sg-ink-strong"></span> | 本文・見出し・リンク |
 | <span class="sg-chip sg-ink-mute"></span> | `ink-mute` | <span class="sg-hex sg-ink-mute"></span> | <span class="sg-ratio sg-ink-mute"></span> | 本文に添える補助情報（日付・著者・タグ・件数・注記）と引用の本文 |
@@ -29,7 +29,7 @@ layout: page
 
 罫線は「囲うための線」と「切るための線」で役割が違います。枠は形を作るので見え、区切りは読みの邪魔をしない濃さで足ります。ここの比は文字の読みやすさではなく**白背景との差の強さ**を表す数字です。
 
-| | 変数 | 値 | 白背景との差 | 使うところ |
+| <span class="sr-only">見本</span> | 変数 | 値 | 白背景との差 | 使うところ |
 | --- | --- | --- | --- | --- |
 | <span class="sg-chip sg-rule-base"></span> | `rule-base` | <span class="sg-hex sg-rule-base"></span> | <span class="sg-ratio sg-rule-base"></span> | 枠。カード・チップ・箱・画像枠 |
 | <span class="sg-chip sg-rule-weak"></span> | `rule-weak` | <span class="sg-hex sg-rule-weak"></span> | <span class="sg-ratio sg-rule-weak"></span> | 区切り。見出しの下・リストの行間 |
@@ -41,7 +41,7 @@ layout: page
 
 面は白背景との差だけで意味を出します。濃くすると上に載る文字のコントラストが動くため、白に近い2段階に留めています。
 
-| | 変数 | 値 | 白背景との差 | 使うところ |
+| <span class="sr-only">見本</span> | 変数 | 値 | 白背景との差 | 使うところ |
 | --- | --- | --- | --- | --- |
 | <span class="sg-chip sg-surface-tint"></span> | `surface-tint` | <span class="sg-hex sg-surface-tint"></span> | <span class="sg-ratio sg-surface-tint"></span> | 静止した面。チップ・タブ帯・表のヘッダ |
 | <span class="sg-chip sg-surface-mute"></span> | `surface-mute` | <span class="sg-hex sg-surface-mute"></span> | <span class="sg-ratio sg-surface-mute"></span> | hover / focus の面と、空・無効の面・インラインコードの背景 |
@@ -54,7 +54,7 @@ layout: page
 
 比を取る背景が3種類あるので、下の表は**それぞれの背景に対する比**です。note は4色あるので、そのうち**いちばん厳しい背景との比**を載せています（AA を満たすかはそこで決まります）。
 
-| | 変数 | 値 | 背景 | 背景との比 | 使うところ |
+| <span class="sr-only">見本</span> | 変数 | 値 | 背景 | 背景との比 | 使うところ |
 | --- | --- | --- | --- | --- | --- |
 | <span class="sg-chip sg-link-blue"></span> | `link-blue` | <span class="sg-hex sg-link-blue"></span> | 白 | <span class="sg-ratio sg-link-blue"></span> | 読み物の中のリンク（`--a-color`） |
 | <span class="sg-chip sg-link-visited"></span> | `link-visited` | <span class="sg-hex sg-link-visited"></span> | 白 | <span class="sg-ratio sg-link-visited"></span> | 訪問済み。インラインコードの中でも同じ値 |
@@ -68,7 +68,7 @@ layout: page
 
 ネイビーは塗り面（フッター）とインタラクション（selection / hover / focus）専用で、**文字色には使いません**。本文の `ink-strong` との比が 1.63 しかなく、文字にすると黒と区別が付かないためです。クリムゾンはコンセプトブックの文法どおり、画面内で同時に1箇所だけの差し色に限定しています。
 
-| | 変数 | 値 | 白背景との比 | 使うところ |
+| <span class="sr-only">見本</span> | 変数 | 値 | 白背景との比 | 使うところ |
 | --- | --- | --- | --- | --- |
 | <span class="sg-chip sg-brand-navy"></span> | `brand-navy` | <span class="sg-hex sg-brand-navy"></span> | <span class="sg-ratio sg-brand-navy"></span> | 塗り面とインタラクション。フッターの背景・チップ・ページャの現在地・フォーカスリング |
 | <span class="sg-chip sg-brand-gray"></span> | `brand-gray` | <span class="sg-hex sg-brand-gray"></span> | <span class="sg-ratio sg-brand-gray"></span> | 白背景の上で面としてはっきり見せたいところ。小さな部品には広げない |
@@ -80,7 +80,7 @@ layout: page
 
 `ink` / `rule` / `surface` は白背景の上で決めた値なので、ネイビー背景では1つも使えません（`ink-strong` は 1.63 しか出ません）。白背景に3段階置いたのと同じ考え方で、暗い背景の上にもスケールを置いています。比はネイビー背景に対する値です。
 
-| | 変数 | 値 | ネイビー背景との比 | 使うところ |
+| <span class="sr-only">見本</span> | 変数 | 値 | ネイビー背景との比 | 使うところ |
 | --- | --- | --- | --- | --- |
 | <span class="sg-chip-ground"><span class="sg-chip sg-on-dark-strong"></span></span> | `on-dark-strong` | <span class="sg-hex sg-on-dark-strong"></span> | <span class="sg-ratio sg-on-dark-strong"></span> | 見出し・強調と、暗い背景でのフォーカスリング |
 | <span class="sg-chip-ground"><span class="sg-chip sg-on-dark"></span></span> | `on-dark` | <span class="sg-hex sg-on-dark"></span> | <span class="sg-ratio sg-on-dark"></span> | リンク・本文 |
