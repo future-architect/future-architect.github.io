@@ -130,7 +130,8 @@ hexo.extend.helper.register('popular_posts_in', function (posts, limit, decay) {
 
   if (ranked.length === 0) return '';
 
-  // マークアップはホームの「連載から探す」と同じカード。2列で並べる
+  // マークアップはホームの「連載から探す」と同じカード。2列で並べる。
+  // サムネはタイトルと同じ行き先なので、タブ順と読み上げから外す (#2845 / #2923)
   const cards = ranked
     .map(({ post }) => {
       // サムネはタイトルと同じ行き先なので、タブ順と読み上げから外す (#2845 / #2936)
