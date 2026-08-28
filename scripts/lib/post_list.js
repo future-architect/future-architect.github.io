@@ -39,9 +39,9 @@ const newLabel = (date) => {
 };
 
 /**
- * サムネの箱。索引記事の表の列（thumb タグ #2790）も同じ markup を使う。
+ * サムネの箱。索引記事の表（thumb タグ #2790）も同じ markup を使う。
  *
- * 隣のタイトルと同じ行き先のリンクなので、タブ移動と読み上げからは外す (#2845)。
+ * 同じ行のタイトルと同じ行き先のリンクなので、タブ移動と読み上げからは外す (#2845)。
  * サムネの無い記事は同じ大きさの空き枠を置いて行頭を揃える
  */
 const emptyThumbIcon = () => `<span class="post-list-icon post-list-icon-empty"></span>`;
