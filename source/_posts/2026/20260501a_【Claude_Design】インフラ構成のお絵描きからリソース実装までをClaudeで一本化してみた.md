@@ -22,7 +22,7 @@ lede: "Claude Design、最近話題になっていますね。"
 
 Claude Design、最近話題になっていますね。
 
-- https://qiita.com/ryu-ki/items/bca0ee8f15a13dfd8cfa
+- [【Claude Design】見せてもらおうか Claude Designの性能とやらを](https://qiita.com/ryu-ki/items/bca0ee8f15a13dfd8cfa)
 
 以下は上記記事の引用です。
 >Claude Design は「見た目を作って終わり」ではなく、Claude Code への橋渡しまで考えられています。

@@ -95,4 +95,4 @@ lede: "同僚の澁川さん、松本さんと一緒に、Software Design 2026�
 
 そう考えるエンジニアの方々に、ぜひ第3章を含め、本誌を手に取っていただければ幸いです。
 
-- https://amzn.asia/d/dZ8eIgy
+- [Software Design 2026年1月号（Amazon）](https://amzn.asia/d/dZ8eIgy)

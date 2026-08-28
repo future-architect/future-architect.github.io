@@ -79,8 +79,8 @@ Terraformで管理している設定と、実際のクラウドリソースの�
 
 上記で挙げた以外にも、自社専用のモジュールを共有できる「プライベートレジストリ」や、プライベートネットワーク内の隔離されたインフラを管理できる「HCP Terraformエージェント」など様々な機能がありますので、詳細は公式ドキュメントをご確認ください。
 
-* https://developer.hashicorp.com/terraform/cloud-docs
-* https://qiita.com/hsmto25519/items/a9ff129657d0d0e531c7
+* [HCP Terraform 公式ドキュメント](https://developer.hashicorp.com/terraform/cloud-docs)
+* [Terraformの次のステップ!? HCP Terraformの主要機能を紹介](https://qiita.com/hsmto25519/items/a9ff129657d0d0e531c7)
 
 ## 4. アーキテクチャ選定とコストの落とし穴
 
