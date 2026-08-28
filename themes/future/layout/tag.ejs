@@ -15,6 +15,11 @@
     <% if (page.current === 1) { %>
     <% const summary = summary_tag(page.tag); %>
     <% const ts = tag_stats(page.tag); %>
+    <%# 統計とグラフは畳む (#2911)。カテゴリページと同じ扱い。
+        総本数だけは一覧の見出しに出す %>
+    <details class="stats-details">
+      <summary>統計</summary>
+      <div class="stats-details-body">
     <%# 累計と直近1年（#2088）は時間軸が違うので、パネルで束ねて区別する (#2276)。
         カテゴリページと同じ構成 %>
     <div class="summary-panels">
@@ -42,10 +47,6 @@
         <% } %>
       </section>
     </div>
-    <% } else { %>
-    <%- partial('_partial/pagination-info', {total: count_tag(page.tag)}) %>
-    <% } %>
-    <% if (page.current === 1) { %>
     <%# 統計の直下にグラフ。全ページ同じ並びにする (#2211)。
         記事の少ないタグでは出さない（条件は tag_monthly_chart 側）。
         見出し・軸・色は著者ページの月別チャートと同じ作りにする %>
@@ -57,7 +58,8 @@
     <script type="text/javascript">
       const chartData = <%- tagChart %>;
       const catColors = <%- category_colors() %>;
-      echarts.init(document.getElementById('chart')).setOption({
+      const chart = echarts.init(document.getElementById('chart'));
+      chart.setOption({
         <%# タイトルは直上の h2 が担うので、チャート内では重ねない %>
         title: {},
         <%# 凡例は下端に置く。echarts の既定は上部中央で、grid に上の余白が
@@ -79,8 +81,12 @@
             同じカテゴリの色が変わってしまう %>
         series: chartData.series.map(s => Object.assign({}, s, { itemStyle: { color: catColors[s.name] } }))
       });
+      <%# 閉じた details の中は幅ゼロなので、開いた時点で測り直す %>
+      document.currentScript.closest('.stats-details').addEventListener('toggle', () => chart.resize());
     </script>
     <% } %>
+      </div>
+    </details>
     <%# そのタグの中でよく読まれている記事。新着より前に置く。
         絞り込んだ直後の読者がまず知りたいのは「定番はどれか」であって、
         新しさは新着一覧が担う %>
@@ -106,9 +112,11 @@
       <% }) %>
     </ul>
     <% } %>
+    <% } else { %>
+    <%- partial('_partial/pagination-info', {total: count_tag(page.tag)}) %>
     <% } %>
     <%# 見出しの語彙はホーム・カテゴリページに合わせる %>
-    <%- partial('_partial/archive', {pagination: config.tag, index: true, list_heading: page.current === 1 ? '新着記事' : '記事一覧'}) %>
+    <%- partial('_partial/archive', {pagination: config.tag, index: true, list_heading: page.current === 1 ? '新着記事' : '記事一覧', list_total: page.current === 1 ? count_tag(page.tag) : null}) %>
   </section>
     </main>
     <aside class="col-xs-12 col-sm-12 col-md-2 blog-sidebar">
