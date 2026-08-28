@@ -67,4 +67,85 @@
 <p class="more-link"><a href="/tags/">タグ一覧へ<%- partial('svg-icon', {icon: 'chevron-right', class_name: 'svg-icon-trailing'}).trim() %></a></p>
 </section>
 <% } %>
+<% if (is_post() || sToc || pageToc) { %>
+<%# 読んでいる節の目次の行に面を塗る (#2909)。見た目は CSS が持ち、ここは
+    aria-current="location" を付け替えるだけ。目で見る読者・支援技術・機械の
+    3方向に同じ違いを渡す形（パンくずの現在地 #2705 と同じ考え方）。
+
+    このブログで2つ目のクライアント JS（1つ目は #2565 のリンクのコピー）。
+    外部ライブラリは足さない。IntersectionObserver が無い環境では何も起きず、
+    目次はスクロールに反応しないだけで壊れない。
+
+    サイドバーの目次と本文前のモバイル目次は同じ見出しを指すので、
+    行は見出しごとに束ねて両方に同じ印を付ける（幅で出ている方が変わるだけ） %>
+<script>
+  (function () {
+    if (!('IntersectionObserver' in window) || typeof Map !== 'function') return;
+    var links = document.querySelectorAll('.toc-section a[href^="#"]');
+    if (!links.length) return;
+
+    // 見出し → その見出しを指す目次の行（サイドバーとモバイルで2本ある）
+    var rows = new Map();
+    Array.prototype.forEach.call(links, function (a) {
+      var raw = a.hash.slice(1);
+      if (!raw) return;
+      var id = raw;
+      // 目次の href は percent encode 済みだが、見出しの id は生の文字列
+      try { id = decodeURIComponent(raw); } catch (e) { /* そのまま使う */ }
+      var heading = document.getElementById(id);
+      if (!heading) return;
+      if (!rows.has(heading)) rows.set(heading, []);
+      rows.get(heading).push(a);
+    });
+    if (!rows.size) return;
+
+    var headings = [];
+    rows.forEach(function (_, heading) { headings.push(heading); });
+    headings.sort(function (a, b) {
+      // 4 は DOCUMENT_POSITION_FOLLOWING
+      return a.compareDocumentPosition(b) & 4 ? -1 : 1;
+    });
+
+    // 画面の上から 96px の線を越えた見出しを「読み始めた」とみなす。
+    // 帯は追従しないので、送った後の画面の上端が基準になる
+    var LINE = 96;
+    var above = new Map();
+    var current = null;
+
+    var mark = function (heading, on) {
+      rows.get(heading).forEach(function (a) {
+        if (on) a.setAttribute('aria-current', 'location');
+        else a.removeAttribute('aria-current');
+      });
+    };
+
+    var update = function () {
+      var found = null;
+      for (var i = 0; i < headings.length; i++) {
+        if (above.get(headings[i])) found = headings[i];
+      }
+      if (found === current) return;
+      if (current) mark(current, false);
+      if (found) mark(found, true);
+      current = found;
+    };
+
+    // rootMargin の負の上マージンで「上から 96px の線」を作る。
+    // 見出しがその線をまたぐたびに呼ばれ、初回は全件ぶん呼ばれる
+    var io = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (e) {
+          above.set(e.target, e.boundingClientRect.top < LINE);
+        });
+        update();
+      },
+      { rootMargin: '-' + LINE + 'px 0px 0px 0px', threshold: 0 }
+    );
+    headings.forEach(function (heading) {
+      above.set(heading, false);
+      io.observe(heading);
+    });
+  })();
+</script>
+<% } %>
 <!-- END SIDEBAR -->
