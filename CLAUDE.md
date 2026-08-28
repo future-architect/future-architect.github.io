@@ -475,7 +475,7 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
   | 本文見出し h1（`.article-entry h1`） | 記事タイトルと同じ（`.article-title` / `.list-page` と同一ルール。直前の空き 64px・罫線 2px はここで持つ） | 〃 |
   | 一覧ページの見出し `.list-page` | 記事タイトルと同じ（`.article-title` と同一ルール） | 〃 |
   | 一覧ページの統計（数値 / ラベル） | 16px / 12px（#2911。サイドバーの内寸 208〜298px では 20px が行の6割を占めた。統計は一覧ページの主役ではないので #1927 の 25px → 20px と同じ向きにもう一段。16px は `.header-search input` と同値） | 〃 |
-  | 全件への導線（`.more-link`） | 14px（#2893。押す対象なので「行として並ぶもの」の段。`.panel-meta` 11.7px と分ける） | 〃 |
+  | 全件への導線（`.more-link`） | `text-row`（#2893。押す対象なので「行として並ぶもの」の段。添えの `text-meta` と分ける） | 〃 |
   | 目次の項目（`.toc-section ol`。サイドバー・モバイル共通） | 14px（字下げの `1em` もこの値に追従する） | 〃 |
   | 目次のラベル「目次」（`.toc-section h2` / `.toc-mobile summary`） | 14px（サイドバーの `h2` の例外。見出しではなくブロックのラベル） | 〃 |
   | 脚注（`#footnotelist li`） | `1em` = 13px | 〃 |
@@ -508,6 +508,8 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
     404 の 128px・タグの件数の 6.5px
   - **`font-size` でアイコンの実寸を決めている箇所は段の外**（`.svg-icon` が `1em` なので、
     親の `font-size` がそのまま絵の大きさになる）。文字ではないので役の名前が付かない
+  - **添えの小さい数字・注記は `ink-mute` × `text-meta`。** 以前は `0.85em`（11.05px）・
+    `0.9em`（11.7px）・`10px`・`11px` に分かれていたが、#2971 で1つに寄せた
   - **`em` は親に掛かる。** `1em` は「サイズを決める」のではなく
     **親の倍率を打ち消す**指定（`.article-entry details p` の親は `1.2em`）。
     `.summary-count` の「em の連鎖をやめて px で書く」（#1927 / #1928）は
@@ -906,7 +908,7 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
   - **節の見出しは置かない。** 「累計」「直近1年」のラベルと数字が並んでいれば何のブロックかは
     見て分かる。目で見えない読者には `<section aria-label="統計">` が名乗る。
     **時間軸のラベルを強めない。** 主役は数値（16px 太字）で、箱の名前はその上に
-    小さく添えるもの。本文の統計と同じ `summary-panel-label`（`ink-mute` × `0.85em`）の
+    小さく添えるもの。本文の統計と同じ `summary-panel-label`（`ink-mute` × `text-meta`）の
     ままにして、サイドバー用の上書きを持たない
   - **グラフの凡例は出さない。** カテゴリ別の積み上げは最長の `DataEngineering` だけで
     117.9px あり、`type: scroll` の横送りになって場所だけ取る。どの色が何かは
@@ -976,7 +978,7 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
         #2892 で足した。人を表す `users` / `users-group` は著者一覧と Management
         カテゴリが使っているので、アクティビティには当てない
       - 太字なのは、すぐ下の `.panel-meta` が同じ `ink-mute` で、役の違いが
-        大きさ（12px 対 11.7px）では読み取れないため
+        大きさでは読み取れないため（どちらも `text-meta` #2971）
     - ラベルはリンクの**外**に置く。種別はカードの属性であって導線ではなく、
       同じ行き先のリンクを1枚のカードに2つ置かない (#2845) 決まりにも合う
     - **ラベルが名乗るぶん、説明文からは種別を落とす**（連載の `全9本・2026.08 更新` に
