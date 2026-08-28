@@ -9,8 +9,6 @@ layout: page
 
 記事を書くときの記法は [記法ガイド](/specials/markdown/) が担います。
 
-**このページの数字は手で書いていません。** 色の見本・16進数・コントラスト比、文字の大きさ・太さ・行間、間隔の刻みのどれも、実際にサイトを描いている値をそのまま出しています。片方だけ直したときにページが嘘をつかないようにするためです。
-
 ## 色
 
 黒・灰色は値ではなく**役割**で選びます。段階の数は「読み手が区別できるか」で決めていて、区別できない差に2つの役割を割り当てません。目安は明度差で、13/255 ほどしか違わない2色は見分けられないので、同じ色と見なしてどちらかの段階に寄せます。
@@ -25,7 +23,7 @@ layout: page
 | <span class="sg-chip sg-ink-mute"></span> | `ink-mute` | <span class="sg-hex sg-ink-mute"></span> | <span class="sg-ratio sg-ink-mute"></span> | 本文に添える補助情報（日付・著者・タグ・件数・注記）と引用の本文 |
 | <span class="sg-chip sg-ink-faint"></span> | `ink-faint` | <span class="sg-hex sg-ink-faint"></span> | <span class="sg-ratio sg-ink-faint"></span> | 空表示・無効と、補助情報の中でさらに弱くする記号（パンくずの `>`・折りたたみの三角） |
 
-白はスケールの1段階ではなく背景の色そのもので、役割を選ぶ余地がないため変数にしていません。
+白はスケールの1段階ではなく背景の色そのもので、役割を選ぶ余地がありません。
 
 ### 罫線（rule）は3段階
 
@@ -56,13 +54,13 @@ layout: page
 
 | | 変数 | 値 | 背景 | 背景との比 | 使うところ |
 | --- | --- | --- | --- | --- | --- |
-| <span class="sg-chip sg-link-blue"></span> | `link-blue` | <span class="sg-hex sg-link-blue"></span> | 白 | <span class="sg-ratio sg-link-blue"></span> | リンク（`--a-color`） |
+| <span class="sg-chip sg-link-blue"></span> | `link-blue` | <span class="sg-hex sg-link-blue"></span> | 白 | <span class="sg-ratio sg-link-blue"></span> | 読み物の中のリンク（`--a-color`） |
 | <span class="sg-chip sg-link-visited"></span> | `link-visited` | <span class="sg-hex sg-link-visited"></span> | 白 | <span class="sg-ratio sg-link-visited"></span> | 訪問済み。インラインコードの中でも同じ値 |
 | <span class="sg-chip-ground sg-chip-tint"><span class="sg-chip sg-link-on-tint"></span></span> | `link-on-tint` | <span class="sg-hex sg-link-on-tint"></span> | インラインコードの背景 | <span class="sg-ratio sg-link-on-tint"></span> | インラインコードの中のリンク |
 | <span class="sg-chip-ground sg-chip-note"><span class="sg-chip sg-link-on-note"></span></span> | `link-on-note` | <span class="sg-hex sg-link-on-note"></span> | note の4色 | <span class="sg-ratio sg-link-on-note"></span> | note の中のリンク |
 | <span class="sg-chip-ground sg-chip-note"><span class="sg-chip sg-link-on-note-visited"></span></span> | `link-on-note-visited` | <span class="sg-hex sg-link-on-note-visited"></span> | note の4色 | <span class="sg-ratio sg-link-on-note-visited"></span> | note の中の訪問済み |
 
-`link-on-tint` は `theme-styles.styl` と `highlight.styl` の両方に書く必要があります（詳細度の都合）。**値は1箇所から引いているので、揃っていることをコメントで主張する必要がありません。**
+**青は読み物の中のリンクの色です。** レイアウトの導線（「すべての連載を見る」のような全件への行き先、パンくず、日付、著者名）には青を使わず、文字のスケールの `ink-mute` に置いて、反応で `ink-strong` に1段階濃くします。同じページで本文のリンクと導線が同じ青だと、どちらが読み物の続きなのかが見分けられません。
 
 ### ブランド色
 
@@ -95,20 +93,18 @@ layout: page
 
 ### トークンにない色
 
-上の22個以外に残っている色は13箇所で、**どれも役割があって残しているもの**です。
+上のスケールの外に残っている色は2種類で、**どちらも役割があって残しているもの**です。
 
-- **note の4色** — 色相を持つ背景。`code-bg()` がその背景から1段階濃いインラインコードの背景を作ります
-- **表彰・殿堂の淡金9箇所** — メダルは灰→銅→金、殿堂のカードは淡金。ブランド色は表彰に広げません
+- **note の4色** — 色相を持つ背景。中のインラインコードの背景は、その背景より1段階濃い同じ色になります
+- **表彰・殿堂の淡金** — メダルは灰→銅→金、殿堂のカードは淡金。ブランド色は表彰に広げません
 
 `ink` / `rule` / `surface` の**スケールの外にある色はありません**。**段階と数しか違わない色を別の役割として置くと、どちらを使うかの判断ができなくなります。** 新しい色を入れるときは、まず近い段階との差を見て寄せられないかを確かめます。
 
 ## 文字
 
-**1つの要素のサイズは1箇所でしか決めません。** 決める場所が2つあると、最終値がどこで決まるのか追えなくなります。幅によって変える場合もメディアクエリを重ねず `clamp()` で1行にまとめます。
-
 ### 大きさ
 
-下の見本は実際のルールをそのまま借りて描いています。**記事タイトルと本文 h2 が同着になっていないか**は、この並びで確かめられます。
+**記事タイトルと本文 h2 が同着になっていないか**は、下の並びで確かめられます。
 
 <div class="sg-type">
 <div class="sg-type-label">記事タイトル・ページ見出し（<code>.article-title</code> / <code>.list-page</code> / <code>.article-entry h1</code>）</div>
@@ -153,8 +149,6 @@ layout: page
 | 見出し | 記事タイトル・ページ見出し・本文の h1〜h6・サイト名・カードとパネルの見出し |
 | 読み下す文章 | 記事本文・特設ページの本文・note の中・フッターの説明 |
 | 行として並ぶもの | 記事一覧・年別一覧・目次・パンくず・ページャ・タグのチップ・タブ・カードの説明・コードブロックの1行 |
-
-**行間を書かないままにしません。** 指定が無いとブラウザやフォントの既定値が効き、環境によって行送りが変わります。
 
 アイコンや順位の丸のように**1行しか入らない小さな箱**では、`line-height` は行間ではなく箱の高さを決める値です。字を丸の中心に置くために 1 を使う場所があり、これは行間のスケールの外にあります。
 
@@ -227,6 +221,10 @@ layout: page
 
 アイコンだけのリンクにチップと同じ反応を持たせるのは、**下線が引く相手を持たない**からです。絵柄に下線を引いても何も起きたように見えないので、丸い背景を持たせてそこを1段階変えます。
 
+**下線と背景は同時に動きません。** 背景が変わる部品（カード・行・チップ・アイコンだけのリンク）では下線を出さず、下線が付くのは背景を持たない裸のリンクだけです。本文のリンクのほか、パンくず・日付・著者名・カテゴリ名・タグクラウド・「すべての連載を見る」のような全件への導線がこれにあたります。どちらか一方しか動かないので、部品ごとにどちらだったかを覚える必要がありません。
+
+ヘッダーの帯の中だけは、下線も背景も動かさず文字色を1段階濃くします（帯から下がるドロップダウンの行は背景が変わります）。
+
 フッターのリンクだけは例外で、下線が左から 0.25 秒で伸びます。読者がわざわざ辿り着いた先なので動きを持たせても認知負荷にならない、という判断です。タブの切り替え（0.18 秒）と `details` の開閉は反応ではなく状態の変化なので、それぞれ別の時間を持ちます。
 
 ### フォーカスリング
@@ -278,37 +276,9 @@ layout: page
 
 ## 部品
 
-同じ見た目のものは同じ部品を使います。新しいクラスを足す前にここを探してください。呼び出し元の多い順です。
-
-| 部品 | 呼び出し元 | 役割 | 実物 |
-| --- | --- | --- | --- |
-| `_partial/section-heading` | 19 | 節見出しの共通形。アンカー付き | [タグ一覧](/tags/) |
-| `_partial/breadcrumb` | 17 | パンくず。道筋だけを出し、現在地は h1 に任せる | [カテゴリ一覧](/categories/) |
-| `_partial/svg-icon` | 15 | インラインSVGアイコン。絵柄の辞書を1箇所で持つ | [カテゴリ一覧](/categories/) |
-| `_partial/sidebar` | 12 | サイドバー。目次・カテゴリ・枠の出し分けを持つ | [記事ページ](/articles/20260804a/) |
-| `_partial/category-icon` | 8 | カテゴリ名からアイコンを引く | [カテゴリ一覧](/categories/) |
-| `_partial/post-panel-grid` | 5 | 記事の3列カード | [HACK TO THE FUTURE](/specials/httf/) |
-| `_partial/pagination-info` | 4 | 「N件中 M〜K件」 | [すべての記事](/articles/) の2ページ目 |
-| `_partial/tab-hint` | 4 | タブが矢印キーで切り替えられることを名乗る | [トップページ](/) |
-| `_partial/award-medal` | 3 | 表彰のメダル | [著者一覧](/authors/) |
-
-クラスで共有しているものは次のとおりです。
-
-| クラス | 役割 | 実物 |
-| --- | --- | --- |
-| `summary-panel` / `summary` | ページ冒頭の統計 | [カテゴリ一覧](/categories/) |
-| `article-card` / `panel-*` | 一覧の1件とパネルの中身 | [トップページ](/) |
-| `series-panels` | パネルの3列グリッド | [連載一覧](/series/) |
-| `tag-list` / `tag-list-link` | タグのチップ | [タグ一覧](/tags/) |
-| `tabs` / `tab_item` / `tab_content` | CSS だけのタブ。radio をフォーカス対象にする | [トップページ](/) |
-| `scroll` / `cell-list` / `cell-nowrap` / `cell-mark` | 表の受け皿とセル | [アドベントカレンダー](/specials/advent-calendar/) |
-| `sr-only` | 目で見えないが読み上げられる文 | 外部リンクの「（外部サイト）」 |
-| `more-link` | 枠の下の「すべての◯◯を見る」 | [トップページ](/) |
-| `specials-text` | 特設ページの本文（`.article-entry` の外で本文サイズを出す） | [HACK TO THE FUTURE](/specials/httf/) |
-
 ### note
 
-4色あり、背景は色相を持ちます。中のインラインコードの背景は `code-bg()` が「背景より1段階濃い同じ色」として作るので、4色でも表のヘッダでも同じ規則が効きます。書き方は[記法ガイド](/specials/markdown/)にあります。
+4色あり、背景は色相を持ちます。中のインラインコードの背景は、その背景より1段階濃い同じ色になります。4色でも表のヘッダでも同じ規則が効きます。書き方は[記法ガイド](/specials/markdown/)にあります。
 
 ::: note tip
 `tip` の背景です。知っておくと得をすることに使います。
