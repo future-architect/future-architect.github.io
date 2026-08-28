@@ -130,11 +130,12 @@ hexo.extend.helper.register('popular_posts_in', function (posts, limit, decay) {
 
   if (ranked.length === 0) return '';
 
-  // マークアップはホームの「連載から探す」と同じカード。2列で並べる
+  // マークアップはホームの「連載から探す」と同じカード。2列で並べる。
+  // サムネはタイトルと同じ行き先なので、タブ順と読み上げから外す (#2845 / #2923)
   const cards = ranked
     .map(({ post }) => {
       const thumb = post.thumbnail
-        ? `<a href="/${post.path}" title="${post.title}" class="thumb-link panel-thumb"><img src="${post.thumbnail}" alt="" width="200" height="135" loading="lazy"></a>`
+        ? `<a href="/${post.path}" title="${post.title}" class="thumb-link panel-thumb" tabindex="-1" aria-hidden="true"><img src="${post.thumbnail}" alt="" width="200" height="135" loading="lazy"></a>`
         : '';
       return (
         `<div class="col-12 col-md-6"><div class="article-card post-panel h-100">${thumb}` +
