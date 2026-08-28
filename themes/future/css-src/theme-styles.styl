@@ -1598,17 +1598,20 @@ summary:focus-visible,
 .skip-link:focus-visible {
   outline-color: var(--on-dark-strong);
 }
-/* 一覧カードのサムネは OGP 標準比（1200:630）の枠に固定し、中央で切り抜いて
-   大きさを揃える (#2305)。既存サムネの49%（比率1.75以上）はほぼ無加工で収まる。
+/* 一覧カードのサムネは OGP 標準比（1200:630）で中央を切り抜いて大きさを揃える
+   (#2305)。既存サムネの49%（比率1.75以上）はほぼ無加工で収まる。
    連載パネル（.panel-thumb は #2271 の 200:135）と We're hiring カードは対象外。
-   アンカーは xs 幅で float が外れて inline になるため display を明示する */
+   アンカーは xs 幅で float が外れて inline になるため display を明示する。
+
+   **比は img に持たせる。** 列（.card-thumb）に持たせると左右の padding 24px が
+   比に含まれ、列が狭いほど画像だけが縦長になる（幅240pxの列で 1.71）(#2916) */
 .card-thumb {
   display: block;
-  aspect-ratio: unquote('1200 / 630');
 }
 .card-thumb img {
   width: 100%;
-  height: 100%;
+  height: auto;
+  aspect-ratio: unquote('1200 / 630');
   object-fit: cover;
   /* カードの囲みが無くなったぶん、角を丸めて「置かれている」形にする (#2747)。
      サムネイルは小物なので radius-small */
@@ -1750,37 +1753,18 @@ body {
     margin-bottom: 12px;
   }
 }
-/* 列が横に並ぶ幅では、サムネイルの高さを本文列に合わせる (#2747)。
-   シェアボタンは本文列の最後にあるので、これで画像の下辺とボタンの下辺が
-   そろう。以前は画像が OGP 比で止まり、ボタンだけが下にはみ出していた。
+/* 列が横に並ぶ幅でも OGP 比を保つ (#2916)。以前は列の高さを本文列に合わせて
+   伸ばし（.row の既定 align-items: stretch）、画像を絶対配置で埋めていたので、
+   **比が概要文の長さで決まっていた**。同じ画像が 0.55〜2.63 の比で出て、
+   576〜768px では左右が4〜6割切り落とされていた。
 
-   **画像を絶対配置にするのが要点。** 高さは .row の既定（align-items: stretch）
-   から受け取りたいので、画像には高さに口を出させない。ふつうに置くと画像
-   自身の縦横比がサムネイルの高さになり、元画像が縦長の記事では画像の方が
-   高くなって本文列が引き伸ばされる（一覧のサムネイルは 300x109 から
-   300x300 までばらばら）。
-
-   左右は列の padding のぶんだけ内側に入れる。絶対配置の基準は padding box
-   なので、inset: 0 だと画像が本文列との間隔を埋めてしまう。
-
-   OGP 比の枠（#2305）は縦積みのときだけ効かせる。列が縦に並ぶ幅では
-   サムネイルが1行を独り占めするので、比が無いと高さが0になる */
+   伸ばす狙いは「画像の下辺とシェアボタンの下辺をそろえる」ことだったが、
+   シェアボタンは #2915 で「残す」と決まったので、そろえる相手が居続ける。
+   **比と下辺は同時に成立しない**ので、比を優先して上ぞろえにする。
+   サムネが本文列より低い行では、画像の下に空きが出る */
 @media (min-width: 576px) {
   .archives > .article-card > .card-thumb {
-    aspect-ratio: auto;
-    position: relative;
-  }
-  /* **幅と高さは必ず値で持たせる。** 絶対配置の置換要素（img）は
-     width / height が auto だと、left と right の両方を指定しても
-     元画像の寸法が使われる（bottom / right は無視される）。
-     auto にしていたときは 300px 幅のまま左上に置かれ、
-     object-fit の中央切り抜きが効いていなかった */
-  .archives > .article-card > .card-thumb img {
-    position: absolute;
-    top: 0;
-    left: calc(var(--bs-gutter-x) * 0.5);
-    width: calc(100% - var(--bs-gutter-x));
-    height: 100%;
+    align-self: start;
   }
 }
 /* We're hiring のパネル。サムネイルを左に小さく固定し、見出しと説明を右に積む。
