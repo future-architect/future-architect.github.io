@@ -174,8 +174,8 @@ Header and header elements
 /* ヘッダーは1段・64px の帯 (#2877)。以前は 1500×360 の写真バナーの上に 80px の
    中央タイトルを載せた 151px の塊で、全ページの先頭でそれだけ縦を使っていた。
    縦に返した約90px のぶん、空いた横にサイト名・ナビ・検索を1行で並べる。
-   **追従（sticky）はしない。** 帯を固定すると本文の上に常に乗るので、
-   固定サイドバーを置かないのと同じ理由で採らない。
+   **追従（sticky）はしない。** 64px の帯が全ページで本文の上に常に乗ることになり、
+   読んでいる面が狭くなる。サイドバーの目次は追従する (#2909)。
    影は持たない (#2747)。下辺の 1px の罫線が本文との境目を作る */
 .site-header {
   position: relative;
@@ -1602,7 +1602,12 @@ body {
   font-weight: 400;
   font-size: 13px;
   font-family: font-ja;
-  overflow-x: hidden;
+  /* clip であって hidden ではない (#2909)。hidden にすると縦が auto に計算されて
+     body 自身がスクロールコンテナになり、中の position: sticky が
+     「body のスクロールポート基準」になって効かなくなる。body は伸びるだけで
+     スクロールしないため、目次が追従しない。clip は横のはみ出しを隠すが
+     スクロールコンテナを作らない */
+  overflow-x: clip;
 }
 
 #article-nav {
@@ -2443,9 +2448,13 @@ code {
 .nav a:hover, .nav a:focus {
   background-color: surface-mute;
 }
-/* タブレットで発生する右側の余白を削除 */
+/* タブレットで発生する右側の余白を削除。
+   狙いは横のはみ出しだけなので clip で、hidden にはしない (#2909)。
+   hidden だと .wrap がスクロールコンテナになり、中の position: sticky が
+   .wrap のスクロールポート基準になって効かなくなる（body と同じ罠）。
+   .wrap は display: flex なので、clip に変えても整形コンテキストは変わらない */
 .wrap {
-  overflow: hidden;
+  overflow-x: clip;
 }
 
 .publish-date {
@@ -2700,8 +2709,24 @@ ul.tag-list {
 /* .toc-section は目次の見た目（リストと行）だけを持つ。サイドバー特有の
    余白と、モバイルで隠す指定はサイドバー側のセレクタに寄せる。
    本文前のモバイル目次（.toc-mobile）が同じ見た目を使い回すため (#2452) */
+/* 押し下げは margin で持つ (#2909)。padding だと下の overflow-y: auto の
+   内側に入り、目次が長い記事でスクロールして消える */
 .blog-sidebar .toc-section {
-  padding: 50px 0px 0px 0px;
+  margin-top: 50px;
+  /* 左右の 4px は下の overflow-y: auto のため。スクロールコンテナになると
+     行のフォーカスの輪郭（2px ＋ outline-offset 2px）が箱の縁で切られる */
+  padding: 0 4px;
+  /* スクロールに追従する (#2909)。帯は追従しないので、上端は画面の上から
+     少しだけ空ける。サイドバーが本文の下に落ちる幅（1024px以下）では
+     目次自体を隠しているので、この指定は横並びのときだけ効く。
+
+     見出しが多い記事（h2〜h4 の中央値は10、最大62）では画面に収まらないので、
+     中でスクロールさせる。可視領域 800px で24項目まで入り、溢れるのは
+     全1,481本のうち68本（5%） */
+  position: sticky;
+  top: 24px;
+  max-height: unquote('calc(100vh - 48px)');
+  overflow-y: auto;
 }
 /* 見出しにも行と同じ左パディングを与えて、文字の左端を項目と揃える。
    行の a は ホバー背景を文字に密着させないため左右に 8px 持っており (#1957)、
@@ -2745,7 +2770,14 @@ ul.tag-list {
   border-radius: radius-small;
   transition: background-color hover-speed ease;
 }
-.toc-section a:hover, .toc-section a:focus {
+/* 読んでいる節の行は hover と同じ面を塗る (#2909)。丸や箱の的を持つ部品の
+   現在地は面、という規則（ページャ・タブと同じ）に乗せる。
+   印は aria-current が兼ねるので、専用のクラスは持たない。
+
+   **:focus ではなく :focus-visible。** :focus だとマウスで目次をクリックした行に
+   面が残り続け、読み進めたあとの現在地の面と2つ並んで、どちらが現在地か
+   分からなくなる。キーボードの読者には輪郭（a:focus-visible）と合わせて出る */
+.toc-section a:hover, .toc-section a:focus-visible, .toc-section a[aria-current] {
   background-color: surface-mute;
 }
 /* 本文とサイドバーの間隔は 44px（本文側 24px ＋ サイドバー側 20px。どちらも
