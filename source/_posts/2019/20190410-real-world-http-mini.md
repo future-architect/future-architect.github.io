@@ -14,6 +14,10 @@ categories:
 thumbnail: /images/2019/20190410/thumbnail.png
 author: 真野隼記
 lede: "Real World HTTPミニ版を記念にフューチャーのオフィスで勉強会を実施しましたら、リアル渋川さんに出会えました話です"
+books:
+  - name: "Real World HTTP ミニ版"
+    url: https://www.oreilly.co.jp/community/blog/2019/03/real-world-http-mini-released.html
+    by: 澁川喜規
 ---
 
 <img src="/images/2019/20190410/top.png" class="img-small-size" width="515" height="660">

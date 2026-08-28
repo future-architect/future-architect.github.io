@@ -12,6 +12,10 @@ categories:
 thumbnail: /images/2024/20240925a/thumbnail.jpg
 author: 真野隼記
 lede: "2024年9月18日に発売された、Software Design 2024年10月号の第1特集「再考 設計ドキュメントの課題　二重管理しない，陳腐化させない」の「第1章：受託開発における設計ドキュメントの課題と解決案　作成・管理のヒントを探る」に寄稿させていただきました。"
+magazines:
+  - name: "Software Design 2024年10月号"
+    url: https://gihyo.jp/magazine/SD/archive/2024/202410
+    work: "受託開発における設計ドキュメントの課題と解決案"
 ---
 ## はじめに
 

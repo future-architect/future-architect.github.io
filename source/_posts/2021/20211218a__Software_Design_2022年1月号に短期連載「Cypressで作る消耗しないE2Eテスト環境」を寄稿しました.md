@@ -12,6 +12,10 @@ categories:
 thumbnail: /images/2021/20211218a/thumbnail.png
 author: 木戸俊輔
 lede: "Software Design 2022年1月号に短期連載「Cypressで作る消耗しないE2Eテスト環境」を寄稿しました！"
+magazines:
+  - name: "Software Design 2022年1月号"
+    url: https://gihyo.jp/magazine/SD/archive/2022/202201
+    work: "Cypressで作る“消耗しない”E2Eテスト環境【1】"
 ---
 ## はじめに
 

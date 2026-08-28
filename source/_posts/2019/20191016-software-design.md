@@ -11,6 +11,19 @@ categories:
   - DataScience
 author: 上野貴史
 lede: "2019年は幸運なことに、技術評論社のSoftware Designという雑誌に3回も機械学習関連の記事を執筆する機会を頂きました。本記事では3回分の記事を振り返りながら、機械学習を学ぶ際のちょっとしたTipsを紹介したいと思います。"
+magazines:
+  - name: "Software Design 2019年1月号"
+    url: https://gihyo.jp/magazine/SD/archive/2019/201901
+    work: "自然言語処理・画像処理における線形代数の応用"
+    by: 上野貴史、貞光九月
+  - name: "Software Design 2019年3月号"
+    url: https://gihyo.jp/magazine/SD/archive/2019/201903
+    work: "微分でつなぐ、機械学習とニューラルネットワーク"
+    by: 上野貴史、貞光九月
+  - name: "Software Design 2019年9月号"
+    url: https://gihyo.jp/magazine/SD/archive/2019/201909
+    work: "数字認識APIを作って実感"
+    by: 上野貴史、貞光九月
 ---
 ## はじめに
 

@@ -12,6 +12,10 @@ categories:
 thumbnail: /images/2024/20240827a/thumbnail.png
 author: 後藤玲雄
 lede: "2024年8月17日に発売された、Software Design 2024年9月号の第二特集である、「Goのエラーハンドリングと向き合う ベストな設計戦略を徹底解剖」 の2章を後藤、3章を渋川で執筆し寄稿させていただきました。"
+magazines:
+  - name: "Software Design 2024年9月号"
+    url: https://gihyo.jp/magazine/SD/archive/2024/202409
+    work: "Goのエラーハンドリングと向き合う"
 ---
 
 ## はじめに

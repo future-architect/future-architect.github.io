@@ -12,6 +12,10 @@ categories:
 thumbnail: /images/2025/20251218a/thumbnail.jpg
 author: 澁川喜規
 lede: "真野さん、松本さんと一緒にSoftware Designの特集記事に寄稿しました。当初は3章構成の2章だけで、「配列 vs 連結リスト / HashMap vs Tree」みたいな企画内容として話が来たのですが、企画を見たときに..."
+magazines:
+  - name: "Software Design 2026年1月号"
+    url: https://gihyo.jp/magazine/SD/archive/2026/202601
+    work: "アルゴリズム特集"
 ---
 
 <a href="https://gihyo.jp/magazine/SD/archive/2026/202601">

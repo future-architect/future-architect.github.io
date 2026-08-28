@@ -14,6 +14,10 @@ categories:
 thumbnail: /images/2021/20211026b/thumbnail.jpeg
 author: 玉木竜二
 lede: "先日10月18日に発売されたSoftware Design 2021年11月号の第一特集、「Kaggleで知る機械学習 前処理から学習モデルの構築，スコアの上げ方までわかる」をフューチャーの農見、玉木、金子が担当しました。数日経ってしまいましたが、簡単に紹介させていただきます。"
+magazines:
+  - name: "Software Design 2021年11月号"
+    url: https://gihyo.jp/magazine/SD/archive/2021/202111
+    work: "Kaggleで知る機械学習"
 ---
 ## はじめに
 

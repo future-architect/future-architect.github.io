@@ -13,6 +13,9 @@ categories:
 thumbnail: /images/2024/20240513a/thumbnail.jpg
 author: 澁川喜規
 lede: "ひとえに読者の皆さんが買ってくれたおかげで、Real World HTTPを改訂し、このたび3版を上梓しました。ありがとうございます。"
+books:
+  - name: "Real World HTTP 第3版"
+    url: https://www.oreilly.co.jp/books/9784814400669/
 ---
 
 <a href="https://www.oreilly.co.jp/books/9784814400669/">
