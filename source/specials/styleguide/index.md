@@ -56,11 +56,13 @@ layout: page
 
 | | 変数 | 値 | 背景 | 背景との比 | 使うところ |
 | --- | --- | --- | --- | --- | --- |
-| <span class="sg-chip sg-link-blue"></span> | `link-blue` | <span class="sg-hex sg-link-blue"></span> | 白 | <span class="sg-ratio sg-link-blue"></span> | リンク（`--a-color`） |
+| <span class="sg-chip sg-link-blue"></span> | `link-blue` | <span class="sg-hex sg-link-blue"></span> | 白 | <span class="sg-ratio sg-link-blue"></span> | 読み物の中のリンク（`--a-color`） |
 | <span class="sg-chip sg-link-visited"></span> | `link-visited` | <span class="sg-hex sg-link-visited"></span> | 白 | <span class="sg-ratio sg-link-visited"></span> | 訪問済み。インラインコードの中でも同じ値 |
 | <span class="sg-chip-ground sg-chip-tint"><span class="sg-chip sg-link-on-tint"></span></span> | `link-on-tint` | <span class="sg-hex sg-link-on-tint"></span> | インラインコードの背景 | <span class="sg-ratio sg-link-on-tint"></span> | インラインコードの中のリンク |
 | <span class="sg-chip-ground sg-chip-note"><span class="sg-chip sg-link-on-note"></span></span> | `link-on-note` | <span class="sg-hex sg-link-on-note"></span> | note の4色 | <span class="sg-ratio sg-link-on-note"></span> | note の中のリンク |
 | <span class="sg-chip-ground sg-chip-note"><span class="sg-chip sg-link-on-note-visited"></span></span> | `link-on-note-visited` | <span class="sg-hex sg-link-on-note-visited"></span> | note の4色 | <span class="sg-ratio sg-link-on-note-visited"></span> | note の中の訪問済み |
+
+**青は読み物の中のリンクの色です。** レイアウトの導線（「すべての連載を見る」のような全件への行き先、パンくず、日付、著者名）には青を使わず、文字のスケールの `ink-mute` に置いて、反応で `ink-strong` に1段階濃くします。同じページで本文のリンクと導線が同じ青だと、どちらが読み物の続きなのかが見分けられません。
 
 `link-on-tint` は `theme-styles.styl` と `highlight.styl` の両方に書く必要があります（詳細度の都合）。**値は1箇所から引いているので、揃っていることをコメントで主張する必要がありません。**
 
@@ -226,6 +228,10 @@ layout: page
 | アイコンだけのリンク | 背景が1段階変わる（チップと同じ） | [記事ページ](/articles/20260804a/)のシェアボタン |
 
 アイコンだけのリンクにチップと同じ反応を持たせるのは、**下線が引く相手を持たない**からです。絵柄に下線を引いても何も起きたように見えないので、丸い背景を持たせてそこを1段階変えます。
+
+**下線と背景は同時に動きません。** 背景が変わる部品（カード・行・チップ・アイコンだけのリンク）では下線を出さず、下線が付くのは背景を持たない裸のリンクだけです。本文のリンクのほか、パンくず・日付・著者名・カテゴリ名・タグクラウド・「すべての連載を見る」のような全件への導線がこれにあたります。どちらか一方しか動かないので、部品ごとにどちらだったかを覚える必要がありません。
+
+ヘッダーの帯の中だけは、下線も背景も動かさず文字色を1段階濃くします（帯から下がるドロップダウンの行は背景が変わります）。
 
 フッターのリンクだけは例外で、下線が左から 0.25 秒で伸びます。読者がわざわざ辿り着いた先なので動きを持たせても認知負荷にならない、という判断です。タブの切り替え（0.18 秒）と `details` の開閉は反応ではなく状態の変化なので、それぞれ別の時間を持ちます。
 
