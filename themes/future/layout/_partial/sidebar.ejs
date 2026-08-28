@@ -73,14 +73,20 @@
     3方向に同じ違いを渡す形（パンくずの現在地 #2705 と同じ考え方）。
 
     このブログで2つ目のクライアント JS（1つ目は #2565 のリンクのコピー）。
-    外部ライブラリは足さない。IntersectionObserver が無い環境では何も起きず、
+    外部ライブラリは足さない。requestAnimationFrame が無い環境では何も起きず、
     目次はスクロールに反応しないだけで壊れない。
+
+    **IntersectionObserver は使わない。** rootMargin で線を作ると「線より上」と
+    「画面より下」がどちらも isIntersecting: false になり、最下部から先頭へ飛んだ
+    ときに後ろの見出しがこの2状態の間を移動するだけでコールバックが呼ばれない。
+    状態をキャッシュすると古い値が残り、最後の章が現在地に居座る。
+    毎回その場で測る形にして状態を持たない。
 
     サイドバーの目次と本文前のモバイル目次は同じ見出しを指すので、
     行は見出しごとに束ねて両方に同じ印を付ける（幅で出ている方が変わるだけ） %>
 <script>
   (function () {
-    if (!('IntersectionObserver' in window) || typeof Map !== 'function') return;
+    if (typeof Map !== 'function' || !window.requestAnimationFrame) return;
     var links = document.querySelectorAll('.toc-section a[href^="#"]');
     if (!links.length) return;
 
@@ -111,12 +117,11 @@
     //
     // **線は「見出しから次の見出しまでの最小距離」より浅くする。** 目次の行を
     // クリックすると見出しが画面の上端（top 0）へ来るので、線が深いと次の見出しも
-    // 線より上に入り、「線より上にある最後の見出し」＝次の節が現在地になってしまう。
-    // CSS の値から出した最小距離は h4 の直後に h4 が来る 46px（h3→h4 が 49px、
-    // h2→h3 が 72px）なので、余裕を見て 32px にしている
+    // 線より上に入り、次の節が現在地になってしまう。CSS の値から出した最小距離は
+    // h4 の直後に h4 が来る 46px（h3→h4 が 49px、h2→h3 が 72px）
     var LINE = 32;
-    var above = new Map();
     var current = null;
+    var queued = false;
 
     var mark = function (heading, on) {
       rows.get(heading).forEach(function (a) {
@@ -125,32 +130,43 @@
       });
     };
 
-    var update = function () {
+    var pick = function () {
+      // 最下部では最後の見出しを現在地にする。そこから先へは送れないので、
+      // 最後の節が画面より短い記事では線まで上がってこない
+      var doc = document.documentElement;
+      if (window.innerHeight + window.pageYOffset >= doc.scrollHeight - 4) {
+        return headings[headings.length - 1];
+      }
+      // 文書順に並んでいるので、線より下に出たらそれ以降は全部下にある
       var found = null;
       for (var i = 0; i < headings.length; i++) {
-        if (above.get(headings[i])) found = headings[i];
+        if (headings[i].getBoundingClientRect().top >= LINE) break;
+        found = headings[i];
       }
+      return found;
+    };
+
+    var update = function () {
+      queued = false;
+      var found = pick();
       if (found === current) return;
       if (current) mark(current, false);
       if (found) mark(found, true);
       current = found;
     };
 
-    // rootMargin の負の上マージンで「上から 96px の線」を作る。
-    // 見出しがその線をまたぐたびに呼ばれ、初回は全件ぶん呼ばれる
-    var io = new IntersectionObserver(
-      function (entries) {
-        entries.forEach(function (e) {
-          above.set(e.target, e.boundingClientRect.top < LINE);
-        });
-        update();
-      },
-      { rootMargin: '-' + LINE + 'px 0px 0px 0px', threshold: 0 }
-    );
-    headings.forEach(function (heading) {
-      above.set(heading, false);
-      io.observe(heading);
-    });
+    var schedule = function () {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule, { passive: true });
+    // 画像や図の読み込みで位置が動く／ハッシュ付きで開かれた場合に測り直す
+    window.addEventListener('load', schedule);
+    window.addEventListener('hashchange', schedule);
   })();
 </script>
 <% } %>
