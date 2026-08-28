@@ -58,6 +58,7 @@
         url: '/specials/advent-calendar/',
         label: 'コミュニティ',
         labelIcon: 'speakerphone',
+        more: {url: '/specials/', text: 'すべての特設ページを見る'},
         title: 'アドベントカレンダー',
         meta: adventYear + '年のカレンダーが公開中です。',
       });
@@ -67,6 +68,7 @@
         url: '/specials/techcast/',
         label: 'コミュニティ',
         labelIcon: 'speakerphone',
+        more: {url: '/specials/', text: 'すべての特設ページを見る'},
         title: 'Future Tech Cast',
         meta: '新しいエピソード「' + latestEpisode.title + '」を公開しました。',
       });
@@ -76,6 +78,7 @@
         url: '/specials/httf/',
         label: 'コミュニティ',
         labelIcon: 'speakerphone',
+        more: {url: '/specials/', text: 'すべての特設ページを見る'},
         title: 'HACK TO THE FUTURE',
         meta: httfYear + '年の回を AtCoder で開催中です。',
         // ロゴは切り抜くと欠けるので contain 表示
@@ -91,6 +94,7 @@
         url: url_for(freshSeries.index.path),
         label: '連載',
         labelIcon: 'run-baton',
+        more: {url: '/series/', text: 'すべての連載を見る'},
         title: freshSeries.name,
         // 更新の日付は鮮度の目安なので年月まで (#2404)。/series/ の期間表記とも揃う
         meta: '全' + freshSeries.total + '本・' + date(freshSeries.latest, 'YYYY.MM') + ' 更新',
@@ -101,17 +105,24 @@
       url: '/specials/guidelines/',
       label: 'リソース',
       labelIcon: 'book',
+      more: {url: '/specials/', text: 'すべての特設ページを見る'},
       title: 'フューチャーのガイドライン',
       meta: '設計ガイドライン・コーディング規約・TypeScript 教材の入口です。',
       thumb: {src: '/archtecture_guidelines.png', width: 200, height: 135},
     });
   %>
+  <%# 「すべての◯◯を見る」は種別ごとの導線なので、置ける場所が中身で変わる (#2892)。
+      2枚の種別が揃っている回（特設2枚）は節の下にまとめて置ける。
+      連載と特設が混ざる回は行き先が2つになるので、それぞれのパネルの中に入れる %>
+  <% const shownPanels = specialPanels.slice(0, 2); %>
+  <% const sharedMore = new Set(shownPanels.map(function(p){ return p.more.url; })).size === 1
+       ? shownPanels[0].more : null; %>
   <section class="series-panels">
     <%# 連載の索引は記事なので「特設ページ」では名前が実態と合わない (#2892)。
         連載も特設ページも「記事1本ではない、まとまった読み物への入口」なので特集で束ねる %>
     <%- partial('section-heading', {id: 'specials', text: '特集'}) %>
     <div class="row g-4">
-      <% specialPanels.slice(0, 2).forEach(function(p){ %>
+      <% shownPanels.forEach(function(p){ %>
       <div class="col-12 col-md-6">
         <div class="article-card series-panel h-100">
           <% if (p.thumb) { %>
@@ -128,13 +139,18 @@
             <span class="panel-label"><%- partial('svg-icon', {icon: p.labelIcon}) %><%= p.label %></span>
             <a href="<%= p.url %>" class="panel-title"><%= p.title %></a>
             <div class="panel-meta"><%= p.meta %></div>
+            <% if (!sharedMore) { %>
+            <p class="more-link"><a href="<%= p.more.url %>"><%= p.more.text %><%- partial('svg-icon', {icon: 'chevron-right', class_name: 'svg-icon-trailing'}).trim() %></a></p>
+            <% } %>
           </div>
         </div>
       </div>
       <% }) %>
     </div>
     <%# 記法ガイドはパネルに出していない。全件は /specials/ が持つ %>
-    <p class="more-link"><a href="/specials/">すべての特設ページを見る<%- partial('svg-icon', {icon: 'chevron-right', class_name: 'svg-icon-trailing'}).trim() %></a></p>
+    <% if (sharedMore) { %>
+    <p class="more-link"><a href="<%= sharedMore.url %>"><%= sharedMore.text %><%- partial('svg-icon', {icon: 'chevron-right', class_name: 'svg-icon-trailing'}).trim() %></a></p>
+    <% } %>
   </section>
 <% } %>
 <%# 関連タグは1ページ目だけ一覧の前に出す。カテゴリページの
