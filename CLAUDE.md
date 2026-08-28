@@ -585,6 +585,23 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
       `rule-strong`（線なので `rule` の段）、RSS アイコンの hover の純黒 → 下記
     - **役があって残す色は2種類だけ**（計13箇所）。note の4色と表彰・殿堂の淡金9箇所。
       リンクの状態色5箇所は #2860 でトークンにした
+  - **地の文のリンクは色だけで名乗らない。下線を持つ**（#2926）。`link-blue` と地の文
+    （`ink-strong`）の比は 2.17 しかなく、WCAG 1.4.1（レベル A）が求める 3:1 に届かない。
+    **色では直せない**——白地で AA（4.5）を保つ輝度（≤ 0.1833）と、地の文と 3:1 を作る
+    輝度（≥ 0.2634）は重ならず、暗い側は負になる。地の文を #2C2C2C 以下まで暗くすれば
+    未訪問だけは通るが、訪問済みの紫は**地の文を純黒にしても成立しない**（未訪問と
+    同じ輝度の帯に入り、色相でしか見分けられなくなる）。`:visited` に下線を足す手も
+    使えない（履歴の覗き見対策で、書けるのは色系のプロパティだけ）
+    - **当てるのは地の文の器**（`.article-entry` の `p` / `li` / `td` と
+      `p.specials-text`）。`.article-entry a` でまとめると見出しのアンカー（113個）と
+      We're hiring のカードまで拾う
+    - 下線は `currentColor` なので**訪問済みは紫の線になる**。`text-decoration-color` を
+      書く必要はない。`text-underline-offset: 3px` はサイトに既にある唯一の値
+      （`.blog-info-metric span[title]`）と同じ
+    - **静止で下線を持つぶん、反応は線の太さで返す**（1px → 2px）。反応が起きる場所は
+      下線のままなので hover の型は増えていない
+    - 脚注（`sup` の番号と `#footnotelist` の戻り）は上付きの数字と記号で地の文に
+      紛れないので下線を持たない
   - **リンクの色は4値・3状態**（#2860）。`_variables.styl` が持つ（`link-blue` /
     `link-visited` / `link-on-tint` / `link-on-note` / `link-on-note-visited`）。
     地が濃くなるぶん暗い側へ振る段で、`link-blue` は白地では AA を満たすが
