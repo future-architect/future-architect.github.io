@@ -25,47 +25,20 @@
   </section>
 <% } %>
 <%# はじめて来た読者は記事の探し方が分からない。ランキングと新着の間に
-    「連載」と「特設ページ」の入口を置く (#2039)。
-    タグはサイドバーがカテゴリと並べて持つ (#2885) %>
+    まとまった読み物への入口を置く (#2039)。
+    カテゴリ・タグ・連載という「探す軸」はサイドバーが持つ (#2885 / #2892)。
+    ここに出すのは軸ではなく、いま動いているもの2枚 %>
 <% if (isHomeFirst) { %>
-<%# 2枚。3枚目以降は「数ヶ月前に1枚目だったもの」の置き場になっていた (#2575)。
-    2024-01〜2026-08 の各月末で枠の中身を再現すると、最終更新からの経過は
-    1枠目 0.2ヶ月 / 2枠目 1.2ヶ月 に対して 3枠目 2.2ヶ月 / 4枠目 3.2ヶ月（最大6ヶ月）。
-    枠を4つ持っても入れ替わりは増えない（30ヶ月で29回 対 28回）。
-    新しい連載は必ず1枠目に入り、古いものが下へ押し出される作りのため。
-    2枚だとすぐ下の特設枠と同じ1行に揃う %>
-<% const panels = recent_series(2); %>
-<% if (panels.length) { %>
-  <section class="series-panels">
-    <%- partial('section-heading', {id: 'series', text: '連載から探す'}) %>
-    <div class="row g-4">
-      <% panels.forEach(function(s){ %>
-      <div class="col-12 col-md-6">
-        <div class="article-card series-panel h-100">
-          <a href="<%- url_for(s.index.path) %>" title="<%= s.name %>" class="thumb-link panel-thumb" tabindex="-1" aria-hidden="true">
-            <img src="<%= s.index.thumbnail %>" alt="" width="200" height="135" loading="lazy">
-          </a>
-          <div class="panel-body">
-            <a href="<%- url_for(s.index.path) %>" class="panel-title"><%= s.name %></a>
-            <%# 更新の日付は鮮度の目安なので年月まで (#2404)。/series/ の期間表記とも揃う %>
-            <div class="panel-meta">全<%= s.total %>本・<%= date(s.latest, 'YYYY.MM') %> 更新</div>
-          </div>
-        </div>
-      </div>
-      <% }) %>
-    </div>
-    <%# 全連載は /series/ が持つ (#2304)。トップの枠は増やさない %>
-    <p class="more-link"><a href="/series/">すべての連載を見る</a></p>
-  </section>
-<% } %>
   <%# 特設ページへの入口 (#2295 / #2421)。テキスト1行では視線が滑るため
       パネルにする (#2343)。外部サイトへ直接飛ばさず、サイト内のポータルを
       紹介する（説明と外部サイトへの分岐はポータル側が担う）。
       全件は /specials/ が持つので、ここに並べるのは2枚まで。
-      連載枠と同じく、残りは下の全件導線から辿る %>
+      残りは下の全件導線から辿る %>
   <%# 並べる2枚は旬で決める (#2880)。開催中のアドベントカレンダーと
       公開直後の Tech Cast が前に入り、常設は後ろから落ちる。
-      常設のうち HTTF を先に置くのは、開催が年で動くのがこちらだけのため %>
+      常設のうち HTTF を先に置くのは、開催が年で動くのがこちらだけのため。
+      連載を常設より前に入れるのは、旬のものが1枚も無い期間を無くすため (#2892)。
+      オフシーズンには常設2枚だけが残り、「旬で選ぶ」枠が名前どおりに働いていなかった %>
   <%
     // カレンダーの年を advent_calendar.yml に足す作業がそのままスイッチになる。
     // 年が変われば一致しなくなるので、シーズンの終わりを別に持たなくてよい
@@ -87,6 +60,20 @@
         meta: '新しいエピソード「' + latestEpisode.title + '」を公開しました。',
       });
     }
+    // 最終更新が4ヶ月以内なら旬とみなす。過去24ヶ月のどの月でも候補が1本以上あった窓で、
+    // 3ヶ月に狭めると空く月が出る。連載の顔は索引記事のサムネなのでそのまま借りる
+    const FOUR_MONTHS = 4 * 30 * 24 * 60 * 60 * 1000;
+    const freshSeries = recent_series(1)[0];
+    if (freshSeries && Date.now() - freshSeries.latest.valueOf() <= FOUR_MONTHS) {
+      specialPanels.push({
+        url: url_for(freshSeries.index.path),
+        title: freshSeries.name,
+        // 更新の日付は鮮度の目安なので年月まで (#2404)。/series/ の期間表記とも揃う。
+        // 頭の「連載」は、この行の中で連載だけが特設ページではないため
+        meta: '連載・全' + freshSeries.total + '本／' + date(freshSeries.latest, 'YYYY.MM') + ' 更新',
+        thumb: {src: freshSeries.index.thumbnail, width: 200, height: 135},
+      });
+    }
     specialPanels.push({
       url: '/specials/httf/',
       title: 'HACK TO THE FUTURE',
@@ -102,7 +89,9 @@
     });
   %>
   <section class="series-panels">
-    <%- partial('section-heading', {id: 'specials', text: '特設ページ'}) %>
+    <%# 連載の索引は記事なので「特設ページ」では名前が実態と合わない (#2892)。
+        連載も特設ページも「記事1本ではない、まとまった読み物への入口」なので特集で束ねる %>
+    <%- partial('section-heading', {id: 'specials', text: '特集'}) %>
     <div class="row g-4">
       <% specialPanels.slice(0, 2).forEach(function(p){ %>
       <div class="col-12 col-md-6">
