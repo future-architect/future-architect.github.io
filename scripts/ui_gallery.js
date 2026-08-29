@@ -39,6 +39,13 @@ const NOT_SHOWN = {
   head: 'ページの <head>。見た目を持たない',
   header: 'ヘッダー。実物がこのページの上端に出ている',
   'json-ld': '構造化データ。見た目を持たない',
+  'chart-theme': 'グラフの色をテーマに追従させる <script>。見た目を持たない',
+  'sidebar-index-archive': '期間ページのサイドバーそのもの。ページ固有の統計とグラフを持つ',
+  'sidebar-index-authors': '同上（/authors/）',
+  'sidebar-index-categories': '同上（/categories/）',
+  'sidebar-index-tags': '同上（/tags/）',
+  'sidebar-stats-index':
+    '一覧ページのサイドバーの中身。渡された統計とグラフを並べるだけで、単体では形を持たない',
   'related-categories': 'カテゴリページの本体の一部。page.category に依存する',
   'related-tags': 'タグページの本体の一部。page.tag に依存する',
   scripts: 'ページ末のスクリプト。見た目を持たない',
