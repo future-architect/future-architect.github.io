@@ -15,23 +15,36 @@
         line: s.getPropertyValue('--rule-base').trim(),
       };
     }
-    function apply(chart) {
+    // 元の option が凡例を持っているか。**持っていないチャートに legend を渡すと、
+    // echarts がそこで凡例を作ってしまう**（既定は show: true で系列名を全部出す）。
+    // サイドバーのグラフは系列が1本なので凡例を出していない (#2911)
+    function hasLegend(chart) {
+      var legend = (chart.getOption() || {}).legend;
+      return Array.isArray(legend) && legend.length > 0;
+    }
+    function apply(chart, legend) {
       var t = tokens();
       // 既存の option に重ねる。系列の色は触らない（カテゴリ色は #2170 で固定）
-      chart.setOption({
+      var option = {
         textStyle: { color: t.text },
-        legend: { textStyle: { color: t.text } },
         xAxis: { axisLabel: { color: t.text }, axisLine: { lineStyle: { color: t.line } } },
         yAxis: { axisLabel: { color: t.text }, splitLine: { lineStyle: { color: t.line } } },
-      });
+      };
+      if (legend) option.legend = { textStyle: { color: t.text } };
+      chart.setOption(option);
     }
     document.addEventListener('themechange', function () {
-      charts.forEach(apply);
+      charts.forEach(function (c) {
+        apply(c.chart, c.legend);
+      });
     });
     return function (chart) {
       if (!chart) return;
-      charts.push(chart);
-      apply(chart);
+      // 凡例の有無は最初に1度だけ見る。apply の後は自分が足した legend が
+      // getOption に出るので、毎回見ると判定が変わる
+      var entry = { chart: chart, legend: hasLegend(chart) };
+      charts.push(entry);
+      apply(entry.chart, entry.legend);
     };
   })();
 </script>
