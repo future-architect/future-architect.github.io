@@ -7,9 +7,28 @@
     Facebook も1以上あるのは1,491件中93件だけで事情は同じ。
     主要な行（投稿・著者数・総シェア数）は0でも出す。そこが空くと数字の枠が
     何を数えているのか読めなくなる %>
-<% const panelTotal = total.filter(function(r){ return !r.sub || r.value; }); %>
+<%#
+    **明細が1行だけ残り、その値が親と同じなら明細ごと出さない。**
+    総シェア数 = X + Facebook + はてブ + Pocket なので、他が0なら残った1行は
+    総シェア数と同じ数字の繰り返しにしかならない（2026年ページの
+    「1788 総シェア数 / 1788 はてブ」）。内訳は分かれているから意味があるので、
+    分かれていないときは行を1つ増やすだけになる。
+
+    **行数だけで決めず値も比べるのは、総シェア数が明細の合計とは限らないため。**
+    `getSNSCnt` は Feedly も足すが、明細に Feedly の行は無い（`sns_count_cache.json`
+    に今は Feedly のキーが無いので実際は一致するが、戻れば食い違う）。
+    食い違うときは「総シェア数の全部がこの1つではない」という情報が残るので出す %>
+<% const collapseSubs = function(rows){
+     const subs = rows.filter(function(r){ return r.sub; });
+     if (subs.length !== 1) return rows;
+     const before = rows.slice(0, rows.indexOf(subs[0]));
+     const parent = before.filter(function(r){ return !r.sub; }).pop();
+     if (!parent || String(parent.value) !== String(subs[0].value)) return rows;
+     return rows.filter(function(r){ return !r.sub; });
+   }; %>
+<% const panelTotal = collapseSubs(total.filter(function(r){ return !r.sub || r.value; })); %>
 <% const panelRecent = (typeof recent === 'undefined' ? null : recent); %>
-<% const panelRecentRows = panelRecent ? panelRecent.filter(function(r){ return !r.sub || r.value; }) : null; %>
+<% const panelRecentRows = panelRecent ? collapseSubs(panelRecent.filter(function(r){ return !r.sub || r.value; })) : null; %>
 <%# 数字の桁数が違うとラベルの開始位置がずれる（実測で最大31px）(#3004)。
     いちばん桁数の多い値に合わせた幅を配り、数字はその中で右寄せにする。
     2つの組で同じ幅を使うので、組をまたいでも数字の右端とラベルの左端がそろう %>
