@@ -1,6 +1,9 @@
-# 文字サイズが段から外れていないかを PR で検出する (#2971)。
-# 26種類を7段に寄せた直後、別の PR が 1.4em と 12px を直接書いて段の外へ戻した。
-# CLAUDE.md に文章で書くだけでは守れなかったので機械で止める。
+# CSS の検査を PR で回す。
+# 1. 解決されなかった Stylus の識別子（#2746 で表の枠が全部消えた）
+# 2. 文字サイズが段から外れていないか (#2971)
+#
+# どちらも CLAUDE.md に文章で書くだけでは守れなかったもの。1つ目は表の枠が
+# 全ページで消え、2つ目は寄せ終えた直後に別の PR が段の外へ戻した。
 #
 # paths フィルタにより、CSS を触らない PR ではこのジョブ自体が走らない。
 name: css
@@ -9,14 +12,17 @@ on:
   pull_request:
     paths:
       - "themes/future/css-src/**"
+      - "css.mjs"
+      - "css_lint.mjs"
       - "font_size_lint.mjs"
+      - "scripts/lib/site_css.js"
       - ".github/workflows/css.yml"
 
 permissions:
   contents: read
 
 jobs:
-  font-size:
+  check:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -26,6 +32,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "22"
+          cache: npm
+
+      # css.mjs は stylus を使うので依存が要る
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build CSS
+        run: node css.mjs
+
+      # Stylus は未定義の変数をエラーにせず名前をそのまま出力する。
+      # CSS 側では無効な値なので宣言ごと捨てられ、画面を見るまで気づけない
+      - name: Check for unresolved Stylus identifiers
+        run: node css_lint.mjs
 
       - name: Check font-size scale
         run: node font_size_lint.mjs
