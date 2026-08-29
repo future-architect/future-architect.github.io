@@ -897,6 +897,11 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
   - **echarts の option では CSS 変数を参照できない。** `:root` から実効値を読んで
     option に流し込む（`_partial/chart-theme.ejs` が1箇所で持ち、各チャートは
     `themeChart(インスタンス)` を1回呼ぶ）。切り替えは `themechange` イベントで知らせる
+    - **持っていない部品を `setOption` で渡さない。** `legend: {…}` を無条件に重ねると、
+      **凡例を持たないチャートにそこで凡例が生える**（既定は `show: true` で系列名を
+      全部出す）。サイドバーのグラフは系列が1本なので凡例を出していない (#2911) のに、
+      #2746 でこれを踏んだ。`getOption()` を**最初に1度だけ**見て有無を覚える
+      （`apply` の後は自分が足した分が出るので、毎回見ると判定が変わる）
 - **暗い地の上には別の段を使う**（#2839）。`ink` / `rule` / `surface` は白地の上で
   決めた値で、ネイビー地では `ink-strong` が 1.63 しか出ず1つも使えない。
   暗地用の段は `_variables.styl` が持つ（`on-dark-strong` / `on-dark` / `on-dark-mute` /
