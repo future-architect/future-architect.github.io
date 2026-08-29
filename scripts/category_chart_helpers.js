@@ -286,35 +286,41 @@ function recentPv(site) {
   return pv;
 }
 
-hexo.extend.helper.register('popular_category_groups', function (current) {
+// **サイドバーは群を出さない。平らな1本の並びにする。**
+// 群は18件を2〜6行に落とすための束ね方（#2908）で、8件まで絞った後は
+// 束ねる相手が2〜3件しか無く、ラベルのぶんだけ場所と手数が増える。
+// 群は全件を出すヘッダーのドロップダウンと /categories/ が持ち続ける。
+//
+// **並びは選ぶ鍵（直近1年のPV）と同じ順。** 群の並び（累計順）のまま群だけ
+// 消すと、画面から順序の根拠が消える（327 / 134 / 134 / 77 / 70 / 70 / 49 / 50 と
+// 単調にならない）。隣の人気の連載・人気のタグも自分の物差し順なので、
+// 3枠の読み方がそろう
+hexo.extend.helper.register('popular_categories', function (current) {
   const pv = recentPv(this.site);
-  const groups = groupedCategories(this.site);
-  const shown = new Set(
-    groups
-      .flatMap((g) => g.categories)
-      .filter((c) => c.recent >= SIDEBAR_MIN_RECENT && pv.get(c.name) > 0)
-      // **同点は PV の次に直近1年の本数で決める。** GA4 の値は 100 単位に
-      // 丸められている（全1,499件が100の倍数）ので同点が構造的に出て、候補が
-      // 17件しか無いここでは上限の線にちょうど並ぶ（Business と Culture が
-      // 10,000PV）。名前順で決めると、落ちる理由が読者から見て何も無くなる
-      .sort(
-        (a, b) =>
-          pv.get(b.name) - pv.get(a.name) ||
-          b.recent - a.recent ||
-          b.count - a.count ||
-          (a.name < b.name ? -1 : a.name > b.name ? 1 : 0),
-      )
-      .slice(0, SIDEBAR_LIMIT)
-      .map((c) => c.name),
-  );
+  const rank = (c) => pv.get(c.name) || 0;
+  const all = groupedCategories(this.site).flatMap((g) => g.categories);
+  const shown = all
+    .filter((c) => c.recent >= SIDEBAR_MIN_RECENT && rank(c) > 0)
+    // **同点は PV の次に直近1年の本数で決める。** GA4 の値は 100 単位に
+    // 丸められている（全1,499件が100の倍数）ので同点が構造的に出て、候補が
+    // 17件しか無いここでは上限の線にちょうど並ぶ（Business と Culture が
+    // 10,000PV）。名前順で決めると、落ちる理由が読者から見て何も無くなる
+    .sort(
+      (a, b) =>
+        rank(b) - rank(a) ||
+        b.recent - a.recent ||
+        b.count - a.count ||
+        (a.name < b.name ? -1 : a.name > b.name ? 1 : 0),
+    )
+    .slice(0, SIDEBAR_LIMIT);
   // **いま見ているカテゴリは順位に関わらず残す。** 現在地が一覧から消えると、
-  // そのカテゴリのページに来た読者が自分の居場所を見失う
-  return groups
-    .map((group) => ({
-      name: group.name,
-      categories: group.categories.filter((c) => shown.has(c.name) || c.name === current),
-    }))
-    .filter((group) => group.categories.length);
+  // そのカテゴリのページに来た読者が自分の居場所を見失う。上限を1件超えるが、
+  // 落ちているということは PV が下位なので、末尾がその順位の位置になる
+  if (current && !shown.some((c) => c.name === current)) {
+    const here = all.find((c) => c.name === current);
+    if (here) shown.push(here);
+  }
+  return shown;
 });
 
 /**
