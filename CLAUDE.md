@@ -52,6 +52,15 @@ URL は読者向け、コード配置は保守者向けの分類なので、鏡�
     持っている予約語で、`partial(name, {layout: 'row'})` と渡しても**届かない**。
     エラーにはならず既定の枝で描かれるので、**生成 HTML を見るまで気づけない**。
     見た目の違いを渡す引数は `variant` にする
+  - **`scripts/` の中で部品の markup を組み立てない**（#3029 / #3031）。
+    `themes/` だけを掃除しても JS の中は残るので、同じ形の直しが2箇所に散る
+    （#2845 の `aria-hidden` と #2999 の partial 化は、どちらもここが漏れた）
+    - **原則は「helper はデータだけ返し、EJS が描く」**（#2729 の `techcast_items`）
+    - **呼び出し元が多くて描画が重複するときは、helper から
+      `this.partial('_partial/…', {…})` を呼んでよい**（#3031 の `popular_posts_in`）。
+      helper の `this` はテンプレートのローカルなので、`url_for` と同じように使える。
+      呼び出し元が7つあり、データ返しにするとグリッドの繰り返しが7回に増える場面で採った
+    - どちらの形でも、**部品そのものの markup は partial が1箇所で持つ**
 
 **ページの骨格は `container > breadcrumb > row > main#main.col-md-9.blog-posts >
 aside.col-md-3.blog-sidebar`**（#2995）。サイドバーを持たないページは
