@@ -5,6 +5,15 @@
     **見本は本物の partial を呼ぶ。** 作り直した見本は腐るので置かない
     （スタイルガイドが色を _variables.styl から引くのと同じ流儀 #2856）。
 
+    **並びは 要素 → 部品 → かたまり。** 小さいものから組み上がっていく順で、
+    デザインシステムのカタログの通例に合わせる。
+
+    **出すのは見本を持つ部品だけ。** テンプレートの全 partial を並べる場所ではない
+    （ページの骨格や head のような見た目を持たないものまで並ぶと、
+    「共通の部品はどれか」が読み取れなくなる）。見本を持たない部品は
+    scripts/ui_gallery.js の NOT_SHOWN が理由ごと引き受け、
+    **どちらでもないものだけ**が台帳の下の警告に出る。
+
     **ここで新しい部品は作らない。** いま共通化されているものだけを展示する。
     どれを部品にするかは #2985 の候補一覧で別に決める %>
 <%
@@ -28,27 +37,25 @@
       <h1 class="list-page margin-bottom-20">部品ギャラリー</h1>
       <p class="specials-text">テンプレートで共通化されている部品を、実物を呼んで並べたページです。運営向けで、見た目の決まりそのものは <a href="/specials/styleguide/">スタイルガイド</a> が持ちます。</p>
 
-      <%- partial('_partial/section-heading', {id: 'ledger', text: '台帳', meta: '全' + index.rows.length + '件'}) %>
-      <p class="specials-text">「使われている画面」はこのページを除いた数です。<strong>未分類</strong>は、見本も「見本を出さない理由」も無い部品で、増えたら下の一覧に出ます。</p>
+      <%- partial('_partial/section-heading', {id: 'ledger', text: '台帳', meta: '全' + index.shown.length + '件'}) %>
+      <p class="specials-text">下に見本を並べている部品と、それを使っている画面です。画面数にこのページは含めません。</p>
       <ul class="gallery-ledger">
-        <% index.rows.forEach(function(r){ %>
+        <% index.shown.forEach(function(r){ %>
         <li>
           <code><%= r.name %></code>
-          <span class="gallery-state<%= r.shown ? ' gallery-state-shown' : (r.reason ? '' : ' gallery-state-todo') %>"><%= r.shown ? '見本あり' : (r.reason ? '見本なし' : '未分類') %></span>
           <span class="gallery-note"><%= r.callers.length %>画面<% if (r.callers.length) { %>: <%= r.callers.join('、') %><% } %></span>
-          <% if (!r.shown && r.reason) { %><span class="gallery-note"><%= r.reason %></span><% } %>
         </li>
         <% }) %>
       </ul>
+      <% if (index.unclassified.length) { %>
+      <p class="gallery-alert">見本も「見本を出さない理由」も無い部品が <%= index.unclassified.length %>件あります: <% index.unclassified.forEach(function(r, i){ %><code><%= r.name %></code><%= i < index.unclassified.length - 1 ? '、' : '' %><% }) %>。見本を出すか、<code>scripts/ui_gallery.js</code> に理由を書いてください。</p>
+      <% } %>
       <% if (index.orphan.length) { %>
       <p class="gallery-alert">呼び出し元が無い部品が <%= index.orphan.length %>件あります: <% index.orphan.forEach(function(r, i){ %><code><%= r.name %></code><%= i < index.orphan.length - 1 ? '、' : '' %><% }) %></p>
       <% } %>
-      <% if (index.unclassified.length) { %>
-      <p class="gallery-alert">未分類の部品が <%= index.unclassified.length %>件あります。見本を出すか、<code>scripts/ui_gallery.js</code> に見本を出さない理由を書いてください。</p>
-      <% } %>
 
-      <%- partial('_partial/section-heading', {id: 'icon', text: 'アイコン'}) %>
-      <p class="specials-text">絵柄の辞書は <code>_partial/svg-icon.ejs</code> が1箇所で持ちます。カテゴリ名との対応は <code>_partial/category-icon.ejs</code> の側です。</p>
+      <%- partial('_partial/section-heading', {id: 'elements', text: '要素'}) %>
+      <p class="specials-text">それ以上分けられない最小の部品です。絵柄の辞書は <code>_partial/svg-icon.ejs</code> が1箇所で持ち、カテゴリ名との対応は <code>_partial/category-icon.ejs</code> の側にあります。</p>
       <div class="gallery-item">
         <p class="gallery-name"><code>_partial/svg-icon</code></p>
         <ul class="gallery-icons">
@@ -65,69 +72,10 @@
           <% }); }) %>
         </ul>
       </div>
-
-      <%- partial('_partial/section-heading', {id: 'heading', text: '節見出しとパンくず'}) %>
-      <p class="specials-text"><code>section-heading</code> は <code>meta</code> を渡すと行の右端に添えが付きます（#2911）。パンくずは <code>url</code> を持たない項目が現在地で、2項目未満なら何も出しません（#2837）。</p>
-      <div class="gallery-item">
-        <p class="gallery-name"><code>_partial/section-heading</code></p>
-        <%- partial('_partial/section-heading', {id: 'sample-heading', text: 'meta なし'}) %>
-        <%- partial('_partial/section-heading', {id: 'sample-heading-meta', text: 'meta あり', meta: '全327本'}) %>
-      </div>
-      <div class="gallery-item">
-        <p class="gallery-name"><code>_partial/breadcrumb</code></p>
-        <%- partial('_partial/breadcrumb', {items: [
-              {label: 'ホーム', url: '/'},
-              {label: 'カテゴリ', url: '/categories/'}
-            ]}) %>
-        <%- partial('_partial/breadcrumb', {items: [
-              {label: 'ホーム', url: '/'},
-              {label: 'すべての記事', url: '/articles/'},
-              {label: '2ページ目'}
-            ]}) %>
-      </div>
-
-      <%- partial('_partial/section-heading', {id: 'post', text: '記事のメタ情報'}) %>
-      <p class="specials-text">見本は <a href="<%- url_for(samplePost.path) %>"><%= samplePost.title %></a> の実データです。</p>
-      <div class="gallery-item">
-        <p class="gallery-name"><code>_partial/post/date・post/tag・post/title・post/category</code></p>
-        <ul class="blog-info">
-          <li class="blog-info-item"><%- partial('_partial/post/date', {post: samplePost, class_name: 'archive-article-date', date_format: 'YYYY.MM.DD'}) %></li>
-          <%- post_author_link(samplePost) %>
-        </ul>
-        <div class="article-header-tags"><%- partial('_partial/post/tag', {post: samplePost}) %></div>
-        <%- partial('_partial/post/title', {post: samplePost, class_name: 'archive-post-title'}) %>
-        <% if (samplePost.categories && samplePost.categories.length) { %>
-        <p><%- partial('_partial/post/category', {cat: samplePost.categories.first()}) %></p>
-        <% } %>
-      </div>
-
-      <%- partial('_partial/section-heading', {id: 'card', text: '一覧カードとパネル'}) %>
-      <div class="gallery-item">
-        <p class="gallery-name"><code>_partial/archive-post</code></p>
-        <%# index は「一覧の中か」。true だと lede の代わりに本文全文を出す %>
-        <%- partial('_partial/archive-post', {post: samplePost, index: false}) %>
-      </div>
-      <div class="gallery-item">
-        <p class="gallery-name"><code>_partial/post-panel-grid</code></p>
-        <%- partial('_partial/post-panel-grid', {posts: samples.panelPosts}) %>
-      </div>
-
-      <%- partial('_partial/section-heading', {id: 'share', text: '共有ボタンと著者紹介'}) %>
-      <div class="gallery-item">
-        <p class="gallery-name"><code>_partial/social-button</code></p>
-        <%- partial('_partial/social-button', {post: samplePost, actions: true}) %>
-      </div>
-      <% if (authorPost) { %>
-      <div class="gallery-item">
-        <p class="gallery-name"><code>_partial/author-box</code></p>
-        <%- partial('_partial/author-box', {post: authorPost}) %>
-      </div>
-      <% } %>
-
-      <%- partial('_partial/section-heading', {id: 'award', text: '表彰'}) %>
-      <p class="specials-text">メダルの色は受賞回数で決まります（灰 → 銅 → 金）。<code>withNumber: false</code> なら色だけ使い数字は描きません（#2422）。</p>
       <div class="gallery-item">
         <p class="gallery-name"><code>_partial/award-medal・award-name</code></p>
+        <%# メダルの色は受賞回数で決まる（灰 → 銅 → 金）。withNumber: false なら
+            色だけ使い数字は描かない (#2422) %>
         <ul class="gallery-icons">
           <li><%- partial('_partial/award-medal', {nth: 1}) %><span class="gallery-note">1回</span></li>
           <li><%- partial('_partial/award-medal', {nth: 2}) %><span class="gallery-note">2回</span></li>
@@ -137,14 +85,26 @@
         <p class="award-name"><%- partial('_partial/award-name') %></p>
       </div>
 
-      <%- partial('_partial/section-heading', {id: 'nav', text: '一覧の添えと目次'}) %>
+      <%- partial('_partial/section-heading', {id: 'components', text: '部品'}) %>
+      <p class="specials-text">要素を組んだ、1つの役を持つまとまりです。見本は <a href="<%- url_for(samplePost.path) %>"><%= samplePost.title %></a> の実データを使っています。</p>
       <div class="gallery-item">
-        <p class="gallery-name"><code>_partial/pagination-info</code></p>
-        <%- partial('_partial/pagination-info', {total: 327, page: {current: 2}}) %>
+        <p class="gallery-name"><code>_partial/section-heading</code></p>
+        <%# meta を渡すと行の右端に添えが付く (#2911) %>
+        <%- partial('_partial/section-heading', {id: 'sample-heading', text: 'meta なし'}) %>
+        <%- partial('_partial/section-heading', {id: 'sample-heading-meta', text: 'meta あり', meta: '全327本'}) %>
       </div>
       <div class="gallery-item">
-        <p class="gallery-name"><code>_partial/toc-list</code></p>
-        <%- partial('_partial/toc-list', {items: [{id: 'ledger', text: '台帳'}, {id: 'icon', text: 'アイコン'}, {id: 'card', text: '一覧カードとパネル'}]}) %>
+        <p class="gallery-name"><code>_partial/breadcrumb</code></p>
+        <%# url を持たない項目が現在地。2項目未満なら何も出さない (#2837) %>
+        <%- partial('_partial/breadcrumb', {items: [
+              {label: 'ホーム', url: '/'},
+              {label: 'カテゴリ', url: '/categories/'}
+            ]}) %>
+        <%- partial('_partial/breadcrumb', {items: [
+              {label: 'ホーム', url: '/'},
+              {label: 'すべての記事', url: '/articles/'},
+              {label: '2ページ目'}
+            ]}) %>
       </div>
       <div class="gallery-item">
         <p class="gallery-name"><code>_partial/tab-hint</code></p>
@@ -157,12 +117,52 @@
           <div class="tab_content"><p class="specials-text">2枚目の中身です。</p></div>
         </div>
       </div>
+      <div class="gallery-item">
+        <p class="gallery-name"><code>_partial/pagination-info</code></p>
+        <%- partial('_partial/pagination-info', {total: 327, page: {current: 2}}) %>
+      </div>
+      <div class="gallery-item">
+        <p class="gallery-name"><code>_partial/toc-list</code></p>
+        <%- partial('_partial/toc-list', {items: [{id: 'elements', text: '要素'}, {id: 'components', text: '部品'}, {id: 'patterns', text: 'かたまり'}]}) %>
+      </div>
+      <div class="gallery-item">
+        <p class="gallery-name"><code>_partial/post/date・post/tag・post/title・post/category</code></p>
+        <ul class="blog-info">
+          <li class="blog-info-item"><%- partial('_partial/post/date', {post: samplePost, class_name: 'archive-article-date', date_format: 'YYYY.MM.DD'}) %></li>
+          <%- post_author_link(samplePost) %>
+        </ul>
+        <div class="article-header-tags"><%- partial('_partial/post/tag', {post: samplePost}) %></div>
+        <%- partial('_partial/post/title', {post: samplePost, class_name: 'archive-post-title'}) %>
+        <% if (samplePost.categories && samplePost.categories.length) { %>
+        <p><%- partial('_partial/post/category', {cat: samplePost.categories.first()}) %></p>
+        <% } %>
+      </div>
+      <div class="gallery-item">
+        <p class="gallery-name"><code>_partial/social-button</code></p>
+        <%- partial('_partial/social-button', {post: samplePost, actions: true}) %>
+      </div>
 
-      <%- partial('_partial/section-heading', {id: 'widget', text: 'サイドバーの枠'}) %>
-      <p class="specials-text">サイドバーの列の内寸（208〜298px）で描いています。本文の幅で見ると実物と違って見えるためです。</p>
+      <%- partial('_partial/section-heading', {id: 'patterns', text: 'かたまり'}) %>
+      <p class="specials-text">部品を組んで、そのまま画面の一区画になるものです。</p>
+      <div class="gallery-item">
+        <p class="gallery-name"><code>_partial/archive-post</code></p>
+        <%# index は「一覧の中か」。true だと lede の代わりに本文全文を出す %>
+        <%- partial('_partial/archive-post', {post: samplePost, index: false}) %>
+      </div>
+      <div class="gallery-item">
+        <p class="gallery-name"><code>_partial/post-panel-grid</code></p>
+        <%- partial('_partial/post-panel-grid', {posts: samples.panelPosts}) %>
+      </div>
+      <% if (authorPost) { %>
+      <div class="gallery-item">
+        <p class="gallery-name"><code>_partial/author-box</code></p>
+        <%- partial('_partial/author-box', {post: authorPost}) %>
+      </div>
+      <% } %>
       <div class="gallery-item">
         <p class="gallery-name"><code>_widget/category・series・tag</code></p>
-        <%# 枠の見出し（「活発なカテゴリ」など）はここに書かない。文字列を二重に持つと、
+        <%# サイドバーの列の内寸（208〜298px #2943）で描く。本文の幅で見ると実物と違って見える。
+            枠の見出し（「活発なカテゴリ」など）はここに書かない。文字列を二重に持つと、
             サイドバー側で言い換えたときにこのページだけが古い名前を出す %>
         <div class="gallery-sidebar-scale">
           <%- partial('_widget/category') %>
@@ -176,14 +176,9 @@
     <aside class="col-md-3 blog-sidebar">
       <%- partial('_partial/sidebar', {specialsToc: [
         {id: 'ledger', text: '台帳'},
-        {id: 'icon', text: 'アイコン'},
-        {id: 'heading', text: '節見出しとパンくず'},
-        {id: 'post', text: '記事のメタ情報'},
-        {id: 'card', text: '一覧カードとパネル'},
-        {id: 'share', text: '共有ボタンと著者紹介'},
-        {id: 'award', text: '表彰'},
-        {id: 'nav', text: '一覧の添えと目次'},
-        {id: 'widget', text: 'サイドバーの枠'},
+        {id: 'elements', text: '要素'},
+        {id: 'components', text: '部品'},
+        {id: 'patterns', text: 'かたまり'},
       ]}) %>
     </aside>
   </div>
