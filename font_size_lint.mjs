@@ -37,6 +37,7 @@ const EXEMPT = new Map([
   ['.article-title', "unquote('clamp(26px, 1.325rem + 0.9vw, 32px)')"],
   // font-size がアイコンの実寸を決めている箇所（.svg-icon が 1em）。文字ではない
   ['.snscount-icon', '1.15em'],
+  ['.header-theme', '20px'],
   ['.header-search-open', '20px'],
   ['.header-search:focus-within .header-search-close', '20px'],
   // 機能で決まる値。16px を下回ると iOS がフォーカス時に画面をズームする

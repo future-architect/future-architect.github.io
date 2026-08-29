@@ -145,6 +145,35 @@
 			    素の CSE フォームなので JS は増えない。
 			    狭い幅では虫眼鏡だけ出し、label タップで入力欄にフォーカスして
 			    :focus-within で展開する（CSSのみ）。送信はキーボードの検索キーが担う %>
+			<%# 明暗の切り替え (#2746)。状態は3つ（システム追従 / 明 / 暗）。2値にすると
+			    「OS は暗いがこのサイトは明るく読みたい」と、そこから戻る道が表せない。
+			    **どの絵とどの読み上げ名を出すかは CSS が :root[data-theme] を見て決める**ので、
+			    JS は head の属性付与とこのボタンのクリックだけ。描画時に JS を待たない %>
+			<button type="button" class="header-theme" data-theme-toggle>
+				<span class="header-theme-auto"><%- partial('svg-icon', {icon: 'sun-moon'}) %><span class="sr-only">表示テーマ: 端末の設定に従う。切り替える</span></span>
+				<span class="header-theme-light"><%- partial('svg-icon', {icon: 'sun'}) %><span class="sr-only">表示テーマ: 明るい。切り替える</span></span>
+				<span class="header-theme-dark"><%- partial('svg-icon', {icon: 'moon'}) %><span class="sr-only">表示テーマ: 暗い。切り替える</span></span>
+			</button>
+			<script>
+				// 押すたびに システム追従 → 明 → 暗 → システム追従 と回す。
+				// 絵と読み上げ名の出し分けは CSS が :root[data-theme] を見て行うので、
+				// ここでやるのは属性と localStorage の書き換えだけ
+				(function () {
+					var el = document.querySelector('[data-theme-toggle]');
+					if (!el) return;
+					var order = ['', 'light', 'dark'];
+					el.addEventListener('click', function () {
+						var now = document.documentElement.dataset.theme || '';
+						var next = order[(order.indexOf(now) + 1) % order.length];
+						if (next) document.documentElement.dataset.theme = next;
+						else delete document.documentElement.dataset.theme;
+						try {
+							if (next) localStorage.setItem('theme', next);
+							else localStorage.removeItem('theme');
+						} catch (e) {}
+					});
+				})();
+			</script>
 			<form action="https://google.com/cse" target="_blank" class="header-search">
 				<label for="header-search-q" class="header-search-open"><%- partial('svg-icon', {icon: 'search'}) %><span class="sr-only">検索を開く</span></label>
 				<%# autocomplete: ブラウザが出す入力履歴のポップアップが、下に開く
