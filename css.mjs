@@ -6,7 +6,7 @@
 //
 // 連結そのものは公開ビルド（scripts/combine_css.js）と同じ
 // scripts/lib/site_css.js を呼ぶ。ここが持つのは Stylus の描画だけ。
-import { readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { createRequire } from 'node:module';
@@ -30,6 +30,9 @@ stylus.render(readFileSync(stylPath, 'utf8'), { filename: stylPath }, (err, css)
   });
 
   const out = join(root, 'public/css/site.css');
+  // public/ は gitignore されているので、まっさらな checkout には無い。
+  // CI（css ワークフロー）が ENOENT で落ちた
+  mkdirSync(dirname(out), { recursive: true });
   writeFileSync(out, combined);
   console.log(`${out} (${Math.round(combined.length / 1024)}KB)`);
 });
