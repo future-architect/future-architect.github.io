@@ -295,7 +295,7 @@ function recentPv(site) {
 // 消すと、画面から順序の根拠が消える（327 / 134 / 134 / 77 / 70 / 70 / 49 / 50 と
 // 単調にならない）。隣の人気の連載・人気のタグも自分の物差し順なので、
 // 3枠の読み方がそろう
-hexo.extend.helper.register('popular_categories', function (current) {
+hexo.extend.helper.register('popular_categories', function () {
   const pv = recentPv(this.site);
   const rank = (c) => pv.get(c.name) || 0;
   const all = groupedCategories(this.site).flatMap((g) => g.categories);
@@ -313,13 +313,6 @@ hexo.extend.helper.register('popular_categories', function (current) {
         (a.name < b.name ? -1 : a.name > b.name ? 1 : 0),
     )
     .slice(0, SIDEBAR_LIMIT);
-  // **いま見ているカテゴリは順位に関わらず残す。** 現在地が一覧から消えると、
-  // そのカテゴリのページに来た読者が自分の居場所を見失う。上限を1件超えるが、
-  // 落ちているということは PV が下位なので、末尾がその順位の位置になる
-  if (current && !shown.some((c) => c.name === current)) {
-    const here = all.find((c) => c.name === current);
-    if (here) shown.push(here);
-  }
   return shown;
 });
 
