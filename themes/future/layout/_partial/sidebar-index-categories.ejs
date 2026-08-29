@@ -4,16 +4,32 @@
         {value: site.categories.length, label: 'カテゴリ数'},
         {value: count_articles(), label: '投稿'},
       ],
-      charts: [{id: 'sidebar-chart-categories', label: '累計投稿数（カテゴリ別）'}],
+      charts: [{id: 'sidebar-chart-categories', label: '累計投稿数（大カテゴリ別）'}],
     }) %>
 <script type="text/javascript">
   <%# 月ごとの実数を足し上げて累計にする。ヘルパーは実数のまま返し、
       表示側で累計にする（軸の作り方をヘルパー1箇所に保つ）(#2432) %>
   const categoriesData = <%- get_monthly_category_data() %>;
-  const categoriesColors = <%- category_colors() %>;
-  const categoriesCumulative = categoriesData.series.map((s) => {
+  <%# **内訳は大カテゴリ（群）で積む** (#3044)。18系列を 285px の列に積むと
+      1系列あたりの帯が細くなりすぎて色が読めず、ツールチップも17行になる。
+      群なら5本で、どの分野が伸びたかが帯の厚みで分かる。
+      期間ページ（月・年・全期間）と同じ単位にそろえる。
+      群の所属は category_groups() が1箇所で持つ %>
+  const categoriesGroupDefs = <%- JSON.stringify(category_groups().map(function(g){
+        return {name: g.name, categories: g.categories.map(function(c){ return c.name; })};
+      })) %>;
+  const categoriesCumulative = categoriesGroupDefs.map((g) => {
     let sum = 0;
-    return { name: s.name, data: s.data.map((n) => (sum += n)) };
+    return {
+      name: g.name,
+      data: categoriesData.months.map(
+        (_, i) =>
+          (sum += categoriesData.series.reduce(
+            (n, s) => n + (g.categories.indexOf(s.name) >= 0 ? s.data[i] || 0 : 0),
+            0,
+          )),
+      ),
+    };
   });
   sidebarChart('sidebar-chart-categories', {
     xAxis: {
@@ -28,16 +44,18 @@
       axisLabel: <%- partial('chart-xaxis-year-labels', {months: 'categoriesData.months', el: 'sidebar-chart-categories'}).trim() %>
     },
     yAxis: { type: 'value' },
+    <%# 群は対等なので濃淡ではなく色相で分ける。色は scripts/chart_style.js が
+        1箇所で持ち、順は category_groups.yml のキーの順に当たる %>
+    color: <%- chart_series_colors('category_groups') %>,
     <%# 累計は単調増加で、127点だと棒の差が縞にしか見えない。積み上げ面にすると
-        帯の厚みがそのカテゴリの蓄積量、上端が総数になる。色は名前で固定 (#2170) %>
+        帯の厚みがその群の蓄積量、上端が総数になる %>
     series: categoriesCumulative.map((s) => ({
       name: s.name,
       type: 'line',
       stack: 'categories',
       symbol: 'none',
       lineStyle: { width: 0 },
-      areaStyle: { color: categoriesColors[s.name] },
-      itemStyle: { color: categoriesColors[s.name] },
+      areaStyle: {},
       data: s.data,
     })),
   });

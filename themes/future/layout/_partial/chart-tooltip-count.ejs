@@ -1,0 +1,38 @@
+<%# 投稿数チャートのツールチップ。echarts の option 内で
+    tooltip: <この部品>, として使う。
+
+    **値が0の系列は出さない** (#2989)。タグ・著者ページの積み上げはサイトの
+    全カテゴリ（18件）を系列に持つので、その月に1本しか無くても既定の
+    ツールチップは18行を並べる。実測で 150×324px あり、高さ120pxのグラフから
+    上へ206px はみ出して、サイドバーの統計を覆っていた。
+
+    投稿が1本も無い月は「投稿なし」の1行にする。0の行を18本並べても
+    言っていることは同じで、場所だけ取る。
+
+    軸の規則（chart-yaxis-count / chart-xaxis-year-labels）と同じく、
+    1箇所でしか決めないための共有部品。
+
+    shadow: true で軸の帯（axisPointer）を出す。年別の棒グラフはこの形。
+    emptyText: 数えているものが投稿でないグラフ（/tags/ の新規タグ数）は
+    空の言い方が変わるので呼び出し側が渡す %>
+<% const tipShadow = typeof shadow !== 'undefined' && shadow; %>
+<% const tipEmpty = typeof emptyText === 'undefined' ? '投稿なし' : emptyText; %>
+{
+  trigger: 'axis',
+<% if (tipShadow) { %>  axisPointer: { type: 'shadow' },
+<% } %>
+  formatter: (params) => {
+    const label = params.length ? params[0].axisValueLabel : '';
+    const rows = params.filter((p) => p.value);
+    if (!rows.length) return `${label}<br><%= tipEmpty %>`;
+    <%# 値を右端へ寄せるのは echarts の既定のツールチップと同じ組み方。
+        ここだけ左寄せにすると、他のグラフと見え方が割れる %>
+    return [
+      label,
+      ...rows.map(
+        (p) =>
+          `${p.marker}${p.seriesName}<span style="float:right;margin-left:16px;font-weight:700">${p.value}</span>`,
+      ),
+    ].join('<br>');
+  },
+}
