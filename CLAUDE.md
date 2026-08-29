@@ -49,6 +49,16 @@ URL は読者向け、コード配置は保守者向けの分類なので、鏡�
   - **EJS の partial は中身を差し込むスロットを持たない。** ページの骨格のような
     「包む部品」は作れないので、規則として書く側に回す
 
+**ページの骨格は `container > breadcrumb > row > main#main.col-md-9.blog-posts >
+aside.col-md-3.blog-sidebar`**（#2995）。サイドバーを持たないページは
+`main#main.margin-top-30`。
+
+- **`col-xs-*` は書かない。** Bootstrap 5 に無く、`site.css` にも定義が無い。
+  11箇所あったが1つも効いていなかった
+- **`col-sm-12` も足さない。** `.row > *` の既定が `width: 100%` なので、
+  `col-md-9` だけで 768px 未満は全幅になる。`.row` の直下で明示が要るところ
+  （`_partial/archive-post.ejs`）は `col-12`
+
 ## 記事の書き方
 
 ファイル名は `source/_posts/<年>/YYYYMMDD<postid>_<タイトル>.md`。
