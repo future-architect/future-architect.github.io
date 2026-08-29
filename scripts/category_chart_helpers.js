@@ -324,7 +324,6 @@ hexo.extend.helper.register('popular_categories', function () {
 function buildCategoryStats(category) {
   const oneYearAgo = Date.now() - 365 * 24 * 60 * 60 * 1000;
   const tagCount = new Map();
-  const authors = new Set();
   const recentAuthors = new Set();
   let recent = 0;
   category.posts.forEach((post) => {
@@ -332,7 +331,6 @@ function buildCategoryStats(category) {
     if (isRecent) recent++;
     // 共著の旧記事は author が配列
     [].concat(post.author || []).forEach((a) => {
-      authors.add(a);
       if (isRecent) recentAuthors.add(a);
     });
     (post.tags ? post.tags.toArray() : []).forEach((tag) => {
@@ -353,7 +351,6 @@ function buildCategoryStats(category) {
     path: category.path,
     count: category.length,
     recent,
-    authorCount: authors.size,
     recentAuthorCount: recentAuthors.size,
     topTags,
   };
