@@ -17,38 +17,51 @@ hexo.extend.helper.register('get_ga4_pv', (url) => {
 // 記事数が変わったら作り直すため、server での編集にも追随する
 const popularTagsCache = new Map();
 
-// トップの「人気のタグ」(#2358)。以前は全期間のSNSシェア合計順で、
-// 古い大型タグが上位に固定されいまの人気を反映しなかった。
-// 公開が1年以内の記事の PV 合計で選ぶ（直近1年の記事はシェア数の
-// 積み上がりが薄く、PV は GA4 の実測が全記事にあるため信号が強い）。
-// 直近3本未満のタグは、話題の勢いではなく単発のバズなので出さない
-// （「3件あれば選択肢として成立する」の related_tags と同じ基準）
-hexo.extend.helper.register('recent_popular_tags', function (limit = 10, minRecent = 3) {
-  const cacheKey = `${limit}:${minRecent}:${this.site.posts.length}`;
+// トップの「人気のタグ」(#2358)。
+// **物差しはランキング記事・人気の連載と同じ経過年ペナルティ** (#2855)。
+// 以前は「直近1年に公開された記事の PV 合計」で、古さで減点する仕組みが無く
+// 1年の窓を出た瞬間に候補から消えていた。窓を外して1本ずつ 1/(1+経過年^2) で
+// 割れば、境目で顔ぶれが飛ばず、新しさと読まれ方が同じ式の中で釣り合う。
+//
+// **連載と違って本数では割らない。** 連載の √本数 は「連載の規模」を薄める
+// ためのものだが、タグの本数は主題の広さで、集合の大きさそのものが
+// 「このブログの中心にある話題か」を表す。実測でも √本数 で割ると
+// 3本の「構造化ログ」が3位に入り、265本の Go は6位まで落ちて、
+// 入口として薄いタグが並ぶ（タグは3〜265本と幅が連載の10倍あるので、
+// 同じ割り方でも効きが強く出る）。
+//
+// 3本未満のタグは出さない。「3件あれば選択肢として成立する」の related_tags と
+// 同じ基準で、行き先として薄いものを入口に置かない
+hexo.extend.helper.register('recent_popular_tags', function (limit = 10, minPosts = 3) {
+  const cacheKey = `${limit}:${minPosts}:${this.site.posts.length}`;
   if (popularTagsCache.has(cacheKey)) return popularTagsCache.get(cacheKey);
   const YEAR = 365 * 24 * 60 * 60 * 1000;
   const now = Date.now();
+  const score = (post) => {
+    const years = (now - post.date.valueOf()) / YEAR;
+    return getGA4PV('/' + post.path) / (1 + years * years);
+  };
   const tags = this.site.tags
     .map((tag) => {
-      const recent = tag.posts.toArray().filter((p) => now - p.date.valueOf() <= YEAR);
+      const posts = tag.posts.toArray();
       return {
         name: tag.name,
         path: tag.path,
         count: tag.length,
-        recent: recent.length,
-        pv: recent.reduce((sum, p) => sum + getGA4PV('/' + p.path), 0),
+        pv: posts.reduce((sum, p) => sum + getGA4PV('/' + p.path), 0),
+        score: posts.reduce((sum, p) => sum + score(p), 0),
       };
     })
-    .filter((t) => t.recent >= minRecent && t.pv > 0)
+    .filter((t) => t.count >= minPosts && t.score > 0)
     // 同点は名前で決める（決着が無いとビルドごとに並びが変わる）
-    .sort((a, b) => b.pv - a.pv || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
+    .sort((a, b) => b.score - a.score || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
     .slice(0, limit);
   popularTagsCache.set(cacheKey, tags);
   return tags;
 });
 
 // ヘッダーのドロップダウンとサイドバーの「人気の連載」(#2855)。
-// **物差しはランキング記事（popular_posts_in）と同じ経過年ペナルティ**。
+// **物差しはランキング記事（popular_posts_in）・人気のタグと同じ経過年ペナルティ**。
 // 以前は「直近1年に公開された記事の PV 合計」で、古さで減点する仕組みは無く
 // 1年の窓を出た瞬間に候補から消えていた。窓の中では逆に古い方が有利で
 // （PV を積む時間があるため）、10か月前の連載が最新の連載を上回っていた。
