@@ -147,22 +147,25 @@ hexo.extend.helper.register('popular_posts_in', function (posts, limit, decay) {
 
   if (ranked.length === 0) return '';
 
-  // マークアップはホームの「連載から探す」と同じカード。2列で並べる
+  // カードは _partial/panel-card.ejs が1箇所で持つ (#3031)。ここで手書きすると、
+  // 同じ形の直しが themes/ の外にも散る（#2845 の aria-hidden はここが漏れた）。
+  // 列だけは呼び出し側の都合なので JS が持つ。2列で並べる
   const cards = ranked
-    .map(({ post }) => {
-      // サムネはタイトルと同じ行き先なので、タブ順と読み上げから外す (#2845 / #2936)
-      const thumb = post.thumbnail
-        ? `<a href="/${post.path}" title="${post.title}" class="thumb-link panel-thumb" tabindex="-1" aria-hidden="true"><img src="${post.thumbnail}" alt="" width="200" height="135" loading="lazy"></a>`
-        : '';
-      return (
-        `<div class="col-12 col-md-6"><div class="article-card post-panel h-100">${thumb}` +
-        `<div class="panel-body"><a href="/${post.path}" class="panel-title">${post.title}</a>` +
-        // 推薦カードの日付は鮮度の目安なので年月まで (#2404)
-        `<div class="panel-meta">${post.date.format('YYYY.MM')}${snsLabel(post.permalink)}</div>` +
-        `</div></div></div>`
-      );
-    })
+    .map(
+      ({ post }) =>
+        '<div class="col-12 col-md-6">' +
+        this.partial('_partial/panel-card', {
+          url: '/' + post.path,
+          title: post.title,
+          thumb: post.thumbnail ? { src: post.thumbnail, width: 200, height: 135 } : null,
+          // 推薦カードの日付は鮮度の目安なので年月まで (#2404)
+          meta: post.date.format('YYYY.MM') + snsLabel(post.permalink),
+        }) +
+        '</div>',
+    )
     .join('');
 
-  return `<div class="row g-4">${cards}</div>`;
+  // 囲みは .series-panels .article-card が持つ。以前は .post-panel という別名で
+  // 同じルールを引いていたが、名前が2つある理由が無かった
+  return `<div class="series-panels row g-4">${cards}</div>`;
 });
