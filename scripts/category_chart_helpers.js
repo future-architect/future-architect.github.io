@@ -260,29 +260,36 @@ hexo.extend.helper.register('category_groups', function () {
 // 空間だけなら13件まで入る。増やすなら根拠は認知の側から立て直す
 const SIDEBAR_LIMIT = 8;
 
-// 物差しは直近1年に公開された記事の PV 合計。「人気の」が付く枠は
-// 「いまよく読まれているか」で選ぶ (#2855)。人気のタグ（recent_popular_tags）と
-// 同じ式で、直近3本未満を外すのも同じ——単発のバズを勢いと取り違えないため。
-// **人気の連載だけは経過年ペナルティに移っている** (#3001)。こことタグも
-// 同じ式へ寄せる余地があるが、揃えるならまとめて動かす
-const SIDEBAR_MIN_RECENT = 3;
+// 「人気の」が付く枠は「いまよく読まれているか」で選ぶ (#2855)。
+// **物差しはランキング記事・人気の連載・人気のタグと同じ経過年ペナルティ**
+// （1本ずつ PV を 1/(1+経過年^2) で割って足す）。以前は「直近1年に公開された
+// 記事の PV 合計」で、古さで減点する仕組みが無く、窓を出た瞬間に候補から
+// 消えていた。これで4つの枠の式が同じになる (#3038)。
+//
+// **タグと同じく本数では割らない。** 割るのは連載だけで、あちらの √本数 は
+// 「連載の規模」を薄めるためのもの。カテゴリの本数は主題の広さで、
+// 集合の大きさそのものが「このブログの中心にある話題か」を表す
+//
+// 直近3本未満を外す足切りは要らなくなった。窓が無いので、書かれなくなった
+// カテゴリは経過年ペナルティで自然に下がる（候補は18件しかなく、
+// 上限8件で半分以上が落ちる）
+const decayedPvCache = new Map();
 
-// 直近1年の PV 合計。記事数を鍵にして持ち回るのは recentCounts と同じ理由
-const recentPvCache = new Map();
-
-function recentPv(site) {
+function decayedPv(site) {
   const key = String(site.posts.length);
-  if (recentPvCache.has(key)) return recentPvCache.get(key);
-  const oneYearAgo = Date.now() - 365 * 24 * 60 * 60 * 1000;
+  if (decayedPvCache.has(key)) return decayedPvCache.get(key);
+  const YEAR = 365 * 24 * 60 * 60 * 1000;
+  const now = Date.now();
   const pv = new Map();
   site.categories.forEach((category) => {
     let sum = 0;
     category.posts.forEach((post) => {
-      if (post.date.valueOf() >= oneYearAgo) sum += getGA4PV('/' + post.path);
+      const years = (now - post.date.valueOf()) / YEAR;
+      sum += getGA4PV('/' + post.path) / (1 + years * years);
     });
     pv.set(category.name, sum);
   });
-  recentPvCache.set(key, pv);
+  decayedPvCache.set(key, pv);
   return pv;
 }
 
@@ -291,27 +298,22 @@ function recentPv(site) {
 // 束ねる相手が2〜3件しか無く、ラベルのぶんだけ場所と手数が増える。
 // 群は全件を出すヘッダーのドロップダウンと /categories/ が持ち続ける。
 //
-// **並びは選ぶ鍵（直近1年のPV）と同じ順。** 群の並び（累計順）のまま群だけ
+// **並びは選ぶ鍵（経過年ペナルティ付きのPV）と同じ順。** 群の並び（累計順）のまま群だけ
 // 消すと、画面から順序の根拠が消える（327 / 134 / 134 / 77 / 70 / 70 / 49 / 50 と
 // 単調にならない）。隣の人気の連載・人気のタグも自分の物差し順なので、
 // 3枠の読み方がそろう
 hexo.extend.helper.register('popular_categories', function () {
-  const pv = recentPv(this.site);
+  const pv = decayedPv(this.site);
   const rank = (c) => pv.get(c.name) || 0;
   const all = groupedCategories(this.site).flatMap((g) => g.categories);
   const shown = all
-    .filter((c) => c.recent >= SIDEBAR_MIN_RECENT && rank(c) > 0)
-    // **同点は PV の次に直近1年の本数で決める。** GA4 の値は 100 単位に
-    // 丸められている（全1,499件が100の倍数）ので同点が構造的に出て、候補が
-    // 17件しか無いここでは上限の線にちょうど並ぶ（Business と Culture が
-    // 10,000PV）。名前順で決めると、落ちる理由が読者から見て何も無くなる
-    .sort(
-      (a, b) =>
-        rank(b) - rank(a) ||
-        b.recent - a.recent ||
-        b.count - a.count ||
-        (a.name < b.name ? -1 : a.name > b.name ? 1 : 0),
-    )
+    .filter((c) => rank(c) > 0)
+    // 同点は名前で決める（決着が無いとビルドごとに並びが変わる）。
+    // 以前は PV の次に直近1年の本数を見ていた。GA4 の値が 100 単位に
+    // 丸められていて（全1,499件が100の倍数）、窓の中の合計では同点が
+    // 構造的に出ていたため（Business と Culture が 10,000PV でちょうど
+    // 上限の線に並んだ）。経過年で割ると値がばらけるので実測で同点は0件
+    .sort((a, b) => rank(b) - rank(a) || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
     .slice(0, SIDEBAR_LIMIT);
   return shown;
 });
