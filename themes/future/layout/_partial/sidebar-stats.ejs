@@ -23,6 +23,7 @@
         ? [{label: '投稿', value: t.recent}, {label: '著者数', value: t.recentAuthorCount}]
         : [],
       chart: tag_monthly_chart(page.tag),
+      chartLabel: '投稿数（カテゴリ別）',
     };
   } else if (page.category) {
     const s = summary_category(page.category);
@@ -41,6 +42,8 @@
         ? [{label: '投稿', value: c.recent}, {label: '著者数', value: c.recentAuthorCount}]
         : [],
       chart: category_monthly_chart(page.category),
+      // 系列はそのカテゴリ1本だけなので内訳は書かない
+      chartLabel: '投稿数',
     };
   } else if (page.author) {
     const a = author_stats(page.author);
@@ -55,6 +58,7 @@
       ],
       recent: a && a.recent > 0 ? [{label: '投稿', value: a.recent}] : [],
       chart: author_monthly_chart(page.author),
+      chartLabel: '投稿数（カテゴリ別）',
     };
   }
 %>
@@ -62,43 +66,19 @@
 <%# 見出しは置かない (#2911)。「累計」「直近1年」のラベルと数字が並んでいれば
     何のブロックかは見て分かる。目で見えない読者には aria-label が名乗る %>
 <section class="sidebar-stats" data-nosnippet aria-label="統計">
-  <%# 内訳が0の行は出さない (#2911)。Pocket はサービス終了済みで、これから増えることが
-      無い。終了後の記事だけで構成されるタグ・著者では、ずっと「0 Pocket」が並ぶ。
-      Facebook も1以上あるのは1,491件中93件だけで事情は同じ。
-      主要な行（投稿・著者数・総シェア数）は0でも出す。そこが空くと数字の枠が
-      何を数えているのか読めなくなる %>
-  <% ['total', 'recent'].forEach(function(k){
-       stats[k] = stats[k].filter(function(r){ return !r.sub || r.value; });
-     }); %>
   <%# 箱と時間軸のラベルは本文の統計と同じ部品。中身だけタイルから行に替える。
       208px の列にタイルを7つ並べると3.4倍の幅が要る。
       シェアの内訳（X・Facebook・はてブ・Pocket）は総シェア数の内訳なので、
       本文と同じく summary-sub で一段下げる (#2096)。
-      タイル（数値の下にラベル）を行（数値の右にラベル）に組み替えるだけで、
-      クラスと大きさの段は本文と共有する %>
-  <%# 数字の桁数が違うとラベルの開始位置がずれる（実測で最大31px）。
-      いちばん桁数の多い値に合わせた幅を配り、数字はその中で右寄せにする。
-      2つの組で同じ幅を使うので、組をまたいでも数字の右端とラベルの左端がそろう %>
-  <% const countWidth = Math.max.apply(null, stats.total.concat(stats.recent).map(function(r){ return String(r.value).length; })); %>
-  <%# 枠は1つで、中に「累計」「直近1年」の2組を積む。同じページについての数字なので
-      分ける理由が無く、枠を2つ置くと1つめの下辺と2つめの上辺で線が2本並ぶ。
-      組の切れ目は間隔が作る（#2747） %>
-  <div class="summary-panels" style="--summary-count-width: <%= countWidth %>ch">
-    <section class="summary-panel">
-      <span class="summary-panel-label">累計</span>
-      <%- partial('summary-tiles', {items: stats.total, variant: 'row'}) %>
-      <span class="summary-panel-label">直近1年</span>
-      <% if (stats.recent.length) { %>
-      <%- partial('summary-tiles', {items: stats.recent, variant: 'row'}) %>
-      <% } else { %>
-      <p class="summary-note">投稿はありません</p>
-      <% } %>
-    </section>
-  </div>
+      0行の間引きと桁そろえは sidebar-summary-panel が持つ（一覧ページと共有）%>
+  <%- partial('sidebar-summary-panel', {total: stats.total, recent: stats.recent}) %>
   <% if (stats.chart) { %>
   <%# 凡例は出さない。カテゴリ別の積み上げは最長の「DataEngineering」だけで
       117.9px あり、208px の列では横送りになって場所だけ取る。
       どの色が何かはツールチップ（trigger: axis）が名乗る %>
+  <%# 一覧ページと同じく「量（内訳）」の形でグラフを名乗る。h2 を持たないので、
+      ラベルが無いと何の数のグラフか分からない %>
+  <span class="sidebar-stats-chart-label"><%= stats.chartLabel %></span>
   <div id="chart" class="sidebar-stats-chart"></div>
   <%- partial('echarts-script') %>
   <script type="text/javascript">
@@ -108,9 +88,15 @@
     sidebarChart.setOption({
       <%# タイトルは直上の h2 が担うので、チャート内では重ねない %>
       title: {},
+      <%# 凡例は明示的に消す。option を省くだけでは消えない——themeChart が
+          legend.textStyle を setOption するので、宣言していないチャートにも
+          凡例が生成され、既定の show: true で描かれる %>
+      legend: { show: false },
       tooltip: { trigger: 'axis' },
-      <%# 既定の grid.left 10% で右へズレて見える。軸ラベル込みで左端に寄せる %>
-      grid: { left: 0, right: 0, top: 8, bottom: 0, containLabel: true },
+      <%# 既定の grid.left 10% で右へズレて見える。軸ラベル込みで左端に寄せる。
+          right に余白を置くのは、containLabel が**端のカテゴリラベルのはみ出しを
+          見ない**ため。軸の最後が1月に当たると「2026年」の半分が外へ出て切れる %>
+      grid: { left: 0, right: 16, top: 8, bottom: 0, containLabel: true },
       xAxis: {
         type: 'category',
         boundaryGap: true,

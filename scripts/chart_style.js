@@ -38,6 +38,11 @@ hexo.extend.helper.register('chart_series_colors', function (kind) {
 // 値0.85件ぶんで、これより太いと隣の年の線と接する月が 2/12 から 6/12 に増える
 const LINE_WIDTH = 4;
 
-hexo.extend.helper.register('chart_line_width', function () {
-  return LINE_WIDTH;
+// サイドバーは細い。同じ上限30件をプロット高92pxに描くので 1件 = 3.07px で、
+// 本文の 4.7px より詰まっている（実測）。4px のままだと 1.30件ぶんになり、
+// 本文の 0.85件ぶんより太く見える。同じ比に合わせた値
+const LINE_WIDTH_SIDEBAR = 2.5;
+
+hexo.extend.helper.register('chart_line_width', function (variant) {
+  return variant === 'sidebar' ? LINE_WIDTH_SIDEBAR : LINE_WIDTH;
 });

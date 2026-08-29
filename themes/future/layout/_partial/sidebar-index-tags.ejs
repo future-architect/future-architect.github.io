@@ -1,0 +1,52 @@
+<%# /tags/ のサイドバー。統計と、年別 新規タグ数の推移を2つの内訳で %>
+<%# 平均と中央値を並べるのは、少数の大きいタグに引っ張られて両者が倍以上ずれるため。
+    片方だけでは付け方の実態が分からない %>
+<% const tagsPerPost = tags_per_post(); %>
+<% const postsPerTag = posts_per_tag(); %>
+<%- partial('sidebar-stats-index', {
+      items: [
+        {value: count_tags(), label: 'タグ数'},
+        {value: tagsPerPost.mean, label: '記事あたり（平均）'},
+        {value: tagsPerPost.median, label: '記事あたり（中央値）'},
+        {value: postsPerTag.mean, label: 'タグあたり（平均）'},
+        {value: postsPerTag.median, label: 'タグあたり（中央値）'},
+      ],
+      charts: [
+        {id: 'sidebar-chart-tag-category', label: '新規タグ数（カテゴリ別）'},
+        {id: 'sidebar-chart-tag-retention', label: '新規タグ数（定着）'},
+      ],
+    }) %>
+<script type="text/javascript">
+  <%# 初出の年で数える。「定着したか」で積み上げる案もあったが、新しい年ほど
+      再利用の機会が無いだけで交絡するため、新規数だけを出す %>
+  const tagYearData = <%- new_tags_by_year() %>;
+  const tagCatColors = <%- category_colors() %>;
+  sidebarChart('sidebar-chart-tag-category', {
+    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+    xAxis: { type: 'category', data: tagYearData.years, axisTick: { show: false } },
+    yAxis: { type: 'value', min: 0, minInterval: 1 },
+    <%# 色はカテゴリ名で固定 (#2170) %>
+    series: tagYearData.series.map((s) => ({
+      name: s.name,
+      type: 'bar',
+      stack: 'tags',
+      itemStyle: { color: tagCatColors[s.name] },
+      data: s.data,
+    })),
+  });
+
+  const tagRetentionData = <%- new_tags_retention() %>;
+  sidebarChart('sidebar-chart-tag-retention', {
+    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+    xAxis: { type: 'category', data: tagRetentionData.years, axisTick: { show: false } },
+    yAxis: { type: 'value', min: 0, minInterval: 1 },
+    <%# 土台が定着、上が定着せず。週別の積み上げと同じ段を共有する %>
+    color: <%- chart_series_colors('retention') %>,
+    series: tagRetentionData.series.map((s) => ({
+      name: s.name,
+      type: 'bar',
+      stack: 'tags',
+      data: s.data,
+    })),
+  });
+</script>
