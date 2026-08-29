@@ -21,6 +21,11 @@ g:
 css:
 	node css.mjs
 
+# 文字サイズが段（_variables.styl の text-*）から外れていないかを検査する (#2971)。
+# 寄せ終えた直後に別の PR が 1.4em を直接書いて戻した実績がある
+lint-css:
+	node font_size_lint.mjs
+
 mermaid:
 	node mermaid_svg.mjs
 

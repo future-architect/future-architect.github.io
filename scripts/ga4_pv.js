@@ -47,31 +47,43 @@ hexo.extend.helper.register('recent_popular_tags', function (limit = 10, minRece
   return tags;
 });
 
-// 検索窓のパネルの「人気の連載」(#2855)。物差しは人気のタグと揃える。
-// 同じ面に並ぶ3つの入口が別々の基準で選ばれていると、どれが「いま」を
-// 指しているのか読者には区別できない。
+// ヘッダーのドロップダウンとサイドバーの「人気の連載」(#2855)。
+// **物差しはランキング記事（popular_posts_in）と同じ経過年ペナルティ**。
+// 以前は「直近1年に公開された記事の PV 合計」で、古さで減点する仕組みは無く
+// 1年の窓を出た瞬間に候補から消えていた。窓の中では逆に古い方が有利で
+// （PV を積む時間があるため）、10か月前の連載が最新の連載を上回っていた。
+// 窓を外して1本ずつ 1/(1+経過年^2) で割れば、境目で顔ぶれが飛ばず、
+// 新しさと読まれ方が同じ式の中で釣り合う。
 // 行き先は索引記事（無ければ1本目）で、/series/ の一覧と同じ規則
 const popularSeriesCache = new Map();
 
-hexo.extend.helper.register('recent_popular_series', function (limit = 6, minRecent = 3) {
-  const cacheKey = `${limit}:${minRecent}:${this.site.posts.length}`;
+hexo.extend.helper.register('popular_series', function (limit = 6, minPosts = 3) {
+  const cacheKey = `${limit}:${minPosts}:${this.site.posts.length}`;
   if (popularSeriesCache.has(cacheKey)) return popularSeriesCache.get(cacheKey);
   const YEAR = 365 * 24 * 60 * 60 * 1000;
   const now = Date.now();
+  // popular_posts_in と同じ式（1年落ち=1/2、2年=1/5、4年=1/17）。
+  // 連載は記事の集まりなので、1本ずつ割ってから足す
+  const score = (post) => {
+    const years = (now - post.date.valueOf()) / YEAR;
+    return getGA4PV('/' + post.path) / (1 + years * years);
+  };
+  // **足したあと √本数 で割る。** 単純な合計だと本数がそのまま効き、27本の
+  // 「春の入門祭り2025」のような大型連載が上位を占める。本数が多い連載は
+  // 実際に盛り上がっているので有利のままにしたいが、効きは弱めたい。
+  // √で割ると効きが指数の半分（N から √N）になり、27本と6本の差は
+  // 4.5倍から2.1倍に縮む。平均にすると本数の効きが完全に消えるので採らない
   const series = allSeries(this.site)
-    .map((s) => {
-      const recent = s.posts.filter((p) => now - p.date.valueOf() <= YEAR);
-      return {
-        name: s.name,
-        path: s.index.path,
-        total: s.total,
-        recent: recent.length,
-        pv: recent.reduce((sum, p) => sum + getGA4PV('/' + p.path), 0),
-      };
-    })
-    .filter((s) => s.recent >= minRecent && s.pv > 0)
+    .map((s) => ({
+      name: s.name,
+      path: s.index.path,
+      total: s.total,
+      pv: s.posts.reduce((sum, p) => sum + getGA4PV('/' + p.path), 0),
+      score: s.posts.reduce((sum, p) => sum + score(p), 0) / Math.sqrt(s.total),
+    }))
+    .filter((s) => s.total >= minPosts && s.score > 0)
     // 同点は名前で決める（決着が無いとビルドごとに並びが変わる）
-    .sort((a, b) => b.pv - a.pv || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
+    .sort((a, b) => b.score - a.score || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
     .slice(0, limit);
   popularSeriesCache.set(cacheKey, series);
   return series;

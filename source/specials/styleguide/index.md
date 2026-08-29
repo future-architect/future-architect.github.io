@@ -34,7 +34,7 @@ layout: page
 | --- | --- | --- | --- | --- |
 | <span class="sg-chip sg-rule-base"></span> | `rule-base` | <span class="sg-hex sg-rule-base"></span> | <span class="sg-ratio sg-rule-base"></span> | 枠。カード・チップ・箱・画像枠 |
 | <span class="sg-chip sg-rule-weak"></span> | `rule-weak` | <span class="sg-hex sg-rule-weak"></span> | <span class="sg-ratio sg-rule-weak"></span> | 区切り。見出しの下・リストの行間 |
-| <span class="sg-chip sg-rule-strong"></span> | `rule-strong` | <span class="sg-hex sg-rule-strong"></span> | <span class="sg-ratio sg-rule-strong"></span> | focus / hover でひとつ強める |
+| <span class="sg-chip sg-rule-strong"></span> | `rule-strong` | <span class="sg-hex sg-rule-strong"></span> | <span class="sg-ratio sg-rule-strong"></span> | 地を持たない部品の枠（チップ・表・タブの上辺）と、focus / hover でひとつ強めるところ |
 
 見出しの下の罫線が薄いのは意図です。節の区切りは直前の空き（56px）が担っていて、線は「そこに境目がある」と気づかせる程度で足ります。読みやすさの指標ではないので濃くしません。
 
@@ -44,7 +44,7 @@ layout: page
 
 | <span class="sr-only">見本</span> | 変数 | 値 | 白背景との差 | 使うところ |
 | --- | --- | --- | --- | --- |
-| <span class="sg-chip sg-surface-tint"></span> | `surface-tint` | <span class="sg-hex sg-surface-tint"></span> | <span class="sg-ratio sg-surface-tint"></span> | 静止した面。チップ・タブ帯・表のヘッダ |
+| <span class="sg-chip sg-surface-tint"></span> | `surface-tint` | <span class="sg-hex sg-surface-tint"></span> | <span class="sg-ratio sg-surface-tint"></span> | 静止した面。タブ帯・表のヘッダ・記事末の帯・検索窓 |
 | <span class="sg-chip sg-surface-mute"></span> | `surface-mute` | <span class="sg-hex sg-surface-mute"></span> | <span class="sg-ratio sg-surface-mute"></span> | hover / focus の面と、空・無効の面・インラインコードの背景 |
 
 ### 本文のリンクは下線を持つ。色は背景に合わせて替える
@@ -238,6 +238,8 @@ layout: page
 </div>
 
 小さな部品はチップ・サムネイル・操作部品、箱はカード・コードブロック・note・`details` です。
+
+**チップは枠だけで作り、地を持ちません。** 地を敷いても白背景との差が 1.09 しか出ず、形を作っているのは枠の方だからです。そのぶん枠は `rule-base` ではなく `rule-strong` を使います（白背景との差が 1.36 から 1.61 になります）。
 
 ### 影は持たない
 
