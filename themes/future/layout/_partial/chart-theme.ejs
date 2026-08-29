@@ -1,0 +1,37 @@
+<%# グラフの文字と軸をテーマに追従させる (#2746)。
+    **echarts の option では CSS 変数を参照できない**（値は JavaScript 側にある）ので、
+    :root から実効値を読んで option に流し込む。読み取りは描画時と、
+    テーマを切り替えたときの2回だけ。
+
+    各チャートは setOption のあとに themeChart(インスタンス) を1回呼ぶ。
+    どの色を使うかをここが1箇所で決めるので、チャートごとに散らない %>
+<script>
+  window.themeChart = (function () {
+    var charts = [];
+    function tokens() {
+      var s = getComputedStyle(document.documentElement);
+      return {
+        text: s.getPropertyValue('--ink-mute').trim(),
+        line: s.getPropertyValue('--rule-base').trim(),
+      };
+    }
+    function apply(chart) {
+      var t = tokens();
+      // 既存の option に重ねる。系列の色は触らない（カテゴリ色は #2170 で固定）
+      chart.setOption({
+        textStyle: { color: t.text },
+        legend: { textStyle: { color: t.text } },
+        xAxis: { axisLabel: { color: t.text }, axisLine: { lineStyle: { color: t.line } } },
+        yAxis: { axisLabel: { color: t.text }, splitLine: { lineStyle: { color: t.line } } },
+      });
+    }
+    document.addEventListener('themechange', function () {
+      charts.forEach(apply);
+    });
+    return function (chart) {
+      if (!chart) return;
+      charts.push(chart);
+      apply(chart);
+    };
+  })();
+</script>

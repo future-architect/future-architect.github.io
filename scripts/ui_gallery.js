@@ -32,6 +32,7 @@ const NOT_SHOWN = {
   'breadcrumb-page': 'Markdown のページ用にパンくずの項目を組むだけの包み。見た目はパンくずが持つ',
   'chart-xaxis-year-labels': 'echarts に渡す設定値を返す断片。見た目を持たない',
   'chart-yaxis-count': '同上',
+  'echarts-script': 'グラフのライブラリを読み込む <script>。見た目を持たない',
   'featured-post': '呼び出し元が無い',
   'footer-columns': 'フッターの中身。実物がこのページの下端に出ている',
   footer: '同上',

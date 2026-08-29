@@ -35,6 +35,9 @@
   --award-card-from: award-card-from;
   --award-card-to: award-card-to;
   --award-card-rule: award-card-rule;
+  --award-medal-bg: rgba(255, 255, 255, 0.75);
+  // 引き出しを開いたときに本文に敷く面。地の側に寄せて薄く曇らせる
+  --backdrop: rgba(255, 255, 255, 0.4);
 
     // 文字・罫線・面の段と、リンクの4値 (#2746)。ダークモードで実行時に差し替えるため、
   // 使う側は var() で引く。値と役の説明は _variables.styl が持ったままにする
@@ -54,8 +57,161 @@
   --link-blue: link-blue;
   --link-visited: link-visited;
   --link-on-tint: link-on-tint;
+
+  // 表の枠。地が反転すると同じ濃さでは見えないので、テーマで差し替える
+  --table-border: table-border;
+
+  // note の4色。地と、その中のインラインコード・表ヘッダの地（一段濃い / 暗地では一段明るい）
+  --note-tip-bg: note-tip-bg;
+  --note-info-bg: note-info-bg;
+  --note-warn-bg: note-warn-bg;
+  --note-alert-bg: note-alert-bg;
+  --note-tip-code: code-bg(note-tip-bg);
+  --note-info-code: code-bg(note-info-bg);
+  --note-warn-code: code-bg(note-warn-bg);
+  --note-alert-code: code-bg(note-alert-bg);
   --link-on-note: link-on-note;
   --link-on-note-visited: link-on-note-visited;
+}
+
+// ダークモード (#2746)。状態は3つある。
+//   何も指定していない        … OS の設定に従う（prefers-color-scheme）
+//   data-theme="dark"        … 明示的に暗い
+//   data-theme="light"       … 明示的に明るい（OS が暗くてもこちらが勝つ）
+// 2値のトグルにするとシステム追従へ戻せなくなるので、3状態を持つ。
+// 属性は head の中の同期スクリプトが localStorage を読んで付ける
+// （外部ファイルにすると読み込み待ちの間に明るい画面が一瞬出る）
+dark-tokens()
+  --ink-strong: dark-ink-strong;
+  --ink-mute: dark-ink-mute;
+  --ink-faint: dark-ink-faint;
+
+  --rule-base: dark-rule-base;
+  --rule-weak: dark-rule-weak;
+  --rule-strong: dark-rule-strong;
+
+  --surface-base: dark-surface-base;
+  --surface-tint: dark-surface-tint;
+  --surface-mute: dark-surface-mute;
+
+  --link-blue: dark-link-blue;
+  --link-visited: dark-link-visited;
+  --link-on-tint: dark-link-on-tint;
+  --link-on-note: dark-link-on-note;
+  --link-on-note-visited: dark-link-on-note-visited;
+
+  // 表彰の淡金。カードだけ明るいまま残すと中の文字が沈むので、カードごと暗くする
+  --award-card-from: dark-award-card-from;
+  --award-card-to: dark-award-card-to;
+  --award-card-rule: dark-award-card-rule;
+  --award-gold-on-tint: dark-award-gold-on-tint;
+  --award-bronze: dark-award-bronze;
+  --award-medal-bg: dark-award-medal-bg;
+  --backdrop: rgba(0, 0, 0, 0.4);
+  --table-border: dark-rule-strong;
+
+  // note の4色。ページとの差を 1.34〜1.35 にそろえる（surface-mute の 1.21 より一段上）。
+  // 中のコードの地は、白地では「一段濃い」だが暗地では**一段明るい**。持ち上げる向きが逆
+  --note-tip-bg: dark-note-tip-bg;
+  --note-info-bg: dark-note-info-bg;
+  --note-warn-bg: dark-note-warn-bg;
+  --note-alert-bg: dark-note-alert-bg;
+  --note-tip-code: dark-note-tip-code;
+  --note-info-code: dark-note-info-code;
+  --note-warn-code: dark-note-warn-code;
+  --note-alert-code: dark-note-alert-code;
+
+  // ネイビーは暗い地で 1.05 しか出ない。面としては一段暗くして帯の色味だけ残す
+  --brand-navy: dark-navy;
+
+// 差し色としてのネイビーは、暗い地では面ではなく「明るい線・明るい塗り」に置き換える。
+// 白地では #0A1461 が 16.34 の差し色だが、暗い地では 1.05 で消える (#2746)
+dark-parts()
+  /* コーポレートのロゴは濃い文字＋クリムゾンの2本線。暗い地では白抜きにする。
+     外部ファイルの <img> なので中の要素には触れず、フィルタで白のシルエットにする */
+  .header-logo {
+    filter: brightness(0) invert(1);
+  }
+  /* 所在の輪郭。フッター（暗地）で既にやっている置き換えを、ページ全体に広げる */
+  a:focus-visible,
+  button:focus-visible,
+  summary:focus-visible,
+  input:focus-visible,
+  [tabindex]:focus-visible {
+    outline-color: var(--ink-strong);
+  }
+  /* 静止時のアイコンがネイビーだと沈む。反転も明暗を入れ替える */
+  .share-btn {
+    color: var(--ink-strong);
+  }
+  .share-btn:hover,
+  .share-btn:focus {
+    background: var(--ink-strong);
+    border-color: var(--ink-strong);
+    color: var(--surface-base);
+  }
+  /* ページ送り。現在地の塗りと hover の文字 */
+  .pagination > a:hover,
+  .pagination > a:focus {
+    color: var(--ink-strong);
+  }
+  .pagination span.current {
+    background-color: var(--ink-strong);
+    color: var(--surface-base);
+  }
+  /* 選択中のタブの上辺。線1本で所在を示す部品なので、暗い地では明るい線にする */
+  .tabs input:checked + .tab_item {
+    border-top-color: var(--ink-strong);
+  }
+  /* 塗り面。明暗を入れ替える。地だけ明るくすると白文字が飛ぶので、中の文字も一緒に返す */
+  ::-moz-selection,
+  ::selection,
+  .skip-link,
+  .share-copied,
+  .tag-list-link:hover,
+  .tag-list-link:focus,
+  .post-list-rank-high {
+    background: var(--ink-strong);
+    color: var(--surface-base);
+  }
+  .tag-list-link:hover,
+  .tag-list-link:focus {
+    border-color: var(--ink-strong);
+  }
+  /* 著者の頭文字の丸は装飾（aria-hidden）で、押す対象でも所在の印でもない。
+     白地の濃い丸をそのまま明暗反転すると、明るい面は膨張して見えるぶん
+     暗地では浮く。面は一段上げるだけにして、文字で読ませる */
+  .author-box-initial {
+    background: var(--rule-strong);
+    color: var(--ink-strong);
+  }
+  /* 表ヘッダの中のインラインコードは code-bg() がビルド時に計算するのでテーマに
+     追従しない。暗い側の地から同じ関係（一段濃い）を作り直す */
+  .article-entry th code {
+    background: code-bg(dark-surface-tint);
+  }
+  /* 差し色として置いた文字・記号。暗い地では 1.12 で沈む */
+  .headerlink,
+  .headerlink:visited,
+  .headerlink:hover,
+  .headerlink:focus,
+  .share-count,
+  .author-box-name,
+  .author-box-name:focus,
+  .tab-hint,
+  .page-404 .number {
+    color: var(--ink-strong);
+  }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    dark-tokens();
+    dark-parts();
+  }
+}
+:root[data-theme='dark'] {
+  dark-tokens();
+  dark-parts();
 }
 
 /* General body settings */
@@ -451,31 +607,29 @@ Header and header elements
   font-weight: 700;
   color: var(--ink-mute);
 }
-/* カテゴリの群の名前 (#2908)。素の12pxでは18行の並びの中に埋もれるので枠で囲む。
-   タグのチップ（ピル型・薄い地）と取り違えられないよう、角は radius-small の
-   四角のままで地は敷かない。「押せば絞り込める」と読まれる形を避ける (#2892) */
+/* カテゴリの群の名前 (#2908)。素の文字で、行き先である行より弱く置く
+   （添えの段。太字にもしない）。**群を表す手はその場所で1つだけ持つ。**
+   サイドバーは下の縦罫が範囲を示すので、ラベル自身は印を持たない */
 .category-group-label {
-  display: inline-block;
+  display: block;
   margin: 0 0 space-step;
+  font-size: text-meta;
+  line-height: leading-row;
+  color: var(--ink-mute);
+}
+/* ドロップダウンだけは枠を持つ。2列の多段組で左の余白が無く、縦罫を引く場所が
+   無いので、印はラベル自身が持つしかない。行にはアイコンがあるため、
+   ここで素の文字にすると子のほうが手厚く見える。
+   枠はタグのチップ（ピル型・薄い地）と取り違えられないよう、角は radius-small の
+   四角のままで地は敷かない。幅は文字ちょうどに留める
+   （列幅いっぱいに伸ばすと同じ幅のボタンの列に見える）。
+   枠の中の文字は行のアイコンの頭（.header-dropdown-item の左 12px）に揃える */
+.header-dropdown-group .category-group-label {
+  width: fit-content;
+  margin-left: (space-step * 3) - chip-pad-x - 1px;
   padding: 2px (space-step * 2);
   border: 1px solid var(--rule-base);
   border-radius: radius-small;
-  font-size: text-meta;
-  line-height: leading-row;
-  font-weight: 700;
-  color: var(--ink-strong);
-}
-/* 枠の中の文字を、行のアイコンの頭（.header-dropdown-item の左 12px）に揃える。
-   枠1px と左パディングのぶんだけ枠を左へ出す */
-.header-dropdown-group .category-group-label {
-  margin-left: (space-step * 3) - chip-pad-x - 1px;
-}
-/* 群と群の間だけ空ける。最初の群は枠の見出し（h2「カテゴリー」）の直下に付く */
-.widget > .category-group-label {
-  margin-top: (space-step * 4);
-}
-.widget > .category-group-label:first-child {
-  margin-top: 0;
 }
 /* カテゴリ・連載の行。リソース / アクティビティの行と違って説明を持たない。
    名前が主題そのもので、6行並ぶので太字にもしない（検索パネルのカテゴリ行を
@@ -489,10 +643,16 @@ Header and header elements
      2列のときは左右の行がずれる */
   white-space: nowrap;
 }
-/* 右肩の件数は「総数」の意味 (#2129)。押す対象ではない添えなので薄い段に置く */
-.header-dropdown-count {
+/* 右肩の件数は「総数」の意味 (#2129)。押す対象ではない添えなので薄い段に置く。
+   ドロップダウンとサイドバーで同じ数字なので、同じ形にする。
+   **8px は段の外**（font_size_lint.mjs の EXEMPT）。行の主題は名前で、数字は
+   選ぶ判断には効かない。段のいちばん下（text-meta 12px）でも 13px の名前と
+   1px しか違わず、名前の一部に見える。タグのチップの件数（0.5em = 6.5px）が
+   同じ役で既に段の外にあり、そちらに寄せた値 */
+.header-dropdown-count,
+.sidebar-count {
   margin-left: space-step;
-  font-size: text-meta;
+  font-size: 8px;
   font-weight: normal;
   color: var(--ink-faint);
 }
@@ -548,7 +708,7 @@ Header and header elements
   left: 0;
   right: 0;
   height: 100vh;
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--backdrop);
   backdrop-filter: blur(8px);
 }
 /* 引き出しの引き金。992px 以上では要らないので display: none で消す
@@ -2005,9 +2165,17 @@ body {
   font-size: text-meta;
 }
 /* 種別が混ざる回だけ、全件導線がパネルの中に入る (#2892)。p の既定の下マージンは
-   カードの底に空きを作るだけなので落とす */
+   カードの底に空きを作るだけなので落とす。
+   **カードの中では 12px。** 名札・メタと同じ従属テキストの段に揃える。
+   14px のままだと 12 → 15.6 → 12 → 14 と大きさが上がり直し、いちばん弱い情報が
+   従属テキストより大きくなる。単独の行として置く導線（サイドバー・記事末）は
+   14px のままで、「行として並ぶもの」の段（#2893）は外の文脈で保つ。
+   上の空きを 16px 取るのは、8px だと名札→タイトル（6px）・タイトル→メタ（4px）と
+   近く、メタの続きに見えるため */
 .series-panel .more-link {
+  margin-top: 16px;
   margin-bottom: 0;
+  font-size: text-meta;
 }
 /* 反響のハートは日付の右に少し離して置く */
 .panel-meta .snscount {
@@ -2325,7 +2493,7 @@ table {
   background-color: var(--surface-base); // :::info の中で背景が塗りつぶされるため
 }
 th, td {
-  border: solid 1px table-border;
+  border: solid 1px var(--table-border);
   padding: 8px 10px;
 }
 th {
@@ -2727,23 +2895,15 @@ ul.tag-list {
   color: var(--ink-strong);
   text-decoration: underline;
 }
+/* サイドバーのカテゴリと連載は同じ形の行なので、1つのルールで持つ。
+   左が 9px なのは、下のタグのチップ（枠1px + 左パディング8px）に頭を揃えるため。
+   カテゴリ側のアイコンの位置（1em + 0.3em で 16.9px）まで下げると、
+   狭い列で折り返す行が増える (#2892) */
 .sidebar-categories li a,
 .sidebar-series-list li a {
-  padding: 10px 0;
+  padding: 10px 0 10px chip-pad-x + 1px;
   border-bottom: 1px solid var(--rule-weak);
   color: var(--ink-strong);
-}
-/* 連載の行はアイコンを持たないので、そのままだと文字が上下の枠より左に出る
-   （カテゴリの文字はアイコン 1em + 0.3em で 16.9px、タグの文字はチップの枠1px +
-   左パディング8px で 9px から始まる）。下のタグ側に合わせるのは、カテゴリ側の
-   16.9px まで下げると狭い列で折り返す行が増えるため (#2892) */
-.sidebar-series-list li a {
-  padding-left: chip-pad-x + 1px;
-}
-/* カテゴリの行も同じ位置から始める (#2908)。群のラベルが枠を持つので、
-   その中の文字（枠1px + 左パディング）とアイコンの頭を揃える */
-.sidebar-categories li a {
-  padding-left: chip-pad-x + 1px;
 }
 /* Blog Item */
 .blog-item .blog-item-img {
@@ -3223,7 +3383,7 @@ ul.tag-list {
 }
 .gallery-ledger > li {
   padding: 6px 0;
-  border-bottom: 1px solid rule-weak;
+  border-bottom: 1px solid var(--rule-weak);
 }
 .gallery-note {
   display: block;
@@ -3247,7 +3407,7 @@ ul.tag-list {
 .gallery-item {
   margin: 16px 0 32px;
   padding: 16px;
-  border: 1px solid rule-base;
+  border: 1px solid var(--rule-base);
   border-radius: card-radius;
 }
 /* アイコン・メダルのように小さい見本を敷き詰める */
@@ -4247,7 +4407,7 @@ a.series-nav-item:hover .series-nav-item-title {
   gap: 4px;
   padding: 3px 10px 3px 8px;
   border-radius: 999px;
-  background: rgba(255,255,255,0.75);
+  background: var(--award-medal-bg);
   font-size: text-meta;
   font-weight: bold;
   color: var(--award-gold-on-tint);
@@ -4781,6 +4941,47 @@ a.award-badge:focus {
   line-height: leading-row;
   vertical-align: middle;
 }
+/* bootstrap-subset の .card は地と枠を直接持っている (#2746)。連載ナビのパネルや
+   著者紹介がこれを継ぐので、面と罫線のトークンで上書きしてテーマに追従させる。
+   枠は rgba(0,0,0,.125) の半透明の黒で、暗い地では黒い輪になって残る */
+.card {
+  background-color: var(--surface-base);
+  border-color: var(--rule-base);
+}
+
+/* 明暗の切り替え (#2746)。帯の中のアイコンだけのボタンなので、形は検索の虫眼鏡
+   （.header-search-open）と同じ規格にそろえる。帯の中は下線で反応しないので、
+   hover は文字色を一段濃くするだけ */
+.header-theme {
+  display: flex;
+  align-items: center;
+  flex: none;
+  margin: 0;
+  padding: space-step;
+  border: 0;
+  background: none;
+  color: var(--ink-mute);
+  cursor: pointer;
+  /* .svg-icon が 1em なので、これは文字ではなくアイコンの実寸。段の外 */
+  font-size: 20px;
+}
+.header-theme:hover,
+.header-theme:focus {
+  color: var(--ink-strong);
+}
+/* 3つの状態のうち1つだけを出す。**出し分けは CSS が持つ**ので、描画時に JS を待たない。
+   読み上げ名も同じ規則で切り替わる（各 span が sr-only の名前を連れている） */
+.header-theme-auto,
+.header-theme-light,
+.header-theme-dark {
+  display: none;
+}
+:root:not([data-theme]) .header-theme-auto,
+:root[data-theme='light'] .header-theme-light,
+:root[data-theme='dark'] .header-theme-dark {
+  display: flex;
+}
+
 /* ヘッダーの右端のサイト内検索 (#2399)。サイドバーから昇格し、全ページで同じ位置に出す。
    枠を持つのはフォーム1つだけで、中の入力欄と送信ボタンは地も枠も持たない。
    反応もフォームの側だけに置く（1部品1反応・外側優先 #2686）。
@@ -5022,7 +5223,8 @@ a.award-badge:focus {
 /* 全件への導線（#2304 / #2893）。ホームの連載・特設の枠、サイドバーの人気のタグ、
    記事末の連載ナビと著者紹介で共用する。ヘッダーのドロップダウンの
    「連載の一覧を見る」（.header-dropdown-more）と同じ役なので、色も同じ ink-mute。
-   14px は「行として並ぶもの」の段で、添えのメタ（.panel-meta 11.7px）と分ける */
+   14px は「行として並ぶもの」の段で、単独の行として置くときの値。
+   カードの中に入る回だけ従属テキストの段に落とす（.series-panel .more-link）*/
 .more-link {
   text-align: right;
   font-size: text-row;
@@ -5143,30 +5345,18 @@ pre.mermaid,
   overflow: visible;
 }
 
-/* ::: note の種別。持たせるのは色だけで、寸法は .note-container が1箇所で決める。
-   以前は両方が padding / margin / border-radius を宣言しており、同じ詳細度の
-   後勝ちで .note-container 側だけが効いていた。読んでも効いている値が分からない
-   状態で、CLAUDE.md の「1つの要素のサイズは1箇所でしか決めない」に反していた (#2486)
-
-   tip の地は以前 #8E96AA24 と透過色だったが、他の3つに合わせて不透明にした。
-   白地に載せた実効値と同じなので見た目は変わらない。透過のままだと、ここから
-   色を導くたびに合成計算が要る（#2482 でその合成を誤って1段濃い色を算出した） */
-note-tip-bg = #eff0f3
-note-info-bg = #e5f8e2
-note-warn-bg = #fdf9e2
-note-alert-bg = #ffdbdb
 
 .note-container.note-tip {
-  background: note-tip-bg;
+  background: var(--note-tip-bg);
 }
 .note-container.note-info {
-  background: note-info-bg;
+  background: var(--note-info-bg);
 }
 .note-container.note-warn {
-  background: note-warn-bg;
+  background: var(--note-warn-bg);
 }
 .note-container.note-alert {
-  background: note-alert-bg;
+  background: var(--note-alert-bg);
 }
 
 /* 左右非対称（左16 / 右24）で、下は 0.2rem = 3px しか無かった。
@@ -5293,16 +5483,16 @@ note-alert-bg = #ffdbdb
 /* tip の地だけ透過色（rgba(142,150,170,0.141)）なので、白地に載せた
    実効値 #eff0f3 から導く */
 .article-entry .note-container.note-tip :not(pre) > code {
-  background: code-bg(note-tip-bg);
+  background: var(--note-tip-code);
 }
 .article-entry .note-container.note-info :not(pre) > code {
-  background: code-bg(note-info-bg);
+  background: var(--note-info-code);
 }
 .article-entry .note-container.note-warn :not(pre) > code {
-  background: code-bg(note-warn-bg);
+  background: var(--note-warn-code);
 }
 .article-entry .note-container.note-alert :not(pre) > code {
-  background: code-bg(note-alert-bg);
+  background: var(--note-alert-code);
 }
 
 /* note の中のテーブル (#2520)。table は全体で background-color: white を
@@ -5325,16 +5515,16 @@ note-alert-bg = #ffdbdb
   background-color: transparent;
 }
 .article-entry .note-container.note-tip th {
-  background-color: code-bg(note-tip-bg);
+  background-color: var(--note-tip-code);
 }
 .article-entry .note-container.note-info th {
-  background-color: code-bg(note-info-bg);
+  background-color: var(--note-info-code);
 }
 .article-entry .note-container.note-warn th {
-  background-color: code-bg(note-warn-bg);
+  background-color: var(--note-warn-code);
 }
 .article-entry .note-container.note-alert th {
-  background-color: code-bg(note-alert-bg);
+  background-color: var(--note-alert-code);
 }
 
 /* note の中のリンクは一段暗い青にする。地を濃くした分、本文色（ink-strong）は
@@ -5619,6 +5809,47 @@ sg-link-on-note = {
 }
 sg-note-grounds = note-tip-bg note-info-bg note-warn-bg note-alert-bg
 
+// ダークモードの段 (#3012)。値は明るい側と別物なので、同じ表に混ぜず別の節で出す。
+// 比の地は dark-surface-base（ページの地）。明るい側が白地で測っているのと同じ関係
+sg-dark = {
+  'dark-ink-strong': dark-ink-strong,
+  'dark-ink-mute': dark-ink-mute,
+  'dark-ink-faint': dark-ink-faint,
+  'dark-rule-base': dark-rule-base,
+  'dark-rule-weak': dark-rule-weak,
+  'dark-rule-strong': dark-rule-strong,
+  'dark-surface-base': dark-surface-base,
+  'dark-surface-tint': dark-surface-tint,
+  'dark-surface-mute': dark-surface-mute,
+  'dark-navy': dark-navy,
+}
+// リンクは地が3種類あるので、明るい側と同じく分けて測る
+sg-dark-link = {
+  'dark-link-blue': dark-link-blue,
+  'dark-link-visited': dark-link-visited,
+}
+sg-dark-link-on-tint = {
+  'dark-link-on-tint': dark-link-on-tint,
+}
+sg-dark-link-on-note = {
+  'dark-link-on-note': dark-link-on-note,
+  'dark-link-on-note-visited': dark-link-on-note-visited,
+}
+sg-dark-note = {
+  'dark-note-tip-bg': dark-note-tip-bg,
+  'dark-note-info-bg': dark-note-info-bg,
+  'dark-note-warn-bg': dark-note-warn-bg,
+  'dark-note-alert-bg': dark-note-alert-bg,
+}
+sg-dark-award = {
+  'dark-award-card-from': dark-award-card-from,
+  'dark-award-card-to': dark-award-card-to,
+  'dark-award-card-rule': dark-award-card-rule,
+  'dark-award-gold-on-tint': dark-award-gold-on-tint,
+  'dark-award-bronze': dark-award-bronze,
+}
+sg-dark-note-grounds = dark-note-tip-bg dark-note-info-bg dark-note-warn-bg dark-note-alert-bg
+
 sg-swatches(sg-on-white)
 sg-swatches(sg-on-navy)
 sg-swatches(sg-no-ratio)
@@ -5630,6 +5861,19 @@ sg-ratios(sg-on-navy, brand-navy)
 sg-ratios(sg-link-on-white, #fff)
 sg-ratios(sg-link-on-tint, surface-mute)
 sg-ratios-min(sg-link-on-note, sg-note-grounds)
+
+sg-swatches(sg-dark)
+sg-swatches(sg-dark-link)
+sg-swatches(sg-dark-link-on-tint)
+sg-swatches(sg-dark-link-on-note)
+sg-swatches(sg-dark-note)
+sg-swatches(sg-dark-award)
+sg-ratios(sg-dark, dark-surface-base)
+sg-ratios(sg-dark-link, dark-surface-base)
+sg-ratios(sg-dark-link-on-tint, dark-surface-mute)
+sg-ratios-min(sg-dark-link-on-note, sg-dark-note-grounds)
+sg-ratios(sg-dark-note, dark-surface-base)
+sg-ratios(sg-dark-award, dark-surface-base)
 
 /* トークンの一覧は素の表で組む。見本・16進数・比だけがこの3つのクラスで、
    変数名と用途は文章なので Markdown 側が持つ */
@@ -5655,6 +5899,18 @@ sg-ratios-min(sg-link-on-note, sg-note-grounds)
 }
 .sg-chip-ground .sg-chip {
   border-color: var(--rule-on-dark);
+}
+/* ダークの段の見本はページの地の上に置く。白地の見本と並べたときに
+   「どの地での色か」が見本そのもので分かる (#3012) */
+.sg-chip-ground-dark {
+  background: dark-surface-base;
+  border-radius: radius-small;
+  display: block;
+  padding: 4px;
+  width: 32px;
+}
+.sg-chip-ground-dark .sg-chip {
+  border-color: dark-rule-base;
 }
 /* リンクの段は地の上に置く。白地の見本と並べたときに「どの地での色か」が
    見本そのもので分かる (#2860)。alert を使うのは note の4色でいちばん厳しい地 */

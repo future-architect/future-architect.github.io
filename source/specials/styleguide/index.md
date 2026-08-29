@@ -63,7 +63,11 @@ layout: page
 | <span class="sg-chip-ground sg-chip-note"><span class="sg-chip sg-link-on-note"></span></span> | `link-on-note` | <span class="sg-hex sg-link-on-note"></span> | note の4色 | <span class="sg-ratio sg-link-on-note"></span> | note の中のリンク |
 | <span class="sg-chip-ground sg-chip-note"><span class="sg-chip sg-link-on-note-visited"></span></span> | `link-on-note-visited` | <span class="sg-hex sg-link-on-note-visited"></span> | note の4色 | <span class="sg-ratio sg-link-on-note-visited"></span> | note の中の訪問済み |
 
-**青は読み物の中のリンクの色です。** レイアウトの導線（「すべての連載を見る」のような全件への行き先、パンくず、日付、著者名）には青を使わず、文字のスケールの `ink-mute` に置いて、反応で `ink-strong` に1段階濃くします。同じページで本文のリンクと導線が同じ青だと、どちらが読み物の続きなのかが見分けられません。
+**青は読み物の中のリンクの色です。** レイアウトの導線（「連載一覧へ」のような全件への行き先、パンくず、日付、著者名）には青を使わず、文字のスケールの `ink-mute` に置いて、反応で `ink-strong` に1段階濃くします。同じページで本文のリンクと導線が同じ青だと、どちらが読み物の続きなのかが見分けられません。
+
+**全件への行き先には末尾に `>` を置きます。** 色を青から `ink-mute` に落としたぶん、静止した状態ではリンクだと分かる手がかりが色から消えます。文言（「◯◯一覧へ」）と記号の2つで行き先を名乗り、反応では下線が付きます。記号を使うのはこの導線だけで、装飾として他の場所には置きません。
+
+大きさは置かれ方で決まります。**単独の行として置くとき**（サイドバー・記事の末尾）は「行として並ぶもの」のスケール、**カードの中に入るとき**（トップページの特集）はカードの名札や説明と同じ添えのスケールです。カードの中でいちばん弱い情報が、その上の説明より大きくなると、まとまりが崩れて見えます。
 
 ### ブランド色
 
@@ -94,12 +98,71 @@ layout: page
 
 **差し色は役割で分けます。** `brand-crimson` は暗い背景で 3.06 しかなく線や記号として見えないので、そこには1段階明るい `crimson-on-dark` を使います。逆に塗り面は `brand-crimson` のままです（白文字で 5.35。明るい方は 4.51 で余裕がありません）。暗い背景で「読める差し色」と「白文字を載せられる差し色」は同時に成立しません。
 
+### ダークモードのスケール
+
+表示テーマは3つあります。**端末の設定に従う**のが既定で、ヘッダーのボタンで**明るい**・**暗い**を選べます。2つの切り替えにすると「端末は暗いがこのサイトは明るく読みたい」を表せず、そこから端末の設定へ戻る道も無くなるため、3つ持っています。
+
+暗いほうのスケールは、明るいほうと**同じ役割の並び**を別の値で作ったものです。背景は色味を持たせず無彩色に寄せています。上の「暗い背景の上のスケール」はフッターのネイビー背景の上でだけ使うもので、彩度があるぶんページ全体の背景には重すぎます。
+
+比はページの背景（`dark-surface-base`）に対する値です。
+
+| <span class="sr-only">見本</span> | 変数 | 値 | 背景との比 | 使うところ |
+| --- | --- | --- | --- | --- |
+| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-ink-strong"></span></span> | `ink-strong` | <span class="sg-hex sg-dark-ink-strong"></span> | <span class="sg-ratio sg-dark-ink-strong"></span> | 本文・見出し・リンク |
+| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-ink-mute"></span></span> | `ink-mute` | <span class="sg-hex sg-dark-ink-mute"></span> | <span class="sg-ratio sg-dark-ink-mute"></span> | 補助情報（日付・著者・タグ・件数・注記） |
+| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-ink-faint"></span></span> | `ink-faint` | <span class="sg-hex sg-dark-ink-faint"></span> | <span class="sg-ratio sg-dark-ink-faint"></span> | 空表示・無効と、補助情報の中でさらに弱くする記号 |
+| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-rule-base"></span></span> | `rule-base` | <span class="sg-hex sg-dark-rule-base"></span> | <span class="sg-ratio sg-dark-rule-base"></span> | 枠。カード・チップ・箱・画像枠 |
+| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-rule-weak"></span></span> | `rule-weak` | <span class="sg-hex sg-dark-rule-weak"></span> | <span class="sg-ratio sg-dark-rule-weak"></span> | 区切り。見出しの下・リストの行間 |
+| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-rule-strong"></span></span> | `rule-strong` | <span class="sg-hex sg-dark-rule-strong"></span> | <span class="sg-ratio sg-dark-rule-strong"></span> | 地を持たない部品の枠と、focus / hover でひとつ強めるところ |
+| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-surface-base"></span></span> | `surface-base` | <span class="sg-hex sg-dark-surface-base"></span> | <span class="sg-ratio sg-dark-surface-base"></span> | ページと部品の背景 |
+| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-surface-tint"></span></span> | `surface-tint` | <span class="sg-hex sg-dark-surface-tint"></span> | <span class="sg-ratio sg-dark-surface-tint"></span> | 静止した面 |
+| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-surface-mute"></span></span> | `surface-mute` | <span class="sg-hex sg-dark-surface-mute"></span> | <span class="sg-ratio sg-dark-surface-mute"></span> | 反応した面・インラインコードの背景 |
+| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-navy"></span></span> | `brand-navy` | <span class="sg-hex sg-dark-navy"></span> | <span class="sg-ratio sg-dark-navy"></span> | フッターの帯 |
+
+**`ink-faint` は明るいほうと同じく「AA を満たす最も薄い段階」です。** 上の表の比はページの背景に対する値ですが、実際にいちばん厳しいのはインラインコードの背景で、そこでも AA を満たす値にしています。これより薄くしません。
+
+**ブランドのネイビーは、暗い背景では背景とほとんど見分けが付きません。** 面に使っても線に使っても消えるので、フッターの帯は1段階暗い値にして色味だけ残し、選択中のページ・選択中のタブの上辺・共有ボタン・タグの hover・フォーカスリングは明るい線と明るい塗りに置き換えています。
+
+**同じコントラスト比でも、明るい面は暗い面より膨らんで見えます。** 白背景の濃い丸をそのまま反転すると暗い背景では浮きます。同じ強さを移すのではなく、その部品が担う役割から決めます。所在や反応の印は明るいまま、装飾は1段階落とします。
+
+#### リンク
+
+背景が3種類あるので、明るいほうと同じく分けて測ります。
+
+| <span class="sr-only">見本</span> | 変数 | 値 | 比 | 背景 |
+| --- | --- | --- | --- | --- |
+| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-link-blue"></span></span> | `link-blue` | <span class="sg-hex sg-dark-link-blue"></span> | <span class="sg-ratio sg-dark-link-blue"></span> | ページの背景 |
+| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-link-visited"></span></span> | `link-visited` | <span class="sg-hex sg-dark-link-visited"></span> | <span class="sg-ratio sg-dark-link-visited"></span> | ページの背景（訪問済み） |
+| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-link-on-tint"></span></span> | `link-on-tint` | <span class="sg-hex sg-dark-link-on-tint"></span> | <span class="sg-ratio sg-dark-link-on-tint"></span> | インラインコードの背景 |
+| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-link-on-note"></span></span> | `link-on-note` | <span class="sg-hex sg-dark-link-on-note"></span> | <span class="sg-ratio sg-dark-link-on-note"></span> | note の4色（いちばん厳しい背景） |
+| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-link-on-note-visited"></span></span> | `link-on-note-visited` | <span class="sg-hex sg-dark-link-on-note-visited"></span> | <span class="sg-ratio sg-dark-link-on-note-visited"></span> | note の4色（訪問済み） |
+
+#### 背景に色が付いた面
+
+**背景だけ明るいまま残すと、中の文字がテーマ側に付いていって沈みます。** note の4色と表彰の淡い金は、背景ごと暗くしています。ページの背景との差は、面のスケールより1段階上に取っています。上の表の `surface-mute` と見比べると、帯として1つの塊に見える程度に離れているのが分かります。
+
+| <span class="sr-only">見本</span> | 変数 | 値 | 背景との差 | 使うところ |
+| --- | --- | --- | --- | --- |
+| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-note-tip-bg"></span></span> | `note-tip-bg` | <span class="sg-hex sg-dark-note-tip-bg"></span> | <span class="sg-ratio sg-dark-note-tip-bg"></span> | note tip |
+| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-note-info-bg"></span></span> | `note-info-bg` | <span class="sg-hex sg-dark-note-info-bg"></span> | <span class="sg-ratio sg-dark-note-info-bg"></span> | note info |
+| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-note-warn-bg"></span></span> | `note-warn-bg` | <span class="sg-hex sg-dark-note-warn-bg"></span> | <span class="sg-ratio sg-dark-note-warn-bg"></span> | note warn |
+| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-note-alert-bg"></span></span> | `note-alert-bg` | <span class="sg-hex sg-dark-note-alert-bg"></span> | <span class="sg-ratio sg-dark-note-alert-bg"></span> | note alert |
+| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-award-card-from"></span></span> | `award-card-from` | <span class="sg-hex sg-dark-award-card-from"></span> | <span class="sg-ratio sg-dark-award-card-from"></span> | 殿堂カードのグラデーション（明るいほうの端） |
+| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-award-card-to"></span></span> | `award-card-to` | <span class="sg-hex sg-dark-award-card-to"></span> | <span class="sg-ratio sg-dark-award-card-to"></span> | 同（暗いほうの端） |
+| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-award-card-rule"></span></span> | `award-card-rule` | <span class="sg-hex sg-dark-award-card-rule"></span> | <span class="sg-ratio sg-dark-award-card-rule"></span> | 同・枠 |
+| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-award-gold-on-tint"></span></span> | `award-gold-on-tint` | <span class="sg-hex sg-dark-award-gold-on-tint"></span> | <span class="sg-ratio sg-dark-award-gold-on-tint"></span> | 淡い金の上の金 |
+| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-award-bronze"></span></span> | `award-bronze` | <span class="sg-hex sg-dark-award-bronze"></span> | <span class="sg-ratio sg-dark-award-bronze"></span> | 2回目のメダル |
+
+**「背景より1段階濃い」は、暗い背景では「1段階明るい」になります。** note の中のインラインコードと表の見出しは、明るいほうでは背景から計算して1段階濃くしていますが、暗いほうは持ち上げる向きが逆になるので値を直接持っています。
+
 ### トークンにない色
 
 上のスケールの外に残っている色は2種類で、**どちらも役割があって残しているもの**です。
 
 - **note の4色** — 色相を持つ背景。中のインラインコードの背景は、その背景より1段階濃い同じ色になります
 - **表彰・殿堂の淡金** — メダルは灰→銅→金、殿堂のカードは淡金。ブランド色は表彰に広げません
+
+どちらもテーマで入れ替わります（上のダークモードのスケールを参照）。
 
 `ink` / `rule` / `surface` の**スケールの外にある色はありません**。**段階と数しか違わない色を別の役割として置くと、どちらを使うかの判断ができなくなります。** 新しい色を入れるときは、まず近い段階との差を見て寄せられないかを確かめます。
 
