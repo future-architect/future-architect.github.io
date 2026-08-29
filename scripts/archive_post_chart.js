@@ -121,36 +121,3 @@ hexo.extend.helper.register('posts_year_overlay_series', function () {
     selected,
   });
 });
-
-// 積み上げの内訳データ。年ページは月の棒を週で、全期間は四半期の棒を月で割る。
-//
-// 年ページの週は「その月の何日目か」で決める（1〜7日 = 第1週）。ISO週にすると
-// 月をまたぐ週が出て、棒の合計が月の投稿数と合わなくなる
-hexo.extend.helper.register('posts_stack_series', function (year) {
-  const buckets = generatePostsSeries(this.site.posts, year).map((e) => e.groupKey);
-  const index = new Map(buckets.map((b, i) => [b, i]));
-
-  const quarterOf = (date) =>
-    `${date.format('YYYY')}年${Math.ceil(Number(date.format('MM')) / 3)}Q`;
-  const slotCount = year ? 5 : 3;
-  const labels = year
-    ? Array.from({ length: 5 }, (_, i) => `第${i + 1}週`)
-    : ['1か月目', '2か月目', '3か月目'];
-
-  const slots = Array.from({ length: slotCount }, () => buckets.map(() => 0));
-  const target = year
-    ? this.site.posts.filter((post) => post.date.format('YYYY') === year.toString())
-    : this.site.posts;
-
-  target.forEach((post) => {
-    const key = year ? post.date.format('M月') : quarterOf(post.date);
-    const i = index.get(key);
-    if (i === undefined) return;
-    const slot = year
-      ? Math.min(slotCount, Math.ceil(Number(post.date.format('D')) / 7)) - 1
-      : (Number(post.date.format('MM')) - 1) % 3;
-    slots[slot][i]++;
-  });
-
-  return JSON.stringify({ buckets, labels, slots });
-});

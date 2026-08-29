@@ -21,10 +21,17 @@ const LINE_ACCENT = '#d5004a';
 // 著者の推移は「継続・再開・新規・常連（線）」の順に並べる。
 // 2色しか使わないタグの定着は、淡い端ではなくグレーの一番濃い段を取る
 // （段を飛ばすと相手が無いので、薄い側が弱いだけになる）
+// カテゴリの群（#2908）。**濃淡にしない。** 5つの群は読者にとって対等で、
+// 並びも本数から出していないので、段にすると無い順序を表してしまう。
+// **カテゴリの18色とも別の組にする。** 群はカテゴリではないので、同じ色が
+// 別の意味を持つのを避ける (#2767)。順は category_groups.yml のキーの順
+const CATEGORY_GROUPS = ['#4269d0', '#efb118', '#ff725c', '#6cc5b0', '#3ca951'];
+
 const PALETTES = {
   weeks: NAVY_STEPS,
   retention: [NAVY_STEPS[0], NAVY_STEPS[2]],
   author_types: [NAVY_STEPS[0], NAVY_STEPS[1], NAVY_STEPS[2], LINE_ACCENT],
+  category_groups: CATEGORY_GROUPS,
 };
 
 hexo.extend.helper.register('chart_series_colors', function (kind) {
