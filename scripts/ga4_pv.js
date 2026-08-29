@@ -76,13 +76,18 @@ hexo.extend.helper.register('popular_series', function (limit = 6, minPosts = 3)
     const years = (now - post.date.valueOf()) / YEAR;
     return getGA4PV('/' + post.path) / (1 + years * years);
   };
+  // **足したあと √本数 で割る。** 単純な合計だと本数がそのまま効き、27本の
+  // 「春の入門祭り2025」のような大型連載が上位を占める。本数が多い連載は
+  // 実際に盛り上がっているので有利のままにしたいが、効きは弱めたい。
+  // √で割ると効きが指数の半分（N から √N）になり、27本と6本の差は
+  // 4.5倍から2.1倍に縮む。平均にすると本数の効きが完全に消えるので採らない
   const series = allSeries(this.site)
     .map((s) => ({
       name: s.name,
       path: s.index.path,
       total: s.total,
       pv: s.posts.reduce((sum, p) => sum + getGA4PV('/' + p.path), 0),
-      score: s.posts.reduce((sum, p) => sum + score(p), 0),
+      score: s.posts.reduce((sum, p) => sum + score(p), 0) / Math.sqrt(s.total),
     }))
     .filter((s) => s.total >= minPosts && s.score > 0)
     // 同点は名前で決める（決着が無いとビルドごとに並びが変わる）
