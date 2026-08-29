@@ -1380,6 +1380,15 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
     `theme-styles.styl` と `highlight.styl` の両方に書く必要は残る（詳細度の都合）が、
     値を1箇所から引くので**揃っていることを説明するコメントが要らなくなった**。
     値の重複を消せば主張も消える、という形の例
+- **Stylus は未定義の変数をエラーにせず、名前をそのまま値として出力する。**
+  CSS 側では無効な値なので、その宣言が（一括指定なら丸ごと）捨てられる。
+  **画面を見るまで気づけない壊れ方**で、2回踏んでいる
+  - `:root { --table-border: table-border }` … 表の枠が全ページで消えた（#2746）
+  - `.footer-link { transition: hover-speed }` … #2753
+  - 原因はいつも同じで、**変数の定義が使う場所より後ろにある**こと。
+    `_variables.styl` は `theme-styles.styl` の先頭で読むので、そこに置けば起きない
+  - **再発は `css_lint.mjs` が止める**（`make lint-css`、PR では `css` ワークフロー）。
+    コンパイル後の CSS を見て、カスタムプロパティの値が裸の識別子になっていないかを検査する
 - **色は `_variables.styl` が値を持ち、`:root` が CSS 変数として配り、使う側は `var()` で引く**
   （#2746。ダークモードの前段）。3つの役を分ける
   - **値は Stylus 変数のまま置く。`:root` にだけ書かない。** CSS カスタムプロパティは
