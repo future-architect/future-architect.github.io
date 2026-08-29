@@ -866,7 +866,7 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
       「リソース」「アクティビティ」は**手で選んだページ3件**＋説明文1行。
       「カテゴリ」は **`/categories/` と同じ全件**（`category_groups()` の群と並び）で、
       18件を5つの群に束ねて2列に並べる。「連載」は
-      **`recent_popular_series(6)` の6件**。どちらも説明は持たず名前だけで、
+      **`popular_series(6)` の6件**。どちらも説明は持たず名前だけで、
       カテゴリだけ累計本数を添える。名前が主題そのものだからで、
       カテゴリの一言説明は `source/_data/categories.yml` を読む個別ページが持つ
     - **全件でないことはラベルが名乗り、条件は `title` が持つ**（#2670）。
