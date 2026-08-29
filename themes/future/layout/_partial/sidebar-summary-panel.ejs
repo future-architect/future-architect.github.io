@@ -1,0 +1,37 @@
+<%# サイドバーの統計の枠。個別ページ（sidebar-stats）と一覧ページ
+    （sidebar-stats-index）が同じ規則で描くために、ここが1箇所で持つ。
+    total は必須、recent は「累計 / 直近1年」の対を持つページだけ渡す。
+
+    **内訳が0の行は出さない** (#2911)。Pocket はサービス終了済みで、これから増える
+    ことが無い。終了後の記事だけで構成されるタグ・著者では、ずっと「0 Pocket」が並ぶ。
+    Facebook も1以上あるのは1,491件中93件だけで事情は同じ。
+    主要な行（投稿・著者数・総シェア数）は0でも出す。そこが空くと数字の枠が
+    何を数えているのか読めなくなる %>
+<% const panelTotal = total.filter(function(r){ return !r.sub || r.value; }); %>
+<% const panelRecent = (typeof recent === 'undefined' ? null : recent); %>
+<% const panelRecentRows = panelRecent ? panelRecent.filter(function(r){ return !r.sub || r.value; }) : null; %>
+<%# 数字の桁数が違うとラベルの開始位置がずれる（実測で最大31px）(#3004)。
+    いちばん桁数の多い値に合わせた幅を配り、数字はその中で右寄せにする。
+    2つの組で同じ幅を使うので、組をまたいでも数字の右端とラベルの左端がそろう %>
+<% const panelWidth = Math.max.apply(null, panelTotal.concat(panelRecentRows || []).map(function(r){ return String(r.value).length; })); %>
+<%# 枠は1つで、中に組を積む。同じページについての数字なので分ける理由が無く、
+    枠を2つ置くと1つめの下辺と2つめの上辺で線が2本並ぶ。組の切れ目は間隔が作る (#2747)。
+
+    **組が1つのページではラベルを置かない。** 対になる相手が無いので
+    「累計」と名乗っても何とも対比されない %>
+<div class="summary-panels" style="--summary-count-width: <%= panelWidth %>ch">
+  <section class="summary-panel">
+    <% if (panelRecent) { %>
+    <span class="summary-panel-label">累計</span>
+    <% } %>
+    <%- partial('summary-tiles', {items: panelTotal, variant: 'row'}) %>
+    <% if (panelRecent) { %>
+    <span class="summary-panel-label">直近1年</span>
+    <% if (panelRecentRows.length) { %>
+    <%- partial('summary-tiles', {items: panelRecentRows, variant: 'row'}) %>
+    <% } else { %>
+    <p class="summary-note">投稿はありません</p>
+    <% } %>
+    <% } %>
+  </section>
+</div>
