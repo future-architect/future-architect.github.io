@@ -27,15 +27,20 @@
       {value: s.hatebu, label: 'はてブ', sub: true},
       {value: s.pocket, label: 'Pocket', sub: true},
     ];
-    // **タブを分解して縦に積む** (#2757 の2枚)。年ページは月の中の週、
-    // 全期間は年を重ねた月。同じことを全期間でやると
-    // 「10年分の月の中の第何週か」になり読み取るべき問いが無くなる
-    archiveCharts = [
-      {id: 'sidebar-chart-category', label: '投稿数（カテゴリ別）'},
-      is_year()
-        ? {id: 'sidebar-chart-period', label: '投稿数（週別）'}
-        : {id: 'sidebar-chart-years', label: '投稿数（年別）'},
-    ];
+    // 年ページは1枚だけ。**月の中の週は出さない**——月ごとの棒を第1〜5週で
+    // 割っても、週は月の区切りでしかなく読み取るべき問いが無い。
+    // 全期間は年を重ねた月を足す（#2757）。
+    //
+    // **全期間のカテゴリ別は大カテゴリ（群）で積む。** 127ヶ月 × 18系列を
+    // 285px の列に積むと、1系列あたりの帯が細くなりすぎて色が読めない。
+    // 群なら5本で、どの分野が伸びたかが帯の厚みで分かる。
+    // 年ページは12ヶ月なので18系列のままでよい
+    archiveCharts = is_year()
+      ? [{id: 'sidebar-chart-category', label: '投稿数（カテゴリ別）'}]
+      : [
+          {id: 'sidebar-chart-groups', label: '投稿数（大カテゴリ別）'},
+          {id: 'sidebar-chart-years', label: '投稿数（年別）'},
+        ];
   }
 %>
 <%- partial('sidebar-stats-index', {items: archiveItems, charts: archiveCharts}) %>
@@ -60,6 +65,10 @@
   <%# 粒度は年の指定に関わらず月 (#2432)。読み手が知りたいのは
       「どれくらいのペースで書かれているか」で、それは月の単位で見るもの %>
   const archiveCatData = <%- is_year() ? get_monthly_category_data(page.year) : get_monthly_category_data() %>;
+  <%# **月ページでも is_year() は真になる**（hexo は page.year があれば真を返す）。
+      冒頭の if / else と同じ1本の連鎖にしないと、月ページで存在しない div に
+      echarts.init が走る %>
+<% if (is_year()) { %>
   sidebarChart('sidebar-chart-category', {
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
     xAxis: {
@@ -69,6 +78,7 @@
       axisLabel: <%- partial('chart-xaxis-year-labels', {months: 'archiveCatData.months', el: 'sidebar-chart-category'}).trim() %>
     },
     yAxis: { type: 'value', min: 0 },
+    <%# 色はカテゴリ名で固定 (#2170) %>
     series: archiveCatData.series.map((s) => ({
       name: s.name,
       type: 'bar',
@@ -77,27 +87,37 @@
       data: s.data,
     })),
   });
-  <%# **月ページでも is_year() は真になる**（hexo は page.year があれば真を返す）。
-      冒頭の if / else と同じ1本の連鎖にしないと、月ページで存在しない div に
-      echarts.init が走る %>
-<% if (is_year()) { %>
-  const periodData = <%- posts_stack_series(page.year) %>;
-  sidebarChart('sidebar-chart-period', {
+<% } else { %>
+  <%# 群の所属は category_groups() が1箇所で持つ（source/_data/category_groups.yml）。
+      ここで束ね直すと、ヘッダーのドロップダウンや /categories/ と割れる %>
+  const archiveGroupDefs = <%- JSON.stringify(category_groups().map(function(g){
+        return {name: g.name, categories: g.categories.map(function(c){ return c.name; })};
+      })) %>;
+  sidebarChart('sidebar-chart-groups', {
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-    xAxis: { type: 'category', data: periodData.buckets, axisTick: { show: false } },
-    <%# 上限は echarts の自動に任せる (#2466)。手で丸めると最上段だけ間隔が変わる %>
+    xAxis: {
+      type: 'category',
+      data: archiveCatData.months,
+      axisTick: { show: false },
+      axisLabel: <%- partial('chart-xaxis-year-labels', {months: 'archiveCatData.months', el: 'sidebar-chart-groups'}).trim() %>
+    },
     yAxis: { type: 'value', min: 0 },
-    <%# 第1週→第5週と順序に意味があるので同系の段で塗る。
-        色は scripts/chart_colors.js が1箇所で持つ %>
-    color: <%- chart_series_colors('weeks') %>,
-    series: periodData.slots.map((data, i) => ({
-      name: periodData.labels[i],
+    <%# 群は対等なので濃淡ではなく色相で分ける。色は scripts/chart_style.js が
+        1箇所で持ち、順は category_groups.yml のキーの順に当たる %>
+    color: <%- chart_series_colors('category_groups') %>,
+    series: archiveGroupDefs.map((g) => ({
+      name: g.name,
       type: 'bar',
-      stack: 'posts',
-      data,
+      stack: 'groups',
+      data: archiveCatData.months.map((_, i) =>
+        archiveCatData.series.reduce(
+          (n, s) => n + (g.categories.indexOf(s.name) >= 0 ? s.data[i] || 0 : 0),
+          0,
+        ),
+      ),
     })),
   });
-<% } else { %>
+
   const yearData = <%- posts_year_overlay_series() %>;
   <%# 凡例が無いので selected（初期表示は直近3年）が効かない。そのままだと
       直近5年ぶんの線が全部出る。平坦な古い年が読み取りの邪魔になるのは

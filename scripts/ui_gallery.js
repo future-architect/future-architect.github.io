@@ -39,7 +39,6 @@ const NOT_SHOWN = {
   head: 'ページの <head>。見た目を持たない',
   header: 'ヘッダー。実物がこのページの上端に出ている',
   'json-ld': '構造化データ。見た目を持たない',
-  'posts-chart': 'ページ固有のグラフ。見本のために echarts をもう1本読み込まない',
   'related-categories': 'カテゴリページの本体の一部。page.category に依存する',
   'related-tags': 'タグページの本体の一部。page.tag に依存する',
   scripts: 'ページ末のスクリプト。見た目を持たない',

@@ -66,9 +66,7 @@ hexo.extend.helper.register('get_monthly_category_data', function (year) {
   const nowM = now.getMonth() + 1;
 
   // 軸の作り方。年を指定したときは 1月〜（今年なら現在月まで）。
-  // 今年で12ヶ月固定にすると未来の空欄が並ぶうえ、同じページの「週別」タブ
-  // （posts_stack_series）と軸の長さが食い違い、タブを切り替えるたびに
-  // 棒の幅と位置が変わっていた (#2430)
+  // 今年で12ヶ月固定にすると未来の空欄が並ぶ (#2430)
   //
   // 全期間は最初の投稿の月から現在月まで。ラベルは YYYY/MM で、
   // 個別ページ（category.ejs / author.ejs）と同じ書式にそろえる
@@ -114,8 +112,8 @@ hexo.extend.helper.register('get_monthly_category_data', function (year) {
 });
 
 // 月ページの週別 × カテゴリ別の投稿数 (#2227)。週は「その月の何日目か」で
-// 決める（1〜7日 = 第1週）。posts_stack_series と同じ規則で、ISO週だと
-// 月をまたぐ週が出て合計が月の投稿数と合わなくなる
+// 決める（1〜7日 = 第1週）。ISO週だと月をまたぐ週が出て、
+// 合計が月の投稿数と合わなくなる
 hexo.extend.helper.register('get_weekly_category_data', function (year, month) {
   const ym = year.toString() + month.toString().padStart(2, '0');
   const daysInMonth = new Date(Number(year), Number(month), 0).getDate();
