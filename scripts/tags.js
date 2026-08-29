@@ -160,13 +160,15 @@ hexo.extend.helper.register('ranking_tags', function () {
     .sort(compareFunc)
     .slice(0, 30);
 
-  // マークアップは関連タグ・「今年使われ始めたタグ」と同じチップに揃える。
-  // 以前は素のテキストリンクで、同じページ内でタグの見た目が割れていた (#2052)
-  let result = '';
-  rankings.map((tp) => {
-    result += `<li class="tag-list-item"><a class="tag-list-link" href="${this.url_for(tp.tag.path)}" rel="tag" title="${tp.tag.name} の記事 ${tp.count}本（総シェア ${tp.shareCount}）">${tp.tag.name}<span class="tag-list-count">${tp.count}</span></a></li>`;
-  });
-  return `<div class="blog-tags"><div class="widget"><ul class="tag-list">${result}</ul></div></div>`;
+  // ここはデータだけ返し、描くのは呼び出し側 (#3029)。チップの形は
+  // _partial/tag-chips.ejs が1箇所で持つ。JS の中で HTML を作ると、
+  // 同じ形の直しが themes/ の外にも散る（#3008 のときここだけ漏れた）
+  return rankings.map((tp) => ({
+    name: tp.tag.name,
+    path: tp.tag.path,
+    count: tp.count,
+    shareCount: tp.shareCount,
+  }));
 });
 
 const totalCount = (posts) => {
