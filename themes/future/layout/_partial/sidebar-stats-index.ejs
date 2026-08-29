@@ -10,9 +10,12 @@
   <%# 見出しは置かない (#2911)。数字が並んでいれば何のブロックかは見て分かる。
       目で見えない読者には aria-label が名乗る。
       **枠と規則は個別ページと共有する**（0行の間引き・桁そろえ・枠は1つ）。
-      個別ページと違って「累計 / 直近1年」の対を持たないので recent は渡さず、
-      その場合はラベルも出ない %>
-  <%- partial('sidebar-summary-panel', {total: items}) %>
+      recent を渡したページだけ「累計 / 直近1年」のラベルが出る。
+      対を持たないページ（/categories/ など）は渡さない %>
+  <% const indexRecent = (typeof recent === 'undefined') ? null : recent; %>
+  <%- indexRecent
+        ? partial('sidebar-summary-panel', {total: items, recent: indexRecent})
+        : partial('sidebar-summary-panel', {total: items}) %>
   <%# **タブは分解して縦に積む。** 本文では chart-tabs で切り替えていたが、
       サイドバーは「一目で見る」場所なので、切り替えを挟むと畳んだ側は見られない。
 
@@ -20,7 +23,8 @@
       本文では上の h2 が量を（「投稿数の推移」）、タブが内訳を（「カテゴリ別」）
       名乗っていた。サイドバーは h2 を持たないので、内訳だけ書くと
       何の量のグラフか分からなくなる %>
-  <% charts.forEach(function (c) { %>
+  <% const indexCharts = (typeof charts === 'undefined') ? [] : charts; %>
+  <% indexCharts.forEach(function (c) { %>
   <span class="sidebar-stats-chart-label"><%= c.label %></span>
   <div id="<%= c.id %>" class="sidebar-stats-chart"></div>
   <%# 凡例を落とすと意味が落ちる系列だけ、定義を注記で持つ（/authors/ の種別）。
@@ -30,6 +34,9 @@
   <% } %>
   <% }) %>
 </section>
+<%# **グラフが無いページでは echarts を読まない。** 描くものが無いのに
+    gzip 309 KB を落とすことになる（/series/ は推移の図を持たない）%>
+<% if (indexCharts.length) { %>
 <%- partial('echarts-script') %>
 <script type="text/javascript">
   <%# グラフの器は1箇所で持つ。ページごとに違うのは xAxis / yAxis / series だけ。
@@ -61,3 +68,4 @@
     return chart;
   }
 </script>
+<% } %>
