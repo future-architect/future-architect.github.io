@@ -496,8 +496,8 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
   | `body` | 13px | `theme-styles.styl` |
   | 本文（`p` / `li` / `summary`） | `1.2em` = 15.6px | 〃 |
   | 記事タイトル | `clamp(26px, 1.325rem + 0.9vw, 32px)` ＋ `text-wrap: pretty`（#2655。均等化すると「列幅の半分×2行」に縮む） | 〃（1箇所のみ） |
-  | クラス無しの `h2`（関連記事・We're hiring 等） | `1.85em` = 24.05px | 〃 |
-  | サイドバーの `h2` | `1.4em` = 18.2px | 〃 |
+  | クラス無しの `h2`（関連記事・We're hiring 等） | `text-display`（#2971。`1.85em` = 24.05px から） | 〃 |
+  | サイドバーの `h2` | `text-lead`（#2971。`1.4em` = 18.2px から） | 〃 |
   | 本文見出し h2〜h6 | `1.85 / 1.5 / 1.3 / 1.2 / 1.1em` = 24.05 / 19.5 / 16.9 / 15.6 / 14.3px（太さは全て700。直前の空きは h2 56px / h3 32px / h4 以下 24px）。`text-wrap: balance` は**幅768px以上だけ**（#2776 / #2822。狭い列では2行になる見出しが h2 の19.8%に達し、均等に割ると1行目が列の65%しか埋めず折り返しが早く見える） | 〃 |
   | 本文見出し h1（`.article-entry h1`） | 記事タイトルと同じ（`.article-title` / `.list-page` と同一ルール。直前の空き 64px・罫線 2px はここで持つ） | 〃 |
   | 一覧ページの見出し `.list-page` | 記事タイトルと同じ（`.article-title` と同一ルール） | 〃 |
@@ -509,7 +509,7 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
   | 記事概要文 `.lede`（一覧 / We're hiring カード） | `1.2em` = 15.6px / 継承 = 13px | 〃 |
   | 特設ページの本文 `.specials-text` | `1.2em` = 15.6px（`.article-entry` 外なので明示） | 〃 |
   | コードブロック | 13px（`line-height` は `font-size × leading-row` で追従） | `highlight.styl` の変数 |
-  | ヘッダーのサイト名 `.header-title` / 和文 `.header-title-sub` | 17px / 12px（#2877。写真の上に置いていた 80px / 20px から。字間 0.35em と影は白地では役が無い） | 〃 |
+  | ヘッダーのサイト名 `.header-title` / 和文 `.header-title-sub` | `text-lead` / `text-meta`（#2877 で写真の上の 80px / 20px から。#2971 で 17px → 段の 18px へ。字間 0.35em と影は白地では役が無い） | 〃 |
   | ヘッダーのナビ `.header-nav-link` / ドロップダウン（見出し / 説明） | 14px / 13px / 12px | 〃 |
   | パンくず（`.breadcrumb`） | 14px | `theme-styles.styl` 冒頭（土台の塊）の `font:` 一括指定。フォント名だけ後方で上書き |
 
