@@ -63,7 +63,11 @@ layout: page
 | <span class="sg-chip-ground sg-chip-note"><span class="sg-chip sg-link-on-note"></span></span> | `link-on-note` | <span class="sg-hex sg-link-on-note"></span> | note の4色 | <span class="sg-ratio sg-link-on-note"></span> | note の中のリンク |
 | <span class="sg-chip-ground sg-chip-note"><span class="sg-chip sg-link-on-note-visited"></span></span> | `link-on-note-visited` | <span class="sg-hex sg-link-on-note-visited"></span> | note の4色 | <span class="sg-ratio sg-link-on-note-visited"></span> | note の中の訪問済み |
 
-**青は読み物の中のリンクの色です。** レイアウトの導線（「すべての連載を見る」のような全件への行き先、パンくず、日付、著者名）には青を使わず、文字のスケールの `ink-mute` に置いて、反応で `ink-strong` に1段階濃くします。同じページで本文のリンクと導線が同じ青だと、どちらが読み物の続きなのかが見分けられません。
+**青は読み物の中のリンクの色です。** レイアウトの導線（「連載一覧へ」のような全件への行き先、パンくず、日付、著者名）には青を使わず、文字のスケールの `ink-mute` に置いて、反応で `ink-strong` に1段階濃くします。同じページで本文のリンクと導線が同じ青だと、どちらが読み物の続きなのかが見分けられません。
+
+**全件への行き先には末尾に `>` を置きます。** 色を青から `ink-mute` に落としたぶん、静止した状態ではリンクだと分かる手がかりが色から消えます。文言（「◯◯一覧へ」）と記号の2つで行き先を名乗り、反応では下線が付きます。記号を使うのはこの導線だけで、装飾として他の場所には置きません。
+
+大きさは置かれ方で決まります。**単独の行として置くとき**（サイドバー・記事の末尾）は「行として並ぶもの」のスケール、**カードの中に入るとき**（トップページの特集）はカードの名札や説明と同じ添えのスケールです。カードの中でいちばん弱い情報が、その上の説明より大きくなると、まとまりが崩れて見えます。
 
 ### ブランド色
 
