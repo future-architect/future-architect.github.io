@@ -1,5 +1,7 @@
 'use strict';
 
+const { getGA4PV } = require('./lib/ga4');
+
 // カテゴリの色は名前で固定する (#2170)。系列順に既定パレットを当てると、
 // 著者やページごとにカテゴリの並びが違うため、同じ Programming が青だったり
 // 緑だったりして色が手がかりにならない。記事数の多いカテゴリから
@@ -244,25 +246,70 @@ hexo.extend.helper.register('category_groups', function () {
   return groupedCategories(this.site);
 });
 
-// サイドバー（_widget/category.ejs）から呼ぶ。**活発なカテゴリだけ**を出す (#2908)。
-// 群のラベルを枠にしたぶんサイドバーが縦に伸びたので、全件はヘッダーの
-// ドロップダウンに任せて、ここは間引く。
+// サイドバー（_widget/category.ejs）から呼ぶ。**上限8件**に絞る。
+// 全件はヘッダーのドロップダウンが持つ。
 //
-// 直近1年の本数は 33〜0 本に散っていて、いちばん大きい切れ目が 4本と2本の間。
-// 4本＝四半期に1本のペースなので、そこで切る（Mobile 2 / IoT 1 / 認証認可 1 /
-// VR 0 が外れて14件）。
-//
-// **いま見ているカテゴリは本数に関わらず残す。** 現在地が一覧から消えると、
-// そのカテゴリのページに来た読者が自分の居場所を見失う
-const SIDEBAR_ACTIVE_MIN = 4;
+// **8件は空間から決めた上限で、本数の分布の切れ目とは関係が無い。** 切れ目で
+// 決めると、分布が変わるたびに上限の根拠がこのファイルの外へ出てしまう。
+// 条件は「枠が3つあることが1画面で分かる」こと。サイドバーが出るいちばん
+// 小さい画面（1366×768、viewport 約640px）で、枠の開始 y=118 から次の枠
+// 「人気の連載」の見出しの下端までが 640px に入るには枠が 459px 以下で、
+// 群ラベル4本の固定費155px と見出し33px を引くと8行（30.2px×8＝242px）。
+// 実測 430px で 29px の余裕がある。
+// 走査コスト（群の数＋最大群サイズ）も 5+4=9 から 4+3=7 に落ちる
+const SIDEBAR_LIMIT = 8;
 
-hexo.extend.helper.register('active_category_groups', function (current) {
-  return groupedCategories(this.site)
+// 物差しは直近1年に公開された記事の PV 合計。「人気の」が付く枠は
+// 人気の連載・人気のタグと同じ鍵で選ぶ (#2855)。
+// 直近3本未満を外すのも同じ理由で、単発のバズを勢いと取り違えないため
+const SIDEBAR_MIN_RECENT = 3;
+
+// 直近1年の PV 合計。記事数を鍵にして持ち回るのは recentCounts と同じ理由
+const recentPvCache = new Map();
+
+function recentPv(site) {
+  const key = String(site.posts.length);
+  if (recentPvCache.has(key)) return recentPvCache.get(key);
+  const oneYearAgo = Date.now() - 365 * 24 * 60 * 60 * 1000;
+  const pv = new Map();
+  site.categories.forEach((category) => {
+    let sum = 0;
+    category.posts.forEach((post) => {
+      if (post.date.valueOf() >= oneYearAgo) sum += getGA4PV('/' + post.path);
+    });
+    pv.set(category.name, sum);
+  });
+  recentPvCache.set(key, pv);
+  return pv;
+}
+
+hexo.extend.helper.register('popular_category_groups', function (current) {
+  const pv = recentPv(this.site);
+  const groups = groupedCategories(this.site);
+  const shown = new Set(
+    groups
+      .flatMap((g) => g.categories)
+      .filter((c) => c.recent >= SIDEBAR_MIN_RECENT && pv.get(c.name) > 0)
+      // **同点は PV の次に直近1年の本数で決める。** GA4 の値は 100 単位に
+      // 丸められている（全1,499件が100の倍数）ので同点が構造的に出て、候補が
+      // 17件しか無いここでは上限の線にちょうど並ぶ（Business と Culture が
+      // 10,000PV）。名前順で決めると、落ちる理由が読者から見て何も無くなる
+      .sort(
+        (a, b) =>
+          pv.get(b.name) - pv.get(a.name) ||
+          b.recent - a.recent ||
+          b.count - a.count ||
+          (a.name < b.name ? -1 : a.name > b.name ? 1 : 0),
+      )
+      .slice(0, SIDEBAR_LIMIT)
+      .map((c) => c.name),
+  );
+  // **いま見ているカテゴリは順位に関わらず残す。** 現在地が一覧から消えると、
+  // そのカテゴリのページに来た読者が自分の居場所を見失う
+  return groups
     .map((group) => ({
       name: group.name,
-      categories: group.categories.filter(
-        (c) => c.recent >= SIDEBAR_ACTIVE_MIN || c.name === current,
-      ),
+      categories: group.categories.filter((c) => shown.has(c.name) || c.name === current),
     }))
     .filter((group) => group.categories.length);
 });
