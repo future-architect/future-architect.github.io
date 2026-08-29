@@ -46,6 +46,10 @@ const EXEMPT = new Map([
   // 一点もの
   ['.page-404 .number', '128px'],
   ['.blog-tags li a span', '0.5em'],
+  // 行き先の名前に付く総数。行の主題は名前で、数字は選ぶ判断には効かない。
+  // 段のいちばん下（text-meta 12px）でも 13px の名前と 1px しか違わず、
+  // 名前の一部に見える。同じ役のタグのチップの件数（0.5em）に寄せた
+  ['.header-dropdown-count', '8px'],
   ['.article-entry .highlight .gutter pre', '0.95em'],
 ]);
 

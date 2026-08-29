@@ -1,16 +1,8 @@
 'use strict';
 
-const fs = require('fs');
 const { snsLabel } = require('./lib/post_list');
 const { allSeries } = require('./lib/series');
-
-const load = JSON.parse(fs.readFileSync('ga4_pv.json', 'utf-8'));
-const map = new Map();
-load.pv.forEach((obj) => {
-  map.set(obj.path, obj);
-});
-
-const getGA4PV = (url) => map.get(url)?.pv || 0;
+const { getGA4PV } = require('./lib/ga4');
 
 // 実測値が無いときは 0 を返す。以前は 100 を返していたが、実際に pv が 100 の
 // 記事も 55 件あり、表示上どちらか区別できなかった。公開直後の記事に
