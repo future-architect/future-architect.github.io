@@ -2768,9 +2768,14 @@ code {
 /* 記事メタ行の下のタグ (#2907)。間隔は gap で持ち、縦横とも同じ 8px にする。
    上の空きは .blog-info の行間（12px）と同じにして、メタ行が折り返した2行目と
    同じ間隔で続いて見えるようにする。
-   チップは枠の内側に文字があるぶん、左端が日付・著者より右へずれる。
-   揃えるのは枠ではなく文字の位置なので、枠線(1px)と左パディング(8px)を戻す
-   （記事メタ行・タグ一覧で行った補正と同じ規則 #2429 / #2453） */
+   **丸いぶんだけ左へ戻す（光学補正）。** チップが日付・著者と同じ行に並んでいた頃は
+   文字どうしをそろえるのが正しく、枠線(1px)と左パディング(8px)の 9px を戻していた
+   （#2429 / #2453）。#2907 でタグが自分の行に移り、読者が見比べるのは行の左端どうしに
+   なったが、**ピルは最も左に張り出す点が縦の中央の1点しかない**ので、箱の左端を
+   0 に置くと図形が右へ寄って見える。逆に 9px 戻すと枠が食い出して見える。
+   実効半径（高さ 21.8px の半分＝10.9px）の半分だけ戻して、最左点と
+   「角丸が終わって直線になる点」の中間を日付にそろえる。
+   4の倍数の刻み（#2864）から外れるのは、間隔ではなく光学補正の値だから */
 .article-header-tags {
   display: flex;
   flex-wrap: wrap;
@@ -2783,7 +2788,7 @@ code {
   align-items: baseline;
   /* 下の 28px は .blog-info が持っていた下の空き（margin 20px + padding 8px）。
      タグが続くときはそれを下の行へ送るので、本文までの空きは変わらない */
-  margin: 12px 0 28px -9px;
+  margin: 12px 0 28px -5.4px;
 }
 /* タグが続くときだけ、メタ行は下の空きを持たない */
 .article-header .blog-info:has(+ .article-header-tags) {
@@ -3552,9 +3557,6 @@ ul.tag-list {
 .category-list-link {
   padding: 0 6px 0 0;
 }
-.category-list-current a {
-  font-weight: bold;
-}
 /* /categories/ の群の見出し (#2908)。節見出し（.bottom-content-header）の下の段 */
 .category-group-heading {
   margin: 32px 0 0;
@@ -3630,16 +3632,13 @@ ul.tag-list {
 .sidebar-tags ul.tag-list {
   margin-left: -4px;
 }
-/* 全件導線はチップの中の文字の左端に合わせる。.more-link の既定の右寄せだと、
-   狭い列ではチップの並びから離れて宙に浮く。足す 1px はチップの枠 */
+/* 全件導線はチップの中の文字の左端に合わせる。足す 1px はチップの枠 */
 .sidebar-tags .more-link {
-  text-align: left;
   padding-left: chip-pad-x + 1px;
 }
 /* 導線は行の文字の左端に合わせる。タグの枠と同じ値なので、サイドバーの
    「すべての◯◯を見る」2本が同じ位置から始まる (#2892) */
 .sidebar-series .more-link {
-  text-align: left;
   padding-left: chip-pad-x + 1px;
 }
 
@@ -3720,12 +3719,19 @@ ul.tag-list {
 .author-box-about {
   margin: 4px 0 0 0;
 }
-/* 導線は紹介文の続きなので、.more-link の既定（右寄せ）ではなく本文の左端に揃える。
+/* 導線は紹介文の続きなので、本文の左端に揃える。
    丸のぶんの字下げは親（.author-box-text）が持つので、ここでは数値を決めない。
-   紹介文とくっつくと1つの段落に見えるため、上の間隔を本文の行送りぶん空ける */
+   紹介文とくっつくと1つの段落に見えるため上を空ける。16px はカードの中で
+   「中身」と「次の行き先」を分ける空きで、トップページの特集パネルと同じ値 (#3022)。
+   以前は 14px で、間隔は4の倍数という規則 (#2864) から外れていた
+   （コメントの「本文の行送りぶん」も 1.75 × 13px = 22.75px で合っていなかった）*/
 .author-box .more-link {
-  text-align: left;
-  margin-top: 14px;
+  /* カードの中なので、そのカードの地の文（.author-box-about の 13px）と同じ段に置く。
+     text-row（14px）のままだと 13 → 13 → 14 と上がり、いちばん弱い情報が紹介文より
+     大きくなる。トップページの特集パネルを text-meta に落としたのと同じ規則で、
+     値が違うのは箱ごとに地の文の大きさが違うため (#3019) */
+  font-size: text-base;
+  margin-top: 16px;
   /* 枠の内側の空きは .author-box-body の padding だけで決める。bootstrap の
      p の margin-bottom: 1rem が残ると、最後の行の下だけ 16px 足されて
      上 10.4px 対 下 26.4px になる (#2813) */
@@ -4177,9 +4183,11 @@ a.series-nav-item:hover .series-nav-item-title {
   font-weight: normal;
 }
 /* シェアの内訳（X・Facebook・はてブ・Pocket）。読者の行動を変える数字では
-   ないので、投稿数・著者数と同格に並べず一段小さくする (#2096) */
+   ないので、投稿数・著者数と同格に並べず小さくする (#2096)。
+   段は添え・件数の text-meta。1つ隣の text-row（14px）では主要行との差が
+   1.6px しかなく、色だけで区別しているように見えていた (#3004) */
 .summary-sub .summary-count {
-  font-size: text-row;
+  font-size: text-meta;
 }
 /* 直近1年の投稿が無いときの表記。0 のタイルを並べるより文で言う方が伝わる */
 .summary-note {
@@ -4216,16 +4224,68 @@ a.series-nav-item:hover .series-nav-item-title {
   /* 数値とラベルは1つのまとまりなので、行の中では詰める */
   gap: 6px;
 }
+/* 数字は幅をそろえて右寄せにする。桁数が違うとラベルの開始位置がずれ、
+   縦に読めなくなる（実測で最大31px）。幅は EJS が桁数から配る
+   （--summary-count-width）。tabular-nums は数字1文字の幅をそろえる指定で、
+   ch（「0」の幅）で数えた値と実際の幅を一致させる */
+.sidebar-stats .summary-count {
+  display: inline-block;
+  width: var(--summary-count-width, 3ch);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
 /* シェアの内訳は総シェア数の内訳で、読者の行動を変える数字ではない。
    本文のタイルが .summary-sub で数値を一段小さくしていた区別はそのまま効く (#2096)。
    縦に並ぶぶん大きさだけでは従属が読み取りにくいので字下げを足し、
-   文字も一段薄い ink-faint に落とす（白地で 4.5 を満たす最も薄い段。これより薄くしない） */
+   文字も一段薄い ink-faint に落とす（白地で 4.5 を満たす最も薄い段。これより薄くしない）。
+
+   **字下げない。数値は右端、ラベルは左端で主要行とそろえる。**
+   内訳の数値だけが右へずれると 4989 + 253 + 10009 + 6528 = 21779 という
+   足し合わせの関係が切れ、「弱い項目が4つ並んでいる」ようにしか見えない。
+   従属は大きさ（text-body → text-meta）と色と線が示す。帳簿の内訳と同じ形。
+
+   **さらに左の縦線で「1つの塊」を示す。** 引用と同じ考え方（塊の左に1本、
+   #2457）で、塊を囲う役なので段は rule-base（区切りの rule-weak ではない）。
+   行の間の空き（4px）を上下2pxずつまたいで1本につなぐ。
+   最初の行の上と最後の行の下は伸ばさない */
 .sidebar-stats .summary li.summary-sub {
-  padding-left: (space-step * 2);
+  position: relative;
+}
+.sidebar-stats .summary li.summary-sub::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: -(space-step / 2);
+  bottom: -(space-step / 2);
+  border-left: 1px solid var(--rule-base);
+}
+.sidebar-stats .summary li.summary-sub:first-of-type::before {
+  top: 0;
+}
+.sidebar-stats .summary li.summary-sub:last-child::before {
+  bottom: 0;
+}
+/* ch は自分の font-size を見るので、数値を一段小さくした内訳では
+   同じ桁数でも箱が狭くなり、右端が総シェア数とそろわない
+   （ずれ方は桁数で変わるので固定値では戻せない）。段の比で戻すと、
+   ラベルの左端も自動的にそろう（数値の箱の右に 6px で置いているだけなので） */
+.sidebar-stats .summary li.summary-sub .summary-count {
+  /* Stylus は px 同士の割り算に px を残すので unit() で無次元に戻す。
+     付いたままだと calc が「長さ×長さ」になって無効になり、width が
+     auto に落ちて桁ごとに幅が変わる（一度踏んだ） */
+  width: s('calc(var(--summary-count-width, 3ch) * %s)', unit(text-body / text-meta, ''));
 }
 .sidebar-stats .summary-sub .summary-count,
 .sidebar-stats .summary-sub .summary-label {
   color: var(--ink-faint);
+}
+
+/* 2組目（「直近1年」）の前は刻み6つぶん空ける。組の中（ラベルの下 8px・
+   行の間 4px）より広くして、1つの枠の中でも2組に読めるようにする (#2747)。
+   枠を2つ並べていたときの間は 22px（下の余白2 + 罫線1 + 間隔12 + 罫線1 +
+   上の余白6）で、線が無くなったぶん切れ目はそれより狭くしない */
+.sidebar-stats .summary + .summary-panel-label {
+  margin-top: (space-step * 6);
 }
 
 /* 高さは本文にあった 250px から下げる。細い列で縦に長いと棒より余白が目立つ。
@@ -4281,10 +4341,15 @@ a.series-nav-item:hover .series-nav-item-title {
   border-radius: card-radius;
   padding: 6px 16px 2px;
 }
+/* 箱の名前と中身の間は間隔の刻み1つぶん。2px では数字の行間（4px）より
+   狭く、ラベルが先頭の行にくっついて1行目のラベルに見えていた (#3004)。
+
+   色は補助情報の中でさらに弱い ink-faint。text-meta が段の最下段で
+   これ以上小さくできないので、弱さは色の段が担う */
 .summary-panel-label {
   display: block;
-  margin-bottom: 2px;
-  color: var(--ink-mute);
+  margin-bottom: (space-step * 2);
+  color: var(--ink-faint);
   font-size: text-meta;
 }
 .summary-panel .summary-note {
@@ -5197,9 +5262,15 @@ a.award-badge:focus {
    14px は「行として並ぶもの」の段で、単独の行として置くときの値。
    カードの中に入る回だけ従属テキストの段に落とす（.series-panel .more-link）*/
 .more-link {
-  text-align: right;
   font-size: text-row;
   margin-top: 8px;
+}
+/* 左端に揃える。**`p` を付けるのは詳細度を `.blog-posts p`（0,1,1）に合わせるため**で、
+   単一クラスだと本文の中で justify に負ける。以前はここが right だったが、本文の中では
+   justify に負け、サイドバーと著者紹介は left で打ち消していて、**実際に右へ寄る場所は
+   1つも無かった**（5文脈を実測）。宣言を読んだとおりに動く形にする */
+p.more-link {
+  text-align: left;
 }
 /* 青をやめたぶんの手がかりは末尾の > が持つ。太さは 400 のまま置く。
    14px の1行を 700 にすると、行の中で主従が付く前に重くなる（#2803） */

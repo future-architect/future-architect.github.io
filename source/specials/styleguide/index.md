@@ -22,7 +22,7 @@ layout: page
 | --- | --- | --- | --- | --- |
 | <span class="sg-chip sg-ink-strong"></span> | `ink-strong` | <span class="sg-hex sg-ink-strong"></span> | <span class="sg-ratio sg-ink-strong"></span> | 本文・見出し・リンク |
 | <span class="sg-chip sg-ink-mute"></span> | `ink-mute` | <span class="sg-hex sg-ink-mute"></span> | <span class="sg-ratio sg-ink-mute"></span> | 本文に添える補助情報（日付・著者・タグ・件数・注記）と引用の本文 |
-| <span class="sg-chip sg-ink-faint"></span> | `ink-faint` | <span class="sg-hex sg-ink-faint"></span> | <span class="sg-ratio sg-ink-faint"></span> | 空表示・無効と、補助情報の中でさらに弱くする記号（パンくずの `>`・折りたたみの三角） |
+| <span class="sg-chip sg-ink-faint"></span> | `ink-faint` | <span class="sg-hex sg-ink-faint"></span> | <span class="sg-ratio sg-ink-faint"></span> | 空表示・無効と、補助情報の中でさらに弱くするもの（パンくずの `>`・折りたたみの三角・統計の内訳と枠の名前） |
 
 白はスケールの1段階ではなく背景の色そのもので、役割を選ぶ余地がありません。
 
@@ -32,7 +32,7 @@ layout: page
 
 | <span class="sr-only">見本</span> | 変数 | 値 | 白背景との差 | 使うところ |
 | --- | --- | --- | --- | --- |
-| <span class="sg-chip sg-rule-base"></span> | `rule-base` | <span class="sg-hex sg-rule-base"></span> | <span class="sg-ratio sg-rule-base"></span> | 枠。カード・チップ・箱・画像枠 |
+| <span class="sg-chip sg-rule-base"></span> | `rule-base` | <span class="sg-hex sg-rule-base"></span> | <span class="sg-ratio sg-rule-base"></span> | 枠。カード・チップ・箱・画像枠と、塊の左に引くバー（引用・内訳） |
 | <span class="sg-chip sg-rule-weak"></span> | `rule-weak` | <span class="sg-hex sg-rule-weak"></span> | <span class="sg-ratio sg-rule-weak"></span> | 区切り。見出しの下・リストの行間 |
 | <span class="sg-chip sg-rule-strong"></span> | `rule-strong` | <span class="sg-hex sg-rule-strong"></span> | <span class="sg-ratio sg-rule-strong"></span> | 地を持たない部品の枠（チップ・表・タブの上辺）と、focus / hover でひとつ強めるところ |
 
@@ -67,7 +67,7 @@ layout: page
 
 **全件への行き先には末尾に `>` を置きます。** 色を青から `ink-mute` に落としたぶん、静止した状態ではリンクだと分かる手がかりが色から消えます。文言（「◯◯一覧へ」）と記号の2つで行き先を名乗り、反応では下線が付きます。記号を使うのはこの導線だけで、装飾として他の場所には置きません。
 
-大きさは置かれ方で決まります。**単独の行として置くとき**（サイドバー・記事の末尾）は「行として並ぶもの」のスケール、**カードの中に入るとき**（トップページの特集）はカードの名札や説明と同じ添えのスケールです。カードの中でいちばん弱い情報が、その上の説明より大きくなると、まとまりが崩れて見えます。
+大きさは置かれ方で決まります。**単独の行として置くとき**（サイドバー・記事末の連載ナビ）は「行として並ぶもの」のスケール、**カードの中に入るとき**（トップページの特集・著者紹介）は**そのカードの説明文と同じ大きさ**です。カードの中でいちばん弱い情報が、その上の説明より大きくなると、まとまりが崩れて見えます。箱によって説明文の大きさが違うので、導線の大きさも箱ごとに変わります。
 
 ### ブランド色
 
