@@ -1,0 +1,66 @@
+<%# 一覧ページ（/categories/ ・/tags/ ・/authors/ ・期間）の統計とグラフの器。
+    本文の先頭に置いていたものをサイドバーへ逃がす。#2911 でカテゴリ・タグ・著者の
+    **個別**ページに当てた判断を、**一覧**ページにも当てたもの。
+    読者がこれらのページに来る目的は行き先を選ぶことで、総シェア数の内訳も
+    投稿数の推移もその判断には効かない。消さないのは運営と書き手が見に来るため。
+
+    呼び出し側（_partial/sidebar-index-*.ejs）が items と charts を渡し、
+    グラフの option は自前の <script> から sidebarChart(id, option) に渡す %>
+<section class="sidebar-stats" data-nosnippet aria-label="統計">
+  <%# 見出しは置かない (#2911)。数字が並んでいれば何のブロックかは見て分かる。
+      目で見えない読者には aria-label が名乗る。
+      個別ページと違って「累計 / 直近1年」の対を持たないので、枠は1つでラベルも無い %>
+  <div class="summary-panels">
+    <section class="summary-panel">
+      <%- partial('summary-tiles', {items: items, variant: 'row'}) %>
+    </section>
+  </div>
+  <%# **タブは分解して縦に積む。** 本文では chart-tabs で切り替えていたが、
+      サイドバーは「一目で見る」場所なので、切り替えを挟むと畳んだ側は見られない。
+      どの内訳かはグラフの上のラベルが名乗る。1枚しか無いページでラベルを
+      出さないのは、直上の統計と合わせて何のグラフかが分かるため %>
+  <% charts.forEach(function (c) { %>
+  <% if (charts.length > 1) { %>
+  <span class="sidebar-stats-chart-label"><%= c.label %></span>
+  <% } %>
+  <div id="<%= c.id %>" class="sidebar-stats-chart"></div>
+  <%# 凡例を落とすと意味が落ちる系列だけ、定義を注記で持つ（/authors/ の種別）。
+      本文では凡例の hover でも読めたが、サイドバーには凡例が無い %>
+  <% if (c.note) { %>
+  <p class="sidebar-stats-note"><%= c.note %></p>
+  <% } %>
+  <% }) %>
+</section>
+<%- partial('echarts-script') %>
+<script type="text/javascript">
+  <%# グラフの器は1箇所で持つ。ページごとに違うのは xAxis / yAxis / series だけ。
+
+      **凡例は明示的に消す。** 208〜298px の列では横送り（type: scroll）になって
+      場所だけ取る。どの系列が何かはツールチップ（trigger: axis）が名乗る。
+      option を省くだけでは消えない——themeChart が legend.textStyle を
+      setOption するので、宣言していないチャートにも凡例が生成され、
+      既定の show: true で描かれてプロットに被る。
+
+      grid の left / right が 0 なのは、既定の 10% だと右へズレて見えるため %>
+  function sidebarChart(el, option) {
+    const chart = echarts.init(document.getElementById(el));
+    chart.setOption(
+      Object.assign(
+        {
+          // タイトルは直上のラベルが担うので、チャートの中では重ねない
+          title: {},
+          legend: { show: false },
+          tooltip: { trigger: 'axis' },
+          <%# right に余白を置くのは、containLabel が**端のカテゴリラベルの
+              はみ出しを見ない**ため。軸の最後の目盛は grid の右端にあり、
+              「2026」の半分（約13px）が外へ出て切れる。
+              16 は echarts の option の中の値なので Stylus の段は使えない %>
+          grid: { left: 0, right: 16, top: 8, bottom: 0, containLabel: true },
+        },
+        option,
+      ),
+    );
+    themeChart(chart);
+    return chart;
+  }
+</script>

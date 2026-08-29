@@ -21,46 +21,10 @@
   <%- partial('_partial/breadcrumb', {items: items}) %>
   <%# ランドマークは h1 から包む (#2925)。以前は記事一覧の部分だけが <main> で、
       h1・統計・グラフがランドマークの外にいた。中の一覧は div に下げてある %>
-  <main id="main" tabindex="-1" class="margin-top-30">
+  <div class="row">
+    <main id="main" tabindex="-1" class="col-md-9 margin-top-30">
     <% if(is_month()) { %>
     <h1 class="list-page"><%- partial('_partial/svg-icon', {icon: 'calendar-stats'}) %><%= page.year%>年<%= page.month %>月<span class="list-sub-text">のすべての記事</span></h1>
-    <%# 統計は年ページと同じ構成 (#2227)。「平均投稿/月」に当たる軸は
-        月の中では意味が薄いので置かない %>
-    <% const summary = summary_monthly_term(page.year, page.month); %>
-    <%- partial('_partial/summary-tiles', {items: [
-          {value: count_articles_month(page.year, page.month), label: '投稿'},
-          {value: summary.total, label: '総シェア数'},
-          {value: summary.twitter, label: 'X', sub: true},
-          {value: summary.facebook, label: 'Facebook', sub: true},
-          {value: summary.hatebu, label: 'はてブ', sub: true},
-          {value: summary.pocket, label: 'Pocket', sub: true},
-        ]}) %>
-    <%# 週別 × カテゴリ別の積み上げ。年ページの「投稿数の推移」の月スコープ版。
-        月の中はデータ量が少ないのでタブは設けず1枚にする (#2227) %>
-    <%- partial('_partial/section-heading', {id: 'trend', text: '投稿数の推移'}) %>
-    <div id="chart-week" style="width:100%;min-height:250px"></div>
-    <%- partial('_partial/echarts-script') %>
-    <script type="text/javascript">
-      const weekData = <%- get_weekly_category_data(page.year, page.month) %>;
-      const catColors = <%- category_colors() %>;
-      const weekChart = echarts.init(document.getElementById('chart-week'));
-      weekChart.setOption({
-        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-        legend: { bottom: 0, type: 'scroll' },
-        grid: { left: 0, right: '2%', bottom: 32, containLabel: true },
-        xAxis: { type: 'category', data: weekData.weeks },
-        yAxis: <%- partial('_partial/chart-yaxis-count', {series: 'weekData.series'}).trim() %>,
-        <%# 色はカテゴリ名で固定 (#2170) %>
-        series: weekData.series.map(s => ({
-          name: s.name,
-          type: 'bar',
-          stack: 'categories',
-          itemStyle: { color: catColors[s.name] },
-          data: s.data
-        }))
-      });
-      themeChart(weekChart);
-    </script>
     <%# その月の中でよく読まれている記事 (#2214)。カテゴリ・タグ・著者の
         詳細ページと同じく新着一覧の前。件数は記事数からヘルパーが決める %>
     <% if (page.current === 1) { %>
@@ -74,19 +38,6 @@
     <% } else if(is_year()) { %>
     <%# 単位の「年」は月ページの h1（2026年8月）と同じく数字側に付ける (#2209) %>
     <h1 class="list-page"><%- partial('_partial/svg-icon', {icon: 'calendar-stats'}) %><%= page.year %>年<span class="list-sub-text">のすべての記事</span></h1>
-    <%# 統計は1行に集約。シェアの内訳を一段小さくするのは他ページと同じ (#2096) %>
-    <% const summary = summary_yearly_term(page.year); %>
-    <%- partial('_partial/summary-tiles', {items: [
-          {value: count_articles_year(page.year), label: '投稿'},
-          {value: ave_posts(page.year), label: '平均投稿/月'},
-          {value: summary.total, label: '総シェア数'},
-          {value: summary.twitter, label: 'X', sub: true},
-          {value: summary.facebook, label: 'Facebook', sub: true},
-          {value: summary.hatebu, label: 'はてブ', sub: true},
-          {value: summary.pocket, label: 'Pocket', sub: true},
-        ]}) %>
-    <%- partial('_partial/section-heading', {id: 'trend', text: '投稿数の推移'}) %>
-    <%- partial('_partial/posts-chart', {year: page.year}) %>
     <%# その年の中でよく読まれている記事 (#2214)。読者にまず見せたい
         優先度の高い順に、定番 → 月の探索 → 新着一覧と並べる。
         年内は経過年数がほぼ同じなので、ペナルティは相殺されて
@@ -121,20 +72,6 @@
     <% } else { %>
     <%# 年・月ページの calendar-stats と同じカレンダーの家族。マス目が複数の期間を表す (#2571) %>
     <h1 class="list-page"><%- partial('_partial/svg-icon', {icon: 'calendar-month'}) %>すべての記事</h1>
-    <%# 統計は1行に集約。シェアの内訳を一段小さくするのは他ページと同じ (#2096) %>
-    <% const summary = summary_all_term(); %>
-    <%- partial('_partial/summary-tiles', {items: [
-          {value: count_articles(), label: '投稿'},
-          {value: ave_posts(page.year), label: '平均投稿/四半期'},
-          {value: summary.total, label: '総シェア数'},
-          {value: summary.twitter, label: 'X', sub: true},
-          {value: summary.facebook, label: 'Facebook', sub: true},
-          {value: summary.hatebu, label: 'はてブ', sub: true},
-          {value: summary.pocket, label: 'Pocket', sub: true},
-        ]}) %>
-
-    <%- partial('_partial/section-heading', {id: 'trend', text: '投稿数の推移'}) %>
-    <%- partial('_partial/posts-chart', {year: null}) %>
     <%# 全期間の「よく読まれている記事」。#2214 では「ホーム1ページ目と二重になる」
         として置かなかったが、一覧ページの確定構成（統計→グラフ→定番→探索→新着）を
         ここだけ欠く非一貫の方が害が大きいと判断を見直した (#2407)。
@@ -213,5 +150,9 @@
       </div>
     </nav>
     <% } %>
-  </main>
+    </main>
+    <aside class="col-md-3 blog-sidebar">
+      <%- partial('_partial/sidebar-index-archive') %>
+    </aside>
+  </div>
 </div>

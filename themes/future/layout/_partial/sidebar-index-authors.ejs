@@ -1,0 +1,43 @@
+<%# /authors/ のサイドバー。統計と年別 著者数の推移 %>
+<%- partial('sidebar-stats-index', {
+      items: [
+        {value: count_authors(), label: '著者数'},
+        {value: count_articles(), label: '投稿'},
+      ],
+      charts: [{
+        id: 'sidebar-chart-authors',
+        label: '著者数',
+        note: '継続=前年にも投稿 ／ 再開=2年以上あいての投稿 ／ 新規=初投稿 ／ 常連=2年連続で年2本以上',
+      }],
+    }) %>
+<script type="text/javascript">
+  <%# 継続・新規・再開の3種別 (#2145)。定義はヘルパー（yearly_author_types）側 %>
+  const authorTypeData = <%- yearly_author_types() %>;
+  sidebarChart('sidebar-chart-authors', {
+    xAxis: {
+      type: 'category',
+      boundaryGap: true,
+      data: authorTypeData.years,
+      axisTick: { show: false },
+    },
+    <%# 積み上げの合計がその年の著者数になるので、軸は1本で足りる %>
+    yAxis: { type: 'value', min: 0 },
+    <%# 色を指定しないと ECharts 既定の色が出るが、その値はカテゴリの色と同じなので
+        同じ色が別の意味を持ってしまう (#2767)。系列の順に当たるので常連を最後に置く %>
+    color: <%- chart_series_colors('author_types') %>,
+    series: [
+      { name: '継続', type: 'bar', stack: 'authors', data: authorTypeData.continuing },
+      { name: '再開', type: 'bar', stack: 'authors', data: authorTypeData.returning },
+      { name: '新規', type: 'bar', stack: 'authors', data: authorTypeData.newcomers },
+      <%# 常連（2年連続で年2本以上）は継続などの内訳と重なるため、積み上げに
+          混ぜず折れ線で重ねる (#2149)。点は出さず線だけ %>
+      {
+        name: '常連',
+        type: 'line',
+        showSymbol: false,
+        lineStyle: { width: <%= chart_line_width() %> },
+        data: authorTypeData.regulars,
+      },
+    ],
+  });
+</script>

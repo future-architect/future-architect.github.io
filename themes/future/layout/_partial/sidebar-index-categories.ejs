@@ -1,0 +1,44 @@
+<%# /categories/ のサイドバー。統計とカテゴリ別の累計投稿数の推移 %>
+<%- partial('sidebar-stats-index', {
+      items: [
+        {value: site.categories.length, label: 'カテゴリ数'},
+        {value: count_articles(), label: '投稿'},
+      ],
+      charts: [{id: 'sidebar-chart-categories', label: 'カテゴリ別'}],
+    }) %>
+<script type="text/javascript">
+  <%# 月ごとの実数を足し上げて累計にする。ヘルパーは実数のまま返し、
+      表示側で累計にする（軸の作り方をヘルパー1箇所に保つ）(#2432) %>
+  const categoriesData = <%- get_monthly_category_data() %>;
+  const categoriesColors = <%- category_colors() %>;
+  const categoriesCumulative = categoriesData.series.map((s) => {
+    let sum = 0;
+    return { name: s.name, data: s.data.map((n) => (sum += n)) };
+  });
+  sidebarChart('sidebar-chart-categories', {
+    xAxis: {
+      type: 'category',
+      <%# 面グラフなので端の余白は無し。左右に隙間があると、最初の月より前・
+          最後の月より後に空白期間があるように見える %>
+      boundaryGap: false,
+      data: categoriesData.months,
+      <%# 目盛りは月ごとに1本立つ。127ヶ月ぶんだと細い列では縦線の帯になって
+          面より目立つ。年ラベルは3〜4本しか出ないので対応も付かない (#2911) %>
+      axisTick: { show: false },
+      axisLabel: <%- partial('chart-xaxis-year-labels', {months: 'categoriesData.months', el: 'sidebar-chart-categories'}).trim() %>
+    },
+    yAxis: { type: 'value' },
+    <%# 累計は単調増加で、127点だと棒の差が縞にしか見えない。積み上げ面にすると
+        帯の厚みがそのカテゴリの蓄積量、上端が総数になる。色は名前で固定 (#2170) %>
+    series: categoriesCumulative.map((s) => ({
+      name: s.name,
+      type: 'line',
+      stack: 'categories',
+      symbol: 'none',
+      lineStyle: { width: 0 },
+      areaStyle: { color: categoriesColors[s.name] },
+      itemStyle: { color: categoriesColors[s.name] },
+      data: s.data,
+    })),
+  });
+</script>

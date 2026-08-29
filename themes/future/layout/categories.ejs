@@ -3,87 +3,13 @@
         {label: 'ホーム', url: '/'}
       ]}) %>
 
-  <main id="main" tabindex="-1" class="margin-top-30">
+  <div class="row">
+    <main id="main" tabindex="-1" class="col-md-9 margin-top-30">
 
     <%# 個別ページはカテゴリごとに絵が違うので、ここは総称の category を出す (#2571) %>
     <h1 class="list-page margin-bottom-20"><%- partial('_partial/svg-icon', {icon: 'category'}) %>カテゴリ一覧</h1>
 
-    <%# 統計は h1 直下。/tags/・/authors/ と同じ流儀 (#2211) %>
-    <%- partial('_partial/summary-tiles', {items: [
-          {value: site.categories.length, label: 'カテゴリ数'},
-          {value: count_articles(), label: '投稿'},
-        ]}) %>
-
-    <%# 統計の直下にグラフ、その後にコンテンツの一覧。全ページ同じ並びにする (#2211) %>
-    <%- partial('_partial/section-heading', {id: 'trend', text: 'カテゴリ別 累計投稿数の推移'}) %>
-    ※各月末時点の累計投稿数を表示
-    <div id="category-chart" style="width: 100%; height: 400px;"></div>
-
-    <%- partial('_partial/echarts-script') %>
-
-    <script type="text/javascript">
-      const chartData = <%- get_monthly_category_data() %>;
-      const catColors = <%- category_colors() %>;
-      <%# 月ごとの実数を足し上げて累計にする。ヘルパーは実数のまま返し、
-          表示側で累計にする（軸の作り方をヘルパー1箇所に保つ）。
-          /articles/ の同じデータは月ごとのペースを見る図なので、
-          こちらは分野ごとの蓄積を見る図として役割を分ける (#2432) %>
-      const cumulative = chartData.series.map(s => {
-        let sum = 0;
-        return { name: s.name, data: s.data.map(n => (sum += n)) };
-      });
-      const cumulativeTotals = chartData.months.map((_, i) => cumulative.reduce((a, s) => a + s.data[i], 0));
-      const myChart = echarts.init(document.getElementById('category-chart'));
-      const option = {
-        tooltip: {
-          trigger: 'axis',
-          axisPointer: { type: 'line' },
-          <%# 18系列あり、初期の月はほとんどが0。0の行は読む手がかりにならないので省き、
-              先頭にその時点の累計合計を出す %>
-          formatter: (params) => {
-            const i = params[0].dataIndex;
-            const rows = params
-              .filter(p => p.value > 0)
-              .map(p => p.marker + p.seriesName + ': ' + p.value + '本');
-            return [chartData.months[i] + '　累計' + cumulativeTotals[i] + '本'].concat(rows).join('<br>');
-          }
-        },
-        legend: { bottom: 0, type: 'scroll' },
-        <%# 余白と凡例位置は他のチャート（posts-chart）に合わせる (#2212) %>
-        grid: { left: 0, right: '2%', bottom: 32, containLabel: true },
-        <%# 全期間は127ヶ月になるため、年の変わり目だけを「YYYY年」で出す
-            （個別ページ・posts-chart と同じ #2135 / #2432）%>
-        xAxis: [ {
-          type: 'category',
-          <%# 面グラフなので端の余白は無し。左右に隙間があると、
-              最初の月より前・最後の月より後に空白期間があるように見える %>
-          boundaryGap: false,
-          data: chartData.months,
-          axisLabel: <%- partial('_partial/chart-xaxis-year-labels', {months: 'chartData.months', el: 'category-chart'}).trim() %>
-        } ],
-        <%# 軸名は付けない。何の数かは直上の h2 が名乗っている %>
-        yAxis: [ { type: 'value' } ],
-        <%# 累計は単調増加で、127点だと棒の差が1本刻みになって縞にしか見えない。
-            積み上げ面にすると帯の厚みがそのカテゴリの蓄積量、上端が総数になる。
-            折れ線の重なりが読めないという #2169 の理由は、積み上げれば起きない。
-            色は名前で固定 (#2170) %>
-        series: cumulative.map(s => ({
-          name: s.name,
-          type: 'line',
-          stack: 'categories',
-          symbol: 'none',
-          lineStyle: { width: 0 },
-          areaStyle: { color: catColors[s.name] },
-          itemStyle: { color: catColors[s.name] },
-          data: s.data
-        }))
-      };
-      myChart.setOption(option);
-      themeChart(myChart);
-    </script>
-
-    <%# 一覧にも節見出しを立てて、グラフとの境界を節間の余白で分ける (#2281)。
-        h1「カテゴリ一覧」と重ならない語にする。
+    <%# 一覧にも節見出しを立てる (#2281)。h1「カテゴリ一覧」と重ならない語にする。
         カテゴリ名は広い言葉なので、代表タグと直近1年の投稿数を添えて
         中身の見当と活発さが分かるようにする (#2056) %>
     <%- partial('_partial/section-heading', {id: 'categories', text: 'すべてのカテゴリ'}) %>
@@ -123,6 +49,9 @@
     </ul>
     <% }) %>
 
-
-  </main>
+    </main>
+    <aside class="col-md-3 blog-sidebar">
+      <%- partial('_partial/sidebar-index-categories') %>
+    </aside>
+  </div>
 </div>

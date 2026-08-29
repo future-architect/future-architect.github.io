@@ -1,0 +1,127 @@
+<%# 期間ページ（月 / 年 / 全期間）のサイドバー。統計と投稿数の推移。
+    3つは同じレイアウトの枝なので、揃えないと年を押したとたんに構成が変わる %>
+<%
+  let archiveItems;
+  let archiveCharts;
+  if (is_month()) {
+    const s = summary_monthly_term(page.year, page.month);
+    // 「平均投稿/月」に当たる軸は月の中では意味が薄いので置かない (#2227)
+    archiveItems = [
+      {value: count_articles_month(page.year, page.month), label: '投稿'},
+      {value: s.total, label: '総シェア数'},
+      {value: s.twitter, label: 'X', sub: true},
+      {value: s.facebook, label: 'Facebook', sub: true},
+      {value: s.hatebu, label: 'はてブ', sub: true},
+      {value: s.pocket, label: 'Pocket', sub: true},
+    ];
+    // 月の中はデータ量が少ないので内訳は週別の1枚だけ (#2227)
+    archiveCharts = [{id: 'sidebar-chart-week', label: '週別'}];
+  } else {
+    const s = is_year() ? summary_yearly_term(page.year) : summary_all_term();
+    archiveItems = [
+      {value: is_year() ? count_articles_year(page.year) : count_articles(), label: '投稿'},
+      {value: ave_posts(page.year), label: is_year() ? '平均投稿/月' : '平均投稿/四半期'},
+      {value: s.total, label: '総シェア数'},
+      {value: s.twitter, label: 'X', sub: true},
+      {value: s.facebook, label: 'Facebook', sub: true},
+      {value: s.hatebu, label: 'はてブ', sub: true},
+      {value: s.pocket, label: 'Pocket', sub: true},
+    ];
+    // **タブを分解して縦に積む** (#2757 の2枚)。年ページは月の中の週、
+    // 全期間は年を重ねた月。同じことを全期間でやると
+    // 「10年分の月の中の第何週か」になり読み取るべき問いが無くなる
+    archiveCharts = [
+      {id: 'sidebar-chart-category', label: 'カテゴリ別'},
+      is_year()
+        ? {id: 'sidebar-chart-period', label: '週別'}
+        : {id: 'sidebar-chart-years', label: '年別'},
+    ];
+  }
+%>
+<%- partial('sidebar-stats-index', {items: archiveItems, charts: archiveCharts}) %>
+<script type="text/javascript">
+  const archiveCatColors = <%- category_colors() %>;
+<% if (is_month()) { %>
+  const weekData = <%- get_weekly_category_data(page.year, page.month) %>;
+  sidebarChart('sidebar-chart-week', {
+    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+    xAxis: { type: 'category', data: weekData.weeks, axisTick: { show: false } },
+    yAxis: <%- partial('chart-yaxis-count', {series: 'weekData.series'}).trim() %>,
+    <%# 色はカテゴリ名で固定 (#2170) %>
+    series: weekData.series.map((s) => ({
+      name: s.name,
+      type: 'bar',
+      stack: 'categories',
+      itemStyle: { color: archiveCatColors[s.name] },
+      data: s.data,
+    })),
+  });
+<% } else { %>
+  <%# 粒度は年の指定に関わらず月 (#2432)。読み手が知りたいのは
+      「どれくらいのペースで書かれているか」で、それは月の単位で見るもの %>
+  const archiveCatData = <%- is_year() ? get_monthly_category_data(page.year) : get_monthly_category_data() %>;
+  sidebarChart('sidebar-chart-category', {
+    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+    xAxis: {
+      type: 'category',
+      data: archiveCatData.months,
+      axisTick: { show: false },
+      axisLabel: <%- partial('chart-xaxis-year-labels', {months: 'archiveCatData.months', el: 'sidebar-chart-category'}).trim() %>
+    },
+    yAxis: { type: 'value', min: 0 },
+    series: archiveCatData.series.map((s) => ({
+      name: s.name,
+      type: 'bar',
+      stack: 'categories',
+      itemStyle: { color: archiveCatColors[s.name] },
+      data: s.data,
+    })),
+  });
+  <%# **月ページでも is_year() は真になる**（hexo は page.year があれば真を返す）。
+      冒頭の if / else と同じ1本の連鎖にしないと、月ページで存在しない div に
+      echarts.init が走る %>
+<% if (is_year()) { %>
+  const periodData = <%- posts_stack_series(page.year) %>;
+  sidebarChart('sidebar-chart-period', {
+    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+    xAxis: { type: 'category', data: periodData.buckets, axisTick: { show: false } },
+    <%# 上限は echarts の自動に任せる (#2466)。手で丸めると最上段だけ間隔が変わる %>
+    yAxis: { type: 'value', min: 0 },
+    <%# 第1週→第5週と順序に意味があるので同系の段で塗る。
+        色は scripts/chart_colors.js が1箇所で持つ %>
+    color: <%- chart_series_colors('weeks') %>,
+    series: periodData.slots.map((data, i) => ({
+      name: periodData.labels[i],
+      type: 'bar',
+      stack: 'posts',
+      data,
+    })),
+  });
+<% } else { %>
+  const yearData = <%- posts_year_overlay_series() %>;
+  <%# 凡例が無いので selected（初期表示は直近3年）が効かない。そのままだと
+      直近5年ぶんの線が全部出る。平坦な古い年が読み取りの邪魔になるのは
+      本文より細い列の方が強いので、選択済みの年だけを描く %>
+  const yearShown = yearData.series.filter((s) => yearData.selected[s.name]);
+  sidebarChart('sidebar-chart-years', {
+    <%# 折れ線なので端に余白を作らない。1月と12月が軸の端に来る %>
+    xAxis: { type: 'category', data: yearData.months, boundaryGap: false, axisTick: { show: false } },
+    yAxis: { type: 'value', min: 0 },
+    <%# 年ごとに色相を変えて、古い年ほど彩度を落として引かせる。
+        線は図形なので基準は 3:1（白地との比 5.35 / 16.34 / 3.25 / 3.18 / 3.23）%>
+    color: ['#D5004A', '#0A1461', '#B8860B', '#689F38', '#8f8f8f'],
+    <%# 点は出さない。3本 × 12か月で36個並ぶと線の形が読み取れない %>
+    series: yearShown.map((s, i) => ({
+      name: s.name,
+      type: 'line',
+      showSymbol: false,
+      lineStyle: { width: <%= chart_line_width() %> },
+      <%# echarts は後の系列を上に描く。z を逆順に振って新しい年を上に置く。
+          既定の 2 より下に落とすと軸の補助線に潜るので +2 する %>
+      z: yearShown.length - i + 2,
+      data: s.data,
+    })),
+  });
+<% } %>
+<% } %>
+</script>
