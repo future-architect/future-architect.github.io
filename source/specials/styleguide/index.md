@@ -22,7 +22,7 @@ layout: page
 | --- | --- | --- | --- | --- |
 | <span class="sg-chip sg-ink-strong"></span> | `ink-strong` | <span class="sg-hex sg-ink-strong"></span> | <span class="sg-ratio sg-ink-strong"></span> | 本文・見出し・リンク |
 | <span class="sg-chip sg-ink-mute"></span> | `ink-mute` | <span class="sg-hex sg-ink-mute"></span> | <span class="sg-ratio sg-ink-mute"></span> | 本文に添える補助情報（日付・著者・タグ・件数・注記）と引用の本文 |
-| <span class="sg-chip sg-ink-faint"></span> | `ink-faint` | <span class="sg-hex sg-ink-faint"></span> | <span class="sg-ratio sg-ink-faint"></span> | 空表示・無効と、補助情報の中でさらに弱くする記号（パンくずの `>`・折りたたみの三角） |
+| <span class="sg-chip sg-ink-faint"></span> | `ink-faint` | <span class="sg-hex sg-ink-faint"></span> | <span class="sg-ratio sg-ink-faint"></span> | 空表示・無効と、補助情報の中でさらに弱くするもの（パンくずの `>`・折りたたみの三角・統計の内訳と枠の名前） |
 
 白はスケールの1段階ではなく背景の色そのもので、役割を選ぶ余地がありません。
 
