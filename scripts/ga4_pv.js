@@ -1,6 +1,6 @@
 'use strict';
 
-const { snsLabel } = require('./lib/post_list');
+const { postListItem } = require('./lib/post_list');
 const { allSeries } = require('./lib/series');
 const { getGA4PV } = require('./lib/ga4');
 
@@ -147,25 +147,13 @@ hexo.extend.helper.register('popular_posts_in', function (posts, limit, decay) {
 
   if (ranked.length === 0) return '';
 
-  // カードは _partial/panel-card.ejs が1箇所で持つ (#3031)。ここで手書きすると、
-  // 同じ形の直しが themes/ の外にも散る（#2845 の aria-hidden はここが漏れた）。
-  // 列だけは呼び出し側の都合なので JS が持つ。2列で並べる
-  const cards = ranked
-    .map(
-      ({ post }) =>
-        '<div class="col-12 col-md-6">' +
-        this.partial('_partial/panel-card', {
-          url: '/' + post.path,
-          title: post.title,
-          thumb: post.thumbnail ? { src: post.thumbnail, width: 200, height: 135 } : null,
-          // 推薦カードの日付は鮮度の目安なので年月まで (#2404)
-          meta: post.date.format('YYYY.MM') + snsLabel(post.permalink),
-        }) +
-        '</div>',
-    )
+  // 行はホームのランキング・関連記事と同じ部品 (#3057)。パネル（panel-card）は
+  // #2892 以降「連載・特設」の名札を持つ部品なので、記事1本には使わない。
+  // 題を1行の塊にして日付・♡を次の行に落とすのは .nav a（display: block）。
+  // ランキング・関連記事・被参照記事も .nav の中に置いて同じ形にしている。
+  // 列は CSS（.popular-in-list）が持つ
+  const items = ranked
+    .map(({ post }) => postListItem(post, 'featured-posts-item', { withThumb: true }))
     .join('');
-
-  // 囲みは .series-panels .article-card が持つ。以前は .post-panel という別名で
-  // 同じルールを引いていたが、名前が2つある理由が無かった
-  return `<div class="series-panels row g-4">${cards}</div>`;
+  return `<ul class="nav popular-in-list">${items}</ul>`;
 });
