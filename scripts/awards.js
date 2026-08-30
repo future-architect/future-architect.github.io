@@ -24,7 +24,7 @@ hexo.extend.helper.register('article_award', function (post) {
     .replace(/\/$/, '');
   const row = rows.find((r) => r.article && String(r.article) === id);
   if (!row) return null;
-  // メダルの色は著者のその年時点の受賞回数で決まる（灰→銅→金）。
+  // メダルの色は著者のその年時点の受賞回数で決まる（銅→銀→金）。
   // 一覧・著者ページと同じ規則にする (#2409)
   const years = rows
     .filter((r) => r.author === row.author)
