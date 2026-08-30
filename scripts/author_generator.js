@@ -111,8 +111,7 @@ hexo.extend.helper.register('list_authors', function (year = 'all') {
     // 「そろそろ声をかけると再開してくれるかも」は運営の関心なので置き場所は /doctor/
     authorMapper = (author) => `
         <li class="author-list-item">
-          <a class="author-list-link" href="/authors/${author_to_url.call(this, author)}">${author}</a>
-          <span class="author-list-count">${count_posts(author)}本</span>
+          <a class="author-list-link" href="/authors/${author_to_url.call(this, author)}">${author}<span class="author-list-count">${count_posts(author)}</span></a>
         </li>`;
   } else {
     // 年指定: その年が初投稿の著者に NEW を付ける (#2413)。
@@ -120,12 +119,12 @@ hexo.extend.helper.register('list_authors', function (year = 'all') {
     // 同じ定義。マークは記事一覧の NEW（.newitem）と同じ表現
     const yearNum = Number(year);
     const isNewIn = (author) => Math.min(...yearsByAuthor.get(author)) === yearNum;
-    // NEW は名前と同じ行（アンカー内の名前直後）に置く。リンクの外に置くと
-    // 2行目の件数の隣に折り返され、「件数が新しい」ように読めてしまう
+    // 件数と NEW はアンカーの中、名前の直後に置く。タブ帯の .nav li a が
+    // display: block なので、外に置くと次の行に落ちて名前から離れる (#3085)。
+    // 形はヘッダーのドロップダウン（名前の右肩に総数）と同じ
     authorMapper = (author) => `
       <li class="author-list-item">
-        <a class="author-list-link" href="/authors/${author_to_url.call(this, author)}">${author}${isNewIn(author) ? '<span class="newitem">NEW</span>' : ''}</a>
-        <span class="author-list-count">${count_posts(author)}本</span>
+        <a class="author-list-link" href="/authors/${author_to_url.call(this, author)}">${author}<span class="author-list-count">${count_posts(author)}</span>${isNewIn(author) ? '<span class="newitem">NEW</span>' : ''}</a>
       </li>`;
   }
 

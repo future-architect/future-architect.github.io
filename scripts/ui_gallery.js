@@ -46,6 +46,10 @@ const NOT_SHOWN = {
   'sidebar-index-tags': '同上（/tags/）',
   'sidebar-stats-index':
     '一覧ページのサイドバーの中身。渡された統計とグラフを並べるだけで、単体では形を持たない',
+  'post/title':
+    '記事の題。一覧のカード（archive-post）の見本の中に実物が出ている。メタ情報の見本には入れない',
+  'post/category':
+    '同上。カテゴリはパンくずが名乗るので、記事のメタ情報の並びには出てこない (#2837)',
   'related-categories': 'カテゴリページの本体の一部。page.category に依存する',
   'related-tags': 'タグページの本体の一部。page.tag に依存する',
   scripts: 'ページ末のスクリプト。見た目を持たない',
