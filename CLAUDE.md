@@ -839,6 +839,7 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
     全件への導線（ホームの連載・特設の枠、サイドバーの人気のタグ、記事末の連載ナビと
     著者紹介の `.more-link`、ヘッダーのドロップダウンの `.header-dropdown-more`）は
     `ink-mute`。hover は他の添えのリンクと同じ `ink-strong` ＋下線（#2699）
+    - **markup は `_partial/more-link` が1箇所で持つ**（#3098。引数は `url` と `text`）
     - **青をやめたら手がかりを別に足す。** 14px の1行では色しか手がかりが無くなるので、
       末尾に `>`（`chevron-right`）を置く。ドロップダウンの側は面 hover と
       仕切りの線を持つ行なので記号は要らない
