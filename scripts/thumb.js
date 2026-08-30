@@ -20,8 +20,6 @@
  * この時点で全記事が DB に入っている。
  */
 
-const { thumbIcon } = require('./lib/post_list');
-
 hexo.extend.tag.register('thumb', function (args) {
   const id = (args[0] || '').trim();
   if (!id) return '';
@@ -33,5 +31,8 @@ hexo.extend.tag.register('thumb', function (args) {
     hexo.log.warn(`thumb: 記事 ${id} が見つかりません`);
     return '';
   }
-  return thumbIcon(post);
+  // 絵の markup は行の部品と共有する (#3097)。タグプラグインには this.partial が
+  // 無いので、テーマのビューを直接引いて描く
+  const view = hexo.theme.getView('_partial/post-list-icon.ejs');
+  return view.renderSync({ post }).trim();
 });

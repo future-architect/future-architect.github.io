@@ -153,7 +153,7 @@ hexo.extend.helper.register('popular_posts_in', function (posts, limit, decay) {
   // ランキング・関連記事・被参照記事も .nav の中に置いて同じ形にしている。
   // 列は CSS（.popular-in-list）が持つ
   const items = ranked
-    .map(({ post }) => postListItem(post, 'featured-posts-item', { withThumb: true }))
+    .map(({ post }) => postListItem(this, post, 'featured-posts-item', { withThumb: true }))
     .join('');
   return `<ul class="nav popular-in-list">${items}</ul>`;
 });

@@ -32,7 +32,7 @@ const rankMark = (rank, crownSvg) => {
 };
 
 // caps は各段の終端順位（累積）。[10, 25] なら 10位まで表示 + 25位まで畳み
-const rankingList = (posts, crownSvg, caps = [RANKING_DISPLAY_COUNT, RANKING_MAX_COUNT]) => {
+const rankingList = (ctx, posts, crownSvg, caps = [RANKING_DISPLAY_COUNT, RANKING_MAX_COUNT]) => {
   // 順位はマークアップ側で振る。CSS カウンタだと「10件で畳む」定数と
   // 二重管理になる。畳んだ側は11位から続く
   const items = (list, offset) =>
@@ -40,7 +40,7 @@ const rankingList = (posts, crownSvg, caps = [RANKING_DISPLAY_COUNT, RANKING_MAX
       .map((post, i) =>
         // NEW を出すのはここだけ (#2788)。PV 順の並びは新しさと無関係なので、
         // 「まだ読んでいないかもしれない新顔」の合図として働く
-        postListItem(post, 'featured-posts-item', {
+        postListItem(ctx, post, 'featured-posts-item', {
           withThumb: true,
           rankMark: rankMark(offset + i + 1, crownSvg),
           withNew: true,
@@ -151,6 +151,7 @@ hexo.extend.helper.register('popular_posts', function (term = 'weekly') {
   // アイコンのパスは svg-icon.ejs の辞書が1箇所で持つ決まりなので、
   // JS 側にパスを書き写さずヘルパーの実行文脈から partial を引く (#2681)
   return rankingList(
+    this,
     popularPosts,
     this.partial('_partial/svg-icon', { icon: 'crown' }).trim(),
     caps,

@@ -29,9 +29,9 @@ hexo.extend.helper.register('list_reference_posts', function () {
   const shown = collapses ? referencePosts.slice(0, VISIBLE) : referencePosts;
   const hidden = collapses ? referencePosts.slice(VISIBLE) : [];
 
-  // マークアップは lib/post_list.js に集約している
+  // マークアップは _partial/post-list-item.ejs に集約している
   const items = (posts) =>
-    posts.map((p) => postListItem(p, 'reference-posts-item', { withThumb: true })).join('');
+    posts.map((p) => postListItem(this, p, 'reference-posts-item', { withThumb: true })).join('');
 
   // ul の直下に details は置けないため、畳む分は別の ul にして details で包む
   const more =
