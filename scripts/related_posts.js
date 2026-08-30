@@ -119,12 +119,9 @@ function generateRelatedPostsHtml(posts, series) {
     return `<p class="related-posts-none">No related post.</p>`;
   }
 
-  // マークアップは lib/post_list.js に集約している
-  const item = (related) => {
-    const scoreText = related.score ? `スコア: ${related.score.toFixed(4)}` : '';
-    const titleAttr = `${related.lede} ${scoreText}`.trim();
-    return postListItem(related, 'related-posts-item', { titleAttr, withThumb: true });
-  };
+  // マークアップは lib/post_list.js に集約している。title は lede だけ
+  // （postListItem の既定）。score は並び順を決める内部の重みで読者には出さない (#3076)
+  const item = (related) => postListItem(related, 'related-posts-item', { withThumb: true });
 
   // 語彙と作りはランキング・参照記事の畳みに揃える (#2249)
   const moreHtml = more.length
