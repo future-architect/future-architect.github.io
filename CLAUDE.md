@@ -1503,6 +1503,16 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
     `_variables.styl` は `theme-styles.styl` の先頭で読むので、そこに置けば起きない
   - **再発は `css_lint.mjs` が止める**（`make lint-css`、PR では `css` ワークフロー）。
     コンパイル後の CSS を見て、カスタムプロパティの値が裸の識別子になっていないかを検査する
+- **ベンダー接頭辞の擬似要素は単独のルールに書く**（#3058）。セレクタリストに1つでも
+  解釈できないセレクタがあると、ブラウザは**ルールごと捨てる**。`::-moz-selection` を
+  他のセレクタと並べると、**Chrome / Safari でその塊が丸ごと効かなくなる**。
+  これも画面を見るまで気づけない壊れ方
+  - ダークモードの `::selection` がこの形で、選択の地がページ地との比 **1.12** のまま
+    だった（意図した値なら 14.03）。同居していた `.skip-link` / `.share-copied` /
+    `.tag-list-link:hover` / `.post-list-rank-high` も暗地用の指定を失っていた
+  - **同じ接頭辞だけで組んだリストは対象外。** 効かないブラウザでは全部まとめて
+    要らないので、捨てられて正しい（`bootstrap-subset.css` の `::-webkit-datetime-edit-*`）
+  - 再発は `css_lint.mjs` の2つめの検査が止める
 - **色は `_variables.styl` が値を持ち、`:root` が CSS 変数として配り、使う側は `var()` で引く**
   （#2746。ダークモードの前段）。3つの役を分ける
   - **値は Stylus 変数のまま置く。`:root` にだけ書かない。** CSS カスタムプロパティは
