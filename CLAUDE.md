@@ -1709,7 +1709,10 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
     **ページ本文にはそう書かない**（#2895。読者に語るのは中身であって、
     ページの作り方と収録の運用ではない）
   - 書き方は `.claude/skills/publish-qiita/SKILL.md` の「フロントマター整備」が持つ。
-    **タグに `出版` を付けるだけでは載らない**ので、公開手順の側に書いておく
+    **タグに `出版` を付けるだけでは載らない**ので、公開手順の側に書いておく。
+    逆に `books:` / `magazines:` を書いた記事に `出版` タグが無いと、一覧には載るのに
+    ページの「関連タグ」の行き先（`/tags/出版/`）には出ない。**textlint の
+    `no-publication-without-tag` が止める**（#3101）
 - **特設・固定ページはルート直下に置かず `/specials/` 配下に切る**（#2344）。
   GitHub Pages のプロジェクトサイトが `future-architect.github.io/<リポジトリ名>/` に生えるため、
   ルート直下のパスは将来のリポジトリ名と衝突しうる（/arch-guidelines/ 等は既に別リポジトリが占有）。

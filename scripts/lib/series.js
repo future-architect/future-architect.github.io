@@ -1,5 +1,8 @@
 'use strict';
 
+// 索引記事の判定に使うタグ。/series/ の関連タグもここから引く (#3101)
+const INDEX_TAG = 'インデックス';
+
 /**
  * 連載記事に前 / 次 と索引へのリンクを出すヘルパー。
  *
@@ -154,13 +157,13 @@ function build(site) {
   // 系統リンクの行き先は索引記事（無ければ先頭の記事）。/series/ 一覧と同じ規則
   const destOf = (name) => {
     const posts = groups.get(name);
-    const index = posts.find((p) => p.tags && p.tags.some((t) => t.name === 'インデックス'));
+    const index = posts.find((p) => p.tags && p.tags.some((t) => t.name === INDEX_TAG));
     return { name, path: (index || posts[0]).path };
   };
 
   const series = new Map(); // 記事のパス -> その記事から見た連載
   for (const [name, posts] of groups) {
-    const index = posts.find((p) => p.tags && p.tags.some((t) => t.name === 'インデックス'));
+    const index = posts.find((p) => p.tags && p.tags.some((t) => t.name === INDEX_TAG));
 
     // 落とすのはナビの表示だけ。記事の title そのものは触らない
     const nav = posts.map((p) => ({ path: p.path, title: navTitle(p.title, name) }));
@@ -192,7 +195,7 @@ function build(site) {
   return {
     byPath: series,
     list: [...groups].map(([name, posts]) => {
-      const index = posts.find((p) => p.tags && p.tags.some((t) => t.name === 'インデックス'));
+      const index = posts.find((p) => p.tags && p.tags.some((t) => t.name === INDEX_TAG));
       return {
         name,
         total: posts.length,
@@ -265,4 +268,4 @@ function navLinkedPaths(site, post) {
   return s ? s.linked : NONE;
 }
 
-module.exports = { seriesOf, navLinkedPaths, allSeries, seriesStats };
+module.exports = { INDEX_TAG, seriesOf, navLinkedPaths, allSeries, seriesStats };
