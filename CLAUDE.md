@@ -805,6 +805,26 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
       下線のままなので hover の型は増えていない
     - 脚注（`sup` の番号と `#footnotelist` の戻り）は上付きの数字と記号で地の文に
       紛れないので下線を持たない
+    - **`text-underline-offset` は `link-underline-offset`（2px）。選択の帯に線を
+      収めるための値**（#3058）。値は `_variables.styl` が持ち、
+      **規則はスタイルガイドが名乗る**（「選択されると色が消えるので、下線だけが残る」）。
+      **選択されると、ブラウザは文字も下線も `::selection` の文字色1色で塗り直す。**
+      リンクの色は残らず、`text-decoration-color` を明示しても残らない
+      （選択中の描画を実測して、リンク色の画素は0だった）。
+      その結果、**帯からはみ出した線は白地の上の白い線**（ダークは暗地の上の暗い線）に
+      なって消える
+      - 帯の高さは行ボックスなので、**いちばん低いのは表のセル**。`td` は
+        `line-height` を持たず `leading-row` を継ぐので、13px × 1.4 で
+        **下の余白が 2.6px** しかない（`p` / `li` は 15.6px × 1.75 で 5.85px）。
+        3px では表のセルでだけ線が帯の外に落ちる
+      - **`::selection` に `text-decoration` を書かない。** 静止の線が既に
+        選択の色で塗られているので足しても増えない。**位置をそろえずに書くと
+        別の場所にもう1本引かれて二重に見える**（#3058 で一度踏んだ）
+      - **カードの hover の下線も同じ 2px にそろえる**（`.article-card:hover`）。
+        地の文の下線と同じものとして #2893 で位置を合わせてあるので、
+        片方だけ動かすと値が2つに割れる
+      - 点線の補足の印（`.blog-info-metric span[title]`）は 3px のまま。
+        リンクの下線ではなく `abbr` の慣習に合わせた別の役
   - **リンクの色は4値・3状態**（#2860）。`_variables.styl` が持つ（`link-blue` /
     `link-visited` / `link-on-tint` / `link-on-note` / `link-on-note-visited`）。
     地が濃くなるぶん暗い側へ振る段で、`link-blue` は白地では AA を満たすが
@@ -1513,6 +1533,16 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
     `_variables.styl` は `theme-styles.styl` の先頭で読むので、そこに置けば起きない
   - **再発は `css_lint.mjs` が止める**（`make lint-css`、PR では `css` ワークフロー）。
     コンパイル後の CSS を見て、カスタムプロパティの値が裸の識別子になっていないかを検査する
+- **ベンダー接頭辞の擬似要素は単独のルールに書く**（#3058）。セレクタリストに1つでも
+  解釈できないセレクタがあると、ブラウザは**ルールごと捨てる**。`::-moz-selection` を
+  他のセレクタと並べると、**Chrome / Safari でその塊が丸ごと効かなくなる**。
+  これも画面を見るまで気づけない壊れ方
+  - ダークモードの `::selection` がこの形で、選択の地がページ地との比 **1.12** のまま
+    だった（意図した値なら 14.03）。同居していた `.skip-link` / `.share-copied` /
+    `.tag-list-link:hover` / `.post-list-rank-high` も暗地用の指定を失っていた
+  - **同じ接頭辞だけで組んだリストは対象外。** 効かないブラウザでは全部まとめて
+    要らないので、捨てられて正しい（`bootstrap-subset.css` の `::-webkit-datetime-edit-*`）
+  - 再発は `css_lint.mjs` の2つめの検査が止める
 - **色は `_variables.styl` が値を持ち、`:root` が CSS 変数として配り、使う側は `var()` で引く**
   （#2746。ダークモードの前段）。3つの役を分ける
   - **値は Stylus 変数のまま置く。`:root` にだけ書かない。** CSS カスタムプロパティは

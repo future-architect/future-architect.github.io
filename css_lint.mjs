@@ -1,4 +1,8 @@
-// コンパイル後の CSS に、解決されなかった Stylus の識別子が残っていないかを見る。
+// コンパイル後の CSS を見て、「画面を見るまで気づけない壊れ方」を2つ止める。
+// どちらも書いた宣言が無言で捨てられる形で、ビルドもエラーにならない。
+//
+// 1. 解決されなかった Stylus の識別子（以下）
+// 2. ベンダー接頭辞の擬似要素と他のセレクタの同居（ファイル後半）
 //
 // Stylus は未定義の変数をエラーにせず、**名前をそのまま値として出力する**。
 // CSS 側では無効な値なので、その宣言（一括指定なら丸ごと）が捨てられる。
@@ -52,3 +56,42 @@ if (errors.length) {
   process.exit(1);
 }
 console.log('CSS に解決漏れの識別子はありません');
+
+// ベンダー接頭辞の擬似要素が、他のセレクタと同じセレクタリストに入っていないかを見る。
+//
+// セレクタリストに1つでも解釈できないセレクタがあると、ブラウザは**ルールごと捨てる**。
+// ::-moz-selection は Firefox 専用なので、他のセレクタと並べると Chrome / Safari で
+// その塊が丸ごと効かなくなる。これも画面を見るまで気づけない壊れ方で、実際に踏んだ:
+//
+//   :root[data-theme='dark'] ::-moz-selection, ... , .post-list-rank-high { ... }
+//     ← ダークモードで選択の地・スキップリンク・ランキングの丸が明るい側の値のまま (#3058)
+//
+// 同じ接頭辞だけで組んだリスト（bootstrap の ::-webkit-datetime-edit-* など）は、
+// 効かないブラウザでは全部まとめて要らないので対象外にする。
+const VENDOR_PSEUDO = /::-(?:moz|webkit|ms|o)-/;
+
+const mixed = [];
+// `}` か `{` の直後から次の `{` までがセレクタ。`@media` などの前置きは `@` で外す
+for (const m of css.matchAll(/[}{]([^{}@;]+)\{/g)) {
+  const parts = m[1].split(',').map((s) => s.trim().replace(/\s+/g, ' '));
+  if (parts.length < 2) continue;
+  const vendor = parts.filter((s) => VENDOR_PSEUDO.test(s));
+  if (vendor.length === 0 || vendor.length === parts.length) continue;
+  mixed.push({ vendor, all: parts });
+}
+
+if (mixed.length) {
+  console.error(
+    `\nベンダー接頭辞の擬似要素が他のセレクタと同居しているルールが ${mixed.length} 件あります。\n`,
+  );
+  mixed.forEach(({ vendor, all }) => {
+    console.error(`  ${FILE}  ${vendor.join(', ')}`);
+    console.error(
+      `    同居しているセレクタ: ${all.filter((s) => !VENDOR_PSEUDO.test(s)).join(', ')}`,
+    );
+  });
+  console.error('\nそのルールは、接頭辞を知らないブラウザでは丸ごと捨てられます。');
+  console.error('ベンダー接頭辞の擬似要素は単独のルールに分けてください。');
+  process.exit(1);
+}
+console.log('ベンダー接頭辞の擬似要素の同居はありません');
