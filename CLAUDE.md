@@ -795,6 +795,13 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
       下線のままなので hover の型は増えていない
     - 脚注（`sup` の番号と `#footnotelist` の戻り）は上付きの数字と記号で地の文に
       紛れないので下線を持たない
+    - **`::selection` で下線を足さない**（#3058）。静止で下線を持つようになったので、
+      選択中に足すと**線が2本引かれる**（静止は offset 3px・太さ 1px、`::selection` は
+      既定値なので位置がずれて重ならない）。選択中は文字も下線も白に返るだけで、
+      リンクかどうかは静止の下線がそのまま示す
+      - 器の外の `<a>` は**本文の 0.55%**（記事57本・1,449本の `<a>` で8本）。
+        残りは見出しのアンカー（686本）と We're hiring のカード（228本）で、
+        どちらも地の文ではない
   - **リンクの色は4値・3状態**（#2860）。`_variables.styl` が持つ（`link-blue` /
     `link-visited` / `link-on-tint` / `link-on-note` / `link-on-note-visited`）。
     地が濃くなるぶん暗い側へ振る段で、`link-blue` は白地では AA を満たすが
