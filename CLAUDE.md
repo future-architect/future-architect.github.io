@@ -795,7 +795,9 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
       下線のままなので hover の型は増えていない
     - 脚注（`sup` の番号と `#footnotelist` の戻り）は上付きの数字と記号で地の文に
       紛れないので下線を持たない
-    - **`text-underline-offset` は 2px。選択の帯に線を収めるための値**（#3058）。
+    - **`text-underline-offset` は `link-underline-offset`（2px）。選択の帯に線を
+      収めるための値**（#3058）。値は `_variables.styl` が持ち、
+      **規則はスタイルガイドが名乗る**（「選択されると色が消えるので、下線だけが残る」）。
       **選択されると、ブラウザは文字も下線も `::selection` の文字色1色で塗り直す。**
       リンクの色は残らず、`text-decoration-color` を明示しても残らない
       （選択中の描画を実測して、リンク色の画素は0だった）。
