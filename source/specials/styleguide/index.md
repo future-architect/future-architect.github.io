@@ -87,7 +87,7 @@ layout: page
 
 | <span class="sr-only">見本</span> | 変数 | 値 | 白背景との比 | 使うところ |
 | --- | --- | --- | --- | --- |
-| <span class="sg-chip sg-brand-navy"></span> | `brand-navy` | <span class="sg-hex sg-brand-navy"></span> | <span class="sg-ratio sg-brand-navy"></span> | 塗り面とインタラクション。フッターの背景・チップ・ページャの現在地・フォーカスリング |
+| <span class="sg-chip sg-brand-navy"></span> | `brand-navy` | <span class="sg-hex sg-brand-navy"></span> | <span class="sg-ratio sg-brand-navy"></span> | 塗り面とインタラクション。フッターの背景・チップ・ページャの現在地・フォーカスリング・テキスト選択の帯 |
 | <span class="sg-chip sg-brand-gray"></span> | `brand-gray` | <span class="sg-hex sg-brand-gray"></span> | <span class="sg-ratio sg-brand-gray"></span> | 白背景の上で面としてはっきり見せたいところ。小さな部品には広げない |
 | <span class="sg-chip sg-brand-crimson"></span> | `brand-crimson` | <span class="sg-hex sg-brand-crimson"></span> | <span class="sg-ratio sg-brand-crimson"></span> | 差し色。フッターの波・ランキング1位・フッターの hover |
 
@@ -130,10 +130,13 @@ layout: page
 | <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-surface-tint"></span></span> | `surface-tint` | <span class="sg-hex sg-dark-surface-tint"></span> | <span class="sg-ratio sg-dark-surface-tint"></span> | 静止した面 |
 | <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-surface-mute"></span></span> | `surface-mute` | <span class="sg-hex sg-dark-surface-mute"></span> | <span class="sg-ratio sg-dark-surface-mute"></span> | 反応した面・インラインコードの背景 |
 | <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-navy"></span></span> | `brand-navy` | <span class="sg-hex sg-dark-navy"></span> | <span class="sg-ratio sg-dark-navy"></span> | フッターの帯 |
+| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-selection"></span></span> | `selection-bg` | <span class="sg-hex sg-dark-selection"></span> | <span class="sg-ratio sg-dark-selection"></span> | テキスト選択の帯。文字は `surface-base` |
 
 **`ink-faint` は明るいほうと同じく「AA を満たす最も薄い段階」です。** 上の表の比はページの背景に対する値ですが、実際にいちばん厳しいのはインラインコードの背景で、そこでも AA を満たす値にしています。これより薄くしません。
 
 **ブランドのネイビーは、暗い背景では背景とほとんど見分けが付きません。** 面に使っても線に使っても消えるので、フッターの帯は1段階暗い値にして色味だけ残し、選択中のページ・選択中のタブの上辺・共有ボタン・タグの hover・フォーカスリングは明るい線と明るい塗りに置き換えています。
+
+**テキスト選択の帯は向きを逆にします。** 明るいほうは濃いネイビーの帯に白い文字ですが、暗い背景ではネイビーを中間まで明るくしても、帯として見える前に白い文字が AA を割ります。そこでネイビーを薄くした帯にして、文字を背景の色で描きます。色相はブランドのまま、彩度は半分に落としています（そのままだと蛍光の紫青になります）。無彩色の帯にすると反転表示のように見えて、ブランドの色味が消えます。コードブロックの背景は両方のテーマで暗いので、明るいほうでもこの帯を使います。
 
 **同じコントラスト比でも、明るい面は暗い面より膨らんで見えます。** 白背景の濃い丸をそのまま反転すると暗い背景では浮きます。同じ強さを移すのではなく、その部品が担う役割から決めます。所在や反応の印は明るいまま、装飾は1段階落とします。
 
