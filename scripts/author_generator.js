@@ -112,7 +112,7 @@ hexo.extend.helper.register('list_authors', function (year = 'all') {
     authorMapper = (author) => `
         <li class="author-list-item">
           <a class="author-list-link" href="/authors/${author_to_url.call(this, author)}">${author}</a>
-          <span class="author-list-count">${count_posts(author)} 件</span>
+          <span class="author-list-count">${count_posts(author)}本</span>
         </li>`;
   } else {
     // 年指定: その年が初投稿の著者に NEW を付ける (#2413)。
@@ -125,7 +125,7 @@ hexo.extend.helper.register('list_authors', function (year = 'all') {
     authorMapper = (author) => `
       <li class="author-list-item">
         <a class="author-list-link" href="/authors/${author_to_url.call(this, author)}">${author}${isNewIn(author) ? '<span class="newitem">NEW</span>' : ''}</a>
-        <span class="author-list-count">${count_posts(author)} 件</span>
+        <span class="author-list-count">${count_posts(author)}本</span>
       </li>`;
   }
 
