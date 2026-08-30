@@ -54,6 +54,7 @@ const NOT_SHOWN = {
   'related-tags': 'タグページの本体の一部。page.tag に依存する',
   scripts: 'ページ末のスクリプト。見た目を持たない',
   'search-hint': '検索窓のヒントパネル。実物がこのページの上端にある',
+  'site-logo': 'ヘッダーのロゴ。実物がこのページの上端に出ている',
   'sidebar-stats': 'サイドバーの中身の一部。page に依存する',
   sidebar: 'サイドバー。実物がこのページの右に出ている',
 };
