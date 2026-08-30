@@ -149,9 +149,11 @@ hexo.extend.helper.register('popular_posts_in', function (posts, limit, decay) {
 
   // 行はホームのランキング・関連記事と同じ部品 (#3057)。パネル（panel-card）は
   // #2892 以降「連載・特設」の名札を持つ部品なので、記事1本には使わない。
+  // 題を1行の塊にして日付・♡を次の行に落とすのは .nav a（display: block）。
+  // ランキング・関連記事・被参照記事も .nav の中に置いて同じ形にしている。
   // 列は CSS（.popular-in-list）が持つ
   const items = ranked
     .map(({ post }) => postListItem(post, 'featured-posts-item', { withThumb: true }))
     .join('');
-  return `<ul class="popular-in-list">${items}</ul>`;
+  return `<ul class="nav popular-in-list">${items}</ul>`;
 });
