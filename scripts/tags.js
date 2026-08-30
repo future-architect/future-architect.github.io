@@ -175,53 +175,69 @@ const totalCount = (posts) => {
   return posts.map((post) => getSNSCnt(post.permalink)).reduce((acc, cur) => acc + cur);
 };
 
-/**
- * カスタムタグクラウドヘルパー
- * @param {object} options - オプション
- * @param {number} [options.min_font=12] - 最小フォントサイズ
- * @param {number} [options.max_font=26] - 最大フォントサイズ
- * @param {string} [options.font_unit='px'] - フォントサイズの単位
- * @param {number} [options.boost_ratio=0.7] - 上昇ペースの度合い（1未満で序盤のペースが上がる）
- * @returns {string} - タグクラウドのHTML文字列
- */
-function customTagCloudHelper(options) {
-  const hexo = this;
-  const { site } = hexo;
-  const tags = site.tags.sort('name', 1);
+// 頭文字の群。カタカナはひらがなに寄せ、小書き・濁音・半濁音は清音の行で数える。
+// ん は独立させず わ行 に入れる（1件のためだけに群を立てない）
+const KANA_ROWS = [
+  ['a', 'あ行', 'あいうえお'],
+  ['ka', 'か行', 'かきくけこ'],
+  ['sa', 'さ行', 'さしすせそ'],
+  ['ta', 'た行', 'たちつてと'],
+  ['na', 'な行', 'なにぬねの'],
+  ['ha', 'は行', 'はひふへほ'],
+  ['ma', 'ま行', 'まみむめも'],
+  ['ya', 'や行', 'やゆよ'],
+  ['ra', 'ら行', 'らりるれろ'],
+  ['wa', 'わ行', 'わをん'],
+];
+const SMALL_KANA = {
+  ぁ: 'あ',
+  ぃ: 'い',
+  ぅ: 'う',
+  ぇ: 'え',
+  ぉ: 'お',
+  っ: 'つ',
+  ゃ: 'や',
+  ゅ: 'ゆ',
+  ょ: 'よ',
+  ゎ: 'わ',
+  ゕ: 'か',
+  ゖ: 'け',
+};
+// 群の並び。0-9 → A〜Z → あ行〜わ行 → 漢字
+const GROUP_ORDER = [
+  'digits',
+  ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+  ...KANA_ROWS.map((r) => r[0]),
+  'kanji',
+];
 
-  if (!tags.length) {
-    return '';
+function initialGroup(name) {
+  // .NET の . のような先頭の ASCII 記号は読み飛ばす。C++ の + は先頭に無いので当たらない
+  const head = name.replace(/^[!-/:-@[-`{-~]+/, '').charAt(0);
+  if (/[0-9]/.test(head)) return ['digits', '0-9'];
+  if (/[A-Za-z]/.test(head)) {
+    const upper = head.toUpperCase();
+    return [upper, upper];
   }
-
-  // オプションのデフォルト値を設定
-  options = options || {};
-  const minFont = options.min_font || 12;
-  const maxFont = options.max_font || 26;
-  const fontUnit = options.font_unit || 'px';
-  const boostRatio = options.boost_ratio || 0.7;
-
-  const sizes = tags.map((tag) => tag.length);
-  const maxSize = Math.max(...sizes) || 1;
-  const minSize = Math.min(...sizes) || 1;
-  const spread = maxSize - minSize;
-
-  let result = '';
-
-  tags.forEach((tag) => {
-    // フォントサイズの計算
-    const ratio = spread === 0 ? 0.5 : (tag.length - minSize) / spread;
-    const adjustedRatio = Math.pow(ratio, boostRatio);
-    const fontSize = minFont + (maxFont - minFont) * adjustedRatio;
-
-    // メンテ用の * / ** / *** マークは /doctor/ に移した (#2058)。
-    // クラウドは読者向けの導線なので、運営向けの印を混ぜない
-    const tagName = tag.name.replace(/ /g, '-');
-    const tagLink = hexo.url_for(tag.path);
-
-    result += `<a href="${tagLink}" style="font-size: ${fontSize.toFixed(2)}${fontUnit};">${tagName}</a>\n`;
-  });
-
-  return result;
+  // NFD で濁点・半濁点を切り離してから清音を取る。ヴ もこれで う になる
+  let kana = head.normalize('NFD').charAt(0);
+  const code = kana.codePointAt(0);
+  if (code >= 0x30a1 && code <= 0x30f6) kana = String.fromCodePoint(code - 0x60);
+  kana = SMALL_KANA[kana] || kana;
+  // 空文字は includes('') が真になって あ行 に落ちるので先に外す
+  const row = kana && KANA_ROWS.find((r) => r[2].includes(kana));
+  // 漢字始まりは読みを持たないので五十音へ入れられない。コード順の1群にまとめる
+  return row ? [row[0], row[1]] : ['kanji', '漢字'];
 }
 
-hexo.extend.helper.register('custom_tagcloud', customTagCloudHelper);
+// /tags/ の「すべてのタグ」の索引 (#3064)。名前順のまま頭文字で束ねる。
+// ここはデータだけ返し、描くのは呼び出し側 (#3029)
+hexo.extend.helper.register('tag_index', function () {
+  const groups = new Map();
+  this.site.tags.sort('name', 1).forEach((tag) => {
+    const [key, label] = initialGroup(tag.name);
+    if (!groups.has(key)) groups.set(key, { key, label, items: [] });
+    groups.get(key).items.push({ name: tag.name, path: tag.path, count: tag.length });
+  });
+  return GROUP_ORDER.filter((key) => groups.has(key)).map((key) => groups.get(key));
+});

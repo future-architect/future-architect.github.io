@@ -881,10 +881,9 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
     アイコンだけのリンク）は `text-decoration: none` で下線を打ち消す。下線が付くのは
     面を持たない部品で、`.breadcrumb a` / `.publish-date` / `.post-author` /
     `.article-category-link` / `.author-list-link` / `.category-index-name` /
-    `.series-nav-title > a` / `.series-nav-succession` / `.tag-cloud a` /
+    `.series-nav-title > a` / `.series-nav-succession` /
     `.more-link a` と本文、そして**カードのタイトル**がこの形。
     **スタイルガイドがこの規則を名乗るので、例外を1つ作ると嘘になる。**
-    `.tag-cloud a` は色だけ動かしていたので #2893 で揃えた
     - **カードは下線側。** #2747 で囲みも影も失って面を持たなくなった。以前は
       中身の色を一段落として返していたが、`ink-strong` → `ink-mute` の**状態の差は
       1.62:1** しかなく読み取れない（状態は前後を並べて比べられないので、同時に
