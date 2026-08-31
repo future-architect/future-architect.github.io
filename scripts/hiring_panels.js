@@ -14,7 +14,12 @@ const recruitPanel = {
   // 「未来報（フューチャー公式note）」は note を名乗っているので付けない
   label: 'フューチャー採用ページ',
   external: true,
+  // 採用サイトの OGP そのもの（写真のビジュアルが無く、これ以外の絵が取れない）。
+  // 白地なので hover の面の上では白い穴に見える。#2458 の枠で縁取る (#3113)
   image: '/career_official.jpg',
+  width: 1200,
+  height: 630,
+  bordered: true,
   lede: '私たちは、多様なバックグラウンドを持つ人材が集まってこそ、より強い組織になると考えています。',
 };
 
@@ -24,6 +29,8 @@ const contentPanels = [
     title: '未来報',
     label: '未来報（フューチャー公式note）',
     image: '/miraiho.jpg',
+    width: 400,
+    height: 145,
     lede: 'フューチャーの公式note。社員やカルチャー、イベントなど、会社の「いま」を発信しています。',
   },
   {
@@ -34,6 +41,8 @@ const contentPanels = [
     // 読者には別サイトへ出ると読めないので印を付ける (#2729)
     external: true,
     image: '/lttf.jpg',
+    width: 1200,
+    height: 600,
     lede: 'フューチャーのオウンドメディア。AI・テクノロジーや業界のインサイト、プロジェクトの裏側を発信しています。',
   },
 ];
