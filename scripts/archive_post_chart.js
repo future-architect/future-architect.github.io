@@ -1,15 +1,5 @@
 'use strict';
 
-hexo.extend.helper.register('generate_posts_series_x', function (year) {
-  const acc = generatePostsSeries(this.site.posts, year);
-  return acc.map((e) => `'${e.groupKey}'`).join(',');
-});
-
-hexo.extend.helper.register('generate_posts_series_y', function (year) {
-  const acc = generatePostsSeries(this.site.posts, year);
-  return acc.map((e) => e.count).join(',');
-});
-
 hexo.extend.helper.register('ave_posts', function (year) {
   const acc = generatePostsSeries(this.site.posts, year);
   const ave =
