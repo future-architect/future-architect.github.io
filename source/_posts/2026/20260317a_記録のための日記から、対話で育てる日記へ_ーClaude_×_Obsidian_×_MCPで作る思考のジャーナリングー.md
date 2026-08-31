@@ -4,6 +4,7 @@ date: 2026/03/17 00:00:00
 postid: a
 tags:
   - Claude
+  - Obsidian
   - MCP
 categories:
   - AIDD
