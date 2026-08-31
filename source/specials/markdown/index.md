@@ -3,6 +3,7 @@ title: 記法ガイド
 description: "フューチャー技術ブログで使える記法と、その表示結果をまとめたページです。"
 layout: page
 mathjax: true
+career: true
 ---
 
 # 記法ガイド
