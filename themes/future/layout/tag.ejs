@@ -1,3 +1,23 @@
+<%# 節はテンプレートが作るので、目次も同じ並びをここで持つ（#2345 / #3116 と同じ
+    specialsToc の形）。節の有無を決める値は下の本文と同じ変数から引く。
+    2項目に満たないページで目次を出さない判断は _partial/sidebar が持つ (#3145) %>
+<%
+  const isFirstPage = page.current === 1;
+  const tagAll = site.tags.findOne({name: page.tag});
+  const popular = (isFirstPage && tagAll) ? popular_posts_in(tagAll.posts.toArray()) : '';
+  const tc = isFirstPage ? tag_stats(page.tag) : null;
+  // 関連タグは1ページ目（一覧の前）と最終ページ（ページャーの下）に出る。
+  // 出す位置を決めているのは _partial/archive (#2088 / #2213)
+  const hasRelatedTags = related_tags(page.tag).length > 0;
+  const tagToc = [];
+  if (popular) tagToc.push({id: 'popular', text: 'よく読まれている記事'});
+  if (tc && tc.topCategories.length) tagToc.push({id: 'topcategories', text: 'よく使われるカテゴリ'});
+  if (isFirstPage && hasRelatedTags) tagToc.push({id: 'relatedtags', text: '関連タグ'});
+  tagToc.push({id: 'posts', text: isFirstPage ? '新着記事' : '記事一覧'});
+  if (!isFirstPage && page.current === page.total && hasRelatedTags) {
+    tagToc.push({id: 'relatedtags', text: '関連タグ'});
+  }
+%>
 <div class="container">
   <%# タグ名は真下の h1 が名乗るので出さない (#2837) %>
   <%- partial('_partial/breadcrumb', {items: [
@@ -12,14 +32,10 @@
   <div class="margin-top-30">
     <%# タグはページ種別を表す統一アイコン。カテゴリと違って個別の絵柄は割り当てない (#2336) %>
     <h1 class="list-page"><%- partial('_partial/svg-icon', {icon: 'tag'}) %><%- page.tag %> <span class="list-sub-text">タグ</span></h1>
-    <% if (page.current === 1) { %>
-    <% const summary = summary_tag(page.tag); %>
-    <% const ts = tag_stats(page.tag); %>
+    <% if (isFirstPage) { %>
     <%# そのタグの中でよく読まれている記事。新着より前に置く。
         絞り込んだ直後の読者がまず知りたいのは「定番はどれか」であって、
         新しさは新着一覧が担う %>
-    <% const tagAll = site.tags.findOne({name: page.tag}); %>
-    <% const popular = tagAll ? popular_posts_in(tagAll.posts.toArray()) : ''; %>
     <% if (popular) { %>
     <%- partial('_partial/section-heading', {id: 'popular', text: 'よく読まれている記事'}) %>
     <%- popular %>
@@ -28,7 +44,6 @@
         前に置き、著者ページと同じくカテゴリ→タグの順にする。
         カテゴリはタグと誤認しないようチップにせず、記事メタデータと同じ
         テキストリンク。添えは本数だけ。何を数えたかは見出しが名乗る (#3075) %>
-    <% const tc = tag_stats(page.tag); %>
     <% if (tc && tc.topCategories.length) { %>
     <%- partial('_partial/section-heading', {id: 'topcategories', text: 'よく使われるカテゴリ'}) %>
     <%- partial('_partial/tendency-panels', {kind: 'category', items: tc.topCategories.map(function(c){
@@ -48,7 +63,8 @@
         列そのものは中身が無くても残す。畳むと本文の幅がこのページだけ広くなり、
         一覧を行き来したときにカードの幅が揃わない (#2944) %>
     <aside class="col-md-3 blog-sidebar" aria-label="サイドバー">
-      <%- partial('_partial/sidebar', {showStats: true}) %>
+      <%# 統計はページ自身の数字なので目次より上 (#2911 / #3116) %>
+      <%- partial('_partial/sidebar', {showStats: true, specialsToc: tagToc}) %>
     </aside>
   </div>
 </div>
