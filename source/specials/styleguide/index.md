@@ -2,6 +2,7 @@
 title: スタイルガイド
 description: "フューチャー技術ブログの見た目の決まりと、その実物を並べたページです。色・文字の大きさ・行間・間隔・形・部品の段階を、実際の値とコントラスト比つきで見られます。"
 layout: page
+career: true
 ---
 
 # スタイルガイド
@@ -44,7 +45,7 @@ layout: page
 
 | <span class="sr-only">見本</span> | 変数 | 値 | 白背景との差 | 使うところ |
 | --- | --- | --- | --- | --- |
-| <span class="sg-chip sg-surface-tint"></span> | `surface-tint` | <span class="sg-hex sg-surface-tint"></span> | <span class="sg-ratio sg-surface-tint"></span> | 静止した面。表のヘッダ・記事末の帯・検索窓 |
+| <span class="sg-chip sg-surface-tint"></span> | `surface-tint` | <span class="sg-hex sg-surface-tint"></span> | <span class="sg-ratio sg-surface-tint"></span> | 静止した面。表のヘッダ・本文末の帯・検索窓 |
 | <span class="sg-chip sg-surface-mute"></span> | `surface-mute` | <span class="sg-hex sg-surface-mute"></span> | <span class="sg-ratio sg-surface-mute"></span> | hover / focus の面と、空・無効の面・インラインコードの背景 |
 
 ### 本文のリンクは下線を持つ。色は背景に合わせて替える
@@ -348,7 +349,7 @@ layout: page
 
 行が背景側なのは、**行のどこを押しても記事へ飛ぶから**です。反応は押せる範囲を映すもので、行全体が押せる部品は行全体が光ります。カードで押せるのはサムネと、タイトルから概要までの塊だけで、日付やカテゴリは別の行き先です。カード全体を光らせると押せない部分まで押せるように見えるので、押せる2つの部分（タイトルと画像）だけが動きます。同じ「記事1本へのリンク」でも行とカードで反応が違うのはこのためで、どちらか一方には揃えません。
 
-逆に、カードの形をしていても**全体がひとつの行き先**なら、行と同じ背景で返します（記事ページ末尾の We're hiring）。反応の型を決めるのは部品の形ではなく、押せる範囲です。
+逆に、カードの形をしていても**全体がひとつの行き先**なら、行と同じ背景で返します（本文末の帯にある We're hiring）。反応の型を決めるのは部品の形ではなく、押せる範囲です。
 
 ヘッダーの帯の中だけは、下線も背景も動かさず文字色を1段階濃くします（帯から下がるドロップダウンの行は背景が変わります）。
 

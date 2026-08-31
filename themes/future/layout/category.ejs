@@ -1,3 +1,23 @@
+<%# 節はテンプレートが作るので、目次も同じ並びをここで持つ（/series/ や
+    /categories/ と同じ specialsToc の形 #2345 / #3116）。節の有無を決める値は
+    下の本文と同じ変数から引き、目次と本文で条件が割れないようにする。
+    2項目に満たないページで目次を出さない判断は _partial/sidebar が持つ (#3145) %>
+<%
+  const isFirstPage = page.current === 1;
+  const catAll = site.categories.findOne({name: page.category});
+  const popular = (isFirstPage && catAll) ? popular_posts_in(catAll.posts.toArray()) : '';
+  const cs = isFirstPage ? category_stats(page.category) : null;
+  // 関連カテゴリは1ページ目（一覧の前）と最終ページ（ページャーの下）に出る (#2213)
+  const hasRelatedCats = related_categories(page.category).length > 0;
+  const catToc = [];
+  if (popular) catToc.push({id: 'popular', text: 'よく読まれている記事'});
+  if (cs && cs.topTags.length) catToc.push({id: 'toptags', text: 'よく使われるタグ'});
+  if (isFirstPage && hasRelatedCats) catToc.push({id: 'relatedcategories', text: '関連カテゴリ'});
+  catToc.push({id: 'posts', text: isFirstPage ? '新着記事' : '記事一覧'});
+  if (!isFirstPage && page.current === page.total && hasRelatedCats) {
+    catToc.push({id: 'relatedcategories', text: '関連カテゴリ'});
+  }
+%>
 <div class="container">
   <%# 2ページ目以降はカテゴリ自身が現在地ではなくなるのでリンクにする。
       URL は page.base（hexo が採番したページの基点）から取る。
@@ -23,7 +43,7 @@
         <%- partial('_partial/svg-icon', {icon: 'rss'}) %>
       </a>
     </div>
-    <% if (page.current === 1) { %>
+    <% if (isFirstPage) { %>
     <%# カテゴリの役割を1文で名乗る (#2405)。何の記事かはタグチップが担うので
         トピックの列挙はしない。文言は source/_data/categories.yml %>
     <% const catDesc = site.data.categories && site.data.categories[page.category]; %>
@@ -41,12 +61,9 @@
     <% if (without) { %>
     <%- partial('_partial/more-link', {url: url_for(without.path), text: `${page.category}カテゴリの${without.name}以外の記事へ（${without.count}本）`}) %>
     <% } %>
-    <% const cs = category_stats(page.category); %>
     <%# そのカテゴリの中でよく読まれている記事。新着より前に置く。
         絞り込んだ直後の読者がまず知りたいのは「定番はどれか」であって、
         新しさは新着一覧が担う %>
-    <% const catAll = site.categories.findOne({name: page.category}); %>
-    <% const popular = catAll ? popular_posts_in(catAll.posts.toArray()) : ''; %>
     <% if (popular) { %>
     <%- partial('_partial/section-heading', {id: 'popular', text: 'よく読まれている記事'}) %>
     <%- popular %>
@@ -73,7 +90,8 @@
   </div>
     </main>
     <aside class="col-md-3 blog-sidebar" aria-label="サイドバー">
-      <%- partial('_partial/sidebar', {showStats: true}) %>
+      <%# 統計はページ自身の数字なので目次より上 (#2911 / #3116) %>
+      <%- partial('_partial/sidebar', {showStats: true, specialsToc: catToc}) %>
     </aside>
   </div>
 </div>

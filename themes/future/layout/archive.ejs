@@ -19,6 +19,56 @@
     if (page.current > 1) items.push({label: page.current + 'ページ目'});
   %>
   <%- partial('_partial/breadcrumb', {items: items}) %>
+  <%# 節はテンプレートが作るので、目次も同じ並びをここで持つ（#2345 / #3116 と同じ
+      specialsToc の形）。「よく読まれている記事」は本数が足りないと出ないので、
+      本文と同じ変数で判定する。月ページは節が「記事一覧」だけになることがあり、
+      その場合は目次を出さない（判断は _partial/sidebar #3145）%>
+  <%
+    const periodPopular = page.current !== 1 ? '' :
+      is_month()
+        ? popular_posts_in(site.posts.filter(function(p){
+            return p.date.format('YYYYMM') === page.year.toString() + page.month.toString().padStart(2, '0');
+          }).toArray())
+        : is_year()
+          ? popular_posts_in(site.posts.filter(function(p){ return p.date.format('YYYY') === page.year.toString(); }).toArray())
+          // 全期間だけ経過年ペナルティが線形（下の呼び出しと揃える）
+          : popular_posts_in(site.posts.toArray(), undefined, 'linear');
+    // 一覧の中の束（全期間は年ごと、年ページは月ごと #2754）。_partial/archive-all の
+    // 見出しと目次の子項目が同じ id・同じ文言を使うよう、ここで1度だけ組む。
+    // 月ページはカード一覧なので束ねない
+    const archiveGroups = [];
+    if (!is_month()) {
+      page.posts.each(function(post){
+        const key = is_year() ? post.date.format('MM') : post.date.format('YYYY');
+        if (!archiveGroups.length || archiveGroups[archiveGroups.length - 1].key !== key) {
+          archiveGroups.push({
+            key: key,
+            id: is_year() ? 'posts-' + page.year + '-' + key : 'posts-' + key,
+            // 行の日付から年を落とすぶん、束ねている見出しが年を名乗る (#2773)。
+            // h1 と重なるが、h3 はスクロール中とアンカー着地時に単独で読まれる
+            label: is_year() ? page.year + '年' + Number(key) + '月' : key + '年',
+            posts: [],
+          });
+        }
+        archiveGroups[archiveGroups.length - 1].posts.push(post);
+      });
+    }
+    const periodToc = [];
+    if (periodPopular) periodToc.push({id: 'popular', text: 'よく読まれている記事'});
+    if (is_month()) {
+      // 月ページは期間の中をさらに割る軸を持たない
+    } else if (is_year()) {
+      periodToc.push({id: 'months', text: '月別'});
+    } else {
+      periodToc.push({id: 'years', text: '年別'});
+    }
+    // 一覧の中の年（月）の見出しは「記事一覧」の子にする。フラットに並べると
+    // 上の「年別」節（年ページへのリンク）とラベルが重なって、同じ行き先に見える
+    periodToc.push({
+      id: 'posts', text: '記事一覧',
+      children: archiveGroups.map(function(g){ return {id: g.id, text: g.label}; }),
+    });
+  %>
   <%# ランドマークは h1 から包む (#2925)。以前は記事一覧の部分だけが <main> で、
       h1・統計・グラフがランドマークの外にいた。中の一覧は div に下げてある %>
   <div class="row">
@@ -27,13 +77,9 @@
     <h1 class="list-page"><%- partial('_partial/svg-icon', {icon: 'calendar-stats'}) %><%= page.year%>年<%= page.month %>月<span class="list-sub-text">のすべての記事</span></h1>
     <%# その月の中でよく読まれている記事 (#2214)。カテゴリ・タグ・著者の
         詳細ページと同じく新着一覧の前。件数は記事数からヘルパーが決める %>
-    <% if (page.current === 1) { %>
-    <% const ym = page.year.toString() + page.month.toString().padStart(2, '0'); %>
-    <% const monthPopular = popular_posts_in(site.posts.filter(function(p){ return p.date.format('YYYYMM') === ym; }).toArray()); %>
-    <% if (monthPopular) { %>
+    <% if (periodPopular) { %>
     <%- partial('_partial/section-heading', {id: 'popular', text: 'よく読まれている記事'}) %>
-    <%- monthPopular %>
-    <% } %>
+    <%- periodPopular %>
     <% } %>
     <% } else if(is_year()) { %>
     <%# 単位の「年」は月ページの h1（2026年8月）と同じく数字側に付ける (#2209) %>
@@ -42,12 +88,9 @@
         優先度の高い順に、定番 → 月の探索 → 新着一覧と並べる。
         年内は経過年数がほぼ同じなので、ペナルティは相殺されて
         素直に PV 順になる %>
-    <% if (page.current === 1) { %>
-    <% const yearPopular = popular_posts_in(site.posts.filter(function(p){ return p.date.format('YYYY') === page.year.toString(); }).toArray()); %>
-    <% if (yearPopular) { %>
+    <% if (periodPopular) { %>
     <%- partial('_partial/section-heading', {id: 'popular', text: 'よく読まれている記事'}) %>
-    <%- yearPopular %>
-    <% } %>
+    <%- periodPopular %>
     <% } %>
     <%# 月ページへの唯一の導線 (#2219)。/articles/ の「年別」と同じ
         カード型で、新しい順の並びも揃える。
@@ -78,12 +121,9 @@
         経過年ペナルティは線形（decay: linear）。既定の2乗だと実質直近人気になり
         ホームの年間人気と完全に重複した（実測6/6）。線形なら歴代の定番が並び、
         重複は2/6まで下がる %>
-    <% if (page.current === 1) { %>
-    <% const allPopular = popular_posts_in(site.posts.toArray(), undefined, 'linear'); %>
-    <% if (allPopular) { %>
+    <% if (periodPopular) { %>
     <%- partial('_partial/section-heading', {id: 'popular', text: 'よく読まれている記事'}) %>
-    <%- allPopular %>
-    <% } %>
+    <%- periodPopular %>
     <% } %>
     <%- partial('_partial/section-heading', {id: 'years', text: '年別'}) %>
     <section class="archives">
@@ -119,7 +159,7 @@
       </div>
     </div>
     <% } else { %>
-    <%- partial('_partial/archive-all', {pagination: config.archive}) %>
+    <%- partial('_partial/archive-all', {pagination: config.archive, groups: archiveGroups}) %>
     <% } %>
     <%# 前後の期間へのページャー (#2228)。連載ナビと同じ型（前が左・
         対象明示型のラベル＋行き先名）で、一覧を読み終えた位置に置く。
@@ -153,6 +193,10 @@
     </main>
     <aside class="col-md-3 blog-sidebar" aria-label="サイドバー">
       <%- partial('_partial/sidebar-index-archive') %>
+      <%# 統計はページ自身の数字なので目次より上 (#2911 / #3116)。
+          軸の枠（人気のカテゴリ・連載・タグ）は一覧ページには置かないので
+          tocOnly で抑える (#2911 / #3025) %>
+      <%- partial('_partial/sidebar', {specialsToc: periodToc, tocOnly: true}) %>
     </aside>
   </div>
 </div>

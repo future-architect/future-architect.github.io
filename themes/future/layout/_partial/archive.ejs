@@ -85,20 +85,24 @@
         thumb: {src: '/httf_logo.png', width: 640, height: 280, contain: true},
       });
     }
-    // 最終更新が4ヶ月以内なら旬とみなす。過去24ヶ月のどの月でも候補が1本以上あった窓で、
-    // 3ヶ月に狭めると空く月が出る。連載の顔は索引記事のサムネなのでそのまま借りる
-    const FOUR_MONTHS = 4 * 30 * 24 * 60 * 60 * 1000;
-    const freshSeries = recent_series(1)[0];
-    if (freshSeries && Date.now() - freshSeries.latest.valueOf() <= FOUR_MONTHS) {
+    // 出すのは「すぐ下の新着一覧に1本も出ていない連載」のうち最後に更新されたもの
+    // (#3135)。最新の連載はその記事自体が新着一覧に並ぶので、パネルにしても二重になる。
+    // 連載の顔は索引記事のサムネなのでそのまま借りる
+    const doneSeries = featured_series(page.posts);
+    if (doneSeries) {
       specialPanels.push({
-        url: url_for(freshSeries.index.path),
+        url: url_for(doneSeries.index.path),
         label: '連載',
         labelIcon: 'run-baton',
         more: {url: '/series/', text: '連載一覧へ'},
-        title: freshSeries.name,
-        // 更新の日付は鮮度の目安なので年月まで (#2404)。/series/ の期間表記とも揃う
-        meta: '全' + freshSeries.total + '本・' + date(freshSeries.latest, 'YYYY.MM') + ' 更新',
-        thumb: {src: freshSeries.index.thumbnail, width: 200, height: 135},
+        title: doneSeries.name,
+        // 説明文は索引記事の lede。ガイドラインのパネルと同じ「1文で名乗る」に揃える。
+        // 名乗りしか書かれていない連載だけ、規模と更新月に戻す
+        // （更新の日付は年月まで #2404。/series/ の期間表記とも揃う）
+        meta: doneSeries.summary
+          ? escape_html(doneSeries.summary)
+          : '全' + doneSeries.total + '本・' + date(doneSeries.latest, 'YYYY.MM') + ' 更新',
+        thumb: {src: doneSeries.index.thumbnail, width: 200, height: 135},
       });
     }
     specialPanels.push({
