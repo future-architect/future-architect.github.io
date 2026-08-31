@@ -1735,7 +1735,7 @@ blockquote p {
   width: initial;
 }
 /* 一覧・パネルのサムネイルを包むリンク (#2458)。大きさは併用するクラスが持つ
-   （card-thumb / panel-thumb / hiring-card-thumb）。ここが持つのは共通の振る舞いだけで、
+   （card-thumb / panel-thumb）。ここが持つのは共通の振る舞いだけで、
    overflow は object-fit: cover の切り抜きに要る。
 
    このリンクは常に隣のタイトルと同じ行き先なので、マークアップ側で
@@ -1870,7 +1870,7 @@ summary:focus-visible,
 }
 /* 一覧カードのサムネは OGP 標準比（1200:630）で中央を切り抜いて大きさを揃える
    (#2305)。既存サムネの49%（比率1.75以上）はほぼ無加工で収まる。
-   連載パネル（.panel-thumb は #2271 の 200:135）と We're hiring カードは対象外。
+   横並びのパネル（連載パネル・We're hiring。.panel-thumb は #2271 の 200:135）は対象外。
    アンカーは xs 幅で float が外れて inline になるため display を明示する。
 
    **比は img に持たせる。** 列（.card-thumb）に持たせると左右の padding 24px が
@@ -1933,7 +1933,7 @@ body {
    中央値5行・最大7行で、1件は幅375pxで中央値460px・最大530pxある。
    **カードの区切り（80px）が節の区切り（56px）より大きいのは階層が逆で、**
    さらに #2911 で区切り線が入ったので、空きだけが分ける役を負っていない。
-   横に並んで箱でないと成立しない部品（連載・特設パネル / We're hiring / タブ）は
+   横に並んで箱でないと成立しない部品（連載・特設パネル / タブ）は
    個別に枠線を持つ */
 /* 一括指定にしない (#2951)。margin-left / margin-right まで 0 になり、
    一覧カード（.row）が持つ負のマージン（ガターの半分）を打ち消していた。
@@ -1957,14 +1957,13 @@ body {
    0.7 だと本文の文字が白地に対して 4.23、0.8 でもメタ行の文字が 3.89 で
    AA を割る（透明度は文字と画像を区別せず、薄い方から先に読めなくなる）。
    画像は文字ではないので透明度でよい。
-   img をまとめて指すのは、一覧のサムネ・パネルのサムネ・We're hiring のロゴを
-   同じだけ引かせるため */
+   img をまとめて指すのは、一覧のサムネとパネルのサムネを同じだけ引かせるため。
+   We're hiring は行の型（面）なので引かせない (#3113) */
 .article-card img {
   transition: opacity hover-speed ease;
 }
 .article-card:hover .archive-post-title,
-.article-card:hover .panel-title,
-.article-card:hover .hiring-card-label {
+.article-card:hover .panel-title {
   text-decoration: underline;
   text-underline-offset: link-underline-offset;
   text-decoration-thickness: 1px;
@@ -2050,10 +2049,32 @@ body {
 .career-counseling .article-card {
   display: flex;
   gap: 12px;
-  /* 画像の縦横比がまちまち（88px幅で高さ32〜46px）なので、上揃えだと
-     本文より低い画像が浮いて見える。垂直中央で釣り合わせる (#2347) */
+  /* 固定59pxのサムネと、高さの違う本文（ラベル＋説明文）を垂直中央で
+     釣り合わせる (#2347)。連載パネルと同じ */
   align-items: center;
   margin: 0;
+  position: relative;
+  transition: background-color hover-speed ease;
+  /* サムネが箱の中でいちばん高いので、余白が無いと hover の面の上下の縁が
+     画像の縁とぴったり重なり、面が画像を囲まない。関連記事の行と同じ形 (#3113) */
+  padding: (space-step * 2) 0;
+}
+/* 反応は行と同じ面 (#3113)。カードの型（下線＋画像の引き）は日付やシェアボタン
+   など別の行き先を含んでいて面を敷くと嘘になる部品のためのもので、ここは
+   1枚＝1行き先。直上の関連記事・被参照記事の行と反応がそろう */
+.career-counseling .article-card:hover {
+  background-color: var(--surface-mute);
+}
+.career-counseling .article-card:hover img {
+  opacity: 1;
+}
+/* 面が光るなら全体が押せないと嘘になる (#2686)。説明文はリンクの外の素の div で
+   死に領域だったので、関連記事の行と同じ ::after の手でラベルの当たりを広げる。
+   サムネのリンクは同じ行き先の重複（tabindex="-1"）なので広げるのはラベル側だけ */
+.hiring-card-label::after {
+  content: '';
+  position: absolute;
+  inset: 0;
 }
 /* 2列の切れ目は間隔だけが作るので、gutter の 24px（.row > * の左右 12px）では
    左のパネルの説明文が右のパネルのロゴに近すぎる。内側だけ 24px に広げて
@@ -2069,15 +2090,6 @@ body {
     padding-left: 24px;
   }
 }
-.hiring-card-thumb {
-  flex: 0 0 88px;
-  line-height: 0;
-}
-.hiring-card-thumb img {
-  width: 88px;
-  height: auto;
-  border-radius: radius-small;
-}
 .hiring-card-body {
   min-width: 0;
 }
@@ -2090,13 +2102,11 @@ body {
   font-weight: bold;
   margin-bottom: 4px;
 }
-/* 反応はカードの引き（.article-card:hover）だけにする (#2699)。節が class="nav" を
+/* 反応はカード全体の面だけにする (#2699 / #3113)。節が class="nav" を
    持つため .nav a:hover の灰色の面がサムネとラベルの両方に付き、そこに
    .article-entry a:hover の下線と metronic の a:hover の青が重なっていた。
    関連記事・ランキングが #2686 で同じ面を打ち消しているのと同じ形。
-   **色は動かさない。**カード側の反応が下線になったので、ink-mute に
-   落とすとラベルを直接指したときだけ余分に変わる（逆の理由で #2747 では
-   ink-mute にしていた）*/
+   **色は動かさない。**ink-mute に落とすとラベルを直接指したときだけ余分に変わる */
 .career-counseling .article-card a:hover,
 .career-counseling .article-card a:focus {
   background-color: transparent;
@@ -3935,7 +3945,9 @@ a.series-nav-item:hover .series-nav-item-title {
 .reference-posts-item,
 .featured-posts-item {
   list-style: none;
-  padding: 0.5em 0;
+  /* 面がサムネの上下を囲むぶんの余白。We're hiring のカードと同じ刻みに乗せる
+     (#3113。0.5em は刻みの外の 6.5px だった) */
+  padding: (space-step * 2) 0;
   border-bottom: 1px solid var(--rule-weak);
 }
 /* ランキング・関連記事・被参照記事の行の反応 (#2686)。3つとも同じ部品
@@ -4148,7 +4160,8 @@ a.series-nav-item:hover .series-nav-item-title {
 .reference-post-more > summary,
 .related-posts-more > summary,
 .ranking-more > summary {
-  padding: 0.5em 0;
+  /* 行と同じ余白 */
+  padding: (space-step * 2) 0;
   border-top: 1px solid var(--rule-weak);
   color: var(--ink-mute);
   font-size: text-meta;
