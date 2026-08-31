@@ -33,6 +33,26 @@
           ? popular_posts_in(site.posts.filter(function(p){ return p.date.format('YYYY') === page.year.toString(); }).toArray())
           // 全期間だけ経過年ペナルティが線形（下の呼び出しと揃える）
           : popular_posts_in(site.posts.toArray(), undefined, 'linear');
+    // 一覧の中の束（全期間は年ごと、年ページは月ごと #2754）。_partial/archive-all の
+    // 見出しと目次の子項目が同じ id・同じ文言を使うよう、ここで1度だけ組む。
+    // 月ページはカード一覧なので束ねない
+    const archiveGroups = [];
+    if (!is_month()) {
+      page.posts.each(function(post){
+        const key = is_year() ? post.date.format('MM') : post.date.format('YYYY');
+        if (!archiveGroups.length || archiveGroups[archiveGroups.length - 1].key !== key) {
+          archiveGroups.push({
+            key: key,
+            id: is_year() ? 'posts-' + page.year + '-' + key : 'posts-' + key,
+            // 行の日付から年を落とすぶん、束ねている見出しが年を名乗る (#2773)。
+            // h1 と重なるが、h3 はスクロール中とアンカー着地時に単独で読まれる
+            label: is_year() ? page.year + '年' + Number(key) + '月' : key + '年',
+            posts: [],
+          });
+        }
+        archiveGroups[archiveGroups.length - 1].posts.push(post);
+      });
+    }
     const periodToc = [];
     if (periodPopular) periodToc.push({id: 'popular', text: 'よく読まれている記事'});
     if (is_month()) {
@@ -42,7 +62,12 @@
     } else {
       periodToc.push({id: 'years', text: '年別'});
     }
-    periodToc.push({id: 'posts', text: '記事一覧'});
+    // 一覧の中の年（月）の見出しは「記事一覧」の子にする。フラットに並べると
+    // 上の「年別」節（年ページへのリンク）とラベルが重なって、同じ行き先に見える
+    periodToc.push({
+      id: 'posts', text: '記事一覧',
+      children: archiveGroups.map(function(g){ return {id: g.id, text: g.label}; }),
+    });
   %>
   <%# ランドマークは h1 から包む (#2925)。以前は記事一覧の部分だけが <main> で、
       h1・統計・グラフがランドマークの外にいた。中の一覧は div に下げてある %>
@@ -134,7 +159,7 @@
       </div>
     </div>
     <% } else { %>
-    <%- partial('_partial/archive-all', {pagination: config.archive}) %>
+    <%- partial('_partial/archive-all', {pagination: config.archive, groups: archiveGroups}) %>
     <% } %>
     <%# 前後の期間へのページャー (#2228)。連載ナビと同じ型（前が左・
         対象明示型のラベル＋行き先名）で、一覧を読み終えた位置に置く。
