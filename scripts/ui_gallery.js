@@ -28,7 +28,7 @@ const GALLERY = 'gallery.ejs';
 const NOT_SHOWN = {
   'archive-all': '「すべての記事」ページの中身そのもの。ここで一覧をもう1本描かない',
   archive: '一覧ページの本体。ランキング・特集・ページャを含む塊で、部品ではない',
-  'article-appendix': '記事末の帯。全幅で敷くので本文列の中に置けない (#2874)',
+  'article-appendix': '本文末の帯。全幅で敷くので本文列の中に置けない (#2874)',
   article: '記事ページの本体',
   'author-tendencies': '著者ページの本体の一部。page.author に依存する',
   'breadcrumb-page': 'Markdown のページ用にパンくずの項目を組むだけの包み。見た目はパンくずが持つ',

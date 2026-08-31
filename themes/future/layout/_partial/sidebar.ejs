@@ -19,12 +19,20 @@
     目次を出すページではページ内移動が主なので、カテゴリ一覧は出さない。
     Markdown のページは本文があるので、レイアウト側で組んだ目次の HTML を
     tocHtml で受け取る (#2559) %>
-<% const sToc = (typeof specialsToc === 'undefined') ? null : specialsToc; %>
+<% const sTocGiven = (typeof specialsToc === 'undefined') ? null : specialsToc; %>
+<%# 項目が1つのページでは出さない。「目次」の下に1行だけ並ぶ形になる。
+    数えるのは子まで含めた総数で、/categories/ のように h2 が1つで群が
+    子に並ぶ形も1項目とは数えない。Markdown のページの page_toc が
+    <li> の数で同じ判断をしているので、条件はそこと揃える (#2559 / #3145) %>
+<% const sTocCount = (sTocGiven || []).reduce(function(n, i){ return n + 1 + ((i.children || []).length); }, 0); %>
+<% const sToc = sTocCount >= 2 ? sTocGiven : null; %>
 <%# tocHtml は空で渡ることがある（見出しが足りないページ）。その場合は目次の枠を
     出さない。tocOnly は「このサイドバーはページ自身の目次のための場所」という
     レイアウト側の宣言で、目次を出せるかどうかとは別に、カテゴリ一覧を抑える %>
 <% const pageToc = (typeof tocHtml === 'undefined' || !tocHtml) ? null : tocHtml; %>
-<% const isTocOnly = (typeof tocOnly !== 'undefined' && tocOnly) || !!sToc; %>
+<%# 見出しが足りなくて目次を出せなかったページでも「目次のための場所」であることは
+    変わらないので、判定は渡された配列の側で行う %>
+<% const isTocOnly = (typeof tocOnly !== 'undefined' && tocOnly) || !!sTocGiven; %>
 <%# 検索はヘッダー右上に昇格した (#2399)。二重の導線は置かない %>
 <% if (is_post()) { %>
 <section class="toc-section" data-nosnippet>
