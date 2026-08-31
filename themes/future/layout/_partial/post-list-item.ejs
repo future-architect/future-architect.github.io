@@ -1,0 +1,43 @@
+<%# 記事を1行で並べる部品 (#3097)。ランキング・関連記事・被参照記事・
+    一覧ページの「よく読まれている記事」が同じ形を持つ。
+
+    並びは 題 → NEW → (年月 / 反響)。読み手は「何の記事か」を見てから
+    「古くないか」「評判はどうか」を確かめるので、判断の順序に合わせる。
+
+    引数:
+      post       記事（path / title / lede / date / thumbnail を読む）
+      itemClass  li に付けるクラス
+      titleAttr  a の title 属性。省略時は lede
+      withThumb  題の左に小さいサムネを添える (#2230)
+      rankMark   {html, className} か null。行頭に出す順位の丸 (#2249)。
+                 何位がどの段か・数字を出すか記号にするかはランキング側の
+                 都合なので、ここは受け取った通りに包むだけにする (#2681)
+      isNew      NEW を出す (#2788)
+      snsCount   反響の数。0 のときは出さない（0と表示されると寂しく見える）
+
+    **行の中に改行を出さない。** .nav の中では題がブロックになるので、
+    要素の間に空白が入ると順位の丸と題の頭がずれる。そのため各行の末尾で
+    テンプレート側の改行を落としている -%>
+<%
+  const rank = typeof rankMark === 'undefined' ? null : rankMark;
+  const thumbed = typeof withThumb !== 'undefined' && withThumb;
+  const fresh = typeof isNew !== 'undefined' && isNew;
+  const sns = typeof snsCount === 'undefined' ? 0 : snsCount;
+  const attr = (typeof titleAttr === 'undefined' ? post.lede : titleAttr) || '';
+-%>
+<li class="<%= itemClass %><%= thumbed ? ' post-list-item-thumb' : '' %>"><% if (rank) { -%>
+<span class="post-list-rank<%= rank.className ? ' ' + rank.className : '' %>"><%- rank.html %></span><% } -%>
+<% if (thumbed) { -%>
+<%# サムネの無い記事は同じ大きさの空き枠に置き換えて、行の左端をそろえる -%>
+<%- partial('post-list-icon', {post: post}).trim() || '<span class="post-list-icon post-list-icon-empty"></span>' %><div class="post-list-body"><% } -%>
+<a href="/<%= post.path %>" title="<%= attr %>"><%= post.title %></a><% if (fresh) { -%>
+<span class="newitem">NEW</span><% } -%>
+<%# 日付は鮮度の目安なので年月まで (#2404)。日まで出すのは、日付が並びの
+    座標になる時系列リストと記事自身だけ -%>
+<span class="post-meta"><span class="post-meta-date"><%= post.date.format('YYYY.MM') %></span><% if (sns > 0) { -%>
+<%# ♡ だけ span で包むのは、記号は少し大きくしないと線が潰れる一方、
+    数字は日付と同じ大きさにそろえたいため (#2453) -%>
+<span class="snscount"><span class="snscount-icon">&#9825;</span><%= sns %></span><% } -%>
+</span><% if (thumbed) { -%>
+</div><% } -%>
+</li>

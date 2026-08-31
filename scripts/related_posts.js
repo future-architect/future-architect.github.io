@@ -102,7 +102,7 @@ function pickRelatedPosts(posts, series) {
 }
 
 // HTMLを生成するロジックを共通関数として外に切り出す
-function generateRelatedPostsHtml(posts, series) {
+function generateRelatedPostsHtml(ctx, posts, series) {
   posts = pickRelatedPosts(posts, series);
 
   let visible = posts.slice(0, DISPLAY_COUNT);
@@ -119,9 +119,9 @@ function generateRelatedPostsHtml(posts, series) {
     return `<p class="related-posts-none">No related post.</p>`;
   }
 
-  // マークアップは lib/post_list.js に集約している。title は lede だけ
+  // マークアップは _partial/post-list-item.ejs に集約している。title は lede だけ
   // （postListItem の既定）。score は並び順を決める内部の重みで読者には出さない (#3076)
-  const item = (related) => postListItem(related, 'related-posts-item', { withThumb: true });
+  const item = (related) => postListItem(ctx, related, 'related-posts-item', { withThumb: true });
 
   // 語彙と作りはランキング・参照記事の畳みに揃える (#2249)
   const moreHtml = more.length
@@ -221,7 +221,7 @@ hexo.extend.helper.register('list_related_posts', function () {
       `[INFO] Related Posts: No tag-related posts found for "${post.title}". Falling back to category.`,
     );
     const categoryPosts = getCategoryRelatedPosts(this, post, isExcluded);
-    return generateRelatedPostsHtml(categoryPosts, post.series);
+    return generateRelatedPostsHtml(this, categoryPosts, post.series);
   }
 
   // IDF は展開後の頻度で計算する。抽象タグ（CSS 等）は展開後に大量の記事が
@@ -286,5 +286,5 @@ hexo.extend.helper.register('list_related_posts', function () {
   }
 
   // 最終的な記事リストをHTMLに変換して返す
-  return generateRelatedPostsHtml(relatedPosts, post.series);
+  return generateRelatedPostsHtml(this, relatedPosts, post.series);
 });

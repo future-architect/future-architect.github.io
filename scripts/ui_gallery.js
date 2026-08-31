@@ -19,6 +19,7 @@ const fs = require('fs');
 const path = require('path');
 
 const LAYOUT_DIR = path.join(hexo.theme_dir, 'layout');
+const SCRIPT_DIR = path.join(hexo.base_dir, 'scripts');
 const GALLERY = 'gallery.ejs';
 
 // 見本を出さない部品と、その理由。
@@ -46,6 +47,7 @@ const NOT_SHOWN = {
   'sidebar-index-tags': '同上（/tags/）',
   'sidebar-stats-index':
     '一覧ページのサイドバーの中身。渡された統計とグラフを並べるだけで、単体では形を持たない',
+  'post-list-icon': '行に添えるサムネ。記事の行（post-list-item）の見本の中に実物が出ている',
   'post/title':
     '記事の題。一覧のカード（archive-post）の見本の中に実物が出ている。メタ情報の見本には入れない',
   'post/category':
@@ -59,8 +61,10 @@ const NOT_SHOWN = {
   sidebar: 'サイドバー。実物がこのページの右に出ている',
 };
 
-// partial('_partial/svg-icon') / partial('svg-icon') / partial('../category-icon')
-// / partial('_widget/tag.ejs') をすべて同じ名前に寄せる
+// 参照の書き方は '_partial/svg-icon' / 'svg-icon' / '../category-icon' /
+// '_widget/tag.ejs' と揺れるので、すべて同じ名前に寄せる。
+// **この行に呼び出しの形をそのまま書かない。** 下の走査が自分自身を読んで、
+// 例に挙げた部品の呼び出し元にこのファイルが並ぶ
 function normalize(ref) {
   return ref
     .replace(/\.ejs$/, '')
@@ -68,13 +72,13 @@ function normalize(ref) {
     .replace(/^_partial\//, '');
 }
 
-function listFiles(dir) {
+function listFiles(dir, ext) {
   const out = [];
   (function walk(d) {
     for (const name of fs.readdirSync(d)) {
       const p = path.join(d, name);
       if (fs.statSync(p).isDirectory()) walk(p);
-      else if (name.endsWith('.ejs')) out.push(p);
+      else if (name.endsWith(ext)) out.push(p);
     }
   })(dir);
   return out;
@@ -84,7 +88,7 @@ let cache = null;
 
 function buildIndex() {
   if (cache) return cache;
-  const files = listFiles(LAYOUT_DIR);
+  const files = listFiles(LAYOUT_DIR, '.ejs');
   const rel = (p) =>
     p
       .replace(LAYOUT_DIR + path.sep, '')
@@ -94,9 +98,20 @@ function buildIndex() {
   // 部品 = _partial/ と _widget/ の下の .ejs
   const parts = files.map(rel).filter((f) => f.startsWith('_partial/') || f.startsWith('_widget/'));
 
+  // helper も呼び出し元に数える。呼び出し元が多くて描画が重複するときは
+  // helper から this.partial(…) を呼んでよい (#3031) ので、テンプレートだけを
+  // 舐めると helper からしか呼ばれない部品が「呼び出し元が無い」に落ちる
+  const scripts = listFiles(SCRIPT_DIR, '.js');
+  const scriptRel = (p) =>
+    'scripts/' +
+    p
+      .replace(SCRIPT_DIR + path.sep, '')
+      .split(path.sep)
+      .join('/');
+
   const callers = new Map(); // 部品名 -> 呼び出し元のファイル
-  for (const f of files) {
-    const name = rel(f);
+  for (const f of files.concat(scripts)) {
+    const name = f.startsWith(SCRIPT_DIR) ? scriptRel(f) : rel(f);
     const text = fs.readFileSync(f, 'utf8');
     for (const m of text.matchAll(/partial\(\s*['"]([^'"]+)['"]/g)) {
       const target = normalize(m[1]);
