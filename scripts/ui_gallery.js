@@ -17,6 +17,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { getGA4PV } = require('./lib/ga4');
 
 const LAYOUT_DIR = path.join(hexo.theme_dir, 'layout');
 const SCRIPT_DIR = path.join(hexo.base_dir, 'scripts');
@@ -170,8 +171,11 @@ hexo.extend.helper.register('ui_icon_names', function () {
  */
 hexo.extend.helper.register('ui_gallery_samples', function () {
   const posts = this.site.posts.sort('date', -1).toArray();
-  // サムネとタグを持つ記事を選ぶ。どちらかが欠けた記事だと、
-  // 見本がその部品を持たない形（空き枠・タグ無し）になる
-  const post = posts.find((p) => p.thumbnail && p.tags && p.tags.length >= 3) || posts[0];
+  // サムネ・タグ・PV を持つ記事を選ぶ。どれか欠けた記事だと、
+  // 見本がその部品を持たない形（空き枠・タグ無し・PV無しの3項目）になる。
+  // 直近の記事は GA4 の集計がまだ無いことが多いので、最新から遡って探す
+  const post =
+    posts.find((p) => p.thumbnail && p.tags && p.tags.length >= 3 && getGA4PV('/' + p.path) > 0) ||
+    posts[0];
   return { post, panelPosts: posts.slice(0, 3) };
 });
