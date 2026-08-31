@@ -34,7 +34,7 @@ layout: page
 | --- | --- | --- | --- | --- |
 | <span class="sg-chip sg-rule-base"></span> | `rule-base` | <span class="sg-hex sg-rule-base"></span> | <span class="sg-ratio sg-rule-base"></span> | 枠。カード・チップ・箱・画像枠と、塊の左に引くバー（引用・内訳） |
 | <span class="sg-chip sg-rule-weak"></span> | `rule-weak` | <span class="sg-hex sg-rule-weak"></span> | <span class="sg-ratio sg-rule-weak"></span> | 区切り。見出しの下・リストの行間 |
-| <span class="sg-chip sg-rule-strong"></span> | `rule-strong` | <span class="sg-hex sg-rule-strong"></span> | <span class="sg-ratio sg-rule-strong"></span> | 地を持たない部品の枠（チップ・表・タブの上辺）と、focus / hover でひとつ強めるところ |
+| <span class="sg-chip sg-rule-strong"></span> | `rule-strong` | <span class="sg-hex sg-rule-strong"></span> | <span class="sg-ratio sg-rule-strong"></span> | 地を持たない部品の枠（チップ・表）と、focus / hover でひとつ強めるところ（タブの hover の下線もここ） |
 
 見出しの下の罫線が薄いのは意図です。節の区切りは直前の空き（56px）が担っていて、線は「そこに境目がある」と気づかせる程度で足ります。読みやすさの指標ではないので濃くしません。
 
@@ -44,7 +44,7 @@ layout: page
 
 | <span class="sr-only">見本</span> | 変数 | 値 | 白背景との差 | 使うところ |
 | --- | --- | --- | --- | --- |
-| <span class="sg-chip sg-surface-tint"></span> | `surface-tint` | <span class="sg-hex sg-surface-tint"></span> | <span class="sg-ratio sg-surface-tint"></span> | 静止した面。タブ帯・表のヘッダ・記事末の帯・検索窓 |
+| <span class="sg-chip sg-surface-tint"></span> | `surface-tint` | <span class="sg-hex sg-surface-tint"></span> | <span class="sg-ratio sg-surface-tint"></span> | 静止した面。表のヘッダ・記事末の帯・検索窓 |
 | <span class="sg-chip sg-surface-mute"></span> | `surface-mute` | <span class="sg-hex sg-surface-mute"></span> | <span class="sg-ratio sg-surface-mute"></span> | hover / focus の面と、空・無効の面・インラインコードの背景 |
 
 ### 本文のリンクは下線を持つ。色は背景に合わせて替える
@@ -134,7 +134,7 @@ layout: page
 
 **`ink-faint` は明るいほうと同じく「AA を満たす最も薄い段階」です。** 上の表の比はページの背景に対する値ですが、実際にいちばん厳しいのはインラインコードの背景で、そこでも AA を満たす値にしています。これより薄くしません。
 
-**ブランドのネイビーは、暗い背景では背景とほとんど見分けが付きません。** 面に使っても線に使っても消えるので、フッターの帯は1段階暗い値にして色味だけ残し、選択中のページ・選択中のタブの上辺・共有ボタン・タグの hover・フォーカスリングは明るい線と明るい塗りに置き換えています。
+**ブランドのネイビーは、暗い背景では背景とほとんど見分けが付きません。** 面に使っても線に使っても消えるので、フッターの帯は1段階暗い値にして色味だけ残し、選択中のページ・選択中のタブの下線・共有ボタン・タグの hover・フォーカスリングは明るい線と明るい塗りに置き換えています。
 
 **テキスト選択の帯は向きを逆にします。** 明るいほうは濃いネイビーの帯に白い文字ですが、暗い背景ではネイビーを中間まで明るくしても、帯として見える前に白い文字が AA を割ります。そこでネイビーを薄くした帯にして、文字を背景の色で描きます。色相はブランドのまま、彩度は半分に落としています（そのままだと蛍光の紫青になります）。無彩色の帯にすると反転表示のように見えて、ブランドの色味が消えます。コードブロックの背景は両方のテーマで暗いので、明るいほうでもこの帯を使います。
 
@@ -321,7 +321,7 @@ layout: page
 
 ### 影は持たない
 
-影は1段階も持ちません。**輪郭はなるべく作りません。** 一覧の1件は囲みを持たず間隔だけで分け、**横に並んで箱でないと成立しない部品**（連載・特設パネル / We're hiring / タブ / リンクプレビュー）だけが枠線を持ちます。
+影は1段階も持ちません。**輪郭はなるべく作りません。** 一覧の1件は囲みを持たず間隔だけで分け、**横に並んで箱でないと成立しない部品**（連載・特設パネル / We're hiring / リンクプレビュー）だけが枠線を持ちます。タブも枠を持たず、切り替わる範囲は帯の下辺の線が示します。
 
 ### hover は1部品1反応
 
@@ -381,7 +381,7 @@ layout: page
 | パンくず | 太字 | [すべての記事](/articles/) の2ページ目 |
 | サイドバーのカテゴリ | 太字 | [Programming カテゴリ](/categories/Programming/) |
 | ページャ | 現在のページだけネイビーの丸で塗る。省略の「…」は塗らない | [すべての記事](/articles/) の2ページ目 |
-| タブ | 本体と同じ白背景になり、上辺にネイビーの線が1本入る。塗りにすると中身より目立つ | [トップページ](/) |
+| タブ | 下線がネイビーになり、太字になる。塗りにすると中身より目立つ | [トップページ](/) |
 
 現在地は**リンクにしません**。押しても同じ場所に来るリンクは、行き先を辿るときに空振りになります。目で見る読者・支援技術・機械の3方向に同じ違いを渡すため、太字と併せて `aria-current="page"` を付けます。
 
