@@ -104,20 +104,25 @@ hexo.extend.helper.register('popular_series', function (limit = 6, minPosts = 3)
 
 // 推薦の件数は記事数から決める。推薦が全記事の半分を超えると
 // 一覧の並べ替えにしかならず、新着とほぼ同じ顔ぶれになるため、
-// 2件には4本以上、4件には8本以上、6件には12本以上を要求する (#2173 / #2272)
-function recommendLimit(count) {
+// 2件には4本以上、4件には8本以上、6件には12本以上を要求する (#2173 / #2272)。
+// extended を渡した呼び出し（期間ページのおかわり #3144）だけ 10件の段を持ち、
+// 比は同じなので 20本以上を要求する
+function recommendLimit(count, extended) {
   if (count <= 3) return 0;
   if (count <= 7) return 2;
   if (count <= 11) return 4;
+  if (extended && count >= 20) return 10;
   return 6;
 }
 
 // 指定した記事の中から PV の多い順に取り出す。カテゴリ・タグの一覧ページで
 // 「よく読まれている記事」を出すのに使う（#2033 / #2034）。
 // limit を省略すると記事数に応じた件数になる。
-// decay に 'linear' を渡すと経過年ペナルティが線形（≒年平均PV）になる
-hexo.extend.helper.register('popular_posts_in', function (posts, limit, decay) {
-  if (limit === undefined) limit = recommendLimit(posts.length);
+// decay に 'linear' を渡すと経過年ペナルティが線形（≒年平均PV）になる。
+// foldAfter を渡すと、その件数までを開いた状態で置き、残りを details で畳む
+// （#3144。/articles/ と /articles/yyyy/ だけ）
+hexo.extend.helper.register('popular_posts_in', function (posts, limit, decay, foldAfter = 0) {
+  if (limit === undefined) limit = recommendLimit(posts.length, foldAfter > 0);
   if (limit === 0) return '';
   // PV は累積なので、古い記事ほど有利になる。経過年数で割って、
   // 何年もかけて積んだ数字と最近読まれている数字を並べられるようにする。
@@ -152,8 +157,18 @@ hexo.extend.helper.register('popular_posts_in', function (posts, limit, decay) {
   // 題を1行の塊にして日付・♡を次の行に落とすのは .nav a（display: block）。
   // ランキング・関連記事・被参照記事も .nav の中に置いて同じ形にしている。
   // 列は CSS（.popular-in-list）が持つ
-  const items = ranked
-    .map(({ post }) => postListItem(this, post, 'featured-posts-item', { withThumb: true }))
-    .join('');
-  return `<ul class="nav popular-in-list">${items}</ul>`;
+  const list = (part) =>
+    `<ul class="nav popular-in-list">${part
+      .map(({ post }) => postListItem(this, post, 'featured-posts-item', { withThumb: true }))
+      .join('')}</ul>`;
+
+  // 残りが1件だけなら畳む意味がないので開いたまま出す（ランキングと同じ扱い）
+  if (foldAfter === 0 || ranked.length <= foldAfter + 1) return list(ranked);
+
+  // 畳みは details。文言・見た目はホームのランキングの2段目と同じ (#2249)
+  return `${list(ranked.slice(0, foldAfter))}
+<details class="popular-in-more">
+  <summary>残り ${ranked.length - foldAfter}本を表示</summary>
+  ${list(ranked.slice(foldAfter))}
+</details>`;
 });
