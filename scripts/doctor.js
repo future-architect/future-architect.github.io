@@ -87,7 +87,15 @@ hexo.extend.helper.register('doctor_checks', function () {
       }
     }
   }
-  nearDuplicates.sort((x, y) => x.bN - x.aN - (y.bN - y.aN) || y.aN - x.aN);
+  // 同点はタグ名で決める（決着が無いとビルドごとに並びが変わる）。
+  // 差は0〜2の3通りしか無いので同点は構造的に出る
+  nearDuplicates.sort(
+    (x, y) =>
+      x.bN - x.aN - (y.bN - y.aN) ||
+      y.aN - x.aN ||
+      (x.a < y.a ? -1 : x.a > y.a ? 1 : 0) ||
+      (x.b < y.b ? -1 : x.b > y.b ? 1 : 0),
+  );
 
   // 6) 1記事タグ。同じ記事に1記事タグ同士が同居している場合は、その記事の
   //    タグ付けがまとめて薄い可能性が高いので印を付ける
@@ -205,9 +213,14 @@ hexo.extend.helper.register('doctor_ontology_suggestions', function () {
       });
     }
   }
-  // 記事数の多い子から。影響するページが大きい順に見てもらう
+  // 記事数の多い子から。影響するページが大きい順に見てもらう。
+  // 子が同じで親の本数も同じ行は名前まで見ないと決着しない
   suggestions.sort(
-    (a, b) => b.childN - a.childN || a.parentN - b.parentN || (a.child < b.child ? -1 : 1),
+    (a, b) =>
+      b.childN - a.childN ||
+      a.parentN - b.parentN ||
+      (a.child < b.child ? -1 : a.child > b.child ? 1 : 0) ||
+      (a.parent < b.parent ? -1 : a.parent > b.parent ? 1 : 0),
   );
 
   const childCount = new Set(suggestions.map((s) => s.child)).size;
@@ -325,7 +338,8 @@ hexo.extend.helper.register('doctor_text_suggestions', function () {
       if (count >= TEXT_SUGGEST_MIN_COUNT) hits.push({ name: c.name, path: c.path, count });
     }
     if (!hits.length) return;
-    hits.sort((a, b) => b.count - a.count);
+    // 同数はタグ名で決める（決着が無いとビルドごとに並びが変わる）
+    hits.sort((a, b) => b.count - a.count || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
     total += hits.length;
     // 直す単位は記事のフロントマターなので、記事ごとにまとめる
     rows.push({ title: post.title, path: post.path, tags: hits, top: hits[0].count });

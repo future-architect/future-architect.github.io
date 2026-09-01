@@ -94,9 +94,9 @@ hexo.extend.helper.register('popular_posts', function (term = 'weekly') {
   const threeDayAgo = new Date();
   threeDayAgo.setDate(threeDayAgo.getDate() - 3); // 3day
 
-  const compareFunc = (a, b) => {
-    return b.pv - a.pv;
-  };
+  // 同点はパスで決める（決着が無いとビルドごとに並びが変わる）。
+  // GA4 の PV は 100 単位に丸められているので、下位ほど同点が出る
+  const compareFunc = (a, b) => b.pv - a.pv || (a.path < b.path ? -1 : a.path > b.path ? 1 : 0);
 
   let [rate3d, rate1w, rate2w, rate4w, rate2m, rate3m, rate6m, rate12m] = [
     10, 8, 5, 4, 3.5, 3, 2.5, 2,
@@ -105,20 +105,19 @@ hexo.extend.helper.register('popular_posts', function (term = 'weekly') {
     [rate3d, rate1w, rate2w, rate4w, rate2m, rate3m, rate6m, rate12m] = [3, 3, 3, 2, 2, 1.5, 1, 1];
   }
 
+  // GA のパスから記事を引くのはパスの完全一致で行う。部分一致だと
+  // 一覧ページ /articles/ が全記事の permalink に含まれて全件に一致し、
+  // 先頭の1本が一覧ページの PV を持ってしまう。どれが先頭かは
+  // site.posts.data の格納順＝ファイルを読み終えた順で、コールドビルドの
+  // たびに変わる。完全一致なら一覧ページはどの記事にも当たらず落ちる
+  const postByPath = new Map(this.site.posts.data.map((post) => [`/${post.path}`, post]));
+
   const popularPosts = gaCache[term]
-    .filter((gaPage) => gaPage.path.indexOf('articles') > 0)
-    .filter((gaPage) => {
-      return this.site.posts.data.some((post) => post.permalink.indexOf(gaPage.path) > 0);
-    })
     .flatMap((gaPage) => {
-      const post = this.site.posts.data
-        .filter((post) => post.permalink.indexOf(gaPage.path) > 0)
-        .slice(0, 1);
-      if (post && post.length > 0) {
-        post[0].pv = parseInt(gaPage.pv);
-        return post;
-      }
-      return []; // もしpostがundefinedや空の配列なら空の配列を返す
+      const post = postByPath.get(gaPage.path);
+      if (!post) return [];
+      post.pv = parseInt(gaPage.pv);
+      return [post];
     })
     .map((post) => {
       if (post.date.toISOString() >= threeDayAgo.toISOString()) {

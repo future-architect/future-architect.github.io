@@ -340,7 +340,9 @@ function buildCategoryStats(category) {
   const topTags = [...tagCount.entries()]
     // インデックスは連載索引の構造タグで、カテゴリの中身を表さない
     .filter(([name]) => name !== 'インデックス')
-    .sort((a, b) => b[1] - a[1])
+    // 同数は名前で決める（決着が無いとビルドごとに並びが変わる）。
+    // 上位5件で切るので、5位が同点だと出るタグ自体が入れ替わる
+    .sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0))
     .slice(0, 5)
     .map(([name, count]) => {
       const tag = this.site.tags.findOne({ name });

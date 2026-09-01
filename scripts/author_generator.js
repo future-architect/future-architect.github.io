@@ -179,7 +179,9 @@ hexo.extend.helper.register('author_stats', function (name) {
       tagCount.set(t.name, e);
     });
   });
-  const byCount = (a, b) => b.count - a.count;
+  // 同数は名前で決める（決着が無いとビルドごとに並びが変わる）。
+  // 上位3件・10件で切るので、境目が同点だと出る項目自体が入れ替わる
+  const byCount = (a, b) => b.count - a.count || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
   // 使用が1本だけの項目は「よく使う」傾向とは言えないので省く (#2139)。
   // ただし省いた結果が空になる著者（投稿1本や、投稿ごとにタグが全部違う著者）は
   // 何も出せなくなるので、その場合だけ省かずに全部見せる
@@ -242,8 +244,11 @@ hexo.extend.helper.register('author_monthly_chart', function (name) {
     }
   }
 
-  // 積み上げの並びは合計の多いカテゴリから。凡例の順もこれに従う
-  const cats = [...catTotal.entries()].sort((a, b) => b[1] - a[1]).map(([c]) => c);
+  // 積み上げの並びは合計の多いカテゴリから。凡例の順もこれに従う。
+  // 同数は名前で決める（決着が無いとビルドごとに積む順と色が変わる）
+  const cats = [...catTotal.entries()]
+    .sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0))
+    .map(([c]) => c);
   const series = cats.map((cat) => ({
     name: cat,
     type: 'bar',
