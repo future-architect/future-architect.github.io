@@ -1523,7 +1523,7 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
     - 本文側の `footer-gap` は帯が続くとき落とす（`:has(+ .article-appendix)`）。
       帯の上の空きは `.article-appendix` の `margin-top` だけが持つ
   - **中身は白の面に戻す**（`.article-appendix-inner`。角丸 `card-radius`）。行の細線
-    （`rule-weak` 1.19 → 1.09）・行の hover（`surface-mute` 1.16 → 1.06）・NEW の枠・空サムネは
+    （`rule-weak` 1.19 → 1.09）・NEW の枠・空サムネ（`surface-mute`）は
     いずれも白地の上で決めた値で、グレーの上では一段弱くなる（#2732 で確認した性質）。
     **グレーは領域の枠として外側に使い、読む対象は白の上に置く**
   - **見出しの大きさは動かさない。** 面が本文との違いを持つので、大きさまで動かすと
