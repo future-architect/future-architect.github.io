@@ -113,14 +113,20 @@ hexo.extend.generator.register('sitemap', function (locals) {
   // 従来のプラグインは pages をそのまま出しており 404.html が混ざっていた
   const pages = locals.pages.filter((p) => !/(^|\/)404\.html$/.test(p.path));
 
+  // 並びはパス順にそろえる。toArray() は Warehouse の格納順＝ファイルを
+  // 読み終えた順で、コールドビルドのたびに入れ替わる。サイトマップに
+  // 並び順の意味は無いが、順序が不定だと差分の照合でノイズになる
+  const byPath = (a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0);
+  const sorted = (list) => list.toArray().sort(byPath);
+
   const children = [
-    { path: 'post-sitemap.xml', data: build(locals.posts.toArray(), RULES.post, (p) => p.path) },
-    { path: 'page-sitemap.xml', data: build(pages.toArray(), RULES.page, (p) => p.path) },
+    { path: 'post-sitemap.xml', data: build(sorted(locals.posts), RULES.post, (p) => p.path) },
+    { path: 'page-sitemap.xml', data: build(sorted(pages), RULES.page, (p) => p.path) },
     {
       path: 'category-sitemap.xml',
-      data: buildTaxonomy(locals.categories.toArray(), RULES.category),
+      data: buildTaxonomy(sorted(locals.categories), RULES.category),
     },
-    { path: 'tag-sitemap.xml', data: buildTaxonomy(locals.tags.toArray(), RULES.tag) },
+    { path: 'tag-sitemap.xml', data: buildTaxonomy(sorted(locals.tags), RULES.tag) },
   ];
 
   // 子サイトマップの lastmod は、その中で最も新しい更新日時
