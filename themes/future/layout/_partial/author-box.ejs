@@ -1,10 +1,17 @@
 <%#
-  記事末の著者紹介 (#2567)。
+  記事末の著者紹介 (#2567)。/specials/engineers/ の「エンジニアの声」も同じ形で描く (#2913)。
 
-  出す条件は「`_profile.yml` に about があり、かつ投稿が3本以上」の両方。
+  引数はどちらか一方。
+    post        記事。`post.author` の紹介文（`_profile.yml` の about）を出す
+    authorName  著者名。`paragraphs`（1要素1段落）を紹介文の下に足す
+
+  記事末の出す条件は「`_profile.yml` に about があり、かつ投稿が3本以上」の両方。
   about が無いと紹介文が空になり、1〜2本では「この人の他の記事」の行き先が
   今読んでいる記事だけになる（連載を3本からとしているのと同じ線引き #2510）。
   登録は329人中3人なので、いま出るのは197本（13.4%）。登録が増えれば自動で増える。
+
+  声のカードは paragraphs が本文になるので、about の有無では止めない。
+  about が未登録の人でも、その人が書いた文章は出る。
 
   X / GitHub のアイコンは出さない。ここは「どんな人か」を伝える場所で、
   外部への導線は著者ページが持つ。
@@ -12,16 +19,19 @@
   アイコン画像は持っていないので、名前の1文字目を丸に載せる（vuls.biz と同じ形）。
 %>
 <%
-  const author = post.author;
+  const boxPost = typeof post === 'undefined' ? null : post;
+  const author = (typeof authorName !== 'undefined' && authorName) || (boxPost && boxPost.author);
+  const paras = (typeof paragraphs !== 'undefined' && paragraphs) || [];
   const profile = author ? get_profile_data(author) : null;
   const about = profile && profile.about;
   const total = author ? count_author(author) : 0;
 %>
-<% if (about && total >= 3) { %>
+<% if (author && (paras.length || (about && total >= 3))) { %>
 <% const authorPath = '/authors/' + encodeURI(author); %>
 <%# 見出しは置かない。丸・名前・紹介文の並びで何のブロックかは伝わるので、
-    「著者」の1行は場所を取るだけだった。支援技術には aria-label で名前を渡す %>
-<section class="author-box nav" data-nosnippet aria-label="著者">
+    「著者」の1行は場所を取るだけだった。支援技術には aria-label で名前を渡す。
+    声のカードは「著者」ではなくその人の発言なので、名前そのものを名乗る %>
+<section class="author-box nav" data-nosnippet aria-label="<%= paras.length ? author : '著者' %>">
   <div class="card">
     <div class="author-box-body">
       <%# 丸は装飾なので読み上げから外す。名前は隣のリンクが読む %>
@@ -29,7 +39,17 @@
       <div class="author-box-text">
         <a class="author-box-name" href="<%- url_for(authorPath) %>"><%= author %></a>
         <%# about は <br /> を含むのでエスケープしない %>
+        <% if (about) { %>
         <p class="author-box-about"><%- about %></p>
+        <% } %>
+        <%# 声は読み下す文章なので、添えの紹介文（13px）ではなく本文の段に置く %>
+        <% if (paras.length) { %>
+        <div class="author-box-voice">
+          <% paras.forEach(function(p){ %>
+          <p><%= p %></p>
+          <% }) %>
+        </div>
+        <% } %>
         <%# 導線は紹介文の続きなので、丸の右の列（= 本文の左端）に置く %>
         <%- partial('more-link', {url: url_for(authorPath), text: `執筆記事一覧へ（${total}本）`}) %>
       </div>
