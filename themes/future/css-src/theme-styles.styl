@@ -1941,52 +1941,37 @@ body {
 .article-card img {
   transition: opacity hover-speed ease;
 }
-.article-card:hover .archive-post-title,
-.article-card:hover .panel-title {
-  text-decoration: underline;
-  text-underline-offset: link-underline-offset;
-  text-decoration-thickness: 1px;
-}
-.article-card:hover img {
-  opacity: 0.7;
-}
-/* カードの中の別行き先のリンクを指している間は、カードの反応を止める (#3164)。
-   カードは「記事へ行く」と名乗るのに、カーソル直下の行き先は日付・カテゴリ・
-   シェア・予選/本選・「◯◯一覧へ」で、1つのカーソル位置で2つの行き先が名乗ることになる。
-   押せない余白に乗ったときの反応（誘い）はそのまま残すので、
-   引き金は「カードの hover」ではなく「中のリンクの hover」の側に置く */
-/* **@css で素の CSS として通す。** Stylus は `:has()` の中のカンマもセレクタの
-   区切りとして扱う。セレクタを並べると2本目が `…a:hover) .panel-title` になり、
-   入れ子にすると子セレクタが `:has()` の引数ひとつずつに配られる。どちらも
-   閉じ括弧の余ったセレクタが混ざり、そのルールはブラウザに丸ごと捨てられる (#3058)。
-   このブロックはトークンを使わないので、素で書いても値の出どころは増えない */
-@css {
-  .article-card:hover:has(.blog-info a:hover, .social-button a:hover, .panel-meta a:hover, .more-link a:hover) .archive-post-title,
-  .article-card:hover:has(.blog-info a:hover, .social-button a:hover, .panel-meta a:hover, .more-link a:hover) .panel-title {
-    text-decoration: none;
-  }
-  .article-card:hover:has(.blog-info a:hover, .social-button a:hover, .panel-meta a:hover, .more-link a:hover) img {
-    opacity: 1;
-  }
-}
-/* キーボードで題のリンクに来たときも同じ反応を返す (#3168)。輪郭
-   （a:focus-visible）は所在を示すが、反応そのものが hover にしか付いておらず、
-   Tab の読者だけが「押せばこの記事へ行く」という合図を受け取れていなかった。
-   本文の中では年月カード（.archive-list-item:focus-within）・目次・見出しの
-   アンカーが既に同じ形で、輪郭だけにするのはヘッダーの帯の例外 (#2686)。
+/* 引き金は「記事へ行くリンクを指している／フォーカスしていること」(#3170)。
+   カードに乗っていること自体を引き金にすると、中の別の行き先（日付・著者・
+   カテゴリ・シェア・予選/本選・「◯◯一覧へ」）の**隙間**を通るたびに反応が戻る。
+   隙間はメタ行の項目間 28px・シェアの丸の間 12px・メタ行の右の余りと広く、
+   横切るだけで6回以上切り替わって点滅に見えた。#3164 はこれを
+   「リンクに乗っている瞬間」だけ止める形で解いていたが、カードの中の余白は
+   連続した1つの面ではなく行き先と行き先の隙間なので、誘いとして働くより先に
+   ノイズになる。
 
-   引き金は行き先を名乗る題のリンクに置く。:focus-within で受けると、
-   カードの中の日付・著者・カテゴリ・シェア・「◯◯一覧へ」に来たときにも
-   反応してしまい、上の #3164 の線引きが focus 側だけ崩れる */
+   記事へ行くリンクは、サムネ（3種とも .thumb-link を持つ）と題の2つだけ。
+   キーボード側 (#3168) と同じ引き金になるので、hover と focus で
+   「反応が出る条件」が1つの規則にまとまる。サムネは tabindex="-1" なので
+   focus の側には出てこない (#2845) */
+.archive-post-item > a:hover .archive-post-title,
 .archive-post-item > a:focus-visible .archive-post-title,
+.article-card:has(.thumb-link:hover) .archive-post-title,
+.article-card .panel-title:hover,
 .article-card .panel-title:focus-visible,
+.article-card:has(.thumb-link:hover) .panel-title,
+.career-counseling .article-card .hiring-card-label:hover,
 .career-counseling .article-card .hiring-card-label:focus-visible {
   text-decoration: underline;
   text-underline-offset: link-underline-offset;
   text-decoration-thickness: 1px;
 }
+.article-card:has(.thumb-link:hover) img,
+.article-card:has(.archive-post-item > a:hover) img,
 .article-card:has(.archive-post-item > a:focus-visible) img,
+.article-card:has(.panel-title:hover) img,
 .article-card:has(.panel-title:focus-visible) img,
+.article-card:has(.hiring-card-label:hover) img,
 .article-card:has(.hiring-card-label:focus-visible) img {
   opacity: 0.7;
 }
@@ -2075,13 +2060,8 @@ body {
   position: relative;
 }
 /* 反応はカードの型（題に下線・絵が一段引く。#3162）。1枚＝1行き先なので当たりは
-   カード全体に広げるが、反応は押した先を名乗るラベルと絵に出す。
-   画像の引きは .article-card:hover img が持つ */
-.career-counseling .article-card:hover .hiring-card-label {
-  text-decoration: underline;
-  text-underline-offset: link-underline-offset;
-  text-decoration-thickness: 1px;
-}
+   カード全体に広げる（.hiring-card-label::after が下で伸ばしている）。
+   下線と画像の引きは上の #3170 の規則が .hiring-card-label の hover で持つ */
 /* 説明文はリンクの外の素の div で死に領域なので、関連記事の行と同じ ::after の手で
    ラベルの当たりをカード全体に広げる。サムネのリンクは同じ行き先の重複
    （tabindex="-1"）なので広げるのはラベル側だけ */
@@ -2254,7 +2234,7 @@ body {
   font-size: text-body;
   font-weight: bold;
 }
-/* 反応を返すのはカード（.article-card:hover の引き）で、ここでは足さない (#2686)。
+/* 反応を返すのはカードの規則（記事へ行くリンクの hover）で、ここでは足さない (#2686)。
    以前は下線も出していて、1回のカーソル移動で2つの反応が起きていた。
    ルールを消すのではなく打ち消しで残すのは、消すと metronic の
    `a:hover { color: var(--a-color); text-decoration: underline }`（0,1,1）が
@@ -2686,7 +2666,7 @@ code {
 .archive-post-item a {
   color: var(--ink-strong);
 }
-/* 反応を返すのはカード（.article-card:hover の引き）で、ここでは足さない。
+/* 反応を返すのはカードの規則（記事へ行くリンクの hover）で、ここでは足さない。
    **色も動かさない。**以前は ink-mute に落として「サムネに乗せたときと
    タイトルに乗せたときで引きを揃える」形だったが、カード側の反応が下線に
    なったので、ここで色を動かすとタイトルに乗せたときだけ余分に変わる。
