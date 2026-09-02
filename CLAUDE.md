@@ -930,6 +930,22 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
         - 内側のリンク自身の hover は添えのリンクの型（`ink-mute` →
           `ink-strong` ＋下線 #2699）かチップの型に揃っている必要がある。
           `.panel-meta a` だけが metronic の既定（青＋下線）のままだった
+      - **キーボードで題のリンクに来たときも同じ反応を返す**（#3168）。
+        `a:focus-visible` の輪郭は**所在**を示すが、反応そのものが `:hover` に
+        しか付いておらず、Tab の読者だけが「押せばこの記事へ行く」という合図を
+        受け取れていなかった。**「所在は輪郭だけ」はヘッダーの帯の例外**で
+        （64px の帯の中で下線を重ねると合図が2つになる）、本文の中には
+        年月カード（`.archive-list-item:focus-within`）・目次・見出しのアンカーの
+        前例が既にある
+        - **引き金は行き先を名乗る題のリンクに置く**（`.archive-post-item > a` /
+          `.panel-title` / `.hiring-card-label` / 行の題）。`:focus-within` で
+          受けると、カードの中の日付・著者・カテゴリ・シェア・「◯◯一覧へ」に
+          来たときにも反応して、上の #3164 の線引きが focus 側だけ崩れる
+        - **`:focus` ではなく `:focus-visible`**（#2686 のまま）。
+          マウスで押したときには出ない
+        - 打ち消しの `text-decoration: none` は `:focus` にも当たっているので、
+          **詳細度で勝てる形に書く**（`.panel-title:focus` 0,2,0 に対して
+          `.article-card .panel-title:focus-visible` 0,3,0）
     - 打ち消しの2箇所（`.panel-title:hover` / `.career-counseling .article-card a:hover`）は
       metronic の `a:hover` の青を止めるために残すが、色は `ink-strong` にする。
       `ink-mute` のままだと、タイトルやラベルを直接指したときだけ余分に変わる
