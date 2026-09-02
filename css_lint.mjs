@@ -95,3 +95,50 @@ if (mixed.length) {
   process.exit(1);
 }
 console.log('ベンダー接頭辞の擬似要素の同居はありません');
+
+// セレクタの括弧が閉じているかを見る。上と同じ「リストに1本でも解釈できない
+// セレクタがあるとルールごと捨てられる」形で、こちらは Stylus が作る。
+//
+// **Stylus は `:has()` / `:is()` の中のカンマもセレクタの区切りとして扱う。**
+// 複数のセレクタを並べると2本目以降が引数の途中から始まり、入れ子にすると
+// 子セレクタが引数ひとつずつに配られる。どちらも閉じ括弧の余ったセレクタが混ざる:
+//
+//   .card:hover:has(.a:hover, .b:hover) .title, .card:hover:has(.a:hover, .b:hover) .meta
+//     → `.card:hover:has(.a:hover,` … `.b:hover) .meta`  ← 後半が壊れてルールごと消える
+//
+// カンマを持つ `:has()` は @css で素の CSS として通す (#3164)。
+const unbalanced = [];
+for (const m of css.matchAll(/[}{]([^{}@;]+)\{/g)) {
+  // カンマで割るのは括弧の外だけ。`:has(a, b)` の中のカンマは区切りではない
+  const parts = [];
+  let depth = 0;
+  let start = 0;
+  for (let i = 0; i < m[1].length; i++) {
+    const c = m[1][i];
+    if (c === '(') depth++;
+    else if (c === ')') depth--;
+    else if (c === ',' && depth === 0) {
+      parts.push(m[1].slice(start, i));
+      start = i + 1;
+    }
+  }
+  parts.push(m[1].slice(start));
+  for (const part of parts) {
+    let d = 0;
+    for (const c of part) {
+      if (c === '(') d++;
+      else if (c === ')') d--;
+      if (d < 0) break;
+    }
+    if (d !== 0) unbalanced.push(part.trim().replace(/\s+/g, ' '));
+  }
+}
+
+if (unbalanced.length) {
+  console.error(`\n括弧の閉じていないセレクタが ${unbalanced.length} 件あります。\n`);
+  unbalanced.forEach((s) => console.error(`  ${FILE}  ${s}`));
+  console.error('\nそのセレクタを含むルールは、ブラウザに丸ごと捨てられます。');
+  console.error('カンマを持つ :has() / :is() は @css で素の CSS として通してください。');
+  process.exit(1);
+}
+console.log('括弧の閉じていないセレクタはありません');
