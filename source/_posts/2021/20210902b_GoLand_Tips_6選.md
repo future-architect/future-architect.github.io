@@ -103,7 +103,7 @@ Go言語ではエラー処理など何度も書く処理がありますが、こ
 ### Key Promoter X
 
 [Key Promoter X](https://plugins.jetbrains.com/plugin/9792-key-promoter-x/versions)とは、ショートカットが用意されている処理をショートカットを使用せずに実行するとポップアップでお知らせしてくれるプラグインです。使っていて邪魔になったことはほとんどないので入れておいて損はないと思います。
-<img src="/images/2021/20210902b/ファイル名" alt="ファイル名" width="801" height="283" loading="lazy">
+<img src="/images/2021/20210902b/ファイル名.png" alt="ファイル名" width="801" height="283" loading="lazy">
 
 ### Learnで学ぼう
 
@@ -111,7 +111,7 @@ Go言語ではエラー処理など何度も書く処理がありますが、こ
 
 Search everywhereウィンドウを立ち上げ（`Shift`2回）、”Learn”を検索すると出てきます。
 
-<img src="/images/2021/20210902b/ファイル名_2" alt="ファイル名" width="1200" height="707" loading="lazy">
+<img src="/images/2021/20210902b/ファイル名_2.png" alt="ファイル名" width="1200" height="707" loading="lazy">
 
 ### GoLand公式のショートカット一覧PDF
 
