@@ -11,7 +11,7 @@ tags:
 categories:
   - Programming
 series: "Qiitaアドベントカレンダー2024"
-thumbnail: /images/2024/20240627a/thumbnail
+thumbnail: /images/2024/20240627a/thumbnail.png
 author: 星賢一
 lede: "筆者自身もコミッターとして関わるJavaのDB永続化ライブラリ「uroboroSQL」の紹介です。"
 ---

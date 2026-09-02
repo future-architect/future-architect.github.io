@@ -165,7 +165,7 @@ alias dc='docker compose'
 
 ランチャーアプリには「[Raycast](https://www.raycast.com/)」を利用します。
 
-<img src="/images/2025/20250225a/raycast.png" alt="raycast" width="512" height="512" loading="lazy">
+<img src="/images/2025/20250225a/raycast.webp" alt="raycast" width="512" height="512" loading="lazy">
 
 Raycast には「ランチャー」としての機能だけでなく、クリップボード履歴機能や、各種操作に Hotkey 付与する機能が搭載されています。そして、これらを無料で利用できます。（ただし、「AI機能」は2週間の Free Trial 後に有償利用となります。また、ハイスペ PC なら気にするまでもありませんが、メモリ消費量が比較的多いように感じます。）
 
@@ -243,7 +243,7 @@ Raycast Setting には以下の設定を加えました。ランチャーの起�
 
 [Arc](https://arc.net/) は [The Browser Company](https://thebrowser.company/) が開発する Chromium ベースの Web ブラウザーです。
 
-<img src="/images/2025/20250225a/arc.png" alt="arc" width="1920" height="1080" loading="lazy">
+<img src="/images/2025/20250225a/arc.avif" alt="arc" width="1920" height="1080" loading="lazy">
 
 Google Chrome であれば「タブ」と「ブックマーク」は水平に広がっていきますが、Arc は垂直にそれらの要素を配置していきます。また、利用頻度の高いアプリをアイコンのように配置したり、Space を切り替えることで「タブやブックマークのグルーピング」と「作業環境の切り替え」をワンセットで行えます。エンジニア目線で「確かに、こんな機能が欲しかった！」がてんこ盛りになっており、私は **Arc をデフォルトのブラウザに設定** しました。Arc ブラウザの詳細機能は本ブログでは扱わないため、以下の記事をご参照ください。具体的なイメージがつかない場合には「とりあえずインストールして、軽く触れてみる」だけでも、Chrome とは違った操作感が得られると思います。
 
@@ -270,7 +270,7 @@ https://x.com/joshm/status/1849889202164334786
 
 「[Zen Browser](https://zen-browser.app/)」は、オープンソースで開発されている Fixforx ベースの Web ブラウザです。
 
-<img src="/images/2025/20250225a/zen.png" alt="zen" width="2560" height="1440" loading="lazy">
+<img src="/images/2025/20250225a/zen.webp" alt="zen" width="2560" height="1440" loading="lazy">
 
 Zen Browser は設定を「日本語」に変更できます。
 

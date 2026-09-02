@@ -22,7 +22,7 @@ lede: "PrometheusはSoundCloud社によって開発されたオープンソー�
 
 https://grafana-meetup-japan.connpass.com/event/314500/
 
-<a href="https://grafana-meetup-japan.connpass.com/event/314500/"><img src="/images/2024/20240417b/2024-04-17_Grafana_Meetup_Japan_1___connpass.jpg" alt="Grafana Meetup Japan #1 - connpass" width="1119" height="256"></a>
+<a href="https://grafana-meetup-japan.connpass.com/event/314500/"><img src="/images/2024/20240417b/2024-04-17_Grafana_Meetup_Japan_1___connpass.png" alt="Grafana Meetup Japan #1 - connpass" width="1119" height="256"></a>
 
 知り合いが告知していたことや、登壇される方々に興味を持って参加しました。しかし、「Grafanaほぼ触ったことない」の丸腰で行っても得るものが少なくなりそうなので、せっかくならと記事を書いています。
 
