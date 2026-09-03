@@ -4,6 +4,7 @@ description: "フューチャー技術ブログで使える記法と、その表
 layout: page
 mathjax: true
 career: true
+editable: true
 ---
 
 # 記法ガイド

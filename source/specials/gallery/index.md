@@ -3,4 +3,5 @@ title: 部品ギャラリー
 description: "フューチャー技術ブログを組み立てている部品を、実物のまま並べたページです。アイコン・カード・チップ・統計・パンくずなどの形と、その使いどころが見られます。"
 layout: gallery
 career: true
+edit_path: themes/future/layout/gallery.ejs
 ---
