@@ -1,9 +1,9 @@
 'use strict';
 
 /**
- * source/_data/tag_ontology.yml の親子構造。/tags/ の「広いタグと詳しいタグ」が
- * 木を描き、/doctor/ が登録の漏れ（独立ノード・行き先の無い概念ノード）を見る (#3196)。
- * 複数親のノードはそれぞれの親の下に重複して出す
+ * source/_data/tag_ontology.yml の親子構造。/tags/ の「親子関係」が根ごとの
+ * 群として描き、/doctor/ が登録の漏れ（独立ノード・行き先の無い概念ノード）を
+ * 見る (#3196)。複数親のノードはそれぞれの親の下に重複して出す
  * （DAG を1本の木に潰すと片方の系統から見えなくなる）。
  */
 hexo.extend.helper.register('tag_forest', function () {
@@ -77,6 +77,24 @@ hexo.extend.helper.register('tag_forest', function () {
       .sort((a, b) => b.family - a.family || (a.name < b.name ? -1 : 1)),
   });
 
+  // 根の下の子孫を平らにした列。/tags/ はチップで並べるので入れ子を持たない。
+  // 深さは失われる（深さ3が31件・深さ4が2件）が、そのぶん狭い画面で縦に短くなる。
+  // 並びは記事の多い順——次に行く先を選ぶ場所で、深さはもう表現できていないため
+  const flatten = (node) => {
+    const seen = new Map();
+    const walk = (n) => {
+      for (const c of n.children) {
+        if (!seen.has(c.name)) seen.set(c.name, c);
+        walk(c);
+      }
+    };
+    walk(node);
+    return [...seen.values()]
+      .filter((c) => c.path) // 概念ノードは行き先が無いのでチップにできない
+      .sort((a, b) => b.posts - a.posts || (a.name < b.name ? -1 : 1))
+      .map((c) => ({ name: c.name, path: c.path, count: c.posts }));
+  };
+
   // versionOf ノード（Vue3 等）は語幹に吸収されるので、木や独立タグには数えない
   const roots = Object.keys(ontology).filter(
     (n) => !hasParent.has(n) && !(ontology[n] && ontology[n].versionOf),
@@ -84,7 +102,8 @@ hexo.extend.helper.register('tag_forest', function () {
   const trees = roots
     .filter((n) => children.has(n))
     .map((n) => build(n, null))
-    .sort((a, b) => b.family - a.family || (a.name < b.name ? -1 : 1));
+    .sort((a, b) => b.family - a.family || (a.name < b.name ? -1 : 1))
+    .map((t) => ({ ...t, descendants: flatten(t) }));
   const standalone = roots
     .filter((n) => !children.has(n) && tagInfo.has(n))
     .map((n) => build(n, null))
