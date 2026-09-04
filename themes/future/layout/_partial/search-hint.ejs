@@ -7,6 +7,15 @@
     ここに3種類並べていた頃は、同じ行き先が2か所にあるうえ濃さとチップの形も
     揃っていなかった（#2871 / #2872）%>
 <div class="header-search-hint">
+	<%# 最近の検索 (#2931)。履歴は localStorage にしかないので、行は下のスクリプトが描く。
+	    キーワードはタグではないのでチップにしない（ピルはタグの印 #2892）%>
+	<div class="header-search-recent" hidden>
+		<p class="header-search-hint-label header-search-recent-label">
+			<span><%- partial('svg-icon', {icon: 'history'}) %>最近の検索</span>
+			<button type="button" class="header-search-recent-clear">消す</button>
+		</p>
+		<ul class="header-search-recent-list"></ul>
+	</div>
 	<p class="header-search-hint-label"><%- partial('svg-icon', {icon: 'tags'}) %>人気のタグ</p>
 	<%# /tags/ とサイドバーの「人気のタグ」と同じ部品・同じ見出し。検索窓の中なので「〜から探す」は書かない (#3083)。
 	    件数の右肩は .blog-tags が持つ %>
@@ -17,3 +26,66 @@
 	    「連載一覧へ」と同じ部品（.header-dropdown-more）。文言は全件導線の「◯◯一覧へ」(#2899) %>
 	<a class="header-dropdown-more header-search-hint-more" href="/tags/">タグ一覧へ</a>
 </div>
+
+<%# 検索したキーワードを localStorage に5件だけ持ち、次に検索窓を押したときに出す。
+    行は type="submit" のボタンで、押すと入力欄に入れてそのまま送信する
+    （Google の結果ページへの <a> にすると、キーワードが外部リンクの文字列になる）%>
+<script>
+	(function () {
+		var KEY = 'recentSearches';
+		var MAX = 5;
+		var form = document.querySelector('.header-search');
+		if (!form) return;
+		var input = form.querySelector('#header-search-q');
+		var box = form.querySelector('.header-search-recent');
+		var list = box.querySelector('.header-search-recent-list');
+
+		function read() {
+			try {
+				var items = JSON.parse(localStorage.getItem(KEY));
+				return Array.isArray(items) ? items.filter(function (w) { return typeof w === 'string'; }) : [];
+			} catch (e) {
+				return [];
+			}
+		}
+		function write(items) {
+			try {
+				localStorage.setItem(KEY, JSON.stringify(items));
+			} catch (e) {}
+		}
+		function render() {
+			var items = read();
+			list.textContent = '';
+			items.forEach(function (word) {
+				var button = document.createElement('button');
+				button.type = 'submit';
+				button.className = 'header-search-recent-item';
+				button.textContent = word;
+				button.addEventListener('click', function () {
+					input.value = word;
+				});
+				var li = document.createElement('li');
+				li.appendChild(button);
+				list.appendChild(li);
+			});
+			box.hidden = items.length === 0;
+		}
+
+		form.addEventListener('submit', function () {
+			var word = input.value.trim().slice(0, 100);
+			if (!word) return;
+			var items = read().filter(function (w) { return w !== word; });
+			items.unshift(word);
+			write(items.slice(0, MAX));
+			render();
+		});
+		box.querySelector('.header-search-recent-clear').addEventListener('click', function () {
+			write([]);
+			render();
+			// 消したボタンごと隠れるとフォーカスが外れてパネルが閉じるので、入力欄へ戻す
+			input.focus();
+		});
+
+		render();
+	})();
+</script>
