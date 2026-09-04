@@ -52,13 +52,22 @@ jobs:
       - name: Update GitHub followers
         run: node update_follower_counts.mjs
 
+      # 取得に10分近くかかるので、その間に main が進んで push が弾かれる。
+      # 触るのは生成物の4ファイルだけなので、取り込み直して積み直す
       - name: Commit and push
         run: |
           git config --local user.name "github-actions[bot]"
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add sns_count_cache.json ga_cache.json ga4_pv.json source/_data/follower_counts.yml
           git commit -m "Update SNS counts cache"
-          git push origin HEAD
+          for i in 1 2 3; do
+            git fetch origin main
+            # 衝突するのは人が同じファイルを触ったときだけなので、その場合は止めて気づけるようにする
+            git rebase origin/main || { git rebase --abort; exit 1; }
+            if git push origin HEAD:main; then exit 0; fi
+            sleep 5
+          done
+          exit 1
 
       - name: Trigger Deploy Workflow
         uses: actions/github-script@v7
