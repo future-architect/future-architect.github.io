@@ -15,7 +15,7 @@ lede: "Japan Datadog User Group Meetup#21@東京 で「全リクエストのレ�
 ---
 こんにちは、CSIG (Cyber Security Innovation Group) 所属の市川です。普段は脆弱性管理サービスの FutureVuls の開発・運用を担当しており、最近はパフォーマンス改善のリーディングをしています。
 
-2026年8月26日(水)に開催された Japan Datadog User Group Meetup#21@東京 で、5 分間の LT をしてきたので、発表内容を軽くまとめておこうと思います。[前回の #14@福岡](/articles/20251128a/) に続いて 2 回目の登壇です。
+2026年8月26日(水)に開催された [Japan Datadog User Group Meetup#21@東京](https://datadog-jp.connpass.com/event/401209/) で、5 分間の LT をしてきたので、発表内容を軽くまとめておこうと思います。[前回の #14@福岡](/articles/20251128a/) に続いて 2 回目の登壇です。
 
 ## 発表内容
 
