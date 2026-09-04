@@ -42,7 +42,9 @@ const EXEMPT = new Map([
   ['.header-search:focus-within .header-search-close', '20px'],
   // 機能で決まる値。16px を下回ると iOS がフォーカス時に画面をズームする
   ['.header-search input', '16px'],
-  ['.header-search button', '16px'],
+  ['.header-search > button', '16px'],
+  // 1件ずつ消す ✕。押せる面の 24px の箱に収める絵の実寸 (#2931)
+  ['.header-search-recent-remove', '14px'],
   // 一点もの
   ['.page-404 .number', '128px'],
   // 行き先の名前に付く総数。行の主題は名前で、数字は選ぶ判断には効かない。

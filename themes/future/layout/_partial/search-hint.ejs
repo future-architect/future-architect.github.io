@@ -12,9 +12,17 @@
 	<div class="header-search-recent" hidden>
 		<p class="header-search-hint-label header-search-recent-label">
 			<span><%- partial('svg-icon', {icon: 'history'}) %>最近の検索</span>
-			<button type="button" class="header-search-recent-clear">消す</button>
+			<button type="button" class="header-search-recent-clear">すべて消す</button>
 		</p>
 		<ul class="header-search-recent-list"></ul>
+		<%# 行の markup はここが1箇所で持つ。スクリプトは複製して文字を入れるだけで、
+		    JS の中で組み立てるとアイコンの絵柄が辞書の外にもう1つ増える %>
+		<template class="header-search-recent-row">
+			<li>
+				<button type="submit" class="header-search-recent-item"></button>
+				<button type="button" class="header-search-recent-remove"><%- partial('svg-icon', {icon: 'x'}) %></button>
+			</li>
+		</template>
 	</div>
 	<p class="header-search-hint-label"><%- partial('svg-icon', {icon: 'tags'}) %>人気のタグ</p>
 	<%# /tags/ とサイドバーの「人気のタグ」と同じ部品・同じ見出し。検索窓の中なので「〜から探す」は書かない (#3083)。
@@ -39,6 +47,7 @@
 		var input = form.querySelector('#header-search-q');
 		var box = form.querySelector('.header-search-recent');
 		var list = box.querySelector('.header-search-recent-list');
+		var template = box.querySelector('.header-search-recent-row');
 
 		function read() {
 			try {
@@ -56,19 +65,32 @@
 		function render() {
 			var items = read();
 			list.textContent = '';
-			items.forEach(function (word) {
-				var button = document.createElement('button');
-				button.type = 'submit';
-				button.className = 'header-search-recent-item';
-				button.textContent = word;
-				button.addEventListener('click', function () {
+			items.forEach(function (word, index) {
+				var row = template.content.querySelector('li').cloneNode(true);
+				var item = row.querySelector('.header-search-recent-item');
+				item.textContent = word;
+				item.addEventListener('click', function () {
 					input.value = word;
 				});
-				var li = document.createElement('li');
-				li.appendChild(button);
-				list.appendChild(li);
+				var remove = row.querySelector('.header-search-recent-remove');
+				remove.setAttribute('aria-label', '「' + word + '」を履歴から消す');
+				remove.addEventListener('click', function () {
+					removeAt(index);
+				});
+				list.appendChild(row);
 			});
 			box.hidden = items.length === 0;
+		}
+		function removeAt(index) {
+			var items = read();
+			items.splice(index, 1);
+			write(items);
+			render();
+			// 押したボタンごと消えるとフォーカスが外れてパネルが閉じる。
+			// 次の行へ移し、最後の1件だったら入力欄へ戻す
+			var next = list.querySelectorAll('.header-search-recent-remove')[Math.min(index, items.length - 1)];
+			if (next) next.focus();
+			else input.focus();
 		}
 
 		form.addEventListener('submit', function () {
