@@ -73,7 +73,7 @@ hexo.extend.helper.register('tag_forest', function () {
 
   // タグでも親でもないノードは木に出さない。行き先が無いうえ子も連れないので、
   // 読者にはただの行き止まりになる。**消さずに /doctor/ が漏れとして拾う**
-  // ——タグができる前に辺だけ登録してある形（TiDB ⊆ DB）で、誤登録とは限らない
+  // ——タグができる前に辺だけ登録した形もありうるので、誤登録とは限らない
   const showable = (name) => tagInfo.has(name) || (children.get(name) || []).length > 0;
 
   // 子は「それ自身が子を持つか」で2つに分ける。持たない子は横に流れるチップ、

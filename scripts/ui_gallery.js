@@ -34,6 +34,7 @@ const NOT_SHOWN = {
   'breadcrumb-page': 'Markdown のページ用にパンくずの項目を組むだけの包み。見た目はパンくずが持つ',
   'chart-xaxis-year-labels': 'echarts に渡す設定値を返す断片。見た目を持たない',
   'chart-yaxis-count': '同上',
+  'chart-tooltip-count': '同上（ツールチップ）',
   'edit-pencil': '見出しの末尾に出る、原稿の編集画面への鉛筆。実物がこのページの h1 の末尾にある',
   'echarts-script': 'グラフのライブラリを読み込む <script>。見た目を持たない',
   'featured-post': '呼び出し元が無い',
@@ -47,6 +48,8 @@ const NOT_SHOWN = {
   'sidebar-index-authors': '同上（/authors/）',
   'sidebar-index-categories': '同上（/categories/）',
   'sidebar-index-tags': '同上（/tags/）',
+  'sidebar-index-series': '同上（/series/）',
+  'sidebar-index-without': '同上（「◯◯以外の記事」）',
   'sidebar-stats-index':
     '一覧ページのサイドバーの中身。渡された統計とグラフを並べるだけで、単体では形を持たない',
   'post-list-icon': '行に添えるサムネ。記事の行（post-list-item）の見本の中に実物が出ている',
@@ -59,6 +62,8 @@ const NOT_SHOWN = {
   scripts: 'ページ末のスクリプト。見た目を持たない',
   'search-hint': '検索窓のヒントパネル。実物がこのページの上端にある',
   'site-logo': 'ヘッダーのロゴ。実物がこのページの上端に出ている',
+  'theme-toggle':
+    '明暗の切り替え。実物がこのページの上端の帯にある。3つの状態のうち出るのは常に1つで、切り替えは CSS が持つ',
   'sidebar-stats': 'サイドバーの中身の一部。page に依存する',
   sidebar: 'サイドバー。実物がこのページの右に出ている',
 };

@@ -28,7 +28,7 @@ hexo.extend.generator.register('doctor', function (locals) {
  * 見送ったものは残り、逆に未判断でも記事が古いだけの候補が消える。見送りは
  * tag_ontology.yml の notBroader が記憶する。
  *
- * 包含の候補（統合候補・親子の候補）は子の記事集合が親に含まれるので、
+ * 包含の候補（ほぼ重複するタグ・親子の候補）は子の記事集合が親に含まれるので、
  * 子が活きていれば親も必ず活きている。判定は子だけで足りる。
  */
 const ACTIVE_DAYS = 365;
@@ -65,7 +65,7 @@ hexo.extend.helper.register('doctor_checks', function () {
   const posts = this.site.posts.sort('-date');
   const active = activeTagNames(this.site.tags);
 
-  // タグ -> 記事IDの集合。ほぼ重なるタグ（統合候補）と1記事タグの検出に使う
+  // タグ -> 記事IDの集合。ほぼ重複するタグと1記事タグの検出に使う
   const tagPostSets = new Map();
   const tagPath = new Map();
   this.site.tags.forEach((tag) => {
@@ -73,7 +73,7 @@ hexo.extend.helper.register('doctor_checks', function () {
     tagPostSets.set(tag.name, new Set(tag.posts.map((p) => p._id)));
   });
 
-  // 4) ほぼ重なるタグ（統合候補）。A の記事がすべて B にも付いていて、
+  // 4) ほぼ重複するタグ。A の記事がすべて B にも付いていて、
   //    B 側の差分も2本以内なら、実質同じ集合に2つの名前が付いている。
   //    Go1.27 ⊆ Go のような健全な階層（差が大きい包含）はここでは出さない
   const nearDuplicates = [];
@@ -154,10 +154,10 @@ hexo.extend.helper.register('doctor_checks', function () {
  * こちらは候補を並べるだけに留める。人が見て認めたものを yml に書き、
  * 書いた分だけ表示に反映される。
  *
- * 差が2本以内のペアは「ほぼ重なるタグ（統合候補）」が受け持つので出さない。
+ * 差が2本以内のペアは「ほぼ重複するタグ」が受け持つので出さない。
  * あちらは名前を1つに寄せる提案で、こちらは親子として繋ぐ提案。
  */
-const ONTOLOGY_SUGGEST_MIN_DIFF = 3; // 差がこれ未満なら統合候補（別の節）の担当
+const ONTOLOGY_SUGGEST_MIN_DIFF = 3; // 差がこれ未満なら「ほぼ重複するタグ」の担当
 const ONTOLOGY_SUGGEST_MIN_POSTS = 2; // 1記事タグは包含が偶然になりやすい
 
 hexo.extend.helper.register('doctor_ontology_suggestions', function () {
