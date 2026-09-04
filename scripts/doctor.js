@@ -22,14 +22,30 @@ hexo.extend.generator.register('doctor', function (locals) {
 // 監査のネタ出しとしての役目は上記3回で回収済み
 
 /**
- * 直近1年より古いものは候補から外す。タグの節（統合候補・1記事タグ・親子の候補）は
- * 記事の無いタグ、本文照合の節は記事そのものを外す。見送りを決めたものが毎回並ぶと、
- * 新しく増えた分が埋もれる。
+ * 古いものは候補から外す。見送りを決めたものが毎回並ぶと、新しく増えた分が埋もれる。
+ *
+ * **窓を短くして「判断済み」を消すことはできない**（#3205）。記事の日付が新しいまま
+ * 見送ったものは残り、逆に未判断でも記事が古いだけの候補が消える。見送りは
+ * tag_ontology.yml の notBroader が記憶する。
  *
  * 包含の候補（統合候補・親子の候補）は子の記事集合が親に含まれるので、
  * 子が活きていれば親も必ず活きている。判定は子だけで足りる。
  */
 const ACTIVE_DAYS = 365;
+
+// 版タグの語幹（scripts/version_tags.js と同じ3層）。1記事タグの除外と
+// 親子の候補の除外の2箇所で使う
+const VERSIONED = /^(.+?)(\d+(?:\.\d+)+|\d{2,})$/;
+const versionStemLookup = (tags, ontology) => {
+  const names = new Set(tags.map((t) => t.name));
+  return (name) => {
+    const node = ontology[name];
+    if (node && node.notVersion) return null;
+    if (node && node.versionOf) return node.versionOf;
+    const m = VERSIONED.exec(name);
+    return m && names.has(m[1]) ? m[1] : null;
+  };
+};
 
 const activeTagNames = (tags) => {
   const limit = Date.now() - ACTIVE_DAYS * 24 * 60 * 60 * 1000;
@@ -100,9 +116,12 @@ hexo.extend.helper.register('doctor_checks', function () {
   // 6) 1記事タグ。同じ記事に1記事タグ同士が同居している場合は、その記事の
   //    タグ付けがまとめて薄い可能性が高いので印を付ける
   //    （タグクラウドで * / ** として出していた仕様の移設）
+  // 版タグ（インターン2026 / GoogleCloudNext2026）は語幹に吸収されるので、
+  // 1本しか無いこと自体が指摘にならない (#3205)
+  const stemOfTag = versionStemLookup(this.site.tags, (this.site.data || {}).tag_ontology || {});
   const singleUse = [];
   for (const [name, set] of tagPostSets) {
-    if (set.size !== 1 || !active.has(name)) continue;
+    if (set.size !== 1 || !active.has(name) || stemOfTag(name)) continue;
     const postId = [...set][0];
     let lonelyPair = false;
     for (const [other, otherSet] of tagPostSets) {
@@ -172,26 +191,22 @@ hexo.extend.helper.register('doctor_ontology_suggestions', function () {
 
   // 版タグ（Go1.27）は名前の規則で語幹と同義になり、オントロジーに書く対象では
   // ないので提案しない（scripts/version_tags.js が担う）
-  const VERSIONED = /^(.+?)(\d+(?:\.\d+)+|\d{2,})$/;
-  const stemOf = (name) => {
-    const node = ontology[name];
-    if (node && node.notVersion) return null;
-    if (node && node.versionOf) return node.versionOf;
-    const m = VERSIONED.exec(name);
-    return m && sets.has(m[1]) ? m[1] : null;
-  };
+  const stemOf = versionStemLookup(this.site.tags, ontology);
 
   const entries = [...sets.entries()].filter(([, s]) => s.size >= ONTOLOGY_SUGGEST_MIN_POSTS);
   const active = activeTagNames(this.site.tags);
   const suggestions = [];
   for (const [child, C] of entries) {
     if (!active.has(child)) continue;
-    const stem = stemOf(child);
+    // 版タグ（GoogleCloudNext2025）は語幹に吸収されるので、語幹以外の親も提案しない。
+    // 以前は parent === stem だけを外していたため GoogleCloudNext2025 ⊆ GoogleCloud が出ていた
+    if (stemOf(child)) continue;
     const known = ancestorsOf(child);
+    const declined = new Set((ontology[child] || {}).notBroader || []);
     for (const [parent, P] of entries) {
       if (parent === child || P.size - C.size < ONTOLOGY_SUGGEST_MIN_DIFF) continue;
-      if (parent === stem) continue; // 版タグと語幹は名前の規則が担う
       if (known.has(parent)) continue; // すでに親子として書かれている
+      if (declined.has(parent)) continue; // 見送りと決めたもの (#3205)
       let subset = true;
       for (const id of C) {
         if (!P.has(id)) {

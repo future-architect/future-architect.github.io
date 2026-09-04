@@ -20,7 +20,7 @@
       {id: 'duplicates', text: 'ほぼ重なるタグ（統合候補）', label: '統合候補のタグ', count: checks.nearDuplicates.length},
       {id: 'single-use', text: '1記事にしか使われていないタグ', label: '1記事タグ', count: checks.singleUse.length},
       {id: 'ontology-suggestions', text: 'オントロジーへの追加提案（親子の候補）', label: '親子の候補', count: ontoSuggest.suggestions.length},
-      {id: 'ontology', text: '木にならなかったオントロジー登録', label: 'オントロジー', count: onto.standalone.length + onto.orphanConcepts.length},
+      {id: 'ontology', text: '実体の無いオントロジー登録', label: 'オントロジー', count: onto.orphanConcepts.length},
       {id: 'text-suggestions', text: '本文に何度も出てくるのにタグが付いていない記事', label: 'タグ付け漏れ候補', count: textSuggest.posts.length},
       {id: 'dormant', text: 'リマインドしたい著者', label: 'リマインドしたい著者', count: dormant.recent.length},
       {id: 'ui-partials', text: '共通部品の台帳', label: '共通部品', count: uiParts.rows.length},
@@ -32,7 +32,7 @@
   <div class="margin-top-30">
     <div class="footer-gap">
       <h1 class="list-page margin-bottom-20">記事ドクター</h1>
-      ※運営向けの画面です。人の判断が要る候補だけを並べます（提案であって、正とは限りません）。タグ無し・カテゴリと同名のタグ・未登録のカテゴリは PR の検査が止めるので、ここには出ません。タグの3節（統合候補・1記事タグ・親子の候補）は直近1年間に記事のあるタグ、タグ付け漏れ候補は直近1年間の記事だけを対象にします
+      ※運営向けの画面です。人の判断が要る候補だけを並べます（提案であって、正とは限りません）。タグ無し・カテゴリと同名のタグ・未登録のカテゴリは PR の検査が止めるので、ここには出ません。タグの3節（統合候補・1記事タグ・親子の候補）は直近1年間に記事のあるタグ、タグ付け漏れ候補は直近1年間の記事だけを対象にします。親子の候補で<strong>見送ると決めたもの</strong>は <code>source/_data/tag_ontology.yml</code> の <code>notBroader</code> に書くと出なくなります（版タグは語幹に吸収されるので最初から出ません）
       <%- partial('_partial/summary-tiles', {items: SECTIONS.map(function(sec){
             return {value: sec.count, label: sec.label};
           })}) %>
@@ -156,26 +156,11 @@
       </div>
 
       <%- heading('ontology') %>
-      ※<code>source/_data/tag_ontology.yml</code> に登録した親子のうち、<strong>木にならなかったもの</strong>です。親子そのものは <a href="/tags/#tagforest">タグ一覧の「親子関係を持つタグ」</a>が根ごとの群として描きます (#3196)。登録するのは「子タグの記事に親タグを打つのは冗長」と言える自明な包含だけ
+      ※<code>source/_data/tag_ontology.yml</code> に登録したのに<strong>タグとしても親としても実体が無い</strong>ノードです。タグができる前に辺だけ書いた形（<code>TiDB ⊆ DB</code>）なので誤登録とは限りませんが、<a href="/tags/#tagforest">タグ一覧の「親子関係を持つタグ」</a>には出ないのでここでしか気づけません
       <ul class="doctor-list">
-        <%# リマインドしたい著者の列と同じ扱い。数十件が横に流れるので、
-            区切りの「、」ではなく行間と余白で分ける (#2418) %>
-        <li class="doctor-inline-row">
-          <span class="doctor-note">親も子も無い根タグ（<%= onto.standalone.length %>件）</span>
-          <% onto.standalone.forEach(function(n){ %><a href="<%- url_for(n.path) %>"><%= n.name %></a><span class="ontology-count doctor-note-inline"><%= n.posts %>本<%= (n.versions || []).length ? '・版' + n.versions.length : '' %></span><% }) %>
-        </li>
-        <%# タグでも親でもないノード。タグができる前に辺だけ書いた形（TiDB ⊆ DB）なので
-            誤登録とは限らないが、木には出ないのでここでしか気づけない %>
         <li class="doctor-inline-row">
           <span class="doctor-note">タグにも親にもなっていないノード（<%= onto.orphanConcepts.length %>件）</span>
           <% if (onto.orphanConcepts.length) { %><%= onto.orphanConcepts.join('、') %><% } else { %>該当なし<% } %>
-        </li>
-        <%# 版は語幹に吸収される（Go1.27 は Go を書いたのと同じ扱い）。
-            末尾が4桁の年のものは「バージョン」ではないので /tags/ には出さない。
-            ここは台帳なので両方出し、年の側に印を付ける %>
-        <li class="doctor-inline-row">
-          <span class="doctor-note">版を持つ語幹（<%= onto.versionStems.length %>件。うち年は /tags/ に出さない）</span>
-          <% onto.versionStems.forEach(function(s){ %><a href="<%- url_for(s.path) %>"><%= s.name %></a><span class="ontology-count doctor-note-inline"><%= s.year ? '年' : '版' %><%= s.count %></span><% }) %>
         </li>
       </ul>
 
