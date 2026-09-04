@@ -79,7 +79,9 @@ lines.forEach((line, i) => {
     pending.push(cont[1]);
     return;
   }
-  const decl = line.match(/^\s*font-size:\s*([^;]+);\s*$/);
+  // 末尾のコメントを許す。行末までを要求していた頃は、コメントの付いた行を
+  // まるごと素通ししていた（3件あり、セレクタを変えて EXEMPT の鍵が外れても黙っていた）
+  const decl = line.match(/^\s*font-size:\s*([^;]+);/);
   if (!decl) return;
   const value = decl[1].trim();
   if (STEPS.includes(value) || CANCEL.includes(value)) return;
