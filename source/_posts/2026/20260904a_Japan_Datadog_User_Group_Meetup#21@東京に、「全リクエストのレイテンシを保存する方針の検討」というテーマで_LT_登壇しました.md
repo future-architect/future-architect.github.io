@@ -6,7 +6,6 @@ tags:
   - 登壇レポート
   - Datadog
   - オブサーバビリティ
-  - APM
   - ログ
 categories:
   - DevOps
