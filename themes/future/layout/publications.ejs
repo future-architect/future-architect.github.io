@@ -1,6 +1,6 @@
 <%# 出版・寄稿の一覧 (#2912)。記事のフロントマターの books / magazines から
-    scripts/publications.js が集める。表紙は並べない——買い物ページではなく
-    「誰が何を書いたか」の記録なので、書名・寄稿タイトル・執筆者が読めることを優先する。
+    scripts/publications.js が集める。書影を添えるのは書籍の節だけ——技術誌は
+    23件のうち13件が号ごとの表紙を持たない（2本のまとめ記事に由来する）。
     行き先は出版社のページで、リンク1本ずつに印を付けずページの本文で一度名乗る (#2729) %>
 <% const pub = publications(); %>
 <div class="container">
@@ -13,34 +13,57 @@
   <div class="margin-top-30">
     <div class="footer-gap">
       <h1 class="list-page margin-bottom-20">出版・寄稿</h1>
-      <p class="specials-text">フューチャーの社員が書いた書籍<%= pub.books.length %>点と、技術誌への寄稿<%= pub.magazines.length %>件です。書名・号の名前は出版社のページに、それぞれの行は書いた本人によるブログの記事にリンクしています。</p>
+      <p class="specials-text">フューチャーの社員が書いた書籍<%= pub.books.length %>点と、技術誌への寄稿<%= pub.magazineCount %>件です。</p>
 
       <%- partial('_partial/section-heading', {id: 'books', text: '書籍'}) %>
-      <ul class="publication-list">
+      <%# 書籍はパネルのグリッド（連載・HTTF と同じ部品）で2列。3列にすると添えの
+          「執筆者 ／ 記事タイトル」が幅122〜212pxで3〜4行に折り返し、文字の塊が
+          書影（80px）より高くなる。2列なら題は1行、添えは1〜2行に収まる %>
+      <div class="series-panels publication-panels row">
         <% pub.books.forEach(function(b){ %>
-        <li class="publication-item">
-          <p class="publication-name"><a href="<%= b.url %>" target="_blank" rel="noopener"><%= b.name %></a></p>
-          <p class="publication-meta"><%= b.by %> ／ <a href="<%= b.post.path %>"><%= b.post.title %></a></p>
-        </li>
+        <div class="col-12 col-md-6">
+          <%- partial('_partial/panel-card', {
+                url: b.url,
+                title: b.name,
+                thumb: Object.assign({src: b.cover, variant: 'cover'}, image_size(b.cover)),
+                // 著者名は出さない。共著・共訳でも1名しか出ないので単著に見える
+                meta: '<span class="publication-credit"><a href="' + url_for(b.post.path) + '">'
+                  + escape_html(b.post.title) + '</a></span>',
+                external: true,
+              }) %>
+        </div>
         <% }) %>
-      </ul>
+      </div>
 
       <%- partial('_partial/section-heading', {id: 'magazines', text: '技術誌への寄稿'}) %>
-      <%# まとめる単位は号ではなく寄稿1件。1つの号に複数の寄稿があり、書いた人も違う %>
-      <ul class="publication-list">
+      <%# 書籍と同じパネルのグリッド。題が「何に書いたか」（号＋特集名）、
+          添えが報告の記事。同じ特集に複数の記事があればその行を積む %>
+      <div class="series-panels publication-panels row">
         <% pub.magazines.forEach(function(m){ %>
-        <li class="publication-item">
-          <p class="publication-name"><a href="<%= m.url %>" target="_blank" rel="noopener"><%= m.name %></a></p>
-          <p class="publication-meta"><% if (m.work) { %><%= m.work %> ／ <% } %><%= m.by %> ／ <a href="<%= m.post.path %>"><%= m.post.title %></a></p>
-        </li>
+        <div class="col-12 col-md-6">
+          <%- partial('_partial/panel-card', {
+                url: m.url,
+                title: m.name,
+                thumb: Object.assign({src: m.cover, variant: 'cover'}, m.cover ? image_size(m.cover) : {}),
+                // 特集名は題と同じ行に置く。添えに落とすと、素の文字と記事のリンクが
+                // 同じ段・同じ色で隣り合って区別が付かない
+                note: m.work,
+                // 執筆者は出さない。書籍と同じで、連名でも1名しか出ないので単著に見える
+                meta: m.items.map(function(w){
+                      return '<span class="publication-credit"><a href="' + url_for(w.post.path) + '">'
+                        + escape_html(w.post.title) + '</a></span>';
+                    }).join(''),
+                external: true,
+              }) %>
+        </div>
         <% }) %>
-      </ul>
+      </div>
 
       <%- partial('_partial/section-heading', {id: 'relatedtags', text: '関連タグ'}) %>
       <div class="blog-tags">
         <%- partial('_partial/tag-chips', {items: [
             {name: '出版', path: '/tags/出版/'},
-            {name: '外部寄稿', path: '/tags/外部寄稿/'},
+            {name: 'SoftwareDesign', path: '/tags/SoftwareDesign/'},
           ]}) %>
       </div>
     </div>

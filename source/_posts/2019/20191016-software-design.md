@@ -14,14 +14,17 @@ lede: "2019年は幸運なことに、技術評論社のSoftware Designという
 magazines:
   - name: "Software Design 2019年1月号"
     url: https://gihyo.jp/magazine/SD/archive/2019/201901
+    cover: /images/publications/sd-201901.jpg
     work: "自然言語処理・画像処理における線形代数の応用"
     by: 上野貴史、貞光九月
   - name: "Software Design 2019年3月号"
     url: https://gihyo.jp/magazine/SD/archive/2019/201903
+    cover: /images/publications/sd-201903.jpg
     work: "微分でつなぐ、機械学習とニューラルネットワーク"
     by: 上野貴史、貞光九月
   - name: "Software Design 2019年9月号"
     url: https://gihyo.jp/magazine/SD/archive/2019/201909
+    cover: /images/publications/sd-201909.jpg
     work: "数字認識APIを作って実感"
     by: 上野貴史、貞光九月
 ---

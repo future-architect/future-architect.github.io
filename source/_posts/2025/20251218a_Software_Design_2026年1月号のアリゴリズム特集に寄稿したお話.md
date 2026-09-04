@@ -15,7 +15,7 @@ lede: "真野さん、松本さんと一緒にSoftware Designの特集記事に�
 magazines:
   - name: "Software Design 2026年1月号"
     url: https://gihyo.jp/magazine/SD/archive/2026/202601
-    work: "アルゴリズム特集"
+    work: "アルゴリズムはどこに効く？"
 ---
 
 <a href="https://gihyo.jp/magazine/SD/archive/2026/202601">

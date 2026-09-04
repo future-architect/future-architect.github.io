@@ -10,7 +10,9 @@
     引数:
       url      行き先（必須）
       title    題（必須）
-      thumb    {src, width, height, contain} か null。null なら空き枠を出す
+      note     題と同じ行に続ける添え（省略可）。リンクの外に置くので押せない
+      thumb    {src, width, height, contain, variant} か null。null なら空き枠を出す
+               variant は器の形を替える（'cover' で縦長の表紙 60×80）
       label    {icon, text} か null。種別の名札 (#2892)
       meta     題の下の添え。**HTML を受け取る**（HTTF はリンクを含む）
       more     {url, text} か null。カードごとの全件導線
@@ -30,23 +32,33 @@
   const panelLabel = typeof label === 'undefined' ? null : label;
   const panelMeta = typeof meta === 'undefined' ? null : meta;
   const panelMore = typeof more === 'undefined' ? null : more;
+  const panelNote = typeof note === 'undefined' ? null : note;
   const panelBlank = (typeof external !== 'undefined' && external) ? ' target="_blank" rel="noopener"' : '';
+  const thumbShape = (panelThumb && panelThumb.contain ? ' panel-thumb-contain' : '')
+    + (panelThumb && panelThumb.variant ? ' panel-thumb-' + panelThumb.variant : '');
+  %><%# 器の形（variant）は絵が無いときの空き枠にも要るので、src の有無だけで枝を分ける %><%
+  const hasThumb = panelThumb && panelThumb.src;
 %>
 <div class="article-card series-panel">
-  <% if (panelThumb) { %>
-  <a href="<%= url %>" title="<%= title %>" class="thumb-link panel-thumb<%= panelThumb.contain ? ' panel-thumb-contain' : '' %>" tabindex="-1" aria-hidden="true"<%- panelBlank %>>
+  <% if (hasThumb) { %>
+  <a href="<%= url %>" title="<%= title %>" class="thumb-link panel-thumb<%= thumbShape %>" tabindex="-1" aria-hidden="true"<%- panelBlank %>>
     <img src="<%= panelThumb.src %>" alt="" width="<%= panelThumb.width %>" height="<%= panelThumb.height %>" loading="lazy">
   </a>
   <% } else { %>
   <%# サムネの無いものは同じ大きさの空き枠で行頭を揃える（post_list.js と同じ流儀） %>
-  <span class="panel-thumb panel-thumb-empty"></span>
+  <span class="panel-thumb panel-thumb-empty<%= thumbShape %>"></span>
   <% } %>
   <div class="panel-body">
     <%# 名札はリンクの外に置く。種別はカードの属性であって導線ではない (#2892) %>
     <% if (panelLabel) { %>
     <span class="panel-label"><%- partial('svg-icon', {icon: panelLabel.icon}) %><%= panelLabel.text %></span>
     <% } %>
+    <%# note があるときは題と同じ行に流すので、題をインラインにする器で包む %>
+    <% if (panelNote) { %>
+    <div class="panel-title-line"><a href="<%= url %>" class="panel-title"<%- panelBlank %>><%= title %></a><span class="panel-title-note"><%= panelNote %></span></div>
+    <% } else { %>
     <a href="<%= url %>" class="panel-title"<%- panelBlank %>><%= title %></a>
+    <% } %>
     <% if (panelMeta) { %>
     <div class="panel-meta"><%- panelMeta %></div>
     <% } %>
