@@ -3,7 +3,7 @@
 // 連載ナビ本体。グループ化と題名の整形は lib/series.js にある
 // （related_posts / reference_posts も同じ結果を使うため）
 
-const { INDEX_TAG, seriesOf, allSeries, seriesStats } = require('./lib/series');
+const { seriesOf, allSeries, seriesStats, seriesRelatedTags } = require('./lib/series');
 
 hexo.extend.helper.register('series_nav', function (post) {
   return seriesOf(this.site, post);
@@ -71,9 +71,9 @@ hexo.extend.helper.register('all_series', function () {
   return allSeries(this.site);
 });
 
-// /series/ の関連タグ。索引記事の判定と同じ値 (#3101)
-hexo.extend.helper.register('series_index_tag', function () {
-  return INDEX_TAG;
+// /series/ の関連タグ。索引タグと恒例行事の企画名（規則は lib/series.js）
+hexo.extend.helper.register('series_related_tags', function () {
+  return seriesRelatedTags(this.site);
 });
 
 // /series/ の統計。累計と直近1年 (#2572)
