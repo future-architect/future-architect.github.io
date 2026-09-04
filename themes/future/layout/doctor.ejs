@@ -7,7 +7,7 @@
   <%
     const checks = doctor_checks();
     const ontoSuggest = doctor_ontology_suggestions();
-    const onto = doctor_ontology();
+    const onto = tag_forest();
     const textSuggest = doctor_text_suggestions();
     const dormant = doctor_dormant_authors();
     const thisYear = new Date().getFullYear();
@@ -20,7 +20,7 @@
       {id: 'duplicates', text: 'ほぼ重なるタグ（統合候補）', label: '統合候補のタグ', count: checks.nearDuplicates.length},
       {id: 'single-use', text: '1記事にしか使われていないタグ', label: '1記事タグ', count: checks.singleUse.length},
       {id: 'ontology-suggestions', text: 'オントロジーへの追加提案（親子の候補）', label: '親子の候補', count: ontoSuggest.suggestions.length},
-      {id: 'ontology', text: 'タグの親子関係（オントロジー）', label: 'オントロジー登録', count: onto.nodeCount},
+      {id: 'ontology', text: '木にならなかったオントロジー登録', label: 'オントロジー', count: onto.standalone.length + onto.orphanConcepts.length},
       {id: 'text-suggestions', text: '本文に何度も出てくるのにタグが付いていない記事', label: 'タグ付け漏れ候補', count: textSuggest.posts.length},
       {id: 'dormant', text: 'リマインドしたい著者', label: 'リマインドしたい著者', count: dormant.recent.length},
       {id: 'ui-partials', text: '共通部品の台帳', label: '共通部品', count: uiParts.rows.length},
@@ -156,38 +156,26 @@
       </div>
 
       <%- heading('ontology') %>
-      ※<code>source/_data/tag_ontology.yml</code> に登録した親子の可視化。関連記事の計算に使う辺で、「子タグの記事に親タグを打つのは冗長」と言える自明な包含だけを登録します。灰色はタグとして実在しない概念ノード。「系統」は自分＋子孫のユニーク記事数。「版」はバージョン同義（Go1.27 は Go を書いたのと同じ扱い）で語幹に吸収されるタグ
-      <%
-        function renderNode(n) { %>
-        <li>
-          <% if (n.path) { %><a href="<%- url_for(n.path) %>"><%= n.name %></a><% } else { %><span class="ontology-concept"><%= n.name %></span><% } %>
-          <span class="ontology-count"><%= n.posts %>本<% if (n.family > n.posts) { %>・系統<%= n.family %>本<% } %><% if (n.otherParents.length) { %>・他の親: <%= n.otherParents.join('、') %><% } %></span>
-          <%# versions が無くても落とさない。scripts/ は再起動まで古いままでテーマだけ
-              watch で再読込されるため、開発サーバでは版ズレでヘルパーが versions を
-              返さないことがある。undefined のまま参照すると未処理例外になり、
-              レスポンスが返らず /doctor/ がハングして見える %>
-          <% const vers = n.versions || []; %>
-          <% if (vers.length) { %><span class="ontology-versions">版: <% vers.forEach(function(v, i){ %><a href="<%- url_for(v.path) %>"><%= v.name %></a>（<%= v.posts %>）<%= i < vers.length - 1 ? '、' : '' %><% }) %></span><% } %>
-          <% if (n.children.length) { %>
-          <ul>
-            <% n.children.forEach(renderNode) %>
-          </ul>
-          <% } %>
-        </li>
-      <% } %>
-      <div class="ontology-forest">
-        <% onto.trees.forEach(function(t){ %>
-        <ul class="ontology-tree">
-          <% renderNode(t) %>
-        </ul>
-        <% }) %>
-      </div>
+      ※<code>source/_data/tag_ontology.yml</code> に登録した親子のうち、<strong>木にならなかったもの</strong>です。親子そのものは <a href="/tags/#tagforest">タグ一覧の「親子関係を持つタグ」</a>が根ごとの群として描きます (#3196)。登録するのは「子タグの記事に親タグを打つのは冗長」と言える自明な包含だけ
       <ul class="doctor-list">
         <%# リマインドしたい著者の列と同じ扱い。数十件が横に流れるので、
             区切りの「、」ではなく行間と余白で分ける (#2418) %>
         <li class="doctor-inline-row">
           <span class="doctor-note">親も子も無い根タグ（<%= onto.standalone.length %>件）</span>
           <% onto.standalone.forEach(function(n){ %><a href="<%- url_for(n.path) %>"><%= n.name %></a><span class="ontology-count doctor-note-inline"><%= n.posts %>本<%= (n.versions || []).length ? '・版' + n.versions.length : '' %></span><% }) %>
+        </li>
+        <%# タグでも親でもないノード。タグができる前に辺だけ書いた形（TiDB ⊆ DB）なので
+            誤登録とは限らないが、木には出ないのでここでしか気づけない %>
+        <li class="doctor-inline-row">
+          <span class="doctor-note">タグにも親にもなっていないノード（<%= onto.orphanConcepts.length %>件）</span>
+          <% if (onto.orphanConcepts.length) { %><%= onto.orphanConcepts.join('、') %><% } else { %>該当なし<% } %>
+        </li>
+        <%# 版は語幹に吸収される（Go1.27 は Go を書いたのと同じ扱い）。
+            末尾が4桁の年のものは「バージョン」ではないので /tags/ には出さない。
+            ここは台帳なので両方出し、年の側に印を付ける %>
+        <li class="doctor-inline-row">
+          <span class="doctor-note">版を持つ語幹（<%= onto.versionStems.length %>件。うち年は /tags/ に出さない）</span>
+          <% onto.versionStems.forEach(function(s){ %><a href="<%- url_for(s.path) %>"><%= s.name %></a><span class="ontology-count doctor-note-inline"><%= s.year ? '年' : '版' %><%= s.count %></span><% }) %>
         </li>
       </ul>
 
