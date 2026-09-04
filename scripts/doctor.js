@@ -397,17 +397,24 @@ const longestStreak = (years) => {
 
 hexo.extend.helper.register('doctor_dormant_authors', function () {
   const thisYear = new Date().getFullYear();
-  const byAuthor = new Map(); // 著者 -> {years:Set, count}
+  const byAuthor = new Map(); // 著者 -> {years:Set, count, lastAt}
   this.site.posts.forEach((post) => {
     // 共著の旧記事は author が配列
     [].concat(post.author || []).forEach((name) => {
       if (!name) return;
-      if (!byAuthor.has(name)) byAuthor.set(name, { years: new Set(), count: 0 });
+      if (!byAuthor.has(name)) byAuthor.set(name, { years: new Set(), count: 0, lastAt: 0 });
       const entry = byAuthor.get(name);
       entry.years.add(post.date.year());
       entry.count++;
+      const at = post.date.valueOf();
+      if (at > entry.lastAt) entry.lastAt = at;
     });
   });
+
+  // 年をまたいだだけの人は声かけの相手ではない。**暦の年差ではなく実日数で見る**
+  // (#3205)。12月に書いた人は年が明けた時点で gap 1 になり、まだ数週間しか
+  // 経っていないのに「2025年まで」の列に並んでいた
+  const dormantLimit = Date.now() - 365 * 24 * 60 * 60 * 1000;
 
   const recent = [];
   for (const [name, entry] of byAuthor) {
@@ -422,6 +429,7 @@ hexo.extend.helper.register('doctor_dormant_authors', function () {
       streak: longestStreak(entry.years),
     };
     if (gap !== 1 && gap !== 2) continue;
+    if (entry.lastAt > dormantLimit) continue;
     recent.push(row);
   }
   // 表示は本数でまとめるので本数の多い順。同数なら最近まで書いていた人を先に
