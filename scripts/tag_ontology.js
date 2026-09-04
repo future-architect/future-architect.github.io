@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * source/_data/tag_ontology.yml の親子構造。/tags/ の「親子関係」が根ごとの
+ * source/_data/tag_ontology.yml の親子構造。/tags/ の「親子関係を持つタグ」が根ごとの
  * 群として描き、/doctor/ が登録の漏れ（独立ノード・行き先の無い概念ノード）を
  * 見る (#3196)。複数親のノードはそれぞれの親の下に重複して出す
  * （DAG を1本の木に潰すと片方の系統から見えなくなる）。
@@ -34,6 +34,20 @@ hexo.extend.helper.register('tag_forest', function () {
     if (!m) return null;
     return tagInfo.has(m[1]) ? m[1] : null;
   };
+  // 末尾が4桁の年なら軸はバージョンではなく年（related_tags.js の isYear と同じ線）。
+  // インターン2022 / GoogleCloudNext2024 / NLP2024 がこちらで、
+  // PostgreSQL18 は2桁なので年にならない
+  const YEAR = /^(?:19|20)\d{2}$/;
+  const isYear = (name) => {
+    const m = VERSIONED.exec(name);
+    return !!m && YEAR.test(m[2]);
+  };
+  // 1.27 -> 1027、2024 -> 2024。桁上げが 1000 なのは 1.9 < 1.27 を正しく扱うため
+  const versionKey = (name) =>
+    VERSIONED.exec(name)[2]
+      .split('.')
+      .reduce((acc, n) => acc * 1000 + Number(n), 0);
+
   const versionsByStem = new Map();
   for (const name of tagInfo.keys()) {
     const stem = stemOf(name);
@@ -102,14 +116,37 @@ hexo.extend.helper.register('tag_forest', function () {
     .filter((n) => !showable(n) && !(ontology[n] && ontology[n].versionOf))
     .sort();
   const versionStems = [...versionsByStem.entries()]
-    .map(([name, vers]) => ({ name, path: tagInfo.get(name).path, count: vers.length }))
+    .map(([name, vers]) => ({
+      name,
+      path: tagInfo.get(name).path,
+      count: vers.length,
+      year: vers.every(isYear),
+    }))
     .sort((a, b) => b.count - a.count || (a.name < b.name ? -1 : 1));
+  // /tags/ の「バージョンを持つタグ」。年で分かれるものは出さない——
+  // インターン2022 を「バージョン」と呼ぶことになり、個別のタグページが
+  // 「他の年」と名乗っているのと食い違う。木と同じ形で描けるよう節点の形に揃える
+  const versioned = [...versionsByStem.entries()]
+    .filter(([, vers]) => !vers.every(isYear))
+    .map(([name, vers]) => ({
+      name,
+      path: tagInfo.get(name).path,
+      posts: tagInfo.get(name).ids.size,
+      chips: vers
+        .sort((a, b) => versionKey(b) - versionKey(a)) // 新しい版が先
+        .map((v) => ({ name: v, path: tagInfo.get(v).path, count: tagInfo.get(v).ids.size })),
+      subs: [],
+    }))
+    .sort(
+      (a, b) => b.chips.length - a.chips.length || b.posts - a.posts || (a.name < b.name ? -1 : 1),
+    );
 
   return {
     trees,
     standalone,
     orphanConcepts,
     versionStems,
+    versioned,
     nodeCount: Object.keys(ontology).length,
   };
 });
