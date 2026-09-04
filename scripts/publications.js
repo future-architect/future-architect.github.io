@@ -29,6 +29,24 @@ const entry = (post, item) => ({
   date: post.date.valueOf(),
 });
 
+/**
+ * 同じ号は1行にまとめ、寄稿を行の中に積む。1つの号に複数の寄稿があり
+ * （書いた人も記事も違う）、号が2行に分かれると同じ号を2冊と読み違える
+ */
+const groupByIssue = (magazines) => {
+  const issues = [];
+  magazines.forEach((m) => {
+    const last = issues[issues.length - 1];
+    const item = { work: m.work, by: m.by, post: m.post };
+    if (last && last.url === m.url) {
+      last.items.push(item);
+      return;
+    }
+    issues.push({ name: m.name, url: m.url, items: [item] });
+  });
+  return issues;
+};
+
 hexo.extend.helper.register('publications', function () {
   const books = [];
   const magazines = [];
@@ -38,5 +56,6 @@ hexo.extend.helper.register('publications', function () {
   });
   books.sort((a, b) => b.date - a.date || (a.name < b.name ? -1 : 1));
   magazines.sort((a, b) => b.key - a.key || b.date - a.date || (a.name < b.name ? -1 : 1));
-  return { books, magazines };
+  // 冊数ではなく寄稿の件数を本文が名乗るので、まとめる前の数も返す
+  return { books, magazines: groupByIssue(magazines), magazineCount: magazines.length };
 });
