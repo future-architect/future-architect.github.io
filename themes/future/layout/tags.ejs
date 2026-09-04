@@ -56,19 +56,27 @@
           見出しに「タグ」を重ねないのは、h1 と隣の節が既に名乗っているため。
           全件ではないが網羅を名乗ってもいないので断りは置かない (#2670) %>
       <%- partial('_partial/section-heading', {id: 'tagforest', text: '親子関係'}) %>
-      <%# 中身は「すべてのタグ」と同じチップ。入れ子のリストだと狭い画面で
-          1.5倍縦に伸びる（幅375pxで 5,972px 対 3,896px の実測）。
-          引き換えに深さが平らになる——根の直下に子孫が全部並ぶ。
+      <%# 葉は「すべてのタグ」と同じチップで横に流す。1件1行の入れ子のリストだと
+          縦に伸びる（実測 幅375pxで 5,972px 対 5,339px、幅1280pxで 2,002px 対 1,999px）。
+          子を持つ子だけラベルを立てるので、DynamoDB ⊃ DynamoDBStreams は残る。
+          深さの上限は無い（AI > 生成AI > LLM > Claude の4段が実在する）。
           群を列の途中で割らないための多段組は /categories/ (#3180) と同じ手。
           このページ1枚でしか使わないので partial にはしない %>
+      <%
+        // 子を持たない子はチップ、持つ子は自分のラベルを立てて中を字下げする。
+        // 名前とチップの markup は根と同じなので、深さだけ変えて再帰で描く
+        function renderTagGroup(n, depth) { %>
+        <p class="<%= depth ? 'tag-forest-sublabel' : 'tag-forest-label' %>"><% if (n.path) { %><a href="<%- url_for(n.path) %>"><%= n.name %></a><span class="tag-forest-count"><%= n.posts %></span><% } else { %><%= n.name %><% } %></p>
+        <div class="tag-forest-branch">
+          <% if (n.chips.length) { %>
+          <div class="blog-tags"><%- partial('_partial/tag-chips', {items: n.chips}) %></div>
+          <% } %>
+          <% n.subs.forEach(function(sb){ renderTagGroup(sb, depth + 1) }) %>
+        </div>
+      <% } %>
       <ul class="tag-forest">
         <% tag_forest().trees.forEach(function(t){ %>
-        <li>
-          <%# 根がタグとして実在しないとき（AI・DB・OS など）は行き先が無いので
-              素の文字で置く。/categories/ の群のラベルと同じ扱いで、本数も出さない %>
-          <p class="tag-forest-label"><% if (t.path) { %><a href="<%- url_for(t.path) %>"><%= t.name %></a><span class="tag-forest-count"><%= t.posts %></span><% } else { %><%= t.name %><% } %></p>
-          <div class="blog-tags"><%- partial('_partial/tag-chips', {items: t.descendants}) %></div>
-        </li>
+        <li><% renderTagGroup(t, 0) %></li>
         <% }) %>
       </ul>
 

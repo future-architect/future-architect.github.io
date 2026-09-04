@@ -62,37 +62,28 @@ hexo.extend.helper.register('tag_forest', function () {
   // ——タグができる前に辺だけ登録してある形（TiDB ⊆ DB）で、誤登録とは限らない
   const showable = (name) => tagInfo.has(name) || (children.get(name) || []).length > 0;
 
-  const build = (name, parentName) => ({
-    name,
-    path: tagInfo.has(name) ? tagInfo.get(name).path : null,
-    posts: tagInfo.has(name) ? tagInfo.get(name).ids.size : 0,
-    family: familyIds(name, new Set([name])).size,
-    otherParents: ((ontology[name] || {}).broader || []).filter((p) => p !== parentName),
-    versions: (versionsByStem.get(name) || [])
-      .sort((a, b) => (a < b ? 1 : -1)) // 新しい版を先に（名前の降順で近似）
-      .map((v) => ({ name: v, path: tagInfo.get(v).path, posts: tagInfo.get(v).ids.size })),
-    children: (children.get(name) || [])
-      .filter(showable)
-      .map((c) => build(c, name))
-      .sort((a, b) => b.family - a.family || (a.name < b.name ? -1 : 1)),
-  });
-
-  // 根の下の子孫を平らにした列。/tags/ はチップで並べるので入れ子を持たない。
-  // 深さは失われる（深さ3が31件・深さ4が2件）が、そのぶん狭い画面で縦に短くなる。
-  // 並びは記事の多い順——次に行く先を選ぶ場所で、深さはもう表現できていないため
-  const flatten = (node) => {
-    const seen = new Map();
-    const walk = (n) => {
-      for (const c of n.children) {
-        if (!seen.has(c.name)) seen.set(c.name, c);
-        walk(c);
-      }
+  // 子は「それ自身が子を持つか」で2つに分ける。持たない子は横に流れるチップ、
+  // 持つ子は自分のラベルを立てて中を字下げする (#3196)。全部をチップにすると
+  // DynamoDB ⊃ DynamoDBStreams のような関係が平らになり、全部を行にすると縦に伸びる
+  const build = (name) => {
+    const kids = (children.get(name) || []).filter(showable).map(build);
+    return {
+      name,
+      path: tagInfo.has(name) ? tagInfo.get(name).path : null,
+      posts: tagInfo.has(name) ? tagInfo.get(name).ids.size : 0,
+      family: familyIds(name, new Set([name])).size,
+      versions: (versionsByStem.get(name) || [])
+        .sort((a, b) => (a < b ? 1 : -1)) // 新しい版を先に（名前の降順で近似）
+        .map((v) => ({ name: v, path: tagInfo.get(v).path, posts: tagInfo.get(v).ids.size })),
+      // チップは記事の多い順。次に行く先を選ぶ場所なので大きいものから並べる
+      chips: kids
+        .filter((c) => !c.subs.length && !c.chips.length && c.path)
+        .sort((a, b) => b.posts - a.posts || (a.name < b.name ? -1 : 1))
+        .map((c) => ({ name: c.name, path: c.path, count: c.posts })),
+      subs: kids
+        .filter((c) => c.subs.length || c.chips.length)
+        .sort((a, b) => b.family - a.family || (a.name < b.name ? -1 : 1)),
     };
-    walk(node);
-    return [...seen.values()]
-      .filter((c) => c.path) // 概念ノードは行き先が無いのでチップにできない
-      .sort((a, b) => b.posts - a.posts || (a.name < b.name ? -1 : 1))
-      .map((c) => ({ name: c.name, path: c.path, count: c.posts }));
   };
 
   // versionOf ノード（Vue3 等）は語幹に吸収されるので、木や独立タグには数えない
@@ -101,12 +92,11 @@ hexo.extend.helper.register('tag_forest', function () {
   );
   const trees = roots
     .filter((n) => children.has(n))
-    .map((n) => build(n, null))
-    .sort((a, b) => b.family - a.family || (a.name < b.name ? -1 : 1))
-    .map((t) => ({ ...t, descendants: flatten(t) }));
+    .map(build)
+    .sort((a, b) => b.family - a.family || (a.name < b.name ? -1 : 1));
   const standalone = roots
     .filter((n) => !children.has(n) && tagInfo.has(n))
-    .map((n) => build(n, null))
+    .map(build)
     .sort((a, b) => b.posts - a.posts || (a.name < b.name ? -1 : 1));
   const orphanConcepts = Object.keys(ontology)
     .filter((n) => !showable(n) && !(ontology[n] && ontology[n].versionOf))
