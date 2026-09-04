@@ -1976,8 +1976,8 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
       metronic の青を打ち消して地の文と同じ色にしている）で隣り合い、区別が付かない。
       **記事のリンクに静止の下線を足す手は採らない**——同じカードの中で
       号名（hover で下線）と記事（常時下線）が違う振る舞いになる
-    - 題の行と記事の間は 8px（題の行の 4px ＋ `.publication-panels .panel-meta` の 4px）、
-      記事と記事の間は 4px。組の切れ目を刻み1つぶん広く取る
+    - 題の行と記事の間は 12px（題の行の 4px ＋ `.publication-panels .panel-meta` の 8px）、
+      記事と記事の間は 4px。組の切れ目を刻み2つぶん広く取る
     - 冊数は23、寄稿は24件なので、**本文が名乗るのは寄稿の件数**（`magazineCount`）
   - **並べるのは記事の日付ではなく「出たもの」の順。** 号の年月は URL の
     `/archive/YYYY/YYYYMM` から取る（2024年8月号の記事が12月に出ていた）。
