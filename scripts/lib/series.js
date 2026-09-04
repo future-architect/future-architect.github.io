@@ -1,6 +1,6 @@
 'use strict';
 
-// 索引記事の判定に使うタグ。/series/ の関連タグもここから引く (#3101)
+// 索引記事の判定に使うタグ。/series/ の関連タグの先頭にもこれが出る (#3101)
 const INDEX_TAG = 'インデックス';
 
 /**
@@ -142,6 +142,43 @@ function successionMaps(site, groups) {
   return { nextOf, prevOf };
 }
 
+/**
+ * /series/ の関連タグ。索引記事に付いているタグのうち、**3つ以上の連載に
+ * またがり**、かつそのタグの記事の**8割以上が索引記事**のものを返す。
+ *
+ * 恒例行事の連載（春の入門祭り・夏休み自由研究・秋ブログ週間）は、年ごとの
+ * 連載の索引記事に同じタグが付いている。連載名はタグで表さない規則なので、
+ * 年をまたぐ企画の名前を持つ語はここにしか出てこない。
+ *
+ * 索引記事に居合わせただけの主題のタグと分けるのは比の方。3連載以上のタグは
+ * 8タグあり、比は 0.83 以上（インデックス・春・夏・秋）と 0.14 以下
+ * （Go 16連載・入門 6連載・Terraform 4連載・GoogleCloud / Vue.js / CNCF 3連載）に
+ * 割れて、間に何も無い。件数では切れない（Go は索引記事16本で最多）。
+ *
+ * 並びは連載数の多い順で、同数は初出の古い順（春 → 夏 → 秋）。
+ */
+const EVENT_MIN_SERIES = 3;
+const EVENT_MIN_INDEX_RATIO = 0.8;
+
+function relatedTags(site, indexPaths) {
+  const seriesCount = new Map(); // タグ -> そのタグを持つ索引記事の連載数
+  const total = new Map(); // タグ -> そのタグの記事数
+  const firstSeen = new Map(); // タグ -> 初出の日付
+  site.posts.each((post) => {
+    const isIndex = indexPaths.has(post.path);
+    (post.tags ? post.tags.toArray() : []).forEach((tag) => {
+      total.set(tag.name, (total.get(tag.name) || 0) + 1);
+      if (isIndex) seriesCount.set(tag.name, (seriesCount.get(tag.name) || 0) + 1);
+      const at = firstSeen.get(tag.name);
+      if (!at || post.date < at) firstSeen.set(tag.name, post.date);
+    });
+  });
+  return [...seriesCount]
+    .filter(([name, n]) => n >= EVENT_MIN_SERIES && n / total.get(name) >= EVENT_MIN_INDEX_RATIO)
+    .sort((a, b) => b[1] - a[1] || firstSeen.get(a[0]) - firstSeen.get(b[0]))
+    .map(([name]) => name);
+}
+
 let cache = null;
 
 function build(site) {
@@ -192,8 +229,16 @@ function build(site) {
   const all = [...groups.values()].flat();
   const oneYearAgo = Date.now() - 365 * 24 * 60 * 60 * 1000;
 
+  const indexPaths = new Set(
+    [...groups.values()]
+      .map((posts) => posts.find((p) => p.tags && p.tags.some((t) => t.name === INDEX_TAG)))
+      .filter(Boolean)
+      .map((p) => p.path),
+  );
+
   return {
     byPath: series,
+    relatedTags: relatedTags(site, indexPaths),
     list: [...groups].map(([name, posts]) => {
       const index = posts.find((p) => p.tags && p.tags.some((t) => t.name === INDEX_TAG));
       return {
@@ -254,6 +299,12 @@ function seriesStats(site) {
   return cache.stats;
 }
 
+/** /series/ の関連タグ。索引タグと恒例行事の企画名 */
+function seriesRelatedTags(site) {
+  if (!cache) cache = build(site);
+  return cache.relatedTags;
+}
+
 const NONE = new Set();
 
 /**
@@ -268,4 +319,11 @@ function navLinkedPaths(site, post) {
   return s ? s.linked : NONE;
 }
 
-module.exports = { INDEX_TAG, seriesOf, navLinkedPaths, allSeries, seriesStats };
+module.exports = {
+  INDEX_TAG,
+  seriesOf,
+  navLinkedPaths,
+  allSeries,
+  seriesStats,
+  seriesRelatedTags,
+};
