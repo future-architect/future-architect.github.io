@@ -22,14 +22,30 @@ hexo.extend.generator.register('doctor', function (locals) {
 // 監査のネタ出しとしての役目は上記3回で回収済み
 
 /**
- * 直近1年より古いものは候補から外す。タグの節（統合候補・1記事タグ・親子の候補）は
- * 記事の無いタグ、本文照合の節は記事そのものを外す。見送りを決めたものが毎回並ぶと、
- * 新しく増えた分が埋もれる。
+ * 古いものは候補から外す。見送りを決めたものが毎回並ぶと、新しく増えた分が埋もれる。
  *
- * 包含の候補（統合候補・親子の候補）は子の記事集合が親に含まれるので、
+ * **窓を短くして「判断済み」を消すことはできない**（#3205）。記事の日付が新しいまま
+ * 見送ったものは残り、逆に未判断でも記事が古いだけの候補が消える。見送りは
+ * tag_ontology.yml の notBroader が記憶する。
+ *
+ * 包含の候補（ほぼ重複するタグ・親子の候補）は子の記事集合が親に含まれるので、
  * 子が活きていれば親も必ず活きている。判定は子だけで足りる。
  */
 const ACTIVE_DAYS = 365;
+
+// 版タグの語幹（scripts/version_tags.js と同じ3層）。1記事タグの除外と
+// 親子の候補の除外の2箇所で使う
+const VERSIONED = /^(.+?)(\d+(?:\.\d+)+|\d{2,})$/;
+const versionStemLookup = (tags, ontology) => {
+  const names = new Set(tags.map((t) => t.name));
+  return (name) => {
+    const node = ontology[name];
+    if (node && node.notVersion) return null;
+    if (node && node.versionOf) return node.versionOf;
+    const m = VERSIONED.exec(name);
+    return m && names.has(m[1]) ? m[1] : null;
+  };
+};
 
 const activeTagNames = (tags) => {
   const limit = Date.now() - ACTIVE_DAYS * 24 * 60 * 60 * 1000;
@@ -49,7 +65,7 @@ hexo.extend.helper.register('doctor_checks', function () {
   const posts = this.site.posts.sort('-date');
   const active = activeTagNames(this.site.tags);
 
-  // タグ -> 記事IDの集合。ほぼ重なるタグ（統合候補）と1記事タグの検出に使う
+  // タグ -> 記事IDの集合。ほぼ重複するタグと1記事タグの検出に使う
   const tagPostSets = new Map();
   const tagPath = new Map();
   this.site.tags.forEach((tag) => {
@@ -57,7 +73,7 @@ hexo.extend.helper.register('doctor_checks', function () {
     tagPostSets.set(tag.name, new Set(tag.posts.map((p) => p._id)));
   });
 
-  // 4) ほぼ重なるタグ（統合候補）。A の記事がすべて B にも付いていて、
+  // 4) ほぼ重複するタグ。A の記事がすべて B にも付いていて、
   //    B 側の差分も2本以内なら、実質同じ集合に2つの名前が付いている。
   //    Go1.27 ⊆ Go のような健全な階層（差が大きい包含）はここでは出さない
   const nearDuplicates = [];
@@ -100,9 +116,12 @@ hexo.extend.helper.register('doctor_checks', function () {
   // 6) 1記事タグ。同じ記事に1記事タグ同士が同居している場合は、その記事の
   //    タグ付けがまとめて薄い可能性が高いので印を付ける
   //    （タグクラウドで * / ** として出していた仕様の移設）
+  // 版タグ（インターン2026 / GoogleCloudNext2026）は語幹に吸収されるので、
+  // 1本しか無いこと自体が指摘にならない (#3205)
+  const stemOfTag = versionStemLookup(this.site.tags, (this.site.data || {}).tag_ontology || {});
   const singleUse = [];
   for (const [name, set] of tagPostSets) {
-    if (set.size !== 1 || !active.has(name)) continue;
+    if (set.size !== 1 || !active.has(name) || stemOfTag(name)) continue;
     const postId = [...set][0];
     let lonelyPair = false;
     for (const [other, otherSet] of tagPostSets) {
@@ -135,10 +154,10 @@ hexo.extend.helper.register('doctor_checks', function () {
  * こちらは候補を並べるだけに留める。人が見て認めたものを yml に書き、
  * 書いた分だけ表示に反映される。
  *
- * 差が2本以内のペアは「ほぼ重なるタグ（統合候補）」が受け持つので出さない。
+ * 差が2本以内のペアは「ほぼ重複するタグ」が受け持つので出さない。
  * あちらは名前を1つに寄せる提案で、こちらは親子として繋ぐ提案。
  */
-const ONTOLOGY_SUGGEST_MIN_DIFF = 3; // 差がこれ未満なら統合候補（別の節）の担当
+const ONTOLOGY_SUGGEST_MIN_DIFF = 3; // 差がこれ未満なら「ほぼ重複するタグ」の担当
 const ONTOLOGY_SUGGEST_MIN_POSTS = 2; // 1記事タグは包含が偶然になりやすい
 
 hexo.extend.helper.register('doctor_ontology_suggestions', function () {
@@ -172,26 +191,22 @@ hexo.extend.helper.register('doctor_ontology_suggestions', function () {
 
   // 版タグ（Go1.27）は名前の規則で語幹と同義になり、オントロジーに書く対象では
   // ないので提案しない（scripts/version_tags.js が担う）
-  const VERSIONED = /^(.+?)(\d+(?:\.\d+)+|\d{2,})$/;
-  const stemOf = (name) => {
-    const node = ontology[name];
-    if (node && node.notVersion) return null;
-    if (node && node.versionOf) return node.versionOf;
-    const m = VERSIONED.exec(name);
-    return m && sets.has(m[1]) ? m[1] : null;
-  };
+  const stemOf = versionStemLookup(this.site.tags, ontology);
 
   const entries = [...sets.entries()].filter(([, s]) => s.size >= ONTOLOGY_SUGGEST_MIN_POSTS);
   const active = activeTagNames(this.site.tags);
   const suggestions = [];
   for (const [child, C] of entries) {
     if (!active.has(child)) continue;
-    const stem = stemOf(child);
+    // 版タグ（GoogleCloudNext2025）は語幹に吸収されるので、語幹以外の親も提案しない。
+    // 以前は parent === stem だけを外していたため GoogleCloudNext2025 ⊆ GoogleCloud が出ていた
+    if (stemOf(child)) continue;
     const known = ancestorsOf(child);
+    const declined = new Set((ontology[child] || {}).notBroader || []);
     for (const [parent, P] of entries) {
       if (parent === child || P.size - C.size < ONTOLOGY_SUGGEST_MIN_DIFF) continue;
-      if (parent === stem) continue; // 版タグと語幹は名前の規則が担う
       if (known.has(parent)) continue; // すでに親子として書かれている
+      if (declined.has(parent)) continue; // 見送りと決めたもの (#3205)
       let subset = true;
       for (const id of C) {
         if (!P.has(id)) {
@@ -382,17 +397,24 @@ const longestStreak = (years) => {
 
 hexo.extend.helper.register('doctor_dormant_authors', function () {
   const thisYear = new Date().getFullYear();
-  const byAuthor = new Map(); // 著者 -> {years:Set, count}
+  const byAuthor = new Map(); // 著者 -> {years:Set, count, lastAt}
   this.site.posts.forEach((post) => {
     // 共著の旧記事は author が配列
     [].concat(post.author || []).forEach((name) => {
       if (!name) return;
-      if (!byAuthor.has(name)) byAuthor.set(name, { years: new Set(), count: 0 });
+      if (!byAuthor.has(name)) byAuthor.set(name, { years: new Set(), count: 0, lastAt: 0 });
       const entry = byAuthor.get(name);
       entry.years.add(post.date.year());
       entry.count++;
+      const at = post.date.valueOf();
+      if (at > entry.lastAt) entry.lastAt = at;
     });
   });
+
+  // 年をまたいだだけの人は声かけの相手ではない。**暦の年差ではなく実日数で見る**
+  // (#3205)。12月に書いた人は年が明けた時点で gap 1 になり、まだ数週間しか
+  // 経っていないのに「2025年まで」の列に並んでいた
+  const dormantLimit = Date.now() - 365 * 24 * 60 * 60 * 1000;
 
   const recent = [];
   for (const [name, entry] of byAuthor) {
@@ -407,6 +429,7 @@ hexo.extend.helper.register('doctor_dormant_authors', function () {
       streak: longestStreak(entry.years),
     };
     if (gap !== 1 && gap !== 2) continue;
+    if (entry.lastAt > dormantLimit) continue;
     recent.push(row);
   }
   // 表示は本数でまとめるので本数の多い順。同数なら最近まで書いていた人を先に

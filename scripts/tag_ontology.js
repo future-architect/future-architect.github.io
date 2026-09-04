@@ -73,7 +73,7 @@ hexo.extend.helper.register('tag_forest', function () {
 
   // タグでも親でもないノードは木に出さない。行き先が無いうえ子も連れないので、
   // 読者にはただの行き止まりになる。**消さずに /doctor/ が漏れとして拾う**
-  // ——タグができる前に辺だけ登録してある形（TiDB ⊆ DB）で、誤登録とは限らない
+  // ——タグができる前に辺だけ登録した形もありうるので、誤登録とは限らない
   const showable = (name) => tagInfo.has(name) || (children.get(name) || []).length > 0;
 
   // 子は「それ自身が子を持つか」で2つに分ける。持たない子は横に流れるチップ、
@@ -104,25 +104,16 @@ hexo.extend.helper.register('tag_forest', function () {
   const roots = Object.keys(ontology).filter(
     (n) => !hasParent.has(n) && !(ontology[n] && ontology[n].versionOf),
   );
+  // 根は名前順。系統の大きさで並べると、読者が探している主題がどこにあるか
+  // 名前からは当てが付かない（#3205）。中の子は記事の多い順のまま。
+  // コードポイント順だと大文字が先に来て AWS < Airflow になるので localeCompare
   const trees = roots
     .filter((n) => children.has(n))
     .map(build)
-    .sort((a, b) => b.family - a.family || (a.name < b.name ? -1 : 1));
-  const standalone = roots
-    .filter((n) => !children.has(n) && tagInfo.has(n))
-    .map(build)
-    .sort((a, b) => b.posts - a.posts || (a.name < b.name ? -1 : 1));
+    .sort((a, b) => a.name.localeCompare(b.name, 'ja'));
   const orphanConcepts = Object.keys(ontology)
     .filter((n) => !showable(n) && !(ontology[n] && ontology[n].versionOf))
     .sort();
-  const versionStems = [...versionsByStem.entries()]
-    .map(([name, vers]) => ({
-      name,
-      path: tagInfo.get(name).path,
-      count: vers.length,
-      year: vers.every(isYear),
-    }))
-    .sort((a, b) => b.count - a.count || (a.name < b.name ? -1 : 1));
   // /tags/ の「バージョンを持つタグ」。年で分かれるものは出さない——
   // インターン2022 を「バージョン」と呼ぶことになり、個別のタグページが
   // 「他の年」と名乗っているのと食い違う。木と同じ形で描けるよう節点の形に揃える
@@ -143,9 +134,7 @@ hexo.extend.helper.register('tag_forest', function () {
 
   return {
     trees,
-    standalone,
     orphanConcepts,
-    versionStems,
     versioned,
     nodeCount: Object.keys(ontology).length,
   };
