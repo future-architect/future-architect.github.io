@@ -1,6 +1,6 @@
-<%# 検索窓を押したときに出す行き先の一覧 (#2791)。開閉は CSS だけで、フォームの
-    :focus-within で開き、input:placeholder-shown で「打ち始めたら閉じる」を作る。
-    JS が要るのは最近の検索の行だけ (#2931)。
+<%# 検索窓を押したときに出す行き先の一覧 (#2791)。フォームの :focus-within で開き、
+    フォーカスが外れるまで開いたままにする（打ち始めても閉じない #3215）。
+    JS が要るのは最近の検索の行と Esc で畳むところ (#2931 / #3215)。
     タグは人気順（PV を経過年ペナルティで割る #3028）に10件。
     全件でないことはラベルの「人気の」が名乗り、
     条件そのものは title が持つ (#2670)。ラベルのアイコンは /tags/ の h1 と同じ絵。
@@ -38,7 +38,8 @@
 
 <%# 検索したキーワードを localStorage に5件だけ持ち、次に検索窓を押したときに出す。
     行は type="submit" のボタンで、押すと入力欄に入れてそのまま送信する
-    （Google の結果ページへの <a> にすると、キーワードが外部リンクの文字列になる）%>
+    （Google の結果ページへの <a> にすると、キーワードが外部リンクの文字列になる）。
+    Esc で畳むのもここが持つ %>
 <script>
 	(function () {
 		var KEY = 'recentSearches';
@@ -101,12 +102,18 @@
 			items.unshift(word);
 			write(items.slice(0, MAX));
 			render();
-			// 結果は別タブなのでこのタブの入力欄は残る。語を入れたままにすると
-			// :placeholder-shown が外れてパネルごと開かなくなる。同期で消すと
-			// q が空のまま送られるので、送信の後に空へ戻す
-			setTimeout(function () {
-				input.value = '';
-			}, 0);
+		});
+		// Esc で畳む (#3215)。開く条件が :focus-within なので、畳むこと＝フォーカスを
+		// 外すこと。keydown はフォームまで上がるので、パネルの中の行に居ても
+		// 入力欄に居ても同じ1つの手で済む。
+		// 既定を止めるのは、Firefox が入力欄の Esc で値をフォーカス時まで
+		// 巻き戻すため。Esc の役目はパネルを畳むことで、打った語を消すことではない
+		form.addEventListener('keydown', function (event) {
+			if (event.key !== 'Escape') return;
+			var active = document.activeElement;
+			if (!active || !form.contains(active) || !active.blur) return;
+			event.preventDefault();
+			active.blur();
 		});
 		box.querySelector('.header-search-recent-clear').addEventListener('click', function () {
 			write([]);
