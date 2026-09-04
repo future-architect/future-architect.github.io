@@ -5,7 +5,6 @@ postid: ""
 tags:
   - Auth0
   - SSO
-  - AD
   - Auth0Rules
   - Salesforce
 categories:

@@ -4,7 +4,6 @@ date: 2022/11/22 00:00:00
 postid: a
 tags:
   - Azure
-  - AD
   - MSAL.js
   - Go
   - EntraID
