@@ -21,6 +21,9 @@ const entry = (post, item) => ({
   url: item.url,
   work: item.work || '',
   by: item.by || post.author || '',
+  // 書影は記事のサムネイルを既定にする。書籍の紹介記事はサムネイルに書影を
+  // 使うのが慣例で、そうでない記事だけ cover: が上書きする
+  cover: item.cover || post.thumbnail || '',
   post: { title: post.title, path: '/' + post.path },
   key: issueKey(item.url),
   date: post.date.valueOf(),
