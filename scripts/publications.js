@@ -30,19 +30,19 @@ const entry = (post, item) => ({
 });
 
 /**
- * 同じ号は1行にまとめ、寄稿を行の中に積む。1つの号に複数の寄稿があり
- * （書いた人も記事も違う）、号が2行に分かれると同じ号を2冊と読み違える
+ * 1行は「号＋章」で、同じ章に複数人が寄稿していれば書いた人をその行の中に積む。
+ * 号だけを見出しにすると、章の違う寄稿に並ぶ「誰が」がどちらの章のものか読めない
  */
 const groupByIssue = (magazines) => {
   const issues = [];
   magazines.forEach((m) => {
     const last = issues[issues.length - 1];
-    const item = { work: m.work, by: m.by, post: m.post };
-    if (last && last.url === m.url) {
+    const item = { by: m.by, post: m.post };
+    if (last && last.url === m.url && last.work === m.work) {
       last.items.push(item);
       return;
     }
-    issues.push({ name: m.name, url: m.url, items: [item] });
+    issues.push({ name: m.name, url: m.url, work: m.work, items: [item] });
   });
   return issues;
 };

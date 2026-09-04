@@ -14,7 +14,7 @@ lede: "同僚の澁川さん、松本さんと一緒に、Software Design 2026�
 magazines:
   - name: "Software Design 2026年1月号"
     url: https://gihyo.jp/magazine/SD/archive/2026/202601
-    work: "アルゴリズムはどこに効く？ 第3章 パフォーマンス問題の診断とアーキテクチャの再考"
+    work: "アルゴリズムはどこに効く？"
 ---
 <img src="/images/2026/20260217a/pxl_20260121_025217424.jpg" alt="" width="1000" height="1333">
 
