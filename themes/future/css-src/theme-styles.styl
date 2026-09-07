@@ -548,7 +548,14 @@ Header and header elements
 }
 .header-nav-caret {
   color: var(--ink-faint);
-  transition: transform hover-speed ease;
+  /* パネル本体と同じ state-speed。回転は反応ではなく開いたことの合図 */
+  transition: transform state-speed ease;
+}
+/* 動きを減らす設定では回さずに向きだけ変える。パネルの開閉そのものは残る */
+@media (prefers-reduced-motion: reduce) {
+  .header-nav-caret {
+    transition: none;
+  }
 }
 .header-nav-item:hover .header-nav-caret,
 .header-nav-disclosure[open] .header-nav-caret {
@@ -568,7 +575,7 @@ Header and header elements
   border-radius: card-radius;
   visibility: hidden;
   opacity: 0;
-  transition: opacity 0.12s ease, visibility 0s 0.3s;
+  transition: opacity state-speed ease, visibility 0s 0.3s;
 }
 /* カテゴリは18件あるので2列にする。列数は数えず**列幅の下限**で決める。
    最長の行は DataEngineering の101px（13px・Noto Sans CJK の実測）＋
@@ -598,14 +605,28 @@ Header and header elements
 .header-nav-disclosure[open] ~ .header-dropdown {
   visibility: visible;
   opacity: 1;
-  transition: opacity 0.12s ease;
+  transition: opacity state-speed ease;
+}
+/* 動きを減らす設定では送らずに出し入れする。閉じるときの visibility の遅延は
+   残す。あれは動きではなく、消えるまでに click を届かせるための待ち時間 */
+@media (prefers-reduced-motion: reduce) {
+  .header-dropdown {
+    transition: opacity 0s, visibility 0s 0.3s;
+  }
+  .header-nav-item:hover .header-dropdown,
+  .header-nav-disclosure[open] ~ .header-dropdown {
+    transition: none;
+  }
 }
 /* 開いたままカーソルもフォーカスも離れたら畳んで見せる（open 属性は残る）。
    これが無いと、別の引き金にカーソルを乗せたときに2枚が同じ位置で重なる。
    引き金へ戻れば また出るので、開いた読者の意図は保たれる。
-   **幅で囲むのは、引き出し（1024px 以下）ではパネルを常時開いて並べているため。**
-   囲まないとこの規則の詳細度が勝ち、引き出しで引き金を押した瞬間に消える */
-@media (min-width: 1025px) {
+   **幅で囲むのは、引き出し（991px 以下）ではパネルを常時開いて並べているため。**
+   囲まないとこの規則の詳細度が勝ち、引き出しで引き金を押した瞬間に消える。
+   境界はナビが帯から降りる幅（992px）に合わせる。サイドバーの縦積み（1025px）に
+   合わせると、992〜1024px は帯にナビが並ぶのにこの規則が効かず、
+   押して開いたパネルが離れても残る */
+@media (min-width: 992px) {
   .header-nav-item:not(:hover):not(:focus-within) .header-nav-disclosure[open] ~ .header-dropdown {
     visibility: hidden;
     opacity: 0;
@@ -815,9 +836,8 @@ Header and header elements
     /* 線なのでピルにする。角丸の段の3つ目 */
     border-radius: 999px;
     background: var(--ink-mute);
-    /* 開閉は反応ではなく状態の変化なので、hover-speed ではなくこちらの段
-       （details の開閉・タブの切り替えと同じ 0.18s） */
-    transition: transform tab-speed ease, opacity tab-speed ease;
+    /* 開閉は反応ではなく状態の変化なので、hover-speed ではなく state-speed */
+    transition: transform state-speed ease, opacity state-speed ease;
   }
   /* 上下の線を中央へ寄せてから回す。6px は線の高さ2pxと間隔4pxの和で、
      間隔の段として選んだ値ではない。角度は参照実装（リクルートサイト）と
@@ -827,6 +847,12 @@ Header and header elements
   }
   .header-drawer-input:checked + .header-drawer-toggle .header-drawer-bar:nth-child(2) {
     opacity: 0;
+  }
+  /* 動きを減らす設定では回さずに ✕ の形へ切り替える */
+  @media (prefers-reduced-motion: reduce) {
+    .header-drawer-bar {
+      transition: none;
+    }
   }
   .header-drawer-input:checked + .header-drawer-toggle .header-drawer-bar:nth-child(3) {
     transform: translateY(-6px) rotate(135deg);
@@ -1611,7 +1637,13 @@ p {
   border-left: 6px solid var(--ink-faint);
   border-top: 5px solid transparent;
   border-bottom: 5px solid transparent;
-  transition: transform 0.2s ease;
+  transition: transform state-speed ease;
+}
+/* 動きを減らす設定では回さずに向きだけ変える。開いたことの合図は残す */
+@media (prefers-reduced-motion: reduce) {
+  .article-entry details > summary::before {
+    transition: none;
+  }
 }
 .article-entry details[open] > summary::before {
   transform: rotate(90deg);
@@ -1641,10 +1673,16 @@ p {
   details::details-content {
     block-size: 0;
     overflow: hidden;
-    transition: block-size 0.18s ease, content-visibility 0.18s allow-discrete;
+    transition: block-size state-speed ease, content-visibility state-speed allow-discrete;
   }
   details[open]::details-content {
     block-size: auto;
+  }
+  /* 動きを減らす設定では高さを送らず、開いた高さで出す */
+  @media (prefers-reduced-motion: reduce) {
+    details::details-content {
+      transition: none;
+    }
   }
 }
 .article-entry li p {
@@ -3287,8 +3325,9 @@ ul.tag-list {
 
 /* タブレット以下はサイドバーを本文の下に落とす (#2044)。
    Bootstrap の md（768px〜）で横並びになるが、その幅では列が窮屈。
-   境界はヘッダーメニューの切替（max-width: 1024px）に揃え、
-   iPad の縦（768px）横（1024px）ともモバイルと同じ縦積みにする。
+   境界は 1024px で、iPad の縦（768px）横（1024px）ともモバイルと同じ縦積みにする。
+   ナビが帯から降りる 992px とは別の境界。あちらは帯に何本並ぶかで決まり、
+   こちらは2列にしたときの列の内寸で決まる
 
    **鍵は col-md-9。** 75% を作っているのが Bootstrap の列なので、打ち消しも
    同じ列で受ける。中身の性格を表す blog-posts で受けていたときは、それを
@@ -3727,7 +3766,7 @@ ul.tag-list {
    一覧とページャの後ろに出しても読者は辿り着かない（目次を
    .toc-mobile に移しているのと同じ理由 #2452）。タグとカテゴリの
    行き先はヘッダーの検索窓のパネルとナビが持つ (#2885) */
-@media screen and (max-width: 768px){
+@media (max-width: 767px) {
   .category,
   .sidebar-series,
   .sidebar-tags {
@@ -3793,7 +3832,7 @@ ul.tag-list {
 }
 /* 列数は幅で決め打ちする。column-width で自動に落とすと、幅 576px の端末でも
    2列（1列 242px）になって説明文とタグが入らない */
-@media screen and (min-width: 768px) {
+@media (min-width: 768px) {
   .category-index {
     columns: 2;
   }
@@ -5151,7 +5190,7 @@ a.award-badge:focus {
   }
 }
 .year-tabs input:checked + .tab_item + .tab_content {
-  animation: tab-fade-in tab-speed ease;
+  animation: tab-fade-in state-speed ease;
 }
 /* 動きを減らす設定では切り替えを瞬時に戻す。0.05秒の色や面の送りは
    動きではないので止めない（#2686 と同じ線引き） */
@@ -5211,14 +5250,14 @@ a.award-badge:focus {
   opacity: 0;
 }
 /* **transition は表示される側に書く。** 基底（上）に置くと消える側も
-   0.18秒かけて薄くなり、同じマスに重ねてある2枚が同時に見えて文字が重なる。
+   state-speed かけて薄くなり、同じマスに重ねてある2枚が同時に見えて文字が重なる。
    「出るときだけ送る」形にしたいので、#2686 の「transition は基底側」の
    原則をここでは意図して外す */
 #monthly:checked ~ .tab-stack > #popular_monthly,
 #yearly:checked ~ .tab-stack > #popular_yearly {
   visibility: visible;
   opacity: 1;
-  transition: opacity tab-speed ease;
+  transition: opacity state-speed ease;
 }
 /* 動きを減らす設定では瞬時に切り替える。詳細度が同じなので、打ち消しは
    必ず上のルールより後ろに置く（メディアクエリは詳細度を上げない） */
@@ -5437,7 +5476,13 @@ a.award-badge:focus {
     width: 0;
     padding: 0;
     opacity: 0;
-    transition: width 0.15s ease, opacity 0.15s ease;
+    transition: width state-speed ease, opacity state-speed ease;
+  }
+  /* 動きを減らす設定では伸ばさずに開いた幅で出す */
+  @media (prefers-reduced-motion: reduce) {
+    .header-search input {
+      transition: none;
+    }
   }
   .header-search > button {
     display: none;
@@ -5526,12 +5571,21 @@ a.award-badge:focus {
   /* 閉じるときだけ visibility を遅らせる。Safari はクリックでリンクに
      フォーカスを与えず、blur で先に閉じるとタップが着地しない（送信ボタンを
      モバイルで出していないのと同じ理由）。消えるまでの間に click が届く */
-  transition: opacity 0.12s ease, visibility 0s 0.3s;
+  transition: opacity state-speed ease, visibility 0s 0.3s;
 }
 .header-search:focus-within .header-search-hint {
   visibility: visible;
   opacity: 1;
-  transition: opacity 0.12s ease;
+  transition: opacity state-speed ease;
+}
+/* ドロップダウンと同じ扱い。閉じるときの visibility の遅延だけ残す */
+@media (prefers-reduced-motion: reduce) {
+  .header-search-hint {
+    transition: opacity 0s, visibility 0s 0.3s;
+  }
+  .header-search:focus-within .header-search-hint {
+    transition: none;
+  }
 }
 /* 枠の中のラベル。見出しではなく面の中の仕切りなので h2 は使わない */
 .header-search-hint-label {
@@ -6111,7 +6165,7 @@ pre.mermaid,
   color: inherit;
   min-height: 110px;
 }
-/* 反応はカードの持ち上がりだけにする (#2699)。color: inherit は静止状態にしか
+/* 反応は上の「中身が一段引く」だけにする。color: inherit は静止状態にしか
    効かず、打ち消しが無いと hover で文字が青くなって下線も出る。
    .article-entry を付けるのは、本文の a:hover（0,2,1）に勝たせるため */
 .article-entry .link-preview-card-anchor:hover,
