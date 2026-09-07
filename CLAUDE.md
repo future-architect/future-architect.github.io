@@ -1735,6 +1735,10 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
   - 帯までの空きは `.article-appendix` の `margin-top` の1箇所で決める。共有ボタンの下 padding と
     著者紹介の `margin-bottom` を落として、著者紹介の有無で空きが変わらないようにした
     （以前は 48px と 67.5px でばらついていた）
+    - **共有ボタンの `ul` が Bootstrap の既定で持つ下 1rem と、サイドバーの `padding-bottom`
+      40px もここに上乗せされていた**（#3227。375px で 112px、1280px で 72px）。1024px 以下では
+      目次が消えて中身が空でも padding だけが本文と帯の間に残る。前者は `.social-area` の中で
+      落とし、後者は `.footer-gap` と同じ `:has(+ .article-appendix)` で落とす
   - 短いページでは `.wrap > footer` の `margin-top: auto` が帯とネイビーの間に白を入れるので、
     余りは帯より前（本文の `container`）で吸わせる
   - 残っている難点: 中身がコンテナ幅（約1,116px）になるぶん、関連記事の行のタイトル占有率が
