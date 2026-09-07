@@ -392,3 +392,45 @@ store_id,item_id,sales_date,sales_quantity,sales_amount
 +	fmt.Println("hello, world")
  }
 ```
+
+## 埋め込み
+
+動画・スライド・ポストは、提供元が出す埋め込みコードを**そのまま**本文に貼ってください。Markdown の中に HTML を直接書けます。
+
+**幅と高さは書き換えないでください。** 狭い画面で収まるように整えるのはこちら側の CSS の仕事で、`width="560" height="315"` のような属性が付いたままでも、表示は本文の幅に合わせて縦横比を保ったまま縮みます。書き換えると、その調整とぶつかります。
+
+このページでは実物を出していません。埋め込みの中身は提供元のプレイヤーで、このブログの見た目の決まりが効く範囲の外にあります。表示を確かめるときは、記事のプレビューで見てください。
+
+### YouTube
+
+動画の「共有」から「埋め込む」で出るコードを貼ります。
+
+```html
+<iframe width="560" height="315" src="https://www.youtube.com/embed/jUJgXRPqGQQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+```
+
+16:9 で本文の幅に合わせて出ます。**`title` は残してください。** 画面を読み上げて使う人には、これが動画の名前になります。
+
+Google スライドと SlideShare の `<iframe>` も同じように貼れます。こちらも幅を合わせています。
+
+### X
+
+ポストの「埋め込む」で出る `<blockquote>` と `<script>` を、2つセットで貼ります。
+
+```html
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">ポストの本文</p>&mdash; 名前 (@account) <a href="https://twitter.com/account/status/1837669917916561886">September 22, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+```
+
+1つの記事に複数貼るときも、同じ形のまま並べてください。
+
+**ポストが消えると埋め込みも消えます。** 引用したかった内容が記事から失われるので、**要点は本文にも書いてください。** `<blockquote>` の中はポストの本文なので、そこだけは消えたあとも残ります。
+
+### Speakerdeck
+
+スライドの「Embed」で出るコードを貼ります。`<script>` 形式と `<iframe>` 形式のどちらでも同じように出ますが、**選べるなら `<iframe>` 形式**にしてください。外部の JavaScript を読まずに済みます。
+
+```html
+<iframe class="speakerdeck-iframe" src="https://speakerdeck.com/player/2d59638e59f04898857ce369ed20ba87" title="発表タイトル" allowfullscreen="true" style="border: 0px; background: rgba(0, 0, 0, 0.1); margin: 0px; padding: 0px; border-radius: 6px; box-shadow: rgba(0, 0, 0, 0.2) 0px 5px 40px; width: 100%; height: auto; aspect-ratio: 560 / 315;" data-ratio="1.7777777777777777"></iframe>
+```
+
+Speakerdeck の埋め込みコードは幅と縦横比を自分で持っているので、こちら側では触っていません。**`style` の中身も消さずに残してください。**
