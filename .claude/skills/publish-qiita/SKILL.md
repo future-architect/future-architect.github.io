@@ -1,6 +1,6 @@
 ---
 name: publish-qiita
-description: Qiita の下書き URL と著者名を入力に、hexiita 変換 → フロントマター整備 → 本文の整形（見出し・段落内の改行・箇条書き）→ カテゴリ・タグ見直し → textlint / markdownlint 対応 → mermaid SVG 生成 → 検証 → PR 作成まで行う記事公開手順。「この Qiita 記事を公開して」と頼まれたときに使う。
+description: Qiita の下書き URL と著者名を入力に、hexiita 変換 → フロントマター整備 → 本文の整形（見出し・段落内の改行・箇条書き）→ カテゴリ・タグ見直し → 連載の索引記事の表を埋める → textlint / markdownlint 対応 → mermaid SVG 生成 → 検証 → PR 作成まで行う記事公開手順。「この Qiita 記事を公開して」と頼まれたときに使う。
 ---
 
 # Qiita 記事の公開
@@ -135,7 +135,31 @@ Qiita の書き方をそのまま出すと崩れるものを直す。lint より
   1件なら非リンクのテキストで描くので空のタグページへ読者を送らない。
   削る基準は「活発でない×汎用語」なので、製品名はそもそも対象外
 
-## 6. lint
+## 6. 連載の索引記事（`series` を書いたときだけ）
+
+**`series` を足したら索引記事の表も埋める。** 記事側の連載ナビは `series` から
+自動で出るが、**索引記事の表は手書き**（予定表なので `series` から生成していない。
+CLAUDE.md #2790）。ここが抜けると、連載の入口に来た読者が公開済みの記事へ辿れない。
+
+- 索引記事は同じ `series` を持ち `インデックス` タグが付いた記事
+
+  ```sh
+  grep -rl 'series: "<連載名>"' source/_posts/<年>/ | xargs grep -l インデックス
+  ```
+
+- 自分の行（「調整中」「〜（仮）」になっている）を、**日付のセルの先頭に
+  `{% thumb <記事ID> %}`、タイトルの列にリンク**へ差し替える
+
+  ```markdown
+  | {% thumb 20260907a %} 9/7（月） | 永井優斗 | [タイトル](/articles/20260907a/) |
+  ```
+
+- **日付と執筆者の列は触らない。行の並びも入れ替えない**（予定表であって
+  公開順の一覧ではない）
+- サムネイル用の列を足さない（日付のセルに畳む #2790）
+- 索引記事も PR の変更ファイルに入る
+
+## 7. lint
 
 ```sh
 node_modules/.bin/textlint --fix <path>            # 自動修正
@@ -156,7 +180,7 @@ node_modules/.bin/markdownlint-cli2 --fix "<path>" # 見出し表記ゆれ（hea
 - markdownlint の MD025（複数の h1）は Qiita 由来の記事で必ず出る。Qiita は `#` で
   節を切るため。4. の1段下げが済んでいれば消える
 
-## 7. mermaid 図（記事にある場合のみ）
+## 8. mermaid 図（記事にある場合のみ）
 
 ```sh
 make mermaid   # Docker 必須
@@ -164,7 +188,7 @@ make mermaid   # Docker 必須
 
 `source/_mermaid/*.svg` が生成されるので、記事とあわせてコミットする。
 
-## 8. 検証
+## 9. 検証
 
 - ローカルサーバを立てて、その URL を `curl` で叩いて確認する。保存すると
   再描画されるので **`hexo generate` は回さない**（何も変えていなくても1分半以上かかる）。
@@ -176,11 +200,13 @@ make mermaid   # Docker 必須
   - 段落内の `<br>` が消えているか
   - mermaid 図がインライン SVG になっているか（`<svg id="mermaid-`）
   - プロフィールを追記した場合は著者ページ `/authors/<著者名>/`
+- 連載記事なら索引記事 `curl http://localhost:<port>/articles/<索引記事ID>/` も見る。
+  自分の行にサムネイル（72×48）とリンクが入っているか
 - 同じ URL をユーザーの目視確認用に伝える。作業が終わったらサーバを止める
 
-## 9. PR
+## 10. PR
 
-- コミット対象: 記事 MD / 画像ディレクトリ / `source/_mermaid/*.svg` /
+- コミット対象: 記事 MD / 画像ディレクトリ / **連載の索引記事 MD** / `source/_mermaid/*.svg` /
   （変更していれば）`_profile.yml` / `.textlintrc` / `tag_ontology.yml`
 - worktree では `gh pr create` に `--head <branch> --base main` を明示する
   （省略すると push 済みでも "must first push the current branch" で失敗する）。
