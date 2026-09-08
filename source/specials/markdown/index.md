@@ -409,7 +409,7 @@ store_id,item_id,sales_date,sales_quantity,sales_amount
 <iframe width="560" height="315" src="https://www.youtube.com/embed/jUJgXRPqGQQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 ```
 
-16:9 で本文の幅に合わせて出ます。**`title` は残してください。** 画面を読み上げて使う人には、これが動画の名前になります。
+16:9 で本文の幅に合わせて出ます。**属性の `title` は残してください。** 画面を読み上げて使う人には、これが動画の名前になります。
 
 Google スライドと SlideShare の `<iframe>` も同じように貼れます。こちらも幅を合わせています。
 
@@ -433,4 +433,4 @@ Google スライドと SlideShare の `<iframe>` も同じように貼れます�
 <iframe class="speakerdeck-iframe" src="https://speakerdeck.com/player/2d59638e59f04898857ce369ed20ba87" title="発表タイトル" allowfullscreen="true" style="border: 0px; background: rgba(0, 0, 0, 0.1); margin: 0px; padding: 0px; border-radius: 6px; box-shadow: rgba(0, 0, 0, 0.2) 0px 5px 40px; width: 100%; height: auto; aspect-ratio: 560 / 315;" data-ratio="1.7777777777777777"></iframe>
 ```
 
-Speakerdeck の埋め込みコードは幅と縦横比を自分で持っているので、こちら側では触っていません。**`style` の中身も消さずに残してください。**
+Speakerdeck の埋め込みコードは幅と縦横比を自分で持っているので、こちら側では触っていません。**インラインの `style` も消さずに残してください。**
