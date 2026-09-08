@@ -59,7 +59,9 @@ editable: true
 
 **訪問済みは4色に割らず紫のままです。** 紫はサイト全体で訪問済みを意味していて、未訪問とは色相で分かれます。種別ごとに割ると未訪問と同じ色相の明るさ違いになり、読んだかどうかが分からなくなります。
 
-比を取る背景が3種類あるので、下の表は**それぞれの背景に対する比**です。note の行は、その注釈の背景と、その中のインラインコードの背景の**厳しい方との比**を載せています（AA を満たすかはそこで決まります）。
+**リンクの中のインラインコードは背景を持ちません。** 背景を残すと、リンクの色は注釈の背景とインラインコードの背景の2つを相手にすることになります。背景をひとつに絞れば、明るさも鮮やかさもそろった濃さが選べます。等幅の文字と下線が残るので、コードであることもリンクであることも読めます。
+
+比を取る背景が3種類あるので、下の表は**それぞれの背景に対する比**です。note の行は、その注釈の背景との比を載せています（AA を満たすかはそこで決まります）。
 
 | <span class="sr-only">見本</span> | 変数 | 値 | 背景 | 背景との比 | 使うところ |
 | --- | --- | --- | --- | --- | --- |
@@ -153,17 +155,18 @@ editable: true
 
 背景が3種類あるので、明るいほうと同じく分けて測ります。
 
-**note の中の色相をそろえるのは明るいほうだけです。** 暗い背景ではリンクを明るくするしかなく、色相を保ったまま鮮やかさを残すと、その注釈の中のインラインコードの背景に乗ったときに読めなくなります。色相を4色に振ったまま AA を取ると蛍光色になります。ここでも、同じ手を移すのではなくその役割から決めます。
-
-**note の行でいちばん厳しいのは、注釈の背景ではなくその中のインラインコードの背景です。** 暗いほうのコードの背景は注釈の背景より1段階**明るい**ので、素のリンクが通ってもリンクがインラインコードを包む形（`` [`code`](url) ``）で下回ります。明るさだけを上げて、8つの背景すべてで満たす値にしています。そのぶんリンクは本文とほとんど同じ明るさになりますが、**リンクであることは下線が示す**ので、ここは色が担っていません。
+**note の中は暗いほうも色相を背景から借ります。** 4色は**明るさと鮮やかさをそろえ、色相だけを変えます**。色相ごとに鮮やかさの上限を取ると、緑と黄は蛍光色に、青と赤は淡いパステルになって、ひとつの組に見えません。いちばん低い青に合わせて、明るさも鮮やかさも共通の組にしています。
 
 | <span class="sr-only">見本</span> | 変数 | 値 | 比 | 背景 |
 | --- | --- | --- | --- | --- |
 | <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-link-blue"></span></span> | `link-blue` | <span class="sg-hex sg-dark-link-blue"></span> | <span class="sg-ratio sg-dark-link-blue"></span> | ページの背景 |
 | <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-link-visited"></span></span> | `link-visited` | <span class="sg-hex sg-dark-link-visited"></span> | <span class="sg-ratio sg-dark-link-visited"></span> | ページの背景（訪問済み） |
 | <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-link-on-tint"></span></span> | `link-on-tint` | <span class="sg-hex sg-dark-link-on-tint"></span> | <span class="sg-ratio sg-dark-link-on-tint"></span> | インラインコードの背景 |
-| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-link-on-note"></span></span> | `link-on-note` | <span class="sg-hex sg-dark-link-on-note"></span> | <span class="sg-ratio sg-dark-link-on-note"></span> | note の4色と、その中のインラインコードの背景（いちばん厳しいもの）。暗い側は種別で分けず1色 |
-| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-link-on-note-visited"></span></span> | `link-on-note-visited` | <span class="sg-hex sg-dark-link-on-note-visited"></span> | <span class="sg-ratio sg-dark-link-on-note-visited"></span> | 同じ8つの背景（訪問済み） |
+| <span class="sg-chip-ground-dark sg-ground-note-tip"><span class="sg-chip sg-dark-link-on-note-tip"></span></span> | `link-on-note-tip` | <span class="sg-hex sg-dark-link-on-note-tip"></span> | <span class="sg-ratio sg-dark-link-on-note-tip"></span> | tip の背景 |
+| <span class="sg-chip-ground-dark sg-ground-note-info"><span class="sg-chip sg-dark-link-on-note-info"></span></span> | `link-on-note-info` | <span class="sg-hex sg-dark-link-on-note-info"></span> | <span class="sg-ratio sg-dark-link-on-note-info"></span> | info の背景 |
+| <span class="sg-chip-ground-dark sg-ground-note-warn"><span class="sg-chip sg-dark-link-on-note-warn"></span></span> | `link-on-note-warn` | <span class="sg-hex sg-dark-link-on-note-warn"></span> | <span class="sg-ratio sg-dark-link-on-note-warn"></span> | warn の背景 |
+| <span class="sg-chip-ground-dark sg-ground-note-alert"><span class="sg-chip sg-dark-link-on-note-alert"></span></span> | `link-on-note-alert` | <span class="sg-hex sg-dark-link-on-note-alert"></span> | <span class="sg-ratio sg-dark-link-on-note-alert"></span> | alert の背景 |
+| <span class="sg-chip-ground-dark sg-ground-note-alert"><span class="sg-chip sg-dark-link-on-note-visited"></span></span> | `link-on-note-visited` | <span class="sg-hex sg-dark-link-on-note-visited"></span> | <span class="sg-ratio sg-dark-link-on-note-visited"></span> | note の4色（訪問済み。4種類に共通） |
 
 #### 背景に色が付いた面
 
@@ -484,7 +487,7 @@ editable: true
 :::
 
 ::: note warn
-`warn` の背景です。気をつけないと困ることに使います。[`categories`](/categories/) のようにリンクがインラインコードを含むときも、同じ色になります。
+`warn` の背景です。気をつけないと困ることに使います。[`categories`](/categories/) のようにリンクがインラインコードを包むときは、コードの背景が外れて等幅の文字と下線だけになります。
 :::
 
 ::: note alert
