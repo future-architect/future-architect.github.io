@@ -63,7 +63,11 @@
 
   --link-blue: link-blue;
   --link-visited: link-visited;
-  --link-on-tint: link-on-tint;
+  // リンクの中のインラインコードの文字色 (#3244)。明るい側は札の上でも AA を満たす
+  // リンクの色に替える。note の中はその note の色をそのまま継ぐ（currentColor）
+  --code-in-link: link-on-tint;
+  --code-in-link-visited: link-visited;
+  --code-in-note-link: currentColor;
 
   // 表の枠。地が反転すると同じ濃さでは見えないので、テーマで差し替える
   --table-border: table-border;
@@ -107,13 +111,16 @@ dark-tokens()
 
   --link-blue: dark-link-blue;
   --link-visited: dark-link-visited;
-  --link-on-tint: dark-link-on-tint;
-  // 暗い側は種別で割らず4つとも同じ値。暗い地では色相をそろえる余地が無い
-  // （_variables.styl の dark-link-on-note のコメント）
-  --link-on-note-tip: dark-link-on-note;
-  --link-on-note-info: dark-link-on-note;
-  --link-on-note-warn: dark-link-on-note;
-  --link-on-note-alert: dark-link-on-note;
+  // **暗い側はリンクの中のインラインコードを本体色のままにする** (#3244)。
+  // 札は地より明るい側にあり、そこへ明るいリンク色を乗せると読みにくい。
+  // リンクであることは下線が名乗る（#2926）ので、色は札の役（コードである）に譲る
+  --code-in-link: dark-ink-strong;
+  --code-in-link-visited: dark-ink-strong;
+  --code-in-note-link: dark-ink-strong;
+  --link-on-note-tip: dark-link-on-note-tip;
+  --link-on-note-info: dark-link-on-note-info;
+  --link-on-note-warn: dark-link-on-note-warn;
+  --link-on-note-alert: dark-link-on-note-alert;
   --link-on-note-visited: dark-link-on-note-visited;
 
   // 表彰の淡金。カードだけ明るいまま残すと中の文字が沈むので、カードごと暗くする
@@ -2999,16 +3006,21 @@ code {
   color: var(--ink-strong);
 }
 
-/* インラインコードの地の上では link-blue が AA を下回るため、
+/* **明るい側**はインラインコードの地の上で link-blue が AA を下回るため、
    一段暗い link-on-tint に替える。highlight.styl 側にも同じ指定があるが、
    こちらの方が詳細度が高く後勝ちするので両方を揃えておく。
-   値は _variables.styl の1箇所から引くので、揃っていることを主張する必要が無い */
+   値は _variables.styl の1箇所から引くので、揃っていることを主張する必要が無い。
+
+   **暗い側は本体色のままにする** (#3244)。暗い地では札が地より明るい側にあり、
+   そこへ明るいリンク色を乗せると読みにくい（対 札 7.67 に対し本体色は 11.64）。
+   **順序は「コードである」が先で、「それがリンクになっている」が後**——
+   リンクであることは下線が名乗る（#2926） */
 .article-entry a code {
-  color: var(--link-on-tint);
+  color: var(--code-in-link);
 }
 
 .article-entry a:visited code {
-  color: var(--link-visited);
+  color: var(--code-in-link-visited);
 }
 
 .nav {
@@ -6139,7 +6151,7 @@ pre.mermaid,
   background-color: var(--note-alert-code);
 }
 
-/* note の中のリンクは、その note の地の色相を借りる (#3241)。地を濃くした分
+/* note の中のリンクは、その note の地の色相を借りる (#3241 / #3244)。地を濃くした分
    link-blue は alert の上で AA を割るので、いずれにせよ白地の値は使えない。
    色相まで振れるのは #2926 で地の文のリンクが常時下線を持つようになったからで、
    リンクであることは下線が名乗る。
@@ -6147,25 +6159,31 @@ pre.mermaid,
 
    **訪問済みは4色に割らず紫のまま。** 順序が効く——`:visited` の側は
    `.note-tip` を持たないぶん詳細度が同じ (0,3,1) なので、後ろに置いて勝たせる */
-.article-entry .note-container.note-tip a,
-.article-entry .note-container.note-tip a code {
+.article-entry .note-container.note-tip a {
   color: var(--link-on-note-tip);
 }
-.article-entry .note-container.note-info a,
-.article-entry .note-container.note-info a code {
+.article-entry .note-container.note-info a {
   color: var(--link-on-note-info);
 }
-.article-entry .note-container.note-warn a,
-.article-entry .note-container.note-warn a code {
+.article-entry .note-container.note-warn a {
   color: var(--link-on-note-warn);
 }
-.article-entry .note-container.note-alert a,
-.article-entry .note-container.note-alert a code {
+.article-entry .note-container.note-alert a {
   color: var(--link-on-note-alert);
 }
-.article-entry .note-container a:visited,
-.article-entry .note-container a:visited code {
+.article-entry .note-container a:visited {
   color: var(--link-on-note-visited);
+}
+/* **リンクの中のインラインコードは札の役を優先する** (#3244)。順序は
+   「コードである」が先で、「それがリンクになっている」が後。リンクであることは
+   下線が名乗る（#2926）。
+   明るい側は `currentColor` なので、そのリンクの色（note の種別の色）をそのまま継ぐ。
+   **暗い側だけ本体色に戻す**——札は地より明るい側にあり、そこへ明るいリンク色を
+   乗せると読みにくい。本体色なら札の上で 5.79〜5.83 出る。
+   `.article-entry a code`（0,1,2）に勝つ詳細度で、訪問済みの側もここで受ける */
+.article-entry .note-container a code,
+.article-entry .note-container a:visited code {
+  color: var(--code-in-note-link);
 }
 
 /* :not(pre) > code でインラインコードだけに効かせる。付けないと
@@ -6436,7 +6454,7 @@ sg-link-on-tint = {
   'link-on-tint': link-on-tint,
 }
 // note の中のリンクは種別ごとに色が違うので、それぞれ自分の地で測る (#3241)。
-// 地は2つ（note の地と、その中のインラインコードの地）あるので厳しい方を出す。
+// 明るい側はリンクの中のインラインコードもこの色になるので、note の地と札の両方で測る。
 // 訪問済みは4色に共通なので8つの地の最小
 sg-link-on-note-tip = {
   'link-on-note-tip': link-on-note-tip,
@@ -6479,11 +6497,19 @@ sg-dark-link = {
   'dark-link-blue': dark-link-blue,
   'dark-link-visited': dark-link-visited,
 }
-sg-dark-link-on-tint = {
-  'dark-link-on-tint': dark-link-on-tint,
+sg-dark-link-on-note-tip = {
+  'dark-link-on-note-tip': dark-link-on-note-tip,
 }
-sg-dark-link-on-note = {
-  'dark-link-on-note': dark-link-on-note,
+sg-dark-link-on-note-info = {
+  'dark-link-on-note-info': dark-link-on-note-info,
+}
+sg-dark-link-on-note-warn = {
+  'dark-link-on-note-warn': dark-link-on-note-warn,
+}
+sg-dark-link-on-note-alert = {
+  'dark-link-on-note-alert': dark-link-on-note-alert,
+}
+sg-dark-link-on-note-visited = {
   'dark-link-on-note-visited': dark-link-on-note-visited,
 }
 sg-dark-note = {
@@ -6500,6 +6526,12 @@ sg-dark-award = {
   'dark-award-bronze': dark-award-bronze,
   'dark-award-silver': dark-award-silver,
 }
+// 暗い側が相手にする地は note の地だけ (#3244)。リンクの中のインラインコードは
+// 本体色のままなので、札はリンクの色の条件に入らない
+sg-dark-note-tip-ground = dark-note-tip-bg
+sg-dark-note-info-ground = dark-note-info-bg
+sg-dark-note-warn-ground = dark-note-warn-bg
+sg-dark-note-alert-ground = dark-note-alert-bg
 sg-dark-note-grounds = dark-note-tip-bg dark-note-info-bg dark-note-warn-bg dark-note-alert-bg
 
 sg-swatches(sg-on-white)
@@ -6524,14 +6556,20 @@ sg-ratios-min(sg-link-on-note-visited, sg-note-grounds)
 
 sg-swatches(sg-dark)
 sg-swatches(sg-dark-link)
-sg-swatches(sg-dark-link-on-tint)
-sg-swatches(sg-dark-link-on-note)
+sg-swatches(sg-dark-link-on-note-tip)
+sg-swatches(sg-dark-link-on-note-info)
+sg-swatches(sg-dark-link-on-note-warn)
+sg-swatches(sg-dark-link-on-note-alert)
+sg-swatches(sg-dark-link-on-note-visited)
 sg-swatches(sg-dark-note)
 sg-swatches(sg-dark-award)
 sg-ratios(sg-dark, dark-surface-base)
 sg-ratios(sg-dark-link, dark-surface-base)
-sg-ratios(sg-dark-link-on-tint, dark-surface-mute)
-sg-ratios-min(sg-dark-link-on-note, sg-dark-note-grounds)
+sg-ratios-min(sg-dark-link-on-note-tip, sg-dark-note-tip-ground)
+sg-ratios-min(sg-dark-link-on-note-info, sg-dark-note-info-ground)
+sg-ratios-min(sg-dark-link-on-note-warn, sg-dark-note-warn-ground)
+sg-ratios-min(sg-dark-link-on-note-alert, sg-dark-note-alert-ground)
+sg-ratios-min(sg-dark-link-on-note-visited, sg-dark-note-grounds)
 sg-ratios(sg-dark-note, dark-surface-base)
 sg-ratios(sg-dark-award, dark-surface-base)
 
@@ -6579,6 +6617,20 @@ sg-ratios(sg-dark-award, dark-surface-base)
 }
 .sg-chip-note {
   background: note-alert-bg;
+}
+/* 暗い側の note の中のリンクも、それぞれの地の上に置く (#3244)。
+   ページの地に置く .sg-chip-ground-dark に重ねて地だけ差し替える */
+.sg-chip-ground-dark.sg-ground-note-tip {
+  background: dark-note-tip-bg;
+}
+.sg-chip-ground-dark.sg-ground-note-info {
+  background: dark-note-info-bg;
+}
+.sg-chip-ground-dark.sg-ground-note-warn {
+  background: dark-note-warn-bg;
+}
+.sg-chip-ground-dark.sg-ground-note-alert {
+  background: dark-note-alert-bg;
 }
 /* note の中のリンクは種別ごとに色が違うので、見本もそれぞれの地の上に置く (#3241) */
 .sg-chip-note-tip {
