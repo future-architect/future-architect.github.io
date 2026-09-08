@@ -136,14 +136,19 @@
       return a.compareDocumentPosition(b) & 4 ? -1 : 1;
     });
 
-    // 画面の上から 32px の線を越えた見出しを「読み始めた」とみなす。
-    // 帯は追従しないので、送った後の画面の上端が基準になる。
+    // 帯の下辺から 32px の線を越えた見出しを「読み始めた」とみなす。
+    // 帯は 1025px 以上で追従する (#3220) ので、基準は画面の上端ではなく帯の下辺。
+    // 追従しない幅では送った帯が画面の外へ出るので、下辺は 0 で止める。
     //
     // **線は「見出しから次の見出しまでの最小距離」より浅くする。** 目次の行を
     // クリックすると見出しが画面の上端（top 0）へ来るので、線が深いと次の見出しも
     // 線より上に入り、次の節が現在地になってしまう。CSS の値から出した最小距離は
     // h4 の直後に h4 が来る 46px（h3→h4 が 49px、h2→h3 が 72px）
-    var LINE = 32;
+    var header = document.querySelector('.site-header');
+    var line = function () {
+      var bottom = header ? header.getBoundingClientRect().bottom : 0;
+      return Math.max(0, bottom) + 32;
+    };
     var current = null;
     var queued = false;
 
@@ -164,7 +169,7 @@
       // 文書順に並んでいるので、線より下に出たらそれ以降は全部下にある
       var found = null;
       for (var i = 0; i < headings.length; i++) {
-        if (headings[i].getBoundingClientRect().top >= LINE) break;
+        if (headings[i].getBoundingClientRect().top >= line()) break;
         found = headings[i];
       }
       return found;
