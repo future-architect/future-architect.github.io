@@ -153,15 +153,17 @@ editable: true
 
 背景が3種類あるので、明るいほうと同じく分けて測ります。
 
-**note の中の色相をそろえるのは明るいほうだけです。** 暗い背景ではリンクを明るくするしかなく、色相を保ったまま鮮やかさを残すと、その注釈の中のインラインコードの背景に乗ったときに読めなくなります。逆に AA を取ると本文とほとんど同じ明るさの淡い色か、蛍光色のどちらかになります。ここでも、同じ手を移すのではなくその役割から決めます。
+**note の中の色相をそろえるのは明るいほうだけです。** 暗い背景ではリンクを明るくするしかなく、色相を保ったまま鮮やかさを残すと、その注釈の中のインラインコードの背景に乗ったときに読めなくなります。色相を4色に振ったまま AA を取ると蛍光色になります。ここでも、同じ手を移すのではなくその役割から決めます。
+
+**note の行でいちばん厳しいのは、注釈の背景ではなくその中のインラインコードの背景です。** 暗いほうのコードの背景は注釈の背景より1段階**明るい**ので、素のリンクが通ってもリンクがインラインコードを包む形（`` [`code`](url) ``）で下回ります。明るさだけを上げて、8つの背景すべてで満たす値にしています。そのぶんリンクは本文とほとんど同じ明るさになりますが、**リンクであることは下線が示す**ので、ここは色が担っていません。
 
 | <span class="sr-only">見本</span> | 変数 | 値 | 比 | 背景 |
 | --- | --- | --- | --- | --- |
 | <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-link-blue"></span></span> | `link-blue` | <span class="sg-hex sg-dark-link-blue"></span> | <span class="sg-ratio sg-dark-link-blue"></span> | ページの背景 |
 | <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-link-visited"></span></span> | `link-visited` | <span class="sg-hex sg-dark-link-visited"></span> | <span class="sg-ratio sg-dark-link-visited"></span> | ページの背景（訪問済み） |
 | <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-link-on-tint"></span></span> | `link-on-tint` | <span class="sg-hex sg-dark-link-on-tint"></span> | <span class="sg-ratio sg-dark-link-on-tint"></span> | インラインコードの背景 |
-| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-link-on-note"></span></span> | `link-on-note` | <span class="sg-hex sg-dark-link-on-note"></span> | <span class="sg-ratio sg-dark-link-on-note"></span> | note の4色（いちばん厳しい背景）。暗い側は種別で分けず1色 |
-| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-link-on-note-visited"></span></span> | `link-on-note-visited` | <span class="sg-hex sg-dark-link-on-note-visited"></span> | <span class="sg-ratio sg-dark-link-on-note-visited"></span> | note の4色（訪問済み） |
+| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-link-on-note"></span></span> | `link-on-note` | <span class="sg-hex sg-dark-link-on-note"></span> | <span class="sg-ratio sg-dark-link-on-note"></span> | note の4色と、その中のインラインコードの背景（いちばん厳しいもの）。暗い側は種別で分けず1色 |
+| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-link-on-note-visited"></span></span> | `link-on-note-visited` | <span class="sg-hex sg-dark-link-on-note-visited"></span> | <span class="sg-ratio sg-dark-link-on-note-visited"></span> | 同じ8つの背景（訪問済み） |
 
 #### 背景に色が付いた面
 
