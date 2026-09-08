@@ -233,7 +233,7 @@ $$
 
 ```markdown
 ::: note tip
-おすすめや小技を書きます。
+おすすめや小技を書きます。`go test -run TestFoo` のようなインラインコードや、[Go の公式ドキュメント](https://go.dev/doc/) へのリンクも書けます。
 :::
 
 ::: note info
@@ -250,7 +250,7 @@ $$
 ```
 
 ::: note tip
-おすすめや小技を書きます。
+おすすめや小技を書きます。`go test -run TestFoo` のようなインラインコードや、[Go の公式ドキュメント](https://go.dev/doc/) へのリンクも書けます。
 :::
 
 ::: note info
