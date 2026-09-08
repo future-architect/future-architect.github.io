@@ -55,15 +55,22 @@ editable: true
 
 リンクは**背景が濃くなるぶん暗い側へ振った段階**を持ちます。`link-blue` は白背景で AA を満たしますが、インラインコードの背景や note の色の付いた背景に乗ると下回るため、同系色のまま暗くした値に替えます。訪問済みは紫で、こちらは白背景でもコードの背景でも足ります。
 
-比を取る背景が3種類あるので、下の表は**それぞれの背景に対する比**です。note は4色あるので、そのうち**いちばん厳しい背景との比**を載せています（AA を満たすかはそこで決まります）。
+**note の中だけは、色相もその背景から借ります。** 注釈は4種類それぞれが色を持っているので、その中の青いリンクは箱の中で唯一の外来色になります。リンクであることは下線が示しているので、色は「その注釈のものである」ことだけを担えます。tip の背景は無彩色に近いため、色相を保つと青になります。
+
+**訪問済みは4色に割らず紫のままです。** 紫はサイト全体で訪問済みを意味していて、未訪問とは色相で分かれます。種別ごとに割ると未訪問と同じ色相の明るさ違いになり、読んだかどうかが分からなくなります。
+
+比を取る背景が3種類あるので、下の表は**それぞれの背景に対する比**です。note の行は、その注釈の背景と、その中のインラインコードの背景の**厳しい方との比**を載せています（AA を満たすかはそこで決まります）。
 
 | <span class="sr-only">見本</span> | 変数 | 値 | 背景 | 背景との比 | 使うところ |
 | --- | --- | --- | --- | --- | --- |
 | <span class="sg-chip sg-link-blue"></span> | `link-blue` | <span class="sg-hex sg-link-blue"></span> | 白 | <span class="sg-ratio sg-link-blue"></span> | 読み物の中のリンク（`--a-color`） |
 | <span class="sg-chip sg-link-visited"></span> | `link-visited` | <span class="sg-hex sg-link-visited"></span> | 白 | <span class="sg-ratio sg-link-visited"></span> | 訪問済み。インラインコードの中でも同じ値 |
 | <span class="sg-chip-ground sg-chip-tint"><span class="sg-chip sg-link-on-tint"></span></span> | `link-on-tint` | <span class="sg-hex sg-link-on-tint"></span> | インラインコードの背景 | <span class="sg-ratio sg-link-on-tint"></span> | インラインコードの中のリンク |
-| <span class="sg-chip-ground sg-chip-note"><span class="sg-chip sg-link-on-note"></span></span> | `link-on-note` | <span class="sg-hex sg-link-on-note"></span> | note の4色 | <span class="sg-ratio sg-link-on-note"></span> | note の中のリンク |
-| <span class="sg-chip-ground sg-chip-note"><span class="sg-chip sg-link-on-note-visited"></span></span> | `link-on-note-visited` | <span class="sg-hex sg-link-on-note-visited"></span> | note の4色 | <span class="sg-ratio sg-link-on-note-visited"></span> | note の中の訪問済み |
+| <span class="sg-chip-ground sg-chip-note-tip"><span class="sg-chip sg-link-on-note-tip"></span></span> | `link-on-note-tip` | <span class="sg-hex sg-link-on-note-tip"></span> | tip の背景 | <span class="sg-ratio sg-link-on-note-tip"></span> | tip の中のリンク |
+| <span class="sg-chip-ground sg-chip-note-info"><span class="sg-chip sg-link-on-note-info"></span></span> | `link-on-note-info` | <span class="sg-hex sg-link-on-note-info"></span> | info の背景 | <span class="sg-ratio sg-link-on-note-info"></span> | info の中のリンク |
+| <span class="sg-chip-ground sg-chip-note-warn"><span class="sg-chip sg-link-on-note-warn"></span></span> | `link-on-note-warn` | <span class="sg-hex sg-link-on-note-warn"></span> | warn の背景 | <span class="sg-ratio sg-link-on-note-warn"></span> | warn の中のリンク |
+| <span class="sg-chip-ground sg-chip-note-alert"><span class="sg-chip sg-link-on-note-alert"></span></span> | `link-on-note-alert` | <span class="sg-hex sg-link-on-note-alert"></span> | alert の背景 | <span class="sg-ratio sg-link-on-note-alert"></span> | alert の中のリンク |
+| <span class="sg-chip-ground sg-chip-note"><span class="sg-chip sg-link-on-note-visited"></span></span> | `link-on-note-visited` | <span class="sg-hex sg-link-on-note-visited"></span> | note の4色 | <span class="sg-ratio sg-link-on-note-visited"></span> | note の中の訪問済み。4種類に共通 |
 
 **青は読み物の中のリンクの色です。** レイアウトの導線（「連載一覧へ」のような全件への行き先、パンくず、日付、著者名）には青を使わず、文字のスケールの `ink-mute` に置いて、反応で `ink-strong` に1段階濃くします。同じページで本文のリンクと導線が同じ青だと、どちらが読み物の続きなのかが見分けられません。
 
@@ -146,12 +153,14 @@ editable: true
 
 背景が3種類あるので、明るいほうと同じく分けて測ります。
 
+**note の中の色相をそろえるのは明るいほうだけです。** 暗い背景ではリンクを明るくするしかなく、色相を保ったまま鮮やかさを残すと、その注釈の中のインラインコードの背景に乗ったときに読めなくなります。逆に AA を取ると本文とほとんど同じ明るさの淡い色か、蛍光色のどちらかになります。ここでも、同じ手を移すのではなくその役割から決めます。
+
 | <span class="sr-only">見本</span> | 変数 | 値 | 比 | 背景 |
 | --- | --- | --- | --- | --- |
 | <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-link-blue"></span></span> | `link-blue` | <span class="sg-hex sg-dark-link-blue"></span> | <span class="sg-ratio sg-dark-link-blue"></span> | ページの背景 |
 | <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-link-visited"></span></span> | `link-visited` | <span class="sg-hex sg-dark-link-visited"></span> | <span class="sg-ratio sg-dark-link-visited"></span> | ページの背景（訪問済み） |
 | <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-link-on-tint"></span></span> | `link-on-tint` | <span class="sg-hex sg-dark-link-on-tint"></span> | <span class="sg-ratio sg-dark-link-on-tint"></span> | インラインコードの背景 |
-| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-link-on-note"></span></span> | `link-on-note` | <span class="sg-hex sg-dark-link-on-note"></span> | <span class="sg-ratio sg-dark-link-on-note"></span> | note の4色（いちばん厳しい背景） |
+| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-link-on-note"></span></span> | `link-on-note` | <span class="sg-hex sg-dark-link-on-note"></span> | <span class="sg-ratio sg-dark-link-on-note"></span> | note の4色（いちばん厳しい背景）。暗い側は種別で分けず1色 |
 | <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-link-on-note-visited"></span></span> | `link-on-note-visited` | <span class="sg-hex sg-dark-link-on-note-visited"></span> | <span class="sg-ratio sg-dark-link-on-note-visited"></span> | note の4色（訪問済み） |
 
 #### 背景に色が付いた面
