@@ -37,9 +37,9 @@ AWS MCP Server は、AWS 公式が提供する Agent Toolkit for AWS スイー�
 
 | 構成要素 | 役割 |
 |---|---|
-| **AWS MCP Server** | マネージドな MCP エンドポイント（ツール単位の認可：API系は SigV4 必須、doc系は SigV4 不要） |
-| **Agent Skills** | AWS タスクごとに用意された手順・リファレンス（必要に応じてエージェントが取得） |
-| **Agent Plugins** | 複数エディタ（Claude Code、Codex、Cursor、Kiro 等）への一括導入パッケージ |
+| AWS MCP Server | マネージドな MCP エンドポイント（ツール単位の認可：API系は SigV4 必須、doc系は SigV4 不要） |
+| Agent Skills | AWS タスクごとに用意された手順・リファレンス（必要に応じてエージェントが取得） |
+| Agent Plugins | 複数エディタ（Claude Code、Codex、Cursor、Kiro 等）への一括導入パッケージ |
 
 ローカル運用は不要で、AWS 側がスケーラビリティ・自動アップデート・監査ログを管理します。
 

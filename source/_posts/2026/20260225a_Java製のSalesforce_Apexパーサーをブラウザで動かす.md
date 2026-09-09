@@ -68,15 +68,15 @@ Javaコードをブラウザで動かす選択肢はいくつかあります。
 
 | 項目 | TeaVM (JS) | TeaVM (WASM) | CheerpJ | GraalVM Wasm | GWT/J2CL |
 |------|-----------|-------------|---------|--------------|----------|
-| **アプローチ** | .classバイトコード→JS AOT | .classバイトコード→Wasm AOT | JVMエミュレーション（ブラウザ内JVM） | Java→Wasm AOT | Java→JS source-to-source(トランスパイル) |
-| **Javaバージョン** | Java 8+ | Java 8+ | Java 8/11 | Java 17+ | Java 8-11 |
-| **既存jar対応** | ◎（一部リフレクション制限） | ◎（一部リフレクション制限） | ◎（完全互換だが遅い） | △（GraalVM Native Image制約） | △（未対応API多数） |
-| **バイナリサイズ** | 1-2MB（最適化後） | 2-4MB（ランタイム含む） | 5-10MB（JVM含む） | 3-10MB | 1-3MB |
-| **parse性能** | 速い | より速い | 遅いはず（JVMエミュレーション） | 速いはず | 速い？ |
-| **String/JS相互運用** | ◎（`@JSBody`で直接） | △（手動UTF-16変換） | △（JNI風API） | △（Wasm Interface Types待ち） | ◎（Java↔JS透過的） |
-| **DOM/ブラウザAPI** | ◎（`teavm-jso`） | ○（限定的） | ○（JNI風） | △（外部JS必要） | ◎（JSNI/JsInterop） |
-| **成熟度/コミュニティ** | ○（中規模、活発） | △（発展途上） | △（商用中心） | △（実験的） | ○（大規模だが停滞気味） |
-| **パーサー向き** | ◎ | ◎ | △ | ○ | ○ |
+| アプローチ | .classバイトコード→JS AOT | .classバイトコード→Wasm AOT | JVMエミュレーション（ブラウザ内JVM） | Java→Wasm AOT | Java→JS source-to-source(トランスパイル) |
+| Javaバージョン | Java 8+ | Java 8+ | Java 8/11 | Java 17+ | Java 8-11 |
+| 既存jar対応 | ◎（一部リフレクション制限） | ◎（一部リフレクション制限） | ◎（完全互換だが遅い） | △（GraalVM Native Image制約） | △（未対応API多数） |
+| バイナリサイズ | 1-2MB（最適化後） | 2-4MB（ランタイム含む） | 5-10MB（JVM含む） | 3-10MB | 1-3MB |
+| parse性能 | 速い | より速い | 遅いはず（JVMエミュレーション） | 速いはず | 速い？ |
+| String/JS相互運用 | ◎（`@JSBody`で直接） | △（手動UTF-16変換） | △（JNI風API） | △（Wasm Interface Types待ち） | ◎（Java↔JS透過的） |
+| DOM/ブラウザAPI | ◎（`teavm-jso`） | ○（限定的） | ○（JNI風） | △（外部JS必要） | ◎（JSNI/JsInterop） |
+| 成熟度/コミュニティ | ○（中規模、活発） | △（発展途上） | △（商用中心） | △（実験的） | ○（大規模だが停滞気味） |
+| パーサー向き | ◎ | ◎ | △ | ○ | ○ |
 
 TeaVMを選んだ理由は以下の通りです：
 

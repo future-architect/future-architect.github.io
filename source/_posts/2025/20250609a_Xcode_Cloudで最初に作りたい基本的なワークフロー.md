@@ -67,11 +67,11 @@ Xcode Cloud の毎月25時間分無料枠は、2025年6月時点の情報にな�
 
 | 大分類 | 設定できる主な項目 |
 |:--|:--|
-| **General**  |  ワークフローの名前、説明、編集権限、プライマリリポジトリ |
-| **Environment**  |  Xcode バージョン、 macOS バージョン、クリーンビルド、環境変数 |
-| **Start Conditions**  | ブランチの変更、PRの変更、タグの変更、手動開始  |
-| **Actions**  | 分析、アーカイブ、ビルド、テスト  |
-| **Post-Actions**  |  TestFlight 外部テスト、TestFlight 内部テスト、公証（macOS のみ）、通知 |
+| General  |  ワークフローの名前、説明、編集権限、プライマリリポジトリ |
+| Environment  |  Xcode バージョン、 macOS バージョン、クリーンビルド、環境変数 |
+| Start Conditions  | ブランチの変更、PRの変更、タグの変更、手動開始  |
+| Actions  | 分析、アーカイブ、ビルド、テスト  |
+| Post-Actions  |  TestFlight 外部テスト、TestFlight 内部テスト、公証（macOS のみ）、通知 |
 
 以下では、Xcode での設定例を示します。
 
