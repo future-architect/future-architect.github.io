@@ -34,11 +34,11 @@
       紹介する（説明と外部サイトへの分岐はポータル側が担う）。
       全件は /specials/ が持つので、ここに並べるのは3枚まで。
       残りは下の全件導線から辿る %>
-  <%# 並べる3枚は旬で決める (#2880)。季節もの（アドベントカレンダー・Tech Cast・HTTF）が
-      前に入り、いつでも出せる連載とガイドラインが後ろから落ちる。
-      季節ものの間はシーズンの長さの順で、常設のうち連載を先に置くのは
-      旬のものが1枚も無い期間を無くすため (#2892)。
-      以前は HTTF が無条件に入っていて、オフシーズンでも枠を1つ取っていた %>
+  <%# 1枠目はガイドラインで固定し、残り2枠を「季節もの（アドベントカレンダー・
+      Tech Cast・HTTF）→ 連載」の順で埋める。季節ものの間はシーズンの長さの順。
+      ガイドラインだけ固定なのは、ブログの外にある読み物への唯一の入口で
+      落とす相手が無いため。連載は残り枠のぶんだけ取るので、季節ものが無い時期は
+      2本並んで枠が埋まる %>
   <%
     // カレンダーの年を advent_calendar.yml に足す作業がそのままスイッチになる。
     // 年が変われば一致しなくなるので、シーズンの終わりを別に持たなくてよい
@@ -50,9 +50,19 @@
     const httfYear = contests.length ? Number(contests[0].year) : null;
     const thisYear = new Date().getFullYear();
     const latestEpisode = techcast_episodes()[0];
+    const PANEL_COUNT = 3;
     const specialPanels = [];
     // 枠には連載・アクティビティ・リソースが混ざって出るので、1枚ずつ種別を名乗らせる
     // (#2892)。語彙はヘッダーのナビとフッターの列が持っているものだけを使う
+    specialPanels.push({
+      url: '/specials/guidelines/',
+      label: 'リソース',
+      labelIcon: 'book',
+      more: {url: '/specials/', text: '特設ページ一覧へ'},
+      title: 'フューチャーのガイドライン',
+      meta: '設計ガイドライン・コーディング規約・TypeScript 教材の入口です。',
+      thumb: {src: '/archtecture_guidelines.png', width: 200, height: 135},
+    });
     if (adventYear === thisYear) {
       specialPanels.push({
         url: '/specials/advent-calendar/',
@@ -88,37 +98,27 @@
     // 出すのは「すぐ下の新着一覧に1本も出ていない連載」のうち最後に更新されたもの
     // (#3135)。最新の連載はその記事自体が新着一覧に並ぶので、パネルにしても二重になる。
     // 連載の顔は索引記事のサムネなのでそのまま借りる
-    const doneSeries = featured_series(page.posts);
-    if (doneSeries) {
+    featured_series(page.posts, PANEL_COUNT - specialPanels.length).forEach(function(done){
       specialPanels.push({
-        url: url_for(doneSeries.index.path),
+        url: url_for(done.index.path),
         label: '連載',
         labelIcon: 'run-baton',
         more: {url: '/series/', text: '連載一覧へ'},
-        title: doneSeries.name,
+        title: done.name,
         // 説明文は索引記事の lede。ガイドラインのパネルと同じ「1文で名乗る」に揃える。
         // 名乗りしか書かれていない連載だけ、規模と更新月に戻す
         // （更新の日付は年月まで #2404。/series/ の期間表記とも揃う）
-        meta: doneSeries.summary
-          ? escape_html(doneSeries.summary)
-          : '全' + doneSeries.total + '本・' + date(doneSeries.latest, 'YYYY.MM') + ' 更新',
-        thumb: {src: doneSeries.index.thumbnail, width: 200, height: 135},
+        meta: done.summary
+          ? escape_html(done.summary)
+          : '全' + done.total + '本・' + date(done.latest, 'YYYY.MM') + ' 更新',
+        thumb: {src: done.index.thumbnail, width: 200, height: 135},
       });
-    }
-    specialPanels.push({
-      url: '/specials/guidelines/',
-      label: 'リソース',
-      labelIcon: 'book',
-      more: {url: '/specials/', text: '特設ページ一覧へ'},
-      title: 'フューチャーのガイドライン',
-      meta: '設計ガイドライン・コーディング規約・TypeScript 教材の入口です。',
-      thumb: {src: '/archtecture_guidelines.png', width: 200, height: 135},
     });
   %>
   <%# 「◯◯一覧へ」は種別ごとの導線なので、置ける場所が中身で変わる (#2892)。
       種別が揃っている回（特設だけ）は節の下にまとめて置ける。
       連載と特設が混ざる回は行き先が2つになるので、それぞれのパネルの中に入れる %>
-  <% const shownPanels = specialPanels.slice(0, 3); %>
+  <% const shownPanels = specialPanels.slice(0, PANEL_COUNT); %>
   <% const sharedMore = new Set(shownPanels.map(function(p){ return p.more.url; })).size === 1
        ? shownPanels[0].more : null; %>
   <%# 囲みは持たない (#3241)。旬の3枚は 768px 以上でサムネを上に全幅で置き
