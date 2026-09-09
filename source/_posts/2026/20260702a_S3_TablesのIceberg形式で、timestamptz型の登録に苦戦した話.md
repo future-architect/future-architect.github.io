@@ -118,8 +118,8 @@ def parse_ddl(ddl_content: str) -> list[str]:
 
 | Icebergの型 | 説明 | Spark SQLのDDL | AthenaのDDL |
 | :--- | :--- | :--- | :--- |
-| **`timestamptz`** | タイムゾーンつきタイムスタンプ | **`TIMESTAMP`** | **定義不可**<br>（※Spark等で作成する必要あり） |
-| **`timestamp`** | タイムゾーンなしタイムスタンプ | **`TIMESTAMP_NTZ`** | **`TIMESTAMP`** |
+| `timestamptz` | タイムゾーンつきタイムスタンプ | **`TIMESTAMP`** | **定義不可**<br>（※Spark等で作成する必要あり） |
+| `timestamp` | タイムゾーンなしタイムスタンプ | **`TIMESTAMP_NTZ`** | **`TIMESTAMP`** |
 
 >[Apache Spark公式サイトを参考に作成](https://spark.apache.org/docs/latest/sql-ref-datatypes.html)
 
