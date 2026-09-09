@@ -33,10 +33,10 @@ function panelSummary(lede) {
 }
 
 /**
- * ホームの「特集」に出す連載 (#3135)。
+ * ホームの「特集」に出す連載 (#3135)。更新が新しい順に limit 本まで返す。
  *
- * **同じ画面の新着一覧に1本も出ていない連載**のうち、最後に更新されたものを返す。
- * 最新の連載はその記事自体がすぐ下の新着一覧に並ぶので、パネルにしても二重になる。
+ * **同じ画面の新着一覧に1本も出ていない連載**に絞る。最新の連載はその記事自体が
+ * すぐ下の新着一覧に並ぶので、パネルにしても二重になる。
  * 新着一覧に出ているかは page.posts と突き合わせれば分かるので、
  * 「何日空いたら完走とみなすか」の閾値を持たなくてよい。
  *
@@ -49,20 +49,23 @@ function panelSummary(lede) {
  */
 hexo.extend.helper.register(
   'featured_series',
-  function (shownPosts, windowMonths = 6, minPosts = 3) {
+  function (shownPosts, limit = 1, windowMonths = 6, minPosts = 3) {
+    if (limit <= 0) return [];
     const list = shownPosts && shownPosts.toArray ? shownPosts.toArray() : shownPosts || [];
     const shown = new Set(list.map((p) => p.path));
     const now = Date.now();
     const windowMs = windowMonths * 30 * 24 * 60 * 60 * 1000;
-    // allSeries は更新が新しい順なので、条件に合う先頭がそのまま「最後に完走した連載」
-    const found = allSeries(this.site).find(
-      (s) =>
-        s.total >= minPosts &&
-        s.index.thumbnail &&
-        now - s.latest.valueOf() <= windowMs &&
-        !s.posts.some((p) => shown.has(p.path)),
-    );
-    return found ? { ...found, summary: panelSummary(found.index.lede) } : null;
+    // allSeries は更新が新しい順なので、条件に合う先頭から順に「最後に完走した連載」
+    return allSeries(this.site)
+      .filter(
+        (s) =>
+          s.total >= minPosts &&
+          s.index.thumbnail &&
+          now - s.latest.valueOf() <= windowMs &&
+          !s.posts.some((p) => shown.has(p.path)),
+      )
+      .slice(0, limit)
+      .map((s) => ({ ...s, summary: panelSummary(s.index.lede) }));
   },
 );
 
