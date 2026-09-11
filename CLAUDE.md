@@ -13,6 +13,7 @@ Hexo 7.3 製の静的サイトで、GitHub Pages にホスティングされて�
 | `themes/future/` | 自作テーマ。`layout/*.ejs`（EJS）と `source/css/`（Stylus） |
 | `scripts/` | Hexo の generator / helper 拡張（著者ページ、タグ、SNSカウント、OGPプレビューなど） |
 | `scaffolds/` | `hexo new` のテンプレート |
+| `workers/likes/` | いいね機能の Cloudflare Worker（#1949）。Hexo のビルドには関わらない |
 | `_config.yml` | Hexo 本体設定（permalink、alias によるURLリダイレクト等） |
 | `themes/future/_config.yml` | テーマ設定（メニュー、GA4 プロパティ、SNSリンク） |
 | `_profile.yml` | 著者プロフィール（about / twitter_id / github_id） |
@@ -608,6 +609,40 @@ make mermaid # mermaid 図のSVGキャッシュ更新（Docker必須、記事の
     JavaScript 中の `/<img [^>]*src=…/` を画像タグとして拾う
 - `.markdownlint-cli2.jsonc`: 行長・生URL・インラインHTMLなどは無効化済み
 - PR には reviewdog が textlint を回し、変更行にレビューコメントを付ける（`.github/workflows/reviewdog.yml`）
+
+## いいね（Cloudflare Worker）
+
+記事の「役に立った」を受け取って数を出す（#1949）。**サイトで唯一 JS を使う機能。**
+保存先は Cloudflare Worker + KV で、コードは `workers/likes/` が持つ。
+
+- **数の表示はビルド時に焼き込む。読者のブラウザからは読まない。**
+  記事ページの表示ごとに問い合わせると、全記事ページに外部への通信が1本増える。
+  はてブ数も PV も `update-cache.yml` が毎日取って JSON にコミットする形なので、
+  いいねもそこへ乗せる。**JS が走るのは押したときだけ**
+  - 代償は「他人のいいねは翌日反映」。押した本人には POST のレスポンスの最新値を出す。
+    隣に並ぶはてブ数が同じ遅延なので、数の新しさが揃う
+  - Worker が持つのは `POST /like/<記事ID>` とバッチ用の `GET /dump` の2本だけで、
+    読者向けの `GET /count` は持たない
+- **KV のキーは URL ではなく記事ID**（`like:20260804a`）。`_config.yml` の `alias` で
+  URL を付け替えても数が残る
+- **数は値と `metadata` の両方に持つ。** ダンプは `list()` が返す metadata から読むので、
+  記事数ぶんの `get` を撃たずに済む（Workers の無料枠は1リクエストあたり50サブリクエスト
+  までで、1,500件を `get` で引くと超える）。実測で1,212件が `list()` 2ページ・18KB・32ms
+- **Worker は記事の一覧を知らないので、記事IDは形式（`^20\d{6}[a-z]?$`）だけを見る。**
+  存在しない記事IDでも書けてしまうが、ダンプを取り込む側が実在する記事だけを拾うので
+  表示には出ない。記事IDの一覧を Worker に焼くと、記事を書くたびに再デプロイが要る
+- **二重投稿は完全には防げない。** 認証を持たない以上、別ブラウザ・シークレット
+  ウィンドウからは押せる。技術ブログのいいねとしては許容する
+  - 端末側は `localStorage`、サーバ側は **IP と記事IDのハッシュ**を KV に TTL 24時間で置く。
+    **生の IP は保存しない**（塩を足して SHA-256。記事ごとに別のハッシュになるので、
+    鍵が漏れても「どの端末がどの記事を押したか」の突き合わせにしか使えない）
+  - **連打と記事IDの総当たりは Rate Limiting binding が止める**（IPあたり60秒で20回）。
+    KV を触らないので**書き込み枠を消費しない**。KV の無料枠は書き込みが1日1,000で、
+    いいね1回につき2回（カウンタと重複記録）書くため、実質1日500いいねが上限になる
+  - **`Origin` が一致しないリクエストは受けない。** ブラウザ以外からの POST を
+    完全には防げないが、素の叩き方は止まる
+- **カウンタの `get` → `put` は競合しうる**（KV は結果整合）。同時に押されると取りこぼすが、
+  いいね数は1件の差が読者の判断を変える数字ではないので Durable Objects は使わない
 
 ## ブランチ / デプロイ
 
