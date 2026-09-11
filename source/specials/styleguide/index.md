@@ -235,12 +235,11 @@ editable: true
 | <span class="sg-chip-ground-dark sg-ground-code"><span class="sg-chip sg-dark-code-attr"></span></span> | `code-attr` | <span class="sg-hex sg-dark-code-attr"></span> | <span class="sg-ratio sg-dark-code-attr"></span> |
 | <span class="sg-chip-ground-dark sg-ground-code"><span class="sg-chip sg-dark-code-tag"></span></span> | `code-tag` | <span class="sg-hex sg-dark-code-tag"></span> | <span class="sg-ratio sg-dark-code-tag"></span> |
 
-### 横スクロールのつまみは文字のスケールから選ばない
+### 横スクロールのつまみは罫線のスケールから選ぶ
 
-横に溢れるもの——コードブロックと、横に溢れる表——のつまみは**文字ではありません。** 文字のスケールは白背景で AA を満たすために決めた段階なので、そこからは選びません。条件は2つです。
+横に溢れるもの——コードブロックと、横に溢れる表——のつまみは**文字ではなく線です。** 文字のスケールは白背景で AA を満たすために決めた段階なので、そこからは選びません。**罫線のいちばん強い段階**を使います。
 
-- **下限は背景に対して 3:1。** 文字以外の部品に求められる比で、これを割ると帯が出ていても位置が読み取れません
-- **上限はその箱の文字より弱いこと。** つまみは中身より前に出るものではありません
+**つまみは中身より前に出るものではありません。** 切れ目のない帯は同じ比の文字より強く見えるので、本文と競わない濃さまで引きます。**溢れていること自体は折り返しの切り替えが示す**ので、つまみが唯一の合図ではありません。
 
 **テーマごとに1つの値です。** つまみの役割は1つなので、コードブロックと表で分けません。下の比は、その2つの背景のうち厳しいほうに対する値です。
 
