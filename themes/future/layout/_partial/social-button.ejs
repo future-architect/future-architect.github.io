@@ -51,16 +51,19 @@
     <% if (likeId) { %>
     <% const likes = like_count(likeId); %>
     <li class="share-item like-item" data-like-id="<%= likeId %>" hidden>
-      <%# 名前は吹き出しと sr-only が持つ。共有ボタンの title（OSの素の吹き出し）に
-          しないのは、出るまで間があり見た目も揃わないため。コピーの
-          「コピーしました」と同じ形の吹き出しを1つのルールで共有する。
-          件数は共有ボタンと同じく読み上げ名に畳む (#3066) %>
-      <button type="button" class="share-btn like-button" aria-pressed="false">
+      <%# 押す前の名前は title（OSのツールチップ）と sr-only が持つ。件数は
+          共有ボタンと同じく読み上げ名に畳む (#3066)。
+
+          押した後は title を外す。すでに押したボタンに「いいね」と出ても
+          意味が無く、下の礼の吹き出しと二重にも見える %>
+      <button type="button" class="share-btn like-button" aria-pressed="false" title="いいね">
         <%- partial('svg-icon', {icon: 'heart', class_name: 'like-icon-outline'}) %>
         <%- partial('svg-icon', {icon: 'heart-filled', class_name: 'like-icon-filled'}) %>
         <span class="sr-only like-sr">いいね<%= likes ? `（${likes}件）` : '' %></span>
       </button>
-      <span class="share-copied like-tip" aria-hidden="true">いいね</span>
+      <%# 押した少し後に一度だけ出す礼。以後は指しても出さない。
+          形はコピーの「コピーしました」と1つのルールを共有する %>
+      <span class="share-copied like-thanks" aria-hidden="true">ありがとうございます！</span>
       <%# 0 のときは共有の数字と同じく出さない %>
       <span class="share-count like-count" aria-hidden="true"<%= likes ? '' : ' hidden' %>><%= likes %></span>
     </li>
@@ -184,7 +187,7 @@
       var likeKey = 'liked:' + likeItem.dataset.likeId;
       var likeBusy = false;
       var likeSr = likeItem.querySelector('.like-sr');
-      var likeTip = likeItem.querySelector('.like-tip');
+      var likeThanks = likeItem.querySelector('.like-thanks');
       var showCount = function (n) {
         likeCount.textContent = String(n);
         likeCount.hidden = n <= 0;
@@ -196,7 +199,7 @@
       try { pressed = localStorage.getItem(likeKey) === '1'; } catch (e) {}
       if (pressed) {
         likeBtn.setAttribute('aria-pressed', 'true');
-        likeTip.textContent = 'ありがとうございます！';
+        likeBtn.removeAttribute('title');
       }
       likeItem.hidden = false;
 
@@ -205,6 +208,7 @@
         var before = Number(likeCount.textContent) || 0;
         // 押した瞬間に塗りと +1 を返す。往復を待たせると押せたかが分からない。
         // 返ってきたらサーバの数で上書きし、届かなければ見た目も戻す
+        var pressedAt = Date.now();
         likeBusy = true;
         likeBtn.setAttribute('aria-pressed', 'true');
         showCount(before + 1);
@@ -219,11 +223,13 @@
           .then(function (data) {
             showCount(data.likes);
             try { localStorage.setItem(likeKey, '1'); } catch (e) {}
-            // 礼は少しの間だけ出す。文字は戻さないので、以後この吹き出しは
-            // 指したときも「ありがとうございます！」になる
-            likeTip.textContent = 'ありがとうございます！';
-            likeTip.classList.add('is-thanks');
-            setTimeout(function () { likeTip.classList.remove('is-thanks'); }, 2000);
+            // 礼は押した少し後に一度だけ。跳ねが終わってから出したいので、
+            // 往復が速くても遅くても「押してから 400ms」にそろえる
+            likeBtn.removeAttribute('title');
+            setTimeout(function () {
+              likeThanks.classList.add('is-thanks');
+              setTimeout(function () { likeThanks.classList.remove('is-thanks'); }, 2000);
+            }, Math.max(0, 400 - (Date.now() - pressedAt)));
           })
           .catch(function () {
             likeBtn.setAttribute('aria-pressed', 'false');
