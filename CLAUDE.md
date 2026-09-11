@@ -1255,7 +1255,7 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
   - **横スクロールのつまみは `scrollbar-thumb` で、コードブロックと横に溢れる表
     （`.scroll`）が共有する**（#3274）。**つまみは文字ではなく線**なので `ink` ではなく
     **`rule` の段を指す**（`table-border` と同じ、役が段を指す形）。
-    明るい側 `rule-strong`、暗い側 `dark-rule-strong`。**テーマごとに1つの値**で、
+    明るい側 `rule-base`、暗い側 `dark-rule-base`。**テーマごとに1つの値**で、
     部品ごとには分けない
     - **中身より前に出さない。** 以前は `ink-faint` を借りていて、明るい側は
       コードの地 4.23 / 白 4.61、暗い側は表が 5.71・コードブロックが `#7f8b9c` の
@@ -1266,6 +1266,10 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
     - **溢れていること自体は折り返しトグル（#2752）が名乗る。** つまみが唯一の
       合図ではないので、#2775 が OS 既定を「位置が読めない」と退けた線
       （地に対して 1.9）より弱くてよい
+    - **`rule-weak` までは下げない。** 地との差 1.09 / 1.05 は**コードブロックが
+      ページから浮いている差（1.09）と同じ**で、つまみが箱の輪郭と見分けられなくなる。
+      掴む的でもある。濃さではなく面積で引きたいときの手は `scrollbar-width: thin`
+      （Chrome で約15px → 約8px）だが、掴みにくくなるので併用はしない
     - **静止時と操作中の色は分けられない。** `scrollbar-color` が取るのはつまみと
       トラックの2色だけで、hover / active は UA が導出する。
       `::-webkit-scrollbar-thumb:hover` は使えない——Chrome は `scrollbar-color` の
