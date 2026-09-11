@@ -65,6 +65,7 @@
           礼の形はコピーの「コピーしました」と1つのルールを共有する %>
       <%# 叩いたときの祝い。光と点の2枚を ::before / ::after で持つので DOM は1つ %>
       <span class="like-burst" aria-hidden="true"></span>
+      <%# 風船のひな型。叩くたびにこれを複製して飛ばすので、前のが残っていても消えない %>
       <span class="like-plus" aria-hidden="true">+1</span>
       <span class="share-copied like-thanks" aria-hidden="true">ありがとうございました！</span>
       <span class="share-copied like-hold" aria-hidden="true">長押しでキャンセルします</span>
@@ -243,13 +244,26 @@
         clearTimeout(thanksHideTimer);
         likeThanks.classList.remove('is-thanks');
       };
+      // 風船は1つずつ別の要素にして飛ばす。使い回すと、前のが浮いている間に
+      // 次を出したときに前のが消える
+      var PLUS_DX = [0, -11, 9, -6, 13, -14];
+      var plusCount = 0;
+      var launchPlus = function () {
+        var el = likePlus.cloneNode(false);
+        el.textContent = '+' + mine;
+        el.style.setProperty('--dx', PLUS_DX[plusCount++ % PLUS_DX.length] + 'px');
+        el.classList.add('is-rising');
+        likeItem.appendChild(el);
+        // 動きを止める設定ではアニメーションが走らないので、時間で片づける
+        setTimeout(function () { el.remove(); }, 1400);
+      };
       var showPlus = function () {
-        likePlus.textContent = '+' + mine;
-        likePlus.classList.add('is-shown');
+        // 風船が出るのは3つ目に届いたときだけ。1つ目・2つ目は跳ねと祝いで返す
+        if (mine >= LIKE_MAX) launchPlus();
+        // 待ちは毎回引き直す。礼はここが引き金なので、3つ入れなくても出る
         clearTimeout(plusTimer);
         plusTimer = setTimeout(function () {
-          likePlus.classList.remove('is-shown');
-          // 礼は風船が消えてから
+          // 礼は叩き終わってから
           if (!thanked) {
             thanked = true;
             thanksTimer = setTimeout(function () {
@@ -336,8 +350,9 @@
         if (mine <= 0) return;
         hideThanks();
         clearTimeout(plusTimer);
-        likePlus.classList.remove('is-shown');
-        likePlus.textContent = '+1';
+        Array.prototype.forEach.call(likeItem.querySelectorAll('.like-plus.is-rising'), function (el) {
+          el.remove();
+        });
         likeItem.classList.remove('is-level-1', 'is-level-2', 'is-level-3');
         var back = mine;
         clearTimeout(flushTimer);
