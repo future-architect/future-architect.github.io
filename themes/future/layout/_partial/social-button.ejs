@@ -37,6 +37,32 @@
   };
 %>
   <ul class="social-button">
+    <%# いいね (#1949)。共有の丸と同じ行の左端に置く。外へ出す導線ではなく
+        「ここに残す」操作なので、丸の列との間を一段広く空ける。
+        マークだけでは押すと何が起きるか読めないので、ここはラベルを持つ
+        （サービスの区別が形で付く共有ボタンとは事情が違う）。
+
+        コピー (#2565) と同じく li に hidden を付けておき、script が外す。
+        押しても何も起きないボタンを見せない（送り先が未設定なら出さない）。
+        数は like_count_cache.json から焼き込むので、表示のために
+        読者のブラウザが数を読みに行くことはない %>
+    <% const likeId = (typeof actions !== 'undefined' && actions) ? like_post_id(post) : ''; %>
+    <% if (likeId) { %>
+    <% const likes = like_count(likeId); %>
+    <li class="like-item" data-like-id="<%= likeId %>" hidden>
+      <button type="button" class="like-button" aria-pressed="false">
+        <%- partial('svg-icon', {icon: 'thumb-up', class_name: 'like-icon like-icon-outline'}) %>
+        <%- partial('svg-icon', {icon: 'thumb-up-filled', class_name: 'like-icon like-icon-filled'}) %>
+        <span class="like-label">役に立った</span>
+        <%# 件数は共有ボタンと同じく読み上げ名に畳む (#3066)。数字は枠の外に
+            置くのでボタンの外だが、名前には含める %>
+        <span class="sr-only like-count-sr"><%= likes ? `（${likes}件）` : '' %></span>
+      </button>
+      <%# 押した数は読み上げにはボタンの名前として伝わらない。0 のときは
+          共有の数字と同じく出さない %>
+      <span class="like-count" aria-hidden="true"<%= likes ? '' : ' hidden' %>><%= likes %></span>
+    </li>
+    <% } %>
     <%
         let link = full_url_for(path).replace("index.html", "");
         let title = "";
@@ -147,6 +173,49 @@
       item.hidden = false;
       item.querySelector('button').addEventListener('click', handler);
     };
+    // いいね (#1949)。送り先が設定されていなければボタンごと出さない
+    var likeEndpoint = <%- JSON.stringify(theme.likes_endpoint || '') %>;
+    var likeItem = document.querySelector('.like-item');
+    if (likeItem && likeEndpoint && window.fetch) {
+      var likeBtn = likeItem.querySelector('.like-button');
+      var likeCount = likeItem.querySelector('.like-count');
+      var likeKey = 'liked:' + likeItem.dataset.likeId;
+      var likeBusy = false;
+      var likeSr = likeItem.querySelector('.like-count-sr');
+      var showCount = function (n) {
+        likeCount.textContent = String(n);
+        likeCount.hidden = n <= 0;
+        likeSr.textContent = n > 0 ? '（' + n + '件）' : '';
+      };
+      // 押したことは端末が覚える。別ブラウザやシークレットウィンドウからは
+      // また押せるが、認証を持たない以上そこまでしか防げない
+      var pressed = false;
+      try { pressed = localStorage.getItem(likeKey) === '1'; } catch (e) {}
+      if (pressed) likeBtn.setAttribute('aria-pressed', 'true');
+      likeItem.hidden = false;
+
+      likeBtn.addEventListener('click', function () {
+        if (likeBusy || likeBtn.getAttribute('aria-pressed') === 'true') return;
+        var before = Number(likeCount.textContent) || 0;
+        // 押した瞬間に塗りと +1 を返す。往復を待たせると押せたかが分からない。
+        // 返ってきたらサーバの数で上書きし、届かなければ見た目も戻す
+        likeBusy = true;
+        likeBtn.setAttribute('aria-pressed', 'true');
+        showCount(before + 1);
+        fetch(likeEndpoint + '/like/' + likeItem.dataset.likeId, { method: 'POST' })
+          .then(function (res) { return res.ok ? res.json() : Promise.reject(res.status); })
+          .then(function (data) {
+            showCount(data.likes);
+            try { localStorage.setItem(likeKey, '1'); } catch (e) {}
+          })
+          .catch(function () {
+            likeBtn.setAttribute('aria-pressed', 'false');
+            showCount(before);
+            likeBusy = false;
+          });
+      });
+    }
+
     // 書き込みは https（と localhost）でしか許可されない
     if (navigator.clipboard && window.isSecureContext) {
       enable('copy', function () {
