@@ -51,13 +51,16 @@
     <% if (likeId) { %>
     <% const likes = like_count(likeId); %>
     <li class="share-item like-item" data-like-id="<%= likeId %>" hidden>
-      <%# title はマウス向けの補足、sr-only は読み上げ向けの名前。件数は
-          共有ボタンと同じく名前に畳む (#3066) %>
-      <button type="button" class="share-btn like-button" aria-pressed="false" title="役に立った">
+      <%# 名前は吹き出しと sr-only が持つ。共有ボタンの title（OSの素の吹き出し）に
+          しないのは、出るまで間があり見た目も揃わないため。コピーの
+          「コピーしました」と同じ形の吹き出しを1つのルールで共有する。
+          件数は共有ボタンと同じく読み上げ名に畳む (#3066) %>
+      <button type="button" class="share-btn like-button" aria-pressed="false">
         <%- partial('svg-icon', {icon: 'heart', class_name: 'like-icon-outline'}) %>
         <%- partial('svg-icon', {icon: 'heart-filled', class_name: 'like-icon-filled'}) %>
-        <span class="sr-only like-sr">役に立った<%= likes ? `（${likes}件）` : '' %></span>
+        <span class="sr-only like-sr">いいね<%= likes ? `（${likes}件）` : '' %></span>
       </button>
+      <span class="share-copied like-tip" aria-hidden="true">いいね</span>
       <%# 0 のときは共有の数字と同じく出さない %>
       <span class="share-count like-count" aria-hidden="true"<%= likes ? '' : ' hidden' %>><%= likes %></span>
     </li>
@@ -181,16 +184,20 @@
       var likeKey = 'liked:' + likeItem.dataset.likeId;
       var likeBusy = false;
       var likeSr = likeItem.querySelector('.like-sr');
+      var likeTip = likeItem.querySelector('.like-tip');
       var showCount = function (n) {
         likeCount.textContent = String(n);
         likeCount.hidden = n <= 0;
-        likeSr.textContent = '役に立った' + (n > 0 ? '（' + n + '件）' : '');
+        likeSr.textContent = 'いいね' + (n > 0 ? '（' + n + '件）' : '');
       };
       // 押したことは端末が覚える。別ブラウザやシークレットウィンドウからは
       // また押せるが、認証を持たない以上そこまでしか防げない
       var pressed = false;
       try { pressed = localStorage.getItem(likeKey) === '1'; } catch (e) {}
-      if (pressed) likeBtn.setAttribute('aria-pressed', 'true');
+      if (pressed) {
+        likeBtn.setAttribute('aria-pressed', 'true');
+        likeTip.textContent = 'ありがとうございます！';
+      }
       likeItem.hidden = false;
 
       likeBtn.addEventListener('click', function () {
@@ -212,6 +219,11 @@
           .then(function (data) {
             showCount(data.likes);
             try { localStorage.setItem(likeKey, '1'); } catch (e) {}
+            // 礼は少しの間だけ出す。文字は戻さないので、以後この吹き出しは
+            // 指したときも「ありがとうございます！」になる
+            likeTip.textContent = 'ありがとうございます！';
+            likeTip.classList.add('is-thanks');
+            setTimeout(function () { likeTip.classList.remove('is-thanks'); }, 2000);
           })
           .catch(function () {
             likeBtn.setAttribute('aria-pressed', 'false');
