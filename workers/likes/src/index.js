@@ -1,8 +1,9 @@
 // 記事IDは source/_posts/<年>/YYYYMMDD<postid>_*.md の YYYYMMDD + a,b,c…
 const POSTID = /^20\d{6}[a-z]?$/;
 
-// 同じ端末から同じ記事へ押せるのは24時間に1回
+// 同じ端末から同じ記事へ入れられるのは24時間で3つまで（#1949。Medium の拍手と同じ形）
 const SEEN_TTL = 60 * 60 * 24;
+const MAX_PER_READER = 3;
 
 export default {
   async fetch(request, env) {
@@ -13,7 +14,10 @@ export default {
       return new Response(null, { status: 204, headers: cors(env, origin) });
     }
     if (request.method === 'POST' && url.pathname.startsWith('/like/')) {
-      return like(request, env, url.pathname.slice('/like/'.length), origin);
+      return like(request, env, url.pathname.slice('/like/'.length), origin, url);
+    }
+    if (request.method === 'POST' && url.pathname.startsWith('/unlike/')) {
+      return unlike(request, env, url.pathname.slice('/unlike/'.length), origin);
     }
     if (request.method === 'GET' && url.pathname === '/dump') {
       return dump(request, env);
@@ -22,7 +26,10 @@ export default {
   },
 };
 
-async function like(request, env, postid, origin) {
+// 読者が何個入れているかは seen: が持つ（生の IP ではなくハッシュ）。
+// 連打ぶんはクライアントがまとめて送ってくるので、KV への書き込みは
+// 読者ひとりにつき2回で済む（無料枠は1日1000）
+async function like(request, env, postid, origin, url) {
   if (!allowedOrigin(env, origin)) {
     return json({ error: 'forbidden' }, 403, env, origin);
   }
@@ -40,19 +47,47 @@ async function like(request, env, postid, origin) {
 
   const countKey = `like:${postid}`;
   const seenKey = `seen:${await fingerprint(env, ip, postid)}`;
+  const mine = Number(await env.LIKES.get(seenKey)) || 0;
   const current = Number(await env.LIKES.get(countKey)) || 0;
 
-  if ((await env.LIKES.get(seenKey)) !== null) {
-    return json({ postid, likes: current, already: true }, 200, env, origin);
+  const want = Math.min(MAX_PER_READER, Math.max(1, Number(url.searchParams.get('n')) || 1));
+  const add = Math.min(want, MAX_PER_READER - mine);
+  if (add <= 0) {
+    return json({ postid, likes: current, mine }, 200, env, origin);
   }
 
-  const next = current + 1;
+  const next = current + add;
   // 数を metadata にも持つ。ダンプは list() の metadata から読むので、
   // 記事数ぶんの get を撃たずに済む（Workers 無料枠は1リクエスト50サブリクエストまで）
   await env.LIKES.put(countKey, String(next), { metadata: { n: next } });
-  await env.LIKES.put(seenKey, '1', { expirationTtl: SEEN_TTL });
+  await env.LIKES.put(seenKey, String(mine + add), { expirationTtl: SEEN_TTL });
 
-  return json({ postid, likes: next, already: false }, 200, env, origin);
+  return json({ postid, likes: next, mine: mine + add }, 200, env, origin);
+}
+
+// 取り消し。読者が入れたぶんだけ引いて、記録も消す
+async function unlike(request, env, postid, origin) {
+  if (!allowedOrigin(env, origin)) {
+    return json({ error: 'forbidden' }, 403, env, origin);
+  }
+  if (!POSTID.test(postid)) {
+    return json({ error: 'bad postid' }, 400, env, origin);
+  }
+
+  const ip = request.headers.get('CF-Connecting-IP') || '0.0.0.0';
+  const countKey = `like:${postid}`;
+  const seenKey = `seen:${await fingerprint(env, ip, postid)}`;
+  const mine = Number(await env.LIKES.get(seenKey)) || 0;
+  const current = Number(await env.LIKES.get(countKey)) || 0;
+  if (mine <= 0) {
+    return json({ postid, likes: current, mine: 0 }, 200, env, origin);
+  }
+
+  const next = Math.max(0, current - mine);
+  await env.LIKES.put(countKey, String(next), { metadata: { n: next } });
+  await env.LIKES.delete(seenKey);
+
+  return json({ postid, likes: next, mine: 0 }, 200, env, origin);
 }
 
 async function dump(request, env) {

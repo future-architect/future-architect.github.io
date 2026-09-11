@@ -183,13 +183,32 @@
     var likeEndpoint = <%- JSON.stringify(theme.likes_endpoint || '') %>;
     var likeItem = document.querySelector('.like-item');
     if (likeItem && likeEndpoint && window.fetch) {
+      // 1人が入れられるのは3つまで（Medium の拍手と同じ形）。上限まで入れた後は
+      // 長押し（キーボードはもう一度押す）で取り消す
+      var LIKE_MAX = 3;
+      var LIKE_HOLD = 600;
+      // 連打はまとめて1回送る。1つずつ送ると KV の書き込み（無料枠は1日1000）を
+      // 3倍消費する。読者には押した瞬間に数が動くので待ち時間は見えない
+      var LIKE_FLUSH = 800;
+
+      var likeId = likeItem.dataset.likeId;
       var likeBtn = likeItem.querySelector('.like-button');
       var likeCount = likeItem.querySelector('.like-count');
-      var likeKey = 'liked:' + likeItem.dataset.likeId;
-      var likeBusy = false;
       var likeSr = likeItem.querySelector('.like-sr');
       var likeThanks = likeItem.querySelector('.like-thanks');
       var likePlus = likeItem.querySelector('.like-plus');
+      var likeKey = 'liked:' + likeId;
+
+      // 何個入れたかは端末が覚える。別ブラウザやシークレットウィンドウからは
+      // また入れられるが、認証を持たない以上そこまでしか防げない
+      var mine = 0;
+      try { mine = Math.min(LIKE_MAX, Number(localStorage.getItem(likeKey)) || 0); } catch (e) {}
+      var pending = 0;
+      var flushTimer = null;
+      var thanked = mine > 0;
+      var held = false;
+      var holdTimer = null;
+
       // 同じクラスを付け直すだけでは再生されない。外して1回レイアウトさせる
       var replay = function (el, name) {
         el.classList.remove(name);
@@ -199,52 +218,109 @@
       var showCount = function (n) {
         likeCount.textContent = String(n);
         likeCount.hidden = n <= 0;
-        likeSr.textContent = 'いいね' + (n > 0 ? '（' + n + '件）' : '');
+        likeSr.textContent = 'いいね' + (n > 0 ? '（' + n + '件）' : '')
+          + (mine >= LIKE_MAX ? '。もう一度押すと取り消します' : '');
       };
-      // 押したことは端末が覚える。別ブラウザやシークレットウィンドウからは
-      // また押せるが、認証を持たない以上そこまでしか防げない
-      var pressed = false;
-      try { pressed = localStorage.getItem(likeKey) === '1'; } catch (e) {}
-      if (pressed) {
-        likeBtn.setAttribute('aria-pressed', 'true');
-        likeBtn.removeAttribute('title');
-      }
-      likeItem.hidden = false;
+      var paint = function () {
+        likeBtn.setAttribute('aria-pressed', mine > 0 ? 'true' : 'false');
+        if (mine > 0) likeBtn.removeAttribute('title');
+        else likeBtn.setAttribute('title', 'いいね');
+      };
+      var remember = function () {
+        try {
+          if (mine > 0) localStorage.setItem(likeKey, String(mine));
+          else localStorage.removeItem(likeKey);
+        } catch (e) {}
+      };
 
-      likeBtn.addEventListener('click', function () {
-        // 何度でも叩ける（Medium の拍手と同じ）。跳ねは毎回返すが、
-        // 数が増えるのも記録を送るのも最初の1回だけ
-        replay(likeBtn, 'is-liking');
-        if (likeBusy || likeBtn.getAttribute('aria-pressed') === 'true') return;
-        var before = Number(likeCount.textContent) || 0;
-        // 押した瞬間に塗りと +1 を返す。往復を待たせると押せたかが分からない。
-        // 返ってきたらサーバの数で上書きし、届かなければ見た目も戻す
-        var pressedAt = Date.now();
-        likeBusy = true;
-        likeBtn.setAttribute('aria-pressed', 'true');
-        showCount(before + 1);
-        replay(likePlus, 'is-rising');
-        fetch(likeEndpoint + '/like/' + likeItem.dataset.likeId, { method: 'POST' })
+      var send = function () {
+        var delta = pending;
+        if (!delta) return;
+        pending = 0;
+        fetch(likeEndpoint + '/like/' + likeId + '?n=' + delta, { method: 'POST' })
           .then(function (res) { return res.ok ? res.json() : Promise.reject(res.status); })
           .then(function (data) {
+            mine = data.mine;
             showCount(data.likes);
-            try { localStorage.setItem(likeKey, '1'); } catch (e) {}
-            // 礼は +1 が抜けきってから一度だけ。往復が速くても遅くても
-            // 「押してから 700ms」にそろえる（+1 は 600ms で終わる）
-            likeBtn.removeAttribute('title');
-            setTimeout(function () {
-              likeThanks.classList.add('is-thanks');
-              setTimeout(function () { likeThanks.classList.remove('is-thanks'); }, 2000);
-            }, Math.max(0, 700 - (Date.now() - pressedAt)));
+            remember();
+            paint();
           })
           .catch(function () {
-            likeBtn.setAttribute('aria-pressed', 'false');
-            likeBtn.classList.remove('is-liking');
-            likePlus.classList.remove('is-rising');
-            showCount(before);
-            likeBusy = false;
+            // 届かなかったので見た目も戻す
+            mine = Math.max(0, mine - delta);
+            showCount(Math.max(0, (Number(likeCount.textContent) || 0) - delta));
+            remember();
+            paint();
           });
+      };
+
+      likeBtn.addEventListener('click', function (event) {
+        // キーボードで起こしたクリックは detail が 0。上限まで入れた後の
+        // 長押しは指でしかできないので、キーボードはもう一度押すと取り消しにする
+        if (held) { held = false; return; }
+        if (mine >= LIKE_MAX) {
+          if (event.detail === 0) { cancel(); return; }
+          // 上限に届いた後も叩ける。増えるのは見た目だけで、風船は
+          // 「いくつ入れたか」を出しているので +3 のまま出続ける
+          replay(likeBtn, 'is-liking');
+          replay(likePlus, 'is-rising');
+          return;
+        }
+
+        // 叩いた瞬間に跳ねと +1 を返す。往復を待たせると入ったかが分からない
+        var first = mine === 0;
+        var pressedAt = Date.now();
+        mine += 1;
+        pending += 1;
+        showCount((Number(likeCount.textContent) || 0) + 1);
+        remember();
+        paint();
+        // 風船は差分ではなく「いくつ入れたか」。+1 → +2 → +3 と育つ
+        likePlus.textContent = '+' + mine;
+        replay(likeBtn, 'is-liking');
+        replay(likePlus, 'is-rising');
+
+        clearTimeout(flushTimer);
+        flushTimer = setTimeout(send, LIKE_FLUSH);
+
+        // 礼は +1 が抜けきってから一度だけ（+1 は 600ms で終わる）
+        if (first && !thanked) {
+          thanked = true;
+          setTimeout(function () {
+            likeThanks.classList.add('is-thanks');
+            setTimeout(function () { likeThanks.classList.remove('is-thanks'); }, 2000);
+          }, Math.max(0, 700 - (Date.now() - pressedAt)));
+        }
       });
+
+      var cancel = function () {
+        if (mine <= 0) return;
+        likePlus.textContent = '+1';
+        var back = mine;
+        clearTimeout(flushTimer);
+        pending = 0;
+        mine = 0;
+        thanked = false;
+        showCount(Math.max(0, (Number(likeCount.textContent) || 0) - back));
+        remember();
+        paint();
+        fetch(likeEndpoint + '/unlike/' + likeId, { method: 'POST' })
+          .then(function (res) { return res.ok ? res.json() : Promise.reject(res.status); })
+          .then(function (data) { mine = data.mine; showCount(data.likes); remember(); paint(); })
+          .catch(function () { mine = back; showCount((Number(likeCount.textContent) || 0) + back); remember(); paint(); });
+      };
+
+      // 長押しで取り消し。上限まで入れた後だけ効く
+      likeBtn.addEventListener('pointerdown', function () {
+        if (mine < LIKE_MAX) return;
+        holdTimer = setTimeout(function () { held = true; cancel(); }, LIKE_HOLD);
+      });
+      ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (type) {
+        likeBtn.addEventListener(type, function () { clearTimeout(holdTimer); });
+      });
+
+      paint();
+      likeItem.hidden = false;
     }
 
     // 書き込みは https（と localhost）でしか許可されない
