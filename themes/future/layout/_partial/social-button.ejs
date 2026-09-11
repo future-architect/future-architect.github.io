@@ -54,8 +54,8 @@
       <%# title はマウス向けの補足、sr-only は読み上げ向けの名前。件数は
           共有ボタンと同じく名前に畳む (#3066) %>
       <button type="button" class="share-btn like-button" aria-pressed="false" title="役に立った">
-        <%- partial('svg-icon', {icon: 'thumb-up', class_name: 'like-icon-outline'}) %>
-        <%- partial('svg-icon', {icon: 'thumb-up-filled', class_name: 'like-icon-filled'}) %>
+        <%- partial('svg-icon', {icon: 'heart', class_name: 'like-icon-outline'}) %>
+        <%- partial('svg-icon', {icon: 'heart-filled', class_name: 'like-icon-filled'}) %>
         <span class="sr-only like-sr">役に立った<%= likes ? `（${likes}件）` : '' %></span>
       </button>
       <%# 0 のときは共有の数字と同じく出さない %>
@@ -201,6 +201,12 @@
         likeBusy = true;
         likeBtn.setAttribute('aria-pressed', 'true');
         showCount(before + 1);
+        // 跳ねと輪は押した瞬間だけ。aria-pressed で回すと、前に押した記事を
+        // 開き直すたび（localStorage から復元するたび）に動いてしまう
+        likeBtn.classList.add('is-liking');
+        likeBtn.addEventListener('animationend', function () {
+          likeBtn.classList.remove('is-liking');
+        }, { once: true });
         fetch(likeEndpoint + '/like/' + likeItem.dataset.likeId, { method: 'POST' })
           .then(function (res) { return res.ok ? res.json() : Promise.reject(res.status); })
           .then(function (data) {
@@ -209,6 +215,7 @@
           })
           .catch(function () {
             likeBtn.setAttribute('aria-pressed', 'false');
+            likeBtn.classList.remove('is-liking');
             showCount(before);
             likeBusy = false;
           });
