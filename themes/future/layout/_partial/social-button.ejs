@@ -57,13 +57,14 @@
           押した後は title を外す。すでに押したボタンに「いいね」と出ても
           意味が無く、下の礼の吹き出しと二重にも見える %>
       <button type="button" class="share-btn like-button" aria-pressed="false" title="いいね">
-        <%- partial('svg-icon', {icon: 'heart', class_name: 'like-icon-outline'}) %>
-        <%- partial('svg-icon', {icon: 'heart-filled', class_name: 'like-icon-filled'}) %>
+        <%- partial('svg-icon', {icon: 'clap', class_name: 'like-icon-outline'}) %>
+        <%- partial('svg-icon', {icon: 'clap-filled', class_name: 'like-icon-filled'}) %>
         <span class="sr-only like-sr">いいね<%= likes ? `（${likes}件）` : '' %></span>
       </button>
-      <%# 押した少し後に一度だけ出す礼。以後は指しても出さない。
-          形はコピーの「コピーしました」と1つのルールを共有する %>
-      <span class="share-copied like-thanks" aria-hidden="true">ありがとうございます！</span>
+      <%# 押した瞬間に上へ抜ける +1 と、その後に一度だけ出す礼。
+          礼の形はコピーの「コピーしました」と1つのルールを共有する %>
+      <span class="like-plus" aria-hidden="true">+1</span>
+      <span class="share-copied like-thanks" aria-hidden="true">ありがとうございました！</span>
       <%# 0 のときは共有の数字と同じく出さない %>
       <span class="share-count like-count" aria-hidden="true"<%= likes ? '' : ' hidden' %>><%= likes %></span>
     </li>
@@ -188,6 +189,13 @@
       var likeBusy = false;
       var likeSr = likeItem.querySelector('.like-sr');
       var likeThanks = likeItem.querySelector('.like-thanks');
+      var likePlus = likeItem.querySelector('.like-plus');
+      // 同じクラスを付け直すだけでは再生されない。外して1回レイアウトさせる
+      var replay = function (el, name) {
+        el.classList.remove(name);
+        void el.offsetWidth;
+        el.classList.add(name);
+      };
       var showCount = function (n) {
         likeCount.textContent = String(n);
         likeCount.hidden = n <= 0;
@@ -204,6 +212,9 @@
       likeItem.hidden = false;
 
       likeBtn.addEventListener('click', function () {
+        // 何度でも叩ける（Medium の拍手と同じ）。跳ねは毎回返すが、
+        // 数が増えるのも記録を送るのも最初の1回だけ
+        replay(likeBtn, 'is-liking');
         if (likeBusy || likeBtn.getAttribute('aria-pressed') === 'true') return;
         var before = Number(likeCount.textContent) || 0;
         // 押した瞬間に塗りと +1 を返す。往復を待たせると押せたかが分からない。
@@ -212,28 +223,24 @@
         likeBusy = true;
         likeBtn.setAttribute('aria-pressed', 'true');
         showCount(before + 1);
-        // 跳ねと輪は押した瞬間だけ。aria-pressed で回すと、前に押した記事を
-        // 開き直すたび（localStorage から復元するたび）に動いてしまう
-        likeBtn.classList.add('is-liking');
-        likeBtn.addEventListener('animationend', function () {
-          likeBtn.classList.remove('is-liking');
-        }, { once: true });
+        replay(likePlus, 'is-rising');
         fetch(likeEndpoint + '/like/' + likeItem.dataset.likeId, { method: 'POST' })
           .then(function (res) { return res.ok ? res.json() : Promise.reject(res.status); })
           .then(function (data) {
             showCount(data.likes);
             try { localStorage.setItem(likeKey, '1'); } catch (e) {}
-            // 礼は押した少し後に一度だけ。跳ねが終わってから出したいので、
-            // 往復が速くても遅くても「押してから 400ms」にそろえる
+            // 礼は +1 が抜けきってから一度だけ。往復が速くても遅くても
+            // 「押してから 700ms」にそろえる（+1 は 600ms で終わる）
             likeBtn.removeAttribute('title');
             setTimeout(function () {
               likeThanks.classList.add('is-thanks');
               setTimeout(function () { likeThanks.classList.remove('is-thanks'); }, 2000);
-            }, Math.max(0, 400 - (Date.now() - pressedAt)));
+            }, Math.max(0, 700 - (Date.now() - pressedAt)));
           })
           .catch(function () {
             likeBtn.setAttribute('aria-pressed', 'false');
             likeBtn.classList.remove('is-liking');
+            likePlus.classList.remove('is-rising');
             showCount(before);
             likeBusy = false;
           });
