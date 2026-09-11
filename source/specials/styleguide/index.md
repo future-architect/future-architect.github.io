@@ -235,6 +235,22 @@ editable: true
 | <span class="sg-chip-ground-dark sg-ground-code"><span class="sg-chip sg-dark-code-attr"></span></span> | `code-attr` | <span class="sg-hex sg-dark-code-attr"></span> | <span class="sg-ratio sg-dark-code-attr"></span> |
 | <span class="sg-chip-ground-dark sg-ground-code"><span class="sg-chip sg-dark-code-tag"></span></span> | `code-tag` | <span class="sg-hex sg-dark-code-tag"></span> | <span class="sg-ratio sg-dark-code-tag"></span> |
 
+### 横スクロールのつまみは文字のスケールから選ばない
+
+横に溢れるもの——コードブロックと、横に溢れる表——のつまみは**文字ではありません。** 文字のスケールは白背景で AA を満たすために決めた段階なので、そこからは選びません。条件は2つです。
+
+- **下限は背景に対して 3:1。** 文字以外の部品に求められる比で、これを割ると帯が出ていても位置が読み取れません
+- **上限はその箱の文字より弱いこと。** つまみは中身より前に出るものではありません
+
+**テーマごとに1つの値です。** つまみの役割は1つなので、コードブロックと表で分けません。下の比は、その2つの背景のうち厳しいほうに対する値です。
+
+| <span class="sr-only">見本</span> | 役 | 値 | いちばん厳しい背景との比 |
+| --- | --- | --- | --- |
+| <span class="sg-chip-ground sg-chip-code"><span class="sg-chip sg-scrollbar-thumb"></span></span> | `scrollbar-thumb` | <span class="sg-hex sg-scrollbar-thumb"></span> | <span class="sg-ratio sg-scrollbar-thumb"></span> |
+| <span class="sg-chip-ground-dark sg-ground-code"><span class="sg-chip sg-dark-scrollbar-thumb"></span></span> | `scrollbar-thumb`（暗いほう） | <span class="sg-hex sg-dark-scrollbar-thumb"></span> | <span class="sg-ratio sg-dark-scrollbar-thumb"></span> |
+
+**静止しているときと操作しているときの色は分けられません。** 指定できるのはつまみと軌道の2色だけで、掴んでいる間の見え方はブラウザが決めます。
+
 ### note の中のコードブロックは背景を白で薄める
 
 note の中は**同じ色相の3段階**になります。**コードブロック（いちばん明るい）→ note の背景 → インラインコード（いちばん濃い）** の順です。インラインコードは本文に馴染ませるために1段階濃く、コードブロックは別の面として離すために1段階明るくします。「1段階濃い」側はインラインコードが既に持っているので、ブロックは反対側へ離すしかありません。
