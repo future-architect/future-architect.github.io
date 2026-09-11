@@ -63,8 +63,11 @@
       </button>
       <%# 押した瞬間に上へ抜ける +1 と、その後に一度だけ出す礼。
           礼の形はコピーの「コピーしました」と1つのルールを共有する %>
+      <%# 叩いたときの祝い。光と点の2枚を ::before / ::after で持つので DOM は1つ %>
+      <span class="like-burst" aria-hidden="true"></span>
       <span class="like-plus" aria-hidden="true">+1</span>
       <span class="share-copied like-thanks" aria-hidden="true">ありがとうございました！</span>
+      <span class="share-copied like-hold" aria-hidden="true">長押しでキャンセルします</span>
       <%# 0 のときは共有の数字と同じく出さない %>
       <span class="share-count like-count" aria-hidden="true"<%= likes ? '' : ' hidden' %>><%= likes %></span>
     </li>
@@ -186,7 +189,12 @@
       // 1人が入れられるのは3つまで（Medium の拍手と同じ形）。上限まで入れた後は
       // 長押し（キーボードはもう一度押す）で取り消す
       var LIKE_MAX = 3;
-      var LIKE_HOLD = 600;
+      // 長押しは案内を出してから、もう一拍おいて取り消す。押し始めた瞬間に
+      // 消えると取り返しがつかない
+      var LIKE_HOLD_HINT = 250;
+      var LIKE_HOLD = 1000;
+      // 風船は叩き終わってからしばらく残す
+      var LIKE_PLUS_HOLD = 900;
       // 連打はまとめて1回送る。1つずつ送ると KV の書き込み（無料枠は1日1000）を
       // 3倍消費する。読者には押した瞬間に数が動くので待ち時間は見えない
       var LIKE_FLUSH = 800;
@@ -197,6 +205,8 @@
       var likeSr = likeItem.querySelector('.like-sr');
       var likeThanks = likeItem.querySelector('.like-thanks');
       var likePlus = likeItem.querySelector('.like-plus');
+      var likeHold = likeItem.querySelector('.like-hold');
+      var likeBurst = likeItem.querySelector('.like-burst');
       var likeKey = 'liked:' + likeId;
 
       // 何個入れたかは端末が覚える。別ブラウザやシークレットウィンドウからは
@@ -205,15 +215,41 @@
       try { mine = Math.min(LIKE_MAX, Number(localStorage.getItem(likeKey)) || 0); } catch (e) {}
       var pending = 0;
       var flushTimer = null;
+      var plusTimer = null;
       var thanked = mine > 0;
       var held = false;
       var holdTimer = null;
+      var hintTimer = null;
 
       // 同じクラスを付け直すだけでは再生されない。外して1回レイアウトさせる
       var replay = function (el, name) {
         el.classList.remove(name);
         void el.offsetWidth;
         el.classList.add(name);
+      };
+      // 風船は叩くたびに撃ち直さない。1つが浮いたまま数字だけ差し替わり、
+      // 叩き終わってから消える。撃ち直すと連打で数字が次々に流れて落ち着かない
+      // 1つ目・2つ目・3つ目で祝いを一段ずつ強くする。強さは li の
+      // is-level-N が持ち、CSS 変数で跳ねと光と点にまとめて効かせる
+      var setLevel = function () {
+        likeItem.classList.remove('is-level-1', 'is-level-2', 'is-level-3');
+        if (mine > 0) likeItem.classList.add('is-level-' + Math.min(mine, LIKE_MAX));
+      };
+      var showPlus = function () {
+        likePlus.textContent = '+' + mine;
+        likePlus.classList.add('is-shown');
+        clearTimeout(plusTimer);
+        plusTimer = setTimeout(function () {
+          likePlus.classList.remove('is-shown');
+          // 礼は風船が消えてから。同じ場所に出るので重ねない
+          if (!thanked) {
+            thanked = true;
+            setTimeout(function () {
+              likeThanks.classList.add('is-thanks');
+              setTimeout(function () { likeThanks.classList.remove('is-thanks'); }, 2000);
+            }, 250);
+          }
+        }, LIKE_PLUS_HOLD);
       };
       var showCount = function (n) {
         likeCount.textContent = String(n);
@@ -262,40 +298,34 @@
           if (event.detail === 0) { cancel(); return; }
           // 上限に届いた後も叩ける。増えるのは見た目だけで、風船は
           // 「いくつ入れたか」を出しているので +3 のまま出続ける
+          setLevel();
           replay(likeBtn, 'is-liking');
-          replay(likePlus, 'is-rising');
+          replay(likeBurst, 'is-bursting');
+          showPlus();
           return;
         }
 
-        // 叩いた瞬間に跳ねと +1 を返す。往復を待たせると入ったかが分からない
-        var first = mine === 0;
-        var pressedAt = Date.now();
+        // 叩いた瞬間に跳ねと風船を返す。往復を待たせると入ったかが分からない
         mine += 1;
         pending += 1;
         showCount((Number(likeCount.textContent) || 0) + 1);
         remember();
         paint();
-        // 風船は差分ではなく「いくつ入れたか」。+1 → +2 → +3 と育つ
-        likePlus.textContent = '+' + mine;
+        setLevel();
         replay(likeBtn, 'is-liking');
-        replay(likePlus, 'is-rising');
+        replay(likeBurst, 'is-bursting');
+        showPlus();
 
         clearTimeout(flushTimer);
         flushTimer = setTimeout(send, LIKE_FLUSH);
-
-        // 礼は +1 が抜けきってから一度だけ（+1 は 600ms で終わる）
-        if (first && !thanked) {
-          thanked = true;
-          setTimeout(function () {
-            likeThanks.classList.add('is-thanks');
-            setTimeout(function () { likeThanks.classList.remove('is-thanks'); }, 2000);
-          }, Math.max(0, 700 - (Date.now() - pressedAt)));
-        }
       });
 
       var cancel = function () {
         if (mine <= 0) return;
+        clearTimeout(plusTimer);
+        likePlus.classList.remove('is-shown');
         likePlus.textContent = '+1';
+        likeItem.classList.remove('is-level-1', 'is-level-2', 'is-level-3');
         var back = mine;
         clearTimeout(flushTimer);
         pending = 0;
@@ -310,15 +340,28 @@
           .catch(function () { mine = back; showCount((Number(likeCount.textContent) || 0) + back); remember(); paint(); });
       };
 
-      // 長押しで取り消し。上限まで入れた後だけ効く
+      // 長押しで取り消し。1つでも入れていれば効く。何が起きるかを先に見せてから、
+      // もう一拍おいて実行する
       likeBtn.addEventListener('pointerdown', function () {
-        if (mine < LIKE_MAX) return;
-        holdTimer = setTimeout(function () { held = true; cancel(); }, LIKE_HOLD);
+        if (mine <= 0) return;
+        hintTimer = setTimeout(function () {
+          likeHold.classList.add('is-holding');
+        }, LIKE_HOLD_HINT);
+        holdTimer = setTimeout(function () {
+          likeHold.classList.remove('is-holding');
+          held = true;
+          cancel();
+        }, LIKE_HOLD);
       });
       ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (type) {
-        likeBtn.addEventListener(type, function () { clearTimeout(holdTimer); });
+        likeBtn.addEventListener(type, function () {
+          clearTimeout(hintTimer);
+          clearTimeout(holdTimer);
+          likeHold.classList.remove('is-holding');
+        });
       });
 
+      setLevel();
       paint();
       likeItem.hidden = false;
     }

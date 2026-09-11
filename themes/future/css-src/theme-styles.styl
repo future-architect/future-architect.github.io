@@ -2815,6 +2815,24 @@ button.share-btn {
    地も枠も共有ボタンと同じ。マークがハートなので、形と記号で既に分かれている */
 .like-item {
   margin-right: 12px;
+  /* 祝いの強さ。1つ目・2つ目・3つ目で一段ずつ上げる。跳ね・光・点が
+     同じ変数を見るので、段を足すのはここ1箇所で済む */
+  --pop-scale: 1.3;
+  --burst-alpha: 0.22;
+  --burst-bloom: 1.05;
+  --burst-spread: 0.85;
+}
+.like-item.is-level-2 {
+  --pop-scale: 1.42;
+  --burst-alpha: 0.3;
+  --burst-bloom: 1.2;
+  --burst-spread: 1.05;
+}
+.like-item.is-level-3 {
+  --pop-scale: 1.55;
+  --burst-alpha: 0.4;
+  --burst-bloom: 1.4;
+  --burst-spread: 1.3;
 }
 .like-button {
   width: 56px;
@@ -2860,19 +2878,82 @@ button.share-btn {
    前に押した記事を開き直すたび（localStorage から復元するたび）に跳ねる */
 @keyframes like-pop {
   0% { transform: scale(1); }
-  35% { transform: scale(1.45); }
+  35% { transform: scale(var(--pop-scale)); }
   65% { transform: scale(0.92); }
   100% { transform: scale(1); }
 }
 .like-button.is-liking .like-icon-filled {
   animation: like-pop like-pop-speed ease-out;
 }
-/* 押した瞬間に上へ抜ける +1。行に場所を取らせると叩くたびに並びが動くので
-   絶対配置にする。左右いっぱいに広げて中央ぞろえにすれば、ボタンの幅を
-   ここに書き写さずに中心がそろう。
+/* 叩いたときの祝い。**硬い輪は衝撃波に見えた**ので、輪郭を持たない光（::before）と、
+   外へ散る小さな点（::after を1つ置いて box-shadow で6つ）にする。DOM は1つで済む。
 
-   速さは跳ねの2倍。**新しい段は置かず like-pop-speed から導く**——同じ
-   できごとの中の2つの動きで、片方だけ別に決める理由が無い */
+   速さは跳ねの2倍。**新しい段は置かず like-pop-speed から導く**——同じできごとの
+   中の動きで、片方だけ別に決める理由が無い */
+.like-burst {
+  position: absolute;
+  left: 0;
+  right: 0;
+  /* ボタン（高さ 28px）の中心 */
+  top: 14px;
+  height: 0;
+  pointer-events: none;
+}
+.like-burst::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 84px;
+  height: 84px;
+  margin: -42px 0 0 -42px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--brand-crimson) 0%, transparent 68%);
+  opacity: 0;
+}
+.like-burst::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 5px;
+  height: 5px;
+  margin: -2.5px 0 0 -2.5px;
+  border-radius: 50%;
+  box-shadow: 0 -26px 0 var(--brand-crimson), 22px -14px 0 var(--brand-crimson),
+    25px 6px 0 var(--brand-crimson), 0 26px 0 var(--brand-crimson),
+    -25px 6px 0 var(--brand-crimson), -22px -14px 0 var(--brand-crimson);
+  opacity: 0;
+  transform: scale(0.25);
+}
+@keyframes like-bloom {
+  from { opacity: var(--burst-alpha); transform: scale(0.5); }
+  to { opacity: 0; transform: scale(var(--burst-bloom)); }
+}
+@keyframes like-sparks {
+  0% { opacity: 1; transform: scale(0.25); }
+  60% { opacity: 1; }
+  100% { opacity: 0; transform: scale(var(--burst-spread)); }
+}
+.like-burst.is-bursting::before {
+  animation: like-bloom (like-pop-speed * 2) ease-out;
+}
+.like-burst.is-bursting::after {
+  animation: like-sparks (like-pop-speed * 2) ease-out;
+}
+/* 光と点は絵の後ろ。ボタンを持ち上げて重なりを決める */
+.like-button {
+  position: relative;
+  z-index: 1;
+}
+
+/* 叩いた数の風船。行に場所を取らせると叩くたびに並びが動くので絶対配置にする。
+   左右いっぱいに広げて中央ぞろえにすれば、ボタンの幅をここに書き写さずに
+   中心がそろう。
+
+   **叩くたびに撃ち直さない。** 1つが浮いたまま数字だけ差し替わり、叩き終わって
+   から消える。撃ち直すと連打で +1 +2 +3 が次々に流れて落ち着かない。
+   アニメーションではなく transition なのはそのため */
 .like-plus {
   position: absolute;
   left: 0;
@@ -2886,14 +2967,20 @@ button.share-btn {
   font-weight: bold;
   opacity: 0;
   pointer-events: none;
+  transition: opacity like-pop-speed ease-out, transform like-pop-speed ease-out;
 }
-@keyframes like-plus-rise {
-  0% { transform: translateY(6px); opacity: 0; }
-  25% { opacity: 1; }
-  100% { transform: translateY(-14px); opacity: 0; }
+.like-plus.is-shown {
+  opacity: 1;
+  transform: translateY(-14px);
 }
-.like-plus.is-rising {
-  animation: like-plus-rise (like-pop-speed * 2) ease-out;
+/* 長押しの案内。取り消しは戻せないので、何が起きるかを先に出す。
+   礼（クリムゾン）と役が違うので、地は .share-copied の既定のネイビーのまま */
+.like-hold {
+  left: 0;
+  transform: none;
+}
+.like-hold.is-holding {
+  opacity: 1;
 }
 /* 押した少し後に一度だけ出す礼。指しても出ない（押す前の名前は title が持つ）。
    吹き出しの形は .share-copied が1箇所で持ち、ここは地と位置だけを変える。
@@ -2917,8 +3004,12 @@ button.share-btn {
    合図そのものは失われない (#2686 と同じ線引き) */
 @media (prefers-reduced-motion: reduce) {
   .like-button.is-liking .like-icon-filled,
-  .like-plus.is-rising {
+  .like-burst.is-bursting::before,
+  .like-burst.is-bursting::after {
     animation: none;
+  }
+  .like-plus {
+    transition: none;
   }
 }
 .like-icon-filled,
