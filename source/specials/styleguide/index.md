@@ -141,11 +141,11 @@ editable: true
 | <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-rule-strong"></span></span> | `rule-strong` | <span class="sg-hex sg-dark-rule-strong"></span> | <span class="sg-ratio sg-dark-rule-strong"></span> | 地を持たない部品の枠と、focus / hover でひとつ強めるところ |
 | <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-surface-base"></span></span> | `surface-base` | <span class="sg-hex sg-dark-surface-base"></span> | <span class="sg-ratio sg-dark-surface-base"></span> | ページと部品の背景 |
 | <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-surface-tint"></span></span> | `surface-tint` | <span class="sg-hex sg-dark-surface-tint"></span> | <span class="sg-ratio sg-dark-surface-tint"></span> | 静止した面 |
-| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-surface-mute"></span></span> | `surface-mute` | <span class="sg-hex sg-dark-surface-mute"></span> | <span class="sg-ratio sg-dark-surface-mute"></span> | 反応した面・インラインコードの背景 |
+| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-surface-mute"></span></span> | `surface-mute` | <span class="sg-hex sg-dark-surface-mute"></span> | <span class="sg-ratio sg-dark-surface-mute"></span> | 反応した面と、空・無効の面 |
 | <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-navy"></span></span> | `brand-navy` | <span class="sg-hex sg-dark-navy"></span> | <span class="sg-ratio sg-dark-navy"></span> | フッターの帯 |
 | <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-selection"></span></span> | `selection-bg` | <span class="sg-hex sg-dark-selection"></span> | <span class="sg-ratio sg-dark-selection"></span> | テキスト選択の帯。文字は `surface-base` |
 
-**`ink-faint` は明るいほうと同じく「AA を満たす最も薄い段階」です。** 上の表の比はページの背景に対する値ですが、実際にいちばん厳しいのはインラインコードの背景で、そこでも AA を満たす値にしています。これより薄くしません。
+**`ink-faint` は明るいほうと同じく「AA を満たす最も薄い段階」です。** 上の表の比はページの背景に対する値ですが、実際にいちばん厳しいのは面のスケールでいちばん明るい `surface-mute` で、そこでも AA を満たす値にしています。これより薄くしません。
 
 **ブランドのネイビーは、暗い背景では背景とほとんど見分けが付きません。** 面に使っても線に使っても消えるので、フッターの帯は1段階暗い値にして色味だけ残し、選択中のページ・選択中のタブの下線・共有ボタン・タグの hover・フォーカスリングは明るい線と明るい塗りに置き換えています。
 
@@ -186,6 +186,8 @@ editable: true
 | <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-award-bronze"></span></span> | `award-bronze` | <span class="sg-hex sg-dark-award-bronze"></span> | <span class="sg-ratio sg-dark-award-bronze"></span> | 2回目のメダル |
 
 **「背景より1段階濃い」は、暗い背景では「1段階明るい」になります。** note の中のインラインコードと表の見出しは、明るいほうでは背景から計算して1段階濃くしていますが、暗いほうは持ち上げる向きが逆になるので値を直接持っています。
+
+**インラインコードの背景は、暗いほうでは面のスケールから外れて独自の値を持ちます。** 明るいほうは `surface-mute` をそのまま使いますが、暗いほうで同じことをすると背景との差が note の中の同じ札の半分しか出ず、文中で札として読めません。**離す量は note の中の札に合わせています**——同じ部品が、置かれた場所で強さが変わらないようにするためです。面のスケールのほうは動かせません（`ink-faint` の AA がそこで決まります）。
 
 ### トークンにない色
 
