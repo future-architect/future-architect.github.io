@@ -149,7 +149,7 @@ editable: true
 
 **ブランドのネイビーは、暗い背景では背景とほとんど見分けが付きません。** 面に使っても線に使っても消えるので、フッターの帯は1段階暗い値にして色味だけ残し、選択中のページ・選択中のタブの下線・共有ボタン・タグの hover・フォーカスリングは明るい線と明るい塗りに置き換えています。
 
-**テキスト選択の帯は向きを逆にします。** 明るいほうは濃いネイビーの帯に白い文字ですが、暗い背景ではネイビーを中間まで明るくしても、帯として見える前に白い文字が AA を割ります。そこでネイビーを薄くした帯にして、文字を背景の色で描きます。色相はブランドのまま、彩度は半分に落としています（そのままだと蛍光の紫青になります）。無彩色の帯にすると反転表示のように見えて、ブランドの色味が消えます。コードブロックの背景は両方のテーマで暗いので、明るいほうでもこの帯を使います。
+**テキスト選択の帯は向きを逆にします。** 明るいほうは濃いネイビーの帯に白い文字ですが、暗い背景ではネイビーを中間まで明るくしても、帯として見える前に白い文字が AA を割ります。そこでネイビーを薄くした帯にして、文字を背景の色で描きます。色相はブランドのまま、彩度は半分に落としています（そのままだと蛍光の紫青になります）。無彩色の帯にすると反転表示のように見えて、ブランドの色味が消えます。
 
 **同じコントラスト比でも、明るい面は暗い面より膨らんで見えます。** 白背景の濃い丸をそのまま反転すると暗い背景では浮きます。同じ強さを移すのではなく、その部品が担う役割から決めます。所在や反応の印は明るいまま、装飾は1段階落とします。
 
@@ -189,14 +189,61 @@ editable: true
 
 ### トークンにない色
 
-上のスケールの外に残っている色は2種類で、**どちらも役割があって残しているもの**です。
+上のスケールの外に残っている色は3種類で、**どれも役割があって残しているもの**です。
 
 - **note の4色** — 色相を持つ背景。中のインラインコードの背景は、その背景より1段階濃い同じ色になります
 - **表彰・殿堂の淡金** — メダルは灰→銅→金、殿堂のカードは淡金。ブランド色は表彰に広げません
+- **コードブロックの構文の色** — 役ごとに1色（キーワード・型名・文字列・数値・キー・タグ・コメントと本文）。詳しくは次の節
 
-どちらもテーマで入れ替わります（上のダークモードのスケールを参照）。
+どれもテーマで入れ替わります（上のダークモードのスケールを参照）。
 
 `ink` / `rule` / `surface` の**スケールの外にある色はありません**。**段階と数しか違わない色を別の役割として置くと、どちらを使うかの判断ができなくなります。** 新しい色を入れるときは、まず近い段階との差を見て寄せられないかを確かめます。
+
+### コードブロックの色は役で持つ
+
+コードブロックの色は**役で持ちます。色の名前では持ちません。** 役と色相の対応はテーマで変わり——キーワードは明るいほうでは赤、暗いほうではオレンジです——「赤」という名前だとどちらかで嘘になるためです。**どのトークンがどの役かは両方のテーマで同じ**で、そこはテーマでは切り替えません。
+
+既製のテーマをそのまま置くことはしません。エディタ用の配色は Web のアクセシビリティ基準を前提にしておらず、明るいほうも暗いほうもそのままではコメント・キーワードが AA を下回ります。**色相だけ借りて、明度を基準に合わせます。**
+
+比は**いちばん厳しい背景**に対する値です。明るいほうは背景が5種類あり（本文と note の4種）、そのうち最も暗いものを載せています。
+
+| <span class="sr-only">見本</span> | 役 | 値 | いちばん厳しい背景との比 | 当たるところ |
+| --- | --- | --- | --- | --- |
+| <span class="sg-chip-ground sg-chip-code"><span class="sg-chip sg-code-fg"></span></span> | `code-fg` | <span class="sg-hex sg-code-fg"></span> | <span class="sg-ratio sg-code-fg"></span> | 本文。色の付かない部分 |
+| <span class="sg-chip-ground sg-chip-code"><span class="sg-chip sg-code-comment"></span></span> | `code-comment` | <span class="sg-hex sg-code-comment"></span> | <span class="sg-ratio sg-code-comment"></span> | コメント・区切り記号・プロンプト・引用 |
+| <span class="sg-chip-ground sg-chip-code"><span class="sg-chip sg-code-keyword"></span></span> | `code-keyword` | <span class="sg-hex sg-code-keyword"></span> | <span class="sg-ratio sg-code-keyword"></span> | キーワード・組み込み・引数 |
+| <span class="sg-chip-ground sg-chip-code"><span class="sg-chip sg-code-type"></span></span> | `code-type` | <span class="sg-hex sg-code-type"></span> | <span class="sg-ratio sg-code-type"></span> | 型名・関数名・アノテーション |
+| <span class="sg-chip-ground sg-chip-code"><span class="sg-chip sg-code-string"></span></span> | `code-string` | <span class="sg-hex sg-code-string"></span> | <span class="sg-ratio sg-code-string"></span> | 文字列・文字リテラル |
+| <span class="sg-chip-ground sg-chip-code"><span class="sg-chip sg-code-number"></span></span> | `code-number` | <span class="sg-hex sg-code-number"></span> | <span class="sg-ratio sg-code-number"></span> | 数値・リテラル・関数・リンク |
+| <span class="sg-chip-ground sg-chip-code"><span class="sg-chip sg-code-attr"></span></span> | `code-attr` | <span class="sg-hex sg-code-attr"></span> | <span class="sg-ratio sg-code-attr"></span> | 名前と値の組の「名前」。YAML・JSON のキー |
+| <span class="sg-chip-ground sg-chip-code"><span class="sg-chip sg-code-tag"></span></span> | `code-tag` | <span class="sg-hex sg-code-tag"></span> | <span class="sg-ratio sg-code-tag"></span> | タグ・属性・変数・CSS のセレクタ |
+
+暗いほうは背景が1つなので、それに対する比です。
+
+| <span class="sr-only">見本</span> | 役 | 値 | 背景との比 |
+| --- | --- | --- | --- |
+| <span class="sg-chip-ground-dark sg-ground-code"><span class="sg-chip sg-dark-code-fg"></span></span> | `code-fg` | <span class="sg-hex sg-dark-code-fg"></span> | <span class="sg-ratio sg-dark-code-fg"></span> |
+| <span class="sg-chip-ground-dark sg-ground-code"><span class="sg-chip sg-dark-code-comment"></span></span> | `code-comment` | <span class="sg-hex sg-dark-code-comment"></span> | <span class="sg-ratio sg-dark-code-comment"></span> |
+| <span class="sg-chip-ground-dark sg-ground-code"><span class="sg-chip sg-dark-code-keyword"></span></span> | `code-keyword` | <span class="sg-hex sg-dark-code-keyword"></span> | <span class="sg-ratio sg-dark-code-keyword"></span> |
+| <span class="sg-chip-ground-dark sg-ground-code"><span class="sg-chip sg-dark-code-type"></span></span> | `code-type` | <span class="sg-hex sg-dark-code-type"></span> | <span class="sg-ratio sg-dark-code-type"></span> |
+| <span class="sg-chip-ground-dark sg-ground-code"><span class="sg-chip sg-dark-code-string"></span></span> | `code-string` | <span class="sg-hex sg-dark-code-string"></span> | <span class="sg-ratio sg-dark-code-string"></span> |
+| <span class="sg-chip-ground-dark sg-ground-code"><span class="sg-chip sg-dark-code-number"></span></span> | `code-number` | <span class="sg-hex sg-dark-code-number"></span> | <span class="sg-ratio sg-dark-code-number"></span> |
+| <span class="sg-chip-ground-dark sg-ground-code"><span class="sg-chip sg-dark-code-attr"></span></span> | `code-attr` | <span class="sg-hex sg-dark-code-attr"></span> | <span class="sg-ratio sg-dark-code-attr"></span> |
+| <span class="sg-chip-ground-dark sg-ground-code"><span class="sg-chip sg-dark-code-tag"></span></span> | `code-tag` | <span class="sg-hex sg-dark-code-tag"></span> | <span class="sg-ratio sg-dark-code-tag"></span> |
+
+### note の中のコードブロックは背景を白で薄める
+
+note の中は**同じ色相の3段階**になります。**コードブロック（いちばん明るい）→ note の背景 → インラインコード（いちばん濃い）** の順です。インラインコードは本文に馴染ませるために1段階濃く、コードブロックは別の面として離すために1段階明るくします。「1段階濃い」側はインラインコードが既に持っているので、ブロックは反対側へ離すしかありません。
+
+値は note の背景と白の**中間**です。「1段階明るい」の幅を決め打ちしないための取り方で、純白にすると差はいちばん開きますが、色の付いた背景の中に無彩色の面が入ります。
+
+暗いほうは3段階の向きが逆で、インラインコードが note の背景より明るく、コードブロックは暗い側にあります。**既に別の面として分かれているので、こちらは種類ごとに分けません。**
+
+### コードブロックは枠線を持たない
+
+**輪郭は背景の差だけが作ります。** 明るいほうの差は、`surface-tint` を枠のない面として使っているところ（表の見出し・本文末の帯）と同じで、暗いほうは背景の暗さがそのまま輪郭になります。
+
+ファイル名のタブは内容の幅しか持たないので、枠を入れるとタブと本体の間に横線が残って2つの部品に見えます。**枠で囲うなら、タブは本体と同じ幅の帯にする必要があります**——それはこのサイトが選ばなかったほうの形です。
 
 ## 文字
 
