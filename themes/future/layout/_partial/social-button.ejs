@@ -220,6 +220,8 @@
       var held = false;
       var holdTimer = null;
       var hintTimer = null;
+      var thanksTimer = null;
+      var thanksHideTimer = null;
 
       // 同じクラスを付け直すだけでは再生されない。外して1回レイアウトさせる
       var replay = function (el, name) {
@@ -235,18 +237,28 @@
         likeItem.classList.remove('is-level-1', 'is-level-2', 'is-level-3');
         if (mine > 0) likeItem.classList.add('is-level-' + Math.min(mine, LIKE_MAX));
       };
+      // 礼と長押しの案内は同じ場所に出るので重ねない
+      var hideThanks = function () {
+        clearTimeout(thanksTimer);
+        clearTimeout(thanksHideTimer);
+        likeThanks.classList.remove('is-thanks');
+      };
       var showPlus = function () {
         likePlus.textContent = '+' + mine;
         likePlus.classList.add('is-shown');
         clearTimeout(plusTimer);
         plusTimer = setTimeout(function () {
           likePlus.classList.remove('is-shown');
-          // 礼は風船が消えてから。同じ場所に出るので重ねない
+          // 礼は風船が消えてから
           if (!thanked) {
             thanked = true;
-            setTimeout(function () {
+            thanksTimer = setTimeout(function () {
+              // 長押しの案内が出ている間は出さない
+              if (likeHold.classList.contains('is-holding')) return;
               likeThanks.classList.add('is-thanks');
-              setTimeout(function () { likeThanks.classList.remove('is-thanks'); }, 2000);
+              thanksHideTimer = setTimeout(function () {
+                likeThanks.classList.remove('is-thanks');
+              }, 2000);
             }, 250);
           }
         }, LIKE_PLUS_HOLD);
@@ -322,6 +334,7 @@
 
       var cancel = function () {
         if (mine <= 0) return;
+        hideThanks();
         clearTimeout(plusTimer);
         likePlus.classList.remove('is-shown');
         likePlus.textContent = '+1';
@@ -345,6 +358,7 @@
       likeBtn.addEventListener('pointerdown', function () {
         if (mine <= 0) return;
         hintTimer = setTimeout(function () {
+          hideThanks();
           likeHold.classList.add('is-holding');
         }, LIKE_HOLD_HINT);
         holdTimer = setTimeout(function () {
