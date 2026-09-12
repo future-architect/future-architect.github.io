@@ -65,8 +65,10 @@
           礼の形はコピーの「コピーしました」と1つのルールを共有する %>
       <%# 叩いたときの祝い。光と点の2枚を ::before / ::after で持つので DOM は1つ %>
       <span class="like-burst" aria-hidden="true"></span>
-      <%# 風船のひな型。叩くたびにこれを複製して飛ばすので、前のが残っていても消えない %>
+      <%# 入れた数の札。1つだけ、決まった場所に出る %>
       <span class="like-plus" aria-hidden="true">+1</span>
+      <%# 浮かぶ風船のひな型。叩くたびに複製して飛ばすので、前のが残っていても消えない %>
+      <span class="like-float" aria-hidden="true"></span>
       <span class="share-copied like-thanks" aria-hidden="true">ありがとうございました！</span>
       <span class="share-copied like-hold" aria-hidden="true">長押しでキャンセルします</span>
       <%# 0 のときは共有の数字と同じく出さない %>
@@ -208,6 +210,7 @@
       var likePlus = likeItem.querySelector('.like-plus');
       var likeHold = likeItem.querySelector('.like-hold');
       var likeBurst = likeItem.querySelector('.like-burst');
+      var likeFloat = likeItem.querySelector('.like-float');
       var likeKey = 'liked:' + likeId;
 
       // 何個入れたかは端末が覚える。別ブラウザやシークレットウィンドウからは
@@ -244,25 +247,39 @@
         clearTimeout(thanksHideTimer);
         likeThanks.classList.remove('is-thanks');
       };
-      // 風船は1つずつ別の要素にして飛ばす。使い回すと、前のが浮いている間に
-      // 次を出したときに前のが消える
-      var PLUS_DX = [0, -11, 9, -6, 13, -14];
-      var plusCount = 0;
-      var launchPlus = function () {
-        var el = likePlus.cloneNode(false);
-        el.textContent = '+' + mine;
-        el.style.setProperty('--dx', PLUS_DX[plusCount++ % PLUS_DX.length] + 'px');
-        el.classList.add('is-rising');
-        likeItem.appendChild(el);
-        // 動きを止める設定ではアニメーションが走らないので、時間で片づける
-        setTimeout(function () { el.remove(); }, 1400);
+      // 浮かぶ風船は1つずつ別の要素にして飛ばす。使い回すと、前のが浮いている間に
+      // 次を出したときに前のが消える。**札（+3）はここに含めない**——数字が
+      // 散らばって重なると、そのぶん送られたように読めてしまう
+      var FLOAT_DX = [-14, 11, -6, 17, 4, -20, 8];
+      var FLOAT_SIZE = [7, 5, 9, 6, 8];
+      var floatCount = 0;
+      var launchFloat = function () {
+        // 段が上がるほど数を増やす
+        for (var i = 0; i < Math.min(mine, LIKE_MAX); i++) {
+          (function () {
+            var el = likeFloat.cloneNode(false);
+            el.style.setProperty('--dx', FLOAT_DX[floatCount % FLOAT_DX.length] + 'px');
+            el.style.setProperty('--size', FLOAT_SIZE[floatCount % FLOAT_SIZE.length] + 'px');
+            el.style.setProperty('--delay', (floatCount % 3) * 60 + 'ms');
+            floatCount++;
+            el.classList.add('is-rising');
+            likeItem.appendChild(el);
+            // 動きを止める設定ではアニメーションが走らないので、時間で片づける
+            setTimeout(function () { el.remove(); }, 1800);
+          })();
+        }
       };
       var showPlus = function () {
-        // 風船が出るのは3つ目に届いたときだけ。1つ目・2つ目は跳ねと祝いで返す
-        if (mine >= LIKE_MAX) launchPlus();
+        launchFloat();
+        // 札が出るのは3つ目に届いたときだけ。1つだけを決まった場所に出す
+        if (mine >= LIKE_MAX) {
+          likePlus.textContent = '+' + mine;
+          likePlus.classList.add('is-shown');
+        }
         // 待ちは毎回引き直す。礼はここが引き金なので、3つ入れなくても出る
         clearTimeout(plusTimer);
         plusTimer = setTimeout(function () {
+          likePlus.classList.remove('is-shown');
           // 礼は叩き終わってから
           if (!thanked) {
             thanked = true;
@@ -350,7 +367,8 @@
         if (mine <= 0) return;
         hideThanks();
         clearTimeout(plusTimer);
-        Array.prototype.forEach.call(likeItem.querySelectorAll('.like-plus.is-rising'), function (el) {
+        likePlus.classList.remove('is-shown');
+        Array.prototype.forEach.call(likeItem.querySelectorAll('.like-float.is-rising'), function (el) {
           el.remove();
         });
         likeItem.classList.remove('is-level-1', 'is-level-2', 'is-level-3');
