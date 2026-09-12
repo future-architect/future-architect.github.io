@@ -225,8 +225,29 @@ dark-parts()
   .share-btn {
     color: var(--ink-strong);
   }
+  /* 押した後の絵と枠 (#1949)。brand-crimson は暗い地で 2.92 しか出ないので、
+     一段明るい crimson-on-dark に替える（3.46。非テキストの 3:1 を満たす） */
+  .like-button[aria-pressed="true"] {
+    color: var(--crimson-on-dark);
+    border-color: var(--crimson-on-dark);
+  }
+  /* 長押しの案内の地は ink-strong で、暗い側では明るいグレーになる */
+  .like-hold {
+    color: var(--surface-base);
+  }
+  /* 指しているときはクリムゾンで塗る（明るい側と同じ）ので、絵は白に戻す。
+     暗い側の静止の指定の方が詳細度が高いため、ここで上書きが要る */
+  .like-button[aria-pressed="true"]:hover,
+  .like-button[aria-pressed="true"]:focus-visible {
+    color: var(--on-dark-strong);
+  }
+  /* 数字は文字なので 4.5 が要る。crimson-on-dark でも 3.81 で届かないため、
+     暗い側だけ赤くしない。押したことはハートの塗りと色が示す */
+  .like-button[aria-pressed="true"] ~ .like-count {
+    color: var(--ink-strong);
+  }
   .share-btn:hover,
-  .share-btn:focus {
+  .share-btn:focus-visible {
     background: var(--ink-strong);
     border-color: var(--ink-strong);
     color: var(--surface-base);
@@ -2703,9 +2724,13 @@ ul.social-button li {
 }
 /* タグチップ（.tag-list-link）と同じネイビー反転。小さな操作部品の反応を
    1種類にそろえる (#2686)。枠も同色にしないと縁だけ残って見える。
-   アイコンは fill: currentColor なので color の白がそのまま効く */
+   アイコンは fill: currentColor なので color の白がそのまま効く。
+
+   **:focus ではなく :focus-visible**（#2686 の規則どおり）。:focus だと
+   マウスで押した後もフォーカスが残る間ずっと反転したままになり、
+   他を押すまで戻らない（#1949 で気づいた） */
 .share-btn:hover,
-.share-btn:focus {
+.share-btn:focus-visible {
   background: var(--brand-navy);
   border-color: var(--brand-navy);
   color: var(--on-dark-strong);
@@ -2732,8 +2757,11 @@ button.share-btn {
   margin-right: 0;
   vertical-align: 0;
 }
-/* コピーの合図は2つ。円の中のアイコンをチェックに差し替え、円の上に
-   「コピーしました」の吹き出しを出す。アイコンだけだと何が起きたか読み取れない。
+/* ボタンの上に出る吹き出し。コピーの「コピーしました」と、いいねの名前
+   （#1949。指している間だけ出す）が共有する。
+
+   コピーの合図は2つで、円の中のアイコンをチェックに差し替え、円の上に
+   吹き出しを出す。アイコンだけだと何が起きたか読み取れない。
 
    吹き出しは absolute で浮かせる。行に場所を取らせると、押した瞬間に
    ボタンの並びが動く。押せる部品ではないので pointer-events も切る */
@@ -2781,6 +2809,286 @@ button.share-btn {
   font-variant-numeric: tabular-nums;
 }
 
+/* いいね (#1949)。器・ボタン・数字は共有ボタンと同じ部品を使い、違うのは
+   横幅と押した後の状態だけ。
+
+   外へ出す導線（シェア）ではなく「ここに残す」操作なので、丸の列との間を
+   一段広く空け（gap 12px ＋ 12px）、**幅**で分ける——丸28pxに対して
+   56px（ちょうど2倍）の錠剤。
+
+   地も枠も共有ボタンと同じ。マークがハートなので、形と記号で既に分かれている */
+.like-item {
+  margin-right: 12px;
+  /* 祝いの強さ。1つ目・2つ目・3つ目で一段ずつ上げる。跳ね・光・点が
+     同じ変数を見るので、段を足すのはここ1箇所で済む */
+  --pop-scale: 1.3;
+  --burst-alpha: 0.22;
+  --burst-bloom: 1.05;
+  --burst-spread: 0.85;
+}
+.like-item.is-level-2 {
+  --pop-scale: 1.42;
+  --burst-alpha: 0.3;
+  --burst-bloom: 1.2;
+  --burst-spread: 1.05;
+}
+.like-item.is-level-3 {
+  --pop-scale: 1.55;
+  --burst-alpha: 0.4;
+  --burst-bloom: 1.4;
+  --burst-spread: 1.3;
+}
+.like-button {
+  width: 56px;
+  /* 上限まで入れた後は長押しで取り消す。指で押し続けたときに字を選んだり
+     拡大したりさせない */
+  user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
+}
+/* Phosphor の線画は塗りで描かれていて Tabler の 2px ストロークより細い。
+   共有の丸のロゴ（14px）と同じ大きさだと弱く見えるので一段上げる */
+.like-button .svg-icon {
+  width: 16px;
+  height: 16px;
+}
+/* 押した後はマークの塗りで示す (#2755)。地も枠も動かさない——面は hover が
+   使っており、枠は共有ボタンと共通のままにしてある。
+
+   色はクリムゾン。差し色の「画面内で同時に1箇所」を守ったうえで、
+   出るのは読者が押した後だけなので、その1箇所が読者自身の行為を指す。
+   **枠も同じ色にする**——絵と数字だけが赤いと、丸い枠だけが取り残される */
+.like-button[aria-pressed="true"] {
+  color: var(--brand-crimson);
+  border-color: var(--brand-crimson);
+}
+/* 押した後は下の数字もそろえる。ハートだけ赤くて数字がネイビーだと、
+   1つの部品の中で色が2つになる */
+.like-button[aria-pressed="true"] ~ .like-count {
+  color: var(--brand-crimson);
+}
+/* 押した後も叩ける（Medium の拍手と同じ）ので反応は返すが、ネイビー反転は
+   打ち消す。赤いマークがネイビーの上に乗ると読めない。地の方を赤で塗る */
+.like-button[aria-pressed="true"]:hover,
+.like-button[aria-pressed="true"]:focus-visible {
+  background: var(--brand-crimson);
+  border-color: var(--brand-crimson);
+  color: var(--on-dark-strong);
+}
+/* 押した瞬間の合図。動くのはマークだけ。広がって消える輪も試したが、
+   枠と同じ形の線が外へ出ていくので衝撃波に見えた。
+
+   引き金は aria-pressed ではなく script が足す is-liking。属性で回すと、
+   前に押した記事を開き直すたび（localStorage から復元するたび）に跳ねる */
+@keyframes like-pop {
+  0% { transform: scale(1); }
+  35% { transform: scale(var(--pop-scale)); }
+  65% { transform: scale(0.92); }
+  100% { transform: scale(1); }
+}
+.like-button.is-liking .like-icon-filled {
+  animation: like-pop like-pop-speed ease-out;
+}
+/* 叩いたときの祝い。**硬い輪は衝撃波に見えた**ので、輪郭を持たない光（::before）と、
+   外へ散る小さな点（::after を1つ置いて box-shadow で6つ）にする。DOM は1つで済む。
+
+   速さは跳ねの2倍。**新しい段は置かず like-pop-speed から導く**——同じできごとの
+   中の動きで、片方だけ別に決める理由が無い */
+.like-burst {
+  position: absolute;
+  left: 0;
+  right: 0;
+  /* ボタン（高さ 28px）の中心 */
+  top: 14px;
+  height: 0;
+  pointer-events: none;
+}
+.like-burst::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 84px;
+  height: 84px;
+  margin: -42px 0 0 -42px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--brand-crimson) 0%, transparent 68%);
+  opacity: 0;
+}
+.like-burst::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 5px;
+  height: 5px;
+  margin: -2.5px 0 0 -2.5px;
+  border-radius: 50%;
+  /* **下へ飛ぶ点は持たない。** ボタンの下には数字があり、そこに点が重なると
+     読みにくい。上と横だけの5つにする */
+  box-shadow: 0 -28px 0 var(--brand-crimson), 20px -20px 0 var(--brand-crimson),
+    -20px -20px 0 var(--brand-crimson), 28px -3px 0 var(--brand-crimson),
+    -28px -3px 0 var(--brand-crimson);
+  opacity: 0;
+  transform: scale(0.25);
+}
+@keyframes like-bloom {
+  from { opacity: var(--burst-alpha); transform: scale(0.5); }
+  to { opacity: 0; transform: scale(var(--burst-bloom)); }
+}
+@keyframes like-sparks {
+  0% { opacity: 1; transform: scale(0.25); }
+  60% { opacity: 1; }
+  100% { opacity: 0; transform: scale(var(--burst-spread)); }
+}
+.like-burst.is-bursting::before {
+  animation: like-bloom (like-pop-speed * 2) ease-out;
+}
+.like-burst.is-bursting::after {
+  animation: like-sparks (like-pop-speed * 2) ease-out;
+}
+/* 光と点は絵の後ろ。ボタンを持ち上げて重なりを決める */
+.like-button {
+  position: relative;
+  z-index: 1;
+}
+
+/* 叩いた数の風船。行に場所を取らせると叩くたびに並びが動くので絶対配置にする。
+   左右いっぱいに広げて中央ぞろえにすれば、ボタンの幅をここに書き写さずに
+   中心がそろう。
+
+   **札は1つだけ、決まった場所に出す。** 散らばって重なると、そのぶん送られたように
+   読めてしまう。浮かんで散るのは装飾の風船（.like-float）の役 */
+.like-plus {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  margin-bottom: 4px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--brand-crimson);
+  color: var(--on-dark-strong);
+  font-size: text-meta;
+  line-height: 1;
+  font-weight: bold;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  /* 風船より前。札が隠れると何個入ったかが読めなくなる */
+  z-index: 3;
+  /* **浮いた位置を基準に置く。** 引っ込むときは元いた場所でフェードするだけで、
+     下へは降ろさない。上がるのは出てくるときだけなので、transition ではなく
+     入りのアニメーションで持つ */
+  transform: translate(-50%, -16px);
+  transition: opacity like-pop-speed ease-out;
+}
+.like-plus.is-shown {
+  opacity: 1;
+  animation: like-plus-in like-pop-speed ease-out;
+}
+@keyframes like-plus-in {
+  from { opacity: 0; transform: translate(-50%, 0); }
+  to { opacity: 1; transform: translate(-50%, -16px); }
+}
+/* 出ている間にもう一度叩かれたら揺らす。数は変わらないので、受け取ったことだけを返す。
+   is-shown の入りより後ろに置いて上書きする。
+
+   **振れ幅は % ではなく px で書く。** 横位置は translate(-50%) で中央に寄せているので、
+   そこを 52% にしても幅34pxのチップでは 0.7px しか動かず見えない。
+   跳ねと同じく拡大も混ぜて、小さな札でも動きが読めるようにする */
+@keyframes like-plus-shake {
+  0%, 100% { transform: translate(-50%, -16px) rotate(0) scale(1); }
+  30% { transform: translate(calc(-50% - 1px), -17.5px) rotate(-2deg) scale(1.03); }
+  65% { transform: translate(calc(-50% + 1px), -15.5px) rotate(1.5deg) scale(1.015); }
+}
+.like-plus.is-shaking {
+  animation: like-plus-shake like-pop-speed ease-in-out;
+}
+
+/* 浮かぶ風船。叩くたびに1つずつ別の要素を飛ばすので、前のが浮いていても消えない。
+   左右のずれ（--dx）・大きさ（--size）・出だしの遅れ（--delay）を順に変えて、
+   同じ軌跡が重ならないようにする。**数は段が上がるほど増やす**（呼ぶ側が決める）。
+   速さは跳ねの5倍——**新しい段は置かず like-pop-speed から導く** */
+.like-float {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  width: var(--size, 6px);
+  height: var(--size, 6px);
+  margin-left: calc(var(--size, 6px) / -2);
+  border-radius: 50%;
+  background: var(--brand-crimson);
+  opacity: 0;
+  pointer-events: none;
+  /* 札の後ろ、ボタンの前 */
+  z-index: 2;
+}
+/* 札を避けて左右へ抜ける。まっすぐ上へ上げると札の真下で渋滞する */
+@keyframes like-float-rise {
+  /* 出だしも下へは下げない（同じ理由） */
+  0% { opacity: 0; transform: translate(0, 0) scale(0.4); }
+  25% { opacity: 0.9; transform: translate(calc(var(--dx, 0) * 0.5), -10px) scale(1); }
+  100% { opacity: 0; transform: translate(var(--dx, 0), -52px) scale(0.85); }
+}
+.like-float.is-rising {
+  animation: like-float-rise (like-pop-speed * 5) ease-out var(--delay, 0ms) both;
+}
+/* 長押しの案内。取り消しは戻せないので、何が起きるかを先に出す。
+   地はグレー（ink-strong を面として使う。白い文字で 10.05）——礼のクリムゾンとも、
+   ブランドのネイビーとも役が違う、ただの機械の案内なので色を持たせない。
+   **ink-strong はテーマで明暗が入れ替わる**ので、暗い側は文字の色だけ戻す */
+.like-hold {
+  left: 0;
+  transform: none;
+  background: var(--ink-strong);
+}
+.like-hold.is-holding {
+  opacity: 1;
+}
+/* 押した少し後に一度だけ出す礼。指しても出ない（押す前の名前は title が持つ）。
+   吹き出しの形は .share-copied が1箇所で持ち、ここは地と位置だけを変える。
+
+   **地はクリムゾン。** 押した瞬間に出るものなので、赤くなったハートと同じ
+   できごととして読ませる。白い文字で 5.35。差し色の「画面内で同時に1箇所」は
+   ハートと吹き出しが同じ合図なので割れない。
+
+   **左端をボタンにそろえる**（.share-copied の中央ぞろえを打ち消す）。
+   礼の文は 12px でも 150px 近くあり、72px のボタンの中央に置くと本文列の
+   左端からはみ出す。左ぞろえなら伸びるのは右側＝共有の丸の上で、そこは空いている */
+.like-thanks {
+  left: 0;
+  transform: none;
+  background: var(--brand-crimson);
+}
+.like-thanks.is-thanks {
+  opacity: 1;
+}
+/* 動きを止める設定では結果だけを出す。押したことはマークの塗りと色が示すので、
+   合図そのものは失われない (#2686 と同じ線引き) */
+@media (prefers-reduced-motion: reduce) {
+  .like-button.is-liking .like-icon-filled,
+  .like-burst.is-bursting::before,
+  .like-burst.is-bursting::after {
+    animation: none;
+  }
+  .like-plus {
+    transition: none;
+  }
+  .like-plus.is-shown,
+  .like-plus.is-shaking {
+    animation: none;
+  }
+  .like-float.is-rising {
+    animation: none;
+  }
+}
+.like-icon-filled,
+.like-button[aria-pressed="true"] .like-icon-outline {
+  display: none;
+}
+.like-button[aria-pressed="true"] .like-icon-filled {
+  display: block;
+}
 /* アイコンだけのリンク（GitHub / X / Youtube / RSS）。フッターと著者ページの
    プロフィール (#2774) で共有する。下線は文字のための印なので消し、反応は
    チップと同じ「地を一段」で示す。タップ領域は Lighthouse の
