@@ -4,12 +4,12 @@
 // X の count API は 2015 年に消えているので、sns_count_cache.json の Twitter は
 // 2023-06 で凍結している。その続きをこちらが担う。
 //
-// 点は ポスト 1 ＋ リポスト 1/4 ＋ ブックマーク 1/8 ＋ いいね 1/16 を記事単位で切り上げる。
+// 点は ポスト 1 ＋ リポスト 1/2 ＋ ブックマーク 1/4 ＋ いいね 1/8 を記事単位で切り上げる。
 // 公式アカウントのポストは自己シェアなので本体の 1 を数えず、集まった反応だけを足す。
 // 重みが 2 の冪なので和は二進で正確で、丸めは最後の1回だけになる。
 const fs = require('fs');
 
-const WEIGHT = { post: 1, repost: 1 / 4, bookmark: 1 / 8, like: 1 / 16 };
+const WEIGHT = { post: 1, repost: 1 / 2, bookmark: 1 / 4, like: 1 / 8 };
 
 const loadMentions = () => {
   try {
