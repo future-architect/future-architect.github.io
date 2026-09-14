@@ -1,6 +1,7 @@
 'use strict';
 
 const { getGA4PV } = require('./lib/ga4');
+const { reactionFactor } = require('./lib/reaction');
 
 // カテゴリの色は名前で固定する (#2170)。系列順に既定パレットを当てると、
 // 著者やページごとにカテゴリの並びが違うため、同じ Programming が青だったり
@@ -283,7 +284,7 @@ function decayedPv(site) {
     let sum = 0;
     category.posts.forEach((post) => {
       const years = (now - post.date.valueOf()) / YEAR;
-      sum += getGA4PV('/' + post.path) / (1 + years * years);
+      sum += (getGA4PV('/' + post.path) / (1 + years * years)) * reactionFactor(site, post);
     });
     pv.set(category.name, sum);
   });
@@ -296,7 +297,7 @@ function decayedPv(site) {
 // 束ねる相手が2〜3件しか無く、ラベルのぶんだけ場所と手数が増える。
 // 群は全件を出すヘッダーのドロップダウンと /categories/ が持ち続ける。
 //
-// **並びは選ぶ鍵（経過年ペナルティ付きのPV）と同じ順。** 群の並び（累計順）のまま群だけ
+// **並びは選ぶ鍵（経過年ペナルティと反応の補正を掛けた PV）と同じ順。** 群の並び（累計順）のまま群だけ
 // 消すと、画面から順序の根拠が消える（327 / 134 / 134 / 77 / 70 / 70 / 49 / 50 と
 // 単調にならない）。隣の人気の連載・人気のタグも自分の物差し順なので、
 // 3枠の読み方がそろう
