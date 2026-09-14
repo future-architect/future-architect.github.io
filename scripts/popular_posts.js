@@ -1,6 +1,7 @@
 'use strict';
 
 const { postListItem } = require('./lib/post_list');
+const { reactionFactor } = require('./lib/reaction');
 
 const fs = require('fs');
 const gaCache = JSON.parse(fs.readFileSync('ga_cache.json', 'utf-8'));
@@ -137,6 +138,9 @@ hexo.extend.helper.register('popular_posts', function (term = 'weekly') {
       } else if (post.date.toISOString() >= yearAgo.toISOString()) {
         post.pv = post.pv * rate12m;
       }
+      // PV の割に反応が多い記事を一段上げる (#3290)。窓の PV に掛けるが、
+      // 係数は累計の SNS 数と累計の PV から出るので term によらず同じ
+      post.pv = post.pv * reactionFactor(this.site, post);
       return post;
     })
     .filter((post) => post.pv >= 0)

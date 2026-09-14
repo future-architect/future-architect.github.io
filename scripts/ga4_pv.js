@@ -3,6 +3,7 @@
 const { postListItem } = require('./lib/post_list');
 const { allSeries } = require('./lib/series');
 const { getGA4PV } = require('./lib/ga4');
+const { reactionFactor } = require('./lib/reaction');
 
 // 実測値が無いときは 0 を返す。以前は 100 を返していたが、実際に pv が 100 の
 // 記事も 55 件あり、表示上どちらか区別できなかった。公開直後の記事に
@@ -18,7 +19,8 @@ hexo.extend.helper.register('get_ga4_pv', (url) => {
 const popularTagsCache = new Map();
 
 // トップの「人気のタグ」(#2358)。
-// **物差しはランキング記事・人気の連載と同じ経過年ペナルティ** (#2855)。
+// **物差しはランキング記事・人気の連載と同じ経過年ペナルティ** (#2855) と
+// **反応の補正** (#3290)。4枠すべてが同じ式で選ぶ。
 // 以前は「直近1年に公開された記事の PV 合計」で、古さで減点する仕組みが無く
 // 1年の窓を出た瞬間に候補から消えていた。窓を外して1本ずつ 1/(1+経過年^2) で
 // 割れば、境目で顔ぶれが飛ばず、新しさと読まれ方が同じ式の中で釣り合う。
@@ -39,7 +41,7 @@ hexo.extend.helper.register('recent_popular_tags', function (limit = 10, minPost
   const now = Date.now();
   const score = (post) => {
     const years = (now - post.date.valueOf()) / YEAR;
-    return getGA4PV('/' + post.path) / (1 + years * years);
+    return (getGA4PV('/' + post.path) / (1 + years * years)) * reactionFactor(this.site, post);
   };
   const tags = this.site.tags
     .map((tag) => {
@@ -61,7 +63,8 @@ hexo.extend.helper.register('recent_popular_tags', function (limit = 10, minPost
 });
 
 // ヘッダーのドロップダウンとサイドバーの「人気の連載」(#2855)。
-// **物差しはランキング記事（popular_posts_in）・人気のタグと同じ経過年ペナルティ**。
+// **物差しはランキング記事（popular_posts_in）・人気のタグと同じ経過年ペナルティ**と
+// **反応の補正** (#3290)。
 // 以前は「直近1年に公開された記事の PV 合計」で、古さで減点する仕組みは無く
 // 1年の窓を出た瞬間に候補から消えていた。窓の中では逆に古い方が有利で
 // （PV を積む時間があるため）、10か月前の連載が最新の連載を上回っていた。
@@ -79,7 +82,7 @@ hexo.extend.helper.register('popular_series', function (limit = 6, minPosts = 3)
   // 連載は記事の集まりなので、1本ずつ割ってから足す
   const score = (post) => {
     const years = (now - post.date.valueOf()) / YEAR;
-    return getGA4PV('/' + post.path) / (1 + years * years);
+    return (getGA4PV('/' + post.path) / (1 + years * years)) * reactionFactor(this.site, post);
   };
   // **足したあと √本数 で割る。** 単純な合計だと本数がそのまま効き、27本の
   // 「春の入門祭り2025」のような大型連載が上位を占める。本数が多い連載は
@@ -135,12 +138,14 @@ hexo.extend.helper.register('popular_posts_in', function (posts, limit, decay, f
   // 例外は全期間アーカイブ (#2407)。ここは「歴代の定番」を見せる場なので
   // 線形（1年=1/2、4年=1/5）に緩め、露出期間の不公平だけを補正して古典を残す。
   // 2乗のままだと実質直近人気になり、ホームの年間人気と顔ぶれが完全に重複した
+  // PV の割に SNS 反応が多い記事を一段上げる (#3290)。lib/reaction.js が1箇所で持ち、
+  // 「人気の」4枠すべてが同じ係数を掛ける
   const YEAR = 365 * 24 * 60 * 60 * 1000;
   const now = Date.now();
   const score = (post) => {
     const years = (now - post.date.valueOf()) / YEAR;
     const penalty = decay === 'linear' ? 1 + years : 1 + years * years;
-    return getGA4PV('/' + post.path) / penalty;
+    return (getGA4PV('/' + post.path) / penalty) * reactionFactor(this.site, post);
   };
 
   const ranked = posts
