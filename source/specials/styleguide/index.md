@@ -84,9 +84,7 @@ editable: true
 
 ### 選択されると色が消えるので、下線だけが残る
 
-テキストを選択すると、ブラウザは選択範囲の文字も下線も**選択の文字色1色で塗り直します**。リンクの色は残りません。下線に色を指定しても残りません。**選択中にリンクを名乗れるのは下線だけ**で、ひとつ上の「色だけで名乗らない」がそのまま効いてきます。
-
-<p class="specials-text">前の文 <span class="sg-selected">選択中のリンク</span> 後ろの文</p>
+テキストを選択すると、ブラウザは選択範囲の文字も下線も**選択の文字色1色で塗り直します**。リンクの色は残りません。下線に色を指定しても残りません。**選択中にリンクを名乗れるのは下線だけ**で、ひとつ上の「色だけで名乗らない」がそのまま効いてきます。この段落のリンクを選択すると、実際にそうなります。
 
 このとき、下線は**選択の帯に収まっていないと見えません**。帯からはみ出した線は背景と同じ色で描かれて消えます。帯の高さは行間で決まるので、いちばん低いのは行間の狭いところ——表のセルです。
 
@@ -96,7 +94,7 @@ editable: true
 
 ### ブランド色
 
-ネイビーは塗り面（フッター）とインタラクション（selection / hover / focus）専用で、**文字色には使いません**。本文の `ink-strong` との比が 1.63 しかなく、文字にすると黒と区別が付かないためです。例外は2つの形だけです。1つは**ネイビーの図形とひと組で読ませる小さな文字**で、タブに出る「← → で切り替え」は同時に出るフォーカスリングと同じ色にして1つの信号として読ませ、シェア数はボタンの丸と、著者名は頭文字の丸と1組に見せます。もう1つは、**文字がそのページの面そのものになっている 404 の数字**です。読み下す文章に混ざる文字には使いません。クリムゾンはコンセプトブックの文法どおり、画面内で同時に1箇所だけの差し色に限定しています。
+ネイビーは塗り面（フッター）とインタラクション（hover / focus）専用で、**文字色には使いません**。本文の `ink-strong` との比が 1.63 しかなく、文字にすると黒と区別が付かないためです。例外は2つの形だけです。1つは**ネイビーの図形とひと組で読ませる小さな文字**で、タブに出る「← → で切り替え」は同時に出るフォーカスリングと同じ色にして1つの信号として読ませ、シェア数はボタンの丸と、著者名は頭文字の丸と1組に見せます。もう1つは、**文字がそのページの面そのものになっている 404 の数字**です。読み下す文章に混ざる文字には使いません。クリムゾンはコンセプトブックの文法どおり、画面内で同時に1箇所だけの差し色に限定しています。
 
 | <span class="sr-only">見本</span> | 変数 | 値 | 白背景との比 | 使うところ |
 | --- | --- | --- | --- | --- |
@@ -143,7 +141,6 @@ editable: true
 | <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-surface-tint"></span></span> | `surface-tint` | <span class="sg-hex sg-dark-surface-tint"></span> | <span class="sg-ratio sg-dark-surface-tint"></span> | 静止した面 |
 | <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-surface-mute"></span></span> | `surface-mute` | <span class="sg-hex sg-dark-surface-mute"></span> | <span class="sg-ratio sg-dark-surface-mute"></span> | 反応した面と、空・無効の面 |
 | <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-navy"></span></span> | `brand-navy` | <span class="sg-hex sg-dark-navy"></span> | <span class="sg-ratio sg-dark-navy"></span> | フッターの帯 |
-| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-selection"></span></span> | `selection-bg` | <span class="sg-hex sg-dark-selection"></span> | <span class="sg-ratio sg-dark-selection"></span> | テキスト選択の帯。文字は `surface-base` |
 
 **`ink-faint` は明るいほうと同じく「AA を満たす最も薄い段階」です。** 上の表の比はページの背景に対する値ですが、実際にいちばん厳しいのは面のスケールでいちばん明るい `surface-mute` で、そこでも AA を満たす値にしています。これより薄くしません。
 
