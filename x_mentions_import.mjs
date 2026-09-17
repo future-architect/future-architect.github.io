@@ -13,6 +13,12 @@
 // 記事タイトルと突き合わせる。どちらでも決まらないものは article: null のまま残し、
 // t.co を持たせておく（後から解決できるように捨てない）。
 //
+// 設計ガイドライン（arch-guidelines）への言及は page に入れ、ページごとの点を
+// x_guideline_counts.json に書き出す。あちらのビルドがこれを読んで X ボタンの下に数字を出す。
+// 題→URL の表は x_guideline_pages.json が持つ。向こうの og:title は frontmatter の title
+// そのものなので題がページを指すが、title を持たないページは og:title がトップと同じ
+// 「アーキテクチャ設計ガイドライン」に落ちるため、表には共有ボタンを持つページだけを載せる。
+//
 // 保存するのは点に要るものだけ。投稿者・本文・カードの題は照合に使うだけで書き出さない
 // （公開ポストでも人の発言をリポジトリに溜めない）。公式かどうかは official の真偽で持つ。
 import { readFile, readdir, stat, writeFile } from 'node:fs/promises';
@@ -21,11 +27,16 @@ import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
 const cheerio = require('cheerio');
+const { WEIGHT } = require('./scripts/lib/x_mentions.js');
 
 const OUT = 'x_mentions.json';
+const COUNTS_OUT = 'x_guideline_counts.json';
+const PAGES_FILE = 'x_guideline_pages.json';
+const SITE = 'https://future-architect.github.io';
 const OFFICIAL = 'future_techblog';
 const POSTS_DIR = 'source/_posts';
 const ARTICLE_RE = /future-architect\.github\.io\/articles\/(20\d{6}[a-z]?)\b/;
+const GUIDELINE_RE = /future-architect\.github\.io(\/arch-guidelines\/\S*?\.html)/;
 const SITE_SUFFIX = / \| フューチャー技術ブログ$/;
 
 const normalize = (s) => s.normalize('NFKC').replace(/\s+/g, ' ').replace(SITE_SUFFIX, '').trim();
@@ -83,7 +94,13 @@ function parseMetrics(label) {
   return out;
 }
 
-function parseTweets($, capturedAt, titleIndex, unresolved) {
+// 題 → ガイドラインのページ。前方一致で見るので長い題から先に当てる
+async function loadGuidelinePages() {
+  const table = JSON.parse(await readFile(PAGES_FILE, 'utf-8'));
+  return Object.entries(table).sort((a, b) => b[0].length - a[0].length);
+}
+
+function parseTweets($, capturedAt, titleIndex, guidelinePages, unresolved) {
   const records = [];
   // X は絵文字を <img alt="👨‍👩‍👧‍👦"> で描くので、text() だと題から絵文字が抜けて記事に当たらない
   $('[data-testid="tweetText"] img[alt], [data-testid="card.wrapper"] img[alt]').each((_, img) => {
@@ -119,23 +136,59 @@ function parseTweets($, capturedAt, titleIndex, unresolved) {
       $card.find('a[href^="https://t.co/"]').attr('href') ||
       $text.find('a[href^="https://t.co/"]').attr('href') ||
       null;
+    const both = text + ' ' + cardText;
     let article = null;
-    const fromUrl = (text + ' ' + cardText).match(ARTICLE_RE);
+    const fromUrl = both.match(ARTICLE_RE);
     if (fromUrl) article = fromUrl[1];
     else if (cardTitle) article = titleIndex.get(normalize(cardTitle)) || null;
-    if (!article) unresolved.push({ id, cardTitle, tco });
+
+    let page = null;
+    if (!article) {
+      const fromGuidelineUrl = both.match(GUIDELINE_RE);
+      const title = cardTitle ? normalize(cardTitle) : '';
+      page =
+        guidelinePages.find(([, url]) => url === fromGuidelineUrl?.[1])?.[1] ||
+        guidelinePages.find(([t]) => title.startsWith(normalize(t)))?.[1] ||
+        null;
+    }
+    if (!article && !page) unresolved.push({ id, cardTitle, tco });
 
     records.push({
       id,
       date: $a.find('time').first().attr('datetime'),
       official: author === OFFICIAL,
       article,
-      ...(article ? {} : { tco }),
+      ...(page ? { page } : {}),
+      ...(article || page ? {} : { tco }),
       ...metrics,
       capturedAt,
     });
   });
   return records;
+}
+
+// ページごとの点を書き出す。重みと切り上げは記事と同じ（scripts/lib/x_mentions.js）。
+// 0 の行も出す——向こうは「言及がまだ無い」と「表から漏れた」を区別できないので、
+// 表に載っているページは全部キーを持たせる
+async function writeGuidelineCounts(records, guidelinePages) {
+  const score = new Map(guidelinePages.map(([, url]) => [url, 0]));
+  for (const m of records) {
+    if (!m.page || !score.has(m.page)) continue;
+    score.set(
+      m.page,
+      score.get(m.page) +
+        (m.official ? 0 : WEIGHT.post) +
+        (m.reposts || 0) * WEIGHT.repost +
+        (m.bookmarks || 0) * WEIGHT.bookmark +
+        (m.likes || 0) * WEIGHT.like,
+    );
+  }
+  const counts = {};
+  for (const [, url] of guidelinePages.slice().sort((a, b) => (a[1] < b[1] ? -1 : 1)))
+    counts[SITE + url] = Math.ceil(score.get(url));
+  await writeFile(COUNTS_OUT, JSON.stringify(counts, null, 2) + '\n');
+  const named = Object.values(counts).filter((n) => n > 0).length;
+  console.error(`${COUNTS_OUT}: ${named}/${guidelinePages.length} pages have a count`);
 }
 
 async function main() {
@@ -145,6 +198,7 @@ async function main() {
     process.exit(2);
   }
   const titleIndex = await loadTitleIndex();
+  const guidelinePages = await loadGuidelinePages();
 
   const existing = new Map();
   try {
@@ -159,7 +213,7 @@ async function main() {
   for (const file of await listHtml(args)) {
     const capturedAt = (await stat(file)).mtime.toISOString();
     const $ = cheerio.load(await readFile(file, 'utf-8'));
-    const records = parseTweets($, capturedAt, titleIndex, unresolved);
+    const records = parseTweets($, capturedAt, titleIndex, guidelinePages, unresolved);
     seen += records.length;
     for (const r of records) {
       const old = existing.get(r.id);
@@ -171,6 +225,8 @@ async function main() {
   const out = [...existing.values()].sort((a, b) => (a.date < b.date ? 1 : -1));
   await writeFile(OUT, JSON.stringify(out, null, 2) + '\n');
   console.error(`read ${seen}, ${before} -> ${out.length} posts in ${OUT}`);
+
+  await writeGuidelineCounts(out, guidelinePages);
   if (unresolved.length) {
     console.error(`unresolved (${unresolved.length}):`);
     for (const u of unresolved) console.error(`  ${u.id} ${u.tco} ${u.cardTitle ?? '(no card)'}`);
