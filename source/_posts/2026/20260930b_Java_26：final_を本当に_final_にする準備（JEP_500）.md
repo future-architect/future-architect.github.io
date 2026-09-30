@@ -150,6 +150,6 @@ java --enable-final-field-mutation=ALL-UNNAMED -jar app.jar
 
 ここまでみてきたようにリフレクションで final フィールドを差し替えるコードは、Java 27 では警告付きで通ります。いつ通らなくなるかは、JEP が「将来のリリース」としか書いていないので分かりません。ただ、Integrity by Default の先行例はどれも数リリースでデフォルトを切り替えてきました。
 
-final を本当に final にするのは JVM の仕事ですが、その日に備えて final フィールドを書き換えないコードにしておくのは開発者の仕事です。まずは自分のアプリケーションで `deny` を付けて動かし、どこに警告がでるかを見るところから始めてみると良いでしょう。
+final を本当に final にするのは JVM の仕事ですが、その日に備えて final フィールドを書き換えないコードにしておくのは開発者の仕事です。まずは自分のアプリケーションで `debug` を付けて動かし、どこに警告がでるかを見るところから始めてみると良いでしょう。
 
 この記事で動かしたサンプルコードは [GitHub](https://github.com/rhumie/tech-blog/tree/main/docs/20260928_jep500_final_means_final/example) で公開しています。
