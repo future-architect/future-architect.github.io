@@ -13,7 +13,7 @@ thumbnail: /images/2026/20260930b/thumbnail.jpg
 author: 武田大輝
 lede: "Java 26 で入った JEP 500 により、リフレクションで final フィールドを書き換えると警告が出るようになりました。背景の Integrity by Default、警告と例外の違い、Gson・Jackson での挙動、対処方法を整理します。"
 ---
-<img src="/images/2026/20260930b/top.jpg" alt="" width="600" height="394">
+<img src="/images/2026/20260930b/top.jpg" alt="" width="600" height="395">
 
 ## はじめに
 
