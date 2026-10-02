@@ -202,7 +202,9 @@ make mermaid   # Docker 必須
   - プロフィールを追記した場合は著者ページ `/authors/<著者名>/`
 - 連載記事なら索引記事 `curl http://localhost:<port>/articles/<索引記事ID>/` も見る。
   自分の行にサムネイル（72×48）とリンクが入っているか
-- 同じ URL をユーザーの目視確認用に伝える。作業が終わったらサーバを止める
+- **サーバは止めずに残し、最後の報告で PR の URL と確認用 URL（記事・連載なら索引記事も）を
+  セットで伝える。** 公開の判断はユーザーが目視してからなので、報告の時点でサーバが
+  落ちていると見られない。止めるのはマージされた後
 
 ## 10. PR
 
@@ -211,4 +213,5 @@ make mermaid   # Docker 必須
 - worktree では `gh pr create` に `--head <branch> --base main` を明示する
   （省略すると push 済みでも "must first push the current branch" で失敗する）。
   PR 本文は `--body-file` で渡す
+- 報告は **PR の URL ＋ 確認用 URL** の2点セット（9. 参照）
 - マージ確認を待ち、レビュー指摘は同じ PR に追いコミットで対応する（force push しない）
