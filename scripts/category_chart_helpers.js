@@ -27,6 +27,8 @@ const CATEGORY_COLORS = {
   AIDD: '#749f83',
   認証認可: '#ca8622',
   VR: '#bda29a',
+  // Management の #d48265 より暗く倒して、暖色の並びで見分ける
+  フィジカルAI: '#a0522d',
   // Terraform のブランド色。Mobile の紫よりも濃く倒して判別する
   IaC: '#7b42bc',
 };
