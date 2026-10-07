@@ -117,7 +117,7 @@ lede: "Go 1.27 で標準ライブラリに追加されたuuidパッケージを�
 ---
 ```
 
-- `categories` は既存の語彙から選ぶ。使用実績（記事数）: Programming 327 / Frontend 134 / DevOps 133 / Culture 129 / DataScience 100 / Cloud 75 / Infrastructure 70 / DB 69 / IaC 57 / Mobile 57 / IoT 52 / Business 49 / Management 48 / DataEngineering 45 / AIDD 44 / Security 36 / 認証認可 24 / VR 20
+- `categories` は既存の語彙から選ぶ。使用実績（記事数）: Programming 327 / Frontend 134 / DevOps 133 / Culture 129 / DataScience 100 / Cloud 75 / Infrastructure 70 / DB 69 / IaC 57 / Mobile 57 / IoT 52 / Business 49 / Management 48 / DataEngineering 45 / AIDD 44 / Security 36 / 認証認可 24 / VR 20 / フィジカルAI 2
   - `AI` は `AIDD` に、`Design` は `UI/UX` タグに統合済み。`_config.yml` の `alias` で転送している
   - 基盤系4カテゴリの境界（#2057 / #2461）: **基盤をコードで書く話は `IaC`**（Terraform / Ansible / CDK 等）、
     **マネージドサービスそのものの使い方・設計は `Cloud`**（S3 の署名付きURL、VPC Endpoint の要否、Pub/Sub の概念）、
@@ -131,6 +131,13 @@ lede: "Go 1.27 で標準ライブラリに追加されたuuidパッケージを�
     （アプリ・エージェント開発、プロンプト、活用Tips、社内展開）、
     **モデル・データそのものが主題なら `DataScience`**（モデル開発・学習・評価、NLP研究、学会・論文、データ分析）。
     LLM を「作る」話（基盤モデル構築）や LLMOps・実験管理は DataScience 側に置く
+  - フィジカルAI と IoT・DataScience の境界（#3326）: **AI が現実世界を認識し、動かす話は
+    `フィジカルAI`**（エッジ推論のハードウェア・AI アクセラレータ、ロボット・自動運転の AI、
+    センサーデータのリアルタイム推論）、**センサーやデバイスでつなぐ話で AI が主題でないなら
+    `IoT`**（電子工作・PLC・MQTT・マイコン）、**モデル・研究そのものなら `DataScience`**
+    （学会発表・最適化の研究は AI が物理世界を動かす題材でもこちら）。
+    新設時点で2本（Mark-I と Tenstorrent の AI ボード）。社内の R&D（AI アクセラレータ開発）で
+    増える見込みがあるので、タグで始めて昇格する形ではなく先に入口を作った
   - **全件を見せるときは5つの群に束ねる**（#2908）。所属と群の並びは
     `source/_data/category_groups.yml`、群の中の並びは `category_groups()` が持ち、
     **ヘッダーのドロップダウンと `/categories/` の2箇所で同じ群・同じ並び**になる。
@@ -166,7 +173,7 @@ lede: "Go 1.27 で標準ライブラリに追加されたuuidパッケージを�
         説明文とタグが入らない
     - 群は **開発**（Programming / Frontend / Mobile / IoT / VR）→ **基盤**
       （DevOps / Cloud / Infrastructure / IaC / DB）→ **AI**（DataScience /
-      AIDD / DataEngineering）→ **セキュリティ**（Security / 認証認可）→
+      AIDD / DataEngineering / フィジカルAI）→ **セキュリティ**（Security / 認証認可）→
       **ビジネス**（Culture / Business / Management）の5つ
     - **「基盤」は動かすものの群。** 上の基盤系4カテゴリに `DB` を足した5つ（#3006）。
       DB の70本を読むと**71%が「ミドルウェアを動かす」記事**（PostgreSQL の新機能・
