@@ -15,6 +15,10 @@ lede: "Claude Code から AWS MCP Server をセットアップし、提供され
 ---
 <img src="/images/2026/20260525a/thumbnail-v4.png" alt="thumbnail-v4.png" width="1200" height="630">
 
+::: note info 東京リージョンでの提供開始（2026年10月2日）
+AWS MCP Server がアジアパシフィック（東京）リージョン（`ap-northeast-1`）でも利用可能になりました（[公式アナウンス](https://aws.amazon.com/jp/about-aws/whats-new/2026/10/aws-mcp-server-six-additional-regions/)）。本文の設定例・検証結果は東京リージョン対応前のものです。東京リージョンを利用する場合の設定は、セットアップ手順内の補足を参照してください。
+:::
+
 こんにちは、棚井龍之介です。
 
 最近、Claude Code を含めた「AI の利用環境」は、インターネット利用環境に次ぐ福利厚生のひとつだと実感する日々を送っています。
@@ -46,7 +50,6 @@ AWS MCP Server は、AWS 公式が提供する Agent Toolkit for AWS スイー�
 ### 提供リージョン・料金・クォータ
 
 - 対応リージョンは、本記事執筆時点（2026年5月11日現在）で 米国東部（バージニア北部）と 欧州（フランクフルト）の2リージョンに限られる
-- **追記（2026年10月9日）**：2026年10月2日、AWS MCP Server がアジアパシフィック（東京）リージョン（`ap-northeast-1`）でも利用可能になりました（[公式アナウンス](https://aws.amazon.com/jp/about-aws/whats-new/2026/10/aws-mcp-server-six-additional-regions/)）。
 - AWS MCP Server 自体に追加料金は発生しない。エージェントが作成・利用した AWS リソースおよびデータ転送料金のみが課金される
 - 公式クォータ（[AWS MCP Server Quotas](https://docs.aws.amazon.com/agent-toolkit/latest/userguide/aws-mcp-limits.html)）：1 アカウント・1 リージョンあたり、リクエスト数は **3 RPS（リクエスト/秒）**、同時接続は最大 27（引き上げ不可）、同時セッションは最大 180（引き上げ申請可）。`run_script` の作業ディレクトリ等の ephemeral storage は 8 時間で削除される
 
@@ -107,6 +110,24 @@ claude mcp add-json aws-mcp --scope user '{
   ]
 }'
 ```
+
+::: note info 東京リージョンのエンドポイントを利用する場合
+上記コマンドのエンドポイント URL を `https://aws-mcp.ap-northeast-1.api.aws/mcp` に変更します（[公式エンドポイント一覧](https://docs.aws.amazon.com/general/latest/gr/aws-mcp.html)）。東京リージョンを利用する場合の登録例は次のとおりです。
+
+```sh
+claude mcp add-json aws-mcp --scope user '{
+  "command": "uvx",
+  "args": [
+    "mcp-proxy-for-aws@latest",
+    "https://aws-mcp.ap-northeast-1.api.aws/mcp",
+    "--profile", "my-aws-profile",
+    "--metadata", "AWS_REGION=ap-northeast-1"
+  ]
+}'
+```
+
+`--metadata AWS_REGION=ap-northeast-1` は AWS リソースの操作対象リージョンを指定するもので、元の例ですでに東京リージョンを指定しています。今回変更するのは AWS MCP Server の接続先 URL です。「接続確認」の `claude mcp list` では、接続先が東京リージョンの URL になっていることを確認してください。
+:::
 
 ポイント:
 
