@@ -46,6 +46,7 @@ AWS MCP Server は、AWS 公式が提供する Agent Toolkit for AWS スイー�
 ### 提供リージョン・料金・クォータ
 
 - 対応リージョンは、本記事執筆時点（2026年5月11日現在）で 米国東部（バージニア北部）と 欧州（フランクフルト）の2リージョンに限られる
+- **追記（2026年10月9日）**：2026年10月2日、AWS MCP Server がアジアパシフィック（東京）リージョン（`ap-northeast-1`）でも利用可能になりました（[公式アナウンス](https://aws.amazon.com/jp/about-aws/whats-new/2026/10/aws-mcp-server-six-additional-regions/)）。
 - AWS MCP Server 自体に追加料金は発生しない。エージェントが作成・利用した AWS リソースおよびデータ転送料金のみが課金される
 - 公式クォータ（[AWS MCP Server Quotas](https://docs.aws.amazon.com/agent-toolkit/latest/userguide/aws-mcp-limits.html)）：1 アカウント・1 リージョンあたり、リクエスト数は **3 RPS（リクエスト/秒）**、同時接続は最大 27（引き上げ不可）、同時セッションは最大 180（引き上げ申請可）。`run_script` の作業ディレクトリ等の ephemeral storage は 8 時間で削除される
 
