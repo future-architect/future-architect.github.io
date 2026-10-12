@@ -25,14 +25,18 @@ function stripComments(css) {
 }
 
 /**
- * 読み込み順は Bootstrap → テーマ。CSS は後勝ちなので、この順序を変えると
- * 表示が壊れる。サイトの土台（旧 metronic-src/assets/style.css）は
- * theme-styles.styl の先頭に畳んである (#2759)。
+ * Bootstrap は @layer に入れ、テーマはレイヤーの外に置く。レイヤーの外の
+ * 宣言は詳細度に関係なくレイヤーの中に勝つので、テーマが Bootstrap に
+ * 勝つことを連結順と詳細度に頼らずに決められる (#3332)。
+ * テーマまでレイヤーに入れない。レイヤーの外にある CSS（gist の埋め込み、
+ * mermaid の SVG が持つ <style>）にテーマが負けるようになる。
+ * サイトの土台（旧 metronic-src/assets/style.css）は theme-styles.styl の
+ * 先頭に畳んである (#2759)。
  */
 function combineCss({ bootstrap, themeStyles }) {
   return [
     '/* bootstrap-subset.css */',
-    stripComments(bootstrap),
+    `@layer bootstrap {\n${stripComments(bootstrap)}\n}`,
     '/* theme-styles.styl */',
     stripComments(themeStyles),
   ].join('\n');
