@@ -1637,15 +1637,16 @@ p {
    highlight.styl が濃い色のタブに仕立てているので、:not(.highlight) で分ける */
 /* 画像は左寄せ（.blog-item img に中央寄せの指定はない）。キャプションを
    カラム幅で中央寄せすると、幅の狭い画像でキャプションだけ右にずれる。
-   display: table でボックスを画像の幅に縮め、その中で中央に置く */
+   figure を画像の幅に縮め、その中で中央に置く。キャプションは
+   contain: inline-size で幅の計算から外す。外さないと長いキャプションが
+   figure を押し広げ、画像より広い幅で組まれる */
 .article-entry figure:not(.highlight) {
-  display: table;
+  width: fit-content;
   max-width: 100%;
   margin: 24px 0;
 }
 .article-entry figure:not(.highlight) > figcaption {
-  display: table-caption;
-  caption-side: bottom;
+  contain: inline-size;
   padding-top: 8px;
   /* 本文（1.2em = 15.6px）より一段小さくして、図の補足だと分かるようにする */
   font-size: text-row;
@@ -2095,10 +2096,6 @@ body {
      スクロールしないため、目次が追従しない。clip は横のはみ出しを隠すが
      スクロールコンテナを作らない */
   overflow-x: clip;
-}
-
-#article-nav {
-    clear: both;
 }
 
 /* カードは囲みを持たない (#2747)。1件のまとまりは項目の外（48px）と
@@ -2748,7 +2745,7 @@ button.share-btn {
   position: absolute;
   bottom: 100%;
   left: 50%;
-  transform: translateX(-50%);
+  translate: -50% 0;
   margin-bottom: 6px;
   padding: 3px 8px;
   border-radius: radius-small;
@@ -2957,8 +2954,10 @@ button.share-btn {
   z-index: 3;
   /* **浮いた位置を基準に置く。** 引っ込むときは元いた場所でフェードするだけで、
      下へは降ろさない。上がるのは出てくるときだけなので、transition ではなく
-     入りのアニメーションで持つ */
-  transform: translate(-50%, -16px);
+     入りのアニメーションで持つ。中央寄せは translate が持つので、
+     動きの transform は中央寄せを書き写さずに済む */
+  translate: -50% 0;
+  transform: translateY(-16px);
   transition: opacity like-pop-speed ease-out;
 }
 .like-plus.is-shown {
@@ -2966,19 +2965,18 @@ button.share-btn {
   animation: like-plus-in like-pop-speed ease-out;
 }
 @keyframes like-plus-in {
-  from { opacity: 0; transform: translate(-50%, 0); }
-  to { opacity: 1; transform: translate(-50%, -16px); }
+  from { opacity: 0; transform: translateY(0); }
+  to { opacity: 1; transform: translateY(-16px); }
 }
 /* 出ている間にもう一度叩かれたら揺らす。数は変わらないので、受け取ったことだけを返す。
    is-shown の入りより後ろに置いて上書きする。
 
-   **振れ幅は % ではなく px で書く。** 横位置は translate(-50%) で中央に寄せているので、
-   そこを 52% にしても幅34pxのチップでは 0.7px しか動かず見えない。
+   **振れ幅は % ではなく px で書く。** 幅34pxのチップでは 2% でも 0.7px しか動かず見えない。
    跳ねと同じく拡大も混ぜて、小さな札でも動きが読めるようにする */
 @keyframes like-plus-shake {
-  0%, 100% { transform: translate(-50%, -16px) rotate(0) scale(1); }
-  30% { transform: translate(calc(-50% - 1px), -17.5px) rotate(-2deg) scale(1.03); }
-  65% { transform: translate(calc(-50% + 1px), -15.5px) rotate(1.5deg) scale(1.015); }
+  0%, 100% { transform: translate(0, -16px) rotate(0) scale(1); }
+  30% { transform: translate(-1px, -17.5px) rotate(-2deg) scale(1.03); }
+  65% { transform: translate(1px, -15.5px) rotate(1.5deg) scale(1.015); }
 }
 .like-plus.is-shaking {
   animation: like-plus-shake like-pop-speed ease-in-out;
@@ -3018,7 +3016,7 @@ button.share-btn {
    **ink-strong はテーマで明暗が入れ替わる**ので、暗い側は文字の色だけ戻す */
 .like-hold {
   left: 0;
-  transform: none;
+  translate: none;
   background: var(--ink-strong);
 }
 .like-hold.is-holding {
@@ -3036,7 +3034,7 @@ button.share-btn {
    左端からはみ出す。左ぞろえなら伸びるのは右側＝共有の丸の上で、そこは空いている */
 .like-thanks {
   left: 0;
-  transform: none;
+  translate: none;
   background: var(--brand-crimson);
 }
 .like-thanks.is-thanks {
@@ -3977,30 +3975,14 @@ ul.tag-list {
 .related-tag-groups .tendency-panels + .panels-label {
   margin-top: 24px;
 }
-/* 著者一覧の年別タブ。ランキングと同じ radio + label 方式だが、
-   年ごとの ID ルールを毎年 CSS に足さずに済むよう、input+label+content を
-   隣接させて flex の order で並べ替える。ラベルだけ order:1 で帯に並び、
-   選択された組のコンテンツが order:2 + 全幅で下段に出る */
+/* 著者一覧の年別タブ。並べ方は .tabs の flex の order がそのまま受け持つ */
 .tabs.year-tabs {
-  /* 後方の .tabs { display: flow-root } と同詳細度だと記述順で負けて
-     flex が効かず、ラベルがインライン扱いで選択コンテンツの後ろに
-     折り返してしまう。クラスを2つ重ねて順序に依存させない */
-  display: flex;
-  flex-wrap: wrap;
+  /* 年は12本（2016〜今年＋全期間）並ぶ。間隔 16px で計 593px（Noto Sans CJK 実測）。
+     サイドバーを持つ本文列（1025〜1199px で 678px）に 2027年まで入る (#3085)。
+     あふれたら flex-wrap で2行に折れるだけで崩れない */
+  column-gap: 16px;
   /* 見出しを持たないブロックなので、上のチャートとの区切りは余白で付ける */
   margin-top: 32px;
-}
-/* 年は12本（2016〜今年＋全期間）並ぶ。間隔 16px で計 593px（Noto Sans CJK 実測）。
-   サイドバーを持つ本文列（1025〜1199px で 678px）に 2027年まで入る (#3085)。
-   あふれたら flex-wrap で2行に折れるだけで崩れない */
-.year-tabs .tab_item {
-  float: none;
-  order: 1;
-  margin-right: 16px;
-}
-.year-tabs .tab_content {
-  order: 2;
-  width: 100%;
 }
 /* 全期間は年のタブと性質が違う（集計であって1つの年ではない）ので、
    右端に離して置く */
@@ -5519,15 +5501,20 @@ a.award-badge:focus {
    「塗りにすると中身より目立つので線1本」という判断は元からのもので、
    面の方を落とした形。
 
-   float したタブを含めるのは flow-root */
+   input+label+content を隣接させる形（著者一覧の年・ギャラリーの見本）でも
+   label を先に並べる形（ランキング）でも同じに組めるよう、flex の order で
+   ラベルだけを帯に並べ、中身は全幅で下段に出す。年ごとの ID のルールを
+   毎年 CSS に足さずに済む */
 .tabs {
-  display: flow-root;
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 24px;
   /* 見えない radio の位置の基準。帯の外へ飛ばすとフォーカス時に
      ブラウザがそこまでページを送ってしまう */
   position: relative;
 }
 .tab_item {
-  float: left;
+  order: 1;
   /* 真下に出す .tab-hint の基準 (#2852) */
   position: relative;
   /* 左右の padding は持たない。タブの文字の左端が、下に並ぶ中身と
@@ -5535,7 +5522,7 @@ a.award-badge:focus {
   padding: 4px 0 10px;
   /* margin-bottom の -1px で、下線（2px）を帯の線（1px）に重ねる。
      transparent で場所を取っておくのは、選択時に高さが動かないように */
-  margin: 0 24px -1px 0;
+  margin-bottom: -1px;
   font-size: text-row;
   line-height: leading-row;
   letter-spacing: 0.02em;
@@ -5648,7 +5635,8 @@ a.award-badge:focus {
 }
 .tab_content {
   display: none;
-  clear: both;
+  order: 2;
+  width: 100%;
   /* 帯の下辺の線。切り替わる範囲はこの線が示す。選択タブの下線（2px）が
      -1px のマージンでこの線に重なる */
   border-top: 1px solid var(--rule-base);
@@ -5673,7 +5661,8 @@ a.award-badge:focus {
    display: none と同じく読み上げ・タブ移動からも外れる */
 .tab-stack {
   display: grid;
-  clear: both;
+  order: 2;
+  width: 100%;
   /* 帯の下辺の線はこちらが持つ。重ねた .tab_content に持たせると、
      切り替えの透明度の遷移で線まで一緒に明滅する */
   border-top: 1px solid var(--rule-base);
