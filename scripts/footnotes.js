@@ -77,7 +77,7 @@ function renderFootnotes(text) {
   orderedFootnotes.forEach(function (footNote, i) {
     const index = i + 1; // 脚注番号は1から始まる連番
     html += `<li id="fn:${footNote.name}">`;
-    html += `<span style="vertical-align: top; padding-right: 10px;">${index}.</span>`;
+    html += `<span style="vertical-align: top; padding-inline-end: 10px;">${index}.</span>`;
     html += `<span style="vertical-align: top;">${md.renderInline(footNote.content)}</span>`;
     html += ` <a href="#fnref:${footNote.name}" rev="footnote">↩</a>`;
     html += `</li>`;
@@ -91,7 +91,7 @@ function renderFootnotes(text) {
     text += '\n\n<div id="footnotes">';
     text += '<hr>';
     text += '<div id="footnotelist">';
-    text += '<ol style="list-style:none; padding-left: 0;">' + html + '</ol>';
+    text += '<ol style="list-style:none; padding-inline-start: 0;">' + html + '</ol>';
     text += '</div></div>';
   }
 
