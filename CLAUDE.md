@@ -2239,8 +2239,8 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
       一覧カード（`_partial/archive-post.ejs`）にはカテゴリを残す。同じページに複数の
       記事が並び、そのページのパンくずは個々の記事のカテゴリを指さないため
     - アイコンは描画済みの SVG を `items[].icon` で渡す。絵柄の辞書は
-      `_partial/svg-icon.ejs` が1箇所で持つ。`itemprop="name"` の外に置いて、
-      機械に渡す名前は文字だけに保つ
+      `_partial/svg-icon.ejs` が1箇所で持つ。機械に渡す名前（JSON-LD の `name`）は
+      `label` だけから組むので、絵柄は混ざらない
     - **一覧・期間・著者はメタなページなので道筋を全部出す**（`ホーム > すべての記事 > 2026年`、
       `ホーム > カテゴリ > Programming`）。技術的な知見を求める読者とは別の行動を取る人しか
       見ないので、階層を辿れる方が役に立つ。メイン（記事）とメタ（管理用の一覧）で扱いを分ける
@@ -2263,7 +2263,8 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
     例外で、2〜4項目すべてが太いと帯が重くなり現在地の強調が消える。
     日付・著者名の太字は単独で置くメタ情報という違いがある
   - 現在地の `li` には `aria-current="page"` を付ける。目で見る読者・支援技術・機械
-    （microdata の `itemprop="item"` の有無）の3方向に同じ違いを渡す
+    （JSON-LD の `item` の有無）の3方向に同じ違いを渡す。JSON-LD は表示と同じ
+    `items` から `_partial/breadcrumb.ejs` が組む
 
 ## コメント
 
