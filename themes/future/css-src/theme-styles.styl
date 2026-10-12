@@ -16,6 +16,8 @@
    スタイルガイド（/specials/styleguide/）が見本の地・16進数・コントラスト比を
    同じ1つの値から出せるようにするため。CSS 変数だけだと計算に使えない */
 :root {
+  /* フォーム部品・UA のスクロールバーをテーマに合わせる。暗い側は dark-tokens() が上書きする */
+  color-scheme: light;
   --a-color: var(--link-blue);
   --brand-navy: brand-navy;
   --brand-gray: brand-gray;
@@ -121,6 +123,7 @@
 // 属性は head の中の同期スクリプトが localStorage を読んで付ける
 // （外部ファイルにすると読み込み待ちの間に明るい画面が一瞬出る）
 dark-tokens()
+  color-scheme: dark;
   --ink-strong: dark-ink-strong;
   --ink-mute: dark-ink-mute;
   --ink-faint: dark-ink-faint;
@@ -251,7 +254,7 @@ dark-parts()
   .pagination > a:focus {
     color: var(--ink-strong);
   }
-  .pagination span.current {
+  .pagination [aria-current] {
     background-color: var(--ink-strong);
     color: var(--surface-base);
   }
@@ -412,11 +415,6 @@ Misc tools
 }
 .margin-top-30 {
   margin-top: 30px !important;
-}
-
-/* overides metro scrolbars in IE10 and makes them look like a default scrollbar */
-@-ms-viewport{
-	width: auto !important;
 }
 
 /* ベンダー接頭辞の擬似要素は他のセレクタと同じリストに入れない。
@@ -845,9 +843,9 @@ Header and header elements
    あるので、兄弟結合子では外の面まで届かない。
    **position: fixed にはしない。** ヘッダーは追従しない (#2877) ので、開いたまま
    送られると引き出しは一緒に上へ動くのにぼかしだけ残る。引き出しと同じく
-   ヘッダーを基準にした絶対配置で、帯の下から 100vh 分だけ敷く。
+   ヘッダーを基準にした絶対配置で、帯の下から画面の高さ分だけ敷く。
    開閉に合わせて出し入れするのは display で、透過は動かさない。
-   visibility では隠れている間も 100vh の箱が残り、短いページに縦の
+   visibility では隠れている間も画面の高さの箱が残り、短いページに縦の
    スクロールが生まれる。引き出し自体も瞬時に開くので合わせている */
 .header-backdrop {
   display: none;
@@ -855,7 +853,6 @@ Header and header elements
   top: header-height;
   left: 0;
   right: 0;
-  height: 100vh;
   height: 100dvh;
   background: var(--backdrop);
   backdrop-filter: blur(8px);
@@ -995,8 +992,7 @@ Header and header elements
     /* 高さの基準は dvh (#3197)。100vh はモバイルでは URL バーを畳んだときの高さ
        （大ビューポート）なので、箱の下端が見えている範囲より 60〜115px 下に出る。
        中身は約1,640px あって中で送れてしまうため、送り切っても最後の行が
-       画面の外に残る。vh の行は dvh を持たないブラウザ向けの控え */
-    max-height: unquote('calc(100vh - ' + header-height + ')');
+       画面の外に残る */
     max-height: unquote('calc(100dvh - ' + header-height + ')');
     overflow-y: auto;
     /* 送り切ったぶんを本文へ渡さない。渡すと追従しないヘッダーごと上へ抜ける */
@@ -1511,9 +1507,8 @@ Footer
 .wrap {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  /* モバイルの 100vh はアドレスバーを含む高さなので、短いページで
-     わずかにスクロールが出る。対応ブラウザでは表示領域ぶんに直す */
+  /* 100vh はモバイルではアドレスバーを畳んだときの高さなので、短いページで
+     わずかにスクロールが出る */
   min-height: 100dvh;
 }
 .wrap > footer {
@@ -1557,7 +1552,7 @@ Footer
    3つで現在地・hover 中のリンク・リンクが見分けられる。
    太字をリンク側に広げないのは、2〜4項目すべてが太いと帯が重くなり現在地の
    強調が消えるため（日付・著者名の太字は単独で置くメタ情報という違いがある） */
-.breadcrumb > li.active,
+.breadcrumb > li[aria-current],
 .sg-crumb-current {
   font-weight: bold;
 }
@@ -1603,7 +1598,7 @@ pager-pad-x = space-step * 3
 /* 塗るのは選択中のページだけ。span 全体に掛けると省略の「…」
    （span.space）まで塗られ、クリックできそうに見えて迷わせる (#2091)。
    「…」は base の .pagination > span（グレー文字・白地）のままにする */
-.pagination span.current {
+.pagination [aria-current] {
   color: var(--on-dark-strong);
   cursor: default;
   background-color: var(--brand-navy);
@@ -1642,15 +1637,16 @@ p {
    highlight.styl が濃い色のタブに仕立てているので、:not(.highlight) で分ける */
 /* 画像は左寄せ（.blog-item img に中央寄せの指定はない）。キャプションを
    カラム幅で中央寄せすると、幅の狭い画像でキャプションだけ右にずれる。
-   display: table でボックスを画像の幅に縮め、その中で中央に置く */
+   figure を画像の幅に縮め、その中で中央に置く。キャプションは
+   contain: inline-size で幅の計算から外す。外さないと長いキャプションが
+   figure を押し広げ、画像より広い幅で組まれる */
 .article-entry figure:not(.highlight) {
-  display: table;
+  width: fit-content;
   max-width: 100%;
   margin: 24px 0;
 }
 .article-entry figure:not(.highlight) > figcaption {
-  display: table-caption;
-  caption-side: bottom;
+  contain: inline-size;
   padding-top: 8px;
   /* 本文（1.2em = 15.6px）より一段小さくして、図の補足だと分かるようにする */
   font-size: text-row;
@@ -2100,10 +2096,6 @@ body {
      スクロールしないため、目次が追従しない。clip は横のはみ出しを隠すが
      スクロールコンテナを作らない */
   overflow-x: clip;
-}
-
-#article-nav {
-    clear: both;
 }
 
 /* カードは囲みを持たない (#2747)。1件のまとまりは項目の外（48px）と
@@ -2753,7 +2745,7 @@ button.share-btn {
   position: absolute;
   bottom: 100%;
   left: 50%;
-  transform: translateX(-50%);
+  translate: -50% 0;
   margin-bottom: 6px;
   padding: 3px 8px;
   border-radius: radius-small;
@@ -2810,13 +2802,13 @@ button.share-btn {
   --burst-bloom: 1.05;
   --burst-spread: 0.85;
 }
-.like-item.is-level-2 {
+.like-item[data-level='2'] {
   --pop-scale: 1.42;
   --burst-alpha: 0.3;
   --burst-bloom: 1.2;
   --burst-spread: 1.05;
 }
-.like-item.is-level-3 {
+.like-item[data-level='3'] {
   --pop-scale: 1.55;
   --burst-alpha: 0.4;
   --burst-bloom: 1.4;
@@ -2962,8 +2954,10 @@ button.share-btn {
   z-index: 3;
   /* **浮いた位置を基準に置く。** 引っ込むときは元いた場所でフェードするだけで、
      下へは降ろさない。上がるのは出てくるときだけなので、transition ではなく
-     入りのアニメーションで持つ */
-  transform: translate(-50%, -16px);
+     入りのアニメーションで持つ。中央寄せは translate が持つので、
+     動きの transform は中央寄せを書き写さずに済む */
+  translate: -50% 0;
+  transform: translateY(-16px);
   transition: opacity like-pop-speed ease-out;
 }
 .like-plus.is-shown {
@@ -2971,19 +2965,18 @@ button.share-btn {
   animation: like-plus-in like-pop-speed ease-out;
 }
 @keyframes like-plus-in {
-  from { opacity: 0; transform: translate(-50%, 0); }
-  to { opacity: 1; transform: translate(-50%, -16px); }
+  from { opacity: 0; transform: translateY(0); }
+  to { opacity: 1; transform: translateY(-16px); }
 }
 /* 出ている間にもう一度叩かれたら揺らす。数は変わらないので、受け取ったことだけを返す。
    is-shown の入りより後ろに置いて上書きする。
 
-   **振れ幅は % ではなく px で書く。** 横位置は translate(-50%) で中央に寄せているので、
-   そこを 52% にしても幅34pxのチップでは 0.7px しか動かず見えない。
+   **振れ幅は % ではなく px で書く。** 幅34pxのチップでは 2% でも 0.7px しか動かず見えない。
    跳ねと同じく拡大も混ぜて、小さな札でも動きが読めるようにする */
 @keyframes like-plus-shake {
-  0%, 100% { transform: translate(-50%, -16px) rotate(0) scale(1); }
-  30% { transform: translate(calc(-50% - 1px), -17.5px) rotate(-2deg) scale(1.03); }
-  65% { transform: translate(calc(-50% + 1px), -15.5px) rotate(1.5deg) scale(1.015); }
+  0%, 100% { transform: translate(0, -16px) rotate(0) scale(1); }
+  30% { transform: translate(-1px, -17.5px) rotate(-2deg) scale(1.03); }
+  65% { transform: translate(1px, -15.5px) rotate(1.5deg) scale(1.015); }
 }
 .like-plus.is-shaking {
   animation: like-plus-shake like-pop-speed ease-in-out;
@@ -3023,7 +3016,7 @@ button.share-btn {
    **ink-strong はテーマで明暗が入れ替わる**ので、暗い側は文字の色だけ戻す */
 .like-hold {
   left: 0;
-  transform: none;
+  translate: none;
   background: var(--ink-strong);
 }
 .like-hold.is-holding {
@@ -3041,7 +3034,7 @@ button.share-btn {
    左端からはみ出す。左ぞろえなら伸びるのは右側＝共有の丸の上で、そこは空いている */
 .like-thanks {
   left: 0;
-  transform: none;
+  translate: none;
   background: var(--brand-crimson);
 }
 .like-thanks.is-thanks {
@@ -3115,7 +3108,7 @@ button.share-btn {
   padding: 0;
   margin: -1px;
   overflow: hidden;
-  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
   white-space: nowrap;
   border: 0;
 }
@@ -3688,7 +3681,7 @@ ul.tag-list {
      全1,481本のうち68本（5%） */
   position: sticky;
   top: header-height + 24px;
-  max-height: unquote('calc(100vh - ' + (header-height + 48px) + ')');
+  max-height: unquote('calc(100dvh - ' + (header-height + 48px) + ')');
   overflow-y: auto;
 }
 /* 見出しにも行と同じ左パディングを与えて、文字の左端を項目と揃える。
@@ -3982,30 +3975,14 @@ ul.tag-list {
 .related-tag-groups .tendency-panels + .panels-label {
   margin-top: 24px;
 }
-/* 著者一覧の年別タブ。ランキングと同じ radio + label 方式だが、
-   年ごとの ID ルールを毎年 CSS に足さずに済むよう、input+label+content を
-   隣接させて flex の order で並べ替える。ラベルだけ order:1 で帯に並び、
-   選択された組のコンテンツが order:2 + 全幅で下段に出る */
+/* 著者一覧の年別タブ。並べ方は .tabs の flex の order がそのまま受け持つ */
 .tabs.year-tabs {
-  /* 後方の .tabs { display: flow-root } と同詳細度だと記述順で負けて
-     flex が効かず、ラベルがインライン扱いで選択コンテンツの後ろに
-     折り返してしまう。クラスを2つ重ねて順序に依存させない */
-  display: flex;
-  flex-wrap: wrap;
+  /* 年は12本（2016〜今年＋全期間）並ぶ。間隔 16px で計 593px（Noto Sans CJK 実測）。
+     サイドバーを持つ本文列（1025〜1199px で 678px）に 2027年まで入る (#3085)。
+     あふれたら flex-wrap で2行に折れるだけで崩れない */
+  column-gap: 16px;
   /* 見出しを持たないブロックなので、上のチャートとの区切りは余白で付ける */
   margin-top: 32px;
-}
-/* 年は12本（2016〜今年＋全期間）並ぶ。間隔 16px で計 593px（Noto Sans CJK 実測）。
-   サイドバーを持つ本文列（1025〜1199px で 678px）に 2027年まで入る (#3085)。
-   あふれたら flex-wrap で2行に折れるだけで崩れない */
-.year-tabs .tab_item {
-  float: none;
-  order: 1;
-  margin-right: 16px;
-}
-.year-tabs .tab_content {
-  order: 2;
-  width: 100%;
 }
 /* 全期間は年のタブと性質が違う（集計であって1つの年ではない）ので、
    右端に離して置く */
@@ -5524,15 +5501,20 @@ a.award-badge:focus {
    「塗りにすると中身より目立つので線1本」という判断は元からのもので、
    面の方を落とした形。
 
-   float したタブを含めるのは flow-root */
+   input+label+content を隣接させる形（著者一覧の年・ギャラリーの見本）でも
+   label を先に並べる形（ランキング）でも同じに組めるよう、flex の order で
+   ラベルだけを帯に並べ、中身は全幅で下段に出す。年ごとの ID のルールを
+   毎年 CSS に足さずに済む */
 .tabs {
-  display: flow-root;
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 24px;
   /* 見えない radio の位置の基準。帯の外へ飛ばすとフォーカス時に
      ブラウザがそこまでページを送ってしまう */
   position: relative;
 }
 .tab_item {
-  float: left;
+  order: 1;
   /* 真下に出す .tab-hint の基準 (#2852) */
   position: relative;
   /* 左右の padding は持たない。タブの文字の左端が、下に並ぶ中身と
@@ -5540,7 +5522,7 @@ a.award-badge:focus {
   padding: 4px 0 10px;
   /* margin-bottom の -1px で、下線（2px）を帯の線（1px）に重ねる。
      transparent で場所を取っておくのは、選択時に高さが動かないように */
-  margin: 0 24px -1px 0;
+  margin-bottom: -1px;
   font-size: text-row;
   line-height: leading-row;
   letter-spacing: 0.02em;
@@ -5653,7 +5635,8 @@ a.award-badge:focus {
 }
 .tab_content {
   display: none;
-  clear: both;
+  order: 2;
+  width: 100%;
   /* 帯の下辺の線。切り替わる範囲はこの線が示す。選択タブの下線（2px）が
      -1px のマージンでこの線に重なる */
   border-top: 1px solid var(--rule-base);
@@ -5678,7 +5661,8 @@ a.award-badge:focus {
    display: none と同じく読み上げ・タブ移動からも外れる */
 .tab-stack {
   display: grid;
-  clear: both;
+  order: 2;
+  width: 100%;
   /* 帯の下辺の線はこちらが持つ。重ねた .tab_content に持たせると、
      切り替えの透明度の遷移で線まで一緒に明滅する */
   border-top: 1px solid var(--rule-base);
@@ -6006,7 +5990,7 @@ a.award-badge:focus {
      左端が枠に貼り付く (#2887) */
   padding: (space-step * 4);
   /* 320px 幅では1列に落ちて縦に伸びるので、面の中で送れるようにする */
-  max-height: unquote('calc(100vh - ' + header-height + ')');
+  max-height: unquote('calc(100dvh - ' + header-height + ')');
   overflow-y: auto;
   background: var(--surface-base);
   border: 1px solid var(--rule-base);

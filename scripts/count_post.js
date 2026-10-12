@@ -40,10 +40,6 @@ hexo.extend.helper.register('count_category', function (name) {
   ).length;
 });
 
-hexo.extend.helper.register('join_pagetag', function (name) {
-  return this.page.tags.map((tag) => tag.name).join(',');
-});
-
 /*
  * 期間ページ
  */
