@@ -798,7 +798,18 @@ Hexo は記事の描画結果を `db.json` に持っていて、記事の内容�
 
 CSS は `themes/future/css-src/` にあり、`scripts/combine_css.js` が
 bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する。
-**この順序は後勝ちの前提なので変えると表示が壊れる。**
+**Bootstrap は `@layer bootstrap` に入れ、テーマはレイヤーの外に置く**（#3332）。
+レイヤーの外の宣言は詳細度に関係なく勝つので、テーマが Bootstrap に勝つことは
+連結順にも詳細度にも頼らない。
+
+- **テーマをレイヤーに入れない。** レイヤーの外にある CSS（gist の埋め込みが読む
+  GitHub の CSS、mermaid の SVG が持つ `<style>`）にテーマが負けるようになる
+- **`!important` で勝たせない。** ユーティリティ（`.margin-bottom-20` など）の
+  `!important` は、部品の側に書いた意図の値（`.popular-articles` の 56px、
+  `.series-nav` の 40px）を黙って潰していた。部品が自分の余白を持つなら、
+  マークアップからユーティリティを外す
+  - 残っているのは `highlight.styl` の gist の行の1箇所だけ。相手が外部の CSS で、
+    ローカルの比較では確かめられない
 
 文字サイズは過去に「どこで最終値が決まるか追えない」ことが原因の不具合を
 2回出している（#1927 / #1928）。以下を守る。
