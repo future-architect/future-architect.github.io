@@ -1452,6 +1452,18 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
 - **ダークモードは `:root` のトークンを差し替えて作る**（#2746）。状態は3つ——
   何も指定しない（OS の設定に従う）/ `data-theme="dark"` / `data-theme="light"`。
   **2値のトグルにするとシステム追従へ戻せなくなる**
+  - **明暗は `color-scheme` だけが持つ**（#3332）。`:root` は `light dark`（OS に従う）で、
+    `data-theme` が付くと `light` か `dark` に固定する。トークンは
+    `light-dark(明るい側, 暗い側)` で両方の値を1行に持つ。以前は暗い側の値を
+    `@media (prefers-color-scheme: dark)` と `[data-theme='dark']` の2つのセレクタへ
+    同じものを展開していた
+  - **部品ごとの暗い側も、その部品のルールに `light-dark()` で書く。** 別の塊に
+    集めると、`:root[data-theme]` を前置したぶん詳細度が上がって、意図しない相手にも
+    勝つ（いいねの礼の地が、トグルで暗くしたときだけ灰色になっていた）
+  - **差し色のネイビーは `--accent`、その塗りの上の文字は `--on-accent`。**
+    `--brand-navy` は暗い側で一段暗い面の色になるので、文字・線・塗りの差し色には使わない
+  - **`light-dark()` は色の値にしか書けない。** 色ではない値を明暗で変えたくなったら、
+    この仕組みの外に出ることになる
   - **属性は `head` の中の同期スクリプトが `localStorage` を読んで付ける。**
     外部ファイルにすると読み込み待ちの間に明るい画面が一瞬出る（FOUC）
   - **トグルの絵と読み上げ名の出し分けは CSS が `:root[data-theme]` を見て行う。**
@@ -1524,8 +1536,8 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
       いずれも「白い紙に載った1枚」として読める
   - **`bootstrap-subset.css` が持つ値はトークンで上書きする。** `.card` の地
     （`#fff`）と枠（`rgba(0,0,0,.125)`）を連載ナビのパネルと著者紹介が継いでいた
-  - **echarts の option では CSS 変数を参照できない。** `:root` から実効値を読んで
-    option に流し込む（`_partial/chart-theme.ejs` が1箇所で持ち、各チャートは
+  - **echarts の option では CSS 変数を参照できない。** 要素の色として解決させた値を読んで
+    option に流し込む（変数のまま読むと `light-dark(…, …)` の文字列が返る）（`_partial/chart-theme.ejs` が1箇所で持ち、各チャートは
     `themeChart(インスタンス)` を1回呼ぶ）。切り替えは `themechange` イベントで知らせる
     - **持っていない部品を `setOption` で渡さない。** `legend: {…}` を無条件に重ねると、
       **凡例を持たないチャートにそこで凡例が生える**（既定は `show: true` で系列名を
