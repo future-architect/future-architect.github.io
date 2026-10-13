@@ -13,7 +13,7 @@
  * 引用符の中に改行を含む（Go の encoding/csv の記事）。素の split(',') だと
  * その行から先が丸ごと崩れる。
  *
- * 色は highlight.styl の既存トークン色を6色循環させる（配色は CSS 側）。
+ * 色は highlight.css の既存トークン色を6色循環させる（配色は CSS 側）。
  */
 
 const { replaceOutsideFences } = require('./lib/fence');

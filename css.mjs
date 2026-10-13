@@ -19,7 +19,8 @@ const root = dirname(fileURLToPath(import.meta.url));
 const themeDir = join(root, 'themes/future');
 const stylPath = join(themeDir, 'css-src/theme-styles.styl');
 
-stylus.render(readFileSync(stylPath, 'utf8'), { filename: stylPath }, (err, css) => {
+// highlight.css は include css でそのまま取り込む（hexo-renderer-stylus も同じ設定）
+stylus.render(readFileSync(stylPath, 'utf8'), { filename: stylPath, 'include css': true }, (err, css) => {
   if (err) {
     console.error(err.message);
     process.exit(1);

@@ -8,8 +8,13 @@ const { combineCss } = require('./lib/site_css');
 
 // CSS の URL に付ける内容ハッシュ。URL が /css/site.css 固定だと、
 // スタイルを変えてもブラウザがキャッシュを返し続けて反映されない。
-// 連結元の3ファイルから計算するので、ビルドごとに変わらず決定的
-const CSS_SOURCES = ['css-src/bootstrap-subset.css', 'css-src/theme-styles.styl'];
+// 連結元のファイルから計算するので、ビルドごとに変わらず決定的
+const CSS_SOURCES = [
+  'css-src/bootstrap-subset.css',
+  'css-src/_variables.styl',
+  'css-src/theme-styles.styl',
+  'css-src/highlight.css',
+];
 hexo.extend.helper.register('css_version', function () {
   const src = CSS_SOURCES.map((p) => fsNode.readFileSync(path.join(hexo.theme_dir, p))).join('\n');
   return crypto.createHash('md5').update(src).digest('hex').slice(0, 8);
