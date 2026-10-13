@@ -801,9 +801,15 @@ bootstrap-subset → tokens → highlight → theme-styles の順で `/css/site.
 （変換は挟まない。公開ビルドの `combine_css.js` と `make css` の `css.mjs` が同じ関数を呼ぶ）。
 **Stylus は #3340 で外した。** 変数・計算・ネスト・明暗の切り替えが標準の CSS
 （CSS 変数・`calc()`・ネスト・`light-dark()`）に入ったので、前処理を挟む理由が無くなった
-**Bootstrap は `@layer bootstrap` に入れ、テーマはレイヤーの外に置く**（#3332）。
-レイヤーの外の宣言は詳細度に関係なく勝つので、テーマが Bootstrap に勝つことは
+**Bootstrap は `@layer bootstrap`、テーマの土台（要素だけで書いた規則）は `@layer base` に入れ、
+部品の規則はレイヤーの外に置く**（#3332 / #3359）。強さは bootstrap < base < レイヤーの外の順。
+レイヤーの外の宣言は詳細度に関係なく勝つので、部品が土台や Bootstrap に勝つことは
 連結順にも詳細度にも頼らない。
+
+- **要素だけで書く規則（`a` / `a:hover` / `h2` / `body` / `table` など）は `@layer base` に書く**（#3359）。
+  レイヤーの外に置くと、`a:hover`（0,1,1）のような土台が部品のクラス（0,1,0）に詳細度で勝ち、
+  部品の側に打ち消しの `:hover` が要る。打ち消しを忘れた部品には土台の青と下線が漏れていた
+  （共有ボタンをマウスで押した後・スキップリンクの hover・連載ナビの前後のフォーカス）
 
 - **値は `tokens.css` の `:root` だけが持つ**（#3340）。使う側は `var()` で引き、
   段の倍数は `calc(var(--space-step) * 3)`、端数の切り上げは `round(up, …)` で書く
@@ -820,8 +826,9 @@ bootstrap-subset → tokens → highlight → theme-styles の順で `/css/site.
   - **親の宣言は入れ子の規則より前に書く。** 入れ子の後ろに書いた宣言は、ブラウザによって
     扱いが違う（新しいブラウザは書いた順、古いものは前へ寄せる）
   - `font_size_lint.mjs` は入れ子を親とつないだセレクタで `EXEMPT` と照合する
-- **テーマをレイヤーに入れない。** レイヤーの外にある CSS（gist の埋め込みが読む
-  GitHub の CSS、mermaid の SVG が持つ `<style>`）にテーマが負けるようになる
+- **部品の規則をレイヤーに入れない。** レイヤーの外にある CSS（gist の埋め込みが読む
+  GitHub の CSS、mermaid の SVG が持つ `<style>`）に部品が負けるようになる。
+  土台は要素にしか当たらず、外部の CSS は自分のクラスにしか当たらないので、土台だけは入れてよい
 - **`!important` で勝たせない。** ユーティリティ（`.margin-bottom-20` など）の
   `!important` は、部品の側に書いた意図の値（`.popular-articles` の 56px、
   `.series-nav` の 40px）を黙って潰していた。部品が自分の余白を持つなら、

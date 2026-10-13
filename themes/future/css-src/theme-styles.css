@@ -28,50 +28,171 @@
   color-scheme: dark;
 }
 
-/* General body settings */
-body {
-  color: var(--ink-strong);
-  direction: ltr;
-  font: 400 13px 'Open Sans', Arial, sans-serif;
-  /* font の一括指定は line-height を normal に戻すので、段を明示して
-     フォント依存をなくす。指定を持たない要素はここを継ぐ */
-  line-height: var(--leading-row);
-  background: var(--surface-base);
+/* 土台（要素だけで書いた規則）は層に入れる (#3359)。部品の規則は層の外にあるので、
+   詳細度や書き順に関係なく土台に勝つ。層の外に置くと、a:hover（0,1,1）のような
+   土台が部品のクラス（0,1,0）に詳細度で勝ち、部品の側で打ち消しが要る */
+@layer base {
+  /* General body settings */
+  body {
+    color: var(--ink-strong);
+    direction: ltr;
+    font: 400 13px 'Open Sans', Arial, sans-serif;
+    /* font の一括指定は line-height を normal に戻すので、段を明示して
+       フォント依存をなくす。指定を持たない要素はここを継ぐ */
+    line-height: var(--leading-row);
+    background: var(--surface-base);
+  }
+
+  /* 行間は見出しの段で1つに固定する。ここに `font: 300 'Open Sans', sans-serif`
+     と書かれていたが、font の一括指定は font-size を省くと宣言ごと捨てられるため
+     何も効いていなかった（見出しは bootstrap-subset の 1.2 で描かれていた）*/
+  h1, h2, h3, h4, h5, h6 {
+    line-height: var(--leading-heading);
+    margin: 0 0 10px;
+  }
+
+  /* ホバーで現れる見出しアンカーの目印は theme-styles.css が持つ (#2736)。
+     ここにあった `h2:hover ::before { content:'#' }` は、見出しの子孫の全要素を
+     対象にしていて <a> や <strong> を含む見出しで # が複数出るうえ、
+     絶対配置で見出しの箱の外に浮いていて押せなかった */
+  h1 {
+    margin-bottom: 15px;
+  }
+
+  a {
+    color: var(--a-color);
+    &,
+    &:focus,
+    &:hover,
+    &:active {
+      text-decoration: none;
+    }
+    &:hover,
+    &:focus {
+      color: var(--a-color);
+      text-decoration: underline;
+    }
+  }
+
+  /* 折りたたみ */
+  summary {
+    padding-top: 10px;
+    cursor: pointer;
+  }
+
+  details {
+    padding-bottom: 24px;
+  }
+
+  /* Typography and Posts */
+  p {
+    line-height: var(--leading-row);
+  }
+
+  /* 折りたたみは本文の外にもある（モバイル目次・関連記事・ランキング・被参照）。
+     同じページの同じ操作で反応が違うのを避けるため、セレクタは details 全体で持つ。
+     クラスを付けて回す方式にすると、折りたたみを増やすたびに付け忘れが起きる (#2522) */
+  @supports selector(details::details-content) {
+    details {
+      interpolate-size: allow-keywords;
+      &::details-content {
+        block-size: 0;
+        overflow: hidden;
+        transition: block-size var(--state-speed) ease, content-visibility var(--state-speed) allow-discrete;
+      }
+      &[open]::details-content {
+        block-size: auto;
+      }
+    }
+    /* 動きを減らす設定では高さを送らず、開いた高さで出す */
+    @media (prefers-reduced-motion: reduce) {
+      details::details-content {
+        transition: none;
+      }
+    }
+  }
+
+  /* 引用は左ボーダーだけで示す。以前はグレーの背景も敷いていたが、
+     技術ブログ系のサービス（Zenn / Qiita / はてなブログ）はいずれも
+     左ボーダーのみで、背景を敷く例は少ない。
+     文字サイズ・文字色とも本文と同じにする。引用は補足ではなく本文の
+     一部であり、色数を増やさないほうが指定漏れの事故も起きにくい */
+  blockquote p {
+    margin: 0.5rem 0 0.5rem 0;
+  }
+
+  /******************************
+   全体レイアウト
+  ******************************/
+  body {
+    /* 以前は "Hiragino Kaku Gothic Pro"（旧macOS向け）が先頭で、現行の
+       Hiragino Sans も Windows の Yu Gothic UI も指定が無かった。
+       フォント一覧は tokens.css の font-ja に集約している */
+    font-weight: 400;
+    font-size: var(--text-base);
+    font-family: var(--font-ja);
+    /* clip であって hidden ではない (#2909)。hidden にすると縦が auto に計算されて
+       body 自身がスクロールコンテナになり、中の position: sticky が
+       「body のスクロールポート基準」になって効かなくなる。body は伸びるだけで
+       スクロールしないため、目次が追従しない。clip は横のはみ出しを隠すが
+       スクロールコンテナを作らない */
+    overflow-x: clip;
+  }
+
+  /* クラスでサイズを持たない h2（「関連記事」「We're hiring」「タグから記事を探す」
+     サイドバーの見出しなど）。
+
+     以前は max-width:1024px のメディアクエリでのみ 24px を与えていたため、
+     1024px を超えるとブラウザ既定の 1.5em（19.5px）に落ち、
+     デスクトップの方がモバイルより小さいという逆転が起きていた。
+     幅に依存しない指定にして、本文の h2（1.85em）と揃える。
+
+     同じ場所にあった裸の h1（28px）は、テンプレート上のすべての h1 が
+     .list-page を持つため実質デッドコードだったので落とす。
+
+     .article-entry h2（0,1,1）・.article-title（0,1,0）・.list-page（0,1,0）は
+     いずれも詳細度で勝つため、この指定には影響されない */
+  h2 {
+    font-size: var(--text-display);
+  }
+
+  table {
+    table-layout: auto;
+    border-collapse: collapse;
+    margin: 0 2px 2em;
+    background-color: var(--surface-base); /* :::info の中で背景が塗りつぶされるため */
+  }
+
+  th, td {
+    border: solid 1px var(--table-border);
+    padding: 8px 10px;
+  }
+
+  th {
+    /* 900 は Hiragino / Yu Gothic に該当ウェイトが無く、ブラウザの合成太字になって輪郭が濁る */
+    font-weight: 700;
+    /* 地は面の段から選び、表のための専用の値は持たない (#2743)。
+       Zenn は青みのある #edf2f7 だが、本ブログの配色では水色に寄って浮く */
+    background-color: var(--surface-tint);
+  }
+
+  /* リンクの折り返し */
+  article a {
+    word-wrap: break-word;
+    word-break: break-all;
+  }
+
+  /* ワンライナーの折り返し */
+  code {
+    word-wrap: break-word;
+    width: 100%;
+  }
 }
 
 /***
 General typography
 ***/
-/* 行間は見出しの段で1つに固定する。ここに `font: 300 'Open Sans', sans-serif`
-   と書かれていたが、font の一括指定は font-size を省くと宣言ごと捨てられるため
-   何も効いていなかった（見出しは bootstrap-subset の 1.2 で描かれていた）*/
-h1, h2, h3, h4, h5, h6 {
-  line-height: var(--leading-heading);
-  margin: 0 0 10px;
-}
 
-/* ホバーで現れる見出しアンカーの目印は theme-styles.css が持つ (#2736)。
-   ここにあった `h2:hover ::before { content:'#' }` は、見出しの子孫の全要素を
-   対象にしていて <a> や <strong> を含む見出しで # が複数出るうえ、
-   絶対配置で見出しの箱の外に浮いていて押せなかった */
-h1 {
-  margin-bottom: 15px;
-}
-
-a {
-  color: var(--a-color);
-  &,
-  &:focus,
-  &:hover,
-  &:active {
-    text-decoration: none;
-  }
-  &:hover,
-  &:focus {
-    color: var(--a-color);
-    text-decoration: underline;
-  }
-}
 .article-entry {
   a {
     text-decoration: none;
@@ -176,8 +297,10 @@ Header and header elements
       backdrop-filter: blur(8px);
     }
   }
-  html {
-    scroll-padding-top: calc(var(--header-height) + 16px);
+  @layer base {
+    html {
+      scroll-padding-top: calc(var(--header-height) + 16px);
+    }
   }
 }
 /* 帯の中身。左端はページ本文と同じ .container の内側に揃える。
@@ -849,15 +972,6 @@ Header and header elements
   padding-bottom: 40px;
 }
 
-/* 折りたたみ */
-summary {
-  padding-top: 10px;
-  cursor: pointer;
-}
-details {
-  padding-bottom: 24px;
-}
-
 .featured-post-link a,
 .related-post-link a {
   font-size: var(--text-body);
@@ -1336,10 +1450,6 @@ Footer
   margin-bottom: 56px;
 }
 
-/* Typography and Posts */
-p {
-  line-height: var(--leading-row);
-}
 .article-entry {
   p,
   li {
@@ -1499,28 +1609,6 @@ p {
 /* 開閉を高さのアニメーションで見せる。対応ブラウザだけの上乗せで、
    未対応なら今までどおり即座に開く。
    interpolate-size は継承するので details に置き、サイト全体には広げない */
-/* 折りたたみは本文の外にもある（モバイル目次・関連記事・ランキング・被参照）。
-   同じページの同じ操作で反応が違うのを避けるため、セレクタは details 全体で持つ。
-   クラスを付けて回す方式にすると、折りたたみを増やすたびに付け忘れが起きる (#2522) */
-@supports selector(details::details-content) {
-  details {
-    interpolate-size: allow-keywords;
-    &::details-content {
-      block-size: 0;
-      overflow: hidden;
-      transition: block-size var(--state-speed) ease, content-visibility var(--state-speed) allow-discrete;
-    }
-    &[open]::details-content {
-      block-size: auto;
-    }
-  }
-  /* 動きを減らす設定では高さを送らず、開いた高さで出す */
-  @media (prefers-reduced-motion: reduce) {
-    details::details-content {
-      transition: none;
-    }
-  }
-}
 .article-entry {
   li p {
     font-size: 1em;
@@ -1528,14 +1616,6 @@ p {
   li li {
     font-size: 1.0em;
   }
-}
-/* 引用は左ボーダーだけで示す。以前はグレーの背景も敷いていたが、
-   技術ブログ系のサービス（Zenn / Qiita / はてなブログ）はいずれも
-   左ボーダーのみで、背景を敷く例は少ない。
-   文字サイズ・文字色とも本文と同じにする。引用は補足ではなく本文の
-   一部であり、色数を増やさないほうが指定漏れの事故も起きにくい */
-blockquote p {
-  margin: 0.5rem 0 0.5rem 0;
 }
 .article-entry {
   /* 見出しは body の 13px を基準に em で決める。px 直指定だと body を
@@ -1730,7 +1810,6 @@ blockquote p {
   }
 }
 
-
 /* キーボードのフォーカスの輪郭 (#2686)。反応（hover）と所在（focus）は
    別の役目なので、輪郭をここで1箇所持つ。
    :focus ではなく :focus-visible なので、マウスで押したときには出ない。
@@ -1814,25 +1893,6 @@ summary:focus-visible,
 .img-frame-line {
   border: 1px solid var(--rule-base);
   margin-bottom: 1em;
-}
-
-
-/******************************
- 全体レイアウト
-******************************/
-body {
-  /* 以前は "Hiragino Kaku Gothic Pro"（旧macOS向け）が先頭で、現行の
-     Hiragino Sans も Windows の Yu Gothic UI も指定が無かった。
-     フォント一覧は tokens.css の font-ja に集約している */
-  font-weight: 400;
-  font-size: var(--text-base);
-  font-family: var(--font-ja);
-  /* clip であって hidden ではない (#2909)。hidden にすると縦が auto に計算されて
-     body 自身がスクロールコンテナになり、中の position: sticky が
-     「body のスクロールポート基準」になって効かなくなる。body は伸びるだけで
-     スクロールしないため、目次が追従しない。clip は横のはみ出しを隠すが
-     スクロールコンテナを作らない */
-  overflow-x: clip;
 }
 
 /* カードは囲みを持たない (#2747)。1件のまとまりは項目の外（48px）と
@@ -2374,22 +2434,6 @@ body {
     text-wrap: balance;
   }
 }
-/* クラスでサイズを持たない h2（「関連記事」「We're hiring」「タグから記事を探す」
-   サイドバーの見出しなど）。
-
-   以前は max-width:1024px のメディアクエリでのみ 24px を与えていたため、
-   1024px を超えるとブラウザ既定の 1.5em（19.5px）に落ち、
-   デスクトップの方がモバイルより小さいという逆転が起きていた。
-   幅に依存しない指定にして、本文の h2（1.85em）と揃える。
-
-   同じ場所にあった裸の h1（28px）は、テンプレート上のすべての h1 が
-   .list-page を持つため実質デッドコードだったので落とす。
-
-   .article-entry h2（0,1,1）・.article-title（0,1,0）・.list-page（0,1,0）は
-   いずれも詳細度で勝つため、この指定には影響されない */
-h2 {
-  font-size: var(--text-display);
-}
 /* サイドバーは記事本文の導線ではなく添え物なので、本文の見出しより一段抑える */
 .blog-sidebar h2 {
   font-size: var(--text-lead);
@@ -2522,7 +2566,6 @@ button.share-btn {
 .share-icon-done {
   display: none;
 }
-
 
 /* 数字はボタンと同じネイビー (#2723)。#2716 では「本文に添える属性」として
    日付・タグと同じ ink-mute にしていたが、それだと枠の外に置いた数字が
@@ -2890,23 +2933,6 @@ button.share-btn {
   縞が効く長さの表はそもそも少ない。
 */
 
-table {
-  table-layout: auto;
-  border-collapse: collapse;
-  margin: 0 2px 2em;
-  background-color: var(--surface-base); /* :::info の中で背景が塗りつぶされるため */
-}
-th, td {
-  border: solid 1px var(--table-border);
-  padding: 8px 10px;
-}
-th {
-  /* 900 は Hiragino / Yu Gothic に該当ウェイトが無く、ブラウザの合成太字になって輪郭が濁る */
-  font-weight: 700;
-  /* 地は面の段から選び、表のための専用の値は持たない (#2743)。
-     Zenn は青みのある #edf2f7 だが、本ブログの配色では水色に寄って浮く */
-  background-color: var(--surface-tint);
-}
 /* インラインコードの地色はヘッダの地色とほぼ同じ明度で、そのままだと溶ける。
    ヘッダ内では一段離して、本文セルと同じ「浮いて見える」関係を保つ。
    離す向きはテーマで逆になる（明るい側は一段濃く、暗い側は一段明るく #3269）ので、
@@ -2937,11 +2963,6 @@ th {
   tab-size: 2em;
   margin-bottom: 0.5rem;
 }
-/* リンクの折り返し */
-article a {
-  word-wrap: break-word;
-  word-break: break-all;
-}
 .blog-sidebar a {
   color: var(--ink-strong);
 }
@@ -2954,11 +2975,6 @@ article a {
   border-radius: var(--card-radius);
 }
 
-/* ワンライナーの折り返し */
-code {
-  word-wrap: break-word;
-  width: 100%;
-}
 .archives-wrap {
   margin-top: 30px;
 }
@@ -3407,7 +3423,6 @@ ul.tag-list {
   text-decoration: underline dotted var(--rule-strong);
   text-underline-offset: 3px;
 }
-
 
 /* 脚注は本文と地続きに見えていた。区切り線が inline-block のせいで
    中途半端な幅で止まり、本文との間隔も hr の 1rem しか無かった (#2457)。
@@ -3924,7 +3939,6 @@ ul.tag-list {
     text-decoration: underline;
   }
 }
-
 
 /* 名前の下の中身は、チップも子の群も同じ枝の中に置く。**片方だけ縦罫の外に
    出さない**——直系の子のチップと、子を持つ子のラベルは同じ左端に来る */
@@ -4909,12 +4923,6 @@ a {
   color: var(--ink-faint);
   font-size: var(--text-meta);
 }
-
-
-
-
-
-
 
 .award-badges {
   display: flex;
@@ -5976,7 +5984,6 @@ a {
   border: 1px solid var(--rule-base);
 }
 
-
 /* 全件への導線（#2304 / #2893）。ホームの連載・特設の枠、サイドバーの人気のタグ、
    記事末の連載ナビと著者紹介で共用する。ヘッダーのドロップダウンの
    「連載の一覧を見る」（.header-dropdown-more）と同じ役なので、色も同じ ink-mute。
@@ -6105,7 +6112,6 @@ pre.mermaid,
     overflow: visible;
   }
 }
-
 
 .note-container {
   &.note-tip {
@@ -6620,9 +6626,6 @@ pre.mermaid,
 .sg-chip-code {
   background: var(--code-block-bg);
 }
-
-
-
 
 /* note の中のリンクは種別ごとに色が違うので、見本もそれぞれの地の上に置く (#3241) */
 .sg-chip-note-tip {
