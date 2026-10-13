@@ -605,6 +605,43 @@ Header and header elements
     margin: 0;
     opacity: 0;
     pointer-events: none;
+    /* 上下の線を中央へ寄せてから回す。6px は線の高さ2pxと間隔4pxの和で、
+       間隔の段として選んだ値ではない。角度は参照実装（リクルートサイト）と
+       同じ ±135deg で、45deg と違って回る向きが両者で逆になる。
+       ✕ の2本は左端もそろえて同じ長さにする */
+    &:checked + .header-drawer-toggle .header-drawer-bar:nth-child(1) {
+      transform: translateY(6px) rotate(-135deg);
+    }
+    /* 真ん中は消すのではなく窓の外へ送る */
+    &:checked + .header-drawer-toggle .header-drawer-bar:nth-child(2) {
+      transform: translateX(20px);
+    }
+    &:checked + .header-drawer-toggle .header-drawer-bar:nth-child(3) {
+      transform: translateY(-6px) rotate(135deg);
+    }
+    /* 輪郭は見えない input ではなく label に描く (#2852) */
+    &:focus-visible + .header-drawer-toggle {
+      outline: 2px solid var(--brand-navy);
+      outline-offset: 2px;
+    }
+    &:checked ~ .header-drawer-panel {
+      display: block;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      /* 高さの基準は dvh (#3197)。100vh はモバイルでは URL バーを畳んだときの高さ
+         （大ビューポート）なので、箱の下端が見えている範囲より 60〜115px 下に出る。
+         中身は約1,640px あって中で送れてしまうため、送り切っても最後の行が
+         画面の外に残る */
+      max-height: calc(100dvh - var(--header-height));
+      overflow-y: auto;
+      /* 送り切ったぶんを本文へ渡さない。渡すと追従しないヘッダーごと上へ抜ける */
+      overscroll-behavior: contain;
+      padding: calc(var(--space-step) * 2) 0 calc(var(--space-step) * 4);
+      background: var(--surface-base);
+      border-bottom: 1px solid var(--rule-base);
+    }
   }
   /* 引き金は三本線で、開くと ✕ に変わる (#2883)。1枚の絵は動かせないので
      svg-icon の辞書は使わず、3本の span を並べて回す（Feedly のマークを
@@ -652,35 +689,13 @@ Header and header elements
       transform: translateX(5px);
     }
   }
-  .header-drawer-input {
-    /* 上下の線を中央へ寄せてから回す。6px は線の高さ2pxと間隔4pxの和で、
-       間隔の段として選んだ値ではない。角度は参照実装（リクルートサイト）と
-       同じ ±135deg で、45deg と違って回る向きが両者で逆になる。
-       ✕ の2本は左端もそろえて同じ長さにする */
-    &:checked + .header-drawer-toggle .header-drawer-bar:nth-child(1) {
-      transform: translateY(6px) rotate(-135deg);
-    }
-    /* 真ん中は消すのではなく窓の外へ送る */
-    &:checked + .header-drawer-toggle .header-drawer-bar:nth-child(2) {
-      transform: translateX(20px);
-    }
-  }
   /* 動きを減らす設定では回さずに ✕ の形へ切り替える */
   @media (prefers-reduced-motion: reduce) {
     .header-drawer-bar {
       transition: none;
     }
   }
-  .header-drawer-input {
-    &:checked + .header-drawer-toggle .header-drawer-bar:nth-child(3) {
-      transform: translateY(-6px) rotate(135deg);
-    }
-    /* 輪郭は見えない input ではなく label に描く (#2852) */
-    &:focus-visible + .header-drawer-toggle {
-      outline: 2px solid var(--brand-navy);
-      outline-offset: 2px;
-    }
-  }
+  
   .header-drawer-panel {
     display: none;
   }
@@ -705,24 +720,7 @@ Header and header elements
       cursor: pointer;
     }
   }
-  .header-drawer-input:checked ~ .header-drawer-panel {
-    display: block;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    /* 高さの基準は dvh (#3197)。100vh はモバイルでは URL バーを畳んだときの高さ
-       （大ビューポート）なので、箱の下端が見えている範囲より 60〜115px 下に出る。
-       中身は約1,640px あって中で送れてしまうため、送り切っても最後の行が
-       画面の外に残る */
-    max-height: calc(100dvh - var(--header-height));
-    overflow-y: auto;
-    /* 送り切ったぶんを本文へ渡さない。渡すと追従しないヘッダーごと上へ抜ける */
-    overscroll-behavior: contain;
-    padding: calc(var(--space-step) * 2) 0 calc(var(--space-step) * 4);
-    background: var(--surface-base);
-    border-bottom: 1px solid var(--rule-base);
-  }
+  
   /* 中は縦積み。横帯のための指定（高さ・折り返さない並び）を戻す */
   .header-nav-list {
     display: block;
@@ -1656,6 +1654,11 @@ blockquote p {
    付け忘れると1件につきタブが2回止まる（#2845） */
 .thumb-link {
   overflow: hidden;
+  img {
+    border-radius: var(--radius-small);
+    display: block;
+    max-width: 100%;
+  }
 }
 /* インラインSVGアイコン (#2306 / #2336)。文字サイズに対する相対値で、決めるのはここ1箇所。
    線画（stroke=currentColor）なので文字色にそのまま追従する */
@@ -1696,6 +1699,9 @@ blockquote p {
     height: 0.7em;
     vertical-align: 0;
   }
+  &:focus-visible {
+    opacity: 1;
+  }
 }
 /* 色は選択・focus と同じインタラクションのネイビー。
    状態ごとに書いているのは詳細度のためで、metronic の `a:hover`（青）・
@@ -1723,14 +1729,8 @@ blockquote p {
     opacity: 1;
   }
 }
-.headerlink:focus-visible {
-  opacity: 1;
-}
-.thumb-link img {
-  border-radius: var(--radius-small);
-  display: block;
-  max-width: 100%;
-}
+
+
 /* キーボードのフォーカスの輪郭 (#2686)。反応（hover）と所在（focus）は
    別の役目なので、輪郭をここで1箇所持つ。
    :focus ではなく :focus-visible なので、マウスで押したときには出ない。
@@ -1871,33 +1871,6 @@ body {
   img {
     transition: opacity var(--hover-speed) ease;
   }
-}
-/* 引き金は「記事へ行くリンクを指している／フォーカスしていること」(#3170)。
-   カードに乗っていること自体を引き金にすると、中の別の行き先（日付・著者・
-   カテゴリ・シェア・予選/本選・「◯◯一覧へ」）の**隙間**を通るたびに反応が戻る。
-   隙間はメタ行の項目間 28px・シェアの丸の間 12px・メタ行の右の余りと広く、
-   横切るだけで6回以上切り替わって点滅に見えた。#3164 はこれを
-   「リンクに乗っている瞬間」だけ止める形で解いていたが、カードの中の余白は
-   連続した1つの面ではなく行き先と行き先の隙間なので、誘いとして働くより先に
-   ノイズになる。
-
-   記事へ行くリンクは、サムネ（3種とも .thumb-link を持つ）と題の2つだけ。
-   キーボード側 (#3168) と同じ引き金になるので、hover と focus で
-   「反応が出る条件」が1つの規則にまとまる。サムネは tabindex="-1" なので
-   focus の側には出てこない (#2845) */
-.archive-post-item > a:hover .archive-post-title,
-.archive-post-item > a:focus-visible .archive-post-title,
-.article-card:has(.thumb-link:hover) .archive-post-title,
-.article-card .panel-title:hover,
-.article-card .panel-title:focus-visible,
-.article-card:has(.thumb-link:hover) .panel-title,
-.career-counseling .article-card .hiring-card-label:hover,
-.career-counseling .article-card .hiring-card-label:focus-visible {
-  text-decoration: underline;
-  text-underline-offset: var(--link-underline-offset);
-  text-decoration-thickness: 1px;
-}
-.article-card {
   &:has(.thumb-link:hover) img,
   &:has(.archive-post-item > a:hover) img,
   &:has(.archive-post-item > a:focus-visible) img,
@@ -1924,6 +1897,32 @@ body {
     padding-bottom: 0;
   }
 }
+/* 引き金は「記事へ行くリンクを指している／フォーカスしていること」(#3170)。
+   カードに乗っていること自体を引き金にすると、中の別の行き先（日付・著者・
+   カテゴリ・シェア・予選/本選・「◯◯一覧へ」）の**隙間**を通るたびに反応が戻る。
+   隙間はメタ行の項目間 28px・シェアの丸の間 12px・メタ行の右の余りと広く、
+   横切るだけで6回以上切り替わって点滅に見えた。#3164 はこれを
+   「リンクに乗っている瞬間」だけ止める形で解いていたが、カードの中の余白は
+   連続した1つの面ではなく行き先と行き先の隙間なので、誘いとして働くより先に
+   ノイズになる。
+
+   記事へ行くリンクは、サムネ（3種とも .thumb-link を持つ）と題の2つだけ。
+   キーボード側 (#3168) と同じ引き金になるので、hover と focus で
+   「反応が出る条件」が1つの規則にまとまる。サムネは tabindex="-1" なので
+   focus の側には出てこない (#2845) */
+.archive-post-item > a:hover .archive-post-title,
+.archive-post-item > a:focus-visible .archive-post-title,
+.article-card:has(.thumb-link:hover) .archive-post-title,
+.article-card .panel-title:hover,
+.article-card .panel-title:focus-visible,
+.article-card:has(.thumb-link:hover) .panel-title,
+.career-counseling .article-card .hiring-card-label:hover,
+.career-counseling .article-card .hiring-card-label:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: var(--link-underline-offset);
+  text-decoration-thickness: 1px;
+}
+
 .archives {
   /* 一覧ではシェア数を絶対配置にして、行の高さの計算から外す。
      そろえたいのは丸ボタンの下辺とサムネイルの下辺なので、数字は下にはみ出す。
@@ -1982,17 +1981,37 @@ body {
     align-self: start;
   }
 }
-/* We're hiring のパネル。サムネイルを左に小さく固定し、見出しと説明を右に積む。
-   記事末の他の節と同じく囲みは持たず、2枚の区別は .row の gutter（24px）で作る。
-   左端を節見出し・関連記事の行にそろえるため、内側の余白も持たない (#2820) */
-.career-counseling .article-card {
-  display: flex;
-  gap: 12px;
-  /* 固定59pxのサムネと、高さの違う本文（ラベル＋説明文）を垂直中央で
-     釣り合わせる (#2347)。連載パネルと同じ */
-  align-items: center;
-  margin: 0;
-  position: relative;
+.career-counseling {
+  /* We're hiring のパネル。サムネイルを左に小さく固定し、見出しと説明を右に積む。
+     記事末の他の節と同じく囲みは持たず、2枚の区別は .row の gutter（24px）で作る。
+     左端を節見出し・関連記事の行にそろえるため、内側の余白も持たない (#2820) */
+  .article-card {
+    display: flex;
+    gap: 12px;
+    /* 固定59pxのサムネと、高さの違う本文（ラベル＋説明文）を垂直中央で
+       釣り合わせる (#2347)。連載パネルと同じ */
+    align-items: center;
+    margin: 0;
+    position: relative;
+  }
+  /* リンク単体では反応しない (#2699 / #3113)。節が class="nav" を持つため
+     .nav a:hover の灰色の面がサムネとラベルの両方に付き、そこに
+     .article-entry a:hover の下線と metronic の a:hover の青が重なる。
+     関連記事・ランキングが #2686 で同じ面を打ち消しているのと同じ形。
+     下線はカードの hover が引くので、ここで出すとラベルを直接指したときだけ
+     位置と太さの違う線になる。**色も動かさない** */
+  .article-card a:hover,
+  .article-card a:focus {
+    background-color: transparent;
+    color: var(--ink-strong);
+    text-decoration: none;
+  }
+  /* visited も打ち消す (#3113)。節が article-entry を持つため本文の
+     .article-entry a:visited（紫）がラベルに届くが、紫は地の文の参照リンクの
+     語彙で、カードのラベルは .panel-title と同じく常時 ink-strong (#2699) */
+  .article-card a:visited {
+    color: var(--ink-strong);
+  }
 }
 /* 反応はカードの型（題に下線・絵が一段引く。#3162）。1枚＝1行き先なので当たりは
    カード全体に広げる（.hiring-card-label::after が下で伸ばしている）。
@@ -2004,6 +2023,15 @@ body {
   content: '';
   position: absolute;
   inset: 0;
+}
+/* カードの中のタイトルなので、色は .panel-title と同じ ink-strong にする (#2699)。
+   指定が無いと metronic の `a { color: var(--a-color) }` が出て、
+   静止状態から青いリンクに見える */
+.hiring-card-label {
+  display: block;
+  color: var(--ink-strong);
+  font-weight: bold;
+  margin-bottom: 4px;
 }
 /* 2列の切れ目は間隔だけが作るので、gutter の 24px（.row > * の左右 12px）では
    左のパネルの説明文が右のパネルのロゴに近すぎる。内側だけ 24px に広げて
@@ -2023,35 +2051,6 @@ body {
 }
 .hiring-card-body {
   min-width: 0;
-}
-/* カードの中のタイトルなので、色は .panel-title と同じ ink-strong にする (#2699)。
-   指定が無いと metronic の `a { color: var(--a-color) }` が出て、
-   静止状態から青いリンクに見える */
-.hiring-card-label {
-  display: block;
-  color: var(--ink-strong);
-  font-weight: bold;
-  margin-bottom: 4px;
-}
-.career-counseling {
-  /* リンク単体では反応しない (#2699 / #3113)。節が class="nav" を持つため
-     .nav a:hover の灰色の面がサムネとラベルの両方に付き、そこに
-     .article-entry a:hover の下線と metronic の a:hover の青が重なる。
-     関連記事・ランキングが #2686 で同じ面を打ち消しているのと同じ形。
-     下線はカードの hover が引くので、ここで出すとラベルを直接指したときだけ
-     位置と太さの違う線になる。**色も動かさない** */
-  .article-card a:hover,
-  .article-card a:focus {
-    background-color: transparent;
-    color: var(--ink-strong);
-    text-decoration: none;
-  }
-  /* visited も打ち消す (#3113)。節が article-entry を持つため本文の
-     .article-entry a:visited（紫）がラベルに届くが、紫は地の文の参照リンクの
-     語彙で、カードのラベルは .panel-title と同じく常時 ink-strong (#2699) */
-  .article-card a:visited {
-    color: var(--ink-strong);
-  }
 }
 /* 絞り込みを解く導線を持つ、見出しの直下の注記。地の文なので本文と同じ大きさで、
    1.2em は .article-entry 配下にしか効かないのでここで明示する。
@@ -2224,6 +2223,18 @@ body {
   color: var(--ink-strong);
   font-size: var(--text-body);
   font-weight: bold;
+  /* 反応を返すのはカードの規則（記事へ行くリンクの hover）で、ここでは足さない (#2686)。
+     以前は下線も出していて、1回のカーソル移動で2つの反応が起きていた。
+     ルールを消すのではなく打ち消しで残すのは、消すと metronic の
+     `a:hover { color: var(--a-color); text-decoration: underline }`（0,1,1）が
+     .panel-title（0,1,0）に勝って、タイトルが青くなって下線が出るため。
+     **打ち消すだけで状態は動かさない。**カード側の反応が下線になったので、
+     ここで色を落とすとタイトルに乗せたときだけ余分に変わる */
+  &:hover,
+  &:focus {
+    color: var(--ink-strong);
+    text-decoration: none;
+  }
 }
 /* 題と同じ行に続ける添え（出版・寄稿の特集名）。題をインラインにして1つの塊として
    流し、下マージンは器が持つ。リンクの外なので押せない */
@@ -2242,18 +2253,6 @@ body {
   margin-inline-start: calc(var(--space-step) * 3);
   color: var(--ink-strong);
   font-size: var(--text-body);
-}
-/* 反応を返すのはカードの規則（記事へ行くリンクの hover）で、ここでは足さない (#2686)。
-   以前は下線も出していて、1回のカーソル移動で2つの反応が起きていた。
-   ルールを消すのではなく打ち消しで残すのは、消すと metronic の
-   `a:hover { color: var(--a-color); text-decoration: underline }`（0,1,1）が
-   .panel-title（0,1,0）に勝って、タイトルが青くなって下線が出るため。
-   **打ち消すだけで状態は動かさない。**カード側の反応が下線になったので、
-   ここで色を落とすとタイトルに乗せたときだけ余分に変わる */
-.panel-title:hover,
-.panel-title:focus {
-  color: var(--ink-strong);
-  text-decoration: none;
 }
 .panel-meta {
   color: var(--ink-mute);
@@ -2463,6 +2462,23 @@ ul {
     color: var(--on-accent);
     text-decoration: none;
   }
+  /* 線画のアイコン（.svg-icon）はブランドロゴと同じ 14px に合わせる。
+     既定は文字に添える用で 1em ＋ 右マージンを持っている */
+  .svg-icon {
+    width: 14px;
+    height: 14px;
+    margin-inline-end: 0;
+    vertical-align: 0;
+  }
+  &.is-copied + .share-copied {
+    opacity: 1;
+  }
+  &.is-copied > .svg-icon {
+    display: none;
+  }
+  &.is-copied .share-icon-done {
+    display: inline-flex;
+  }
 }
 .share-btn-icon {
   display: block;
@@ -2476,14 +2492,6 @@ button.share-btn {
   background: transparent;
   font: inherit;
   cursor: pointer;
-}
-/* 線画のアイコン（.svg-icon）はブランドロゴと同じ 14px に合わせる。
-   既定は文字に添える用で 1em ＋ 右マージンを持っている */
-.share-btn .svg-icon {
-  width: 14px;
-  height: 14px;
-  margin-inline-end: 0;
-  vertical-align: 0;
 }
 /* ボタンの上に出る吹き出し。コピーの「コピーしました」と、いいねの名前
    （#1949。指している間だけ出す）が共有する。
@@ -2510,20 +2518,12 @@ button.share-btn {
   pointer-events: none;
   transition: opacity var(--hover-speed) ease;
 }
-.share-btn.is-copied + .share-copied {
-  opacity: 1;
-}
+
 .share-icon-done {
   display: none;
 }
-.share-btn {
-  &.is-copied > .svg-icon {
-    display: none;
-  }
-  &.is-copied .share-icon-done {
-    display: inline-flex;
-  }
-}
+
+
 /* 数字はボタンと同じネイビー (#2723)。#2716 では「本文に添える属性」として
    日付・タグと同じ ink-mute にしていたが、それだと枠の外に置いた数字が
    ボタンと切れて見えた。同じ色にすると円と数字が1つの部品として読める。
@@ -3212,17 +3212,17 @@ code {
   /* 下の 28px は .blog-info が持っていた下の空き（margin 20px + padding 8px）。
      タグが続くときはそれを下の行へ送るので、本文までの空きは変わらない */
   margin: 12px 0 28px -5.4px;
+  /* 1記事だけのタグは非リンクの .tag-list-text で描かれる。
+     どちらも margin を落とさないと gap に上乗せされる (#2764) */
+  .tag-list-link,
+  .tag-list-text {
+    margin: 0;
+  }
 }
 /* タグが続くときだけ、メタ行は下の空きを持たない */
 .article-header .blog-info:has(+ .article-header-tags) {
   margin-bottom: 0;
   padding-bottom: 0;
-}
-/* 1記事だけのタグは非リンクの .tag-list-text で描かれる。
-   どちらも margin を落とさないと gap に上乗せされる (#2764) */
-.article-header-tags .tag-list-link,
-.article-header-tags .tag-list-text {
-  margin: 0;
 }
 /* 狭い画面では記事のメタ行を2行に分ける (#2738 / #2907)。1行目「いつ・誰が」、
    2行目「どれだけ書かれ、読まれたか」。タグはその下の行が持つ。
@@ -3835,6 +3835,9 @@ ul.tag-list {
     padding: 6px 0;
     border-bottom: 1px solid var(--rule-weak);
   }
+  .doctor-inline-row {
+    line-height: var(--leading-row);
+  }
 }
 .doctor-note {
   display: block;
@@ -3848,9 +3851,7 @@ ul.tag-list {
   font-size: var(--text-meta);
   margin: 0 5px 0 2px;
 }
-.doctor-list .doctor-inline-row {
-  line-height: var(--leading-row);
-}
+
 /* 節の中の小見出し（年ごとの列など）。h2 の節見出しより一段小さく */
 .doctor-subhead {
   margin: 16px 0 8px;
@@ -3884,6 +3885,10 @@ ul.tag-list {
     break-inside: avoid;
     margin-bottom: calc(var(--space-step) * 6);
   }
+  /* 木の中の押せないラベルも、押せる根の名前と同じ 8px で枝から離す */
+  .category-group-label {
+    margin-bottom: calc(var(--space-step) * 2);
+  }
 }
 /* 群の名前。根はタグとして実在する行き先（面を持たないので反応は下線
    #3162。/categories/ の .category-index-name と同じ型）。実在しないノード
@@ -3895,12 +3900,6 @@ ul.tag-list {
   font-size: var(--text-body);
   line-height: var(--leading-row);
   font-weight: bold;
-}
-/* 木の中の押せないラベルも、押せる根の名前と同じ 8px で枝から離す */
-.tag-forest .category-group-label {
-  margin-bottom: calc(var(--space-step) * 2);
-}
-.tag-forest-label {
   a {
     color: var(--ink-strong);
   }
@@ -3910,6 +3909,8 @@ ul.tag-list {
     text-decoration: underline;
   }
 }
+
+
 /* 名前の下の中身は、チップも子の群も同じ枝の中に置く。**片方だけ縦罫の外に
    出さない**——直系の子のチップと、子を持つ子のラベルは同じ左端に来る */
 .tag-forest-branch {
@@ -3989,14 +3990,6 @@ ul.tag-list {
   &:first-child {
     margin-top: 0;
   }
-}
-.group-heading-meta {
-  margin-inline-start: 8px;
-  color: var(--ink-mute);
-  font-size: var(--text-meta);
-  font-weight: 400;
-}
-.group-heading {
   /* row の負のトップマージンが見出しに食い込むので外す。
      見出しとカードの間隔がカード同士の間隔（24px）と同じになる */
   + .series-panels {
@@ -4011,6 +4004,13 @@ ul.tag-list {
     margin-top: 4px;
   }
 }
+.group-heading-meta {
+  margin-inline-start: 8px;
+  color: var(--ink-mute);
+  font-size: var(--text-meta);
+  font-weight: 400;
+}
+
 /* /categories/ の一覧。1件は 名前＋統計 / 説明 / タグ の3段構成。
    17件を縦に積むと長いので、幅があるときは2列にする。
 
@@ -4136,6 +4136,24 @@ ul.tag-list {
   padding: 0;
   /* 共有ボタンとの間。下は持たない（帯までの空きは .article-appendix が持つ）*/
   margin: 16px 0 0;
+  /* 導線は紹介文の続きなので、本文の左端に揃える。
+     丸のぶんの字下げは親（.author-box-text）が持つので、ここでは数値を決めない。
+     紹介文とくっつくと1つの段落に見えるため上を空ける。16px はカードの中で
+     「中身」と「次の行き先」を分ける空きで、トップページの特集パネルと同じ値 (#3022)。
+     以前は 14px で、間隔は4の倍数という規則 (#2864) から外れていた
+     （コメントの「本文の行送りぶん」も 1.75 × 13px = 22.75px で合っていなかった）*/
+  .more-link {
+    /* カードの中なので、そのカードの地の文（.author-box-about の 13px）と同じ段に置く。
+       text-row（14px）のままだと 13 → 13 → 14 と上がり、いちばん弱い情報が紹介文より
+       大きくなる。トップページの特集パネルを text-meta に落としたのと同じ規則で、
+       値が違うのは箱ごとに地の文の大きさが違うため (#3019) */
+    font-size: var(--text-base);
+    margin-top: 16px;
+    /* 枠の内側の空きは .author-box-body の padding だけで決める。bootstrap の
+       p の margin-bottom: 1rem が残ると、最後の行の下だけ 16px 足されて
+       上 10.4px 対 下 26.4px になる (#2813) */
+    margin-bottom: 0;
+  }
 }
 .author-box-body {
   display: flex;
@@ -4199,24 +4217,6 @@ ul.tag-list {
     margin-top: 16px;
   }
 }
-/* 導線は紹介文の続きなので、本文の左端に揃える。
-   丸のぶんの字下げは親（.author-box-text）が持つので、ここでは数値を決めない。
-   紹介文とくっつくと1つの段落に見えるため上を空ける。16px はカードの中で
-   「中身」と「次の行き先」を分ける空きで、トップページの特集パネルと同じ値 (#3022)。
-   以前は 14px で、間隔は4の倍数という規則 (#2864) から外れていた
-   （コメントの「本文の行送りぶん」も 1.75 × 13px = 22.75px で合っていなかった）*/
-.author-box .more-link {
-  /* カードの中なので、そのカードの地の文（.author-box-about の 13px）と同じ段に置く。
-     text-row（14px）のままだと 13 → 13 → 14 と上がり、いちばん弱い情報が紹介文より
-     大きくなる。トップページの特集パネルを text-meta に落としたのと同じ規則で、
-     値が違うのは箱ごとに地の文の大きさが違うため (#3019) */
-  font-size: var(--text-base);
-  margin-top: 16px;
-  /* 枠の内側の空きは .author-box-body の padding だけで決める。bootstrap の
-     p の margin-bottom: 1rem が残ると、最後の行の下だけ 16px 足されて
-     上 10.4px 対 下 26.4px になる (#2813) */
-  margin-bottom: 0;
-}
 
 /* 連載の前 / 次。左右に並ぶ2つで1組の部品なので、囲み（card）を持たせて
    どこまでが1組かを示す。前を左・次を右に置いて進行方向を示す */
@@ -4240,6 +4240,14 @@ ul.tag-list {
   margin: 0;
   font-size: var(--text-body);
   font-weight: bold;
+  /* 索引へは連載名そのものから辿る。別途「索引を見る」を置くと導線が二重になる */
+  > a {
+    color: var(--ink-strong);
+  }
+  > a:hover {
+    color: var(--ink-strong);
+    text-decoration: underline;
+  }
 }
 /* 「連載」は見出しの一部ではなくラベル。塗りつぶすと連載名より目立つので、
    NEW ラベル（.newitem）と同じ薄い枠線だけの作りに揃える */
@@ -4265,16 +4273,7 @@ ul.tag-list {
   font-size: var(--text-meta);
   white-space: nowrap;
 }
-.series-nav-title {
-  /* 索引へは連載名そのものから辿る。別途「索引を見る」を置くと導線が二重になる */
-  > a {
-    color: var(--ink-strong);
-  }
-  > a:hover {
-    color: var(--ink-strong);
-    text-decoration: underline;
-  }
-}
+
 .series-nav-pair {
   display: flex;
 }
@@ -4303,9 +4302,18 @@ a {
 }
 .series-nav-next {
   text-align: right;
+  &.series-nav-end {
+    justify-content: flex-end;
+    text-align: right;
+  }
 }
-.series-nav-prev + .series-nav-next {
-  border-left: 1px solid var(--rule-weak);
+.series-nav-prev {
+  + .series-nav-next {
+    border-left: 1px solid var(--rule-weak);
+  }
+  .series-nav-dir:before {
+    content: '‹ ';
+  }
 }
 /* 行き先が無い側。リンクではないので薄く、上下は中央に置いて
    隣のリンク（見出し＋タイトルの2行）と釣り合わせる */
@@ -4315,10 +4323,7 @@ a {
   color: var(--ink-mute);
   font-size: var(--text-meta);
 }
-.series-nav-next.series-nav-end {
-  justify-content: flex-end;
-  text-align: right;
-}
+
 /* 端の案内文の下に添える、隣の連載への導線 (#2383)。
    青のリンク色はナビのカードの中で浮くので、ナビ内の他のリンクと同じ
    濃いグレーに揃える（案内文の #777 より濃いので地の文とは区別できる）。
@@ -4338,9 +4343,7 @@ a {
   color: var(--ink-mute);
   font-size: var(--text-meta);
 }
-.series-nav-prev .series-nav-dir:before {
-  content: '‹ ';
-}
+
 .series-nav-next .series-nav-dir:after {
   content: ' ›';
 }
@@ -4782,19 +4785,6 @@ a {
   border: 1px solid var(--rule-weak);
   border-radius: var(--card-radius);
   padding: 6px 16px 2px;
-}
-/* 箱の名前と中身の間は間隔の刻み1つぶん。2px では数字の行間（4px）より
-   狭く、ラベルが先頭の行にくっついて1行目のラベルに見えていた (#3004)。
-
-   色は補助情報の中でさらに弱い ink-faint。text-meta が段の最下段で
-   これ以上小さくできないので、弱さは色の段が担う */
-.summary-panel-label {
-  display: block;
-  margin-bottom: calc(var(--space-step) * 2);
-  color: var(--ink-faint);
-  font-size: var(--text-meta);
-}
-.summary-panel {
   .summary-note {
     margin: 12px 0;
   }
@@ -4885,7 +4875,6 @@ a {
   .summary-sub .summary-label {
     color: var(--ink-faint);
   }
-
   /* 2組目（「直近1年」）の前は刻み6つぶん空ける。組の中（ラベルの下 8px・
      行の間 4px）より広くして、1つの枠の中でも2組に読めるようにする (#2747)。
      枠を2つ並べていたときの間は 22px（下の余白2 + 罫線1 + 間隔12 + 罫線1 +
@@ -4894,6 +4883,24 @@ a {
     margin-top: calc(var(--space-step) * 6);
   }
 }
+/* 箱の名前と中身の間は間隔の刻み1つぶん。2px では数字の行間（4px）より
+   狭く、ラベルが先頭の行にくっついて1行目のラベルに見えていた (#3004)。
+
+   色は補助情報の中でさらに弱い ink-faint。text-meta が段の最下段で
+   これ以上小さくできないので、弱さは色の段が担う */
+.summary-panel-label {
+  display: block;
+  margin-bottom: calc(var(--space-step) * 2);
+  color: var(--ink-faint);
+  font-size: var(--text-meta);
+}
+
+
+
+
+
+
+
 .award-badges {
   display: flex;
   flex-wrap: wrap;
@@ -4997,6 +5004,12 @@ a {
   > li:last-child {
     border-bottom: 1px solid var(--rule-weak);
   }
+  /* 飛び先から着地した行。smooth scroll で画面が流れるので、どの群に着いたかを
+     行の面で示す（読んでいる位置は面、の目次の現在地と同じ #2909）。
+     ラベルの濃さだけでは流し読みで拾えなかった */
+  > li:target {
+    background: var(--surface-mute);
+  }
 }
 .label-rows-label {
   flex: none;
@@ -5010,12 +5023,6 @@ a {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-}
-/* 飛び先から着地した行。smooth scroll で画面が流れるので、どの群に着いたかを
-   行の面で示す（読んでいる位置は面、の目次の現在地と同じ #2909）。
-   ラベルの濃さだけでは流し読みで拾えなかった */
-.label-rows > li:target {
-  background: var(--surface-mute);
 }
 /* チップは著者ページの受賞バッジ（.award-badge）と同じ形。ページをまたいで
    同じものが同じ見た目になるようにする */
@@ -5042,6 +5049,13 @@ a {
     width: 1.35em;
     height: 1.35em;
     margin-inline-end: 0;
+  }
+  /* 地を一段動かすだけで止める理由は a.article-award と同じ（メダルの色） */
+  &:hover,
+  &:focus {
+    background: var(--surface-mute);
+    color: var(--ink-strong);
+    text-decoration: none;
   }
 }
 /* タイトルの上で名乗るチップ。受賞記事のバッジ (#2422) と連載のラベル。
@@ -5144,13 +5158,6 @@ a.article-series:focus {
     fill: var(--surface-base);
   }
 }
-/* 地を一段動かすだけで止める理由は a.article-award と同じ（メダルの色） */
-.award-chip:hover,
-.award-chip:focus {
-  background: var(--surface-mute);
-  color: var(--ink-strong);
-  text-decoration: none;
-}
 /* 受賞年のバッジはグレースケール。金は殿堂入りだけに使い、称号の格を色で分ける
    （灰アイコン#6e6e6e: 対 淡灰#f5f5f5 4.68。AA充足） */
 .award-badge {
@@ -5165,18 +5172,18 @@ a.article-series:focus {
   svg {
     flex: none;
   }
+  /* アイコンは共有部品（.svg-icon）。バッジは gap で間隔を取るので、
+     部品側の右マージンは打ち消す */
+  .svg-icon {
+    width: 1.15em;
+    height: 1.15em;
+    margin-inline-end: 0;
+  }
 }
 /* バッジは li の中に入っている（リンクになる年だけ <a>）。li は箱としてだけ
    使うので、中のバッジが高さいっぱいに揃うよう flex にする */
 .award-badges li {
   display: flex;
-}
-/* アイコンは共有部品（.svg-icon）。バッジは gap で間隔を取るので、
-   部品側の右マージンは打ち消す */
-.award-badge .svg-icon {
-  width: 1.15em;
-  height: 1.15em;
-  margin-inline-end: 0;
 }
 a {
   /* 受賞年のバッジは代表記事へのリンクになる (#2760)。形は変えず、下線を外して
@@ -5255,6 +5262,10 @@ a {
      帯は本文とは別の領域なので、節の切れ目（56px）より狭くはしない */
   margin-top: 56px;
   padding: 40px 0;
+  /* 節の間は見出しの margin-top（48px）が持つ。帯の内側の上端では二重になるので落とす */
+  section:first-child > .bottom-content-header {
+    margin-top: 0;
+  }
 }
 /* 中身は白の面に戻す。行の細線（rule-weak）・NEW の枠（rule-base）・
    空サムネ（surface-mute）はいずれも白地の上で決めた値で、グレーの上では
@@ -5264,10 +5275,6 @@ a {
   background: var(--surface-base);
   border-radius: var(--card-radius);
   padding: 24px;
-}
-/* 節の間は見出しの margin-top（48px）が持つ。帯の内側の上端では二重になるので落とす */
-.article-appendix section:first-child > .bottom-content-header {
-  margin-top: 0;
 }
 .wrap {
   /* 帯はフッターのネイビーに接する。.wrap は縦の flex で `.wrap > footer` が
@@ -5675,6 +5682,11 @@ a {
     background: none;
     border-radius: 0 var(--radius-small) var(--radius-small) 0;
   }
+  &:focus-within .header-search-hint {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity var(--state-speed) ease;
+  }
 }
 .header-search > button .svg-icon,
 .header-search-open .svg-icon {
@@ -5808,29 +5820,6 @@ a {
      フォーカスを与えず、blur で先に閉じるとタップが着地しない（送信ボタンを
      モバイルで出していないのと同じ理由）。消えるまでの間に click が届く */
   transition: opacity var(--state-speed) ease, visibility 0s 0.3s;
-}
-.header-search:focus-within .header-search-hint {
-  visibility: visible;
-  opacity: 1;
-  transition: opacity var(--state-speed) ease;
-}
-/* ドロップダウンと同じ扱い。閉じるときの visibility の遅延だけ残す */
-@media (prefers-reduced-motion: reduce) {
-  .header-search-hint {
-    transition: opacity 0s, visibility 0s 0.3s;
-  }
-  .header-search:focus-within .header-search-hint {
-    transition: none;
-  }
-}
-/* 枠の中のラベル。見出しではなく面の中の仕切りなので h2 は使わない */
-.header-search-hint-label {
-  margin: 0 0 10px;
-  font-size: var(--text-base);
-  font-weight: bold;
-  color: var(--ink-mute);
-}
-.header-search-hint {
   /* 間隔はチップのマージンではなく gap が持つ (#2864 / #2887)。マージンで作ると
      行末と最終行のぶんだけ右と下に余分な空きが出て四辺が揃わない。
      gap に替えるので ul の負のマージンも要らなくなる */
@@ -5846,6 +5835,23 @@ a {
     font-size: var(--text-base);
     margin: 0;
   }
+}
+
+/* ドロップダウンと同じ扱い。閉じるときの visibility の遅延だけ残す */
+@media (prefers-reduced-motion: reduce) {
+  .header-search-hint {
+    transition: opacity 0s, visibility 0s 0.3s;
+  }
+  .header-search:focus-within .header-search-hint {
+    transition: none;
+  }
+}
+/* 枠の中のラベル。見出しではなく面の中の仕切りなので h2 は使わない */
+.header-search-hint-label {
+  margin: 0 0 10px;
+  font-size: var(--text-base);
+  font-weight: bold;
+  color: var(--ink-mute);
 }
 /* 全件への行き先。ヘッダーのナビの「連載の一覧を見る」と同じ部品
    （.header-dropdown-more）で、色・線・hover の面はそちらが持つ。
@@ -5973,15 +5979,6 @@ a {
 .more-link {
   font-size: var(--text-row);
   margin-top: 8px;
-}
-/* 左端に揃える。**`p` を付けるのは詳細度を `.blog-posts p`（0,1,1）に合わせるため**で、
-   単一クラスだと本文の中で justify に負ける。以前はここが right だったが、本文の中では
-   justify に負け、サイドバーと著者紹介は left で打ち消していて、**実際に右へ寄る場所は
-   1つも無かった**（5文脈を実測）。宣言を読んだとおりに動く形にする */
-p.more-link {
-  text-align: left;
-}
-.more-link {
   /* 青をやめたぶんの手がかりは末尾の > が持つ。太さは 400 のまま置く。
      14px の1行を 700 にすると、行の中で主従が付く前に重くなる（#2803） */
   a {
@@ -5996,6 +5993,13 @@ p.more-link {
     text-decoration: underline;
     background-color: transparent;
   }
+}
+/* 左端に揃える。**`p` を付けるのは詳細度を `.blog-posts p`（0,1,1）に合わせるため**で、
+   単一クラスだと本文の中で justify に負ける。以前はここが right だったが、本文の中では
+   justify に負け、サイドバーと著者紹介は left で打ち消していて、**実際に右へ寄る場所は
+   1つも無かった**（5文脈を実測）。宣言を読んだとおりに動く形にする */
+p.more-link {
+  text-align: left;
 }
 /* サムネの無い連載の空き枠。.panel-thumb img と同じ寸法 */
 .panel-thumb-empty {
@@ -6042,15 +6046,16 @@ pre.mermaid {
 }
 .mermaid-svg {
   margin: 0 0 1rem; /* bootstrap-subset の pre と同じ余白 */
+  svg {
+    max-width: 100%;
+    height: auto;
+  }
 }
 pre.mermaid,
 .mermaid-svg {
   line-height: 1; /* SVGの上下にできる余分な空白を消す */
 }
-.mermaid-svg svg {
-  max-width: 100%;
-  height: auto;
-}
+
 .article-entry {
   /* .article-entry p 等のスタイルがMermaid SVG内の foreignObject に波及するのを防ぐ */
   pre.mermaid p,
@@ -6426,6 +6431,10 @@ pre.mermaid,
   text-decoration: none;
   color: inherit;
   min-height: 110px;
+  /* 画像がない場合のスタイル調整 */
+  &:not(:has(.link-preview-card-image)) .link-preview-card-main {
+    width: 100%;
+  }
 }
 /* 反応は上の題の下線と画像だけにする。color: inherit は静止状態にしか
    効かず、打ち消しが無いと hover でカード全体の文字が青くなって下線も出る。
@@ -6489,11 +6498,6 @@ pre.mermaid,
   background-size: cover;
   background-position: center;
   border-left: 1px solid var(--rule-base);
-}
-
-/* 画像がない場合のスタイル調整 */
-.link-preview-card-anchor:not(:has(.link-preview-card-image)) .link-preview-card-main {
-  width: 100%;
 }
 
 .article-entry {
@@ -6580,20 +6584,6 @@ pre.mermaid,
   .sg-chip {
     border-color: var(--rule-base);
   }
-}
-/* リンクの段は地の上に置く。白地の見本と並べたときに「どの地での色か」が
-   見本そのもので分かる (#2860)。alert を使うのは note の4色でいちばん厳しい地 */
-.sg-chip-tint {
-  background: var(--surface-mute);
-}
-.sg-chip-note {
-  background: var(--note-alert-bg);
-}
-/* 構文の色はコードブロックの地の上に置く (#3266) */
-.sg-chip-code {
-  background: var(--code-block-bg);
-}
-.sg-chip-ground-dark {
   &.sg-ground-code {
     background: var(--code-block-bg);
   }
@@ -6612,6 +6602,22 @@ pre.mermaid,
     background: var(--note-alert-bg);
   }
 }
+/* リンクの段は地の上に置く。白地の見本と並べたときに「どの地での色か」が
+   見本そのもので分かる (#2860)。alert を使うのは note の4色でいちばん厳しい地 */
+.sg-chip-tint {
+  background: var(--surface-mute);
+}
+.sg-chip-note {
+  background: var(--note-alert-bg);
+}
+/* 構文の色はコードブロックの地の上に置く (#3266) */
+.sg-chip-code {
+  background: var(--code-block-bg);
+}
+
+
+
+
 /* note の中のリンクは種別ごとに色が違うので、見本もそれぞれの地の上に置く (#3241) */
 .sg-chip-note-tip {
   background: var(--note-tip-bg);
