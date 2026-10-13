@@ -60,7 +60,14 @@ const errors = [];
 // 積まないと @media (max-width: 575px) がセレクタとして残る
 const stack = [];
 let pending = [];
-const selectorOf = () => [...stack].reverse().find((s) => !s.startsWith('@')) || '';
+// ネストした規則は親とつないで1本のセレクタにする（& は親に置き換え、無ければ子孫）
+const selectorOf = () =>
+  stack
+    .filter((s) => !s.startsWith('@'))
+    .reduce(
+      (parent, s) => (!parent ? s : s.includes('&') ? s.replaceAll('&', parent) : `${parent} ${s}`),
+      '',
+    );
 
 lines.forEach((line, i) => {
   const open = line.match(/^\s*(\S.*?)\s*\{\s*$/);
@@ -75,7 +82,7 @@ lines.forEach((line, i) => {
   }
   // 複数行のセレクタ（末尾がカンマ）。先頭行を代表にする
   const cont = line.match(/^\s*(\S.*?),\s*$/);
-  if (cont && !cont[1].includes(':')) {
+  if (cont && !/:\s/.test(cont[1])) {
     pending.push(cont[1]);
     return;
   }
