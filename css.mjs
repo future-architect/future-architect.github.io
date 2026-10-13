@@ -19,20 +19,25 @@ const root = dirname(fileURLToPath(import.meta.url));
 const themeDir = join(root, 'themes/future');
 const stylPath = join(themeDir, 'css-src/theme-styles.styl');
 
-stylus.render(readFileSync(stylPath, 'utf8'), { filename: stylPath }, (err, css) => {
-  if (err) {
-    console.error(err.message);
-    process.exit(1);
-  }
-  const combined = combineCss({
-    bootstrap: readFileSync(join(themeDir, 'css-src/bootstrap-subset.css'), 'utf8'),
-    themeStyles: css,
-  });
+// highlight.css は include css でそのまま取り込む（hexo-renderer-stylus も同じ設定）
+stylus.render(
+  readFileSync(stylPath, 'utf8'),
+  { filename: stylPath, 'include css': true },
+  (err, css) => {
+    if (err) {
+      console.error(err.message);
+      process.exit(1);
+    }
+    const combined = combineCss({
+      bootstrap: readFileSync(join(themeDir, 'css-src/bootstrap-subset.css'), 'utf8'),
+      themeStyles: css,
+    });
 
-  const out = join(root, 'public/css/site.css');
-  // public/ は gitignore されているので、まっさらな checkout には無い。
-  // CI（css ワークフロー）が ENOENT で落ちた
-  mkdirSync(dirname(out), { recursive: true });
-  writeFileSync(out, combined);
-  console.log(`${out} (${Math.round(combined.length / 1024)}KB)`);
-});
+    const out = join(root, 'public/css/site.css');
+    // public/ は gitignore されているので、まっさらな checkout には無い。
+    // CI（css ワークフロー）が ENOENT で落ちた
+    mkdirSync(dirname(out), { recursive: true });
+    writeFileSync(out, combined);
+    console.log(`${out} (${Math.round(combined.length / 1024)}KB)`);
+  },
+);

@@ -802,13 +802,20 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
 レイヤーの外の宣言は詳細度に関係なく勝つので、テーマが Bootstrap に勝つことは
 連結順にも詳細度にも頼らない。
 
+- **`highlight.css` は素の CSS で、標準のネストで書く**（#3340）。`theme-styles.styl` が
+  `@import "highlight.css"` で取り込み、Stylus の `include css` がそのまま通す
+  （`hexo-renderer-stylus` は既定で有効。`css.mjs` も同じ設定にしてある）。
+  Stylus の変数・関数は使えないので、値は `var()` と `calc()`、端数の切り上げは `round(up, …)` で書く
+  - **親をセレクタリストにしてネストしない。** 標準のネストではリストの親が `:is()` になり、
+    詳細度がリストの中でいちばん高いものにそろう。Stylus のネストは展開するだけなので
+    この差が出ない。詳細度の違う親は、ネストせずに並べて書く
 - **テーマをレイヤーに入れない。** レイヤーの外にある CSS（gist の埋め込みが読む
   GitHub の CSS、mermaid の SVG が持つ `<style>`）にテーマが負けるようになる
 - **`!important` で勝たせない。** ユーティリティ（`.margin-bottom-20` など）の
   `!important` は、部品の側に書いた意図の値（`.popular-articles` の 56px、
   `.series-nav` の 40px）を黙って潰していた。部品が自分の余白を持つなら、
   マークアップからユーティリティを外す
-  - 残っているのは `highlight.styl` の gist の行の1箇所だけ。相手が外部の CSS で、
+  - 残っているのは `highlight.css` の gist の行の1箇所だけ。相手が外部の CSS で、
     ローカルの比較では確かめられない
 
 文字サイズは過去に「どこで最終値が決まるか追えない」ことが原因の不具合を
@@ -838,7 +845,7 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
   | `body` | 13px | `theme-styles.styl` |
   | 本文（`p` / `li` / `summary`） | `1.2em` = 15.6px | 〃 |
   | note の中の段落・箇条書き・タイトル | `text-row`（#3252。本文の組から1段下げる） | 〃 |
-  | note の中のコードブロック・表のセル | `text-meta`（#3252。〃） | `highlight.styl` の変数 / `theme-styles.styl` |
+  | note の中のコードブロック・表のセル | `text-meta`（#3252。〃） | `highlight.css` / `theme-styles.styl` |
   | 記事タイトル | `clamp(26px, 1.325rem + 0.9vw, 32px)` ＋ `text-wrap: pretty`（#2655。均等化すると「列幅の半分×2行」に縮む） | 〃（1箇所のみ） |
   | クラス無しの `h2`（関連記事・We're hiring 等） | `text-display`（#2971。`1.85em` = 24.05px から） | 〃 |
   | サイドバーの `h2` | `text-lead`（#2971。`1.4em` = 18.2px から） | 〃 |
@@ -852,7 +859,7 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
   | 脚注（`#footnotelist li`） | `1em` = 13px | 〃 |
   | 記事概要文 `.lede`（一覧 / We're hiring カード） | `1.2em` = 15.6px / 継承 = 13px | 〃 |
   | 特設ページの本文 `.specials-text` | `1.2em` = 15.6px（`.article-entry` 外なので明示） | 〃 |
-  | コードブロック | 13px（`line-height` は `font-size × leading-row` で追従） | `highlight.styl` の変数 |
+  | コードブロック | `text-base` = 13px（`line-height` は `text-base × leading-row` で追従） | `highlight.css` |
   | ヘッダーのサイト名 `.header-title` / 和文 `.header-title-sub` | `text-lead` / `text-meta`（#2877 で写真の上の 80px / 20px から。#2971 で 17px → 段の 18px へ。字間 0.35em と影は白地では役が無い） | 〃 |
   | ヘッダーのナビ `.header-nav-link` / ドロップダウン（見出し / 説明） | 14px / 13px / 12px | 〃 |
   | パンくず（`.breadcrumb`） | 14px | `theme-styles.styl` 冒頭（土台の塊）の `font:` 一括指定。フォント名だけ後方で上書き |
@@ -884,7 +891,7 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
       15.6 対 13 で 2.6px 差があるが、文章だけ 14px にすると 1px 差になり
       #2534 の「見分けの付かない差に2つの役」に当たる。1段ずつ動かせば 2px 差が残る
     - **`font-size` から出している値も引き直す。** コードの1行の高さ・折り返しの
-      縦線の起点（`highlight.styl` の `note-line-height`）と、絵柄の枠の高さ
+      縦線の起点（`highlight.css` の `.note-container`）と、絵柄の枠の高さ
       （`.note-container .note-icon` の `text-row * leading-body`）。
       12 × 1.4 は浮動小数で 16.799999… になるので `round` する
     - **インラインコードは何も書かない。** `bootstrap-subset.css` の `code` が
@@ -1378,7 +1385,7 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
     リポジトリの中の話で、**読者が語られたいのはスタイルそのものだけ**。
     落とすのは3種類。**ページ自身の作り**（「このページの数字は手で書いていません」
     「下の見本は実際のルールをそのまま借りて描いています」）、**値の置き場所**
-    （「`theme-styles.styl` と `highlight.styl` の両方に書く必要があります」
+    （「`theme-styles.styl` と `highlight.css` の両方に書く必要があります」
     「1つの要素のサイズは1箇所でしか決めません」「行間を書かないままにしません」）、
     **ソースの出現回数**（「残っている色は13箇所」「淡金9箇所」「呼び出し元 19」）
     - **見た目の決まりは残す。** 「段階は3つだけ」「間隔は4の倍数だけ」「新しい色を
@@ -2303,7 +2310,7 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
     （`theme-styles.styl` 冒頭の `:root` はそれを CSS 変数として配るだけ #2856）。
     サイズは `theme-styles.styl` の各ルールが1箇所ずつ持つ
   - この形だったインラインコードのリンク色は #2860 で `link-on-tint` にした。
-    `theme-styles.styl` と `highlight.styl` の両方に書く必要は残る（詳細度の都合）が、
+    `theme-styles.styl` と `highlight.css` の両方に書く必要は残る（詳細度の都合）が、
     値を1箇所から引くので**揃っていることを説明するコメントが要らなくなった**。
     値の重複を消せば主張も消える、という形の例
 - **Stylus は未定義の変数をエラーにせず、名前をそのまま値として出力する。**
