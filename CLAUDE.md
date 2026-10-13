@@ -2328,6 +2328,9 @@ bootstrap-subset → theme-styles.styl の順で `/css/site.css` に連結する
   - 再発は `css_lint.mjs` の2つめの検査が止める
 - **色は `_variables.styl` が値を持ち、`:root` が CSS 変数として配り、使う側は `var()` で引く**
   （#2746。ダークモードの前段）。3つの役を分ける
+  - **色以外の段（文字・行間・間隔・角丸・時間・書体）も同じ形**（#3340。Stylus を外す前段）。
+    倍数は `calc(var(--space-step) * 3)` と書く。**`calc()` の中では Stylus の変数が
+    展開されない**ので、`calc(text-row * …)` のように混ぜると名前がそのまま出る
   - **値は Stylus 変数のまま置く。`:root` にだけ書かない。** CSS カスタムプロパティは
     **計算に使えない**ので、スタイルガイドが `luminosity()` からコントラスト比を出せなくなる（#2858）
   - **Stylus の関数に渡すところは `var()` にしない。** `code-bg(surface-tint)` のように

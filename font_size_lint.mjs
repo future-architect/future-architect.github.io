@@ -11,15 +11,15 @@ import { readFileSync } from 'node:fs';
 
 const FILE = 'themes/future/css-src/theme-styles.styl';
 
-// _variables.styl が持つ段
+// _variables.styl が持つ段。:root が CSS 変数として配る
 const STEPS = [
-  'text-meta',
-  'text-base',
-  'text-row',
-  'text-body',
-  'text-lead',
-  'text-title',
-  'text-display',
+  'var(--text-meta)',
+  'var(--text-base)',
+  'var(--text-row)',
+  'var(--text-body)',
+  'var(--text-lead)',
+  'var(--text-title)',
+  'var(--text-display)',
 ];
 
 // 親の倍率を打ち消す指定。サイズを決めていないので段の話ではない
