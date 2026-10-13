@@ -19,7 +19,7 @@
 
 const { full_url_for } = require('hexo-util');
 
-// テーマのリンク色（css-src/_variables.styl の color-link）。Feedly が購読画面の装飾に使う
+// 旧テーマのリンク色（color-link）。Feedly が購読画面の装飾に使う
 const ACCENT_COLOR = '258fb8';
 
 function esc(s) {

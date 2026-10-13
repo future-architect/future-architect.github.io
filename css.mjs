@@ -5,39 +5,22 @@
 // だけならページの再生成は要らないので、連結済みの CSS を直接置き換える。
 //
 // 連結そのものは公開ビルド（scripts/combine_css.js）と同じ
-// scripts/lib/site_css.js を呼ぶ。ここが持つのは Stylus の描画だけ。
+// scripts/lib/site_css.js を呼ぶ。
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
-const stylus = require('stylus');
 const { combineCss } = require('./scripts/lib/site_css');
 
 const root = dirname(fileURLToPath(import.meta.url));
-const themeDir = join(root, 'themes/future');
-const stylPath = join(themeDir, 'css-src/theme-styles.styl');
+const srcDir = join(root, 'themes/future/css-src');
+const combined = combineCss((name) => readFileSync(join(srcDir, name), 'utf8'));
 
-// highlight.css は include css でそのまま取り込む（hexo-renderer-stylus も同じ設定）
-stylus.render(
-  readFileSync(stylPath, 'utf8'),
-  { filename: stylPath, 'include css': true },
-  (err, css) => {
-    if (err) {
-      console.error(err.message);
-      process.exit(1);
-    }
-    const combined = combineCss({
-      bootstrap: readFileSync(join(themeDir, 'css-src/bootstrap-subset.css'), 'utf8'),
-      themeStyles: css,
-    });
-
-    const out = join(root, 'public/css/site.css');
-    // public/ は gitignore されているので、まっさらな checkout には無い。
-    // CI（css ワークフロー）が ENOENT で落ちた
-    mkdirSync(dirname(out), { recursive: true });
-    writeFileSync(out, combined);
-    console.log(`${out} (${Math.round(combined.length / 1024)}KB)`);
-  },
-);
+const out = join(root, 'public/css/site.css');
+// public/ は gitignore されているので、まっさらな checkout には無い。
+// CI（css ワークフロー）が ENOENT で落ちた
+mkdirSync(dirname(out), { recursive: true });
+writeFileSync(out, combined);
+console.log(`${out} (${Math.round(combined.length / 1024)}KB)`);

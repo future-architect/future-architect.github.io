@@ -91,7 +91,7 @@ description: Qiita の下書き URL と著者名を入力に、hexiita 変換 �
   誤字のことがある（実例: `sumbnail.png`）
 - 白地の画像（スライド・白背景のスクリーンショット）は本文と地続きに見えて
   どこまでが画像か分からない。`<img class="bordered" ...>` を付けて縁取る
-  （CSS は `theme-styles.styl` の `.article-entry img.bordered`）。
+  （CSS は `theme-styles.css` の `.article-entry img.bordered`）。
   枠を内蔵した画像や写真では二重線になるので一律には付けない。
   対象は四隅の画素が白かどうかで機械的に判定できる
 

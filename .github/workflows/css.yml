@@ -1,5 +1,5 @@
 # CSS の検査を PR で回す。
-# 1. 解決されなかった Stylus の識別子（#2746 で表の枠が全部消えた）
+# 1. 定義の無いカスタムプロパティの参照（#2746 で表の枠が全部消えたのと同じ壊れ方）
 # 2. 文字サイズが段から外れていないか (#2971)
 #
 # どちらも CLAUDE.md に文章で書くだけでは守れなかったもの。1つ目は表の枠が
@@ -36,22 +36,17 @@ jobs:
             /*
             !/source/images/
 
+      # 3つのスクリプトは Node の標準モジュールしか使わないので、npm ci は要らない
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: "22"
-          cache: npm
-
-      # css.mjs は stylus を使うので依存が要る
-      - name: Install dependencies
-        run: npm ci
 
       - name: Build CSS
         run: node css.mjs
 
-      # Stylus は未定義の変数をエラーにせず名前をそのまま出力する。
-      # CSS 側では無効な値なので宣言ごと捨てられ、画面を見るまで気づけない
-      - name: Check for unresolved Stylus identifiers
+      # 定義の無い var() の参照は宣言ごと無効になり、画面を見るまで気づけない
+      - name: Check CSS for silently dropped declarations
         run: node css_lint.mjs
 
       - name: Check font-size scale

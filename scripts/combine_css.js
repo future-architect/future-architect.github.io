@@ -1,22 +1,17 @@
 'use strict';
 
 const path = require('path');
-const fs = require('hexo-fs');
 const fsNode = require('fs');
 const crypto = require('crypto');
-const { combineCss } = require('./lib/site_css');
+const { combineCss, CSS_FILES } = require('./lib/site_css');
 
 // CSS の URL に付ける内容ハッシュ。URL が /css/site.css 固定だと、
 // スタイルを変えてもブラウザがキャッシュを返し続けて反映されない。
 // 連結元のファイルから計算するので、ビルドごとに変わらず決定的
-const CSS_SOURCES = [
-  'css-src/bootstrap-subset.css',
-  'css-src/_variables.styl',
-  'css-src/theme-styles.styl',
-  'css-src/highlight.css',
-];
 hexo.extend.helper.register('css_version', function () {
-  const src = CSS_SOURCES.map((p) => fsNode.readFileSync(path.join(hexo.theme_dir, p))).join('\n');
+  const src = CSS_FILES.map((name) =>
+    fsNode.readFileSync(path.join(hexo.theme_dir, 'css-src', name)),
+  ).join('\n');
   return crypto.createHash('md5').update(src).digest('hex').slice(0, 8);
 });
 
@@ -34,19 +29,10 @@ hexo.extend.helper.register('css_version', function () {
  * source/ 配下だと Hexo が public/ にそのまま複製してしまい、
  * 参照されない CSS が配信されるため。
  */
-hexo.extend.generator.register('site_css', async function () {
-  const themeDir = this.theme_dir;
-
-  const bootstrap = await fs.readFile(path.join(themeDir, 'css-src/bootstrap-subset.css'));
-
-  // theme-styles.styl は Stylus なので、ここで描画してから連結する
-  const themeStyles = await this.render.render({
-    path: path.join(themeDir, 'css-src/theme-styles.styl'),
-    engine: 'styl',
-  });
-
+hexo.extend.generator.register('site_css', function () {
+  const srcDir = path.join(this.theme_dir, 'css-src');
   return {
     path: 'css/site.css',
-    data: combineCss({ bootstrap, themeStyles }),
+    data: combineCss((name) => fsNode.readFileSync(path.join(srcDir, name), 'utf8')),
   };
 });

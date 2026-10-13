@@ -81,7 +81,7 @@ node .claude/skills/site-audit/audit.mjs /articles/20260518a/ --widths 375   # �
 - **既に意図として決まっていないか。** `h2` の薄い罫線・`ink-faint` の下限・
   現在地の表し方は CLAUDE.md の「CSS / 文字サイズの方針」が理由つきで持っている。
   機械判定が引っかかっても、そこに書いてあれば所見ではない
-- **色の話は `/specials/styleguide/` を見る。** コントラスト比は `_variables.styl` から
+- **色の話は `/specials/styleguide/` を見る。** コントラスト比は `tokens.css` から
   生成されているので、計算し直さない
 - **1ページだけの所見か、全ページか。** 記事本文由来（alt 無しの画像・見出しレベルの飛び）は
   記事を直す話で、テーマを触らない

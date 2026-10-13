@@ -158,7 +158,10 @@ function fillStyleguide(html, css) {
   const tokens = readRootTokens(css);
   const pick = ({ name, side }) => {
     if (!(name in tokens)) throw new Error(`スタイルガイド: ${name} が :root に無い`);
-    return splitLightDark(tokens[name])[side];
+    const value = splitLightDark(tokens[name])[side];
+    // 別のトークンをそのまま指すもの（--scrollbar-thumb: var(--rule-weak)）は、同じ側を辿る
+    const alias = value.match(/^var\((--[a-z0-9-]+)\)$/);
+    return alias ? pick({ name: alias[1], side }) : value;
   };
   const color = (g) => (typeof g === 'string' ? g : pick(g));
   const table = rows();

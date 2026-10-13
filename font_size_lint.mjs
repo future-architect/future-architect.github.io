@@ -1,4 +1,4 @@
-// 文字サイズが段（_variables.styl の text-*）から外れていないかを検査する (#2971)。
+// 文字サイズが段（tokens.css の --text-*）から外れていないかを検査する (#2971)。
 //
 // 26種類に散っていた font-size を7段に寄せたが、寄せ終えた直後に別の PR が
 // 1.4em と 12px を直接書いて段の外へ戻った。文章の決まりだけでは守れないので、
@@ -9,9 +9,9 @@
 // 選んだ」を通さないための一覧なので、増やすときは理由を書く。
 import { readFileSync } from 'node:fs';
 
-const FILE = 'themes/future/css-src/theme-styles.styl';
+const FILE = 'themes/future/css-src/theme-styles.css';
 
-// _variables.styl が持つ段。:root が CSS 変数として配る
+// tokens.css が持つ段
 const STEPS = [
   'var(--text-meta)',
   'var(--text-base)',
@@ -34,7 +34,7 @@ const EXEMPT = new Map([
   ['.article-entry h5', '1.2em'],
   ['.article-entry h6', '1.1em'],
   // 記事タイトル・ページ見出し。幅で変える唯一の値
-  ['.article-title', "unquote('clamp(26px, 1.325rem + 0.9vw, 32px)')"],
+  ['.article-title', 'clamp(26px, 1.325rem + 0.9vw, 32px)'],
   // font-size がアイコンの実寸を決めている箇所（.svg-icon が 1em）。文字ではない
   ['.snscount-icon', '1.15em'],
   ['.header-theme', '20px'],
@@ -92,7 +92,7 @@ lines.forEach((line, i) => {
 if (errors.length) {
   console.error(`段の外の font-size が ${errors.length} 件あります。\n`);
   errors.forEach((e) => console.error(`  ${e}`));
-  console.error(`\n段は ${STEPS.join(' / ')}（_variables.styl）。`);
+  console.error(`\n段は ${STEPS.join(' / ')}（tokens.css）。`);
   console.error(
     '段の外に置く理由があるなら font_size_lint.mjs の EXEMPT に理由付きで足してください。',
   );
