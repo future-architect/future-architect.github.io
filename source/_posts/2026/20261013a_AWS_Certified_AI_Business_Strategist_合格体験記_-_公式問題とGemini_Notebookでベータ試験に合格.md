@@ -12,7 +12,7 @@ thumbnail: /images/2026/20261013a/thumbnail.png
 author: 棚井龍之介
 lede: "AWS Certified AI Business Strategist（AIB-C01）のベータ試験に日本語で合格しました。試験の概要と、公式練習問題とGemini Notebookを使った約4時間の準備、受験した感想を紹介します。"
 ---
-<img src="/images/2026/20261013a/aws-certified-ai-business-strategist.png" alt="" width="600" height="600">
+<img src="/images/2026/20261013a/aws-certified-ai-business-strategist.png" alt="" width="300" height="300">
 
 FutureVulsチームの棚井です。2026年10月3日（土）に、AWS Certified AI Business Strategist（AIB-C01）のベータ試験を日本語で受験し、合格しました。
 
