@@ -94,7 +94,7 @@ AWS全冠ホルダーでなくても、こうした事業推進の経験があ�
 
 今回は通常の認定バッジに加え、アーリーアドプターバッジも取得できました。
 
-<img src="/images/2026/20261013a/aws-certified-ai-business-strategist-early-adopter.png" alt="" width="600" height="600" loading="lazy">
+<img src="/images/2026/20261013a/aws-certified-ai-business-strategist-early-adopter.png" alt="" width="300" height="300" loading="lazy">
 
 [公式の案内](https://aws.amazon.com/jp/certification/certified-ai-business-strategist/)では、2027年2月15日までにこの認定を取得すると、アーリーアドプターバッジも授与されるとされています。早い時期に受験すると、バッジが2つもらえるのもちょっとした楽しみです。
 
