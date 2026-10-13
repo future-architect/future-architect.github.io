@@ -25,21 +25,28 @@ function stripComments(css) {
 }
 
 /**
+ * 連結の順。素の CSS をつなぐだけで、変換は挟まない (#3340)。
+ *
  * Bootstrap は @layer に入れ、テーマはレイヤーの外に置く。レイヤーの外の
  * 宣言は詳細度に関係なくレイヤーの中に勝つので、テーマが Bootstrap に
  * 勝つことを連結順と詳細度に頼らずに決められる (#3332)。
  * テーマまでレイヤーに入れない。レイヤーの外にある CSS（gist の埋め込み、
  * mermaid の SVG が持つ <style>）にテーマが負けるようになる。
- * サイトの土台（旧 metronic-src/assets/style.css）は theme-styles.styl の
- * 先頭に畳んである (#2759)。
+ *
+ * テーマの中は後勝ち。tokens.css は :root の宣言だけなので位置を問わない。
+ * highlight.css は theme-styles.css より前。以前は theme-styles の途中で読み込んでいて、
+ * その後ろの規則が後から勝つ前提で書かれている（末尾に回すと本文の高さが変わる）
  */
-function combineCss({ bootstrap, themeStyles }) {
+const BOOTSTRAP = 'bootstrap-subset.css';
+const THEME = ['tokens.css', 'highlight.css', 'theme-styles.css'];
+const CSS_FILES = [BOOTSTRAP, ...THEME];
+
+function combineCss(read) {
   return [
-    '/* bootstrap-subset.css */',
-    `@layer bootstrap {\n${stripComments(bootstrap)}\n}`,
-    '/* theme-styles.styl */',
-    stripComments(themeStyles),
+    `/* ${BOOTSTRAP} */`,
+    `@layer bootstrap {\n${stripComments(read(BOOTSTRAP))}\n}`,
+    ...THEME.flatMap((name) => [`/* ${name} */`, stripComments(read(name))]),
   ].join('\n');
 }
 
-module.exports = { stripComments, combineCss };
+module.exports = { stripComments, combineCss, CSS_FILES };

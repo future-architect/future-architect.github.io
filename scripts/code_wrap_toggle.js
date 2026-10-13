@@ -28,7 +28,7 @@
 // Menlo / Liberation Mono はいずれも 0.6em 前後。Consolas は 0.55em で
 // もう少し入るが、狭い側に見積もっておけば足りない方には外れない
 const CHAR_PX = 7.8;
-// tab-size: 2em（theme-styles.styl）。タブは次の 26px の位置まで進む。
+// tab-size: 2em（theme-styles.css）。タブは次の 26px の位置まで進む。
 // Go のインデントはタブなので、1文字ぶんとして数えると大きく足りなくなる
 const TAB_PX = 26;
 

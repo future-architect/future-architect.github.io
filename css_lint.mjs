@@ -1,61 +1,36 @@
-// コンパイル後の CSS を見て、「画面を見るまで気づけない壊れ方」を2つ止める。
-// どちらも書いた宣言が無言で捨てられる形で、ビルドもエラーにならない。
+// 連結後の CSS（public/css/site.css） を見て、「画面を見るまで気づけない壊れ方」を3つ止める。
+// どれも書いた宣言が無言で捨てられる形で、ビルドもエラーにならない。
 //
-// 1. 解決されなかった Stylus の識別子（以下）
-// 2. ベンダー接頭辞の擬似要素と他のセレクタの同居（ファイル後半）
+// 1. 定義の無いカスタムプロパティの参照（以下）
+// 2. ベンダー接頭辞の擬似要素と他のセレクタの同居
+// 3. 括弧の閉じていないセレクタ
 //
-// Stylus は未定義の変数をエラーにせず、**名前をそのまま値として出力する**。
-// CSS 側では無効な値なので、その宣言（一括指定なら丸ごと）が捨てられる。
-// 画面を見るまで気づけない壊れ方で、実際に踏んだ:
-//
-//   :root { --table-border: table-border }   ← 解決されず、表の枠が全部消えた (#2746)
-//   .footer-link { transition: hover-speed }  ← 同じ形 (#2753)
-//
-// 原因はいつも同じで、**変数の定義が使う場所より後ろにある**こと。
-// _variables.styl は theme-styles.styl の先頭で読むので、そこに置けば起きない。
+// var() の参照先がどこにも定義されていないと、その宣言は無効になって
+// 初期値に落ちる。トークンの名前の打ち間違いや、tokens.css から消した
+// トークンの使い残しがこの形になる。Stylus の頃は未定義の変数が名前のまま
+// 出力されて同じ壊れ方をしていた（#2746 で表の枠が全ページで消えた）。
+// 代わりの値（var(--x, 3ch)）を持つ参照と、Bootstrap の --bs-* は見ない
 import { readFileSync } from 'node:fs';
 
 const FILE = 'public/css/site.css';
 
-// 値として正当なキーワード。ここに無い裸の識別子は解決漏れとみなす
-const KEYWORDS = new Set([
-  'inherit',
-  'initial',
-  'unset',
-  'revert',
-  'none',
-  'auto',
-  'transparent',
-  'currentColor',
-  'solid',
-  'dashed',
-  'dotted',
-  'double',
-  'groove',
-  'ridge',
-  'inset',
-  'outset',
-  'hidden',
-]);
-
 const css = readFileSync(FILE, 'utf8');
-const errors = [];
-for (const m of css.matchAll(/(--[\w-]+):\s*([^;{}]+);/g)) {
-  const value = m[2].trim();
-  // 裸の識別子だけの値（#hex・数値・var()・関数・キーワードのどれでもない）
-  if (!/^[a-zA-Z][\w-]*$/.test(value)) continue;
-  if (KEYWORDS.has(value)) continue;
-  errors.push(`${m[1]}: ${value}`);
-}
+const defined = new Set([...css.matchAll(/(--[\w-]+)\s*:/g)].map((m) => m[1]));
+const undefinedRefs = [
+  ...new Set(
+    [...css.matchAll(/var\((--[\w-]+)\s*\)/g)]
+      .map((m) => m[1])
+      .filter((name) => !name.startsWith('--bs-') && !defined.has(name)),
+  ),
+];
 
-if (errors.length) {
-  console.error(`解決されなかった Stylus の識別子が ${errors.length} 件あります。\n`);
-  errors.forEach((e) => console.error(`  ${FILE}  ${e}`));
-  console.error('\n変数の定義が、使う場所より後ろにあります。');
-  console.error('_variables.styl へ移してください（theme-styles.styl の先頭で読まれます）。');
+if (undefinedRefs.length) {
+  console.error(`定義の無いカスタムプロパティの参照が ${undefinedRefs.length} 件あります。\n`);
+  undefinedRefs.forEach((name) => console.error(`  ${FILE}  var(${name})`));
+  console.error('\nトークンは themes/future/css-src/tokens.css が持ちます。');
   process.exit(1);
 }
-console.log('CSS に解決漏れの識別子はありません');
+console.log('定義の無いカスタムプロパティの参照はありません');
 
 // ベンダー接頭辞の擬似要素が、他のセレクタと同じセレクタリストに入っていないかを見る。
 //
@@ -97,16 +72,9 @@ if (mixed.length) {
 console.log('ベンダー接頭辞の擬似要素の同居はありません');
 
 // セレクタの括弧が閉じているかを見る。上と同じ「リストに1本でも解釈できない
-// セレクタがあるとルールごと捨てられる」形で、こちらは Stylus が作る。
-//
-// **Stylus は `:has()` / `:is()` の中のカンマもセレクタの区切りとして扱う。**
-// 複数のセレクタを並べると2本目以降が引数の途中から始まり、入れ子にすると
-// 子セレクタが引数ひとつずつに配られる。どちらも閉じ括弧の余ったセレクタが混ざる:
-//
-//   .card:hover:has(.a:hover, .b:hover) .title, .card:hover:has(.a:hover, .b:hover) .meta
-//     → `.card:hover:has(.a:hover,` … `.b:hover) .meta`  ← 後半が壊れてルールごと消える
-//
-// カンマを持つ `:has()` は @css で素の CSS として通す (#3164)。
+// セレクタがあるとルールごと捨てられる」形。Stylus の頃は `:has()` の中のカンマを
+// セレクタの区切りとして扱われて、この形が作られていた (#3164)。いまは手で書いた
+// 閉じ忘れを拾う
 const unbalanced = [];
 for (const m of css.matchAll(/[}{]([^{}@;]+)\{/g)) {
   // カンマで割るのは括弧の外だけ。`:has(a, b)` の中のカンマは区切りではない
@@ -138,7 +106,6 @@ if (unbalanced.length) {
   console.error(`\n括弧の閉じていないセレクタが ${unbalanced.length} 件あります。\n`);
   unbalanced.forEach((s) => console.error(`  ${FILE}  ${s}`));
   console.error('\nそのセレクタを含むルールは、ブラウザに丸ごと捨てられます。');
-  console.error('カンマを持つ :has() / :is() は @css で素の CSS として通してください。');
   process.exit(1);
 }
 console.log('括弧の閉じていないセレクタはありません');
