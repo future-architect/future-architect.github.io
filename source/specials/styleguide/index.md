@@ -181,8 +181,9 @@ editable: true
 | <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-award-card-from"></span></span> | `award-card-from` | <span class="sg-hex sg-dark-award-card-from"></span> | <span class="sg-ratio sg-dark-award-card-from"></span> | 殿堂カードのグラデーション（明るいほうの端） |
 | <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-award-card-to"></span></span> | `award-card-to` | <span class="sg-hex sg-dark-award-card-to"></span> | <span class="sg-ratio sg-dark-award-card-to"></span> | 同（暗いほうの端） |
 | <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-award-card-rule"></span></span> | `award-card-rule` | <span class="sg-hex sg-dark-award-card-rule"></span> | <span class="sg-ratio sg-dark-award-card-rule"></span> | 同・枠 |
-| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-award-gold-on-tint"></span></span> | `award-gold-on-tint` | <span class="sg-hex sg-dark-award-gold-on-tint"></span> | <span class="sg-ratio sg-dark-award-gold-on-tint"></span> | 淡い金の上の金 |
+| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-award-gold-on-tint"></span></span> | `award-gold-on-tint` | <span class="sg-hex sg-dark-award-gold-on-tint"></span> | <span class="sg-ratio sg-dark-award-gold-on-tint"></span> | 殿堂カードの上の金 |
 | <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-award-bronze"></span></span> | `award-bronze` | <span class="sg-hex sg-dark-award-bronze"></span> | <span class="sg-ratio sg-dark-award-bronze"></span> | 2回目のメダル |
+| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-award-hall-label"></span></span> | `award-hall-label` | <span class="sg-hex sg-dark-award-hall-label"></span> | <span class="sg-ratio sg-dark-award-hall-label"></span> | 殿堂入りの称号 |
 
 **「背景より1段階濃い」は、暗い背景では「1段階明るい」になります。** note の中のインラインコードと表の見出しは、明るいほうでは背景から計算して1段階濃くしていますが、暗いほうは持ち上げる向きが逆になるので値を直接持っています。
 
@@ -193,7 +194,7 @@ editable: true
 上のスケールの外に残っている色は3種類で、**どれも役割があって残しているもの**です。
 
 - **note の4色** — 色相を持つ背景。中のインラインコードの背景は、その背景より1段階濃い同じ色になります
-- **表彰・殿堂の淡金** — メダルは灰→銅→金、殿堂のカードは淡金。ブランド色は表彰に広げません
+- **表彰の色** — メダルは銅→銀→金、殿堂のカードは淡いプラチナに青灰の称号。ブランド色は表彰に広げません
 - **コードブロックの構文の色** — 役ごとに1色（キーワード・型名・文字列・数値・キー・タグ・コメントと本文）。詳しくは次の節
 
 どれもテーマで入れ替わります（上のダークモードのスケールを参照）。
