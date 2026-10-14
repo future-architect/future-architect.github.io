@@ -34,7 +34,7 @@ const EXEMPT = new Map([
   ['.article-entry h5', '1.2em'],
   ['.article-entry h6', '1.1em'],
   // 記事タイトル・ページ見出し。幅で変える唯一の値
-  ['.article-title', 'clamp(26px, 1.325rem + 0.9vw, 32px)'],
+  ['.article-title', 'var(--text-page-title)'],
   // font-size がアイコンの実寸を決めている箇所（.svg-icon が 1em）。文字ではない
   ['.snscount-icon', '1.15em'],
   ['.header-theme', '20px'],
