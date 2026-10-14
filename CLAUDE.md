@@ -833,6 +833,13 @@ bootstrap-subset → tokens → highlight → theme-styles の順で `/css/site.
   `.share-btn.like-button`・`.award-medal.award-medal-2`・`.post-list-rank.post-list-rank-first`。
   単独で書くと元のクラスと詳細度が同じになり、後ろに置いたことだけで勝つ。
   組み合わせる前に、変種のクラスが全ページで必ず元のクラスと一緒に付いていることを確かめる
+  - **文脈の既定（親のクラス＋要素）は `:where()` で詳細度を落とす**（#3359）。
+    `:where(.blog-posts) p`・`:where(.blog-sidebar) a`・`:where(.nav) li a`。
+    既定を部品のクラスが上書きする形は、詳細度が同じだと書き順で勝ち負けが決まる。
+    既定の側を0まで下げれば、どの部品のクラスも書き順に関係なく勝つ。
+    レイヤーの外の規則なので、0まで下げても土台にも Bootstrap にも負けない
+    - 上書きする側の種類が多いときは逆に、上書きする側を上げる（diff の行が
+      構文の色に勝つ `pre .deletion [class]`）
   - **同じセレクタの規則を2か所に分けない。** 後ろの規則が前の規則を書き順だけで上書きする
   - **リンクの状態の順番（未訪問 → 訪問済み → hover → focus）は書き順のままでよい。**
     CSS の定石の並びで、詳細度を上げるとかえって読めなくなる
@@ -1253,8 +1260,8 @@ bootstrap-subset → tokens → highlight → theme-styles の順で `/css/site.
       - **記号を使うのはこの導線だけ。** `chevron-right` はサイト全体で
         `.more-link` の6箇所にしか出ない。装飾として他の場所には置かない。
         規則はスタイルガイドが名乗る（#3014）
-      - **左端に揃える。詳細度を合わせるため `p.more-link` と書く**（#3017）。
-        単一クラスでは `.blog-posts p` の `justify`（0,1,1）に負ける。
+      - **左端に揃える**（#3017）。本文の列の `p` の両端揃えは
+        `:where(.blog-posts) p` で詳細度を持たないので、単一クラスで勝つ。
         以前は `.more-link` に `text-align: right` があったが、本文の中では
         justify に負け、サイドバー2つと著者紹介は `left` で打ち消していて、
         **右へ寄る場所は1つも無かった**（5文脈・2幅で実測）。宣言を4つ落として
