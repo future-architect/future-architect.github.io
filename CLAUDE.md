@@ -829,6 +829,13 @@ bootstrap-subset → tokens → highlight → theme-styles の順で `/css/site.
 - **部品の規則をレイヤーに入れない。** レイヤーの外にある CSS（gist の埋め込みが読む
   GitHub の CSS、mermaid の SVG が持つ `<style>`）に部品が負けるようになる。
   土台は要素にしか当たらず、外部の CSS は自分のクラスにしか当たらないので、土台だけは入れてよい
+- **同じ要素に付く変種のクラスは、元のクラスと組み合わせて書く**（#3359）。
+  `.share-btn.like-button`・`.award-medal.award-medal-2`・`.post-list-rank.post-list-rank-first`。
+  単独で書くと元のクラスと詳細度が同じになり、後ろに置いたことだけで勝つ。
+  組み合わせる前に、変種のクラスが全ページで必ず元のクラスと一緒に付いていることを確かめる
+  - **同じセレクタの規則を2か所に分けない。** 後ろの規則が前の規則を書き順だけで上書きする
+  - **リンクの状態の順番（未訪問 → 訪問済み → hover → focus）は書き順のままでよい。**
+    CSS の定石の並びで、詳細度を上げるとかえって読めなくなる
 - **`!important` で勝たせない。** ユーティリティ（`.margin-bottom-20` など）の
   `!important` は、部品の側に書いた意図の値（`.popular-articles` の 56px、
   `.series-nav` の 40px）を黙って潰していた。部品が自分の余白を持つなら、
@@ -868,7 +875,7 @@ bootstrap-subset → tokens → highlight → theme-styles の順で `/css/site.
   | コードブロック | `text-base` = 13px（`line-height` は `text-base × leading-row` で追従） | `highlight.css` |
   | ヘッダーのサイト名 `.header-title` / 和文 `.header-title-sub` | `text-lead` / `text-meta`（#2877 で写真の上の 80px / 20px から。#2971 で 17px → 段の 18px へ。字間 0.35em と影は白地では役が無い） | 〃 |
   | ヘッダーのナビ `.header-nav-link` / ドロップダウン（見出し / 説明） | 14px / 13px / 12px | 〃 |
-  | パンくず（`.breadcrumb`） | 14px | `theme-styles.css` 冒頭（土台の塊）の `font:` 一括指定。フォント名だけ後方で上書き |
+  | パンくず（`.breadcrumb`） | `text-row` | 〃 |
 
 - コードブロックのサイズは本文との相対バランスを見て 15px → 14px → 13px と
   調整した経緯がある（#1927 / #1929）。安易に変えない
