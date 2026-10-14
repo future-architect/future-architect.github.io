@@ -29,6 +29,11 @@ lint-css:
 	node font_size_lint.mjs
 	node css_media_order_lint.mjs
 
+# 生成したページが要る。hexo generate の後に回す (#3359)
+css-order:
+	node css.mjs
+	node css_order_check.mjs
+
 # 共通部品に「見本」か「見本を出さない理由」のどちらかがあるかを検査する (#3205)。
 # 以前は /doctor/ の台帳に警告として出していたが、答えの決まっている検査なので
 # linter に置く（#2706 と同じ線引き）
