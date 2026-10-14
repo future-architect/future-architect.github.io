@@ -27,6 +27,7 @@ lint-css:
 	node css.mjs
 	node css_lint.mjs
 	node font_size_lint.mjs
+	node css_media_order_lint.mjs
 
 # 共通部品に「見本」か「見本を出さない理由」のどちらかがあるかを検査する (#3205)。
 # 以前は /doctor/ の台帳に警告として出していたが、答えの決まっている検査なので
