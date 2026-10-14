@@ -38,8 +38,7 @@ hexo.extend.helper.register('chart_series_colors', function (kind) {
   return JSON.stringify(PALETTES[kind] || NAVY_STEPS);
 });
 
-// 折れ線の太さ (#2794)。年別の重ね描きも、積み上げの上に重ねるアクセント線も
-// 同じ値にする。年の前後は色と描画順（z）が表すので、太さは順序を持たない。
+// 折れ線の太さ (#2794)。年の前後は色と描画順（z）が表すので、太さは順序を持たない。
 //
 // 投稿数の推移は軸の上限30件・プロット高141pxで 1件 = 4.7px。4px の線は
 // 値0.85件ぶんで、これより太いと隣の年の線と接する月が 2/12 から 6/12 に増える
@@ -50,6 +49,15 @@ const LINE_WIDTH = 4;
 // 本文の 0.85件ぶんより太く見える。同じ比に合わせた値
 const LINE_WIDTH_SIDEBAR = 2.5;
 
+// 積み上げの棒に重ねるアクセント線（著者数の推移の常連）。棒の内訳が主で、線は
+// その上に添えるもの。年別の重ね描きと同じ 2.5px では差し色のぶん内訳より前に出る
+const LINE_WIDTH_SIDEBAR_ACCENT = 1.5;
+
+const LINE_WIDTHS = {
+  sidebar: LINE_WIDTH_SIDEBAR,
+  'sidebar-accent': LINE_WIDTH_SIDEBAR_ACCENT,
+};
+
 hexo.extend.helper.register('chart_line_width', function (variant) {
-  return variant === 'sidebar' ? LINE_WIDTH_SIDEBAR : LINE_WIDTH;
+  return LINE_WIDTHS[variant] ?? LINE_WIDTH;
 });
