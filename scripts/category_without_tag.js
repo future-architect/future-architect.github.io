@@ -57,7 +57,17 @@ hexo.extend.helper.register('category_filter', function (name, selected) {
   const without = this.category_without_tag(name);
   if (!without) return null;
   return [
-    { label: 'すべて', count: without.total, url: without.categoryPath, current: selected === 'all' },
-    { label: `${without.name}以外`, count: without.count, url: without.path, current: selected === 'without' },
+    {
+      label: 'すべて',
+      count: without.total,
+      url: without.categoryPath,
+      current: selected === 'all',
+    },
+    {
+      label: `${without.name}以外`,
+      count: without.count,
+      url: without.path,
+      current: selected === 'without',
+    },
   ];
 });
