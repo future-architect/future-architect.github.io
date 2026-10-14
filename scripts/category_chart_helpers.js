@@ -494,7 +494,7 @@ hexo.extend.helper.register('tag_monthly_chart', function (name) {
 // 「よく使われているカテゴリ」（タグページと同じ 2本以上かつ10%以上）。
 // 読者がカテゴリ→タグ→カテゴリとリンクを辿っても同じ結論になる。
 // 登壇レポート・初心者向けのような形式タグ経由の関連もあえて除外しない。
-// 根拠タグを注記で名乗るので、関連の質は読者が判断できる。
+// 根拠タグを木の枝で名乗るので、関連の質は読者が判断できる。
 // posts を渡すと、絞り込んだ一覧（◯◯以外の記事）の「よく使われるタグ」から引く
 hexo.extend.helper.register('related_categories', function (name, posts) {
   const category = this.site.categories.findOne({ name });
@@ -526,7 +526,7 @@ hexo.extend.helper.register('related_categories', function (name, posts) {
         });
       }
       const e = related.get(catName);
-      e.tags.push(t.name);
+      e.tags.push({ name: t.name, path: tag.path });
       e.strength += count;
     });
   });
