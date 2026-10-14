@@ -136,6 +136,7 @@ function rows() {
       'dark-award-gold-on-tint',
       'dark-award-bronze',
       'dark-award-silver',
+      'dark-award-hall-label',
     ],
     dark,
     [D('--surface-base')],
