@@ -39,6 +39,7 @@ const NOT_SHOWN = {
   header: 'ヘッダー。実物がこのページの上端に出ている',
   'json-ld': '構造化データ。見た目を持たない',
   'chart-theme': 'グラフの色をテーマに追従させる <script>。見た目を持たない',
+  'list-filter': '節見出しの右端に置く絞り込みの2択。見本は「節見出し」が描く',
   'sidebar-index-archive': '期間ページのサイドバーそのもの。ページ固有の統計とグラフを持つ',
   'sidebar-index-authors': '同上（/authors/）',
   'sidebar-index-categories': '同上（/categories/）',

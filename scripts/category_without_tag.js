@@ -37,7 +37,7 @@ hexo.extend.generator.register('category_without_tag', function (locals) {
   return pages;
 });
 
-// カテゴリページから「◯◯ 以外の記事」への導線を出すのに使う
+// カテゴリページと「◯◯ 以外の記事」のページで、一覧の見出しに2択を出すのに使う
 hexo.extend.helper.register('category_without_tag', function (name) {
   const category = this.site.categories.findOne({ name });
   if (!category) return null;
@@ -47,5 +47,27 @@ hexo.extend.helper.register('category_without_tag', function (name) {
     name: dominant.name,
     count: dominant.rest.length,
     path: category.path + dominant.slug + '/',
+    total: category.length,
+    categoryPath: category.path,
   };
+});
+
+// 一覧の見出しに置く2択（すべて / ◯◯以外）。selected は 'all' か 'without'
+hexo.extend.helper.register('category_filter', function (name, selected) {
+  const without = this.category_without_tag(name);
+  if (!without) return null;
+  return [
+    {
+      label: 'すべて',
+      count: without.total,
+      url: without.categoryPath,
+      current: selected === 'all',
+    },
+    {
+      label: `${without.name}以外`,
+      count: without.count,
+      url: without.path,
+      current: selected === 'without',
+    },
+  ];
 });
