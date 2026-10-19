@@ -315,3 +315,32 @@ hexo.extend.helper.register('yearly_author_types', function () {
   }
   return JSON.stringify({ years, continuing, newcomers, returning, regulars });
 });
+
+// 投稿数の多い順に著者を並べ、人数の割合で区切った帯ごとの本数。
+// 下位半分は 1〜2本の著者だけで、10% 刻みでは同じ大きさの細い扇が並ぶのでまとめる。
+// 並びの決着は list_authors と同じ（同数は名前順）
+const AUTHOR_SHARE_BANDS = [
+  [0, 10, '上位10%'],
+  [10, 20, '10〜20%'],
+  [20, 30, '20〜30%'],
+  [30, 40, '30〜40%'],
+  [40, 50, '40〜50%'],
+  [50, 100, 'その他'],
+];
+
+hexo.extend.helper.register('author_post_share', function () {
+  const counts = new Map();
+  this.site.posts.forEach((post) => {
+    counts.set(post.author, (counts.get(post.author) || 0) + 1);
+  });
+  const sorted = [...counts.entries()]
+    .sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0))
+    .map(([, n]) => n);
+  const total = sorted.length;
+  return JSON.stringify(
+    AUTHOR_SHARE_BANDS.map(([from, to, name]) => {
+      const band = sorted.slice(Math.floor((total * from) / 100), Math.floor((total * to) / 100));
+      return { name, value: band.reduce((s, n) => s + n, 0), authors: band.length };
+    }),
+  );
+});
