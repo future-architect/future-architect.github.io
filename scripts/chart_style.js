@@ -27,11 +27,16 @@ const LINE_ACCENT = '#d5004a';
 // 別の意味を持つのを避ける (#2767)。順は category_groups.yml のキーの順
 const CATEGORY_GROUPS = ['#4269d0', '#efb118', '#ff725c', '#6cc5b0', '#3ca951'];
 
+// 著者の上位別の投稿数（/authors/ の円グラフ）。帯は6つで NAVY_STEPS より1段多いので、
+// ネイビーとグレーの間に1段足す。上位ほど濃い
+const AUTHOR_SHARE = ['#0a1461', '#3f4577', '#757a9a', '#9e9e9e', '#c6c6c6', '#e0e0e0'];
+
 const PALETTES = {
   weeks: NAVY_STEPS,
   retention: [NAVY_STEPS[0], NAVY_STEPS[2]],
   author_types: [NAVY_STEPS[0], NAVY_STEPS[1], NAVY_STEPS[2], LINE_ACCENT],
   category_groups: CATEGORY_GROUPS,
+  author_share: AUTHOR_SHARE,
 };
 
 hexo.extend.helper.register('chart_series_colors', function (kind) {
