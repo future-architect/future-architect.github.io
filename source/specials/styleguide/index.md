@@ -23,8 +23,8 @@ editable: true
 | <span class="sr-only">見本</span> | 変数 | 値 | 白背景との比 | 使うところ |
 | --- | --- | --- | --- | --- |
 | <span class="sg-chip sg-ink-strong"></span> | `ink-strong` | <span class="sg-hex sg-ink-strong"></span> | <span class="sg-ratio sg-ink-strong"></span> | 本文・見出し・リンク |
-| <span class="sg-chip sg-ink-mute"></span> | `ink-mute` | <span class="sg-hex sg-ink-mute"></span> | <span class="sg-ratio sg-ink-mute"></span> | 本文に添える補助情報（日付・著者・タグ・件数・注記）と引用の本文 |
-| <span class="sg-chip sg-ink-faint"></span> | `ink-faint` | <span class="sg-hex sg-ink-faint"></span> | <span class="sg-ratio sg-ink-faint"></span> | 空表示・無効と、補助情報の中でさらに弱くするもの（パンくずの `>`・折りたたみの三角・統計の内訳と枠の名前・引用の中の中黒と連番） |
+| <span class="sg-chip sg-ink-mute"></span> | `ink-mute` | <span class="sg-hex sg-ink-mute"></span> | <span class="sg-ratio sg-ink-mute"></span> | 本文に添える補助情報（日付・著者・件数・注記）と引用の本文 |
+| <span class="sg-chip sg-ink-faint"></span> | `ink-faint` | <span class="sg-hex sg-ink-faint"></span> | <span class="sg-ratio sg-ink-faint"></span> | 空表示・無効と、補助情報の中でさらに弱くするもの（タグのチップ・パンくずの `>`・折りたたみの三角・統計の内訳と枠の名前・引用の中の中黒と連番） |
 
 中黒と連番は、その項目の文字より一段弱い段に置きます。本文の中では `ink-mute`、文字が `ink-mute` まで下りる引用の中では `ink-faint` です。
 
@@ -132,8 +132,8 @@ editable: true
 | <span class="sr-only">見本</span> | 変数 | 値 | 背景との比 | 使うところ |
 | --- | --- | --- | --- | --- |
 | <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-ink-strong"></span></span> | `ink-strong` | <span class="sg-hex sg-dark-ink-strong"></span> | <span class="sg-ratio sg-dark-ink-strong"></span> | 本文・見出し・リンク |
-| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-ink-mute"></span></span> | `ink-mute` | <span class="sg-hex sg-dark-ink-mute"></span> | <span class="sg-ratio sg-dark-ink-mute"></span> | 補助情報（日付・著者・タグ・件数・注記） |
-| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-ink-faint"></span></span> | `ink-faint` | <span class="sg-hex sg-dark-ink-faint"></span> | <span class="sg-ratio sg-dark-ink-faint"></span> | 空表示・無効と、補助情報の中でさらに弱くする記号 |
+| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-ink-mute"></span></span> | `ink-mute` | <span class="sg-hex sg-dark-ink-mute"></span> | <span class="sg-ratio sg-dark-ink-mute"></span> | 補助情報（日付・著者・件数・注記） |
+| <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-ink-faint"></span></span> | `ink-faint` | <span class="sg-hex sg-dark-ink-faint"></span> | <span class="sg-ratio sg-dark-ink-faint"></span> | 空表示・無効と、補助情報の中でさらに弱くするもの（タグのチップ・記号） |
 | <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-rule-base"></span></span> | `rule-base` | <span class="sg-hex sg-dark-rule-base"></span> | <span class="sg-ratio sg-dark-rule-base"></span> | 枠。カード・チップ・箱・画像枠 |
 | <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-rule-weak"></span></span> | `rule-weak` | <span class="sg-hex sg-dark-rule-weak"></span> | <span class="sg-ratio sg-dark-rule-weak"></span> | 区切り。見出しの下・リストの行間 |
 | <span class="sg-chip-ground-dark"><span class="sg-chip sg-dark-rule-strong"></span></span> | `rule-strong` | <span class="sg-hex sg-dark-rule-strong"></span> | <span class="sg-ratio sg-dark-rule-strong"></span> | 地を持たない部品の枠と、focus / hover でひとつ強めるところ |
@@ -585,7 +585,7 @@ npm audit fix
 
 ### チップ
 
-タグはピル型のチップで表します。枠だけで地を持たず、hover で背景がネイビーに変わります。右肩の件数は、サイドバーやヘッダーの一覧で名前に添える総数と同じ役なので、同じ大きさ・同じ `ink-faint` です。hover で地が反転する間だけ、反転後の文字色を継ぎます。実物は[タグ一覧](/tags/)にあります。
+タグはピル型のチップで表します。枠だけで地を持たず、hover で背景がネイビーに変わります。文字は太字で、色は `ink-faint` です。本文に添える補助情報（日付・著者）より一段弱く置き、隣に並ぶ一覧の行より重く見えないようにします。右肩の件数は、サイドバーやヘッダーの一覧で名前に添える総数と同じ役なので、同じ大きさ・同じ色です。名前とは大きさで分かれます。hover で地が反転する間だけ、反転後の文字色を継ぎます。実物は[タグ一覧](/tags/)にあります。
 
 この形を借りるのは、**記事タイトルの上で名乗るチップ**（受賞・連載）だけです。アイコンを持ち、太字で文字色が一段濃いので、タグのチップとは見分けが付きます。反応は地がネイビーではなく灰に変わります。実物は[受賞記事](/articles/20250324a/)と[連載の記事](/articles/20260902a/)にあります。
 
