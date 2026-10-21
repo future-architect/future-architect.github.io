@@ -21,8 +21,8 @@ Managed Clusterと、Serverlessを実際に開発環境に投入して利用料�
 
 2種類あります。
 
-* Managed Cluster: あらかじめ指定したインスタンス(EC2と同じ)を選びサービスを起動するもの。設定したもので固定で費用がかかる。EC2と似ていますが、残念ながら一時停止などはなく、停止して節約するにはまるごと削除しかありません。Pricing CalculatorではAmazon OpenSearch Service domainとなっている項目。
-* OpenSearch Serverless: 1 OCU(6GBのメモリと1 vCPU、120GBのストレージ)単位でリソースが増減する仕組み。1 OCU/h = `$0.334`です。1か月だと$244ぐらい。
+* **Managed Cluster**: あらかじめ指定したインスタンス(EC2と同じ)を選びサービスを起動するもの。設定したもので固定で費用がかかる。EC2と似ていますが、残念ながら一時停止などはなく、停止して節約するにはまるごと削除しかありません。Pricing CalculatorではAmazon OpenSearch Service domainとなっている項目。
+* **OpenSearch Serverless**: 1 OCU(6GBのメモリと1 vCPU、120GBのストレージ)単位でリソースが増減する仕組み。1 OCU/h = `$0.334`です。1か月だと$244ぐらい。
 
 他にもIngestionというのもありますが、これはどうも普通の検索サービスではないようなので除外します。
 
