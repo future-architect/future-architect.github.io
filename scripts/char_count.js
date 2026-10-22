@@ -3,8 +3,8 @@
 /**
  * 記事本文の文字数と、読み終えるまでの目安を出すヘルパー。
  *
- * 目安は表示せず title で添える。読む速度は個人差が大きいので、
- * 前提の速さを一緒に名乗れる場所にだけ出す。
+ * 目安は表示せず title で添える。読む速度は個人差が大きく、
+ * メタ行に分数を並べると客観的な数字に見えてしまうため。
  *
  * 「読む労力の目安」として意味のある数字にするため、以下を除外する。
  *
@@ -106,7 +106,7 @@ function readingTime(post) {
   if (!html) return '';
   const min = countChars(html) / CHARS_PER_MIN + extraSeconds(html) / 60;
   const text = min < 1 ? '1分未満' : `約 ${Math.round(min)} 分`;
-  return `読み終えるまでの目安は${text}です（本文を1分あたり${CHARS_PER_MIN}字、コードを1行あたり${SEC_PER_CODE_LINE}秒、コマンドと実行結果を1行あたり${SEC_PER_SKIM_LINE}秒、画像を1枚あたり${SEC_PER_IMAGE}秒として計算）`;
+  return `読み終えるまでの目安は${text}です`;
 }
 
 hexo.extend.helper.register('char_count', label);
