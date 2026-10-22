@@ -1,10 +1,10 @@
 'use strict';
 
 /**
- * 記事本文の文字数を数えるヘルパー。
+ * 記事本文の文字数と、読み終えるまでの目安を出すヘルパー。
  *
- * 読了時間は出さない。読む速度は個人差が大きく、分数で示すと
- * かえって誠実さを欠くため、客観的な文字数だけを示す。
+ * 目安は表示せず title で添える。読む速度は個人差が大きく、
+ * メタ行に分数を並べると客観的な数字に見えてしまうため。
  *
  * 「読む労力の目安」として意味のある数字にするため、以下を除外する。
  *
@@ -70,4 +70,44 @@ function label(post) {
   return `約 ${n.toLocaleString('en-US')} 文字`;
 }
 
+// 日本語の黙読は 400〜600字/分と言われる。技術文なので帯の中ほどを取る
+const CHARS_PER_MIN = 500;
+// コードは記号とインデントで文字数が膨らむので、行で数える
+const SEC_PER_CODE_LINE = 2;
+// 端末の画面・出力・シェルのコマンド列は流し読みされる
+const SEC_PER_SKIM_LINE = 0.5;
+const SKIM_LANGS = new Set(['console', 'sh', 'bash', 'text', 'plaintext', 'txt', 'log']);
+const SEC_PER_IMAGE = 3;
+
+const FIGURE = /<figure\b[^>]*\bclass="([^"]*\bhighlight\b[^"]*)"[\s\S]*?<\/figure>/gi;
+const PRE = /<pre\b[\s\S]*?<\/pre>/gi;
+
+function extraSeconds(html) {
+  let sec = 0;
+  // details の中は開かずに読み終える人が多いので数えない
+  const body = html.replace(/<details\b[\s\S]*?<\/details>/gi, '');
+  // 1x1 は計測ピクセルで、読む対象ではない
+  const images = (body.match(/<img\b[^>]*>/gi) || []).filter((tag) => !/\bwidth="1"/.test(tag));
+  sec += images.length * SEC_PER_IMAGE;
+  const rest = body.replace(FIGURE, (block, cls) => {
+    const lang = cls.split(/\s+/).find((c) => c && c !== 'highlight');
+    const lines = (block.match(/<span class="line">/g) || []).length;
+    sec += lines * (SKIM_LANGS.has(lang) ? SEC_PER_SKIM_LINE : SEC_PER_CODE_LINE);
+    return '';
+  });
+  for (const block of rest.match(PRE) || []) {
+    sec += block.split('\n').length * SEC_PER_CODE_LINE;
+  }
+  return sec;
+}
+
+function readingTime(post) {
+  const html = post.content;
+  if (!html) return '';
+  const min = countChars(html) / CHARS_PER_MIN + extraSeconds(html) / 60;
+  const text = min < 1 ? '1分未満' : `約 ${Math.round(min)} 分`;
+  return `読み終えるまでの目安は${text}です`;
+}
+
 hexo.extend.helper.register('char_count', label);
+hexo.extend.helper.register('reading_time', readingTime);
