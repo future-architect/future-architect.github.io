@@ -124,7 +124,8 @@ function recommendLimit(count, extended) {
 // decay に 'linear' を渡すと経過年ペナルティが線形（≒年平均PV）になる。
 // foldAfter を渡すと、その件数までを開いた状態で置き、残りを details で畳む
 // （#3144。/articles/ と /articles/yyyy/ だけ）
-hexo.extend.helper.register('popular_posts_in', function (posts, limit, decay, foldAfter = 0) {
+// withAuthor に false を渡すと行の著者名を伏せる。著者ページでは全行が同じ名前になる (#3412)
+function popularPostsIn(posts, limit, decay, foldAfter = 0, withAuthor = true) {
   if (limit === undefined) limit = recommendLimit(posts.length, foldAfter > 0);
   if (limit === 0) return '';
   // PV は累積なので、古い記事ほど有利になる。経過年数で割って、
@@ -164,7 +165,9 @@ hexo.extend.helper.register('popular_posts_in', function (posts, limit, decay, f
   // 列は CSS（.popular-in-list）が持つ
   const list = (part) =>
     `<ul class="nav popular-in-list">${part
-      .map(({ post }) => postListItem(this, post, 'featured-posts-item', { withThumb: true }))
+      .map(({ post }) =>
+        postListItem(this, post, 'featured-posts-item', { withThumb: true, withAuthor }),
+      )
       .join('')}</ul>`;
 
   // 残りが1件だけなら畳む意味がないので開いたまま出す（ランキングと同じ扱い）
@@ -176,4 +179,5 @@ hexo.extend.helper.register('popular_posts_in', function (posts, limit, decay, f
   <summary>残り ${ranked.length - foldAfter}本を表示</summary>
   ${list(ranked.slice(foldAfter))}
 </details>`;
-});
+}
+hexo.extend.helper.register('popular_posts_in', popularPostsIn);
