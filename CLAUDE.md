@@ -119,6 +119,17 @@ lede: "Go 1.27 で標準ライブラリに追加されたuuidパッケージを�
 
 - `categories` は既存の語彙から選ぶ。使用実績（記事数）: Programming 327 / Frontend 134 / DevOps 133 / Culture 129 / DataScience 100 / Cloud 75 / Infrastructure 70 / DB 69 / IaC 57 / Mobile 57 / IoT 52 / Business 49 / Management 48 / DataEngineering 45 / AIDD 44 / Security 36 / 認証認可 24 / VR 20 / フィジカルAI 2
   - `AI` は `AIDD` に、`Design` は `UI/UX` タグに統合済み。`_config.yml` の `alias` で転送している
+  - **略語のカテゴリ（`IaC` / `AIDD`）は、略語だけが出る場所で正式名称を補う**（#3409）。
+    AIDD はこのブログの造語に近く、SNS から記事に来た読者が最初に会うカテゴリ名が
+    パンくずの略語になりやすい。**カテゴリページの h1 は添え（`list-sub-text`）に正式名称を
+    足し**、パンくず・ヘッダーのドロップダウン・一覧カード・サイドバー・傾向パネルの
+    リンクは **`title` だけが持つ**（表示は略語のまま。行の幅を変えない）。
+    h1 の文字列・`<title>`・URL・フロントマターの語は変えない
+    - 対は `source/_data/category_full_names.yml` が持ち、`category_label()` が
+      title 用の「略語（正式名称）」を返す。**`categories.yml` に同居させない**——
+      あちらは「名前: 1文」の平らな map を textlint の `no-invalid-post-taxonomy`・
+      カテゴリページ・`/categories/` が読んでいて、値の形を変えると読み手を全部直すことになる
+    - `/categories/` の一覧には足さない。名前の真下の説明文が正式名称から始まる
   - 基盤系4カテゴリの境界（#2057 / #2461）: **基盤をコードで書く話は `IaC`**（Terraform / Ansible / CDK 等）、
     **マネージドサービスそのものの使い方・設計は `Cloud`**（S3 の署名付きURL、VPC Endpoint の要否、Pub/Sub の概念）、
     **ネットワーク・OS・ミドルウェアは `Infrastructure`**（オンプレ含む）、
