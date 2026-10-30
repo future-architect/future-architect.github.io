@@ -14,6 +14,9 @@ const { getSNSCnt } = require('./sns');
 // 行の半分に付き、新顔と定番が見分けられない (#3408)
 const NEW_DAYS = 14;
 
+// 運営アカウントなど人の名前ではないので、行では名乗らせない (#3412)
+const PLACEHOLDER_AUTHORS = new Set(['admin', 'ghost']);
+
 const isRecent = (date) => {
   const threshold = new Date();
   threshold.setDate(threshold.getDate() - NEW_DAYS);
@@ -34,12 +37,13 @@ const isRecent = (date) => {
  * @param {boolean} [opts.withThumb] タイトルの左に小さいサムネを添える (#2230)
  * @param {{html: string, className: string}} [opts.rankMark] 行頭に出す順位の丸 (#2249)
  * @param {boolean} [opts.withNew]   公開から NEW_DAYS 日以内なら NEW を出す (#2788)
+ * @param {boolean} [opts.withAuthor] 著者名を出す。全行が同じ著者になる著者ページだけ false (#3412)
  */
 const postListItem = (
   ctx,
   post,
   itemClass,
-  { titleAttr, withThumb = false, rankMark = null, withNew = false } = {},
+  { titleAttr, withThumb = false, rankMark = null, withNew = false, withAuthor = true } = {},
 ) =>
   ctx
     .partial('_partial/post-list-item', {
@@ -49,6 +53,7 @@ const postListItem = (
       withThumb,
       rankMark,
       isNew: withNew && isRecent(post.date),
+      authorName: withAuthor && !PLACEHOLDER_AUTHORS.has(post.author) ? post.author : '',
       snsCount: getSNSCnt(post.permalink),
     })
     .trim();
