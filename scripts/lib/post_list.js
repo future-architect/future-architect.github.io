@@ -14,6 +14,9 @@ const { getSNSCnt } = require('./sns');
 // 行の半分に付き、新顔と定番が見分けられない (#3408)
 const NEW_DAYS = 14;
 
+// 運営アカウントなど人の名前ではないので、行では名乗らせない (#3412)
+const PLACEHOLDER_AUTHORS = new Set(['admin', 'ghost']);
+
 const isRecent = (date) => {
   const threshold = new Date();
   threshold.setDate(threshold.getDate() - NEW_DAYS);
@@ -50,7 +53,7 @@ const postListItem = (
       withThumb,
       rankMark,
       isNew: withNew && isRecent(post.date),
-      withAuthor,
+      authorName: withAuthor && !PLACEHOLDER_AUTHORS.has(post.author) ? post.author : '',
       snsCount: getSNSCnt(post.permalink),
     })
     .trim();
