@@ -2,18 +2,21 @@
 
 const { getSNSCnt } = require('./sns');
 
-// 公開から30日以内かどうか。
-//
 // **NEW を出すのはランキングだけ**（呼び出し側が withNew で渡す、#2788）。
 // 関連記事は関連度順、参照している記事は張られたリンクの記録で、どちらも
 // 新しさが並びの理由ではない。実測では参照している記事の92%が NEW
 // （12ページ中10ページが全行 NEW）で、しかも並びが日付降順なので二重だった。
 // 関連記事は逆に全期間で0.5%しか出ず、出るのは同じ連載の同時期の記事。
 // ランキングは PV 順で新しさと無関係なので、「まだ読んでいないかもしれない
-// 新顔」の合図として働く（74行中14行）
+// 新顔」の合図として働く
+//
+// 窓はトレンドの集計期間より短くする。同じ長さだとトレンドの
+// 行の半分に付き、新顔と定番が見分けられない (#3408)
+const NEW_DAYS = 14;
+
 const isRecent = (date) => {
   const threshold = new Date();
-  threshold.setDate(threshold.getDate() - 30);
+  threshold.setDate(threshold.getDate() - NEW_DAYS);
   return threshold.toISOString() <= date.toISOString();
 };
 
@@ -30,7 +33,7 @@ const isRecent = (date) => {
  * @param {string} [opts.titleAttr]  a の title 属性。省略時は lede
  * @param {boolean} [opts.withThumb] タイトルの左に小さいサムネを添える (#2230)
  * @param {{html: string, className: string}} [opts.rankMark] 行頭に出す順位の丸 (#2249)
- * @param {boolean} [opts.withNew]   公開30日以内なら NEW を出す (#2788)
+ * @param {boolean} [opts.withNew]   公開から NEW_DAYS 日以内なら NEW を出す (#2788)
  */
 const postListItem = (
   ctx,
