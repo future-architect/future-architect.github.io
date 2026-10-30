@@ -29,8 +29,7 @@ let feedItems = [];
     });
 })();
 
-// 公開から15日以内を新着として扱う。記事一覧の NEW（scripts/lib/post_list.js）が
-// 30日なのに対して短いのは、こちらが「今週出た回」の合図で、記事の新顔とは役が違うため
+// 公開から15日以内を新着として扱う。「今週出た回」の合図
 function isNewEpisode(isoDate) {
   const threshold = new Date();
   threshold.setDate(threshold.getDate() - 15);
