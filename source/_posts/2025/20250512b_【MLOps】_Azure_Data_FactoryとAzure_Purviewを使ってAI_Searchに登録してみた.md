@@ -162,7 +162,6 @@ Azure Data FactoryとAzure Purviewで作業を始めるための設定の流れ�
    - Azure Purview
    - キーコンテナ
    - ストレージアカウント
-
 2. **Azure Purviewでコレクションを作成**
    Azure Purviewでは、コレクションごとに管理します。コレクションには複数のデータソースを登録でき、またアクセス制御などもコレクションごとに行えます。
    <img src="/images/2025/20250512b/image_3.png" alt="" width="1200" height="573" loading="lazy">
@@ -335,11 +334,9 @@ Azure Data FactoryのWebアクティビティを用いて、フューチャー�
 
 1. **「Web」アクティビティを作成:**
    - UIから指定すると動作が不安定な場合があるので、JSONを直接編集することをお勧めします
-
 2. **テキストのエンベディングモデルを作成:**
    - Azure OpenAIのリソースからエンベディングモデルをデプロイします
    - 今回は `text-embedding-ada-002` を使用します
-
 3. **URLの指定規則:**
    - 以下の形式に従います
 

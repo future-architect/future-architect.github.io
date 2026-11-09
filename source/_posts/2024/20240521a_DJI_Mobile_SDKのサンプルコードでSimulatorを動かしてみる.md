@@ -116,7 +116,6 @@ AndroidManifest.xml（パス：Sample Code/app/src/main/main）
 - このアプリを使うには、以下の制限と設定が必要です（少し面倒ですね...）
   - ※新し目のMACで使えない
   - ※USBドライブにアクセス制限あるPCはそれを解除する必要
-
 - 検知できると、こんな画面が出てくる
 
 <img src="/images/2024/20240521a/image_11.png" alt="image.png" width="1200" height="748" loading="lazy">

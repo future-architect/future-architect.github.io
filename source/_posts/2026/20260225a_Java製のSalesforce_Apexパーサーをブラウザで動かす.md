@@ -507,9 +507,7 @@ WebAssembly版はJavaScript版の約2倍速い結果が出ました。
   - `ADVANCED`: インライン化や定数畳み込み
   - `FULL`: Dead Code Eliminationを含む完全最適化（本番用）
     - 今回の実験だと`SIMPLE/minifyなし` に比べて、サイズが1/3になりました
-
 - **minifying**: 変数名を短縮（例：`parseApexSourceCode` → `a`）。可読性は下がるがサイズが30-40%削減される
-
 - **debugInformationGenerated**: ソースマップとスタックトレース情報を生成。開発時は`true`、本番は`false`
 
 ### WebAssembly版の設定
@@ -552,9 +550,7 @@ WebAssembly版はJavaScript版の約2倍速い結果が出ました。
 **WASM固有オプション解説**:
 
 - **minHeapSize/maxHeapSize**: WebAssemblyのリニアメモリサイズ。デフォルト16MBは小さすぎるため、パーサー用途では32-128MBを推奨
-
 - **heapDump**: （オプション）メモリリーク調査用。`true`にするとヒープダンプを出力
-
 - **wasmVersion**: （オプション）WebAssemblyのバージョン。デフォルトは`V_0x1`（MVP）
   - 指定したのですがエラーになりました
   - TeaVMでは指定ができないようです
