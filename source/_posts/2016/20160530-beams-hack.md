@@ -239,13 +239,10 @@ LEDは大きく分けて2種類の光らせる方法を考えています！
 
 * HAPPY OUTSIDE BEAMS HACK 2016
   * http://www.beams.co.jp/special/hosb_hack/
-
 * toggetter（ハッシュタグbeams_hack）
   * http://togetter.com/li/975917
-
 * イベントレポート記事：ファッションビジネスメディア「The FLAG」
   * https://theflag.jp/article/184996
-
 * イベントレポート記事：「LIG BLOG」
   * http://liginc.co.jp/277101
 
