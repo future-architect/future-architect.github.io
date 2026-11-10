@@ -102,6 +102,18 @@ hexo.extend.helper.register('list_authors', function (year = 'all') {
   const compareFunc = (a, b) => count_posts(b) - count_posts(a) || (a < b ? -1 : a > b ? 1 : 0);
   const postRankings = this.site.authors.slice().sort(compareFunc);
 
+  // 他の媒体の記事は「+N」で足す (#3428)。ブログの本数と混ぜて1つの数にすると、
+  // 著者ページの「全N本」と食い違う。年のタブではその年に出たものだけを数える
+  const countLabel = (author) => {
+    const posts = count_posts(author);
+    const external = this.author_external(author).filter(
+      (e) => year === 'all' || e.date.startsWith(`${year}-`),
+    ).length;
+    return external
+      ? `<span class="author-list-count" title="ブログ ${posts}本・ほかの媒体 ${external}本">${posts}+${external}</span>`
+      : `<span class="author-list-count">${posts}</span>`;
+  };
+
   // authorMapperを定義。yearの値によって処理を分岐する
   let authorMapper;
 
@@ -109,19 +121,10 @@ hexo.extend.helper.register('list_authors', function (year = 'all') {
     // 名前の後ろに付けていた * / **（投稿が途切れている著者の印）は /doctor/ へ移した (#2418)。
     // 凡例がページのどこにも無く、読者には意味が読めない記号になっていた。
     // 「そろそろ声をかけると再開してくれるかも」は運営の関心なので置き場所は /doctor/
-    // 他の媒体の記事は「+N」で足す (#3428)。ブログの本数と混ぜて1つの数にすると、
-    // 著者ページの「全N本」と食い違う
-    authorMapper = (author) => {
-      const posts = count_posts(author);
-      const external = this.author_external(author).length;
-      const count = external
-        ? `<span class="author-list-count" title="ブログ ${posts}本・ほかの媒体 ${external}本">${posts}+${external}</span>`
-        : `<span class="author-list-count">${posts}</span>`;
-      return `
+    authorMapper = (author) => `
         <li class="author-list-item">
-          <a class="author-list-link" href="/authors/${author_to_url.call(this, author)}">${author}${count}</a>
+          <a class="author-list-link" href="/authors/${author_to_url.call(this, author)}">${author}${countLabel(author)}</a>
         </li>`;
-    };
   } else {
     // 年指定: その年が初投稿の著者に NEW を付ける (#2413)。
     // 「1本目を踏み出してくれた新しい寄稿者数/年」という運営のキーメトリクスと
@@ -133,7 +136,7 @@ hexo.extend.helper.register('list_authors', function (year = 'all') {
     // 形はヘッダーのドロップダウン（名前の右肩に総数）と同じ
     authorMapper = (author) => `
       <li class="author-list-item">
-        <a class="author-list-link" href="/authors/${author_to_url.call(this, author)}">${author}<span class="author-list-count">${count_posts(author)}</span>${isNewIn(author) ? '<span class="newitem">NEW</span>' : ''}</a>
+        <a class="author-list-link" href="/authors/${author_to_url.call(this, author)}">${author}${countLabel(author)}${isNewIn(author) ? '<span class="newitem">NEW</span>' : ''}</a>
       </li>`;
   }
 
