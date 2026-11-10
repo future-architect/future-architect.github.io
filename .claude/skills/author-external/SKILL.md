@@ -5,7 +5,7 @@ description: 著者が他の媒体（LEAD TO THE FUTURE・未来報・PR TIMES S
 
 # 他媒体の記事をプロフィールに足す
 
-`_profile.yml` の `external` は、著者ページの「ほかの媒体の記事」に全件が出る。記事末の著者紹介には出さない（#3428）。
+`_profile.yml` の `external` は、著者ページの「ほかの媒体の記事」に全件が、`/authors/` の「すべての著者」に本数が「+N」で出る。記事末の著者紹介には出さない（#3428）。
 
 ## 書き方
 
