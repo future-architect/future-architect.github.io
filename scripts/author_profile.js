@@ -16,12 +16,11 @@ const profile = loadYamlFile('./_profile.yml');
 hexo.extend.helper.register('get_profile_data', (authorName) => profile[authorName] || null);
 
 // 他の媒体の記事 (#3428)。新しい順。日付は YAML が Date に読むので文字列に戻す
-hexo.extend.helper.register('author_external', (authorName, limit) => {
-  const items = ((profile[authorName] || {}).external || [])
+hexo.extend.helper.register('author_external', (authorName) => {
+  return ((profile[authorName] || {}).external || [])
     .map((e) => ({
       ...e,
       date: e.date instanceof Date ? e.date.toISOString().slice(0, 10) : String(e.date || ''),
     }))
     .sort((a, b) => b.date.localeCompare(a.date));
-  return limit ? items.slice(0, limit) : items;
 });
