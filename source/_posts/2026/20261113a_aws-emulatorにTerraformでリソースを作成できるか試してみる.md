@@ -10,9 +10,14 @@ tags:
   - GitHubActions
 categories:
   - IaC
+thumbnail: /images/2026/20261113a/thumbnail.png
 author: 伊藤太斉
 lede: "AWSから発表された aws-emulator に向けて、Terraform でVPCやLambdaを作成できるか、GitHub Actions のCIに組み込めるかを試しました。"
 ---
+<img src="/images/2026/20261113a/top.png" alt="" width="1200" height="900">
+
+*（https://aws.amazon.com/jp/products/developer-tools/emulator/ より引用）*
+
 こんにちは。TIGの伊藤です。2026/11/11、AWSから`aws-emulator`というツールが発表されました。
 
 https://aws.amazon.com/jp/products/developer-tools/emulator/
