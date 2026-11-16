@@ -78,6 +78,19 @@ hexo.extend.helper.register('author_advent', function (authorName) {
   };
 });
 
+// アーキテクチャガイドラインの作成・レビュー (#3447)。名前は謝辞の表記のまま照合し、
+// こちらで名寄せしない（アドベントカレンダーと同じ）
+hexo.extend.helper.register('author_guidelines', function (authorName) {
+  const day = (d) => (d instanceof Date ? d.toISOString() : String(d)).slice(0, 10);
+  const all = this.site.data.guidelines || [];
+  const items = all
+    .filter((g) => (g.authors || []).includes(authorName))
+    .map((g) => ({ title: g.title, url: g.url, date: day(g.date) }))
+    .sort((a, b) => b.date.localeCompare(a.date));
+  const reviewed = all.filter((g) => (g.reviewers || []).includes(authorName)).length;
+  return { items, reviewed };
+});
+
 // 被参照: ほかの著者の記事からのリンク。自分の記事からのリンク、索引記事（インデックスタグ）
 // からのリンク、索引記事へのリンクは数えない。自分では張れるうえ、索引記事との間のリンクは
 // 連載に入れば機械的に付く（各記事の冒頭が索引記事を指す）ので、

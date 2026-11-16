@@ -100,6 +100,18 @@ description: 著者がブログの外で発信したもの（LEAD TO THE FUTURE�
   （「以前Qiitaに投稿した記事」「私のQiita記事」「アドベントカレンダーで〜を書きました」＋自分の記事へのリンク）。
   Qiita のプロフィールの GitHub / X の一致、ローマ字の表示名、姓だけの自己紹介で推して書かない
 
+## アーキテクチャガイドライン
+
+`external` には書かない。`source/_data/guidelines.yml` を arch-guidelines リポジトリの各 `documents/*/index.md` の
+「謝辞」から作り直す。ガイドラインが増えた・謝辞が変わったときに回す。
+
+```sh
+python3 .claude/skills/author-external/guidelines.py ../arch-guidelines > source/_data/guidelines.yml
+```
+
+- 名前は謝辞の表記のまま照合する。ブログの `author` と表記が違っても、こちらで名寄せしない
+- 日付は Articles の最も古い告知記事。告知記事が無いものはリポジトリに入った日
+
 ## 確かめる
 
 - YAML として読めるか: `node -e "require('js-yaml').load(require('fs').readFileSync('_profile.yml','utf8'))"`
