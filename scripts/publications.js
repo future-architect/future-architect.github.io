@@ -69,3 +69,17 @@ hexo.extend.helper.register('publications', function () {
   // 冊数ではなく寄稿の件数を本文が名乗るので、まとめる前の数も返す
   return { books, magazines: groupByIssue(magazines), magazineCount: magazines.length };
 });
+
+// 著者ページのサイドバーの統計 (#3428)。登壇は登壇レポートのタグ、
+// 出版・寄稿は books / magazines の書き手（by、無ければ記事の author）で数える
+hexo.extend.helper.register('author_activity_counts', function (author) {
+  let talks = 0;
+  let books = 0;
+  let magazines = 0;
+  this.site.posts.forEach((post) => {
+    if (post.author === author && post.tags.some((t) => t.name === '登壇レポート')) talks++;
+    (post.books || []).forEach((b) => (b.by || post.author) === author && books++);
+    (post.magazines || []).forEach((m) => (m.by || post.author) === author && magazines++);
+  });
+  return { talks, books, magazines };
+});
