@@ -1,6 +1,6 @@
 ---
 name: author-external
-description: 著者がブログの外で発信したもの（LEAD TO THE FUTURE・未来報・PR TIMES STORY・NewsPicks・type就活の記事、Tech Cast の出演回、connpass の登壇、Qiita のアドベントカレンダー）を集め、_profile.yml の external に追記する手順。「他媒体の記事をプロフィールに足して」「〇〇さんの LTTF の記事を載せて」「登壇やアドカレを著者ページに載せて」「external を更新して」と頼まれたときに使う。
+description: 著者がブログの外で発信したもの（LEAD TO THE FUTURE・未来報・PR TIMES STORY・NewsPicks・type就活の記事、Tech Cast の出演回、Qiita のアドベントカレンダー）を集め、_profile.yml の external に追記する手順。「他媒体の記事をプロフィールに足して」「〇〇さんの LTTF の記事を載せて」「Tech Cast やアドカレを著者ページに載せて」「external を更新して」と頼まれたときに使う。
 ---
 
 # ブログの外での発信をプロフィールに足す
@@ -27,7 +27,6 @@ description: 著者がブログの外で発信したもの（LEAD TO THE FUTURE�
   | --- | --- | --- | --- | --- |
   | 企業情報の媒体 | `LEAD TO THE FUTURE` / `未来報` / `PR TIMES STORY` / `NewsPicks` / `type就活` | 記事 | 記事の見出し | 公開日 |
   | Tech Cast | `Tech Cast` | Spotify のエピソード | エピソード名（`#12 …` の番号ごと） | 配信日 |
-  | connpass の登壇 | `登壇` | `https://future.connpass.com/event/<ID>/` | イベント名（`【増枠】` などの告知の飾りは落とす） | 開催日 |
   | アドベントカレンダー | `アドベントカレンダー` | Qiita の記事 | 記事の見出し | カレンダーの日（`YYYY-12-DD`） |
 
   それ以外の媒体は媒体自身の名乗りを使う
@@ -43,7 +42,7 @@ description: 著者がブログの外で発信したもの（LEAD TO THE FUTURE�
 | 執筆・インタビューを受けた・対談（聞き手も含む）・寄稿 | LT 大会などのレポートで、プログラムに名前と演題が載っているだけ |
 | 一人称の節を自分で書いている（司会兼執筆など） | 編集者としてのクレジット、発起人として一度言及されるだけ |
 | Tech Cast のゲストとパーソナリティ | Tech Cast の編集・レビュアー・ジングル作曲だけのクレジット |
-| connpass の発表者 | 管理者・司会だけ。開催レポートを書いただけ |
+| | connpass の登壇（登壇レポートの記事がブログにあることが多く、著者ページの記事一覧と重なる） |
 | | 他の人の記事の中でプロフィール付きで紹介されているだけ |
 | | ブログに転載済みのアドベントカレンダー記事（ブログの記事一覧に既に出ている） |
 
@@ -62,23 +61,11 @@ description: 著者がブログの外で発信したもの（LEAD TO THE FUTURE�
 | NewsPicks | ユーザーページ `https://newspicks.com/user/6522/` の `__NEXT_DATA__` | 出演者・語り手。**初期データの数件しか取れない**（続きは GraphQL で、手段は未特定） |
 | type就活 | `https://typeshukatsu.jp/s/article/industry/it/c-1162-2/`（10件・ページ送りなし） | インタビュー対象 |
 | Tech Cast | RSS `https://anchor.fm/s/2890e980/podcast/rss`（全話） | 概要欄。#20 以降は末尾の `ゲスト：` `パーソナリティ：`、それより前は冒頭の「ゲスト◯◯さん、パーソナリティ◯◯さん」。**姓だけの回が多い**ので、本文の姓とブログの著者を突き合わせる |
-| connpass | グループの一覧 `https://future.connpass.com/event/?page=N` からイベントID、各イベントのページ | 下記 |
 | アドベントカレンダー | `source/_data/advent_calendar.yml` の各年の URL。ページの `data-js-react-on-rails-store="AppStoreWithReactOnRails"` の JSON の `items`（シリーズ2以降も同じ配列に入る。2019年だけ別 URL の `future2`） | 下記 |
 
 - 照合はブログの著者一覧（`source/_posts/*/*.md` の `author:`）と、**姓名の空白（半角・全角）を除いて完全一致**で行う
 - 姓だけの著者（`清水` など）は部分一致で拾いやすい。フルネームの別人として出ていないか確かめる
 - 一致したら行き先を開いて、上の「載せるもの」に当たるかを1件ずつ読んで決める
-
-### connpass の発表者
-
-「発表者」欄は**connpass のユーザー名**で、実名は出ない。次の順で人を決める。
-
-1. 本文にタイムテーブルや「登壇者プロフィール」があれば、そこの実名（Future Tech Conference・FUTURE LIVE はこの形）
-2. ページの「資料」欄のリンク。登壇レポートのブログ記事ならその `author`、スライドなら Speaker Deck などのアカウント名
-3. 登壇レポート記事の冒頭（「TIGの◯◯、◯◯です」）と本文の「◯◯からは〜」
-
-一度決めたユーザー名は他のイベントでも使える（`mano` = 真野隼記、`shibu_jp` / `shibu` = 澁川喜規、`kaedemalu` = 伊藤太斉、`tutuz` = 辻大志郎、`maito0915` = 伊藤真彦、`Midori575` = 多賀聡一朗、`shotashota` = 宮崎将太、`rhumie` = 武田大輝 など）。
-同じ題で2つ立っているイベント（延期など）は、資料が付いている方だけを載せる。
 
 ### アドベントカレンダーの書き手
 
@@ -91,7 +78,7 @@ description: 著者がブログの外で発信したもの（LEAD TO THE FUTURE�
   `github.com/<ID>` / `x.com/<ID>`（`twitter.com/<ID>`）へのリンクがあること
 - 例外は、Qiita の記事の自己紹介で**姓と名が完全一致**するもの（「TIGの伊藤太斉です」）
 
-次のものは推測なので、それだけでは載せない: 姓だけの自己紹介、ローマ字の表示名、ブログ記事から Qiita へのリンク、connpass のユーザー名との類似。
+次のものは推測なので、それだけでは載せない: 姓だけの自己紹介、ローマ字の表示名、ブログ記事から Qiita へのリンク。
 
 ブログの記事（`future-architect.github.io`）を登録した枠は載せない。リバイバル企画（「以前Qiitaに投稿した記事」）などでブログに転載したものも、題か Qiita の URL で突き合わせて外す。
 公開前の枠（`isRevealed` が false）は載せない。
