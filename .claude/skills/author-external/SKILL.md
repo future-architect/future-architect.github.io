@@ -1,11 +1,11 @@
 ---
 name: author-external
-description: 著者が他の媒体（LEAD TO THE FUTURE・未来報・PR TIMES STORY・NewsPicks・type就活など）に執筆・登場した記事を集め、_profile.yml の external に追記する手順。「他媒体の記事をプロフィールに足して」「〇〇さんの LTTF の記事を載せて」「external を更新して」と頼まれたときに使う。
+description: 著者がブログの外で発信したもの（LEAD TO THE FUTURE・未来報・PR TIMES STORY・NewsPicks・type就活の記事、Tech Cast の出演回、connpass の登壇、Qiita のアドベントカレンダー）を集め、_profile.yml の external に追記する手順。「他媒体の記事をプロフィールに足して」「〇〇さんの LTTF の記事を載せて」「登壇やアドカレを著者ページに載せて」「external を更新して」と頼まれたときに使う。
 ---
 
-# 他媒体の記事をプロフィールに足す
+# ブログの外での発信をプロフィールに足す
 
-`_profile.yml` の `external` は、著者ページの「ほかの媒体の記事」に全件が、`/authors/` の「すべての著者」に本数が「+N」で出る。記事末の著者紹介には出さない（#3428）。
+`_profile.yml` の `external` は、著者ページの「ほかの媒体での発信」に全件が、`/authors/` の「すべての著者」に件数が「+N」で出る。記事末の著者紹介には出さない（#3428）。
 
 ## 書き方
 
@@ -20,22 +20,34 @@ description: 著者が他の媒体（LEAD TO THE FUTURE・未来報・PR TIMES S
 ```
 
 - キーは**ブログの `author` と同じ表記**（姓名の間に空白なし）。未登録の著者ならキーごと足す
-- `title` は媒体のページの見出しそのまま。記号を含むので必ず `"` で囲む
-- `media` はフッターの表記に揃える: `LEAD TO THE FUTURE` / `未来報` / `PR TIMES STORY` / `NewsPicks` / `type就活`。それ以外の媒体は媒体自身の名乗りを使う
-- `date` は公開日（`YYYY-MM-DD`）。並びはヘルパーが日付で決めるので、書く順は問わない
+- `title` は行き先のページの見出しそのまま。記号を含むので必ず `"` で囲む
+- `media` はフッターの表記に揃える
+
+  | 種類 | `media` | `url` | `title` | `date` |
+  | --- | --- | --- | --- | --- |
+  | 企業情報の媒体 | `LEAD TO THE FUTURE` / `未来報` / `PR TIMES STORY` / `NewsPicks` / `type就活` | 記事 | 記事の見出し | 公開日 |
+  | Tech Cast | `Tech Cast` | Spotify のエピソード | エピソード名（`#12 …` の番号ごと） | 配信日 |
+  | connpass の登壇 | `登壇` | `https://future.connpass.com/event/<ID>/` | イベント名（`【増枠】` などの告知の飾りは落とす） | 開催日 |
+  | アドベントカレンダー | `アドベントカレンダー` | Qiita の記事 | 記事の見出し | カレンダーの日（`YYYY-12-DD`） |
+
+  それ以外の媒体は媒体自身の名乗りを使う
+- `date` は `YYYY-MM-DD`。並びはヘルパーが日付で決めるので、書く順は問わない
 - 自動で集める仕組みは作らない。名前の表記ゆれと同姓同名は機械では判定しきれないため（出版・寄稿 #2912 と同じ判断）
 
 ## 載せるもの・載せないもの
 
-**「その人の記事」と言えるものだけ**を載せる。
+**「その人の発信」と言えるものだけ**を載せる。
 
 | 載せる | 載せない |
 | --- | --- |
 | 執筆・インタビューを受けた・対談（聞き手も含む）・寄稿 | LT 大会などのレポートで、プログラムに名前と演題が載っているだけ |
 | 一人称の節を自分で書いている（司会兼執筆など） | 編集者としてのクレジット、発起人として一度言及されるだけ |
+| Tech Cast のゲストとパーソナリティ | Tech Cast の編集・レビュアー・ジングル作曲だけのクレジット |
+| connpass の発表者 | 管理者・司会だけ。開催レポートを書いただけ |
 | | 他の人の記事の中でプロフィール付きで紹介されているだけ |
+| | ブログに転載済みのアドベントカレンダー記事（ブログの記事一覧に既に出ている） |
 
-同姓同名の疑い（記事にフューチャーグループの所属が無い）は載せない。
+同姓同名の疑い（記事にフューチャーグループの所属が無い）は載せない。**誰か確かめきれないものも載せない**。
 
 ## 集め方
 
@@ -49,15 +61,42 @@ description: 著者が他の媒体（LEAD TO THE FUTURE・未来報・PR TIMES S
 | PR TIMES STORY | `https://prtimes.jp/story/ajax/company/4374/stories/latest?limit=200` | 記事末のプロフィール欄 |
 | NewsPicks | ユーザーページ `https://newspicks.com/user/6522/` の `__NEXT_DATA__` | 出演者・語り手。**初期データの数件しか取れない**（続きは GraphQL で、手段は未特定） |
 | type就活 | `https://typeshukatsu.jp/s/article/industry/it/c-1162-2/`（10件・ページ送りなし） | インタビュー対象 |
+| Tech Cast | RSS `https://anchor.fm/s/2890e980/podcast/rss`（全話） | 概要欄。#20 以降は末尾の `ゲスト：` `パーソナリティ：`、それより前は冒頭の「ゲスト◯◯さん、パーソナリティ◯◯さん」。**姓だけの回が多い**ので、本文の姓とブログの著者を突き合わせる |
+| connpass | グループの一覧 `https://future.connpass.com/event/?page=N` からイベントID、各イベントのページ | 下記 |
+| アドベントカレンダー | `source/_data/advent_calendar.yml` の各年の URL。ページの `data-js-react-on-rails-store="AppStoreWithReactOnRails"` の JSON の `items`（シリーズ2以降も同じ配列に入る。2019年だけ別 URL の `future2`） | 下記 |
 
 - 照合はブログの著者一覧（`source/_posts/*/*.md` の `author:`）と、**姓名の空白（半角・全角）を除いて完全一致**で行う
 - 姓だけの著者（`清水` など）は部分一致で拾いやすい。フルネームの別人として出ていないか確かめる
-- 一致したら記事を開いて、上の「載せるもの」に当たるかを1件ずつ読んで決める
+- 一致したら行き先を開いて、上の「載せるもの」に当たるかを1件ずつ読んで決める
+
+### connpass の発表者
+
+「発表者」欄は**connpass のユーザー名**で、実名は出ない。次の順で人を決める。
+
+1. 本文にタイムテーブルや「登壇者プロフィール」があれば、そこの実名（Future Tech Conference・FUTURE LIVE はこの形）
+2. ページの「資料」欄のリンク。登壇レポートのブログ記事ならその `author`、スライドなら Speaker Deck などのアカウント名
+3. 登壇レポート記事の冒頭（「TIGの◯◯、◯◯です」）と本文の「◯◯からは〜」
+
+一度決めたユーザー名は他のイベントでも使える（`mano` = 真野隼記、`shibu_jp` / `shibu` = 澁川喜規、`kaedemalu` = 伊藤太斉、`tutuz` = 辻大志郎、`maito0915` = 伊藤真彦、`Midori575` = 多賀聡一朗、`shotashota` = 宮崎将太、`rhumie` = 武田大輝 など）。
+同じ題で2つ立っているイベント（延期など）は、資料が付いている方だけを載せる。
+
+### アドベントカレンダーの書き手
+
+`items` の書き手も**Qiita のユーザー名**。次のどれかで確かめられたものだけを載せる。
+
+- `_profile.yml` の `github_id` / `twitter_id`、または Qiita のプロフィールの GitHub 連携と一致
+- その著者のブログ記事が自分の Qiita を指している（`qiita.com/<ユーザー名>`。**他人の記事を引いているだけのリンクと見分ける**）
+- Qiita のプロフィールの表示名（ローマ字が多い）が著者名と読みで一致し、所属や得意分野も合う
+- 記事冒頭の自己紹介（「TIGの◯◯です」）。姓だけなら、同じ姓の著者が1人しかいないときに限る
+
+ブログの記事（`future-architect.github.io`）を登録した枠は載せない。リバイバル企画（「以前Qiitaに投稿した記事」）などでブログに転載したものも、題か Qiita の URL で突き合わせて外す。
+公開前の枠（`isRevealed` が false）は載せない。
 
 増分で足すときは、各媒体の一覧を `_profile.yml` の最新の `date` より新しいものに絞ればよい。
 
 ## 確かめる
 
 - YAML として読めるか: `node -e "require('js-yaml').load(require('fs').readFileSync('_profile.yml','utf8'))"`
+- キーがブログの著者名と一致しているか（一致しないと著者ページに出ない）
 - `scripts/author_profile.js` は起動時にしか読まれないので、`hexo server` を起動し直してから
   `/authors/<著者名>/` と、その著者の記事の末尾を開く

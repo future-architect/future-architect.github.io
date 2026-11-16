@@ -110,7 +110,7 @@ hexo.extend.helper.register('list_authors', function (year = 'all') {
       (e) => year === 'all' || e.date.startsWith(`${year}-`),
     ).length;
     return external
-      ? `<span class="author-list-count" title="ブログ ${posts}本・ほかの媒体 ${external}本">${posts}+${external}</span>`
+      ? `<span class="author-list-count" title="ブログ ${posts}本・ほかの媒体 ${external}件">${posts}+${external}</span>`
       : `<span class="author-list-count">${posts}</span>`;
   };
 
