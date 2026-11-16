@@ -34,6 +34,49 @@ hexo.extend.helper.register('author_techcast_personality', (authorName) => {
   return { episodes: t.episodes, first: year(t.first), last: year(t.last) };
 });
 
+// アドベントカレンダー (#3428)。記事の一覧（source/_data/advent_calendar_entries.yml）は
+// Qiita のユーザー名だけを持ち、_profile.yml に qiita_id がある人にだけつなぐ。
+// こちらで Qiita のアカウントと実名を名寄せしないため。
+// 年1回の企画なので、明細より「何回・何年続けて」がその人の参加の姿を表す。
+// 連続は最長のもの（途中で抜けた年があれば切れる）
+hexo.extend.helper.register('author_advent', function (authorName) {
+  const qiitaId = ((profile[authorName] || {}).qiita_id || '').toLowerCase();
+  if (!qiitaId) return null;
+  const items = (this.site.data.advent_calendar_entries || [])
+    .filter((e) => String(e.user).toLowerCase() === qiitaId)
+    .map((e) => ({
+      ...e,
+      // ブログの記事を登録した枠はサイト内のリンクにする
+      url: String(e.url).replace(/^https?:\/\/future-architect\.github\.io/, ''),
+      date: e.date instanceof Date ? e.date.toISOString().slice(0, 10) : String(e.date),
+    }))
+    // 枠の登録者と記事の書き手が違うことがある（他の人のブログ記事を代理で登録した枠）。
+    // ブログの記事は author が書き手を名乗るので、そちらと一致するものだけを残す
+    .filter((e) => {
+      if (!e.url.startsWith('/')) return true;
+      const post = this.site.posts.findOne({ path: e.url.replace(/^\//, '') });
+      return !post || post.author === authorName;
+    })
+    .sort((a, b) => b.date.localeCompare(a.date));
+  if (!items.length) return null;
+  const years = [...new Set(items.map((e) => Number(e.date.slice(0, 4))))].sort((a, b) => a - b);
+  let best = { from: years[0], to: years[0] };
+  let from = years[0];
+  years.forEach((y, i) => {
+    if (i && y !== years[i - 1] + 1) from = y;
+    if (y - from > best.to - best.from) best = { from, to: y };
+  });
+  return {
+    items,
+    years: years.length,
+    first: years[0],
+    last: years[years.length - 1],
+    streak: best.to - best.from + 1,
+    streakFrom: best.from,
+    streakTo: best.to,
+  };
+});
+
 // 被参照: ほかの著者の記事からのリンク。自分の記事と索引記事（インデックスタグ）からの
 // リンクは数えない。前者は自分で張れ、後者は連載に入れば機械的に付くので、
 // 「ほかの人に参照された」ことを表さない。全記事の本文を1度だけ走査して持つ

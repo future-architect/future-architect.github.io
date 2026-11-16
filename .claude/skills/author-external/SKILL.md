@@ -54,7 +54,6 @@ description: 著者がブログの外で発信したもの（LEAD TO THE FUTURE�
 | Tech Cast のゲスト | Tech Cast の編集・レビュアー・ジングル作曲だけのクレジット。パーソナリティの回（下記） |
 | | connpass の登壇（登壇レポートの記事がブログにあることが多く、著者ページの記事一覧と重なる） |
 | | 他の人の記事の中でプロフィール付きで紹介されているだけ |
-| | Qiita のアドベントカレンダー（書き手は Qiita のユーザー名で、実名との対応がこちらの名寄せになる） |
 
 同姓同名の疑い（記事にフューチャーグループの所属が無い）は載せない。**誰か確かめきれないものも載せない**。
 
@@ -89,6 +88,17 @@ description: 著者がブログの外で発信したもの（LEAD TO THE FUTURE�
   ハンドルが名前に似ているだけのもの
 - 候補は著者の記事にある `github.com/<ID>` / `x.com/<ID>` / `twitter.com/<ID>` を集め、
   **ほかの著者の記事にも出るものを外して**から、前後の文を1件ずつ読んで決める
+
+## Qiita のアドベントカレンダー
+
+`external` には書かない。記事の一覧は `source/_data/advent_calendar_entries.yml`（`user` は Qiita のユーザー名。
+実名は書かない）が持ち、著者ページには `_profile.yml` に `qiita_id` がある人の分だけが出る。
+
+- 一覧の取り方: `source/_data/advent_calendar.yml` の各年の URL を開き、`data-js-react-on-rails-store="AppStoreWithReactOnRails"`
+  の JSON の `items`（シリーズ2以降も同じ配列。2019年だけ別 URL の `future2`）。公開前の枠（`isRevealed` が false）と URL の無い枠は入れない
+- `qiita_id` は GitHub / X と同じ基準で、**本人がブログの記事で自分の Qiita だと名乗っているものだけ**
+  （「以前Qiitaに投稿した記事」「私のQiita記事」「アドベントカレンダーで〜を書きました」＋自分の記事へのリンク）。
+  Qiita のプロフィールの GitHub / X の一致、ローマ字の表示名、姓だけの自己紹介で推して書かない
 
 ## 確かめる
 
