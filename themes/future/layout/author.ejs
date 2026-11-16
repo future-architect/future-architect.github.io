@@ -103,40 +103,46 @@
       <% } %>
     </div>
     <% } %>
-    <%# アドベントカレンダーは1件にまとめて畳んだまま並べる。年1回の明細を開いて並べると
-        ほかの発信が埋もれる。並びの日付は最新の投稿で取る %>
+    <%# アドベントカレンダーとガイドラインはそれぞれ1件にまとめて畳んだまま並べる (#3447)。
+        明細を開いて並べるとほかの発信が埋もれる（ガイドラインは1人で21本ある）。
+        並びの日付は最新の1本で取る %>
     <% const authorAdvent = author_advent(page.author); %>
-    <% const authorExternal = author_external(page.author).concat(authorAdvent ? [{advent: authorAdvent, date: authorAdvent.items[0].date}] : []).sort(function(a, b){ return b.date.localeCompare(a.date); }); %>
+    <% const authorGuidelines = author_guidelines(page.author).items; %>
+    <% const authorFolds = [
+         authorAdvent && {icon: 'christmas-tree', media: 'アドベントカレンダー', items: authorAdvent.items},
+         authorGuidelines.length && {icon: 'book', media: 'アーキテクチャガイドライン', items: authorGuidelines},
+       ].filter(Boolean).map(function(f){ return {fold: f, date: f.items[0].date}; }); %>
+    <% const authorExternal = author_external(page.author).concat(authorFolds).sort(function(a, b){ return b.date.localeCompare(a.date); }); %>
     <% if (authorExternal.length) { %>
     <%- partial('_partial/section-heading', {id: 'external', text: 'ほかの媒体での発信'}) %>
     <%# 題が行き先を名乗るが外部と読めないので、リンクごとに矢印と sr-only を付ける (#2729) %>
     <ul class="author-external">
       <% authorExternal.forEach(function(e){ %>
-      <% if (e.advent) { %>
+      <% if (e.fold) { %>
       <%# 最新の1本はほかの行と同じ形で出し、残りだけを畳む %>
       <%# ブログに載せた枠はブログの記事へ向ける。外部の印は付けない %>
-      <% const adventLink = function(i){ %>
+      <% const foldLink = function(i){ %>
         <% if (i.url.startsWith('/')) { %>
         <a href="<%- url_for(i.url) %>"><%= i.title %></a>
         <% } else { %>
         <a href="<%= i.url %>" target="_blank" rel="noopener"><%= i.title %><span class="sr-only">（外部サイト）</span><%- partial('_partial/svg-icon', {icon: 'external-link', class_name: 'svg-icon-trailing'}).trim() %></a>
         <% } %>
       <% }; %>
-      <% const adventRest = e.advent.items.slice(1); %>
-      <% const restFrom = adventRest.length ? adventRest[adventRest.length - 1].date.slice(0, 4) : ''; %>
-      <% const restTo = adventRest.length ? adventRest[0].date.slice(0, 4) : ''; %>
+      <% const foldRest = e.fold.items.slice(1); %>
+      <% const restFrom = foldRest.length ? foldRest[foldRest.length - 1].date.slice(0, 4) : ''; %>
+      <% const restTo = foldRest.length ? foldRest[0].date.slice(0, 4) : ''; %>
       <li class="author-external-item">
-        <%- partial('_partial/svg-icon', {icon: 'christmas-tree', class_name: 'author-external-icon'}) %>
-        <% adventLink(e.advent.items[0]); %>
-        <span class="author-external-meta">アドベントカレンダー · <%= e.date.replace(/-/g, '.') %></span>
-        <% if (adventRest.length) { %>
-        <details class="author-advent-more">
-          <summary>残り<%= adventRest.length %>本（<%= restFrom === restTo ? restFrom + '年' : restFrom + '年～' + restTo + '年' %>）</summary>
+        <%- partial('_partial/svg-icon', {icon: e.fold.icon, class_name: 'author-external-icon'}) %>
+        <% foldLink(e.fold.items[0]); %>
+        <span class="author-external-meta"><%= e.fold.media %> · <%= e.date.replace(/-/g, '.') %></span>
+        <% if (foldRest.length) { %>
+        <details class="author-external-more">
+          <summary>残り<%= foldRest.length %>本（<%= restFrom === restTo ? restFrom + '年' : restFrom + '年～' + restTo + '年' %>）</summary>
           <ul class="author-external">
-            <% adventRest.forEach(function(i){ %>
+            <% foldRest.forEach(function(i){ %>
             <li>
-              <% adventLink(i); %>
-              <span class="author-external-meta">アドベントカレンダー · <%= i.date.replace(/-/g, '.') %></span>
+              <% foldLink(i); %>
+              <span class="author-external-meta"><%= e.fold.media %> · <%= i.date.replace(/-/g, '.') %></span>
             </li>
             <% }) %>
           </ul>
