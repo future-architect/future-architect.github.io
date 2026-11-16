@@ -77,8 +77,9 @@ hexo.extend.helper.register('author_advent', function (authorName) {
   };
 });
 
-// 被参照: ほかの著者の記事からのリンク。自分の記事と索引記事（インデックスタグ）からの
-// リンクは数えない。前者は自分で張れ、後者は連載に入れば機械的に付くので、
+// 被参照: ほかの著者の記事からのリンク。自分の記事からのリンク、索引記事（インデックスタグ）
+// からのリンク、索引記事へのリンクは数えない。自分では張れるうえ、索引記事との間のリンクは
+// 連載に入れば機械的に付く（各記事の冒頭が索引記事を指す）ので、
 // 「ほかの人に参照された」ことを表さない。全記事の本文を1度だけ走査して持つ
 let refCache = null;
 const referencesByPost = (posts) => {
@@ -115,10 +116,11 @@ hexo.extend.helper.register('author_activity_counts', function (author) {
     if (post.author !== author) return;
     if (post.tags.some((t) => t.name === '登壇レポート')) talks++;
     if (post.series) series.add(post.series);
+    const isIndex = post.tags.some((t) => t.name === 'インデックス');
     post.categories.forEach((c) => categories.add(c.name));
     post.tags.forEach((t) => tags.add(t.name));
     const id = (post.path.match(/articles\/([^/]+)\//) || [])[1];
-    referenced += (refs.get(id) || []).filter((a) => a !== author).length;
+    if (!isIndex) referenced += (refs.get(id) || []).filter((a) => a !== author).length;
   });
   const t = profile[author] || {};
   const techcast =
