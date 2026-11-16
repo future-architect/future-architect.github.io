@@ -1,6 +1,6 @@
 ---
 name: author-external
-description: 著者がブログの外で発信したもの（LEAD TO THE FUTURE・未来報・PR TIMES STORY・NewsPicks・type就活の記事、Tech Cast の出演回、Qiita のアドベントカレンダー）を集め、_profile.yml の external に追記する手順。「他媒体の記事をプロフィールに足して」「〇〇さんの LTTF の記事を載せて」「Tech Cast やアドカレを著者ページに載せて」「external を更新して」と頼まれたときに使う。
+description: 著者がブログの外で発信したもの（LEAD TO THE FUTURE・未来報・PR TIMES STORY・NewsPicks・type就活の記事、Tech Cast の出演回）を集め、_profile.yml の external に追記する手順。著者の GitHub / X のアカウント（github_id / twitter_id）を記事から拾うときも使う。「他媒体の記事をプロフィールに足して」「〇〇さんの LTTF の記事を載せて」「Tech Cast を著者ページに載せて」「GitHub / X のアカウントを埋めて」「external を更新して」と頼まれたときに使う。
 ---
 
 # ブログの外での発信をプロフィールに足す
@@ -27,7 +27,6 @@ description: 著者がブログの外で発信したもの（LEAD TO THE FUTURE�
   | --- | --- | --- | --- | --- |
   | 企業情報の媒体 | `LEAD TO THE FUTURE` / `未来報` / `PR TIMES STORY` / `NewsPicks` / `type就活` | 記事 | 記事の見出し | 公開日 |
   | Tech Cast | `Tech Cast` | Spotify のエピソード | エピソード名（`#12 …` の番号ごと） | 配信日 |
-  | アドベントカレンダー | `アドベントカレンダー` | Qiita の記事 | 記事の見出し | カレンダーの日（`YYYY-12-DD`） |
 
   それ以外の媒体は媒体自身の名乗りを使う
 - **Tech Cast のパーソナリティは回ごとに書かない。** 毎回出るので明細が著者ページを埋める。
@@ -41,8 +40,6 @@ description: 著者がブログの外で発信したもの（LEAD TO THE FUTURE�
       last: 2025-01-06
   ```
 
-- アドベントカレンダーは著者ページで「ほかの媒体での発信」とは別の節に出る。
-  参加回数・最長の連続年数・本数をサマリにし、記事の明細は折りたたむ
 - `date` は `YYYY-MM-DD`。並びはヘルパーが日付で決めるので、書く順は問わない
 - 自動で集める仕組みは作らない。名前の表記ゆれと同姓同名は機械では判定しきれないため（出版・寄稿 #2912 と同じ判断）
 
@@ -57,6 +54,7 @@ description: 著者がブログの外で発信したもの（LEAD TO THE FUTURE�
 | Tech Cast のゲスト | Tech Cast の編集・レビュアー・ジングル作曲だけのクレジット。パーソナリティの回（下記） |
 | | connpass の登壇（登壇レポートの記事がブログにあることが多く、著者ページの記事一覧と重なる） |
 | | 他の人の記事の中でプロフィール付きで紹介されているだけ |
+| | Qiita のアドベントカレンダー（書き手は Qiita のユーザー名で、実名との対応がこちらの名寄せになる） |
 
 同姓同名の疑い（記事にフューチャーグループの所属が無い）は載せない。**誰か確かめきれないものも載せない**。
 
@@ -73,29 +71,24 @@ description: 著者がブログの外で発信したもの（LEAD TO THE FUTURE�
 | NewsPicks | ユーザーページ `https://newspicks.com/user/6522/` の `__NEXT_DATA__` | 出演者・語り手。**初期データの数件しか取れない**（続きは GraphQL で、手段は未特定） |
 | type就活 | `https://typeshukatsu.jp/s/article/industry/it/c-1162-2/`（10件・ページ送りなし） | インタビュー対象 |
 | Tech Cast | RSS `https://anchor.fm/s/2890e980/podcast/rss`（全話） | 概要欄。#20 以降は末尾の `ゲスト：` `パーソナリティ：`、それより前は冒頭の「ゲスト◯◯さん、パーソナリティ◯◯さん」。**姓だけの回が多い**ので、本文の姓とブログの著者を突き合わせる |
-| アドベントカレンダー | `source/_data/advent_calendar.yml` の各年の URL。ページの `data-js-react-on-rails-store="AppStoreWithReactOnRails"` の JSON の `items`（シリーズ2以降も同じ配列に入る。2019年だけ別 URL の `future2`） | 下記 |
 
 - 照合はブログの著者一覧（`source/_posts/*/*.md` の `author:`）と、**姓名の空白（半角・全角）を除いて完全一致**で行う
 - 姓だけの著者（`清水` など）は部分一致で拾いやすい。フルネームの別人として出ていないか確かめる
 - 一致したら行き先を開いて、上の「載せるもの」に当たるかを1件ずつ読んで決める
 
-### アドベントカレンダーの書き手
-
-`items` の書き手も**Qiita のユーザー名**。Qiita のアカウントと実名の紐づけを嫌がる人がいるので、
-**本人が記事の中で宣言しているものだけ**を載せる。
-
-- **基本は GitHub / X のアカウントで突き合わせる。** Qiita のプロフィールに書かれた GitHub / X のアカウント
-  （ユーザーページの `githubLoginName` / `twitterUrl`）が、ブログ側でもその著者のものと判別できるときだけ載せる。
-  ブログ側の判別は `_profile.yml` の `github_id` / `twitter_id`、またはその著者のブログ記事に
-  `github.com/<ID>` / `x.com/<ID>`（`twitter.com/<ID>`）へのリンクがあること
-- 例外は、Qiita の記事の自己紹介で**姓と名が完全一致**するもの（「TIGの伊藤太斉です」）
-
-次のものは推測なので、それだけでは載せない: 姓だけの自己紹介、ローマ字の表示名、ブログ記事から Qiita へのリンク。
-
-ブログの記事（`future-architect.github.io`）を登録した枠と、リバイバル企画（「以前Qiitaに投稿した記事」）などでブログに転載したもの（題か Qiita の URL で突き合わせる）は、**ブログの記事の `author` を書き手にして**、`url` をブログの記事（`/articles/<ID>/`）にして載せる。参加の回数に数えるためで、Qiita のアカウントの照合は要らない。`/authors/` の「+N」はブログの本数と重なるので数えない。
-公開前の枠（`isRevealed` が false）は載せない。
-
 増分で足すときは、各媒体の一覧を `_profile.yml` の最新の `date` より新しいものに絞ればよい。
+
+## GitHub / X のアカウント
+
+`github_id` / `twitter_id` は著者ページと記事末の著者紹介にアイコンで出る。
+**本人がブログの記事の中で自分のアカウントだと名乗っているものだけ**を書く。
+
+- 名乗りに当たるもの: 自己紹介・プロフィール欄のリンク（「X: @xxx」）、「私の GitHub」「筆者のリポジトリ」、
+  自分で作った OSS・ツールの紹介でリポジトリの持ち主が本人のもの（「作りました」＋ `github.com/<ID>/<repo>`）
+- 当たらないもの: 他人のリポジトリ・ポストの引用、組織のアカウント（`future-architect` など）、
+  ハンドルが名前に似ているだけのもの
+- 候補は著者の記事にある `github.com/<ID>` / `x.com/<ID>` / `twitter.com/<ID>` を集め、
+  **ほかの著者の記事にも出るものを外して**から、前後の文を1件ずつ読んで決める
 
 ## 確かめる
 

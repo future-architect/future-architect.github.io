@@ -102,16 +102,15 @@ hexo.extend.helper.register('list_authors', function (year = 'all') {
   const compareFunc = (a, b) => count_posts(b) - count_posts(a) || (a < b ? -1 : a > b ? 1 : 0);
   const postRankings = this.site.authors.slice().sort(compareFunc);
 
-  // ブログの外での発信（アドベントカレンダーを含む）は「+N」で足す (#3428)。ブログの本数と混ぜて1つの数にすると、
+  // ブログの外での発信は「+N」で足す (#3428)。ブログの本数と混ぜて1つの数にすると、
   // 著者ページの「全N本」と食い違う。年のタブではその年に出たものだけを数える
   const countLabel = (author) => {
     const posts = count_posts(author);
-    // ブログに載せたアドベントカレンダーの枠（url が /articles/…）はブログの本数に入っている
-    const external = this.author_external_all(author).filter(
-      (e) => !e.url.startsWith('/') && (year === 'all' || e.date.startsWith(`${year}-`)),
+    const external = this.author_external(author).filter(
+      (e) => year === 'all' || e.date.startsWith(`${year}-`),
     ).length;
     return external
-      ? `<span class="author-list-count" title="ブログ ${posts}本・ブログの外 ${external}件">${posts}+${external}</span>`
+      ? `<span class="author-list-count" title="ブログ ${posts}本・ほかの媒体 ${external}件">${posts}+${external}</span>`
       : `<span class="author-list-count">${posts}</span>`;
   };
 
