@@ -48,7 +48,8 @@ hexo.extend.helper.register('author_advent', function (authorName) {
       ...e,
       // ブログの記事を登録した枠はサイト内のリンクにする
       url: String(e.url).replace(/^https?:\/\/future-architect\.github\.io/, ''),
-      date: e.date instanceof Date ? e.date.toISOString().slice(0, 10) : String(e.date),
+      // db.json 経由だと Date が ISO 文字列で戻るので、どちらでも日付だけに切る
+      date: (e.date instanceof Date ? e.date.toISOString() : String(e.date)).slice(0, 10),
     }))
     // 枠の登録者と記事の書き手が違うことがある（他の人のブログ記事を代理で登録した枠）。
     // ブログの記事は author が書き手を名乗るので、そちらと一致するものだけを残す
