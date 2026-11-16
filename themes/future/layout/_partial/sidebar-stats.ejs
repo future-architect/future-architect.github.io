@@ -47,16 +47,30 @@
     };
   } else if (page.author) {
     const a = author_stats(page.author);
+    const act = author_activity_counts(page.author);
     stats = {
       total: [
         {label: '投稿', value: count_author(page.author)},
+        {label: 'カテゴリ', value: act.categories},
+        {label: 'タグ', value: act.tags},
+        // 連載・被参照と下のアクティビティは経験のある人だけのものなので、0なら行ごと出さない
+      ].concat([
+        {label: '連載', value: act.series},
+        {label: '被参照', value: act.referenced},
+      ].filter(function(r){ return r.value; })).concat([
         {label: '総シェア数', value: page.authorSNSCnt},
         {label: 'X', value: page.twitterShare, sub: true},
         {label: 'Facebook', value: page.facebookShare, sub: true},
         {label: 'はてブ', value: page.hatebu, sub: true},
         {label: 'Pocket', value: page.pocket, sub: true},
-      ],
+      ]),
       recent: a && a.recent > 0 ? [{label: '投稿', value: a.recent}] : [],
+      activity: [
+        {label: '登壇', value: act.talks},
+        {label: 'Tech Cast 出演', value: act.techcast},
+        {label: '書籍出版', value: act.books},
+        {label: '雑誌寄稿', value: act.magazines},
+      ].filter(function(r){ return r.value; }),
       chart: author_monthly_chart(page.author),
       chartLabel: '投稿数（カテゴリ別）',
     };
@@ -71,7 +85,7 @@
       シェアの内訳（X・Facebook・はてブ・Pocket）は総シェア数の内訳なので、
       本文と同じく summary-sub で一段下げる (#2096)。
       0行の間引きと桁そろえは sidebar-summary-panel が持つ（一覧ページと共有）%>
-  <%- partial('sidebar-summary-panel', {total: stats.total, recent: stats.recent}) %>
+  <%- partial('sidebar-summary-panel', {total: stats.total, recent: stats.recent, activity: stats.activity}) %>
   <% if (stats.chart) { %>
   <%# 凡例は出さない。カテゴリ別の積み上げは最長の「DataEngineering」だけで
       117.9px あり、208px の列では横送りになって場所だけ取る。

@@ -102,7 +102,7 @@ hexo.extend.helper.register('list_authors', function (year = 'all') {
   const compareFunc = (a, b) => count_posts(b) - count_posts(a) || (a < b ? -1 : a > b ? 1 : 0);
   const postRankings = this.site.authors.slice().sort(compareFunc);
 
-  // 他の媒体の記事は「+N」で足す (#3428)。ブログの本数と混ぜて1つの数にすると、
+  // ブログの外での発信は「+N」で足す (#3428)。ブログの本数と混ぜて1つの数にすると、
   // 著者ページの「全N本」と食い違う。年のタブではその年に出たものだけを数える
   const countLabel = (author) => {
     const posts = count_posts(author);
@@ -110,7 +110,7 @@ hexo.extend.helper.register('list_authors', function (year = 'all') {
       (e) => year === 'all' || e.date.startsWith(`${year}-`),
     ).length;
     return external
-      ? `<span class="author-list-count" title="ブログ ${posts}本・ほかの媒体 ${external}本">${posts}+${external}</span>`
+      ? `<span class="author-list-count" title="ブログ ${posts}本・ほかの媒体 ${external}件">${posts}+${external}</span>`
       : `<span class="author-list-count">${posts}</span>`;
   };
 
