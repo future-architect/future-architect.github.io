@@ -85,10 +85,13 @@ description: 著者がブログの外で発信したもの（LEAD TO THE FUTURE�
 `items` の書き手も**Qiita のユーザー名**。Qiita のアカウントと実名の紐づけを嫌がる人がいるので、
 **本人が記事の中で宣言しているものだけ**を載せる。
 
-- その著者のブログ記事が自分の Qiita を指している（`qiita.com/<ユーザー名>`。リバイバル企画の「以前Qiitaに投稿した記事」など）
-- Qiita の記事の中でフルネームを名乗っている（「TIGの伊藤太斉です」）
+- **基本は GitHub / X のアカウントで突き合わせる。** Qiita のプロフィールに書かれた GitHub / X のアカウント
+  （ユーザーページの `githubLoginName` / `twitterUrl`）が、ブログ側でもその著者のものと判別できるときだけ載せる。
+  ブログ側の判別は `_profile.yml` の `github_id` / `twitter_id`、またはその著者のブログ記事に
+  `github.com/<ID>` / `x.com/<ID>`（`twitter.com/<ID>`）へのリンクがあること
+- 例外は、Qiita の記事の自己紹介で**姓と名が完全一致**するもの（「TIGの伊藤太斉です」）
 
-次のものは推測なので、それだけでは載せない: GitHub 連携や `github_id` の一致、ローマ字の表示名、姓だけの自己紹介、connpass のユーザー名との類似。
+次のものは推測なので、それだけでは載せない: 姓だけの自己紹介、ローマ字の表示名、ブログ記事から Qiita へのリンク、connpass のユーザー名との類似。
 
 ブログの記事（`future-architect.github.io`）を登録した枠は載せない。リバイバル企画（「以前Qiitaに投稿した記事」）などでブログに転載したものも、題か Qiita の URL で突き合わせて外す。
 公開前の枠（`isRevealed` が false）は載せない。
