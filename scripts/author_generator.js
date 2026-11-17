@@ -185,9 +185,11 @@ hexo.extend.helper.register('author_stats', function (name) {
   // 上位3件・10件で切るので、境目が同点だと出る項目自体が入れ替わる
   const byCount = (a, b) => b.count - a.count || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
   // 使用が1本だけの項目は「よく使う」傾向とは言えないので省く (#2139)。
-  // ただし省いた結果が空になる著者（投稿1本や、投稿ごとにタグが全部違う著者）は
-  // 何も出せなくなるので、その場合だけ省かずに全部見せる
+  // ただし省いた結果が空になる著者（投稿ごとにタグが全部違う著者）は
+  // 何も出せなくなるので、その場合だけ省かずに全部見せる。
+  // 投稿2本以下では記事のタグを書き写すだけになるので節ごと出さない。3本は連載・タグの足切りと同じ
   const pickTop = (entries, limit) => {
+    if (posts.length < 3) return [];
     const sorted = entries.sort(byCount);
     const repeated = sorted.filter((e) => e.count >= 2);
     return (repeated.length > 0 ? repeated : sorted).slice(0, limit);
