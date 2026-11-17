@@ -7,7 +7,18 @@
     ? popular_posts_in(site.posts.filter(function(p){ return p.author === page.author; }).toArray(), undefined, undefined, 0, false)
     : '';
   const as = isFirstPage ? author_stats(page.author) : null;
+  // アドベントカレンダーとガイドラインはそれぞれ1件にまとめて畳んだまま並べる (#3447)。
+  // 明細を開いて並べるとほかの発信が埋もれる（ガイドラインは1人で21本ある）。
+  // 並びの日付は最新の1本で取る
+  const authorAdvent = author_advent(page.author);
+  const authorGuidelines = author_guidelines(page.author).items;
+  const authorFolds = [
+    authorAdvent && {icon: 'christmas-tree', media: 'アドベントカレンダー', items: authorAdvent.items},
+    authorGuidelines.length && {icon: 'book', media: 'アーキテクチャガイドライン', role: '作成者', items: authorGuidelines},
+  ].filter(Boolean).map(function(f){ return {fold: f, date: f.items[0].date}; });
+  const authorExternal = author_external(page.author).concat(authorFolds).sort(function(a, b){ return b.date.localeCompare(a.date); });
   const authorToc = [];
+  if (authorExternal.length) authorToc.push({id: 'external', text: 'ほかの媒体での発信'});
   if (authorPopular) authorToc.push({id: 'popular', text: 'よく読まれている記事'});
   if (as && as.topCategories.length) authorToc.push({id: 'topcategories', text: 'よく使うカテゴリ'});
   if (as && as.topTags.length) authorToc.push({id: 'toptags', text: 'よく使うタグ'});
@@ -103,16 +114,6 @@
       <% } %>
     </div>
     <% } %>
-    <%# アドベントカレンダーとガイドラインはそれぞれ1件にまとめて畳んだまま並べる (#3447)。
-        明細を開いて並べるとほかの発信が埋もれる（ガイドラインは1人で21本ある）。
-        並びの日付は最新の1本で取る %>
-    <% const authorAdvent = author_advent(page.author); %>
-    <% const authorGuidelines = author_guidelines(page.author).items; %>
-    <% const authorFolds = [
-         authorAdvent && {icon: 'christmas-tree', media: 'アドベントカレンダー', items: authorAdvent.items},
-         authorGuidelines.length && {icon: 'book', media: 'アーキテクチャガイドライン', role: '作成者', items: authorGuidelines},
-       ].filter(Boolean).map(function(f){ return {fold: f, date: f.items[0].date}; }); %>
-    <% const authorExternal = author_external(page.author).concat(authorFolds).sort(function(a, b){ return b.date.localeCompare(a.date); }); %>
     <% if (authorExternal.length) { %>
     <%- partial('_partial/section-heading', {id: 'external', text: 'ほかの媒体での発信'}) %>
     <%# 題が行き先を名乗るが外部と読めないので、リンクごとに矢印と sr-only を付ける (#2729) %>
