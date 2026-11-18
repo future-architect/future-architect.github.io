@@ -2548,7 +2548,7 @@ bootstrap-subset → tokens → highlight → theme-styles の順で `/css/site.
 
     フッターだけ「ブランド名を名乗るものも例外にしない」のは、行き先が社外・
     別サイトに散っていて、印の有無が語彙の差ではなく抜け漏れに見えるため（#2839）。
-    アイコンだけのリンク（X / GitHub / connpass / YouTube / Feedly / RSS）は
+    アイコンだけのリンク（X / GitHub / connpass / YouTube / Qiita / Feedly / RSS）は
     `aria-label` が名乗るので対象外で、これは textlint のルールも同じ扱い
 
     読み物の中の参照リンクに毎回印が挟まると読みにくい（記事本文に付けない判断＝
