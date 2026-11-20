@@ -1,13 +1,26 @@
 'use strict';
 
 const { postListItem } = require('./lib/post_list');
+const { INDEX_TAG, seriesOf } = require('./lib/series');
+
+const isIndex = (p) => p.tags && p.tags.some((t) => t.name === INDEX_TAG);
+
+// 同じ連載の中で型どおりに張るリンクは引用ではない。「N 本目です」と索引の表
+// （索引記事との間）、「次は◯◯さんの記事です」（1本前の記事から）。どれも連載名の
+// チップ・連載ナビ・索引の表が同じ行き先を既に出している
+function seriesBoilerplateLink(site, from, to) {
+  const sf = seriesOf(site, from);
+  const st = seriesOf(site, to);
+  if (!sf || !st || sf.name !== st.name) return false;
+  return isIndex(from) || isIndex(to) || (st.prev && st.prev.path === from.path);
+}
 
 hexo.extend.helper.register('list_reference_posts', function () {
-  // 連載ナビと重複しても落とさない。ここは推薦ではなく、実際に張られた
-  // リンクの記録なので、重複を理由に消すと件数が実態とずれる
+  // 推薦ではなく、ほかの記事が引用したリンクの記録。連載ナビと重複しても落とさない
   const referencePosts = this.site.posts.data
     .filter((p) => p.content.includes(this.post.path))
     .filter((p) => p.path !== this.post.path) // その記事で自分がセルフリンクされている場合は除去
+    .filter((p) => !seriesBoilerplateLink(this.site, p, this.post))
     // site.posts.data は日付順に並んでいない。以前は reverse() を掛けるだけで
     // 順序が不定のまま先頭5件を出しており、「新しい5件」ですら無かった。
     // 新しい順に並べて、参照の広がりを新しいものから辿れるようにする
